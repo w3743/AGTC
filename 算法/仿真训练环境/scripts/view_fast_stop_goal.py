@@ -419,6 +419,26 @@ def map_camera_pose(size: float, aspect: float, fov: float = math.radians(60)) -
             "target": (center[0], center[1], MAP_Z), "up": (0.0, 1.0, 0.0)}
 
 
+def vehicle_follow_camera_pose(robot: Any, *, distance: float = 4.0,
+                               height: float = 2.5, target_height: float = 0.45
+                               ) -> dict[str, tuple[float, float, float]]:
+    """Place the camera behind and above the chassis using its world yaw."""
+    try:
+        x, y, yaw = float(robot["x"]), float(robot["y"]), float(robot["yaw"])
+        z = float(robot.get("z", 0.0))
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("车辆跟随相机需要有限的x/y/yaw/z状态") from exc
+    distance, height, target_height = map(float, (distance, height, target_height))
+    if (not all(map(math.isfinite, (x, y, yaw, z, distance, height, target_height)))
+            or distance <= 0 or height <= 0 or target_height < 0):
+        raise ValueError("车辆跟随相机参数必须为有限的正距离和高度")
+    return {
+        "eye": (x - distance * math.cos(yaw), y - distance * math.sin(yaw), z + height),
+        "target": (x, y, z + target_height),
+        "up": (0.0, 0.0, 1.0),
+    }
+
+
 def _safe_json(value: Any) -> Any:
     if isinstance(value, np.ndarray):
         return value.tolist()
@@ -439,7 +459,10 @@ from isaac_field.viewer import FieldViewerControls
 class FastStopGoalControls(FieldViewerControls):
     """Map picker layered onto the frozen official viewer controls."""
 
-    def __init__(self, visualizer, adapter, checkpoint: str | None = None, *, reset_seed: int | None = None):
+    def __init__(self, visualizer, adapter, checkpoint: str | None = None, *,
+                 reset_seed: int | None = None,
+                 checkpoint_metadata: dict[str, Any] | None = None):
+        self._checkpoint_selection = checkpoint_metadata
         super().__init__(visualizer, adapter, checkpoint, reset_seed=reset_seed)
         if checkpoint is not None and not self.policy_loaded:
             raise RuntimeError("基类查看器未能加载检查点；拒绝记录或启动预览")
@@ -456,9 +479,13 @@ class FastStopGoalControls(FieldViewerControls):
     def _build_sidebar(self, gui, checkpoint: str | None) -> None:
         self._map_size = float(getattr(getattr(self.adapter, "cfg", None), "size", 100.0))
         self._map_pick_enabled = True
+        self._vehicle_follow_enabled = False
         self._goal_map_handles: dict[str, Any] = {}
         self._map_status = "选点后从当前位置重置并暂停；按“运行任务”开始。"
         goal = self._current_goal(self._map_size)
+        with gui.add_folder("当前模型", expand_by_default=True, order=-20):
+            self._model_identity_handle = gui.add_markdown(
+                self._model_identity_content(checkpoint, None, self._checkpoint_selection))
         with gui.add_folder("地图点选目标", expand_by_default=True, order=-10):
             gui.add_markdown(
                 f"世界XY平面，范围0..{self._map_size:g} m；原点(0, 0)，+Y朝北/屏幕上方。")
@@ -467,6 +494,10 @@ class FastStopGoalControls(FieldViewerControls):
                 lambda event: self._enqueue("map_pick_enabled", bool(event.target.value)))
             self._map_view_button = gui.add_button("俯视整张地图")
             self._map_view_button.on_click(lambda _: self._enqueue("map_top_view"))
+            self._vehicle_follow_handle = gui.add_checkbox(
+                "跟随车辆（车后上方）", initial_value=False)
+            self._vehicle_follow_handle.on_update(
+                lambda event: self._enqueue("vehicle_follow", bool(event.target.value)))
             self._map_goal_label = gui.add_markdown(
                 f"目标（{goal[0]:.2f}, {goal[1]:.2f}）m；到点半径 {GOAL_RADIUS_M:.1f} m。")
         super()._build_sidebar(gui, checkpoint)
@@ -483,6 +514,65 @@ class FastStopGoalControls(FieldViewerControls):
         self._update_goal_marker(goal)
         self._update_vehicle_marker()
 
+    @staticmethod
+    def _model_identity_content(checkpoint: str | None, runner: Any,
+                                selection: dict[str, Any] | None = None) -> str:
+        """Describe the active artifact without assigning it an evaluation rank."""
+        model = getattr(runner, "model", None) if runner is not None else None
+        if model is None:
+            return "**模型：** 未加载\n\n**训练步数：** —\n\n**LSTM维度：** —"
+
+        filename = Path(checkpoint).name if checkpoint else "未命名模型"
+        steps = getattr(model, "num_timesteps", None)
+        if isinstance(steps, (int, np.integer)) and not isinstance(steps, (bool, np.bool_)):
+            steps_text = f"{int(steps):,} 步"
+        else:
+            recorded_steps = selection.get("num_timesteps") if isinstance(selection, dict) else None
+            steps_text = f"{int(recorded_steps):,} 步" if isinstance(recorded_steps, int) else "未记录"
+
+        policy = getattr(model, "policy", None)
+        dimensions = []
+        for role in ("actor", "critic"):
+            lstm = getattr(policy, f"lstm_{role}", None)
+            hidden = getattr(lstm, "hidden_size", None)
+            layers = getattr(lstm, "num_layers", None)
+            if isinstance(hidden, int) and isinstance(layers, int):
+                dimensions.append(f"{role} {hidden}×{layers}")
+        dimension_text = "；".join(dimensions) if dimensions else "未检测到LSTM层"
+
+        selection_text = "显式加载的检查点"
+        if isinstance(selection, dict):
+            kind = selection.get("selection")
+            if kind == "near-best":
+                selection_text = "近距开发候选（near-best；不是正式 global best）"
+            elif kind == "latest":
+                selection_text = "最新已保存检查点"
+            elif kind == "explicit":
+                selection_text = "显式指定检查点"
+        return (f"**模型：** `{filename}`\n\n**训练步数：** {steps_text}\n\n"
+                f"**LSTM维度：** {dimension_text}\n\n**评估身份：** {selection_text}")
+
+    def _update_model_identity(self) -> None:
+        handle = getattr(self, "_model_identity_handle", None)
+        if handle is not None:
+            handle.content = self._model_identity_content(
+                self._checkpoint, self._runner, self._checkpoint_selection)
+
+    def _load_checkpoint(self, checkpoint: str, *, select_policy: bool) -> None:
+        super()._load_checkpoint(checkpoint, select_policy=select_policy)
+        metadata = self._checkpoint_selection
+        metadata_path = metadata.get("path") if isinstance(metadata, dict) else None
+        if isinstance(metadata, dict):
+            try:
+                same_checkpoint = (metadata_path is not None
+                                   and Path(metadata_path).expanduser().resolve()
+                                   == Path(self._checkpoint).expanduser().resolve())
+            except (OSError, TypeError, ValueError):
+                same_checkpoint = metadata_path is not None and str(metadata_path) == str(self._checkpoint)
+            if not same_checkpoint:
+                self._checkpoint_selection = None
+        self._update_model_identity()
+
     def _server_scene(self):
         viewer = getattr(self.visualizer, "_viewer", None)
         return getattr(getattr(viewer, "_server", None), "scene", None)
@@ -497,6 +587,12 @@ class FastStopGoalControls(FieldViewerControls):
         self._enqueue("map_ray", ray)
 
     def _apply_command(self, command: str, value: Any) -> None:
+        if command == "vehicle_follow":
+            requested = bool(value)
+            if requested == bool(getattr(self, "_vehicle_follow_enabled", False)):
+                return
+            self._set_vehicle_follow(requested)
+            return
         if command == "map_pick_enabled":
             self._map_pick_enabled = bool(value)
             self._map_status = "地图点选已启用。" if self._map_pick_enabled else "地图点选已关闭。"
@@ -519,6 +615,62 @@ class FastStopGoalControls(FieldViewerControls):
             self._set_top_view()
             return
         super()._apply_command(command, value)
+
+    def _set_vehicle_follow(self, enabled: bool) -> None:
+        enabled = bool(enabled)
+        handle = getattr(self, "_vehicle_follow_handle", None)
+        if handle is not None:
+            handle.value = enabled
+        if enabled:
+            self._map_status = "车辆跟随视角已启用；相机在车后上方随车更新。"
+            try:
+                self._set_follow_view()
+            except Exception:
+                self._vehicle_follow_enabled = False
+                if handle is not None:
+                    handle.value = False
+                raise
+            self._vehicle_follow_enabled = True
+        else:
+            self._vehicle_follow_enabled = False
+            self._map_status = "车辆跟随已关闭；可拖动相机或选择全图俯视。"
+            self._update_map_label()
+
+    def _set_follow_view(self, payload: dict[str, Any] | None = None) -> None:
+        """Update current Viser cameras only; this never renders or steps physics."""
+        server = getattr(getattr(self.visualizer, "_viewer", None), "_server", None)
+        if server is None:
+            raise RuntimeError("Viser server不可用")
+        if payload is None:
+            payload = self.adapter.state_payload()
+        robot = payload.get("robot", {})
+        pose = vehicle_follow_camera_pose(robot)
+        cameras: list[tuple[Any, bool]] = []
+        initial = getattr(server, "initial_camera", None)
+        if initial is not None:
+            cameras.append((initial, True))
+        get_clients = getattr(server, "get_clients", None)
+        if callable(get_clients):
+            clients = get_clients()
+            rows = clients.values() if hasattr(clients, "values") else clients
+            for client in rows:
+                camera = getattr(client, "camera", None)
+                if camera is not None and all(camera is not existing for existing, _ in cameras):
+                    cameras.append((camera, False))
+        applied = 0
+        for camera, is_initial in cameras:
+            try:
+                camera.position, camera.look_at = pose["eye"], pose["target"]
+                if is_initial:
+                    camera.up = pose["up"]
+                else:
+                    camera.up_direction = pose["up"]
+                applied += 1
+            except (AttributeError, TypeError, ValueError):
+                continue
+        if applied == 0:
+            raise RuntimeError("Viser camera缺少可写的跟随视角属性")
+        self._update_map_label()
 
     def _validate_goal_pair(self, start: np.ndarray, goal: np.ndarray):
         """Mirror reset's explicit-pair checks before its physics reset occurs."""
@@ -635,13 +787,15 @@ class FastStopGoalControls(FieldViewerControls):
             except (TypeError, ValueError):
                 pass
 
-    def _update_vehicle_marker(self) -> None:
+    def _update_vehicle_marker(self, payload: dict[str, Any] | None = None) -> None:
         scene = self._server_scene()
         add_points = getattr(scene, "add_point_cloud", None)
         if not callable(add_points):
             return
         try:
-            robot = self.adapter.state_payload()["robot"]
+            if payload is None:
+                payload = self.adapter.state_payload()
+            robot = payload["robot"]
             point = np.asarray([[robot["x"], robot["y"], MAP_Z + 0.035]], dtype=np.float32)
             if not np.isfinite(point).all():
                 return
@@ -655,12 +809,19 @@ class FastStopGoalControls(FieldViewerControls):
         else:
             handle.points, handle.visible = point, True
 
-    def _update_map_label(self) -> None:
-        goal = self._current_goal(self._map_size)
+    def _update_map_label(self, payload: dict[str, Any] | None = None) -> None:
+        if payload is None:
+            goal = self._current_goal(self._map_size)
+        else:
+            goal = np.asarray(payload.get("goal"), dtype=np.float32).reshape(-1)
+            if (goal.shape != (2,) or not np.isfinite(goal).all()
+                    or np.any(goal < 0.0) or np.any(goal > self._map_size)):
+                goal = self._current_goal(self._map_size)
         details = "停车状态不可用。"
         try:
             task = self.adapter.task
-            payload = self.adapter.state_payload()
+            if payload is None:
+                payload = self.adapter.state_payload()
             stop = task._goal_stop_state()
             robot = payload.get("robot", {})
             current = np.asarray((robot.get("x"), robot.get("y")), dtype=np.float64)
@@ -682,8 +843,11 @@ class FastStopGoalControls(FieldViewerControls):
 
     def publish(self) -> None:
         super().publish()
-        self._update_vehicle_marker()
-        self._update_map_label()
+        payload = self.adapter.state_payload()
+        self._update_vehicle_marker(payload)
+        self._update_map_label(payload)
+        if getattr(self, "_vehicle_follow_enabled", False):
+            self._set_follow_view(payload)
 
     @staticmethod
     def _aspect(camera: Any) -> float:
@@ -733,6 +897,10 @@ class FastStopGoalControls(FieldViewerControls):
                 continue
         if applied == 0:
             raise RuntimeError("Viser camera缺少可写的全图视角属性")
+        self._vehicle_follow_enabled = False
+        follow_handle = getattr(self, "_vehicle_follow_handle", None)
+        if follow_handle is not None:
+            follow_handle.value = False
         self._map_status = "全图俯视已启用；地图+Y朝屏幕上方。"
         self._update_map_label()
         self._render_if_connected()
@@ -782,7 +950,9 @@ def _launch_viewer(trial: Path, output: Path, port: int, checkpoint: dict[str, A
         recorded = False
         def attach(visualizer_arg, adapter_arg, checkpoint_arg=None, *, reset_seed=None):
             nonlocal recorded
-            controls = FastStopGoalControls(visualizer_arg, adapter_arg, checkpoint_arg, reset_seed=reset_seed)
+            controls = FastStopGoalControls(
+                visualizer_arg, adapter_arg, checkpoint_arg,
+                reset_seed=reset_seed, checkpoint_metadata=checkpoint)
             controls.process_pending()
             if not controls.policy_loaded:
                 raise RuntimeError("预览控件未加载选定策略；拒绝记录或启动预览")
