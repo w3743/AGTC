@@ -1,6 +1,6 @@
 # Isaac Lab 项目状态
 
-2026-10-21最新状态：fast_stop512 mastery课程于2026-10-21T09:15:19Z（17:15:19北京时间）以196608步完成，summary确认training_finished=true，Python与父shell实际exit均为0，训练进程已退出。最终near探针clean成功6/16，mastered=false、未晋级，capability_improvement_established=false；正式global best仍是untrained_baseline.zip。恢复控制组配对评估仍为no_improvement。当前真实物理策略预览已启动（PID 300，root exec 70940，http://127.0.0.1:8783/），加载98304步near-best开发候选（固定near探针16/16，SHA `ddcff6868cbb5da0f3ae8446564f39a1dabc1af11780fbd3f13993d10e6f2c94`）；预览处于policy_control_paused，仿真时间/hold均为0、真实速度为0。预览责任对话已打开并核验100 m全图，只切换了俯视视角，尚未点选目标或启动任务。预览初始状态与全图截图保存在 `results/isaac_field_viewer/fast_stop512_click_goal_20261021/`。两项自动化仍PAUSED。以下更早步数、PID与验收描述保留为对应历史时点。
+2026-10-21 22:59最新状态：fast_stop512 mastery课程于2026-10-21T09:15:19Z（17:15:19北京时间）以196608步自然完成，Python与父shell实际exit均为0；最终near探针clean成功6/16，未晋级且未建立能力提升，正式global best仍为untrained_baseline.zip，恢复控制组配对评估仍为no_improvement。当前唯一新viewer为WSL PID 415、持久exec 27961，地址http://127.0.0.1:8783/；加载`steps_0098304_near.zip`（98304步，actor/critic 512×1，near-best开发候选），责任对话已核验模型文件名、步数、网络尺寸和候选身份。真实trial `--check --selection near-best --port 8785` exit 0；27 passed、1 skipped的CPU专项真实exit 0，skip为旧`GOAL_MAP_REAL_TRIAL`集成项。47份live源与47份snapshot共94项hash、protocol和模型均未变化；两项自动化仍PAUSED。此前用户回合曾实际运行60秒，旧输出保留在`results/isaac_field_viewer/fast_stop512_click_goal_20261021/`；当前新viewer输出在`results/isaac_field_viewer/fast_stop512_click_goal_follow_20261021_verified/`，截图为`results/isaac_field_viewer/fast_stop512_click_goal_follow_20261021_verified/model_identity_vehicle_follow.png`。根`8784/api/frame`返回running=false、time=0、done=false、vw=0、steps=98304；当前新viewer未推进物理。更早步数、PID和验收描述保留为对应历史时点。
 
 2026-10-21 12:50:55训练历史快照：恢复控制组与rough_a/b配对开发评估已完成；8个paired seed的clean成功与进入0.4 m半径均为0/8→0/8，未见损伤或碰撞，但不构成学习提升。fast_stop512 mastery课程仍在运行；run_status最近记录为`mastery_probe`/49152步（12:50:55北京时间），WSL进程PID458的实际argv已核实。47个训练源码及protocol保持冻结。CPU-only Viser 1.0.30浏览器交互验收已通过；这不包含原生策略物理测试，仍须等待课程自然完成并核实exit 0后才启动实际策略预览。
 
@@ -194,13 +194,13 @@ CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/lassc_replay.py 
 
 当前只准备工具和CPU合成验证，未执行该后继GPU采样。排期先满足用户亲自地图点选预览；用户结束预览且GPU空闲后再串行诊断，不关闭用户正在用的窗口来抢GPU。两自动项保持PAUSED，不以新任务或轮询替代。
 
-本项CPU验收：`tests/test_mastery_process_evaluation.py`与既有`tests/test_fast_stop_resume_evaluation.py`首次合计22 passed；补齐`python -m scripts.*`及`isaac_field`仿真CLI入口识别后，同组回归扩充为31 passed（真实exit 0），对应`py_compile`真实exit 0；`py_compile`与WSL `--check`均真实exit 0。测试覆盖完整rough配置及固定seeds透传、配置不一致拒绝、初态入圈后离开、终止帧入圈、两回合hold不串接、无效真值/缺快照拒绝、未完成/并行仿真/输出覆盖拒绝。并行检查已修复误识别自身bash父进程的问题，放行自身与LM Studio，识别Python训练/评估/预览；另在真实WSL仅调用该检查，预期拒绝PID458正在运行的课程，exit 0。最终`--check`时课程仍running、`launch_allowed=false`，没有创建评估输出。CPU证据不等同原生模型过程成绩；第十八批本项计1/5。
+本项CPU验收（历史版本）：`tests/test_mastery_process_evaluation.py`与既有`tests/test_fast_stop_resume_evaluation.py`首次合计22 passed；补齐`python -m scripts.*`及`isaac_field`仿真CLI入口识别后，同组回归扩充为31 passed（真实exit 0），对应`py_compile`真实exit 0；`py_compile`与WSL `--check`均真实exit 0。测试覆盖完整rough配置及固定seeds透传、配置不一致拒绝、初态入圈后离开、终止帧入圈、两回合hold不串接、无效真值/缺快照拒绝、未完成/并行仿真/输出覆盖拒绝。并行检查已修复误识别自身bash父进程的问题，放行自身与LM Studio，识别Python训练/评估/预览；另在真实WSL仅调用该检查，预期拒绝PID458正在运行的课程，exit 0。最终`--check`时课程仍running、`launch_allowed=false`，没有创建评估输出。CPU证据不等同原生模型过程成绩；当时第十八批本项计1/5，属历史进度。
 
 ### 严格停车地图点选预览
 
-[地图点选预览](scripts/view_fast_stop_goal.py)使用官方Isaac Lab Viser运行真实策略物理预览。课程完成门禁、训练进程检查、protocol和47项训练源核验均已通过；`--check --selection near-best --port 8783`及`validate_completed_trial(check_process=True)`均真实exit 0。当前预览PID 300（root exec 70940），地址[http://127.0.0.1:8783/](http://127.0.0.1:8783/)，初始模式`policy_control_paused`，仿真时间/hold为0、真实速度为0。使用的`near-best`为近距开发候选`steps_0098304_near.zip`（98304步、16/16 clean near探针，SHA `ddcff6868cbb5da0f3ae8446564f39a1dabc1af11780fbd3f13993d10e6f2c94`），不代表正式global best；课程最终near探针为6/16，未master、未晋级，也未建立能力提升。预览责任对话已在浏览器核验100 m俯视全图，仅切换相机，尚未点选目标或启动任务。`initial_state`与`preview_paused_full_map.png`见 `results/isaac_field_viewer/fast_stop512_click_goal_20261021/`。先前CPU-only Viser 1.0.30交互验收和截图仍作为UI测试证据，不等同原生策略物理测试。专用heartbeat与原周期训练automation仍PAUSED；本次预览为总协调显式启动。
+[地图点选预览](scripts/view_fast_stop_goal.py)使用官方Isaac Lab Viser运行真实策略物理预览。当前唯一新viewer为WSL PID 415、持久exec 27961，地址[http://127.0.0.1:8783/](http://127.0.0.1:8783/)；新输出为`results/isaac_field_viewer/fast_stop512_click_goal_follow_20261021_verified/`，截图`results/isaac_field_viewer/fast_stop512_click_goal_follow_20261021_verified/model_identity_vehicle_follow.png`。责任对话浏览器已核验模型`steps_0098304_near.zip`、98304步、actor/critic 512×1及near-best开发候选身份；全图与车辆跟随视角互斥，重复回调问题已修复。真实trial `--check --selection near-best --port 8785` exit 0；27 passed、1 skipped的真实CPU专项exit 0，唯一skip为旧`GOAL_MAP_REAL_TRIAL`集成项。根`8784/api/frame`返回running=false、time=0、done=false、vw=0、steps=98304；当前新viewer未推进物理。此前用户回合曾运行60秒，旧输出仍保留于`results/isaac_field_viewer/fast_stop512_click_goal_20261021/`。47份live源与47份snapshot共94项hash，protocol与模型均未改变；专用heartbeat与原周期训练automation仍PAUSED。第十八批当前进度3/5：既有全场采样入口、此次模型身份显示、车辆跟随视角；同功能回调修复不另计。
 
-修复后的CPU验收证据：[全套CPU回归](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_cpu_after_attempt2.log)为428 passed、22 skipped、8 warnings、exit 0（在显示缺陷修复前）；[显示修复专项](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_ui_fix.log)为18 passed、`py_compile`和`--check`均exit 0。此前CPU验收时`--check`选出的near-best是`checkpoints/steps_0016384_near.zip`（16384步，SHA `9d374b52335464ae2873a1654b69f8a437e04d26ce0e541a40de471c1e686de3`，固定near探针10/16）；这不等同final。protocol SHA为`182b8862f08dc5d92bd7101d8e2a0d0541ab7f01cdc751e760c60c2373519c76`，47/47 live源与snapshot匹配。预览脚本SHA `90f16974401cf34efbb0e206e85ec772d701d327a73347a491b27ebb2eb17ed7`，测试SHA `0d0f8f2bad374785bea66b3d279481bdbbb54222b3074c6adef1694910800aab`；MDX显示文案已改为“低于”，地图文件夹设为`order=-10`并置顶。
+历史版本CPU验收证据（保留原成绩与SHA）：[全套CPU回归](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_cpu_after_attempt2.log)为428 passed、22 skipped、8 warnings、exit 0（在显示缺陷修复前）；[显示修复专项](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_ui_fix.log)为18 passed、`py_compile`和`--check`均exit 0。此前CPU验收时`--check`选出的near-best是`checkpoints/steps_0016384_near.zip`（16384步，SHA `9d374b52335464ae2873a1654b69f8a437e04d26ce0e541a40de471c1e686de3`，固定near探针10/16）；这不等同final。protocol SHA为`182b8862f08dc5d92bd7101d8e2a0d0541ab7f01cdc751e760c60c2373519c76`，47/47 live源与snapshot匹配。预览脚本SHA `90f16974401cf34efbb0e206e85ec772d701d327a73347a491b27ebb2eb17ed7`，测试SHA `0d0f8f2bad374785bea66b3d279481bdbbb54222b3074c6adef1694910800aab`；MDX显示文案已改为“低于”，地图文件夹设为`order=-10`并置顶。
 
 截至106496步已落盘探针，near最高成绩候选为`checkpoints/steps_0098304_near.zip`（16/16）；实际启动时重新按完整manifest/SHA和固定合同选择，不能等同正式global best。
 
@@ -208,7 +208,7 @@ CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/lassc_replay.py 
 
 ```bash
 CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/view_fast_stop_goal.py \
-  --check --trial results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2 --port 8783
+  --check --trial results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2 --selection near-best --port 8785
 ```
 
 核实真实训练exit 0并确保所用输出目录不存在后，再启动官方预览：
@@ -216,7 +216,7 @@ CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/view_fast_stop_g
 ```bash
 bash scripts/isaaclab_python.sh scripts/view_fast_stop_goal.py \
   --launch --trial results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2 \
-  --port 8783 --output results/isaac_field_viewer/fast_stop512_click_goal_20261021
+  --port 8783 --output results/isaac_field_viewer/fast_stop512_click_goal_follow_20261021_verified
 ```
 
 在`http://127.0.0.1:8783/`展开顶部“地图点选目标”目录，点“俯视整张地图”；地图世界坐标范围0–100 m，原点在左下，+Y朝上。保持“启用地图点选”勾选后点击目标位置。程序先检查当前车辆姿态与目标在完整场景中可达；通过后从当前位置保持yaw开启新回合、清零时间和LSTM并暂停。再按“运行任务”开始策略控制。无效或不连通的点击不会改变当前目标。地图点击是预览中的人工目标测试；每个训练reset仍独立随机采样起点、yaw和目标。mastery的固定16-seed探针用于可重复的候选验收：相同seed会复现同一测试初态以比较checkpoint，不会让训练每回合重复同一个起点或目标。两者的结果不混为训练成功率。
