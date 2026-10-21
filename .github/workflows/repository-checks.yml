@@ -173,6 +173,16 @@ jobs:
           # Remove them only from this temporary runner checkout so a new PR value at the
           # same path and line cannot be silently exempted; the commit itself is untouched.
           rm -f -- .gitleaksignore
+          # A generated, unregistered token verifies the pinned scanner is actually active.
+          set +e
+          python -c 'import secrets; print("token = ghp_" + secrets.token_hex(18))' |
+            "$bin_dir/gitleaks" stdin --redact --no-banner --gitleaks-ignore-path /dev/null >/dev/null 2>&1
+          probe_status=$?
+          set -e
+          if [ "$probe_status" -ne 1 ]; then
+            echo '::error::Credential scanner failed its synthetic positive control.'
+            exit 1
+          fi
           "$bin_dir/gitleaks" git \
             --log-opts="$BASE_SHA..$HEAD_SHA" \
             --redact --no-banner --gitleaks-ignore-path /dev/null
