@@ -325,6 +325,28 @@ def dedupe_dicts(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return output
 
 
+def identity_context_signature(context: dict[str, Any]) -> tuple[Any, ...]:
+    """Stable procurement identity fields only; quantity/designator edits do not alter identity."""
+    source_kind = str(context.get("source_kind") or "")
+    if source_kind.startswith("module_price_input"):
+        return (
+            source_kind,
+            context.get("module"),
+            context.get("manufacturer_part"),
+            tuple(sorted(context.get("manufacturer_names") or [])),
+            tuple(sorted(context.get("supplier_codes") or [])),
+        )
+    return (
+        source_kind,
+        context.get("module"),
+        context.get("source_scope"),
+        context.get("actual_manufacturer_part"),
+        context.get("actual_manufacturer"),
+        tuple(sorted(lcsc_codes(context.get("supplier_code")))),
+        context.get("carrier_manufacturer_part"),
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="收集并核对立创商城商品页公开身份字段。")
     parser.add_argument(
@@ -368,14 +390,12 @@ def main() -> int:
         },
     }
     fetched: dict[str, dict[str, Any]] = {}
+    observation_reuse: dict[str, Any] | None = None
     if args.reuse_current_observations:
         if not OUTPUT_PATH.is_file():
             print("没有现有映射可复用；请在受控环境中正常运行一次联网收集。", file=sys.stderr)
             return 2
         previous = read_json(OUTPUT_PATH)
-        if previous.get("source_bindings") != current_source_bindings:
-            print("源文件SHA已变化；拒绝复用旧HTTP观察，请重新进行正常公开GET。", file=sys.stderr)
-            return 2
         previous_observations = previous.get("http_observations", [])
         fetched = {
             item["source_url"]: item
@@ -385,6 +405,75 @@ def main() -> int:
         if set(fetched) != set(urls):
             print("候选直链集合已变化；拒绝复用不完整HTTP观察。", file=sys.stderr)
             return 2
+        incomplete = [
+            url
+            for url in urls
+            if (
+                fetched[url].get("fetch_status") != "identity_read"
+                or fetched[url].get("http_status") != 200
+                or urlparse(fetched[url].get("final_url") or "").netloc.lower() != "item.szlcsc.com"
+                or not all(
+                    (fetched[url].get("product") or {}).get(field)
+                    for field in ("product_model", "product_code", "product_id", "manufacturer_name")
+                )
+            )
+        ]
+        if incomplete:
+            print(
+                f"存在 {len(incomplete)} 条HTTP身份不完整或非官方页面观察；拒绝离线复用。",
+                file=sys.stderr,
+            )
+            return 2
+
+        previous_pages = previous.get("canonical_product_pages", [])
+        old_id_by_url: dict[str, str] = {}
+        old_signatures_by_id: dict[str, set[tuple[Any, ...]]] = {}
+        for page in previous_pages:
+            product_id = exact_text(page.get("product_id"))
+            if not product_id:
+                print("旧映射含缺少productId的商品页；拒绝离线复用。", file=sys.stderr)
+                return 2
+            old_signatures_by_id.setdefault(product_id, set()).update(
+                identity_context_signature(context)
+                for context in page.get("source_link_contexts", [])
+                if isinstance(context, dict)
+            )
+            for source_url in page.get("source_urls", []):
+                prior_id = old_id_by_url.setdefault(source_url, product_id)
+                if prior_id != product_id:
+                    print("旧映射中同一URL关联多个productId；拒绝离线复用。", file=sys.stderr)
+                    return 2
+
+        current_id_by_url = {
+            url: exact_text(fetched[url]["product"]["product_id"])
+            for url in urls
+        }
+        if set(old_id_by_url) != set(urls) or old_id_by_url != current_id_by_url:
+            print("URL→productId身份关联已变化或旧映射不完整；拒绝离线复用。", file=sys.stderr)
+            return 2
+
+        current_signatures_by_id: dict[str, set[tuple[Any, ...]]] = {}
+        for url, contexts in url_contexts.items():
+            product_id = current_id_by_url[url]
+            current_signatures_by_id.setdefault(product_id, set()).update(
+                identity_context_signature(context) for context in contexts
+            )
+        if old_signatures_by_id != current_signatures_by_id:
+            print("URL所关联的采购MPN/制造商/代码身份集合已变化；拒绝离线复用。", file=sys.stderr)
+            return 2
+
+        observation_reuse = {
+            "mode": "offline_reuse_of_prior_public_http_observations",
+            "previous_mapping_generated_at": previous.get("generated_at_utc"),
+            "previous_observation_capture_time_note": "原映射未保存逐URL时间戳；保留原映射生成时间作为观测批次时间，不伪造逐URL时间。",
+            "source_bindings_changed": previous.get("source_bindings") != current_source_bindings,
+            "candidate_url_set_unchanged": True,
+            "all_http_identities_complete": True,
+            "url_to_product_id_associations_unchanged": True,
+            "procurement_identity_associations_unchanged": True,
+            "reused_observation_count": len(fetched),
+            "source_binding_sha_changes_do_not_refresh_http_identity": True,
+        }
     else:
         # At most two workers; each unique source URL is requested once, without retries.
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
@@ -622,6 +711,7 @@ def main() -> int:
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "purpose": "中央商品链接身份映射；仅验证公开商品身份，不包含价格或库存结论。",
         "source_bindings": current_source_bindings,
+        **({"observation_reuse": observation_reuse} if observation_reuse is not None else {}),
         "collection_method": {
             "source_links": "中央元件总表 instances.attrs.instance/device 的 literal HTTPS item.szlcsc.com URL；并合并四个核价输入中的精确商品页直链。",
             "http": "普通公开HTML GET，最多2并发，每个URL一次请求；遇403/203/429/验证码不重试、不绕过。",

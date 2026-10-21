@@ -236,6 +236,7 @@ def make_demand(
         "quantity": quantity,
         "population": population,
         "scope_bucket": scope_bucket or scope_bucket_for(module, scope, refs),
+        "references_by_scope_bucket": {scope_bucket or scope_bucket_for(module, scope, refs): sorted(set(refs))},
         "source": source_path.relative_to(ROOT).as_posix(),
         "source_row": source_row,
         "identity_notes": sorted(set(issues)),
@@ -266,6 +267,7 @@ def merge_demands(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             x["population_set"] = {d.get("population")} if d.get("population") else set()
             x["quantity_by_scope"] = {d.get("scope", "unspecified"): d["quantity"]}
             x["quantity_by_scope_bucket"] = {d.get("scope_bucket", "unspecified"): d["quantity"]}
+            x["references_by_scope_bucket"] = {k: set(v) for k, v in d.get("references_by_scope_bucket", {}).items()}
             x["source_supplier_parts"] = [d.get("source_supplier_part")]
             x["supplier_part_resolution_sources"] = [d.get("supplier_part_resolution_source")] if d.get("supplier_part_resolution_source") else []
             x["supplier_code_verified_from_quote"] = bool(d.get("supplier_code_verified_from_quote"))
@@ -283,6 +285,8 @@ def merge_demands(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
             x["quantity_by_scope"][raw_scope] = x["quantity_by_scope"].get(raw_scope, 0) + d["quantity"]
             bucket = d.get("scope_bucket", "unspecified")
             x["quantity_by_scope_bucket"][bucket] = x["quantity_by_scope_bucket"].get(bucket, 0) + d["quantity"]
+            for scope_bucket, refs in d.get("references_by_scope_bucket", {}).items():
+                x["references_by_scope_bucket"].setdefault(scope_bucket, set()).update(refs)
             x["source_supplier_parts"].append(d.get("source_supplier_part"))
             if d.get("supplier_part_resolution_source"):
                 x["supplier_part_resolution_sources"].append(d["supplier_part_resolution_source"])
@@ -293,6 +297,7 @@ def merge_demands(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         x["populations"] = sorted(x.pop("population_set"))
         x["supplier_part_resolution_sources"] = sorted(set(x["supplier_part_resolution_sources"]))
         x["source_supplier_parts"] = sorted(set(x["source_supplier_parts"]), key=lambda v: v or "")
+        x["references_by_scope_bucket"] = {k: sorted(v) for k, v in sorted(x["references_by_scope_bucket"].items())}
         x.pop("scope", None)
         x.pop("population", None)
         x["sources"] = sorted(x["sources"], key=lambda z: (z["path"], z.get("row") or 0))
@@ -464,7 +469,7 @@ def generic_module_demands(
     catalog: dict[str, Any],
     candidate_exclusions: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    by_ref, _ = catalog_indexes(catalog)
+    by_ref, parts_by_mpn = catalog_indexes(catalog)
     meta_by_ref = ref_meta_map(input_doc, "FOC" if module_key == "FOC" else module_key)
     records: list[dict[str, Any]] = []
     for row_i, row in enumerate(bom_rows, start=2):
@@ -538,6 +543,19 @@ def generic_module_demands(
             bom_code = next(iter(codes_from_catalog))
             code_resolution_source = "current_central_index"
             local_issues.append("supplier_code_filled_from_current_central_index")
+        if not bom_code and mpn:
+            exact_parts = [
+                x for x in parts_by_mpn.get(norm_mpn(mpn), [])
+                if norm_mpn(x.get("mpn")) == norm_mpn(mpn)
+                and norm_manufacturer(x.get("manufacturer")) == norm_manufacturer(maker)
+            ]
+            exact_part_codes = {norm_code(c) for p in exact_parts for c in p.get("supplier_parts", []) if norm_code(c)}
+            if len(exact_part_codes) == 1:
+                bom_code = next(iter(exact_part_codes))
+                code_resolution_source = "current_central_exact_MPN_manufacturer_index"
+                local_issues.append("supplier_code_filled_from_exact_central_part_identity")
+            elif len(exact_part_codes) > 1:
+                local_issues.append("multiple_central_codes_for_exact_MPN_manufacturer")
         if not maker and len(mfrs_from_catalog) == 1:
             maker = next(iter(mfrs_from_catalog.values()))
             local_issues.append("manufacturer_filled_from_current_central_index")
@@ -1005,7 +1023,9 @@ def scenario_result(
         for bucket, qbucket in d.get("scenario_quantity_by_scope_bucket", {}).items():
             g["quantity_by_scope_bucket_by_module"][d["module"]][bucket] += qbucket
             if qbucket:
-                g["references_by_scope_bucket_by_module"][d["module"]][bucket].update(d.get("references", []))
+                g["references_by_scope_bucket_by_module"][d["module"]][bucket].update(
+                    d.get("references_by_scope_bucket", {}).get(bucket, d.get("references", []))
+                )
         g["source_records"].append({"module": d["module"], "source": d["source"], "row": d.get("source_row")})
 
     sku_rows = []
@@ -1021,6 +1041,7 @@ def scenario_result(
             "manufacturer": g["manufacturer"],
             "supplier_part": g["supplier_part"],
             "supplier": g["supplier"],
+            "source_supplier_part": next(iter(g["source_supplier_parts"])) if len(g["source_supplier_parts"]) == 1 else None,
             "source_supplier_parts": sorted(g["source_supplier_parts"], key=lambda v: v or ""),
             "supplier_part_resolution_sources": sorted(g["supplier_part_resolution_sources"]),
             "supplier_code_verified_from_quote": g["supplier_code_verified_from_quote"],
@@ -1126,6 +1147,7 @@ def scenario_result(
                 "verified_installed_subtotal_cny": bucket_partial,
                 "unpriced_sku_count": len(bucket_unpriced),
                 "unpriced_quantity": sum(x["quantity_by_scope_bucket_by_module"][m][bucket] for x in bucket_unpriced),
+                "complete_scope_total_cny": bucket_partial if not bucket_unpriced else None,
                 "unpriced_items": [
                     {
                         "manufacturer_part": x["manufacturer_part"],
@@ -1142,7 +1164,10 @@ def scenario_result(
             "sku_count": len(related_skus),
             "verified_quoted_sku_count": len(priced_skus),
             "verified_installed_subtotal_cny": partial,
-            "complete_module_total_cny": partial if not unpriced and all_quantity_identity_known else None,
+            "complete_module_total_cny": partial if not unpriced and all(
+                x.get("manufacturer_part") and x.get("manufacturer") and x.get("supplier_part") and x.get("quantity_required", 0) > 0
+                for x in related_skus
+            ) else None,
             "unpriced_sku_count": len(unpriced),
             "unpriced_quantity": sum(x["quantity_by_module"][m] for x in unpriced),
             "unpriced_items": [
@@ -1163,12 +1188,36 @@ def scenario_result(
             "scope_breakdown": scope_breakdown,
         }
 
+    cash_risk_examples = []
+    for mpn in ("BZT52H-C3V6,115", "GRM32ER61C476KE15L"):
+        matches = [x for x in sku_rows if norm_mpn(x.get("manufacturer_part")) == norm_mpn(mpn)]
+        if matches:
+            x = matches[0]
+            purchase = x.get("purchase") or {}
+            cash_risk_examples.append({
+                "manufacturer_part": x.get("manufacturer_part"),
+                "manufacturer": x.get("manufacturer"),
+                "supplier_part": x.get("supplier_part"),
+                "quantity_required": x.get("quantity_required"),
+                "moq": (x.get("quote") or {}).get("moq"),
+                "order_multiple": (x.get("quote") or {}).get("order_multiple"),
+                "purchase_quantity": purchase.get("purchase_quantity"),
+                "unit_price_cny": purchase.get("unit_price_cny"),
+                "cash_cost_cny": purchase.get("cash_cost_at_required_order_lot_cny"),
+                "overbuy_quantity": purchase.get("overbuy_quantity"),
+                "quote_match_status": x.get("quote_match_status"),
+                "note": "首轮采购现金风险示例；按合并需求与已声明MOQ/阶梯估算，不代表建议替换或最低系统成本",
+            })
+        else:
+            cash_risk_examples.append({"manufacturer_part": mpn, "status": "not_present_in_this_scenario"})
+
     return decimal_json({
         "scenario": key,
         "label": spec["label"],
         "module_multipliers": spec["modules"],
         "modules": per_module,
         "sku_demands": sku_rows,
+        "cash_purchase_risk_examples": cash_risk_examples,
         "verified_installed_subtotal_cny": known_installed,
         "complete_installed_total_cny": complete_total,
         "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": known_cash,
@@ -1179,7 +1228,8 @@ def scenario_result(
         "all_required_quantities_and_identities_known": all_quantity_identity_known,
         "all_moq_and_order_multiple_known": all_cash_constraints_known,
         "stock_shortage_sku_count": sum(1 for x in sku_rows if x["stock_shortage"]),
-        "stock_unknown_sku_count": sum(1 for x in sku_rows if x["stock_status"] == "unknown"),
+        "stock_unknown_sku_count": sum(1 for x in sku_rows if x["stock_status"] in {"unknown", "zero_snapshot_needs_review", "availability_needs_review"}),
+        "stock_review_sku_count": sum(1 for x in sku_rows if x["stock_status"] in {"unknown", "zero_snapshot_needs_review", "availability_needs_review"}),
         "unpriced_sku_count": sum(1 for x in sku_rows if x["quote_match_status"] != "verified_exact_quote"),
         "unpriced_quantity": sum(x["unpriced_quantity"] for x in sku_rows),
         "cost_scope": "当前BOM采购件+板外配套；不含PCB、SMT、运输；税费仅按报价页明确字段记录，不推算",
@@ -1232,21 +1282,23 @@ def build_outputs() -> tuple[dict[str, Any], str]:
     regulator_records = generic_module_demands("REGULATOR", inputs["REGULATOR"], regulator_rows, catalog, candidate_exclusions)
     pump_records = generic_module_demands("PUMP", inputs["PUMP"], pump_rows, catalog, candidate_exclusions)
 
-    # The Supercap BOM itself is current qty 8. The input's `quantity_additional:16` was a stale
-    # increment interpretation; the requested comparison is 16 total, i.e. +8, and remains candidate.
+    # The user decision is to keep only the current eight supercapacitors; no 16-piece alternative
+    # remains an active candidate or procurement recommendation.
     supercap_refs = [r for r in regulator_rows if str(r.get("Reference", "")).strip().startswith("SC") and norm_mpn(r.get("Manufacturer part")) == norm_mpn("SC0350-270-RSS")]
     supercap_current = sum(as_int(r.get("Quantity", 0)) for r in supercap_refs)
     supercap_sensitivity = {
         "manufacturer": "LICAP Technologies",
         "manufacturer_part": "SC0350-270-RSS",
         "current_bom_quantity": supercap_current,
-        "candidate_total_system_quantity": 16,
-        "candidate_incremental_quantity": max(0, 16 - supercap_current),
+        "candidate_total_system_quantity": supercap_current,
+        "candidate_incremental_quantity": 0,
         "supplier_part": None,
         "price_cny": None,
-        "included_in_current_scenario": False,
+        "included_in_current_scenario": True,
+        "additional_quantity_included": 0,
+        "configuration_status": "single_current_configuration_only; no active 16-piece alternative",
         "source": "电力/稳压模块/原理图准备/BOM.csv",
-        "note": "按当前BOM核实为8只；候选配置目标16只总量，仅增加8只。核价输入中的quantity_additional=16不作为当前数量或增量采用。",
+        "note": "按用户最新决定仅保留当前8只，后续采购唯一配置也是8只，增量0，用于启动瞬态助力；不要求持续1秒，实际启动持续时间尚未确定。先前16只数量已撤回，不作为候选或建议。",
     }
 
     # Add source binding checks and input quantities as audit facts, not as current timestamps.
@@ -1346,7 +1398,8 @@ def build_outputs() -> tuple[dict[str, Any], str]:
             "price_scope": "excludes PCB, SMT, shipping; tax status only recorded when explicitly stated by the quote source",
             "full_total_null_rule": "any current SKU without an exact verified current quote or with unresolved required identity/quantity makes the complete scenario total null; verified subtotal remains labeled partial",
             "minimum_cash_rule": "combine same exact SKU across all modules in a scenario before selecting the price tier at the required demand quantity rounded to stated MOQ/order multiple; only move to the next published tier if no tier covers that lot, never borrow a bulk tier for a small order; if MOQ/order multiple missing, report the assumption and leave a fully constrained cash total null",
-            "stock_rule": "stock is snapshot evidence only; shortage is evaluated against chosen order quantity; missing stock is unknown, not zero",
+            "stock_rule": "zero_snapshot/unknown/out_of_stock inventory is review-needed, not confirmed shortage; only positive known quantity with in_stock or in_stock_snapshot below the chosen lot is counted as stock_shortage",
+            "scope_rule": "scope quantities are carried from each original source demand before identical SKUs are merged; costs are apportioned by those recorded quantities, not by the merged SKU's scope set",
         },
         "source_bindings": bindings,
         "input_validation": evidence,
@@ -1392,6 +1445,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "本页由 `工具/商城成本.py` 从当前BOM、模块核价输入和统一商城报价表确定性生成。只将精确MPN、厂家、已验证LCSC C码三者一致且有当前公开人民币价梯的SKU计入已核价小计。",
         "",
         "完整总价在存在未核价SKU、身份/数量不确定或现金约束缺失时保持 `null`。本页不把部分小计称为总价，也不包括PCB、SMT、运费；没有报价明确说明的税费不推算。",
+        "库存快照中的 `zero_snapshot`、`unknown`、`out_of_stock` 仅列待复核；只有报价标为在售且有正的已知库存数、数量低于采购批量时才计为确证库存不足。",
         "",
         f"报价表中当前观察数：{data['quote_observation_count']}；本轮中央报价文件SHA绑定见下表。输入生成时间不作为本报告更新时间，重复运行不会仅因时钟变化改文件。",
         "",
@@ -1415,7 +1469,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         lines.extend([
             f"### {scenario['label']}",
             "",
-            "|模块|当前需求数量|已核价SKU|已核价实装小计（部分）|未核价SKU / 数量|查询失败SKU / 数量|库存不足 / 库存未知|",
+            "|模块|当前需求数量|已核价SKU|已核价实装小计（部分）|未核价SKU / 数量|查询失败SKU / 数量|确证库存不足 / 库存待复核|",
             "|---|---:|---:|---:|---:|---:|---:|",
         ])
         for m, result in scenario["modules"].items():
@@ -1428,14 +1482,45 @@ def render_markdown(data: dict[str, Any]) -> str:
             )
         lines.extend([
             "",
+            "按原始需求scope分摊（每个模块单独核算；同SKU跨scope时按需求数量拆分）：",
+            "",
+            "|模块|板内：已核价小计 / 未核价SKU·数量|核心板/板级模块：已核价小计 / 未核价SKU·数量|板外附件：已核价小计 / 未核价SKU·数量|",
+            "|---|---:|---:|---:|",
+        ])
+        for m, result in scenario["modules"].items():
+            label = {"BMS": "BMS", "FOC-A": "FOC-A", "FOC-B": "FOC-B", "REGULATOR": "稳压模块", "PUMP": "水泵驱动模块"}.get(m, m)
+            cells = []
+            for bucket in ("on_board", "core_board_module", "external_accessory"):
+                b = result["scope_breakdown"][bucket]
+                cells.append(f"{fmt_money(b['verified_installed_subtotal_cny'])} / {b['unpriced_sku_count']}·{b['unpriced_quantity']}")
+            lines.append(f"|{label}|{cells[0]}|{cells[1]}|{cells[2]}|")
+        lines.extend([
+            "",
             f"已核价SKU的实装折算小计：**{fmt_money(scenario['verified_installed_subtotal_cny'])}**（部分金额）。",
             f"完整实装总价：**{fmt_money(scenario['complete_installed_total_cny'])}**。",
             f"已核价SKU现金采购估算：**{fmt_money(scenario['known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny'])}**（部分；按已声明MOQ、假设按单只/单件下单；订单步长缺失时不称精确最低现金额）。",
             f"已核价SKU MOQ余料：**{scenario['known_sku_overbuy_quantity']}件**；对应现金估算与已核实装折算差额：**{fmt_money(scenario['known_sku_cash_overbuy_vs_installed_value_cny'])}**。",
             f"完整最低采购现金额：**{fmt_money(scenario['complete_minimum_cash_purchase_cny'])}**。",
-            f"当前未核价：{scenario['unpriced_sku_count']} 个SKU，共 {scenario['unpriced_quantity']} 件；库存不足SKU {scenario['stock_shortage_sku_count']} 个，库存未知SKU {scenario['stock_unknown_sku_count']} 个。",
+            f"当前未核价：{scenario['unpriced_sku_count']} 个SKU，共 {scenario['unpriced_quantity']} 件；确证库存不足SKU {scenario['stock_shortage_sku_count']} 个，库存待复核SKU {scenario['stock_unknown_sku_count']} 个。",
             "",
         ])
+
+        if scenario.get("cash_purchase_risk_examples"):
+            lines.extend([
+                "首轮大MOQ现金风险示例（仅展示当前合并需求，不据此自动换型）：",
+                "",
+                "|MPN|需求量|MOQ|需采购量|阶梯单价|预计现金|余料|",
+                "|---|---:|---:|---:|---:|---:|---:|",
+            ])
+            for x in scenario["cash_purchase_risk_examples"]:
+                if x.get("status") == "not_present_in_this_scenario":
+                    continue
+                lines.append(
+                    f"|{x.get('manufacturer_part')}|{x.get('quantity_required')}|{x.get('moq') if x.get('moq') is not None else '未知'}|"
+                    f"{x.get('purchase_quantity') if x.get('purchase_quantity') is not None else '未知'}|{fmt_money(x.get('unit_price_cny'))}|"
+                    f"{fmt_money(x.get('cash_cost_cny'))}|{x.get('overbuy_quantity') if x.get('overbuy_quantity') is not None else '未知'}|"
+                )
+            lines.extend([""])
 
     lines.extend([
         "## 当前采购范围与边界",
@@ -1445,4 +1530,82 @@ def render_markdown(data: dict[str, Any]) -> str:
         f"|BMS|{summaries['BMS']['total_qty']}件（{bms_scope_text}）|核心板身份/SKU未冻结，作为当前BMS采购输入中的指定需求列入且保持未核价；采购补充已包含在BMS BOM与输入，不重复加件。|",
         f"|FOC-A|{foc_a_qty} BOM与板外件|`R_LOAD_VALID_BIAS`仅A安装。板外母线电容、保险、dump电阻与线端配对插头已计数并单独标注。|",
         f"|FOC-B|{foc_b_qty} BOM与板外件|共享1k bias DNP；不把A的1只扩成双装。|",
-        f"|稳压模块|当前BOM {current_bom_summary['REGULATOR']['current_bom_rows']}行；明示候选/条件项{current_bom_summary['REGULATOR']['candidate_excluded_qty']}件剔除后，当前采购量{reg_qty}件|当前SC0350-270-RSS为{data['supercapacitor_candidate
+        f"|稳压模块|当前BOM {current_bom_summary['REGULATOR']['current_bom_rows']}行；明示候选/条件项{current_bom_summary['REGULATOR']['candidate_excluded_qty']}件剔除后，当前采购量{reg_qty}件|当前SC0350-270-RSS为{data['supercapacitor_candidate_sensitivity']['current_bom_quantity']}只；大型BUS_EXT电容与外置dump/保险按BOM计一次。|",
+        f"|水泵驱动模块|当前BOM {current_bom_summary['PUMP']['current_bom_rows']}行、当前采购量{pump_qty}件|板端/线端连接器、保险、线束、核心板等按scope分别保留。|",
+        "",
+        "### 超级电容配置",
+        "",
+        f"当前及后续采购配置均为 {data['supercapacitor_candidate_sensitivity']['current_bom_quantity']} 只，新增量0，用于启动瞬态助力；不要求持续1秒，实际启动持续时间尚未确定。此前16只方案已撤回，不再作为有效候选或建议。超级电容已按当前BOM计入场景成本，不另加数量。",
+        "",
+        "## 已验证报价与逐SKU明细",
+        "",
+        "逐SKU精确MPN、厂家、C码、两个场景合并采购数量、阶梯价、MOQ、步长、库存、现金估算与未核价原因均在 `商城成本.json` 的 `scenarios.*.sku_demands` 和 `current_module_skus` 中。大型/板外件见 `large_or_off_board_items_included_once`；该表仅拆分展示，不再加到总量。",
+        "",
+    ])
+    # List every exact quote currently used; no stale or CAD-carrier price is displayed.
+    used = {}
+    for scenario in data["scenarios"].values():
+        for sku in scenario["sku_demands"]:
+            if sku.get("quote_match_status") == "verified_exact_quote":
+                used[(sku.get("manufacturer_part"), sku.get("manufacturer"), sku.get("supplier_part"))] = sku
+    if used:
+        lines.extend(["|MPN|厂家|C码|C码来源|场景需求|采用单价（元/只）|MOQ|步长|库存|报价来源/时间|", "|---|---|---|---|---:|---:|---:|---:|---:|---|"])
+        for _, sku in sorted(used.items(), key=lambda kv: (norm_mpn(kv[0][0]), kv[0][2] or "")):
+            q = sku["quote"]
+            p = sku.get("purchase") or {}
+            lines.append(
+                f"|{sku.get('manufacturer_part') or '—'}|{sku.get('manufacturer') or '—'}|{sku.get('supplier_part') or '—'}|"
+                f"{'已验证报价补映射' if sku.get('supplier_code_verified_from_quote') else '来源记录/索引'}|{sku['quantity_required']}|{fmt_money(p.get('unit_price_cny'))}|{q.get('moq') if q.get('moq') is not None else '未知'}|"
+                f"{q.get('order_multiple') if q.get('order_multiple') is not None else '未知'}|{q.get('stock_quantity') if q.get('stock_quantity') is not None else '未知'}|"
+                f"[{q.get('quote_id')}]({q.get('source_url')}) / {q.get('captured_at_utc')}|")
+    else:
+        lines.append("当前没有匹配到任何完整的MPN/厂家/C码三元组报价。")
+    lines.extend(["", "## 排除项", ""])
+    excluded = data["input_validation"]["candidate_exclusions"]
+    if excluded:
+        lines.extend(["|模块|位号|MPN|数量|排除原因|", "|---|---|---|---:|---|"])
+        for x in excluded:
+            lines.append(f"|{x['module']}|{', '.join(x['references'])}|{x.get('manufacturer_part') or '—'}|{x['quantity']}|{x['reason']}|")
+    else:
+        lines.append("当前输入中未发现明确标为DNP/条件候选的BOM行。")
+    lines.extend([
+        "",
+        "本报告是当前公开价快照下的采购需求与成本覆盖情况，不表示器件电气、机械或整车资格。价格可用性仅代表报价记录采集时刻。",
+        "",
+    ])
+    return "\n".join(lines)
+
+
+def write_or_check(check: bool) -> int:
+    data, md = build_outputs()
+    json_text = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=False) + "\n"
+    if check:
+        failures = []
+        for path, expected in ((OUTPUT_JSON, json_text), (OUTPUT_MD, md)):
+            if not path.exists():
+                failures.append(f"missing generated output: {path.relative_to(ROOT)}")
+            elif path.read_text(encoding="utf-8-sig") != expected:
+                failures.append(f"stale generated output: {path.relative_to(ROOT)}")
+        if failures:
+            for f in failures:
+                print(f, file=sys.stderr)
+            return 1
+        print("PASS: 当前商城成本 JSON/Markdown 与当前BOM、核价输入和商城报价表一致。")
+        return 0
+    OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_JSON.write_text(json_text, encoding="utf-8", newline="\n")
+    OUTPUT_MD.write_text(md, encoding="utf-8", newline="\n")
+    print(f"WROTE {OUTPUT_JSON.relative_to(ROOT)} sha256={sha256(OUTPUT_JSON)}")
+    print(f"WROTE {OUTPUT_MD.relative_to(ROOT)} sha256={sha256(OUTPUT_MD)}")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="只读校验生成文件是否与当前输入一致")
+    args = parser.parse_args()
+    return write_or_check(args.check)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

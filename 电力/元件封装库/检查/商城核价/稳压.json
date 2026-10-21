@@ -2162,20 +2162,23 @@
     {
       "manufacturer": "LICAP Technologies",
       "manufacturer_part": "SC0350-270-RSS",
-      "quantity_additional": 8,
+      "quantity_additional": 0,
       "current_bom_quantity": 8,
-      "scope": "planning increment only; do not sum into current BOM",
+      "scope": "no active increment; user latest instruction is retain only the existing 8 units",
       "supplier_part": null,
       "official_szlcsc_item_url": null,
       "current_price_cny": null,
       "price_tiers_cny": null,
       "moq": null,
       "stock": null,
-      "search_result_note": "当前BOM 8只；上限16颗对应候选总数16，故新增仅8只，不得写作新增16只。",
+      "search_result_note": "现行BOM与有效整车总量均为8只；16只扩容方案已取消/作废，仅留历史记录；本项新增量为0。",
       "current_total_quantity": 8,
-      "candidate_total_quantity": 16,
-      "quantity_ceiling": 16,
-      "costing_status": "candidate_not_in_current_bom; excluded_from_current_total_cost"
+      "candidate_total_quantity": null,
+      "quantity_ceiling": 8,
+      "costing_status": "no_active_expansion; current total remains 8; no incremental cost is included",
+      "candidate_status": "cancelled_obsolete",
+      "historical_cancelled_candidate_total_quantity": 16,
+      "historical_cancelled_quantity_additional": 8
     }
   ],
   "rejected_same_mpn_different_manufacturer_matches": [
@@ -2196,5 +2199,24 @@
       ],
       "reason": "MPN string matches but manufacturer differs; do not transfer these offers/prices to the selected HiLink part."
     }
-  ]
+  ],
+  "supercapacitor_quantity_rule": {
+    "manufacturer": "LICAP Technologies",
+    "manufacturer_part": "SC0350-270-RSS",
+    "current_bom_quantity": 8,
+    "effective_total_count_max": 8,
+    "active_expansion_quantity": 0,
+    "cancelled_obsolete_historical_candidate_total_quantity": 16,
+    "use_case": "startup_transient_power_assist",
+    "sustained_1s_requirement": false,
+    "duration_s": null,
+    "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+    "reference_power_w": {
+      "min": 800,
+      "max": 1000,
+      "status": "unverified_design_reference_only"
+    },
+    "status": "retain_existing_8_only",
+    "source_note": "2026-10-21 latest user instruction; no expansion is an active candidate or priced quantity"
+  }
 }

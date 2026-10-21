@@ -1,6 +1,22 @@
 {
   "schemaVersion": 1,
   "asOf": "2026-10-21",
+  "requirementUpdate": {
+    "date": "2026-10-21",
+    "userText": "不一定非要持续1秒，就是启动的瞬间用来供电",
+    "use": "启动瞬态补能和母线支撑",
+    "capacitorMpn": "LICAP SC0350-270-RSS",
+    "capacitorCount": 8,
+    "topology": "8S1P",
+    "addedCapacitors": 0,
+    "previous800To1000W1sRequirement": "CANCELLED_HISTORICAL_REFERENCE_ONLY_NOT_A_RELEASE_GATE",
+    "durationSeconds": null,
+    "startupPowerGapW": null,
+    "openChecks": [
+      "真实启动功率缺口和持续时间",
+      "峰值电流、变换器、ESR、逐节保护和响应"
+    ]
+  },
   "scope": "现行8S1P原生单页全部166对象及450脚；不含未落图AFE候选",
   "reviewComplete": true,
   "designRelease": "HOLD",
@@ -280,10 +296,10 @@
   "findings": [
     {
       "id": "SC01",
-      "status": "FAIL",
+      "status": "OPEN",
       "subject": "容量/保护实现",
-      "finding": "现行原生仍是8S1P、8只固定LICAP。8S2P/16只只是候选；800W双向1s模型有附加条件，不能写成已落图或1kW已通过。",
-      "action": "保持固定型号和16只上限；把逐组测量、双向限流和失效隔离一起闭合后再落图，不能只加电容。"
+      "finding": "现行方案固定8S1P、8只LICAP，16只/8S2P已因新增成本过大取消。用户要求启动瞬态补能和母线支撑；此前800–1000W持续1s工况已取消为硬要求，模型仅作历史参考。实际启动功率缺口与持续时间未知，启动能力仍未验证。",
+      "action": "保持固定8颗、不增加电容；以真实启动过程核算功率缺口和持续时间，再验证峰值电流、变换器、ESR、逐组保护、响应与失效隔离。BQ76952或其他专用AFE仍可作为8S1P逐组保护候选并继续验证；SC02的逐节测量FAIL和designRelease=HOLD保持。"
     },
     {
       "id": "SC02",

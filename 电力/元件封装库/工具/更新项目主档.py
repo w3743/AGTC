@@ -140,22 +140,62 @@ def status_from_source(source: Any, fallback: str) -> str:
     return fallback
 
 
+def procurement_lifecycle(record: dict[str, Any], has_native_reference: bool) -> str:
+    """Keep design selection state separate from whether purchasing is complete."""
+    status = norm(record.get("status_source"))
+    scope = norm(record.get("scope_source"))
+    relation = norm(record.get("relation"))
+    fallback = "current" if has_native_reference else "unresolved"
+    lifecycle = status_from_source(status, fallback)
+    if lifecycle in {"obsolete", "DNP", "selected"}:
+        return lifecycle
+
+    # A candidate supplier SKU awaiting quote/validation is a procurement state,
+    # not a candidate design item. Preserve a candidate lifecycle only when the
+    # source explicitly labels the component/assembly itself as candidate.
+    quote_only_candidate = any(token in status for token in (
+        "候选料号待核价", "candidate mpn", "library_candidate", "前轮报价待刷新"
+    ))
+    status_candidate = any(token in status for token in (
+        "candidate_not_qualified", "candidate_or_placeholder", "候选：", "候选方案"
+    )) or status in {"candidate", "候选", "conditional", "条件装配"}
+    scope_candidate = any(token in scope for token in (
+        "conditional", "conditional assembly", "candidate assembly", "候选装配", "条件装配"
+    )) or scope in {"candidate", "候选"}
+    if scope_candidate:
+        return "candidate"
+    if status_candidate and not quote_only_candidate:
+        return "candidate"
+    if "bom独有条目" in relation:
+        # A BOM-only accessory is a current requirement unless its source explicitly
+        # marks it candidate/conditional; “待询价/未采购” describes procurement progress.
+        return "current"
+    return fallback
+
+
 def quote_supplier_part(observation: dict[str, Any]) -> str:
     return norm(observation.get("supplier_part"))
 
 
 def is_usable_quote(observation: dict[str, Any]) -> bool:
     url = str(observation.get("source_url") or "")
+    acquisition = observation.get("acquisition")
+    capture_verified = acquisition == "browser_visible_DOM" or (
+        acquisition == "compact_batch_import"
+        and observation.get("evidence_kind") == "compact_browser_transcription"
+        and str(observation.get("raw_evidence") or "").startswith("compact_browser_transcription;")
+    )
     return (
         observation.get("identity_verified") is True
         and observation.get("supplier") == "LCSC_CN"
         and observation.get("currency") == "CNY"
-        and observation.get("acquisition") == "browser_visible_DOM"
+        and capture_verified
         and bool(re.fullmatch(r"https?://item\.szlcsc\.com/\d+\.html", url))
         and bool(norm(observation.get("mpn")))
         and bool(canonical_maker(observation.get("manufacturer"), {}))
         and bool(quote_supplier_part(observation))
         and isinstance(observation.get("price_tiers"), list)
+        and bool(observation.get("price_tiers"))
         and all(
             isinstance(tier, dict)
             and isinstance(tier.get("min_quantity"), (int, float))
@@ -355,7 +395,7 @@ def build() -> dict[str, Any]:
         identity_result = identity_status(maker_effective, mpn_effective)
         identity_conflicts: list[str] = []
         association = "none"
-        lifecycle = status_from_source(record.get("status_source"), "candidate")
+        lifecycle = procurement_lifecycle(record, bool(linked))
         if lifecycle not in ALLOWED_STATUSES:
             raise ValueError(f"采购行状态分类错误：{line_id} => {lifecycle}")
 
@@ -416,7 +456,6 @@ def build() -> dict[str, Any]:
             if linked_matches and all(linked_matches) and len(linked_native_part_ids) == 1:
                 part_id = linked_native_part_ids[0]
                 identity_result = "exact_manufacturer_mpn_match"
-                lifecycle = "current"
             else:
                 identity_result = "identity_incomplete_or_conflicting"
                 lifecycle = "unresolved"
@@ -476,6 +515,7 @@ def build() -> dict[str, Any]:
             "line_id": line_id,
             "part_id": part_id,
             "lifecycle_status": lifecycle,
+            "selection_status": lifecycle,
             "identity_status": identity_result,
             "identity_conflicts": sorted(set(identity_conflicts)),
             "association_basis": association,
@@ -486,6 +526,7 @@ def build() -> dict[str, Any]:
             "unit_source": record.get("unit_source"),
             "scope_source": record.get("scope_source"),
             "status_source": record.get("status_source"),
+            "procurement_status_source": record.get("status_source"),
             "manufacturer_source": maker_raw,
             "mpn_source": mpn_raw,
             "manufacturer_effective": maker_effective,
@@ -593,9 +634,13 @@ def build() -> dict[str, Any]:
         if quote_catalog.get("schema_version") != 1 or not isinstance(quote_catalog.get("observations"), list):
             raise ValueError("商城报价.json schema不符合已约定版本")
         observations = quote_catalog["observations"]
+        unresolved_quote_rows = quote_catalog.get("unresolved", [])
+        if not isinstance(unresolved_quote_rows, list):
+            raise ValueError("商城报价未闭合记录必须为数组")
     else:
         quote_catalog = {"schema_version": 1, "observations": []}
         observations = []
+        unresolved_quote_rows = []
 
     all_parts = native_catalog_parts + list(procurement_only_parts.values()) + list(supplemental_parts.values())
     part_lookup = {part["part_id"]: part for part in all_parts}
@@ -734,10 +779,24 @@ def build() -> dict[str, Any]:
         candidate_total = supercap.get("candidate_total_count")
         candidate_added = supercap.get("candidate_added_count")
         max_count = supercap.get("total_count_max")
-        if not all(isinstance(value, int) for value in (current_count, candidate_total, candidate_added, max_count)):
-            raise ValueError("稳压超容数量约束必须使用整数")
-        if candidate_total - current_count != candidate_added or candidate_total > max_count:
-            raise ValueError("稳压超容候选总量/增量/总上限关系不一致")
+        candidate_status = supercap.get("candidate_status")
+        if not all(isinstance(value, int) for value in (current_count, candidate_added, max_count)):
+            raise ValueError("稳压超容当前数量、增量和总上限必须使用整数")
+        if current_count > max_count:
+            raise ValueError("稳压超容现行数量超过有效总量上限")
+        if candidate_status == "cancelled_obsolete":
+            if candidate_total is not None or candidate_added != 0 or supercap.get("candidate_is_current") is not False:
+                raise ValueError("已作废的稳压扩容不得作为有效候选或计入增量")
+            if not isinstance(supercap.get("historical_cancelled_candidate_total_count"), int):
+                raise ValueError("已作废扩容需单独标明历史候选总量")
+        else:
+            if not isinstance(candidate_total, int):
+                raise ValueError("有效稳压候选总量必须使用整数")
+            if candidate_total - current_count != candidate_added or candidate_total > max_count:
+                raise ValueError("稳压超容候选总量/增量/总上限关系不一致")
+        if supercap.get("use_case") == "startup_transient_power_assist":
+            if supercap.get("sustained_1s_requirement") is not False or supercap.get("duration_s") is not None:
+                raise ValueError("启动瞬态辅助不得保留固定持续1秒要求")
 
     # Expand per-instance references to strict identity prices and separate CAD carriers.
     native_instance_records: list[dict[str, Any]] = []
@@ -837,6 +896,7 @@ def build() -> dict[str, Any]:
         "requirement_slot_count": len(requirement_slots),
         "quote_observation_count": len(observations),
         "usable_quote_observation_count": sum(is_usable_quote(item) for item in observations),
+        "unresolved_quote_input_count": len(unresolved_quote_rows),
         "matched_quote_observation_count": sum(item["match_status"].startswith("exact_manufacturer_mpn_") for item in quote_match_audit),
         "unmatched_quote_observation_count": sum(item["match_status"].startswith("unmatched_") for item in quote_match_audit),
         "part_ids_with_verified_quote_count": sum(bool(part["quote_ids"]) for part in all_parts),
@@ -846,6 +906,18 @@ def build() -> dict[str, Any]:
         "quantity_policy": "原生BOM按当前实例计数；采购数量只保留原始quantity_source字符串，不汇总进原生用量。",
         "price_policy": "没有按数量选择阶梯价；当前单价始终null，商城阶梯仅保留为可追溯观测。",
     }
+    unresolved_quote_records = [
+        {
+            "unresolved_id": item.get("unresolved_id"),
+            "quote_id": item.get("quote_id"),
+            "manufacturer": item.get("manufacturer"),
+            "manufacturer_part": item.get("mpn"),
+            "supplier_part": item.get("supplier_part"),
+            "source_url": item.get("source_url"),
+            "reason": item.get("reason"),
+        }
+        for item in unresolved_quote_rows
+    ]
     payload = {
         "schema_version": 1,
         "identity_policy": {
@@ -856,6 +928,14 @@ def build() -> dict[str, Any]:
         },
         "status_vocabulary": sorted(ALLOWED_STATUSES),
         "sources": sources,
+        "manual_source_catalog": {
+            row["source_id"]: {
+                "path": row["path"].replace("\\", "/"),
+                "locator": row.get("locator"),
+                "sha256": next((item["sha256"] for item in manual_sources if item["path"] == row["path"].replace("\\", "/")), None),
+            }
+            for row in supplement.get("sources", [])
+        },
         "summary": summary,
         "native_parts": native_catalog_parts,
         "procurement_only_parts": list(procurement_only_parts.values()),
@@ -866,6 +946,7 @@ def build() -> dict[str, Any]:
         "requirement_slots": requirement_slots,
         "project_constraints": project_constraints,
         "quote_match_audit": quote_match_audit,
+        "unresolved_quote_records": unresolved_quote_records,
     }
     stable_payload = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     result = {
@@ -874,6 +955,232 @@ def build() -> dict[str, Any]:
         "content_sha256": sha256_bytes(stable_payload.encode("utf-8")),
     }
     return result
+
+
+def md_cell(value: Any) -> str:
+    if value is None or value == "":
+        return "—"
+    if isinstance(value, list):
+        value = ", ".join(str(item) for item in value if item not in (None, "")) or "—"
+    text = str(value).replace("\r\n", "\n").replace("\r", "\n")
+    return text.replace("|", "\\|").replace("\n", "<br>")
+
+
+def manufacturer_display(part: dict[str, Any]) -> str:
+    raw = part.get("manufacturer")
+    values = raw if isinstance(raw, list) else [raw]
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        if value in (None, ""):
+            continue
+        key = norm(value)
+        if key not in seen:
+            seen.add(key)
+            result.append(str(value))
+    return " / ".join(result) or "未确认"
+
+
+def carrier_difference(instances: list[dict[str, Any]]) -> str:
+    mismatches: list[str] = []
+    comparable = 0
+    for instance in instances:
+        identity = instance.get("identity") or {}
+        cad = instance.get("cad_assets") or {}
+        ref = str(instance.get("reference") or instance.get("instance_key"))
+        actual_mpn = identity.get("manufacturer_part")
+        carrier_mpn = cad.get("carrier_mpn")
+        if actual_mpn and carrier_mpn:
+            comparable += 1
+            if norm(actual_mpn) != norm(carrier_mpn):
+                mismatches.append(f"{ref}:MPN {carrier_mpn}≠{actual_mpn}")
+        actual_value = identity.get("actual_value")
+        carrier_value = cad.get("carrier_value") or cad.get("effective_value_raw")
+        if actual_value and carrier_value:
+            comparable += 1
+            if norm(actual_value) != norm(carrier_value):
+                mismatches.append(f"{ref}:Value {carrier_value}≠{actual_value}")
+    if mismatches:
+        head = mismatches[:4]
+        suffix = f"等{len(mismatches)}处" if len(mismatches) > len(head) else ""
+        return f"{'; '.join(head)}{suffix}"
+    if comparable:
+        return "可比MPN/Value字段未见差异"
+    return "载体字段不足，未作差异判断"
+
+
+def render_markdown(data: dict[str, Any]) -> str:
+    summary = data["summary"]
+    constraints = data.get("project_constraints", {})
+    supercap = constraints.get("regulator_supercapacitor", {})
+    bms_budget = constraints.get("bms_cost_target", {})
+    status_labels = {
+        "selected": "已选型", "current": "现行", "candidate": "候选",
+        "DNP": "不装", "obsolete": "作废", "unresolved": "未闭合",
+    }
+    status_summary = "、".join(
+        f"{status_labels.get(key, key)} {value} 行"
+        for key, value in sorted(summary["lifecycle_counts_procurement_rows"].items())
+    ) or "无采购行"
+    lines = [
+        "# 项目器件主档（整车范围）",
+        "",
+        "本主档覆盖整车现行原生电路、采购补充及已记录的板外部件和未冻结需求。它是统一身份与来源索引，不把采购行重复加到原生实例，也不把商城阶梯价自动转成当前单价或整车总价。",
+        "",
+        "## 快照统计",
+        "",
+        f"- 原生器件：{summary['native_part_count']} 个身份、{summary['native_instance_count']} 个位号实例。",
+        f"- 采购补充：{summary['procurement_record_count']} 行；{summary['procurement_native_reference_count']} 行关联原生实例，{summary['procurement_bom_only_count']} 行为板外/BOM独有条目；采购数量保留源字符串，不再乘算进原生用量。",
+        f"- 整车补充：{summary['external_item_count']} 项；另有 {summary['requirement_slot_count']} 个未冻结需求槽位。",
+        f"- 商城价格输入：{summary['quote_observation_count']} 条观测，{summary['usable_quote_observation_count']} 条符合当前精确身份与商品页证据规则；{summary['unresolved_quote_input_count']} 条仍未闭合。价格阶梯是观测，按本主档政策当前单价保持 null。",
+        f"- 采购行选型状态：{status_summary}。采购进度原文单独保留，不把待询价或未采购自动解释成候选。",
+        "",
+        "## 全车约束与状态口径",
+        "",
+    ]
+    if supercap:
+        lines.append(
+            f"- 稳压超容：固定 {md_cell(supercap.get('manufacturer'))} {md_cell(supercap.get('fixed_manufacturer_part'))}；当前 {md_cell(supercap.get('native_current_count'))} 颗，有效总量上限 {md_cell(supercap.get('total_count_max'))} 颗，活动增量 {md_cell(supercap.get('candidate_added_count'))}。16 颗扩容仅保留为已取消/作废历史方案，不是有效候选。用途为启动瞬态功率辅助；持续 1 秒要求为否，持续时间待实际启动波形和功率缺口核定。800–1000 W 仅为未验证参考值。旧稳压 500 元上限已取消。"
+        )
+    if bms_budget:
+        lines.append(
+            f"- BMS 板内成本目标：{md_cell(bms_budget.get('target_cny'))} 元，仅板上器件；外部 MCU 与板外配套不在该范围内，状态为 {md_cell(bms_budget.get('status'))}。"
+        )
+    lines.extend([
+        "- 全项目仍需优先复用满足要求的器件、减少型号并控制采购总成本；缺少精确报价或订单数量时不填价格、不声称降本。",
+        "- `selected/current/candidate/DNP/obsolete/unresolved` 表示设计选型或装配生命周期；采购进度保留在对应 `procurement_status_source` 原文中，两者分开。",
+        "- 每个原生 instance 有唯一 `part_id`。下表的原生用量按各源板单板列出，不乘以整车板数；实际采购制造商/MPN、supplier part 与 CAD 载体/符号/封装资产分列，载体不用于推断采购身份。",
+        "",
+        "## 整车板外器件与未冻结槽位",
+        "",
+        "需求分配只说明消费者归属，包含在该物件的整车总量内，不重复计数。未知数量、制造商或准确 SKU 保留空值。",
+        "",
+        "| 类别 | 项目 | 制造商 / MPN | 整车数量 | 生命周期 | 需求分配 / 当前价格状态 | 来源 |",
+        "|---|---|---|---:|---|---|---|",
+    ])
+    for item in data["external_items"]:
+        maker_mpn = " / ".join(str(v) for v in (item.get("manufacturer"), item.get("manufacturer_part")) if v) or "未冻结"
+        quantity = "待核" if item.get("quantity_per_vehicle") is None else f"{item['quantity_per_vehicle']} {item.get('quantity_unit') or ''}".strip()
+        allocations = item.get("demand_allocations") or []
+        allocation_text = "; ".join(
+            f"{a.get('consumer_instance')} ×{a.get('quantity')}" for a in allocations
+        )
+        if allocations:
+            allocation_text += "（分配量包含在整车总量内）"
+        if item.get("current_unit_price") is None:
+            allocation_text = (allocation_text + "；" if allocation_text else "") + "当前单价未确定"
+        sources_text = ", ".join(item.get("source_ids") or [])
+        lines.append(
+            "| 整车部件 | " + " | ".join(md_cell(value) for value in (
+                item.get("product_name"), maker_mpn, quantity,
+                status_labels.get(item.get("status"), item.get("status")), allocation_text, sources_text,
+            )) + " |"
+        )
+    for slot in data["requirement_slots"]:
+        maker_mpn = " / ".join(str(v) for v in (slot.get("manufacturer"), slot.get("manufacturer_part")) if v) or "未冻结"
+        slot_status = f"未冻结：{slot.get('reason') or ''}"
+        lines.append(
+            "| 需求槽位 | " + " | ".join(md_cell(value) for value in (
+                slot.get("name"), maker_mpn, "待定", "未闭合", slot_status,
+                ", ".join(slot.get("source_ids") or []),
+            )) + " |"
+        )
+
+    lines.extend([
+        "",
+        "## 原生器件目录（单板用量）",
+        "",
+        "模块用量只统计原生 instance；`DNP` 列显示 BOM 标记为不装的位号。载体差异根据实例已有的载体 MPN/Value 与实际 MPN/Value 比较，缺失字段不会被当成一致。精确商城匹配提供商品页链接；未匹配时不显示价格。",
+        "",
+        "| part_id | 实际制造商 | 实际 MPN | 每板现行用量 | DNP位号数 | 实例状态 | CAD载体差异 | C号（源） | 商城精确关联 |",
+        "|---|---|---|---|---:|---|---|---|---|",
+    ])
+    instances_by_part: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for instance in data["native_instances"]:
+        instances_by_part[instance["part_id"]].append(instance)
+    procurement_by_part: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for record in data["procurement_records"]:
+        if record.get("part_id"):
+            procurement_by_part[record["part_id"]].append(record)
+
+    for part in data["native_parts"]:
+        part_instances = instances_by_part.get(part["part_id"], [])
+        module_current: Counter[str] = Counter()
+        dnp_count = 0
+        unresolved_count = 0
+        for instance in part_instances:
+            lifecycle = instance.get("lifecycle_status")
+            if lifecycle == "current":
+                module_current[str(instance.get("module") or "未标模块")] += 1
+            elif lifecycle == "DNP":
+                dnp_count += 1
+            else:
+                unresolved_count += 1
+        module_text = "; ".join(f"{module} ×{count}" for module, count in sorted(module_current.items())) or "无现行实例"
+        lifecycle_text = "现行" if module_current else "不装" if dnp_count else "未闭合"
+        if unresolved_count:
+            lifecycle_text += f"；未闭合 {unresolved_count}"
+        purchase_rows = procurement_by_part.get(part["part_id"], [])
+        selection_states = sorted({row.get("selection_status") for row in purchase_rows if row.get("selection_status")})
+        if selection_states:
+            lifecycle_text += "；采购选型 " + ", ".join(status_labels.get(value, str(value)) for value in selection_states)
+        quote_links = []
+        for observation in part.get("quote_observations", []):
+            qid = observation.get("quote_id")
+            url = observation.get("source_url")
+            if qid and url:
+                quote_links.append(f"[{qid}]({url})")
+        quote_text = ", ".join(sorted(set(quote_links))) if quote_links else (
+            "身份未闭合" if part.get("identity_status") != "manufacturer_and_mpn_present" else "待精确商品页报价"
+        )
+        supplier_parts = part.get("supplier_parts_source") or part.get("supplier_parts") or []
+        lines.append(
+            "| " + " | ".join(md_cell(value) for value in (
+                part.get("part_id"), manufacturer_display(part), part.get("manufacturer_part"),
+                module_text, dnp_count, lifecycle_text, carrier_difference(part_instances),
+                ", ".join(str(value) for value in supplier_parts), quote_text,
+            )) + " |"
+        )
+
+    lines.extend([
+        "",
+        "## 商城输入未闭合项",
+        "",
+        "以下是主档输入中的未闭合报价候选；没有阶梯价或身份不匹配时保持 null，不映射相似型号或不同厂家。",
+        "",
+        "| 标识 | 制造商 / MPN | C号 | 商品页 | 未闭合原因 |",
+        "|---|---|---|---|---|",
+    ])
+    for item in data.get("unresolved_quote_records", []):
+        maker_mpn = " / ".join(str(v) for v in (item.get("manufacturer"), item.get("manufacturer_part")) if v) or "未确认"
+        page = f"[官方页]({item['source_url']})" if item.get("source_url") else "未取得精确商品页"
+        lines.append(
+            "| " + " | ".join(md_cell(value) for value in (
+                item.get("quote_id") or item.get("unresolved_id"), maker_mpn,
+                item.get("supplier_part"), page, item.get("reason"),
+            )) + " |"
+        )
+
+    source_rows: list[tuple[str, str, str]] = []
+    for key in ("native_index", "procurement_index", "manual_supplement", "quote_catalog"):
+        value = data["sources"].get(key) or {}
+        source_rows.append((key, str(value.get("path") or ""), str(value.get("sha256") or "")))
+    for key in ("native_source_files", "procurement_source_files"):
+        for value in data["sources"].get(key, []):
+            source_rows.append((key, value["path"], value["sha256"]))
+    for source_id, value in sorted(data.get("manual_source_catalog", {}).items()):
+        source_rows.append((source_id, value["path"], str(value.get("sha256") or "")))
+    lines.extend([
+        "",
+        "## 输入来源与SHA-256",
+        "",
+        "| 来源 | 相对路径 | SHA-256 |",
+        "|---|---|---|",
+    ])
+    for label, path, digest in source_rows:
+        lines.append(f"| {md_cell(label)} | `{md_cell(path)}` | `{md_cell(digest)}` |")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def payload_for_compare(value: dict[str, Any]) -> dict[str, Any]:
@@ -901,29 +1208,71 @@ def write_atomic(path: Path, value: dict[str, Any]) -> None:
                 pass
 
 
+def write_text_atomic(path: Path, value: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", newline="\n", dir=path.parent,
+            prefix=f".{path.name}.", suffix=".tmp", delete=False,
+        ) as stream:
+            temp = Path(stream.name)
+            stream.write(value)
+        os.replace(temp, path)
+        temp = None
+    finally:
+        if temp is not None:
+            try:
+                temp.unlink()
+            except FileNotFoundError:
+                pass
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="只读检查主档是否与当前来源一致")
     args = parser.parse_args()
     try:
         expected = build()
+        expected_md = render_markdown(expected)
+        expected_md_sha256 = sha256_bytes(expected_md.encode("utf-8"))
         if args.check:
-            if not OUTPUT_PATH.is_file():
-                print(json.dumps({"pass": False, "error": "主档文件缺失"}, ensure_ascii=True))
+            if not OUTPUT_PATH.is_file() or not OUTPUT_MD_PATH.is_file():
+                print(json.dumps({"pass": False, "error": "JSON或Markdown主档缺失"}, ensure_ascii=True))
                 return 1
             current = read_json(OUTPUT_PATH)
-            matches = payload_for_compare(current) == payload_for_compare(expected)
+            json_matches = payload_for_compare(current) == payload_for_compare(expected)
+            md_matches = OUTPUT_MD_PATH.read_text(encoding="utf-8-sig") == expected_md
+            matches = json_matches and md_matches
             print(json.dumps({
                 "pass": matches,
+                "json_pass": json_matches,
+                "markdown_pass": md_matches,
                 "content_sha256": expected.get("content_sha256"),
+                "markdown_sha256": expected_md_sha256,
                 "native_parts": expected["summary"]["native_part_count"],
                 "native_instances": expected["summary"]["native_instance_count"],
                 "procurement_rows": expected["summary"]["procurement_record_count"],
                 "quote_observations": expected["summary"]["quote_observation_count"],
+                "usable_quote_observations": expected["summary"]["usable_quote_observation_count"],
                 "readonly": True,
             }, ensure_ascii=True))
             return 0 if matches else 1
         write_atomic(OUTPUT_PATH, expected)
+        write_text_atomic(OUTPUT_MD_PATH, expected_md)
         print(json.dumps({
             "generated": True,
-            "path": str(O
+            "path": str(OUTPUT_PATH),
+            "markdown_path": str(OUTPUT_MD_PATH),
+            "content_sha256": expected.get("content_sha256"),
+            "markdown_sha256": expected_md_sha256,
+            **expected["summary"],
+        }, ensure_ascii=True))
+        return 0
+    except Exception as exc:
+        print(json.dumps({"pass": False, "error": str(exc)}, ensure_ascii=True))
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
