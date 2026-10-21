@@ -21,7 +21,7 @@ from urllib.parse import parse_qs, urlsplit
 import numpy as np
 
 from ..action_contract import ACTION_LABELS
-from ..feedback import FEEDBACK_LABELS
+from ..feedback import ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_LABELS, INPUT_SCHEMA
 from .activation_maps import COLOR_MAP_NAME, SPECTRUM_STOPS, DETECTION_LABELS, STATE_LABELS, activation_image
 from .network_layout import NetworkLayoutCache
 
@@ -123,8 +123,15 @@ def _time_number(value: Any) -> float | None:
     return number if math.isfinite(number) else None
 
 
-def _fields_for(key: str) -> tuple[str, ...]:
+def _fields_for(key: str, input_schema: str = INPUT_SCHEMA) -> tuple[str, ...]:
     if key == "input.state":
+        if input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+            return (
+                *STATE_LABELS[:1],
+                "目标绝对世界 X 坐标（场地坐标映射到 [-1, 1]；仅到点模式）",
+                "目标绝对世界 Y 坐标（场地坐标映射到 [-1, 1]；仅到点模式）",
+                *STATE_LABELS[3:],
+            )
         return STATE_LABELS
     if key == "input.feedback":
         return FEEDBACK_LABELS
@@ -316,7 +323,15 @@ class Network2DServer:
         metadata = MappingProxyType(
             {
                 name: _freeze(metadata_source.get(name))
-                for name in ("sequence", "sim_time", "output_time", "mode", "critic", "errors")
+                for name in (
+                    "sequence",
+                    "sim_time",
+                    "output_time",
+                    "mode",
+                    "critic",
+                    "errors",
+                    "input_schema",
+                )
             }
         )
         copied_layers: list[Mapping[str, Any]] = []
@@ -576,7 +591,12 @@ class Network2DServer:
             },
             "description": None if selected_layer is None else selected_layer["description"],
             "source": None if selected_layer is None else selected_layer["source"],
-            "fields": [] if selected_layer is None else list(_fields_for(str(selected_layer["key"]))),
+            "fields": [] if selected_layer is None else list(
+                _fields_for(
+                    str(selected_layer["key"]),
+                    frame.metadata.get("input_schema") or INPUT_SCHEMA,
+                )
+            ),
         }
         metadata = frame.metadata
         errors_value = _json_value(metadata.get("errors"))

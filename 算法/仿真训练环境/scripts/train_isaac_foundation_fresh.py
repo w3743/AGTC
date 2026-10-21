@@ -169,7 +169,14 @@ def _live_action_config(env) -> dict:
     return expected
 
 
-def _live_environment_contract(env) -> dict:
+def _live_environment_contract(env, *, input_schema: str = INPUT_SCHEMA) -> dict:
+    from isaac_field.feedback import SUPPORTED_INPUT_SCHEMAS
+
+    if not isinstance(input_schema, str) or input_schema not in SUPPORTED_INPUT_SCHEMAS:
+        raise ValueError(
+            f"unsupported expected live observation schema {input_schema!r}; "
+            f"expected one of {SUPPORTED_INPUT_SCHEMAS}"
+        )
     action = _live_action_config(env)
     drive = getattr(env, "drive_config", None)
     observation = getattr(env, "observation_config", None)
@@ -197,8 +204,11 @@ def _live_environment_contract(env) -> dict:
                 raise ValueError(f"unexpected live physics contact contract: {physics_contact!r}")
         elif observed != expected:
             raise ValueError(f"unexpected live physics contact contract: {physics_contact!r}")
-    if not isinstance(observation, dict) or observation.get("schema") != INPUT_SCHEMA:
-        raise ValueError(f"unexpected live observation contract: {observation!r}")
+    if not isinstance(observation, dict) or observation.get("schema") != input_schema:
+        raise ValueError(
+            f"unexpected live observation contract for expected schema {input_schema!r}: "
+            f"{observation!r}"
+        )
     return {
         "action_config": action,
         "drive_config": dict(drive),
@@ -206,8 +216,14 @@ def _live_environment_contract(env) -> dict:
     }
 
 
-def _validate_rough_profile_environment(env, profile_physics_contract: dict) -> dict:
-    live = _live_environment_contract(env)
+def _validate_rough_profile_environment(
+    env, profile_physics_contract: dict, *, input_schema: str = INPUT_SCHEMA
+) -> dict:
+    if input_schema == INPUT_SCHEMA:
+        # Preserve the original no-keyword call shape for legacy callers and tests.
+        live = _live_environment_contract(env)
+    else:
+        live = _live_environment_contract(env, input_schema=input_schema)
     drive = live["drive_config"]
     guide_spec = getattr(env, "front_guide_spec", getattr(getattr(env, "cfg", None), "front_guide_spec", None))
     stability_config = getattr(

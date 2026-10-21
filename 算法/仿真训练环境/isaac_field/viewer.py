@@ -17,6 +17,7 @@ from typing import Any
 import numpy as np
 
 from .action_contract import ACTION_LABELS, ACTION_SCHEMA, action_config
+from .feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
 from .task import DAMAGE_METRIC_ROOT_PROTECTION_V1
 
 
@@ -779,7 +780,30 @@ class FieldViewerControls:
         from .policy import PolicyRunner
 
         # Keep the current runner if loading a new file fails.
-        runner = PolicyRunner(self.adapter, checkpoint)
+        observation_config = None
+        for source in (self.adapter, getattr(self.adapter, "engine", None)):
+            if source is None:
+                continue
+            try:
+                candidate = getattr(source, "observation_config", None)
+            except Exception:
+                candidate = None
+            if isinstance(candidate, Mapping):
+                observation_config = candidate
+                break
+        if (
+            observation_config is not None
+            and observation_config.get("schema") == ABSOLUTE_GOAL_INPUT_SCHEMA
+        ):
+            runner = PolicyRunner(
+                self.adapter,
+                checkpoint,
+                input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+                expected_observation_config=observation_config,
+            )
+        else:
+            # Preserve the legacy call shape for v6 and existing lightweight adapters.
+            runner = PolicyRunner(self.adapter, checkpoint)
         runner.reset()
         self._runner = runner
         self._checkpoint = checkpoint

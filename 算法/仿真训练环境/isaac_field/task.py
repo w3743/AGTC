@@ -12,7 +12,8 @@ from scipy import ndimage
 
 from .assets import ROBOT_SPEC
 from .feedback import (
-    FEEDBACK_DIM, FeedbackSample, FeedbackSnapshot, SimFeedbackEstimator,
+    ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, INPUT_SCHEMA, SUPPORTED_INPUT_SCHEMAS,
+    FeedbackSample, FeedbackSnapshot, SimFeedbackEstimator,
 )
 from .layouts import generate_layout
 from .navigation import has_grid_anchor, validate_scene as validate_navigation_scene
@@ -50,6 +51,22 @@ STATE_FIELDS = (
                     "motion_dy_over_lidar_range", "heading_delta_over_pi",
                     "gimbal_yaw_delta_over_pi", "gimbal_pitch_delta_over_pi")),
 )
+ABSOLUTE_GOAL_STATE_FIELDS = (
+    "mode_0_search_1_goto",
+    "goal_world_x_normalized", "goal_world_y_normalized",
+    *STATE_FIELDS[3:],
+)
+
+
+def state_fields_for_schema(input_schema: str) -> tuple[str, ...]:
+    """Return the state labels for one explicitly versioned observation schema."""
+    if input_schema == INPUT_SCHEMA:
+        return STATE_FIELDS
+    if input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+        return ABSOLUTE_GOAL_STATE_FIELDS
+    raise ValueError(
+        f"unsupported input_schema {input_schema!r}; expected one of {SUPPORTED_INPUT_SCHEMAS!r}"
+    )
 
 
 def wrap(angle: float) -> float:
@@ -130,6 +147,8 @@ class Config:
     # strict 0.2 m/s and 0.3 rad/s checks regardless of these fields.
     goal_stop_speed: float = 0.2
     goal_stop_angular_speed: float = 0.3
+    # Select the semantic meaning of state[1:3]; legacy remains the default.
+    input_schema: str = INPUT_SCHEMA
 
     @classmethod
     def from_checkpoint_config(cls, values: dict[str, Any]) -> "Config":
@@ -149,8 +168,14 @@ class Config:
         return cls(**config)
 
     def __post_init__(self):
-        if self.size < 6 or self.cell <= 0 or self.dt <= 0 or self.max_time <= 0:
-            raise ValueError("size >= 6, cell/dt/max_time > 0 required")
+        if not math.isfinite(float(self.size)) or self.size < 6:
+            raise ValueError("size must be finite and >= 6")
+        if self.cell <= 0 or self.dt <= 0 or self.max_time <= 0:
+            raise ValueError("cell/dt/max_time > 0 required")
+        if self.input_schema not in SUPPORTED_INPUT_SCHEMAS:
+            raise ValueError(
+                f"unsupported input_schema {self.input_schema!r}; expected one of {SUPPORTED_INPUT_SCHEMAS!r}"
+            )
         if self.plants < 0 or not 0 <= self.dry_fraction <= 1:
             raise ValueError("invalid plant count or dry fraction")
         if self.layout not in ("rows", "scatter"):
@@ -695,6 +720,7 @@ class FieldTask:
 
     def __init__(self, cfg: Config | None = None, mode: str = "search"):
         self.cfg = cfg or Config()
+        state_fields_for_schema(self.cfg.input_schema)
         if mode not in ("search", "goto"):
             raise ValueError("mode must be search or goto")
         self.mode = mode
@@ -1414,7 +1440,16 @@ class FieldTask:
         theta = float(estimated_pose[2])
         gimbal_yaw, gimbal_pitch = map(float, estimated_pose[3:5])
         relative = np.array([math.cos(theta) * delta[0] + math.sin(theta) * delta[1], -math.sin(theta) * delta[0] + math.cos(theta) * delta[1]]) / c.size
-        state = [float(self.mode == "goto"), *(relative if self.mode == "goto" else [0, 0]),
+        if self.mode != "goto":
+            goal_features = [0.0, 0.0]
+        elif c.input_schema == INPUT_SCHEMA:
+            goal_features = relative
+        elif c.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+            goal_features = self.goal / c.size * 2.0 - 1.0
+        else:  # Config is validated, but guard against mutation after construction.
+            state_fields_for_schema(c.input_schema)
+            raise RuntimeError(f"unhandled input_schema {c.input_schema!r}")
+        state = [float(self.mode == "goto"), *goal_features,
                  *(estimated_xy / c.size * 2 - 1), math.sin(theta), math.cos(theta),
                  *self.last_action, min(1, self.time / c.max_time)]
         for k in ("lidar", "depth", "camera"):
@@ -1429,8 +1464,9 @@ class FieldTask:
         depth = np.where(df["valid"], df["values"], 0.0) / c.depth_range
         feedback = (np.zeros(FEEDBACK_DIM, dtype=np.float32) if self._feedback_snapshot is None
                     else np.asarray(self._feedback_snapshot.feedback, dtype=np.float32).copy())
-        if len(state) != len(STATE_FIELDS):
-            raise RuntimeError(f"task state builder produced {len(state)} values, expected {len(STATE_FIELDS)}")
+        state_fields = state_fields_for_schema(c.input_schema)
+        if len(state) != len(state_fields):
+            raise RuntimeError(f"task state builder produced {len(state)} values, expected {len(state_fields)}")
         return {"lidar": np.where(lf["valid"], lf["ranges"] / c.lidar_range, 0.0)[None, :].astype(np.float32),
                 # Keep validity in the sensor frame for point clouds and diagnostics;
                 # the policy receives normalized range with invalid rays at 0.

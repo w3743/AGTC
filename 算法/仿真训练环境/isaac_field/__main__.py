@@ -7,6 +7,8 @@ from collections.abc import Mapping
 
 import numpy as np
 
+from .feedback import INPUT_SCHEMA, SUPPORTED_INPUT_SCHEMAS
+
 
 def _json_safe(value):
     if isinstance(value, Mapping):
@@ -77,6 +79,8 @@ def main():
     parser.add_argument('--port',type=int,default=8768)
     parser.add_argument('--max-time',type=float,default=30.)
     parser.add_argument('--checkpoint')
+    parser.add_argument('--input-schema', choices=SUPPORTED_INPUT_SCHEMAS, default=INPUT_SCHEMA,
+                        help='Versioned state encoding; checkpoint metadata must match')
     parser.add_argument('--policy-device',default='cpu')
     parser.add_argument('--output',default=None)
     parser.add_argument('--goal-distance',type=float,nargs=2)
@@ -92,6 +96,8 @@ def main():
                        else {'damage_penalty': 4.0, 'goal_progress_budget': None})
     config_kwargs = dict(plants=args.plants, terrain_enabled=not args.flat,
                          max_time=args.max_time, **reward_settings)
+    if args.input_schema != INPUT_SCHEMA:
+        config_kwargs['input_schema'] = args.input_schema
     # Leave Config's established 0.01 default intact unless the CLI overrides it.
     if args.rock_density != 0.01:
         config_kwargs['rock_density'] = args.rock_density

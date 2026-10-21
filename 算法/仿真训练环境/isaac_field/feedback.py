@@ -16,6 +16,8 @@ from scipy.spatial.transform import Rotation
 
 
 INPUT_SCHEMA = "sensor-minimal-v6"
+ABSOLUTE_GOAL_INPUT_SCHEMA = "sensor-absolute-goal-v1"
+SUPPORTED_INPUT_SCHEMAS = (INPUT_SCHEMA, ABSOLUTE_GOAL_INPUT_SCHEMA)
 STATE_DIM = 33
 FEEDBACK_SCHEMA = "gimbal-imu-drive-feedback-v2"
 FEEDBACK_DIM = 37
@@ -109,10 +111,14 @@ SIM_SENSOR_MODEL = {
 _SOURCE_GROUPS = FEEDBACK_GROUPS
 
 
-def feedback_config() -> dict[str, Any]:
+def feedback_config(*, input_schema: str = INPUT_SCHEMA) -> dict[str, Any]:
     """Return a JSON-safe, labeled description of the policy feedback contract."""
+    if input_schema not in SUPPORTED_INPUT_SCHEMAS:
+        raise ValueError(
+            f"unsupported input_schema {input_schema!r}; expected one of {SUPPORTED_INPUT_SCHEMAS!r}"
+        )
     return {
-        "input_schema": INPUT_SCHEMA,
+        "input_schema": input_schema,
         "state_dim": STATE_DIM,
         "schema": FEEDBACK_SCHEMA,
         "dimension": FEEDBACK_DIM,

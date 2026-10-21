@@ -16,11 +16,21 @@ from torch import nn
 from stable_baselines3.common.distributions import DiagGaussianDistribution, StateDependentNoiseDistribution
 
 from ..action_contract import ACTION_LABELS, action_config
+from ..feedback import INPUT_SCHEMA, SUPPORTED_INPUT_SCHEMAS
 from ..policy import detection_presence_mask
 
 class PolicyInspector:
     def __init__(self, runner):
         self.runner = runner
+        observation_config = getattr(runner, "observation_config", None)
+        input_schema = (
+            observation_config.get("schema")
+            if isinstance(observation_config, Mapping)
+            else getattr(runner, "input_schema", INPUT_SCHEMA)
+        )
+        if input_schema not in SUPPORTED_INPUT_SCHEMAS:
+            raise ValueError(f"PolicyRunner has no validated observation schema: {input_schema!r}")
+        self.input_schema = input_schema
         self.policy = runner.model.policy
         self.modules = dict(self.policy.named_modules())
         self.layers: OrderedDict[str, dict[str, Any]] = OrderedDict()
@@ -405,6 +415,7 @@ class PolicyInspector:
         self.snapshot = dict(sequence=self.sequence, action_config=action_config(), sim_time=float(sim_time),
                              mode="暂停预览（未施加车辆）" if preview else "实际驾驶推理（动作前观测）",
                              critic="价值支路为独立记忆的额外诊断计算；记忆自本段连续采集起累计，不控制车辆",
+                             input_schema=self.input_schema,
                              errors=tuple(self._errors), layers=list(self.layers.values()))
         return action
 
