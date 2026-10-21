@@ -42,6 +42,9 @@ PREVIEW_INTERVAL = 1.0 / 30.0
 PREVIEW_QUALITY = max(35, min(90, int(os.environ.get("LIGHTSTEREO_PREVIEW_QUALITY", "55"))))
 MAX_SKEW_NS = 25_000_000
 MAX_FRAME_AGE = .75
+# HTTP cache bound uses the existing 1.5 s late-processing allowance. This is
+# publication freshness only; it does not certify exposure age or vehicle use.
+DEPTH_LATEST_MAX_PUBLISH_AGE_NS = 1_500_000_000
 CAPTURE_TARGET = dict(
     id='screen-checkerboard-10x7', inner_corners=[9, 6], square_size_mm=24.2,
     measurement='User measured five cells horizontally and vertically: 121 mm each',
@@ -725,6 +728,16 @@ class Live:
                         last_capture=captures[-1] if captures else None)
 
 
+def depth_record_is_fresh(record):
+    if record is None:
+        return False
+    published = record.metadata.get('publish_mono_ns')
+    if not isinstance(published, int) or isinstance(published, bool):
+        return False
+    age_ns = time.monotonic_ns() - published
+    return 0 <= age_ns <= DEPTH_LATEST_MAX_PUBLISH_AGE_NS
+
+
 def serve_depth_bin(handler, live, query, wait_timeout=1.0):
     """Send one locked immutable snapshot; query is parse_qs(..., keep_blank_values=True)."""
     try:
@@ -754,7 +767,8 @@ def serve_depth_bin(handler, live, query, wait_timeout=1.0):
             if not history:
                 return False
             if sequence is None:
-                return len(history[-1]) > 3
+                record, status, _ = select_depth_record(history)
+                return status == 200 and depth_record_is_fresh(record)
             if any(entry[0] == sequence for entry in history):
                 return True
             return history[-1][0] >= sequence
@@ -763,10 +777,15 @@ def serve_depth_bin(handler, live, query, wait_timeout=1.0):
             live.condition.wait_for(ready, timeout=wait_timeout)
         if live.calibration_active:
             return handler.json_response({'ok': False, 'message': '校准中：数值深度已暂停'}, 409)
-        if not live.capture_running or live.pipeline_epoch != request_epoch:
+        if live.stopped.is_set() or not live.capture_running or live.pipeline_epoch != request_epoch:
             status = 409 if sequence is not None else 503
             return handler.json_response({'ok': False, 'message': '采集管线已切换，请重新读取'}, status)
         record, status, message = select_depth_record(live.measure_history, sequence)
+        if sequence is None and status == 200 and not depth_record_is_fresh(record):
+            return handler.json_response({
+                'ok': False, 'state': 'warming',
+                'message': '等待新鲜深度帧；旧缓存不作为 latest 返回',
+            }, 503)
         if status == 503 and sequence is not None:
             status = 409
     if status != 200 or record is None:
