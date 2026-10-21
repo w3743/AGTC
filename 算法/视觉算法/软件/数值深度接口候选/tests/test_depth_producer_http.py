@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import unittest
+from unittest.mock import patch
 from types import SimpleNamespace
 
 import numpy as np
@@ -255,7 +256,9 @@ class DepthProducerTests(unittest.TestCase):
     def test_http_statuses_return_same_immutable_record_without_refresh(self):
         live = fake_live()
         payload = bytes(depth_wire.SOURCE_WIDTH * depth_wire.SOURCE_HEIGHT * 2)
-        record = depth_wire.build_depth_record(payload, metadata())
+        current_metadata = metadata()
+        current_metadata['publish_mono_ns'] = time.monotonic_ns()
+        record = depth_wire.build_depth_record(payload, current_metadata)
         live.measure_history.append(record.history_entry())
         before = record.metadata["publish_mono_ns"]
         handler = FakeHandler()
@@ -274,6 +277,17 @@ class DepthProducerTests(unittest.TestCase):
         live.measure_history.clear()
         server.serve_depth_bin(handler, live, {})
         self.assertEqual(handler.result[0], 503)
+
+    def test_latest_freshness_rejects_unknown_future_and_expired_publication_times(self):
+        with patch.object(server.time, 'monotonic_ns', return_value=10_000_000_000):
+            for published, fresh in ((None, False), (True, False),
+                                     (10_000_000_001, False),
+                                     (10_000_000_000, True),
+                                     (8_500_000_000, True),
+                                     (8_499_999_999, False)):
+                with self.subTest(published=published):
+                    record = SimpleNamespace(metadata={'publish_mono_ns': published})
+                    self.assertEqual(server.depth_record_is_fresh(record), fresh)
 
 
 if __name__ == "__main__":

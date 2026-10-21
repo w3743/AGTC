@@ -1,6 +1,6 @@
 # RK3588 统一深度输出
 
-本目录名沿用“数值深度接口候选”，当前服务已部署。2026-10-21 按用户最新要求，常态运行改为 ISP 按需尺寸直出，浏览器仅保留一份实时深度图；相机预览、设备状态和标定保留。
+本目录名沿用“数值深度接口候选”。单深度/ISP直出/NPU监控已部署；本轮新增的 latest 缓存新鲜度修正目前仅是本地已测试候选，尚未安装到运行中的开发板。2026-10-21 按用户最新要求，常态运行改为 ISP 按需尺寸直出，浏览器仅保留一份实时深度图；相机预览、设备状态和标定保留。
 
 ## 当前运行方式
 
@@ -57,7 +57,7 @@ curl.exe --fail --silent --show-error --dump-header depth.headers.txt --output d
 
 这两个接口源不随后续页面排版修改。adapter 修正供电脑侧消费者复用，未包含在本次板端 UI 安装白名单中；板端 producer 的 wire 源保持不变。
 
-截至 NPU 监控修复，当前完整本地套件 **78/78 通过，6.647 s**；包括契约跨层、状态回退、HTTP、几何和保留的离线实验回归。较早的 ARM 63项与23项记录分别属于当时源版本，不冒充当前完整板测。新增契约验收文件由契约对话维护，不由本对话复制一份：
+截至连续采样与 latest 缓存候选修复、此次小修前，完整本地套件 **90/90 通过，7.022 s**；包括契约跨层、状态回退、HTTP、几何和保留的离线实验回归。本次小修仅重跑受影响的 HTTP 传输测试，结果记入本次工作记录。较早的 ARM 63项与23项记录分别属于当时源版本，不冒充当前完整板测。新增契约验收文件由契约对话维护，不由本对话复制一份：
 
 ```powershell
 python -B -m unittest discover -s '算法\视觉算法\软件\数值深度接口候选\tests' -v
@@ -102,6 +102,42 @@ adb shell systemctl is-active rk-lightstereo.service
 adb shell python3 -B /opt/rk-lightstereo/backups/npu-monitor-20261021-120543/installer.py rollback --backup /opt/rk-lightstereo/backups/npu-monitor-20261021-120543
 adb shell systemctl is-active rk-lightstereo.service
 ```
+
+## 连续实机采样与 latest 缓存候选（2026-10-21）
+
+本轮新增可复用的 [probe_depth.py](app/probe_depth.py)，复用现有 wire 解码器检查真实 HTTP 载荷、profile范围、精确同帧绑定、seq/epoch/PTS/发布时钟回退，并保存完整数值帧。现役服务、相机参数和算法均未修改，PID保持712823、NRestarts=0；现役 `server.py` SHA仍为 `362d499e0f81692b456d878a96ce12a78be2f2e0358ec7698dffaa4dc48a928e`。本地缓存修正候选与现役源不同，不能把本地测试写成已部署通过。
+
+| 高精度实机稳定段 | 实测 |
+|---|---:|
+| 采样时间 | 60.030 s |
+| 完整HTTP响应 / 唯一数值帧 | 2436 / 1554 |
+| 消费者实际观测唯一帧率 | 25.88 帧/秒 |
+| 服务序号推进速率（由首尾seq/发布时间计算） | 29.02 序号/秒 |
+| RTT p50 / p95 / max | 28.74 / 34.08 / 68.05 ms |
+| 坏响应 / HTTP错误 / 传输错误 / 同身份内容变化 / 时间回退 | 全部0 |
+| 未观测到的序号 | 189；不可直接判为相机/网络丢帧 |
+| 左软件到达→发布 p50 / p95 | 38.75 / 61.85 ms |
+| 右软件到达→发布 p50 / p95 | 45.72 / 67.97 ms |
+
+到达时间是应用复制图像后的软件时间，以上不是曝光延迟。发布→收包诊断估计使用前后HTTP硬件采样形成的偏移范围，仍假定短测期间偏移固定；未建立合格的跨主机时钟映射，不可用于策略的 source age。源映射、质量和实物外参继续为null；两段共3110帧已实际送入共享adapter回放，全部载荷可解析、`age=None`、`legacy_ready=false`、不产生可供旧策略使用的tensor。
+
+主证据为 [depth-continuity-result.json](evidence/depth-continuity-result.json)。本地保留的原始数据（不在仓库）：`depth-http-probe-highres.json`、`depth-http-probe-highres.frames.bin.gz`。gzip解压后按归档索引顺序、每帧62880字节；对应唯一请求的 `archive_frame_index`、原始 `metadata_ascii` 与payload/header SHA绑定。精确重复请求通过该索引引用原始帧，省略重复的metadata内容。全量解压校验结果在 [depth-continuity-archive-replay.json](evidence/depth-continuity-archive-replay.json)。
+
+首段60秒也本地保留了1556帧完整原始数据（不在仓库）：`depth-http-probe.json`、`depth-http-probe.frames.bin.gz`。但其Windows Python 3.11 `monotonic_ns` 使用GetTickCount64，分辨率15.625 ms，RTT不可作精细统计。发现后已把工具的主机计时与调度改为高精度 `perf_counter_ns`（本机QPC分辨率100 ns），并补了粗uptime tick内完整HTTP交换仍能测出正时长的回归，第二段才作为当前延迟证据。两段原始文件均未重写。
+
+现场异常/恢复证据为 [depth-continuity-recovery.json](evidence/depth-continuity-recovery.json)：非法序号400、不可用/已过期序号409后继续正常读取；同序号请求3次保持原始bytes/header不变；自然休眠且服务未重启后，旧实现先返回旧缓存200，高精度再次测得约297.75 ms后出现新seq。相机断电/拔插、管线异常自愈与长期热稳定性没有在本轮实测，不能由HTTP恢复代替。
+
+**确认并修复的缺陷（本地候选，待协调审核上线）**：无参数 `/depth.bin` 的旧实现不检查缓存发布时间，新请求唤醒后台后仍可立刻返回休眠前缓存，HTTP 200不足以证明实时。候选现按同板 `publish_mono_ns` 检查0..1.5秒的发布缓存年龄；等待期内有新鲜记录就返回，1秒等待后仍无新鲜记录则返回503且 `state=warming`，不会把旧缓存伪装成latest。1.5秒是软件缓存门槛，不是曝光年龄或实车安全目标。`?sequence=N` 仍能读取缓存内指定历史帧的原始字节，过期仍409。既有UI有独立过期遮罩，本轮不改页面或NPU监控。
+
+除合成回归外，还将真实采到的旧帧2968与新帧4857送入本地候选的真实HTTP handler：旧帧作latest时503 warming，指定旧序号仍200且原bytes/header一致，新帧加入后latest 200且内容精确一致。只有用于发布年龄判断的当前板时钟在本地重放中固定；该测试没有冒充板端已部署验证。此前完整本地90项的通过记录包括缓存等待/超时恢复、未来/未知发布时间拒绝与历史读取不变。wire、adapter、标定和训练源未改动。
+
+从项目根运行下一次采样，输出名称应使用未存在的文件（默认拒绝覆盖历史原始数据）：
+
+```powershell
+python -B '算法/视觉算法/软件/数值深度接口候选/app/probe_depth.py' --url http://127.0.0.1:8877 --duration 60 --interval 0.005 --output '算法/视觉算法/软件/数值深度接口候选/evidence/depth-http-probe-next.json'
+```
+
+运行时会请求深度以激活已有worker，不重启服务或更改生产参数；出现坏响应/时间回退/传输错误仍落盘并返回非0。时长、间隔或URL参数错误在开档前拒绝；即使传入`--overwrite`也不会因无效参数截断既有证据，NaN/Inf不进入JSON。当前旧服务的长时休眠后首帧可能是旧缓存，做稳定吞吐比较前需先观察到新的seq并单独记录恢复阶段。
 
 ## 历史实验与未验收项
 
