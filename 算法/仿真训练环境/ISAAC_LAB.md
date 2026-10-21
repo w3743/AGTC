@@ -1,6 +1,6 @@
 # Isaac Lab 项目状态
 
-2026-10-21最新状态：fast-stop恢复控制组 `random_global_rough_fast_stop_lstm512_resume_20261021_attempt2` 已自然完成196608步，真实进程exit 0。summary指定最终checkpoint为 `stage_01_global_random.zip`，实算SHA `c5ab17ceb785e1abfed0a1bfc292b1ad31912801ea91b6e77f672463a508585b`；最终独立CPU审计24/24通过，`final_checkpoint_cpu.json` / `.log`保留，attempt1谓词失败记录未覆盖。配对过程量runner `scripts/evaluate_fast_stop_resume.py` 的6项测试在Windows和WSL Isaac Lab Python均通过，WSL `validate_completed_trial` gate真实exit 0并核实46项child、45项parent源。配对开发评估 `results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2_evaluation` 已真实exit 0/completed，rough_a/b各4个配对seed均valid，共16行；`evaluation_cpu_audit.json` 24项检查通过，attempt1/2审计问题记录保留且原始评估报告未改。两个split分别no_improvement；合并8个paired seed后，clean成功0/8→0/8、进入0.4m半径0/8→0/8、max_hold为0；无损伤/碰撞，boundary事件3→0。不能据此称学习提升或held-out泛化。课程 `fast_stop512_mastery_20261021_attempt2` 已串行启动并发生真实PPO更新；baseline与首8192步checkpoint的独立CPU审计均为真实WSL exit 0、21/21通过。当前run_status为`mastery_probe`/8192，首训练块完整保存；16个near探针仍在进行，尚无near能力成绩或晋级。47源与协议冻结不变，automation保持PAUSED。过程量、训练与运行证据见本文末尾TRAIN-01。
+2026-10-21当前状态：恢复控制组与rough_a/b配对开发评估已完成；8个paired seed的clean成功与进入0.4 m半径均为0/8→0/8，未见损伤或碰撞，但不构成学习提升。fast_stop512 mastery课程仍在运行；run_status最近记录为`mastery_probe`/49152步（12:50:55北京时间），WSL进程PID458的实际argv已核实。47个训练源码及protocol保持冻结。CPU-only Viser 1.0.30浏览器交互验收已通过；这不包含原生策略物理测试，仍须等待课程自然完成并核实exit 0后才启动实际策略预览。原周期训练automation保持PAUSED；单次heartbeat“训练结束后打开点选目标预览”目前ACTIVE、每10分钟安静检查，完成后启动预览并保持暂停供用户点测，结果后暂停自身。恢复与评估明细见TRAIN-01。
 
 恢复前曾只读核实Ubuntu-24.04为Stopped，昨日SIGSTOP的原PID和内存现场已不能确认；没有对旧PID发SIGCONT，也不是逐位原位续跑。新子环境、RNG、LSTM/rollout重新初始化，训练加载阶段逐tensor核实权重与Adam等于父57344检查点。下述2026-10-20启动/暂停等记录属于历史时点；当前运行状态以上述控制组/配对评估完成证据及已启动的课程状态为准。
 用户已确认将本轮目标改为最短时间到点停稳。新入口 `random_rough_fast_stop` 与独立目录 `results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/` 已于18:01:53北京时间正式启动；协议SHA `3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c`，45源冻结。LSTM512、新随机权重、gamma1、成功+10/失败−10/每秒−0.1；距离潜势仅辅助学习并在终态抵消，途中稳定奖励权重为0，姿态统计/硬失败保留。停车为距目标≤0.4m、真实水平速度<0.05m/s、完整车体角速度<0.1rad/s持续0.5s，不要求朝向。物理、全场随机goal、4环境、196608预算和60s上限保持。CPU377 passed/20 skipped/8 warnings、编译/脚本/源码稳定性实际0，原生Newton20 passed/61 warnings真实0；第十六批已整理。初始化已核实actor/critic各512×1、3065801独立参数，训练诊断已有实际PPO更新、reward分项对账一致，尚无能力提升结论。细节见本轮整理与真实运行记录。
@@ -43,7 +43,7 @@
 
 ## 训练与界面边界
 
-原128维新几何准备目录 `results/isaac_field_improvement/random_global_rough_coupled_guides_20261020/` 保留prepared/0步历史证据，协议SHA为5de27ea7b7e1714b8822ec8fe11f0b53e6f08d194577b253d376913a00405980；512入口改源后不能再据旧preflight称其可直接启动。恢复控制组和rough_a/b配对开发评估均已完成；两个split分别no_improvement，合并8个paired seed后clean成功与进入0.4m半径均为0/8→0/8。当前mastery fast_stop512课程已完成首8192步near训练块并进入`mastery_probe`；16个near探针仍在进行，尚无near能力成绩或晋级。手动检查使用8781车辆页，不加载旧checkpoint；此前实际运行至5.45秒并暂停归零/reset回0秒、console无error（1条上游弃用warn）；旧8769/8770模型回放属于原14轮几何，不作为新增导向轮或512策略验收。运行命令见 [使用说明](使用说明.md)。
+原128维新几何准备目录 `results/isaac_field_improvement/random_global_rough_coupled_guides_20261020/` 保留prepared/0步历史证据，协议SHA为5de27ea7b7e1714b8822ec8fe11f0b53e6f08d194577b253d376913a00405980；512入口改源后不能再据旧preflight称其可直接启动。恢复控制组和rough_a/b配对开发评估均已完成；两个split分别no_improvement，合并8个paired seed后clean成功与进入0.4m半径均为0/8→0/8。mastery fast_stop512课程run_status最近记录为`mastery_probe`/49152步（2026-10-21 12:50:55北京时间）；本次WSL核实PID458仍以`train_isaac_mastery.py --launch`运行，未见完成或晋级证据。手动检查使用8781车辆页，不加载旧checkpoint；此前实际运行至5.45秒并暂停归零/reset回0秒、console无error（1条上游弃用warn）；旧8769/8770模型回放属于原14轮几何，不作为新增导向轮或512策略验收。运行命令见 [使用说明](使用说明.md)。
 
 界面固定深色，车辆三维和完整二维网络保留；不恢复网络三维或整体视图。网络共60个监控卡片，并非60个神经层；连续曲线不随选层点亮。主图所有采集激活和参数共用整帧完整值域自适应Turbo色标；详情单图可独立自动缩放。无checkpoint的手动检查不产生训练策略实时激活。
 
@@ -180,3 +180,27 @@ CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/lassc_replay.py 
 
 父训练诊断的终点距离与0成功只能描述回合结束状态，不能推断从未进入0.4 m。配对runner把真实逐步root COM XY速度、全XYZ角速度与trajectory/goal_stop按时刻对齐，报告最小距离、是否进入0.4m范围和最长连续hold，再区分未靠近和经过但未停稳；合并两split的8个paired seed后无clean成功或进入目标半径，max_hold为0，故总体评估为no_improvement。boundary事件减少3→0但不改变无成功门槛结论，不得据步数、检查点或该单项变化认定能力提升，也不得仅凭动作均值或critic EV认定GAE根因。830xx继续不观察。
 
+
+
+### 严格停车地图点选预览
+
+[地图点选预览](scripts/view_fast_stop_goal.py)使用官方Isaac Lab Viser显示当前fast_stop512课程策略；默认选择`near-best`，这是当前阶段固定near探针选出的开发候选，不是课程正式global best或训练结束后的最终检查点。`--check`只核protocol、47项训练源、checkpoint ZIP/header及8783/8784端口，不启动Isaac或加载策略；实际`--launch`要求run_status已completed且训练进程真实exit 0，并核验protocol、源及checkpoint。当前课程最近run_status为`mastery_probe`/49152步，WSL PID458 argv已核；因此仍等课程自然完成。CPU-only Viser 1.0.30交互式浏览器验收已通过：两次点选目标分别为[70.0252124, 69.875]与[30.1247892, 29.975]，保持同scene和起点[50, 50, 0]；reset清零time、XY速度和完整角速度并保持暂停，目标圆环跟随，俯视视角不跳。关闭点选时单击不触发reset，重新启用后仍可选点；界面坐标、速度和hold字段均可见。截图见[preview_map_cpu_verified.png](results/project_history/fast_stop_objective_20261020/preview_map_cpu_verified.png)。CPU fixture已Ctrl-C关闭，PID2644与8795 listener均不存在，训练PID458未动。这只验证CPU交互，不验证原生模型物理。单次heartbeat“训练结束后打开点选目标预览”已ACTIVE；原周期训练automation仍PAUSED。
+
+修复后的CPU验收证据：[全套CPU回归](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_cpu_after_attempt2.log)为428 passed、22 skipped、8 warnings、exit 0（在显示缺陷修复前）；[显示修复专项](results/project_history/fast_stop_objective_20261020/preview_batch17_wsl_ui_fix.log)为18 passed、`py_compile`和`--check`均exit 0。`--check`选出的当前near-best是`checkpoints/steps_0016384_near.zip`（16384步，SHA `9d374b52335464ae2873a1654b69f8a437e04d26ce0e541a40de471c1e686de3`，固定near探针10/16）；这不等同final。protocol SHA为`182b8862f08dc5d92bd7101d8e2a0d0541ab7f01cdc751e760c60c2373519c76`，47/47 live源与snapshot匹配。预览脚本SHA `90f16974401cf34efbb0e206e85ec772d701d327a73347a491b27ebb2eb17ed7`，测试SHA `0d0f8f2bad374785bea66b3d279481bdbbb54222b3074c6adef1694910800aab`；MDX显示文案已改为“低于”，地图文件夹设为`order=-10`并置顶。
+
+训练完成后先用CPU检查：
+
+```bash
+CUDA_VISIBLE_DEVICES='' bash scripts/isaaclab_python.sh scripts/view_fast_stop_goal.py \
+  --check --trial results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2 --port 8783
+```
+
+核实真实训练exit 0并确保所用输出目录不存在后，再启动官方预览：
+
+```bash
+bash scripts/isaaclab_python.sh scripts/view_fast_stop_goal.py \
+  --launch --trial results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2 \
+  --port 8783 --output results/isaac_field_viewer/fast_stop512_click_goal_20261021
+```
+
+在`http://127.0.0.1:8783/`展开顶部“地图点选目标”目录，点“俯视整张地图”；地图世界坐标范围0–100 m，原点在左下，+Y朝上。保持“启用地图点选”勾选后点击目标位置。程序先检查当前车辆姿态与目标在完整场景中可达；通过后从当前位置保持yaw开启新回合、清零时间和LSTM并暂停。再按“运行任务”开始策略控制。无效或不连通的点击不会改变当前目标。地图点击是预览中的人工目标测试；每个训练reset仍独立随机采样起点、yaw和目标。mastery的固定16-seed探针用于可重复的候选验收：相同seed会复现同一测试初态以比较checkpoint，不会让训练每回合重复同一个起点或目标。两者的结果不混为训练成功率。
