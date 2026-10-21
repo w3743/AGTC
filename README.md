@@ -10,7 +10,7 @@
 
 ```powershell
 git lfs install
-git clone --recurse-submodules https://github.com/w3743/AGTC.git
+git -c core.longpaths=true clone --config core.longpaths=true --recurse-submodules https://github.com/w3743/AGTC.git
 cd AGTC
 git lfs pull
 git submodule status --recursive
