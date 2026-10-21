@@ -45,7 +45,10 @@ from .newton_drive import (
     build_physics_contact_metadata,
     same_side_wheel_coupling_metadata,
 )
-from .feedback import FEEDBACK_DIM, STATE_DIM, INPUT_SCHEMA, FeedbackSample, feedback_config
+from .feedback import (
+    ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, STATE_DIM, FeedbackSample,
+    feedback_config,
+)
 from .scene_assets import crop_asset, terrain_asset
 from .layouts import generate_layout
 from .task import (
@@ -53,8 +56,8 @@ from .task import (
     EpisodePoseSamplingError,
     FieldTask,
     Scene,
-    STATE_FIELDS,
     sample_episode_start_goal,
+    state_fields_for_schema,
     wrap,
 )
 from .terrain import Terrain
@@ -889,10 +892,11 @@ class IsaacFieldEnv(DirectRLEnv):
     @property
     def observation_config(self):
         c = self.field_cfg
-        return dict(
-            schema=INPUT_SCHEMA,
+        schema = c.input_schema
+        contract = dict(
+            schema=schema,
             state_dim=STATE_DIM,
-            state_fields=list(STATE_FIELDS),
+            state_fields=list(state_fields_for_schema(schema)),
             observation_shapes={
                 'lidar': [1, c.lidar_rays],
                 'depth': [1, c.depth_height, c.depth_width],
@@ -904,7 +908,7 @@ class IsaacFieldEnv(DirectRLEnv):
             lidar_invalid_value=0.0,
             detection_fields=['cx', 'cy', 'width', 'height', 'class_id', 'confidence', 'range', 'range_valid'],
             detection_presence='positive width and height',
-            feedback=feedback_config(),
+            feedback=feedback_config(input_schema=schema),
             feedback_dim=FEEDBACK_DIM,
             estimated_pose=self.tasks[0].estimated_pose_config,
             imu_mount_body='gimbal_pitch_link',
@@ -920,6 +924,17 @@ class IsaacFieldEnv(DirectRLEnv):
             previous_command_semantics='normalized_direct_track_speed_policy_command',
             action_components=list(ACTION_COMPONENTS),
         )
+        if schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+            contract["absolute_goal_coordinates"] = {
+                "source": "task.goal",
+                "coordinate_frame": "field_world_xy",
+                "origin_xy_m": [0.0, 0.0],
+                "unit": "m",
+                "field_size_m": float(c.size),
+                "normalization": "world_xy / field_size_m * 2 - 1",
+                "state_clip": [-1.0, 1.0],
+            }
+        return contract
 
     @property
     def action_config(self):
@@ -969,6 +984,8 @@ class SingleFieldAdapter(gym.Env):
 
     @property
     def task(self):return self.engine.tasks[0]
+    @property
+    def observation_config(self):return self.engine.observation_config
     def __getattr__(self,name):return getattr(self.task,name)
     def current_observation(self):return self.task._observation()
     def reset(self,*,seed=None,options=None):

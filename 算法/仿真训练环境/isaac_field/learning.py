@@ -14,6 +14,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
+from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA, INPUT_SCHEMA
 from isaac_field.task import Config
 
 
@@ -139,21 +140,152 @@ def _damage_config(source) -> dict[str, Any] | None:
     return None
 
 
-def _model_or_checkpoint(model_or_checkpoint, *, device: str):
+def _live_observation_config(source) -> dict[str, Any] | None:
+    """Find the native observation contract through adapters and wrappers."""
+    pending = [source]
+    visited: set[int] = set()
+    while pending:
+        candidate = pending.pop(0)
+        if candidate is None or id(candidate) in visited:
+            continue
+        visited.add(id(candidate))
+        config = getattr(candidate, "observation_config", None)
+        if isinstance(config, Mapping):
+            return dict(config)
+        for name in ("engine", "env", "unwrapped"):
+            child = getattr(candidate, name, None)
+            if child is not None and child is not candidate:
+                pending.append(child)
+    return None
+
+
+def _live_input_schema(source) -> str | None:
+    """Read the schema carried by a task config, if this environment exposes one."""
+    pending = [source]
+    visited: set[int] = set()
+    while pending:
+        candidate = pending.pop(0)
+        if candidate is None or id(candidate) in visited:
+            continue
+        visited.add(id(candidate))
+        for name in ("cfg", "field_cfg"):
+            config = getattr(candidate, name, None)
+            schema = getattr(config, "input_schema", None)
+            if isinstance(schema, str):
+                return schema
+        for name in ("engine", "env", "unwrapped"):
+            child = getattr(candidate, name, None)
+            if child is not None and child is not candidate:
+                pending.append(child)
+    return None
+
+
+def _observation_config_is_complete(config: Mapping[str, Any] | None) -> bool:
+    if not isinstance(config, Mapping):
+        return False
+    fields = config.get("state_fields")
+    shapes = config.get("observation_shapes")
+    return (
+        config.get("state_dim") == 33
+        and isinstance(fields, (list, tuple))
+        and len(fields) == 33
+        and isinstance(shapes, Mapping)
+        and shapes.get("state") == [33]
+    )
+
+
+def _policy_contract(
+    source,
+    *,
+    input_schema: str | None = None,
+    expected_observation_config: Mapping[str, Any] | None = None,
+) -> tuple[str, dict[str, Any] | None]:
+    """Resolve and cross-check the live schema before model use or checkpoint loading."""
+    from isaac_field.feedback import SUPPORTED_INPUT_SCHEMAS
+
+    live_schema = _live_input_schema(source)
+    actual_config = _live_observation_config(source)
+    actual_schema = actual_config.get("schema") if actual_config is not None else None
+    # Older adapters and tests can carry unrelated, pre-versioned display metadata.
+    # Only a supported schema is authoritative when no Config exposes one.
+    if live_schema is None and actual_schema in SUPPORTED_INPUT_SCHEMAS:
+        live_schema = actual_schema
+    schema = live_schema if input_schema is None and live_schema is not None else (
+        INPUT_SCHEMA if input_schema is None else input_schema
+    )
+    if schema not in SUPPORTED_INPUT_SCHEMAS:
+        raise ValueError(
+            f"unsupported input_schema {schema!r}; expected one of {SUPPORTED_INPUT_SCHEMAS!r}"
+        )
+    if live_schema is not None and live_schema != schema:
+        raise ValueError(
+            f"live environment input_schema {live_schema!r} does not match requested {schema!r}"
+        )
+    if actual_config is not None:
+        config_schema = actual_config.get("schema")
+        if config_schema in SUPPORTED_INPUT_SCHEMAS and config_schema != schema:
+            raise ValueError(
+                f"live observation_config schema {config_schema!r} does not match requested {schema!r}"
+            )
+    if expected_observation_config is not None:
+        expected = dict(expected_observation_config)
+        if actual_config is not None and actual_config != expected:
+            raise ValueError("expected_observation_config differs from the live environment contract")
+        actual_config = expected
+    if schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+        if not _observation_config_is_complete(actual_config):
+            raise ValueError(
+                "absolute-goal training and evaluation require the complete live observation_config"
+            )
+    elif not _observation_config_is_complete(actual_config):
+        # Preserve v6 compatibility with old minimal test adapters and archived
+        # checkpoints. Full contracts are still forwarded whenever available.
+        actual_config = None
+    return schema, actual_config
+
+
+def _model_or_checkpoint(
+    model_or_checkpoint,
+    *,
+    device: str,
+    input_schema: str,
+    expected_observation_config: Mapping[str, Any] | None,
+):
     from isaac_field.policy import (
         _validate_checkpoint_action_metadata,
+        _validate_checkpoint_encoder_metadata,
+        _validate_model_encoder_contract,
         _validate_model_action_contract,
     )
 
     if hasattr(model_or_checkpoint, "predict"):
         _validate_model_action_contract(model_or_checkpoint)
+        # Lightweight fake models used by legacy orchestration tests have no
+        # policy metadata. Real models always receive the schema validation;
+        # the absolute-goal path never permits a metadata-free model.
+        if input_schema != INPUT_SCHEMA or hasattr(model_or_checkpoint, "policy"):
+            _validate_model_encoder_contract(
+                model_or_checkpoint,
+                input_schema=input_schema,
+                expected_observation_config=expected_observation_config,
+            )
         return model_or_checkpoint, None
     from sb3_contrib import RecurrentPPO
 
     path = _existing_checkpoint_path(model_or_checkpoint)
     _validate_checkpoint_action_metadata(path)
+    _validate_checkpoint_encoder_metadata(
+        path,
+        input_schema=input_schema,
+        expected_observation_config=expected_observation_config,
+    )
     model = RecurrentPPO.load(str(path), device=device)
     _validate_model_action_contract(model)
+    _validate_model_encoder_contract(
+        model,
+        input_schema=input_schema,
+        expected_observation_config=expected_observation_config,
+    )
     return model, path
 
 
@@ -280,6 +412,8 @@ def evaluate_model(
     device: str = "cuda:0",
     record_trajectories: bool = False,
     record_initial_conditions: bool = False,
+    input_schema: str | None = None,
+    expected_observation_config: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate complete episodes on fixed seeds and return JSON-safe rows.
 
@@ -306,6 +440,11 @@ def evaluate_model(
     record_initial_conditions = bool(record_initial_conditions or record_trajectories)
     engine, env_cfg = _adapter_engine_cfg(adapter)
     current_action_config = _live_action_config(engine)
+    policy_input_schema, current_observation_config = _policy_contract(
+        adapter,
+        input_schema=input_schema,
+        expected_observation_config=expected_observation_config,
+    )
     if record_initial_conditions and getattr(adapter, "task", None) is None:
         raise TypeError("compact trajectory recording requires an adapter exposing its live task")
     distance_cost = float(getattr(env_cfg, "distance_cost", math.nan))
@@ -318,7 +457,12 @@ def evaluate_model(
     env_cfg.goal_distance = goal_distance
     env_cfg.goal_angle = goal_angle
 
-    model, checkpoint_path = _model_or_checkpoint(model_or_checkpoint, device=device)
+    model, checkpoint_path = _model_or_checkpoint(
+        model_or_checkpoint,
+        device=device,
+        input_schema=policy_input_schema,
+        expected_observation_config=current_observation_config,
+    )
     current_damage_config = _damage_config(adapter)
     current_damage_metric = (
         current_damage_config.get("metric") if current_damage_config is not None else None
@@ -465,6 +609,7 @@ def evaluate_model(
         "checkpoint": None if checkpoint_path is None else str(checkpoint_path),
         "model_class": type(model).__name__,
         "action_config": current_action_config,
+        "input_schema": policy_input_schema,
         "checkpoint_action_config": getattr(model, "field_action_config", None),
         "damage_config": current_damage_config,
         "damage_metric": current_damage_metric or "unrecorded",
@@ -477,6 +622,7 @@ def evaluate_model(
         "drive_config": getattr(engine, "drive_config", None),
         "checkpoint_drive_config": getattr(model, "field_drive_config", None),
         "observation_config": getattr(engine, "observation_config", None),
+        "policy_observation_contract": current_observation_config,
         "checkpoint_observation_config": getattr(model, "field_observation_config", None),
         "goal_distance": None if goal_distance is None else list(goal_distance),
         "goal_angle_rad": float(goal_angle),
@@ -549,6 +695,7 @@ def train_stage(
     target_kl: float | None = 0.03,
     verbose: int = 0,
     lstm_hidden_size: int | None = None,
+    input_schema: str | None = None,
 ) -> StageTrainingResult:
     """Continue or initialize RecurrentPPO on the official Isaac Lab wrapper.
 
@@ -582,6 +729,8 @@ def train_stage(
     from sb3_contrib import RecurrentPPO
     from isaac_field.policy import (
         _validate_checkpoint_action_metadata,
+        _validate_checkpoint_encoder_metadata,
+        _validate_model_encoder_contract,
         _validate_model_action_contract,
         make_model,
         validate_policy_spaces,
@@ -590,6 +739,10 @@ def train_stage(
 
     if hasattr(env, "engine"):
         raise TypeError("train_stage requires a native batched Isaac Lab env, not SingleFieldAdapter")
+    policy_input_schema, observation_config = _policy_contract(
+        env,
+        input_schema=input_schema,
+    )
     from isaac_field.action_contract import action_config
 
     expected_action_config = action_config()
@@ -606,10 +759,24 @@ def train_stage(
             f"current action contract: {live_action_config!r}"
         )
     vec_env = _sb3_wrapper(env)
-    validate_policy_spaces(vec_env.observation_space, vec_env.action_space)
+    if policy_input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+        validate_policy_spaces(
+            vec_env.observation_space,
+            vec_env.action_space,
+            input_schema=policy_input_schema,
+            expected_observation_config=observation_config,
+        )
+    else:
+        validate_policy_spaces(vec_env.observation_space, vec_env.action_space)
     if hasattr(checkpoint, "predict"):
         _validate_model_lstm_hidden_size(checkpoint, lstm_hidden_size)
         _validate_model_action_contract(checkpoint)
+        if policy_input_schema != INPUT_SCHEMA or hasattr(checkpoint, "policy"):
+            _validate_model_encoder_contract(
+                checkpoint,
+                input_schema=policy_input_schema,
+                expected_observation_config=observation_config,
+            )
         model = checkpoint
         model.set_env(vec_env)
     elif checkpoint is None:
@@ -626,7 +793,10 @@ def train_stage(
             "target_kl": target_kl,
             "device": device,
             "verbose": verbose,
+            "input_schema": policy_input_schema,
         }
+        if observation_config is not None:
+            model_kwargs["observation_config"] = observation_config
         if lstm_hidden_size is not None:
             model_kwargs["lstm_hidden_size"] = lstm_hidden_size
         model = make_model(
@@ -636,6 +806,11 @@ def train_stage(
     else:
         checkpoint_path = _existing_checkpoint_path(checkpoint)
         _validate_checkpoint_action_metadata(checkpoint_path)
+        _validate_checkpoint_encoder_metadata(
+            checkpoint_path,
+            input_schema=policy_input_schema,
+            expected_observation_config=observation_config,
+        )
         model = RecurrentPPO.load(
             str(checkpoint_path),
             env=vec_env,
@@ -647,6 +822,12 @@ def train_stage(
         )
     _validate_model_lstm_hidden_size(model, lstm_hidden_size)
     _validate_model_action_contract(model)
+    if policy_input_schema != INPUT_SCHEMA or hasattr(model, "policy"):
+        _validate_model_encoder_contract(
+            model,
+            input_schema=policy_input_schema,
+            expected_observation_config=observation_config,
+        )
 
     if int(getattr(model, "n_steps", -1)) != int(n_steps):
         raise ValueError(
@@ -879,7 +1060,17 @@ def train_curriculum(
                     "gamma": float(gamma),
                     "goal_gain": float(goal_gain),
                     "device": device,
+                    "input_schema": cfg.input_schema,
                 }
+                observation_config = _live_observation_config(engine)
+                if cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+                    if not _observation_config_is_complete(observation_config):
+                        raise ValueError(
+                            "absolute-goal curriculum requires the complete live observation_config"
+                        )
+                    model_kwargs["observation_config"] = observation_config
+                elif _observation_config_is_complete(observation_config):
+                    model_kwargs["observation_config"] = observation_config
                 if lstm_hidden_size is not None:
                     model_kwargs["lstm_hidden_size"] = lstm_hidden_size
                 active_checkpoint = make_model(_sb3_wrapper(engine), **model_kwargs)
@@ -964,6 +1155,7 @@ def train_curriculum(
     summary: dict[str, Any] = {
         "schema": "isaac-field-curriculum-v1",
         "algorithm": "SB3-Contrib RecurrentPPO",
+        "input_schema": cfg.input_schema,
         "checkpoint_start": None if checkpoint is None else str(checkpoint),
         "checkpoint_final": str(final_checkpoint),
         "goal_gain": float(goal_gain),
