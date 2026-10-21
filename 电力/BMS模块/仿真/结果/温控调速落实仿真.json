@@ -1,0 +1,517 @@
+{
+  "title": "BMS四线5V风扇温控调速落地参数化仿真",
+  "model_version": "1.1",
+  "input_model": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\仿真\\输入\\温控调速落实参数.json",
+  "model_status": "局部策略和接口假设模型；非电机模型、非实物、非正式板网表验收",
+  "fan": {
+    "mpn": "Delta KSB0405HBF0D",
+    "supply_v": 5.0,
+    "typical_average_current_a": 0.16,
+    "maximum_label_current_a": 0.3,
+    "pwm_frequency_hz": 25000,
+    "stopped_command_percent": 0,
+    "full_speed_command_percent": 100,
+    "minimum_start_duty_percent_exclusive": 40,
+    "disconnected_pwm_is_full_speed": true,
+    "startup_peak_current_a_sensitivity_default": 0.45,
+    "startup_peak_current_is_manufacturer_guaranteed": false
+  },
+  "power_budget": {
+    "module": {
+      "mpn": "URB4805YMD-10WR3",
+      "output_v_nominal": 5.0,
+      "output_current_a": 2.0,
+      "input_design_range_v": [
+        18.0,
+        75.0
+      ],
+      "maximum_arithmetic_output_w": 10.0
+    },
+    "base_load_planning_a_not_measured": 0.3,
+    "fan_maximum_average_or_label_current_a": 0.3,
+    "seven_510_ohm_minload_resistors": 7,
+    "minload_resistance_each_ohm": 510.0,
+    "minimum_load_nominal_current_at_5v_a": 0.068627,
+    "minimum_load_conservative_budget_current_a_not_measured": 0.073,
+    "continuous_total_arithmetic_a": 0.673,
+    "continuous_module_current_headroom_a": 1.327,
+    "continuous_module_headroom_w_at_5v": 6.635,
+    "sgm_ilim_with_resistor_tolerance_estimate_a": [
+      0.905941,
+      1.09899
+    ],
+    "sgm_approx_foldback_at_60_percent_a": [
+      0.543564,
+      0.659394
+    ],
+    "sgm_max_limit_pressure_budget_a_rounded_up_to_10ma": 1.1,
+    "base_plus_sgm_max_limit_and_minload_pressure_arithmetic_a": 1.473,
+    "module_headroom_at_sgm_max_limit_a": 0.527,
+    "base_plus_conservative_foldback_min_arithmetic_a": 0.916564,
+    "module_headroom_at_foldback_min_a": 1.083436,
+    "startup_sensitivity_cases": [
+      {
+        "assumed_fan_motor_start_peak_a": 0.3,
+        "assumed_linear_5v_output_ramp_ms": 1.3,
+        "47uF_nominal_capacitor_charge_current_a": 0.180769,
+        "assumed_total_sgm_branch_demand_a": 0.480769,
+        "total_5v_module_demand_including_base_and_minload_a": 0.853769,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": true,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.3,
+        "assumed_linear_5v_output_ramp_ms": 5.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.047,
+        "assumed_total_sgm_branch_demand_a": 0.347,
+        "total_5v_module_demand_including_base_and_minload_a": 0.72,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": true,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.3,
+        "assumed_linear_5v_output_ramp_ms": 10.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.0235,
+        "assumed_total_sgm_branch_demand_a": 0.3235,
+        "total_5v_module_demand_including_base_and_minload_a": 0.6965,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": true,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.45,
+        "assumed_linear_5v_output_ramp_ms": 1.3,
+        "47uF_nominal_capacitor_charge_current_a": 0.180769,
+        "assumed_total_sgm_branch_demand_a": 0.630769,
+        "total_5v_module_demand_including_base_and_minload_a": 1.003769,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.45,
+        "assumed_linear_5v_output_ramp_ms": 5.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.047,
+        "assumed_total_sgm_branch_demand_a": 0.497,
+        "total_5v_module_demand_including_base_and_minload_a": 0.87,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": true,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.45,
+        "assumed_linear_5v_output_ramp_ms": 10.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.0235,
+        "assumed_total_sgm_branch_demand_a": 0.4735,
+        "total_5v_module_demand_including_base_and_minload_a": 0.8465,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": true,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.6,
+        "assumed_linear_5v_output_ramp_ms": 1.3,
+        "47uF_nominal_capacitor_charge_current_a": 0.180769,
+        "assumed_total_sgm_branch_demand_a": 0.780769,
+        "total_5v_module_demand_including_base_and_minload_a": 1.153769,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.6,
+        "assumed_linear_5v_output_ramp_ms": 5.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.047,
+        "assumed_total_sgm_branch_demand_a": 0.647,
+        "total_5v_module_demand_including_base_and_minload_a": 1.02,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.6,
+        "assumed_linear_5v_output_ramp_ms": 10.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.0235,
+        "assumed_total_sgm_branch_demand_a": 0.6235,
+        "total_5v_module_demand_including_base_and_minload_a": 0.9965,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.8,
+        "assumed_linear_5v_output_ramp_ms": 1.3,
+        "47uF_nominal_capacitor_charge_current_a": 0.180769,
+        "assumed_total_sgm_branch_demand_a": 0.980769,
+        "total_5v_module_demand_including_base_and_minload_a": 1.353769,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.8,
+        "assumed_linear_5v_output_ramp_ms": 5.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.047,
+        "assumed_total_sgm_branch_demand_a": 0.847,
+        "total_5v_module_demand_including_base_and_minload_a": 1.22,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      },
+      {
+        "assumed_fan_motor_start_peak_a": 0.8,
+        "assumed_linear_5v_output_ramp_ms": 10.0,
+        "47uF_nominal_capacitor_charge_current_a": 0.0235,
+        "assumed_total_sgm_branch_demand_a": 0.8235,
+        "total_5v_module_demand_including_base_and_minload_a": 1.1965,
+        "conservative_approx_foldback_min_a": 0.543564,
+        "demand_within_foldback_min_arithmetic": false,
+        "manufacturer_start_peak_known": false,
+        "interpretation": "边界场景，不是启动实测或器件保证；折返期间能否完成启动仍需首板测波形。"
+      }
+    ],
+    "selected_fan_motor_start_peak_assumption_a": 0.45,
+    "conclusion": "URB4805YMD-10WR3 nominal 5V/2A: 0.3A planning base + 0.3A fan label current + 0.073A conservative 7x510-ohm min-load budget = 0.673A; rounded SGM upper-limit stress arithmetic is 0.3A + 1.10A + 0.073A = 1.473A. The base load is a planning envelope, not measured; fan startup peak has no manufacturer guarantee. The 47uF charge and SGM foldback cases are boundary models only. First article must capture module output, fan branch voltage/current and startup/tach behavior."
+  },
+  "temperature_state_machine": {
+    "sequence_results": [
+      {
+        "time_s": 0.0,
+        "state": "OFF",
+        "transition": null,
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 0.0,
+        "gpio_high_duty_percent": 100.0,
+        "kick_active": false,
+        "expected": {
+          "state": "OFF",
+          "requested_fan_pwm_high_duty_percent": 0.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 1.0,
+        "state": "RUN",
+        "transition": "OFF->RUN",
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 60.0,
+        "gpio_high_duty_percent": 40.0,
+        "kick_active": true,
+        "expected": {
+          "state": "RUN",
+          "requested_fan_pwm_high_duty_percent": 60.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 1.5,
+        "state": "RUN",
+        "transition": null,
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 80.0,
+        "gpio_high_duty_percent": 20.0,
+        "kick_active": true,
+        "expected": {
+          "state": "RUN",
+          "requested_fan_pwm_high_duty_percent": 80.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 2.1,
+        "state": "RUN",
+        "transition": null,
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 80.0,
+        "gpio_high_duty_percent": 20.0,
+        "kick_active": false,
+        "expected": {
+          "state": "RUN",
+          "requested_fan_pwm_high_duty_percent": 80.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 3.0,
+        "state": "RUN",
+        "transition": null,
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 60.0,
+        "gpio_high_duty_percent": 40.0,
+        "kick_active": false,
+        "expected": {
+          "state": "RUN",
+          "requested_fan_pwm_high_duty_percent": 60.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 4.0,
+        "state": "OFF",
+        "transition": "RUN->OFF",
+        "sensor_fault": false,
+        "requested_fan_pwm_high_duty_percent": 0.0,
+        "gpio_high_duty_percent": 100.0,
+        "kick_active": false,
+        "expected": {
+          "state": "OFF",
+          "requested_fan_pwm_high_duty_percent": 0.0
+        },
+        "pass": true
+      },
+      {
+        "time_s": 5.0,
+        "state": "RUN",
+        "transition": "OFF->RUN",
+        "sensor_fault": true,
+        "requested_fan_pwm_high_duty_percent": 100.0,
+        "gpio_high_duty_percent": 0.0,
+        "kick_active": false,
+        "expected": {
+          "state": "RUN",
+          "requested_fan_pwm_high_duty_percent": 100.0
+        },
+        "pass": true
+      }
+    ],
+    "cell_curve_ramp": [
+      {
+        "cell_temp_c": 35.0,
+        "duty_percent": 60.0
+      },
+      {
+        "cell_temp_c": 40.0,
+        "duty_percent": 66.6667
+      },
+      {
+        "cell_temp_c": 45.0,
+        "duty_percent": 73.3333
+      },
+      {
+        "cell_temp_c": 50.0,
+        "duty_percent": 80.0
+      },
+      {
+        "cell_temp_c": 55.0,
+        "duty_percent": 90.0
+      },
+      {
+        "cell_temp_c": 60.0,
+        "duty_percent": 100.0
+      }
+    ],
+    "cell_curve_monotonic": true,
+    "all_expected_sequence_cases_pass": true,
+    "normal_run_floor_percent": 60.0,
+    "invalid_sensor_action_percent": 100.0,
+    "stall_watchdog": {
+      "fault": true,
+      "forced_duty_percent": 100.0,
+      "edge_age_s": null,
+      "watchdog_armed": true,
+      "fault_latch_active": true,
+      "pass_logic_review": true,
+      "description": "After the 1 s kick, no FG edge for 1 s latches a fault and forces full speed; stall and disconnected FG cannot be distinguished."
+    },
+    "tach_latch_recovery_sequence": {
+      "fault_after_no_fg": {
+        "temperature": {
+          "time_s": 0.0,
+          "state": "RUN",
+          "transition": "OFF->RUN",
+          "sensor_fault": false,
+          "requested_fan_pwm_high_duty_percent": 60.0,
+          "gpio_high_duty_percent": 40.0,
+          "kick_active": true
+        },
+        "watchdog": {
+          "fault": true,
+          "forced_duty_percent": 100.0,
+          "edge_age_s": null,
+          "watchdog_armed": true,
+          "fault_latch_active": true
+        }
+      },
+      "after_temperature_cools": {
+        "temperature": {
+          "time_s": 3.2,
+          "state": "OFF",
+          "transition": "RUN->OFF",
+          "sensor_fault": false,
+          "requested_fan_pwm_high_duty_percent": 0.0,
+          "gpio_high_duty_percent": 100.0,
+          "kick_active": false
+        },
+        "watchdog": {
+          "fault": true,
+          "forced_duty_percent": 100.0,
+          "edge_age_s": 0.05,
+          "watchdog_armed": false,
+          "fault_latch_active": true
+        }
+      },
+      "after_fg_recovers": {
+        "temperature": {
+          "time_s": 4.2,
+          "state": "OFF",
+          "transition": null,
+          "sensor_fault": false,
+          "requested_fan_pwm_high_duty_percent": 0.0,
+          "gpio_high_duty_percent": 100.0,
+          "kick_active": false
+        },
+        "watchdog": {
+          "fault": true,
+          "forced_duty_percent": 100.0,
+          "edge_age_s": 0.05,
+          "watchdog_armed": false,
+          "fault_latch_active": true
+        }
+      },
+      "after_physical_power_cycle_reconstruction": {
+        "temperature": {
+          "time_s": 0.0,
+          "state": "OFF",
+          "transition": null,
+          "sensor_fault": false,
+          "requested_fan_pwm_high_duty_percent": 0.0,
+          "gpio_high_duty_percent": 100.0,
+          "kick_active": false
+        },
+        "watchdog": {
+          "fault": false,
+          "forced_duty_percent": 0.0,
+          "edge_age_s": null,
+          "watchdog_armed": false,
+          "fault_latch_active": false
+        }
+      },
+      "pass_logic_review": true,
+      "interpretation": "A latched fault forces effective PWM to 100% despite OFF temperature state and recovered FG edges; a physical power cycle resets controller state."
+    }
+  },
+  "open_drain_pwm_rc": {
+    "assumptions": {
+      "gpio_v_high": 3.3,
+      "gate_series_ohm": 1000.0,
+      "gate_pulldown_ohm": 100000.0,
+      "gate_capacitance_f": 5e-10,
+      "fet_gate_on_threshold_v": 2.5,
+      "fet_rds_on_ohm_model": 0.048,
+      "fan_pwm_pullup_v": 5.0,
+      "fan_pwm_equivalent_pullup_ohm": 10000.0,
+      "fan_pwm_input_and_cable_capacitance_f": 1e-10,
+      "fan_pwm_logic_low_max_v_model": 0.4,
+      "fan_pwm_logic_high_min_v_model": 2.8,
+      "max_mid_level_fraction_percent_model": 2.5,
+      "simulation_step_s": 1e-07,
+      "periods_to_simulate": 12,
+      "periods_to_measure": 4,
+      "assumptions_are_not_ksb_model_guarantees": true
+    },
+    "cases": [
+      {
+        "requested_fan_pwm_high_duty_percent": 0.0,
+        "gpio_high_duty_percent": 100.0,
+        "simulated_fan_pwm_high_duty_percent": 0.0,
+        "duty_error_percentage_points": 0.0,
+        "mid_level_fraction_percent": 0.0,
+        "measured_periods": 4,
+        "gate_tau_us": 0.495,
+        "pwm_line_rise_tau_us": 1.0,
+        "logic_low_peak_v_model": 2.4e-05,
+        "logic_high_min_v_model": 5.0,
+        "pass_model_only": true
+      },
+      {
+        "requested_fan_pwm_high_duty_percent": 40.0,
+        "gpio_high_duty_percent": 60.0,
+        "simulated_fan_pwm_high_duty_percent": 39.5,
+        "duty_error_percentage_points": -0.5,
+        "mid_level_fraction_percent": 2.0,
+        "measured_periods": 4,
+        "gate_tau_us": 0.495,
+        "pwm_line_rise_tau_us": 1.0,
+        "logic_low_peak_v_model": 2.4e-05,
+        "logic_high_min_v_model": 2.967161,
+        "pass_model_only": true
+      },
+      {
+        "requested_fan_pwm_high_duty_percent": 60.0,
+        "gpio_high_duty_percent": 40.0,
+        "simulated_fan_pwm_high_duty_percent": 59.5,
+        "duty_error_percentage_points": -0.5,
+        "mid_level_fraction_percent": 2.0,
+        "measured_periods": 4,
+        "gate_tau_us": 0.495,
+        "pwm_line_rise_tau_us": 1.0,
+        "logic_low_peak_v_model": 2.4e-05,
+        "logic_high_min_v_model": 2.967161,
+        "pass_model_only": true
+      },
+      {
+        "requested_fan_pwm_high_duty_percent": 80.0,
+        "gpio_high_duty_percent": 20.0,
+        "simulated_fan_pwm_high_duty_percent": 79.5,
+        "duty_error_percentage_points": -0.5,
+        "mid_level_fraction_percent": 2.0,
+        "measured_periods": 4,
+        "gate_tau_us": 0.495,
+        "pwm_line_rise_tau_us": 1.0,
+        "logic_low_peak_v_model": 2.4e-05,
+        "logic_high_min_v_model": 2.967161,
+        "pass_model_only": true
+      },
+      {
+        "requested_fan_pwm_high_duty_percent": 100.0,
+        "gpio_high_duty_percent": 0.0,
+        "simulated_fan_pwm_high_duty_percent": 100.0,
+        "duty_error_percentage_points": 0.0,
+        "mid_level_fraction_percent": 0.0,
+        "measured_periods": 4,
+        "gate_tau_us": 0.495,
+        "pwm_line_rise_tau_us": 1.0,
+        "logic_low_peak_v_model": 0.0,
+        "logic_high_min_v_model": 5.0,
+        "pass_model_only": true
+      }
+    ],
+    "all_cases_pass_model_only": true,
+    "note": "风扇内部上拉值/输入电容并未由本型号公开资料量化；R/C只是可改参数的敏感性输入，不能替代25kHz示波器测试。"
+  },
+  "reset_fail_safe": {
+    "sgm_en_net_tied_to": "VOUT_5V",
+    "when_5v_rail_is_on": "SGM2593_EN有效，风扇支路保持供电",
+    "mcu_gpio_state": "reset/boot/high-impedance",
+    "gate_bias": "现有100k下拉令AO3400A关断",
+    "fan_pwm_wire_state": "open/released",
+    "fan_behavior_from_selected_model": "full_speed",
+    "pcb_5v_rail_off": "fan_power_off",
+    "pass_logic_review": true
+  },
+  "test_summary": {
+    "temperature_logic": "PASS",
+    "tach_fault_latch_logic": "PASS",
+    "pwm_rc_assumption_case": "PASS_MODEL_ONLY",
+    "continuous_current_arithmetic": "PASS_ARITHMETIC_ONLY",
+    "startup_during_foldback": "OPEN_BENCH_TEST_REQUIRED",
+    "model_cannot_claim": [
+      "未模拟/实测风扇电机及启动峰值；默认0.45A仅用于灵敏度案例。",
+      "未验证SGM2593在现有47uF与真实风扇条件下的启动/折返动态。",
+      "未验证URB热降额、5V瞬态、风扇机械风量/散热能力、FG转速比例或正式EDA/实板。"
+    ]
+  }
+}

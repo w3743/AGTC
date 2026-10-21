@@ -1,0 +1,1252 @@
+{
+  "title": "BMS局部控制与去耦连线候选",
+  "status": "candidate-not-applied",
+  "source": {
+    "currentSavedSnapshot": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\局部连线\\afe-snapshot.json",
+    "priorBaselineSnapshot": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\局部连线\\baseline-snapshot.json",
+    "constructionManifest": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\当前施工输入.json",
+    "nativeForStrictGeometryOnly": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\sch\\Schematic1\\P1.esch2",
+    "sha256": {
+      "currentSavedSnapshot": "3b021349ff65332f87b38f7bc3374c1979d82c35bf9195d969c0e693d41aff9e",
+      "priorBaselineSnapshot": "afcfcd44eac29ed54acfc4b718d9805cd7fe2d6ec33cafe5dda14c44309deddd",
+      "constructionManifest": "2da3bd3fb52b10daec14477f07ddccd16f3572c91b0b39f06fd937fd4ad09049",
+      "native": "a4e252f2ba4faaee479b80102dad6fbc4e539e2a1aa8ebf655007c7810e8b1d6"
+    }
+  },
+  "currentPinSemanticCheck": {
+    "status": "PASS",
+    "pinsChecked": 700,
+    "method": "verify_semantic_geometry.collect_semantics against latest saved-state capture and current native geometry",
+    "wholeDocumentStatus": "FAIL",
+    "nonPinDefectCounts": {
+      "unrepresentedNativeComponents": 10,
+      "missingPortRows": 10
+    }
+  },
+  "alreadyPhysicalConnections": [
+    {
+      "net": "NTC_BOARD_NODE",
+      "pins": [
+        "U1.22",
+        "NTC_BOARD.1",
+        "C_NTC_BOARD_FILT.1"
+      ],
+      "reason": "strict verifier已确认这些针脚在当前保存态处于同一原生物理wire cluster；不重复加线。",
+      "cluster": "C00190",
+      "actualNames": [
+        "NTC_BOARD_NODE"
+      ]
+    }
+  ],
+  "addWires": [
+    {
+      "id": "can_input_vout_parallel",
+      "net": "VOUT_5V",
+      "start": "C_CAN_PWR_IN1.1",
+      "end": "C_CAN_PWR_IN2.1",
+      "purpose": "并联输入去耦电容的VOUT_5V端",
+      "points": [
+        [
+          920.0,
+          700.0
+        ],
+        [
+          920.0,
+          680.0
+        ],
+        [
+          1000.0,
+          680.0
+        ],
+        [
+          1000.0,
+          700.0
+        ]
+      ],
+      "segments": [
+        [
+          920.0,
+          700.0,
+          920.0,
+          680.0
+        ],
+        [
+          920.0,
+          680.0,
+          1000.0,
+          680.0
+        ],
+        [
+          1000.0,
+          680.0,
+          1000.0,
+          700.0
+        ]
+      ],
+      "manhattanLength": 120
+    },
+    {
+      "id": "can_input_b0_parallel",
+      "net": "B0",
+      "start": "C_CAN_PWR_IN1.2",
+      "end": "C_CAN_PWR_IN2.2",
+      "purpose": "并联输入去耦电容的B0端",
+      "points": [
+        [
+          960.0,
+          700.0
+        ],
+        [
+          960.0,
+          720.0
+        ],
+        [
+          1040.0,
+          720.0
+        ],
+        [
+          1040.0,
+          700.0
+        ]
+      ],
+      "segments": [
+        [
+          960.0,
+          700.0,
+          960.0,
+          720.0
+        ],
+        [
+          960.0,
+          720.0,
+          1040.0,
+          720.0
+        ],
+        [
+          1040.0,
+          720.0,
+          1040.0,
+          700.0
+        ]
+      ],
+      "manhattanLength": 120
+    },
+    {
+      "id": "can_output_iso5v_parallel",
+      "net": "CAN_ISO_5V",
+      "start": "C_CAN_PWR_OUT1.1",
+      "end": "C_CAN_PWR_OUT2.1",
+      "purpose": "并联隔离侧去耦电容的CAN_ISO_5V端",
+      "points": [
+        [
+          1160.0,
+          700.0
+        ],
+        [
+          1160.0,
+          680.0
+        ],
+        [
+          1240.0,
+          680.0
+        ],
+        [
+          1240.0,
+          700.0
+        ]
+      ],
+      "segments": [
+        [
+          1160.0,
+          700.0,
+          1160.0,
+          680.0
+        ],
+        [
+          1160.0,
+          680.0,
+          1240.0,
+          680.0
+        ],
+        [
+          1240.0,
+          680.0,
+          1240.0,
+          700.0
+        ]
+      ],
+      "manhattanLength": 120
+    },
+    {
+      "id": "can_output_pack_return_parallel",
+      "net": "PACK-",
+      "start": "C_CAN_PWR_OUT1.2",
+      "end": "C_CAN_PWR_OUT2.2",
+      "purpose": "并联隔离侧去耦电容的PACK-端",
+      "points": [
+        [
+          1200.0,
+          700.0
+        ],
+        [
+          1200.0,
+          720.0
+        ],
+        [
+          1280.0,
+          720.0
+        ],
+        [
+          1280.0,
+          700.0
+        ]
+      ],
+      "segments": [
+        [
+          1200.0,
+          700.0,
+          1200.0,
+          720.0
+        ],
+        [
+          1200.0,
+          720.0,
+          1280.0,
+          720.0
+        ],
+        [
+          1280.0,
+          720.0,
+          1280.0,
+          700.0
+        ]
+      ],
+      "manhattanLength": 120
+    },
+    {
+      "id": "por_vdd_filter",
+      "net": "PRE_CTRL_3V3",
+      "start": "C_POR.1",
+      "end": "U_POR.3",
+      "purpose": "C_POR绕过POR_OK_N原有线连接U_POR的VDD引脚",
+      "points": [
+        [
+          4020.0,
+          2560.0
+        ],
+        [
+          4020.0,
+          2590.0
+        ],
+        [
+          4120.0,
+          2590.0
+        ],
+        [
+          4120.0,
+          2400.0
+        ],
+        [
+          3960.0,
+          2400.0
+        ],
+        [
+          3960.0,
+          2420.0
+        ],
+        [
+          3985.0,
+          2420.0
+        ]
+      ],
+      "segments": [
+        [
+          4020.0,
+          2560.0,
+          4020.0,
+          2590.0
+        ],
+        [
+          4020.0,
+          2590.0,
+          4120.0,
+          2590.0
+        ],
+        [
+          4120.0,
+          2590.0,
+          4120.0,
+          2400.0
+        ],
+        [
+          4120.0,
+          2400.0,
+          3960.0,
+          2400.0
+        ],
+        [
+          3960.0,
+          2400.0,
+          3960.0,
+          2420.0
+        ],
+        [
+          3960.0,
+          2420.0,
+          3985.0,
+          2420.0
+        ]
+      ],
+      "manhattanLength": 525
+    },
+    {
+      "id": "por_ground_filter",
+      "net": "B0",
+      "start": "C_POR.2",
+      "end": "U_POR.1",
+      "purpose": "C_POR绕过POR_OK_N原有线连接U_POR的GND引脚",
+      "points": [
+        [
+          4060.0,
+          2560.0
+        ],
+        [
+          4080.0,
+          2560.0
+        ],
+        [
+          4080.0,
+          2470.0
+        ],
+        [
+          3975.0,
+          2470.0
+        ],
+        [
+          3975.0,
+          2440.0
+        ],
+        [
+          3985.0,
+          2440.0
+        ]
+      ],
+      "segments": [
+        [
+          4060.0,
+          2560.0,
+          4080.0,
+          2560.0
+        ],
+        [
+          4080.0,
+          2560.0,
+          4080.0,
+          2470.0
+        ],
+        [
+          4080.0,
+          2470.0,
+          3975.0,
+          2470.0
+        ],
+        [
+          3975.0,
+          2470.0,
+          3975.0,
+          2440.0
+        ],
+        [
+          3975.0,
+          2440.0,
+          3985.0,
+          2440.0
+        ]
+      ],
+      "manhattanLength": 255
+    },
+    {
+      "id": "timer_vdd_filter",
+      "net": "TMR_VDD",
+      "start": "C_TIMER.1",
+      "end": "U_TIMER.1",
+      "purpose": "C_TIMER连接U_TIMER的TMR_VDD引脚",
+      "points": [
+        [
+          3360.0,
+          2560.0
+        ],
+        [
+          3180.0,
+          2560.0
+        ],
+        [
+          3180.0,
+          2450.0
+        ],
+        [
+          3220.0,
+          2450.0
+        ]
+      ],
+      "segments": [
+        [
+          3360.0,
+          2560.0,
+          3180.0,
+          2560.0
+        ],
+        [
+          3180.0,
+          2560.0,
+          3180.0,
+          2450.0
+        ],
+        [
+          3180.0,
+          2450.0,
+          3220.0,
+          2450.0
+        ]
+      ],
+      "manhattanLength": 330
+    },
+    {
+      "id": "timer_ground_filter",
+      "net": "B0",
+      "start": "C_TIMER.2",
+      "end": "U_TIMER.2",
+      "purpose": "C_TIMER绕开TMR_SET原有线连接U_TIMER的GND引脚",
+      "points": [
+        [
+          3400.0,
+          2560.0
+        ],
+        [
+          3420.0,
+          2560.0
+        ],
+        [
+          3420.0,
+          2580.0
+        ],
+        [
+          3100.0,
+          2580.0
+        ],
+        [
+          3100.0,
+          2440.0
+        ],
+        [
+          3220.0,
+          2440.0
+        ]
+      ],
+      "segments": [
+        [
+          3400.0,
+          2560.0,
+          3420.0,
+          2560.0
+        ],
+        [
+          3420.0,
+          2560.0,
+          3420.0,
+          2580.0
+        ],
+        [
+          3420.0,
+          2580.0,
+          3100.0,
+          2580.0
+        ],
+        [
+          3100.0,
+          2580.0,
+          3100.0,
+          2440.0
+        ],
+        [
+          3100.0,
+          2440.0,
+          3220.0,
+          2440.0
+        ]
+      ],
+      "manhattanLength": 620
+    },
+    {
+      "id": "ntc_board_filter_return",
+      "net": "B0",
+      "start": "C_NTC_BOARD_FILT.2",
+      "end": "NTC_BOARD.2",
+      "purpose": "将板载NTC滤波电容地端接到NTC_BOARD回流",
+      "points": [
+        [
+          2795.0,
+          1700.0
+        ],
+        [
+          2795.0,
+          1720.0
+        ],
+        [
+          2850.0,
+          1720.0
+        ],
+        [
+          2850.0,
+          1680.0
+        ],
+        [
+          2870.0,
+          1680.0
+        ],
+        [
+          2870.0,
+          1660.0
+        ]
+      ],
+      "segments": [
+        [
+          2795.0,
+          1700.0,
+          2795.0,
+          1720.0
+        ],
+        [
+          2795.0,
+          1720.0,
+          2850.0,
+          1720.0
+        ],
+        [
+          2850.0,
+          1720.0,
+          2850.0,
+          1680.0
+        ],
+        [
+          2850.0,
+          1680.0,
+          2870.0,
+          1680.0
+        ],
+        [
+          2870.0,
+          1680.0,
+          2870.0,
+          1660.0
+        ]
+      ],
+      "manhattanLength": 155
+    },
+    {
+      "id": "ntc_sensor_returns_local_bus",
+      "net": "B0",
+      "start": "NTC_BOARD.2",
+      "end": "NTC_MOS.2",
+      "purpose": "将NTC_BOARD与NTC_MOS的本地B0回流合并；支路供滤波电容使用",
+      "points": [
+        [
+          2870.0,
+          1660.0
+        ],
+        [
+          2850.0,
+          1660.0
+        ],
+        [
+          2850.0,
+          1720.0
+        ],
+        [
+          2990.0,
+          1720.0
+        ],
+        [
+          2990.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1660.0
+        ]
+      ],
+      "segments": [
+        [
+          2870.0,
+          1660.0,
+          2850.0,
+          1660.0
+        ],
+        [
+          2850.0,
+          1660.0,
+          2850.0,
+          1720.0
+        ],
+        [
+          2850.0,
+          1720.0,
+          2990.0,
+          1720.0
+        ],
+        [
+          2990.0,
+          1720.0,
+          2990.0,
+          1680.0
+        ],
+        [
+          2990.0,
+          1680.0,
+          2970.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1680.0,
+          2970.0,
+          1660.0
+        ]
+      ],
+      "manhattanLength": 300
+    },
+    {
+      "id": "ntc_mos_filter_signal",
+      "net": "BQ_TS3",
+      "start": "NTC_MOS.1",
+      "end": "C_BQ_TS3_FILT.1",
+      "purpose": "将MOS温度NTC与BQ_TS3滤波电容信号端相连",
+      "points": [
+        [
+          2910.0,
+          1660.0
+        ],
+        [
+          2910.0,
+          1640.0
+        ],
+        [
+          3045.0,
+          1640.0
+        ],
+        [
+          3045.0,
+          1660.0
+        ]
+      ],
+      "segments": [
+        [
+          2910.0,
+          1660.0,
+          2910.0,
+          1640.0
+        ],
+        [
+          2910.0,
+          1640.0,
+          3045.0,
+          1640.0
+        ],
+        [
+          3045.0,
+          1640.0,
+          3045.0,
+          1660.0
+        ]
+      ],
+      "manhattanLength": 175
+    },
+    {
+      "id": "ntc_mos_filter_return",
+      "net": "B0",
+      "start": "C_BQ_TS3_FILT.2",
+      "end": "NTC_MOS.2",
+      "purpose": "将BQ_TS3滤波电容地端接入本地NTC回流总线",
+      "points": [
+        [
+          3075.0,
+          1660.0
+        ],
+        [
+          3075.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1660.0
+        ]
+      ],
+      "segments": [
+        [
+          3075.0,
+          1660.0,
+          3075.0,
+          1680.0
+        ],
+        [
+          3075.0,
+          1680.0,
+          2970.0,
+          1680.0
+        ],
+        [
+          2970.0,
+          1680.0,
+          2970.0,
+          1660.0
+        ]
+      ],
+      "manhattanLength": 145
+    },
+    {
+      "id": "ntc_ts1_filter_return",
+      "net": "B0",
+      "start": "C_BQ_TS1_FILT.2",
+      "end": "C_BQ_TS3_FILT.2",
+      "purpose": "将两路AFE温度滤波电容的B0端合并",
+      "points": [
+        [
+          3075.0,
+          1750.0
+        ],
+        [
+          3075.0,
+          1660.0
+        ]
+      ],
+      "segments": [
+        [
+          3075.0,
+          1750.0,
+          3075.0,
+          1660.0
+        ]
+      ],
+      "manhattanLength": 90
+    },
+    {
+      "id": "alert_pullup_signal",
+      "net": "BQ_ALERT_N",
+      "start": "R_ALERT_PU.2",
+      "end": "R_ALERT_SER.2",
+      "purpose": "绕过R_ALERT_SER信号侧与现有BQ_ALERT_IC_N线，连接两只电阻的BQ_ALERT_N端",
+      "points": [
+        [
+          2890.0,
+          2020.0
+        ],
+        [
+          2910.0,
+          2020.0
+        ],
+        [
+          2910.0,
+          2040.0
+        ],
+        [
+          3020.0,
+          2040.0
+        ],
+        [
+          3020.0,
+          2020.0
+        ],
+        [
+          3000.0,
+          2020.0
+        ]
+      ],
+      "segments": [
+        [
+          2890.0,
+          2020.0,
+          2910.0,
+          2020.0
+        ],
+        [
+          2910.0,
+          2020.0,
+          2910.0,
+          2040.0
+        ],
+        [
+          2910.0,
+          2040.0,
+          3020.0,
+          2040.0
+        ],
+        [
+          3020.0,
+          2040.0,
+          3020.0,
+          2020.0
+        ],
+        [
+          3020.0,
+          2020.0,
+          3000.0,
+          2020.0
+        ]
+      ],
+      "manhattanLength": 190
+    }
+  ],
+  "removeLocalports": [
+    {
+      "id": "26e214dfaeb5b95e",
+      "ref": "C_CAN_PWR_IN2",
+      "pin": "1",
+      "net": "VOUT_5V",
+      "at": [
+        1000.0,
+        700.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "5d680df5eba15329",
+      "ref": "C_CAN_PWR_IN2",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        1040.0,
+        700.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "d5b088815b903f38",
+      "ref": "C_CAN_PWR_OUT2",
+      "pin": "1",
+      "net": "CAN_ISO_5V",
+      "at": [
+        1240.0,
+        700.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "054cdb53ea6ed36c",
+      "ref": "C_CAN_PWR_OUT2",
+      "pin": "2",
+      "net": "PACK-",
+      "at": [
+        1280.0,
+        700.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "9afd1b5936f70402",
+      "ref": "C_POR",
+      "pin": "1",
+      "net": "PRE_CTRL_3V3",
+      "at": [
+        4020.0,
+        2560.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "a6a5d9922a54926d",
+      "ref": "C_POR",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        4060.0,
+        2560.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "42b0e9477667927e",
+      "ref": "C_TIMER",
+      "pin": "1",
+      "net": "TMR_VDD",
+      "at": [
+        3360.0,
+        2560.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "11507a58cc8e7a80",
+      "ref": "C_TIMER",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3400.0,
+        2560.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "7e0ecdfdbf0d3fbf",
+      "ref": "C_NTC_BOARD_FILT",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        2795.0,
+        1700.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "0b64a23fbb13d4ec",
+      "ref": "NTC_BOARD",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        2870.0,
+        1660.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "b10252697f5103a5",
+      "ref": "C_BQ_TS1_FILT",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3075.0,
+        1750.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "e90cead5874b2b2d",
+      "ref": "C_BQ_TS3_FILT",
+      "pin": "1",
+      "net": "BQ_TS3",
+      "at": [
+        3045.0,
+        1660.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "8802d30bb981dfad",
+      "ref": "C_BQ_TS3_FILT",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3075.0,
+        1660.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    },
+    {
+      "id": "1b9b743b305c0712",
+      "ref": "R_ALERT_SER",
+      "pin": "2",
+      "net": "BQ_ALERT_N",
+      "at": [
+        3000.0,
+        2020.0
+      ],
+      "reason": "该引脚已由候选实线接入同名本地物理cluster；保留同net anchor，删除此重复localport。"
+    }
+  ],
+  "retainedAnchorPorts": [
+    {
+      "id": "e83907ee142f20e2",
+      "ref": "C_CAN_PWR_IN1",
+      "pin": "1",
+      "net": "VOUT_5V",
+      "at": [
+        920.0,
+        700.0
+      ]
+    },
+    {
+      "id": "834ea99851450686",
+      "ref": "C_CAN_PWR_IN1",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        960.0,
+        700.0
+      ]
+    },
+    {
+      "id": "9a6a94cec54e864e",
+      "ref": "C_CAN_PWR_OUT1",
+      "pin": "1",
+      "net": "CAN_ISO_5V",
+      "at": [
+        1160.0,
+        700.0
+      ]
+    },
+    {
+      "id": "ddfd82b6746713ee",
+      "ref": "C_CAN_PWR_OUT1",
+      "pin": "2",
+      "net": "PACK-",
+      "at": [
+        1200.0,
+        700.0
+      ]
+    },
+    {
+      "id": "2b1c503f59e40ee1",
+      "ref": "U_AND2",
+      "pin": "5",
+      "net": "PRE_CTRL_3V3",
+      "at": [
+        3805.0,
+        2230.0
+      ]
+    },
+    {
+      "id": "fd7a21444d6ced14",
+      "ref": "U_AND2",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3735.0,
+        2230.0
+      ]
+    },
+    {
+      "id": "56538f3182f1d43d",
+      "ref": "U_GATE1",
+      "pin": "5",
+      "net": "PRE_CTRL_3V3",
+      "at": [
+        3805.0,
+        2450.0
+      ]
+    },
+    {
+      "id": "ebba6f2b7fdcde60",
+      "ref": "U_GATE1",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3735.0,
+        2450.0
+      ]
+    },
+    {
+      "id": "43495b01dc819a2f",
+      "ref": "U_POR",
+      "pin": "3",
+      "net": "PRE_CTRL_3V3",
+      "at": [
+        3985.0,
+        2420.0
+      ]
+    },
+    {
+      "id": "088ba2baee812fa7",
+      "ref": "U_POR",
+      "pin": "1",
+      "net": "B0",
+      "at": [
+        3985.0,
+        2440.0
+      ]
+    },
+    {
+      "id": "8dc0bf6954445739",
+      "ref": "U_TIMER",
+      "pin": "1",
+      "net": "TMR_VDD",
+      "at": [
+        3220.0,
+        2450.0
+      ]
+    },
+    {
+      "id": "98ae73ebf00941c3",
+      "ref": "U_TIMER",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        3220.0,
+        2440.0
+      ]
+    },
+    {
+      "id": "3b0de1b3975113bd",
+      "ref": "NTC_MOS",
+      "pin": "1",
+      "net": "BQ_TS3",
+      "at": [
+        2910.0,
+        1660.0
+      ]
+    },
+    {
+      "id": "4ef35693bab69110",
+      "ref": "NTC_MOS",
+      "pin": "2",
+      "net": "B0",
+      "at": [
+        2970.0,
+        1660.0
+      ]
+    },
+    {
+      "id": "ae50618fd90c7f25",
+      "ref": "R_ALERT_PU",
+      "pin": "2",
+      "net": "BQ_ALERT_N",
+      "at": [
+        2890.0,
+        2020.0
+      ]
+    }
+  ],
+  "needsMoveOrReview": [
+    {
+      "refs": [
+        "C_CAN_PWR_IN1",
+        "C_CAN_PWR_IN2",
+        "U_CAN"
+      ],
+      "reason": "输入电容对可本地并联，但其VDDP/GNDP1接到U_CAN.6/.5会与现有CAN_TX走线相交或贴近芯片符号边界；若要求直接短线，建议把电容对移到U_CAN左侧电源引脚附近。",
+      "affectedPins": [
+        "C_CAN_PWR_IN1.1",
+        "C_CAN_PWR_IN1.2",
+        "C_CAN_PWR_IN2.1",
+        "C_CAN_PWR_IN2.2",
+        "U_CAN.5",
+        "U_CAN.6"
+      ]
+    },
+    {
+      "refs": [
+        "C_CAN_PWR_OUT1",
+        "C_CAN_PWR_OUT2",
+        "U_CAN"
+      ],
+      "reason": "输出电容对可本地并联；连接U_CAN.10/.11/.12需绕过CANH走线树，当前坐标会形成较长绕线，建议电容移到隔离侧供电脚附近后再定路径。",
+      "affectedPins": [
+        "C_CAN_PWR_OUT1.1",
+        "C_CAN_PWR_OUT1.2",
+        "C_CAN_PWR_OUT2.1",
+        "C_CAN_PWR_OUT2.2",
+        "U_CAN.10",
+        "U_CAN.11",
+        "U_CAN.12"
+      ]
+    },
+    {
+      "refs": [
+        "C_CAN_VCC2_2",
+        "U_CAN"
+      ],
+      "reason": "单颗VDDL去耦电容离U_CAN.7/.8较远，连接B0侧会碰到CANH树；建议移到U_CAN的VDDL/GND1旁边，再画本地回路。",
+      "affectedPins": [
+        "C_CAN_VCC2_2.1",
+        "C_CAN_VCC2_2.2",
+        "U_CAN.7",
+        "U_CAN.8"
+      ]
+    },
+    {
+      "refs": [
+        "C_SEQ",
+        "U_SEQ",
+        "U_GATE1",
+        "U_TIMER"
+      ],
+      "reason": "C_SEQ目前在TMR_ACTIVE总线下方；到U_SEQ供电脚的两条回路需绕过TMR_ACTIVE，并受MAIN_CLR_N/POR_OK_N路径约束。候选不强拉跨线，建议先把C_SEQ移到U_SEQ供电脚侧的空白处。",
+      "affectedPins": [
+        "C_SEQ.1",
+        "C_SEQ.2",
+        "U_SEQ.7",
+        "U_SEQ.14"
+      ]
+    },
+    {
+      "refs": [
+        "C_GATE1",
+        "U_GATE1",
+        "U_SEQ",
+        "U_POR"
+      ],
+      "reason": "U_GATE1.5/6之间已有TMR_ACTIVE连接，且U_GATE1上方为POR_OK_N横线；C_GATE1在芯片下方。现位置无法用不跨异网的短回路接入VCC/GND，候选保留原网标，建议把电容移到芯片供电脚右侧空白区后再连。",
+      "affectedPins": [
+        "C_GATE1.1",
+        "C_GATE1.2",
+        "U_GATE1.5",
+        "U_GATE1.2"
+      ]
+    },
+    {
+      "refs": [
+        "C_AND2",
+        "U_AND2"
+      ],
+      "reason": "C_AND2位于U_AND2上方；MAIN_CLR_N现有水平和垂直导线形成围挡，直接靠近供电脚的候选走线需穿越该异网或绕到芯片符号下侧，暂不新增长绕线，建议将电容移到U_AND2右下方空白处。",
+      "affectedPins": [
+        "C_AND2.1",
+        "C_AND2.2",
+        "U_AND2.5",
+        "U_AND2.2"
+      ]
+    },
+    {
+      "refs": [
+        "C_BQ_TS1_FILT",
+        "U1"
+      ],
+      "reason": "C_BQ_TS1_FILT.1到U1.21的曼哈顿距离为900原理图单位；当前没有同区域传感器引脚，保留同名网标并建议把滤波电容移到U1.21附近。",
+      "affectedPins": [
+        "C_BQ_TS1_FILT.1",
+        "U1.21"
+      ]
+    },
+    {
+      "refs": [
+        "NTC_MOS",
+        "U1"
+      ],
+      "reason": "NTC_MOS与C_BQ_TS3_FILT将在本地实连；U1.23仍以BQ_TS3网名接入，跨越约900单位的远线不在本候选内。",
+      "affectedPins": [
+        "NTC_MOS.1",
+        "C_BQ_TS3_FILT.1",
+        "U1.23"
+      ]
+    },
+    {
+      "refs": [
+        "R_ALERT_PU",
+        "R_SCL_PU",
+        "R_SDA_PU"
+      ],
+      "reason": "R_ALERT_PU.1到相邻CORE_3V3上拉轨的短路径会穿过现有BQ_ALERT_IC_N水平线；保留CORE_3V3网标，建议后续移动R_ALERT_PU或重排该线后再接上拉轨。",
+      "affectedPins": [
+        "R_ALERT_PU.1",
+        "R_SCL_PU.1",
+        "R_SDA_PU.1"
+      ]
+    }
+  ],
+  "geometryCheck": {
+    "status": "PASS",
+    "candidateSegments": 54,
+    "foreignPinOrPortContacts": 0,
+    "foreignExistingWireContactsOrCrossings": 0,
+    "foreignCandidateWireContactsOrCrossings": 0,
+    "orthogonal": true,
+    "note": "检查以native fold后的非零LINE为基准；端点pin/net与manifest一致。原生符号外形未作碰撞建模，正式套用前仍应使用官方API局部截图复核。"
+  },
+  "notApplied": true
+}

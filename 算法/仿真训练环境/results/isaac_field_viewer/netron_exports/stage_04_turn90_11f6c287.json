@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "checkpoint": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/fresh_foundation_20261017_width470_progressive/resume_8192/stage_04_turn90.zip",
+  "checkpoint_sha256": "11f6c287e8bfdbb348fb1c9d9205c2a95692f1629ef8cee4626aef3947ae506f",
+  "format": "TorchScript trace (.pt)",
+  "device": "cpu",
+  "torch_version": "2.11.0+cu130",
+  "policy_hidden_size": 128,
+  "policy_num_layers": 1,
+  "input_names": [
+    "lidar",
+    "depth",
+    "detections",
+    "state",
+    "actor_h",
+    "actor_c",
+    "critic_h",
+    "critic_c"
+  ],
+  "output_names_in_order": [
+    "action_mean",
+    "action_clipped",
+    "action_std",
+    "value",
+    "actor_h_out",
+    "actor_c_out",
+    "critic_h_out",
+    "critic_c_out"
+  ],
+  "episode_start_input": "omitted; caller clears actor and critic h/c at episode start",
+  "wrapper_uses": [
+    "policy.features_extractor (or actual pi/vf feature extractors)",
+    "policy.lstm_actor and policy.lstm_critic",
+    "policy.mlp_extractor.forward_actor and forward_critic",
+    "policy.action_net, policy.log_std, policy.value_net"
+  ],
+  "trace_check": "passed with 3 distinct nonzero actor/critic h/c samples",
+  "trace_warnings": [
+    {
+      "warning": "DeprecationWarning: `torch.jit.trace` is deprecated. Please switch to `torch.compile` or `torch.export`.",
+      "count": 1
+    },
+    {
+      "warning": "DeprecationWarning: `torch.jit.trace_method` is deprecated. Please switch to `torch.compile` or `torch.export`.",
+      "count": 3
+    },
+    {
+      "warning": "TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!",
+      "count": 42
+    }
+  ],
+  "runtime_comparison": {
+    "sequence_count": 3,
+    "steps_per_sequence": 3,
+    "max_abs_errors": {
+      "torchscript_vs_wrapper": 0.0,
+      "mean_vs_policy_distribution": 0.0,
+      "std_vs_policy_distribution": 0.0,
+      "clip_vs_predict": 0.0,
+      "actor_h_vs_predict": 0.0,
+      "actor_c_vs_predict": 0.0,
+      "value_vs_predict_values": 0.0,
+      "critic_h_vs_lstm": 0.0,
+      "critic_c_vs_lstm": 0.0
+    },
+    "tolerance": {
+      "rtol": 2e-05,
+      "atol": 2e-06
+    },
+    "per_step": [
+      {
+        "case": 0,
+        "step": 0,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 0,
+        "step": 1,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 0,
+        "step": 2,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 1,
+        "step": 0,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 1,
+        "step": 1,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 1,
+        "step": 2,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 2,
+        "step": 0,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 2,
+        "step": 1,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      },
+      {
+        "case": 2,
+        "step": 2,
+        "max_abs_errors": {
+          "torchscript_vs_wrapper.action_mean": 0.0,
+          "torchscript_vs_wrapper.action_clipped": 0.0,
+          "torchscript_vs_wrapper.action_std": 0.0,
+          "torchscript_vs_wrapper.value": 0.0,
+          "torchscript_vs_wrapper.actor_h_out": 0.0,
+          "torchscript_vs_wrapper.actor_c_out": 0.0,
+          "torchscript_vs_wrapper.critic_h_out": 0.0,
+          "torchscript_vs_wrapper.critic_c_out": 0.0,
+          "mean_vs_policy_distribution": 0.0,
+          "std_vs_policy_distribution": 0.0,
+          "clip_vs_predict": 0.0,
+          "actor_h_vs_predict": 0.0,
+          "actor_c_vs_predict": 0.0,
+          "value_vs_predict_values": 0.0,
+          "critic_h_vs_lstm": 0.0,
+          "critic_c_vs_lstm": 0.0
+        }
+      }
+    ]
+  },
+  "artifact_bytes": 1482302,
+  "artifact_sha256": "7eedb2fbab1d2bdab4fda85a6a49c89353f8c30ea3d381ad2b64b6bb9825b5a0"
+}

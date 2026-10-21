@@ -1,0 +1,353 @@
+{
+  "report": "N01 UCC27511DBVR → UCC27511ADBVR 本轮正式切换核对",
+  "generated_at": "2026-10-15",
+  "scope": "只读检查；未改正式工程、BOM、原生库或API会话；未启动EasyEDA或桥接。",
+  "decision": {
+    "n01": {
+      "current": {
+        "ref": "U4",
+        "manufacturer": "Texas Instruments",
+        "mpn": "UCC27511DBVR",
+        "supplier_part": "C191027"
+      },
+      "proposed_one_way_change": {
+        "ref": "U4",
+        "manufacturer": "Texas Instruments",
+        "mpn": "UCC27511ADBVR",
+        "supplier_part": "C2676982"
+      },
+      "recommendation": "官方规格明确为drop-in replacement；当前证据已闭合1–6脚网络、双输入使能逻辑、SAFE_5V供电默认态和本地DBV焊盘编号/位置/尺寸等价。可批准为单向器件替代并在隔离副本实施；不能仅以减少一个MPN宣称节省。若本轮正式验收要求真实器件模型仿真，则仍应保留候选，因为厂商PSpice模型未能由项目ngspice运行，当前项目仿真使用理想Bdrv。正式工程/BOM本轮未改。",
+      "formal_change_applied": false,
+      "evidence": {
+        "native_source": {
+          "path": "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+          "sha256": "46CC3FDDEA3C62352F977BBC39ED3C327F0228409BFF7EBDB0F35B4B46D6C81F"
+        },
+        "current_api_readback": {
+          "component_id": "3c02b565d004ffcf",
+          "symbol_uuid": "b8b23147ad78e21a",
+          "footprint_uuid": "411c17a47fabb8af",
+          "symbol_name": "UCC27511",
+          "pins": [
+            {
+              "pin": "1",
+              "name": "VDD",
+              "net": "SAFE_5V"
+            },
+            {
+              "pin": "2",
+              "name": "OUTH",
+              "net": "DUMP_DRV_OUT"
+            },
+            {
+              "pin": "3",
+              "name": "OUTL",
+              "net": "DUMP_DRV_OUT"
+            },
+            {
+              "pin": "4",
+              "name": "GND",
+              "net": "GND_SYS"
+            },
+            {
+              "pin": "5",
+              "name": "IN-",
+              "net": "BUSOV_N"
+            },
+            {
+              "pin": "6",
+              "name": "IN+",
+              "net": "DUMP_THERM_OK"
+            }
+          ],
+          "add_into_bom": "yes",
+          "convert_to_pcb": "yes"
+        },
+        "old_local_exact_device": {
+          "title": "UCC27511DBVR",
+          "device_id": "3c02b565d004ffcf",
+          "device_sha256": "8c5d6a08bdcd0c7e2fbca414574870260800db878df72ad67e5b0c96af4c3468",
+          "symbol_sha256": "90f79be4cb64a7b30439cb7434bab86a56c20e3aae4dd84e12d6e222b38eb55c",
+          "footprint_sha256": "addd35eaf773dc817823506b87eb1929c1068548fe830b30cce199498f8c7070"
+        },
+        "proposed_existing_exact_device": {
+          "title": "UCC27511ADBVR",
+          "device_id": "3dd7ae652f59b10f",
+          "device_sha256": "108b0e2c2c28dd226fc580c176e96285becb3ac78477b07d0129af2466d6f0b4",
+          "supplier_part": "C2676982",
+          "symbol_uuid": "9d00140722618659",
+          "symbol_sha256": "9bd91814f66a9729dc4527a15c5671c6bd84305dbdc4073baebdc186f1aa3fa9",
+          "footprint_uuid": "2d88044b4003b7cd",
+          "footprint_sha256": "5b5cdcea062384f858b67afcb6e97f24085f525727ed85644beb4d508b4fbcff",
+          "already_used_at": "稳压模块::U_DUMP_DRV"
+        },
+        "pin_and_land_comparison": "两份本地符号均为1=VDD、2=OUTH、3=OUTL、4=GND、5=IN−、6=IN+。逐焊盘号对比本地DBV封装后，1–6的中心、长宽、角度与偏移相同；仅封装库名称后缀LS2.8/LS2.9不同。此项证明库焊盘映射相同，不代替板级封装检查、实物贴装/焊接资格。TI页面也将A明确标为drop-in replacement。",
+        "power_and_decoupling": {
+          "VDD": "SAFE_5V，来自TPS7A4001；U3 TLV1704供电也为SAFE_5V。",
+          "U3_C1_U4_C1": "各100nF、10V，SAFE_5V至GND_SYS；当前网络是标称5V而非12V。耐压在标称工作点不是已发现错误，仍应结合SAFE_5V容差/瞬态和MLCC有效容量核实。",
+          "U4_C2": "1uF、16V，SAFE_5V至GND_SYS。"
+        },
+        "enable_logic_and_defaults": {
+          "TI_truth_condition_for_high": "输出高要求IN+高且IN−低；OUTL与OUTH已并联。",
+          "current_interlock": "IN+=DUMP_THERM_OK；IN−=BUSOV_N。故仅在温度允许且过压比较器拉低BUSOV_N时驱动DUMP_GATE。",
+          "fail_safe_biases": "R_DUMP_INP_PD将DUMP_THERM_OK下拉至GND_SYS；BUSOV_N由R_OV_PU上拉至SAFE_5V。温度接口开路使IN+低；BUSOV_N开路/非过压状态使IN−高；两种状态均不会要求输出高。UCC27511/A输入悬空和VDD欠压时输出低，Q7栅极另有10k下拉。",
+          "finding": "网表逐针和默认关断逻辑一致，未发现此次换型会改变默认态。仍不等于硬件失效安全或实体关断验收。"
+        },
+        "specification_comparison": {
+          "common": "TI分别列出DBV 6-pin、VDD工作范围4.5–18V、4A拉/8A灌峰值和双输入/分裂输出结构；UCC27511产品页明确称UCC27511A为drop-in升级替代。",
+          "delta": "A版本增强负输入耐受：TI产品数据列输入可到−5V，A数据手册绝对最大输入为−6V；这是抗负瞬态能力改善，不改变本图正常0–5V逻辑。绝对最大值不能当作连续工作条件。",
+          "fit": "当前SAFE_5V、DUMP_THERM_OK/BUSOV_N逻辑及并联输出接法与A版本一致。"
+        },
+        "procurement_snapshot": {
+          "supplier": "LCSC",
+          "supplier_part": "C2676982",
+          "observed_listing": "LCSC商品页缓存（网页标记约3个月前抓取）显示库存540、最低订购5只；5+为US$0.386/只，50+为US$0.3355/只。该缓存已非实时库存/报价，仅作可采购渠道线索，不作为当前报价或采购承诺。",
+          "comparison": "旧件C191027也在LCSC有商品页，但本轮没有同一时点/同一数量档的有效报价比较；不能据此宣称成本节省。若使用该A料需考虑5只MOQ。"
+        }
+      },
+      "simulation": {
+        "official_models": [
+          {
+            "mpn": "UCC27511ADBVR",
+            "source": "TI SLVMCJ5.ZIP / UCC27511A_PSPICE_TRANS",
+            "sha256": "4d98572a118ca26dacf7a3aa1143983c6e142e856c12eac42f9a3adba5c76d7f",
+            "ngspice_result": "未修改官方模型直接运行失败：ngspice 47不支持模型表达式函数if；错误no such function if。"
+          },
+          {
+            "mpn": "UCC27511DBVR",
+            "source": "TI SLUM488.ZIP / UCC27511_TRANS.LIB",
+            "sha256": "c8d98ceb27b482e9c280a1e48d521521e8804f01220f4ebc1e8cefe65b129c30",
+            "ngspice_result": "未修改官方模型直接运行失败：PSpice表达式解析错误，且出现模型类型不兼容警告。"
+          }
+        ],
+        "project_simulation_limit": "现有FOC仿真以理想Bdrv代替UCC27511，仿真说明明确未纳入真实驱动器静态/栅极充电电流；因此现有PASS不能验证器件替换或真实栅极驱动。",
+        "conclusion": "规格/逻辑替代评估通过；真实器件瞬态仿真未通过工具兼容性验证，不能宣称仿真通过。后续需在TI支持的PSpice/TINA-TI或兼容仿真器完成，或明确采用受控模型转换并独立验证。"
+      }
+    },
+    "j_brake_r": {
+      "current_api_readback": {
+        "ref": "J_BRAKE_R",
+        "component_id": "9178f3e0232956fa",
+        "manufacturer": "Anderson Power Products",
+        "manufacturer_part": "",
+        "supplier_part": "",
+        "add_into_bom": true,
+        "add_into_pcb": false,
+        "symbol_holder": "HC-XH2.54-2AW-M",
+        "footprint_holder": "CONN-TH_HC-XH2.54-2AW-M",
+        "pin_nets": {
+          "1": "DUMP_RES_UP",
+          "2": "DUMP_SW"
+        },
+        "assembly_parts": "2× P992 housing + 4× 5900 silver-plated 6AWG contacts, one complete SB50 paired cable set per board.",
+        "display_name": "SB50 / DUMP R",
+        "native_value": "SB50_P992_5900_PAIR",
+        "native_value_evidence": {
+          "source_path": "元件封装库/索引/元件总表.json",
+          "source_sha256": "c1c5b4ea602d396d5d7258156df0f5a142bd96cbb85de4272075a3270cba8ef0",
+          "instance_key": "FOC驱动模块::J_BRAKE_R",
+          "display_name_source_field": "device_attribute_differences.Name.actual",
+          "native_value_source_fields": [
+            "actual_value",
+            "instance_value_raw",
+            "device_attribute_differences.Value.actual"
+          ]
+        }
+      },
+      "finding": "这里是外置电缆组件，不转PCB；XH符号/封装是原理图占位载体，不是实物SB50端子。厂家字段存在但manufacturerId/supplierId/MPN为空；这是BOM身份/中央解析和采购资格缺口，不构成当前PCB的针脚或电气接线故障证据。仍需确认公母壳/触点配对、压接工具、线径、额定电流/温升、直流分断及供应价格。",
+      "field_name_correction": {
+        "note": "字段命名修复：原current_api_readback.value记录的是显示名称，现更名为display_name并补充原生Value。依据当前元件总表中的同一实例记录。仅修改报告字段，不涉及CAD、原理图、BOM或原生工程变更。",
+        "source_path": "元件封装库/索引/元件总表.json",
+        "source_sha256": "c1c5b4ea602d396d5d7258156df0f5a142bd96cbb85de4272075a3270cba8ef0"
+      }
+    },
+    "bms_vo617a": {
+      "instance": "BMS模块::U_LOAD_POWER_VALID",
+      "declared_actual_mpn": "VO617A-2X007T",
+      "library_carrier": "VO617A-4X007T",
+      "carrier_footprint": "SOP-4_L6.5-W4.6-P2.54-LS10.3-TL",
+      "pin_nets": [
+        {
+          "pin": "1",
+          "name": "A",
+          "net": "LOAD_VALID_LED_A"
+        },
+        {
+          "pin": "2",
+          "name": "C",
+          "net": "LOAD_VALID_LED_K"
+        },
+        {
+          "pin": "3",
+          "name": "E",
+          "net": "LOAD_POWER_VALID"
+        },
+        {
+          "pin": "4",
+          "name": "C",
+          "net": "LOAD_EN_BIAS_EXT"
+        }
+      ],
+      "neighbor_nets": {
+        "R_LOAD_POWER_VALID_LED": [
+          {
+            "pin": "1",
+            "name": "1",
+            "net": "VOUT_5V"
+          },
+          {
+            "pin": "2",
+            "name": "2",
+            "net": "LOAD_VALID_LED_A"
+          }
+        ],
+        "Q_LOAD_POWER_VALID_DRV": [
+          {
+            "pin": "1",
+            "name": "1",
+            "net": "LOAD_VALID_BASE"
+          },
+          {
+            "pin": "2",
+            "name": "2",
+            "net": "B0"
+          },
+          {
+            "pin": "3",
+            "name": "3",
+            "net": "LOAD_VALID_LED_K"
+          }
+        ],
+        "J_LOAD_POWER_VALID": [
+          {
+            "pin": "1",
+            "name": "1",
+            "net": "LOAD_EN_BIAS_EXT"
+          },
+          {
+            "pin": "2",
+            "name": "2",
+            "net": "LOAD_POWER_VALID"
+          }
+        ]
+      },
+      "circuit_assessment": "网表中引脚1=A、2=K接LED回路；3=E接LOAD_POWER_VALID、4=C接LOAD_EN_BIAS_EXT；LED阳极经510Ω由VOUT_5V供电，阴极由MMBT3904低边吸电流。与隔离式开集/光晶体管外部接口意图一致，当前资料没有显示明确的pin/net短接或反接故障。实际外部接收负载/阈值、最大输入电流和隔离侧电位需按整车接口继续确认。",
+      "identity_and_qualification": "原生标称/采购候选为VO617A-2X007T，承载器件/库名为VO617A-4X007T，均SMD-4/SOP-4载体族；这不是已证明的原理图接线故障，但两个CTR等级不能等同：Vishay数据手册在IF=5mA、VCE=5V、25°C条件下，-2的CTR最小63%，-4最小160%。现行设计说明候选-2，故应以实际采购-2验证而不能把本地-4库对象当作采购授权；是否够用取决于全温CTR、实际LED电流/低VCE和外部接收负载。510Ω与5V只可作估算，不能替代全角落CTR闭合。",
+      "action": "不改型号；先让导出器明确区分Manufacturer Part实际料号与DeviceName载体名，再基于VO617A-2的最小CTR、VOUT_5V范围、LED Vf、Q饱和和最坏温度核算接收端负载余量。"
+    }
+  },
+  "tooling_and_execution_boundary": {
+    "official_api_wrapper": "FOC驱动模块/EDA自动化/Invoke-Lceda.ps1 wraps official lceda-pro.exe invoke; script records latest call under EDA automation logs. It can execute mutating API operations; not called.",
+    "project_cli_wrapper": "FOC驱动模块/EDA自动化/Run-Lceda.ps1 launches official CLI operations and may open/modify a project; not called.",
+    "native_persistence": "FOC驱动模块/EDA自动化/Persist-FocNative.py is explicitly a writeback/persistence utility; not called.",
+    "read_only_verifier": "FOC驱动模块/EDA自动化/Verify-FocNetlist.py is the local netlist verifier; not run in this audit.",
+    "bridge": "只读检查本机49620–49629端口未见监听；未启动桥接或EDA。父代理持有的隔离API会话未触碰。",
+    "recommended_safe_change_method": "如批准后续实施，仅在父代理隔离副本中调用官方API把U4换绑到现存精确器件UCC27511ADBVR（C2676982），导出网表确认原1–6脚映射/网名不变，再执行隔离副本DRC并记录原理图/PCB封装对照；不要对正式源直接执行Persist工具，除非正式变更授权另行明确。"
+  },
+  "source_file_hashes": [
+    {
+      "path": "FOC驱动模块/检查/当前原理图证据.json",
+      "sha256": "40009274BF009A535E03BABE8D745A2E797CB53FD93B97018B28262CBEA6AE08",
+      "size_bytes": 1592082
+    },
+    {
+      "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+      "sha256": "46CC3FDDEA3C62352F977BBC39ED3C327F0228409BFF7EBDB0F35B4B46D6C81F",
+      "size_bytes": 3971802
+    },
+    {
+      "path": "FOC驱动模块/仿真/仿真说明.md",
+      "sha256": "A09F164D2A07F2AB40B7AD934A7C974D02CE0DF8B8E747B01376EE83CCE6C878",
+      "size_bytes": 25874
+    },
+    {
+      "path": "FOC驱动模块/EDA自动化/Invoke-Lceda.ps1",
+      "sha256": "E3269617A7A560F86FC3CDD6061EEFB851FC41E6CA3476FBAFE9523DB56A7FAB",
+      "size_bytes": 4443
+    },
+    {
+      "path": "FOC驱动模块/EDA自动化/Run-Lceda.ps1",
+      "sha256": "C03546A026433039987316C2C0BAF0B8B98083BEA0CF2EC1D48DDF071CA280DA",
+      "size_bytes": 4823
+    },
+    {
+      "path": "FOC驱动模块/EDA自动化/Persist-FocNative.py",
+      "sha256": "AA39973DF274710B31F0DDBF2A56D15733EFB1DAD809A85AD039DB613AD81203",
+      "size_bytes": 8661
+    },
+    {
+      "path": "FOC驱动模块/EDA自动化/Verify-FocNetlist.py",
+      "sha256": "DDACFBB7BE14ABD53F90EEE257BE0FB637A73F28E97FF3A19C42F1EB2A9ADAD7",
+      "size_bytes": 4169
+    },
+    {
+      "path": "BMS模块/检查/当前官方网表.json",
+      "sha256": "11A9C066B8C2FF128EDAC6C3BEDD0145614F6C3D07C45FE4F6986D8E52F30338",
+      "size_bytes": 1636478
+    },
+    {
+      "path": "BMS模块/检查/当前原生器件清单.json",
+      "sha256": "867E0388C01772867CE26DE4EEFE33B8681C74B401FE099D211A81325DF38AC8",
+      "size_bytes": 81736
+    },
+    {
+      "path": "BMS模块/检查/当前原理图实时API回读.json",
+      "sha256": "F1F667DA0CAD8BC4105642CC036629A9A7C655D216CD4A63841004388497AC53",
+      "size_bytes": 4364
+    },
+    {
+      "path": "BMS模块/检查/高价值器件定案.md",
+      "sha256": "DEB4F4E57351C2D1A4CAC85CF4640FAACD1B0783D409CAD6057E82A19A19D97B",
+      "size_bytes": 7756
+    },
+    {
+      "path": "元件封装库/检查/有源与连接器共用核对.json",
+      "sha256": "C0B5A2D3C4CA32F8CEFEFB8F265FCB5E5D7B76F1ECFFB8CD3283D87C29C9DCC8",
+      "size_bytes": 588242
+    },
+    {
+      "path": "元件封装库/索引/采购补充.json",
+      "sha256": "75612ED83CB5AE57894A76E00C297F1CA15B9CF0504EA928FC57C2CC8D4211F3",
+      "size_bytes": 1200547
+    },
+    {
+      "path": "元件封装库/索引/元件总表.json",
+      "sha256": "c1c5b4ea602d396d5d7258156df0f5a142bd96cbb85de4272075a3270cba8ef0",
+      "size_bytes": 20275749
+    }
+  ],
+  "external_sources": [
+    {
+      "url": "https://www.ti.com/product/UCC27511",
+      "claim": "TI将UCC27511A标注为有升级功能的drop-in替代，并给出UCC27511基础指标、悬空输入/欠压输出默认态。"
+    },
+    {
+      "url": "https://www.ti.com/product/UCC27511A",
+      "claim": "TI列出UCC27511A的SOT-23 DBV 6-pin、4.5–18V、4A/8A、负输入耐受和输出默认低。"
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+      "claim": "A版本数据手册引脚编号、工作条件、绝对最大值、输入真值逻辑及TI可订购DBVR型号。"
+    },
+    {
+      "url": "https://www.lcsc.com/product-detail/C2676982.html",
+      "claim": "LCSC商品身份C2676982、包装与动态价格/库存页面快照。"
+    },
+    {
+      "url": "https://www.lcsc.com/product-detail/C191027.html",
+      "claim": "LCSC旧器件C191027商品页；页面报价是动态值，本报告不据此宣称节省。"
+    },
+    {
+      "url": "https://www.vishay.com/docs/83430/vo617a.pdf",
+      "claim": "Vishay官方VO617A订货结构、SMD-4 option 7及CTR bin表；VO617A-2与-4 CTR下限不同。"
+    },
+    {
+      "url": "https://www.ti.com/lit/zip/slvmcj5",
+      "claim": "TI UCC27511A PSpice瞬态模型下载。"
+    },
+    {
+      "url": "https://www.ti.com/lit/zip/slum488",
+      "claim": "TI UCC27511未加密PSpice瞬态模型下载。"
+    }
+  ]
+}

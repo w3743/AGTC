@@ -1,0 +1,362 @@
+[
+  {
+    "ref": "U_GATE7",
+    "mpn": "TI SN74LVC1G11DCKR",
+    "libUuid": "27376aeb8ef24d0493ee69f282c2787f",
+    "pins": {
+      "1": "TMR_DONE",
+      "2": "B0",
+      "3": "PRE_READY_N",
+      "4": "TIMEOUT_EVENT",
+      "5": "PRE_CTRL_3V3",
+      "6": "TIMER_SEEN"
+    },
+    "note": "3-input AND only clocks FAULT if a timer pulse occurred, ended, and READY was not latched; PRE_READY_N blocks a false timeout after success.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 150,
+    "value": "SN74LVC1G11"
+  },
+  {
+    "ref": "U_INV2",
+    "mpn": "TI SN74LVC1G04DBVR",
+    "libUuid": "51f5d93783ab4bbdae9a0d33e679904b",
+    "pins": {
+      "1": null,
+      "2": "POR_OK_N",
+      "3": "B0",
+      "4": "POR_OK",
+      "5": "PRE_CTRL_3V3"
+    },
+    "note": "5-pin DBV inverter, pin1 NC.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 750,
+    "y": 150,
+    "value": "SN74LVC1G04"
+  },
+  {
+    "ref": "U_TSEEN",
+    "mpn": "TI SN74LVC1G74DCUR",
+    "libUuid": "f5830f01da8a42d0855628e533598eb8",
+    "pins": {
+      "1": "TMR_ACTIVE",
+      "2": "PRE_CTRL_3V3",
+      "3": null,
+      "4": "B0",
+      "5": "TIMER_SEEN",
+      "6": "PRE_CLR_N",
+      "7": "PRE_CTRL_3V3",
+      "8": "PRE_CTRL_3V3"
+    },
+    "note": "TI DCU 8-pin DFF verified mapping:1 CLK,2 D,3 /Q NC,4 GND,5 Q,6 /CLR,7 /PRE,8 VCC. PRE_CLR_N=POR_OK & HOST_ALLOW clears timer-seen state.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1250,
+    "y": 150,
+    "value": "SN74LVC1G74"
+  },
+  {
+    "ref": "U_SEQ",
+    "mpn": "TI SN74LVC74ADR",
+    "libUuid": "4b9b0b3026db4c3781dcfe76716d53b7",
+    "pins": {
+      "1": "PRE_CLR_N",
+      "2": "PRE_CTRL_3V3",
+      "3": "PRE_READY_SET",
+      "4": "PRE_CTRL_3V3",
+      "5": "PRE_READY",
+      "6": "PRE_READY_N",
+      "7": "B0",
+      "8": "PRE_FAULT_N",
+      "9": "PRE_FAULT",
+      "10": "PRE_CTRL_3V3",
+      "11": "TIMEOUT_EVENT",
+      "12": "PRE_READY_N",
+      "13": "PRE_CLR_N",
+      "14": "PRE_CTRL_3V3"
+    },
+    "note": "SN74LVC74ADR SOIC-14 dual DFF: FF1 READY, FF2 FAULT. Both active-low /CLR use PRE_CLR_N=POR_OK & HOST_ALLOW; /PRE pins tied high. Host loss or POR clears stale sequence/fault state.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1750,
+    "y": 150,
+    "value": "SN74LVC74A"
+  },
+  {
+    "ref": "U_POR",
+    "mpn": "TI TPS3809K33DBVR",
+    "libUuid": "730f62007a0a4f4aae50fb25c8097e82",
+    "pins": {
+      "1": "B0",
+      "2": "POR_OK_N",
+      "3": "PRE_CTRL_3V3"
+    },
+    "note": "DBV pins1 GND,2 active-low push-pull RESET,3 VDD; 2.93V threshold option. No reset pull-up is required.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 2250,
+    "y": 150,
+    "value": "TPS3809K33"
+  },
+  {
+    "ref": "Q_DFETOFF",
+    "mpn": "onsemi MMBT3904LT1G",
+    "libUuid": "564cadce804e4fdcb009ae93bf75eeb3",
+    "pins": {
+      "1": "DFETOFF_B",
+      "2": "B0",
+      "3": "DFETOFF"
+    },
+    "note": "SOT-23 NPN 1=B,2=E,3=C. Collector pulls BQ DFETOFF low only when FET_RELEASE is valid; high = BOTHOFF per configured BQ pin function.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 450,
+    "value": "MMBT3904"
+  },
+  {
+    "ref": "R_DFETOFF_PU",
+    "mpn": "Yageo RC0603FR-0747KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "REG1",
+      "2": "DFETOFF"
+    },
+    "note": "47kΩ sole pull-up from BQ REG1; AFE agent owns U1 pins.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 450,
+    "value": "47kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_DFETOFF_BASE",
+    "mpn": "Yageo RC0603FR-0710KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "FET_RELEASE",
+      "2": "DFETOFF_B"
+    },
+    "note": "10kΩ NPN base resistor.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 450,
+    "value": "10kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_DFETOFF_BE",
+    "mpn": "Yageo RC0603FR-07100KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "DFETOFF_B",
+      "2": "B0"
+    },
+    "note": "100kΩ fail-safe NPN base-emitter pulldown.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 450,
+    "value": "100kΩ 1% 0.1W"
+  },
+  {
+    "ref": "C_GATE7",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_GATE7.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 2250,
+    "y": 450,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_INV2",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_INV2.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_SEQ",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_SEQ.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_TSEEN",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_TSEEN.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_POR",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_POR.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "U_AND5",
+    "mpn": "TI SN74LVC1G08DBVR",
+    "libUuid": "bc9749d59c264b90888987196d1a86c0",
+    "pins": {
+      "1": "PRE_CLR_N",
+      "2": "PRE_OK",
+      "3": "B0",
+      "4": "POSTPRE_CLR_N",
+      "5": "PRE_CTRL_3V3"
+    },
+    "note": "SN74LVC1G08DBVR: POSTPRE_CLR_N=PRE_CLR_N & PRE_OK; PRE_OK/window loss asynchronously clears the post-precharge latch.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 2250,
+    "y": 750,
+    "value": "SN74LVC1G08"
+  },
+  {
+    "ref": "U_POSTPRE",
+    "mpn": "TI SN74LVC1G74DCUR",
+    "libUuid": "f5830f01da8a42d0855628e533598eb8",
+    "pins": {
+      "1": "PRE_READY",
+      "2": "PRE_CTRL_3V3",
+      "3": null,
+      "4": "B0",
+      "5": "POSTPRE_OK",
+      "6": "POSTPRE_CLR_N",
+      "7": "PRE_CTRL_3V3",
+      "8": "PRE_CTRL_3V3"
+    },
+    "note": "TI DCU 8-pin DFF: CLK=PRE_READY rising, D=1; Q=POSTPRE_OK. /CLR=POSTPRE_CLR_N clears on PRE_OK loss, HOST_ALLOW low or POR; /PRE tied high. No stale READY reuse after window loss.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 1050,
+    "value": "SN74LVC1G74"
+  },
+  {
+    "ref": "C_AND5",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_AND5.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 1050,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_POSTPRE",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_POSTPRE.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_LATCH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 1050,
+    "value": "100nF 16V"
+  }
+]

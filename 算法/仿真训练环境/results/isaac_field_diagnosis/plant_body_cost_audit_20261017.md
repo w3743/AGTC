@@ -1,0 +1,22 @@
+# Plant body-cost and reset-path audit (2026-10-17)
+
+Read-only source audit. No simulator, GPU, FPS benchmark, or training run was started. The requested output did not exist before this audit.
+
+## Findings
+
+- `isaac_field/scene_assets.py:66-85` authors one kinematic `RigidBodyAPI` root per plant and a `FixedJoint` from world to that root. The code comment says the world-fixed root maps to a MuJoCo mocap body; it contrasts this with a free root adding six locked DOFs. The installed Isaac Lab source supports the key distinction: `test_newton_manager_abstraction.py:999-1035` builds a world-fixed root with `SolverMuJoCo`, writes its root pose, then verifies the write lands in `solver.mjw_data.mocap_pos`. `articulation_data.py:1840` and `articulation.py:253-255` count six base DOFs only for a `FREE` root; the changelog at `docs/CHANGELOG.rst:40-41` records a fix for incorrectly counting six DOFs when the root is world-jointed by a non-free joint.
+- Therefore the authored plant roots are not evidenced as adding six `q/qd` coordinates each. They still occupy rigid-body/body-pose and mocap/model entries, and their leaf/stem shapes remain in the scene; this audit did not inspect a live model to count exact bodies, shapes, or solver memory. The plant stem and leaves are authored as visual geometry without collision APIs (`scene_assets.py:86-101`), so the rigid roots are not hard plant obstacles.
+- The current reset path is explicit and supported: `isaac_field/env.py:310-333` writes randomized plant transforms to both Newton state buffers, zeros `body_qd`, then calls `manager.invalidate_body_state(...)`. Newton invalidation increments the SceneData transform/geometry timestamps (`newton_manager.py:671-681`, `1104-1115`). Both Newton ray queries and the Viser Warp camera route through `NewtonQueries.run_query`; when those timestamps change it refits the native shape BVH via `model.bvh_refit_shapes(state)` (`newton_manager.py:218-255, 273-277, 342-370`; camera use at `renderers/newton_warp_renderer.py:633-643`; raycaster use at `sensors/ray_caster/newton_raycast_sensor.py:380-395`). The official raycaster test `test_newton_raycast_sensor.py:199-225` verifies that moving a rigid body changes the next ray hit without an intervening physics step.
+- For a bodyless, `VISIBLE`-only plant, the low-level pieces are only partially present. Newton exposes `model.shape_transform` and the public `model.bvh_refit_shapes(state)` call is used by Isaac Lab, but the inspected manager invalidation entry point is specifically `invalidate_body_state`; it publishes body transforms and cable geometry. `NewtonSceneDataBackend` exposes `state.body_q` as its transform array with paths from `model.body_label`, while generic scene-data geometry batches publish particles/cable endpoints, not arbitrary shape transforms (`newton_manager.py:294-369`; `scene_data/scene_data_backend.py:70-119`). I found no official shape-transform-specific invalidation event that also republishes a bodyless prim through SceneDataProvider. `ModelFlags.SHAPE_PROPERTIES` is used by collider material/offset randomization (`envs/mdp/events.py:139,228`), not as a documented shape-pose update pathway.
+
+## Support boundary
+
+**Supported by local source:** reset moving a kinematic fixed-root plant through body-pose writes and `invalidate_body_state`, followed by the shared Newton BVH refit used by ray sensing and the Warp camera. A world-fixed MuJoCo root is represented through mocap state, not a floating six-DOF base.
+
+**Low-level capability, end-to-end path not established:** changing a bodyless static plant's `model.shape_transform` and refitting its BVH. The model refit method exists, but this audit found no public manager/event that makes both BVH-query caches and SceneDataProvider/render transforms observe that shape-only change. No native proof was run, so this should not be treated as a ready reset implementation.
+
+**Not measured:** exact per-plant body/mocap memory or solver-time savings, and whether a bodyless shape representation would reduce overall cost when leaf/stem shape count and ray-BVH work stay the same.
+
+## Recommendation
+
+Keep the current world-fixed kinematic roots for now; they have a source-backed reset/refit path and are not six-DOF plants. Consider a bodyless visible-shape conversion only after a small native reset test demonstrates shape-transform updates, ray hits, and viewer transforms all refresh through supported interfaces.

@@ -1,0 +1,164 @@
+{
+  "title": "HCSK1216FTL500 四端库源草案",
+  "status": "manufacturer_land_geometry_draft_api_source_write_failed_no_binding",
+  "formalDesignAuthority": [
+    "BMS模块/原理图准备/功率元件连接.json",
+    "BMS模块/检查/单页eprj3施工清单.json"
+  ],
+  "formalPart": {
+    "ref": "RSHUNT",
+    "mpn": "HCSK1216FTL500",
+    "R": "0.5mΩ ±1%",
+    "TCR": "±50ppm/°C",
+    "power": "5W permanent at 100°C",
+    "package": "1216",
+    "terminals": 4
+  },
+  "manufacturer": {
+    "name": "Stackpole Electronics, Inc.",
+    "datasheet": "https://stackpole-europe.com/PDF/SEI-HCSK.pdf",
+    "page": 5,
+    "revisionDate": "2021-01-22",
+    "localPageImage": "BMS模块/厂商资料/HCSK1216_Stackpole_page5_fourland_recommended.png"
+  },
+  "recommendedLandsMm": {
+    "a": 1.5,
+    "b": 0.6,
+    "c": 1.5,
+    "e": 0.7,
+    "f": 0.5,
+    "g": 2.95
+  },
+  "coordinateDraft": {
+    "view": "top",
+    "xMeaning": "battery column left, load column right",
+    "yMeaning": "force row at negative y, sense row at positive y",
+    "pads": [
+      {
+        "cadPad": 1,
+        "pin": "1",
+        "role": "F_BAT / B0",
+        "centerMm": [
+          -1.05,
+          -0.6
+        ],
+        "sizeMm": [
+          1.5,
+          2.95
+        ],
+        "row": "large force"
+      },
+      {
+        "cadPad": 2,
+        "pin": "2",
+        "role": "S_BAT / SRP_KELVIN",
+        "centerMm": [
+          -1.05,
+          1.725
+        ],
+        "sizeMm": [
+          1.5,
+          0.7
+        ],
+        "row": "small sense"
+      },
+      {
+        "cadPad": 3,
+        "pin": "3",
+        "role": "S_LOAD / SRN_KELVIN",
+        "centerMm": [
+          1.05,
+          1.725
+        ],
+        "sizeMm": [
+          1.5,
+          0.7
+        ],
+        "row": "small sense"
+      },
+      {
+        "cadPad": 4,
+        "pin": "4",
+        "role": "F_LOAD / PACK-",
+        "centerMm": [
+          1.05,
+          -0.6
+        ],
+        "sizeMm": [
+          1.5,
+          2.95
+        ],
+        "row": "large force"
+      }
+    ],
+    "derived": {
+      "columnEdgeGapMm": 0.6,
+      "rowEdgeGapMm": 0.5,
+      "overallExtentMm": [
+        3.6,
+        4.15
+      ]
+    },
+    "orientationWarning": "The manufacturer drawing is an unnumbered isometric sketch. CAD1..4 is the project mapping, not a Stackpole terminal numbering scheme. The proposed 2x2 orientation follows the drawing and must be visually reviewed against the actual package after import."
+  },
+  "symbolPins": [
+    {
+      "number": 1,
+      "name": "F_BAT",
+      "net": "B0",
+      "electricalType": "Passive",
+      "padNumber": "1"
+    },
+    {
+      "number": 2,
+      "name": "S_BAT",
+      "net": "SRP_KELVIN",
+      "electricalType": "Passive",
+      "padNumber": "2"
+    },
+    {
+      "number": 3,
+      "name": "S_LOAD",
+      "net": "SRN_KELVIN",
+      "electricalType": "Passive",
+      "padNumber": "3"
+    },
+    {
+      "number": 4,
+      "name": "F_LOAD",
+      "net": "PACK-",
+      "electricalType": "Passive",
+      "padNumber": "4"
+    }
+  ],
+  "officialApiPlan": {
+    "targetLibraryUuid": "__PERSONAL_LIBRARY_UUID_REQUIRED__",
+    "apiSequence": [
+      "eda.lib_Symbol.create(libraryUuid, symbolName, undefined, 2, description)",
+      "eda.lib_Symbol.updateDocumentSource(symbolUuid, libraryUuid, ESYM source)",
+      "eda.lib_Footprint.create(libraryUuid, footprintName, undefined, description)",
+      "eda.lib_Footprint.updateDocumentSource(footprintUuid, libraryUuid, EFOO source)",
+      "eda.lib_Device.create(libraryUuid, deviceName, undefined, {symbol:{uuid:symbolUuid,libraryUuid}, footprint:{uuid:footprintUuid,libraryUuid}}, description, properties)"
+    ],
+    "officialSkillReferences": [
+      ".agents/skills/easyeda-api-skill/references/classes/LIB_Symbol.md",
+      ".agents/skills/easyeda-api-skill/references/classes/LIB_Footprint.md",
+      ".agents/skills/easyeda-api-skill/references/classes/LIB_Device.md",
+      ".agents/skills/easyeda-api-skill/references/types/TPCB_PrimitivePadShape.md"
+    ],
+    "stability": "All five creation/update APIs are documented as BETA. Script is guarded and was not run. Use a user library; do not write to the official system library."
+  },
+  "sourceDraftFiles": [
+    "tmp/HCSK1216FTL500_draft.esym",
+    "tmp/HCSK1216FTL500_1216_4PAD_draft.efoo",
+    "tmp/BMS_HCSK1216_官方API_待执行脚本草案.js"
+  ],
+  "scope": {
+    "formalFilesModified": false,
+    "projectCreated": false,
+    "bridgeStarted": false,
+    "writeApisCalled": false,
+    "testsErcDrcRun": false
+  },
+  "apiAttempt": "官方API新建空符号后源写入失败；空符号已清理；无完成的器件或封装。"
+}

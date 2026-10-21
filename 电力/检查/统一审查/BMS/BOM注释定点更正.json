@@ -1,0 +1,40 @@
+{
+  "schema": "BMS_BOM_NOTE_ONLY_CORRECTIONS_V1",
+  "path": "电力/BMS模块/原理图准备/BOM.csv",
+  "rowsIncludingHeader": 249,
+  "dataRows": 248,
+  "beforeSha256": "6690cb1b5c26e6872f827f07592ff63aacc61b4541f53a3fcbcc867b65ae0f3b",
+  "afterSha256": "a1ccd3260a3bfb2a36113a3019f60c041697996ad1dba9e0fee65005cd1456b0",
+  "changedRows": [
+    {
+      "ref": "U1",
+      "csvDataRow": 41,
+      "changedColumns": [
+        "备注"
+      ],
+      "beforeNote": "48-pin PFB/TQFP top-view physical pin map, TI BQ76952 Fig.16-2. 9S: VC0=B0, VC1..VC8 sample protected taps TAP_B1..TAP_B8; VC9..VC14 tie VC8_FILT; VC15 separately filtered from TAP_B8; VC16 samples TAP_B9. BAT/BREG supply remains on raw CELL_B9. Real cell slots 1..8 and 16 enabled; Vcell mode=0x80FF. Pins 21/31/29 use representative thermal zones A/B/C thermistors respectively; these three points do not provide per-group coverage. Pins 28 HDQ and 32 DDSG are NC after removing two thermistor channels. Pin29 CFETOFF remains configured as zone C thermistor; pin30 DFETOFF remains the active-high BOTHOFF hardware shutdown. Pins 19,34,38,39,40,44 NC; TS2 pin22 receives NTC_BOARD_NODE from NTC_BOARD through C_NTC_BOARD_FILT to B0; MCU board-temperature ADC output is retired and the temperature is read over BQ I2C.",
+      "afterNote": "48-pin PFB/TQFP top-view physical pin map, TI BQ76952 Fig.16-2. 9S: VC0=B0, VC1..VC8 sample protected taps TAP_B1..TAP_B8; VC9..VC14 tie VC8_FILT; VC15 separately filtered from TAP_B8; VC16 samples TAP_B9. BAT/BREG supply comes from fused-side TAP_B9 downstream of F_CELL_B9. Real cell slots 1..8 and 16 enabled; Vcell mode=0x80FF. Pins 21/31/29 use representative thermal zones A/B/C thermistors respectively; these three points do not provide per-group coverage. Pins 28 HDQ and 32 DDSG are NC after removing two thermistor channels. Pin29 CFETOFF remains configured as zone C thermistor; pin30 DFETOFF remains the active-high BOTHOFF hardware shutdown. Pins 19,34,38,39,40,44 NC; TS2 pin22 receives NTC_BOARD_NODE from NTC_BOARD through C_NTC_BOARD_FILT to B0; MCU board-temperature ADC output is retired and the temperature is read over BQ I2C."
+    },
+    {
+      "ref": "NTC_BOARD",
+      "csvDataRow": 107,
+      "changedColumns": [
+        "备注"
+      ],
+      "beforeNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于均衡功率区PCB热点，BQ TS2 pin22。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Vishay仍用其独立模型。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。",
+      "afterNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于均衡功率区PCB热点，BQ TS2 pin22。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Semitec 103AT-2各用TI默认18k模型；板内及MOS两颗MF52A103F3950(A1)使用时恒2018-06-04规格书附表1 P163-6定制曲线；GPC输入包已准备，尚未取得返回系数或完成BQ芯片写入/读回。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。"
+    },
+    {
+      "ref": "NTC_MOS",
+      "csvDataRow": 111,
+      "changedColumns": [
+        "备注"
+      ],
+      "beforeNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于主MOS热点，BQ TS3 pin23。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Vishay仍用其独立模型。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。",
+      "afterNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于主MOS热点，BQ TS3 pin23。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Semitec 103AT-2各用TI默认18k模型；板内及MOS两颗MF52A103F3950(A1)使用时恒2018-06-04规格书附表1 P163-6定制曲线；GPC输入包已准备，尚未取得返回系数或完成BQ芯片写入/读回。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。"
+    }
+  ],
+  "procurementQuantitiesAndPricesChanged": false,
+  "otherCellsChanged": false,
+  "nativeChanged": false
+}

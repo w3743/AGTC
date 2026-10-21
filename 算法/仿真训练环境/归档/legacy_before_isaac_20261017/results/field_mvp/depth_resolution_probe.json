@@ -1,0 +1,183 @@
+{
+  "task": "depth resolution CPU raycaster capture probe",
+  "date": "2026-10-17",
+  "method": "FieldEnv._capture(\"depth\") directly; no env.step, HTTP server, browser, or policy inference",
+  "machine": {
+    "python": "3.11.9",
+    "numpy": "2.4.6",
+    "threadpoolctl": "3.6.0",
+    "thread_pools_during_probe": [
+      {
+        "user_api": "blas",
+        "internal_api": "openblas",
+        "num_threads": 1,
+        "prefix": "libscipy_openblas",
+        "filepath": "C:\\Users\\wangj\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\numpy.libs\\libscipy_openblas64_-63c857e738469261263c764a36be9436.dll",
+        "version": "0.3.31.188.0",
+        "threading_layer": "pthreads",
+        "architecture": "Haswell"
+      }
+    ],
+    "physical_memory_available_before_bytes": 76100718592
+  },
+  "scene": {
+    "size_m": 100.0,
+    "plants": 400,
+    "generated_once": true,
+    "seed": 20261017,
+    "pose_xy_m": [
+      50.0,
+      50.0
+    ],
+    "yaw_rad": 0.7853981633974483,
+    "candidate_leaf_planes": 40,
+    "candidate_stems": 4,
+    "raycaster_preflight_estimated_workspace_bytes_at_640x352": 855162880,
+    "estimate_basis": "Conservative heuristic: 20 float32 + 10 boolean ray\u00d7leaf temporary matrices; 10 float32 stem matrices; 3 ray-vector buffers."
+  },
+  "methodology": {
+    "warmups_per_resolution": 1,
+    "measured_runs_per_resolution": 3,
+    "scene_shared_across_resolutions": true,
+    "depth_values_dtype": "float32",
+    "invalid_mask_dtype": "bool",
+    "timings_include": [
+      "ray direction construction",
+      "Scene.cast geometry",
+      "valid-mask/range noise",
+      "reshape"
+    ],
+    "timings_exclude": [
+      "scene generation",
+      "environment step",
+      "JSON/HTTP serialization",
+      "policy encoder",
+      "browser/UI"
+    ]
+  },
+  "results": [
+    {
+      "height": 16,
+      "width": 24,
+      "rays": 384,
+      "estimated_workspace_bytes": 1457664,
+      "timing_ms": {
+        "runs": [
+          0.3009,
+          0.2778,
+          0.3105
+        ],
+        "min": 0.2778,
+        "median": 0.3009,
+        "max": 0.3105
+      },
+      "shape_values": [
+        16,
+        24
+      ],
+      "shape_valid": [
+        16,
+        24
+      ],
+      "depth_json_bytes": 7762,
+      "rss_before_bytes": 44146688,
+      "peak_working_set_before_bytes": 44146688,
+      "rss_after_bytes": 44580864,
+      "peak_working_set_after_bytes": 44580864
+    },
+    {
+      "height": 160,
+      "width": 88,
+      "rays": 14080,
+      "estimated_workspace_bytes": 53447680,
+      "timing_ms": {
+        "runs": [
+          20.5648,
+          20.1109,
+          20.1669
+        ],
+        "min": 20.1109,
+        "median": 20.1669,
+        "max": 20.5648
+      },
+      "shape_values": [
+        160,
+        88
+      ],
+      "shape_valid": [
+        160,
+        88
+      ],
+      "depth_json_bytes": 283011,
+      "rss_before_bytes": 44580864,
+      "peak_working_set_before_bytes": 44580864,
+      "rss_after_bytes": 47222784,
+      "peak_working_set_after_bytes": 65740800
+    },
+    {
+      "height": 320,
+      "width": 176,
+      "rays": 56320,
+      "estimated_workspace_bytes": 213790720,
+      "timing_ms": {
+        "runs": [
+          86.0679,
+          84.2681,
+          84.8097
+        ],
+        "min": 84.2681,
+        "median": 84.8097,
+        "max": 86.0679
+      },
+      "shape_values": [
+        320,
+        176
+      ],
+      "shape_valid": [
+        320,
+        176
+      ],
+      "depth_json_bytes": 1125738,
+      "rss_before_bytes": 46383104,
+      "peak_working_set_before_bytes": 65740800,
+      "rss_after_bytes": 50184192,
+      "peak_working_set_after_bytes": 130351104
+    },
+    {
+      "height": 640,
+      "width": 352,
+      "rays": 225280,
+      "estimated_workspace_bytes": 855162880,
+      "timing_ms": {
+        "runs": [
+          374.1059,
+          362.3213,
+          354.2648
+        ],
+        "min": 354.2648,
+        "median": 362.3213,
+        "max": 374.1059
+      },
+      "shape_values": [
+        640,
+        352
+      ],
+      "shape_valid": [
+        640,
+        352
+      ],
+      "depth_json_bytes": 4502957,
+      "rss_before_bytes": 49111040,
+      "peak_working_set_before_bytes": 130351104,
+      "rss_after_bytes": 55164928,
+      "peak_working_set_after_bytes": 385699840
+    }
+  ],
+  "memory_safety": {
+    "safe_workspace_budget_bytes": 12884901888,
+    "640x352_preflight_within_budget": true,
+    "measured_rss_before_bytes": 44146688,
+    "measured_peak_working_set_before_bytes": 44146688,
+    "physical_memory_available_after_bytes": 76092456960
+  }
+}

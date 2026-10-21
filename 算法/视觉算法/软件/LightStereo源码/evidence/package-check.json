@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "scope": "isolated board package smoke using saved raw pair; camera service not switched; live startup not exercised",
+  "board": "RK3588 Debian11 ARM64 Python3.9 driver0.9.6",
+  "validation_directory": "/tmp/lightstereo-release-check",
+  "offline_dependency_and_integrity_check": {
+    "passed": true,
+    "candidate_verified_files": 646
+  },
+  "runtime": "package-local librknnrt 2.3.2, independent of /opt/lightstereo and /opt/rk-stereo Python vendors",
+  "input_alignment": "raw pair rectification and 4px crop exactly equal bundled reference inputs",
+  "npu_reference_checks": {
+    "forward_mean_delta_px": 0.07781527936458588,
+    "forward_p95_delta_px": 0.29874534606933567,
+    "reverse_mean_delta_px": 0.051659196615219116,
+    "reverse_p95_delta_px": 0.12847919464111324,
+    "forward_median_ms": 211.80814599938458,
+    "reverse_median_ms": 213.4597299991583
+  },
+  "saved_pair_pipeline": {
+    "depth_shape_hw": [
+      640,
+      352
+    ],
+    "valid_points": 128585,
+    "valid_fraction": 0.5707785866477273,
+    "rectify_ms": 27.90812800230924,
+    "match_filter_ms": 448.50858700010576,
+    "offline_total_ms": 476.416715002415
+  },
+  "pointcloud_export": {
+    "passed": true,
+    "points": 128585,
+    "metadata": "package-pointcloud.json"
+  },
+  "shell_syntax": {
+    "run.sh": "PASS",
+    "install.sh": "PASS"
+  },
+  "server_cli_import": "PASS",
+  "old_service_active_after_validation": true,
+  "validated_app_sha256": {
+    "calibration.npz": "fc0ee7b44fe56c397d0abab6cf94140d85c5017793c13656cbeb09a2ed9c2a1e",
+    "depth.py": "3383630aef62de95034db5f4f80872e6487bb7a7fabd09d424dd03f33c5cc47f",
+    "index.html": "86ae41a0f2c65adec9595d84efd9902f50f41f77c3a8176e17007f580d18c695",
+    "lightstereo_depth.py": "fdafd76e090fde86a1de5dafa9a8e4fc93606a7a70f069a6c00b0a9f60e1ef17",
+    "pointcloud.py": "96fd1c4112d62c47279269dca9ac1567d602fd0fd1df1276661041b0cbcd976e",
+    "pointcloud_viewer.html": "34dbcb936356157fd6f9dcb4a942db050874f315d29a8f6ff4ecc4afb78856a5",
+    "server.py": "34f1410b07af5310705863b1597e76aca15f3ab163aa8361dccc93dfbd14e110"
+  }
+}

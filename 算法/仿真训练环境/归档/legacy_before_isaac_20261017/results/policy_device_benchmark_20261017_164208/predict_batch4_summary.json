@@ -1,0 +1,69 @@
+{
+  "timestamp_local": "2026-10-17T16:43:35.411505+08:00",
+  "benchmark": "batch-4 RecurrentPPO.predict on actual FieldSim curriculum observations",
+  "source_checkpoint": "E:\\Pioneer\\\u5148\u8fdb\u901a\u7528\u5c65\u5e26\u5e95\u76d8\u5de5\u7a0b\\\u7b97\u6cd5\\\u4eff\u771f\u8bad\u7ec3\u73af\u5883\\results\\field_policy_improvement\\easy_gsde_20261017_162744_493\\checkpoint.zip",
+  "checkpoint_sha256": "27c8889c745aa5c15b56aaabf88e60f31104ea636fbb47697094b001cd5da977",
+  "goal_gain": 12.5,
+  "seed": 7,
+  "torch": "2.8.0+cu128",
+  "cuda_build": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+  "observation_count": 104,
+  "observation_shapes": {
+    "depth": [
+      4,
+      2,
+      160,
+      88
+    ],
+    "detections": [
+      4,
+      16,
+      10
+    ],
+    "lidar": [
+      4,
+      2,
+      400
+    ],
+    "state": [
+      4,
+      44
+    ]
+  },
+  "adjacent_changed_frames": {
+    "lidar": 49,
+    "depth": 12,
+    "detections": 0,
+    "state": 103
+  },
+  "warmup_calls": 4,
+  "timed_calls": 100,
+  "timing_scope": "PolicyRunner.predict includes observation tensor/device conversion and output materialization; CUDA synchronized before/after each call; observation generation excluded.",
+  "results": {
+    "cpu": {
+      "device": "cpu",
+      "parameters": 341901,
+      "mean_ms": 1.149003000027733,
+      "median_ms": 1.0894000006373972,
+      "p95_ms": 1.7453800001021589,
+      "min_ms": 0.9303000006184448,
+      "max_ms": 2.016300000832416,
+      "fps_from_mean": 870.31974675076,
+      "action_finite": true
+    },
+    "cuda": {
+      "device": "cuda",
+      "parameters": 341901,
+      "mean_ms": 1.9359779998922022,
+      "median_ms": 1.7902500003401656,
+      "p95_ms": 2.641064999625087,
+      "min_ms": 1.4938999993319158,
+      "max_ms": 3.0214999969757628,
+      "fps_from_mean": 516.5347953621794,
+      "action_finite": true
+    }
+  },
+  "action_max_abs_cpu_cuda_delta": 1.2993812561035156e-05,
+  "cuda_over_cpu_mean_latency_ratio": 1.6849198825812244
+}

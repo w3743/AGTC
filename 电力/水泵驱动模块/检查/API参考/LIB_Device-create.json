@@ -1,0 +1,43 @@
+{
+  "title": "创建器件",
+  "params": [
+    {
+      "name": "libraryUuid",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "description": "器件名称",
+      "required": true
+    },
+    {
+      "name": "classification",
+      "type": "ILIB_ClassificationIndex | Array<string>",
+      "description": "分类",
+      "required": false
+    },
+    {
+      "name": "association",
+      "type": "{ symbolType?: ELIB_SymbolType; symbolUuid?: string; symbol?: { uuid: string; libraryUuid: string }; footprintUuid?: string; footprint?: { uuid: string; libraryUuid: string }; model3D?: { uuid: string; libraryUuid: string }; imageData?: any }",
+      "description": "关联符号、封装、图像，指定 `symbolType` 则创建新符号，无需新建符号则无需指定 `symbolType`，但请注意，如若不新建符号也不指定符号的关联信息将无法创建器件",
+      "required": false
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "描述",
+      "required": false
+    },
+    {
+      "name": "property",
+      "type": "ILIB_DeviceExtendPropertyItem",
+      "description": "其它属性，仅 `designator`、`addIntoBom`、`addIntoPcb` 存在默认值",
+      "required": false
+    }
+  ],
+  "returns": {
+    "type": "string | null"
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "status": "layout_handoff_only",
+  "purpose": "给人工 PCB layout 提供低成本、无新增 BOM 器件的焊线焊盘网络映射；不表示焊盘已画入 EPRJ3 或 PCB。",
+  "baseline": {
+    "eprj3": "BMS模块/BMS-9S4P.eprj3",
+    "schematic_page": "P1",
+    "page_uuid": "350a4904c4ec87b3",
+    "pcb_exists": false,
+    "component_count": 206,
+    "cad_component_count": 208,
+    "pins": 700,
+    "normalized_mpn_count": 51,
+    "native_p1_sha256": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+    "snapshot_sha256": "7bfb998bb6c5eb3f53c049aa5da5178dbfd4858152af86b8edaa95cfecffd8f8",
+    "port_count": 285,
+    "wire_count": 331,
+    "text_count": 237,
+    "offboard_component_count": 2,
+    "offboard_refs": [
+      "SW_RUN_STORE",
+      "R_PRE"
+    ],
+    "manual_pad_net_check": {
+      "status": "PASS",
+      "checked_against": "current-snapshot.json ports",
+      "expected_unique_net_count": 13,
+      "verified_net_names": [
+        "B0",
+        "BQ_CFETOFF",
+        "BQ_DCHG",
+        "BQ_TS1",
+        "TAP_B1",
+        "TAP_B2",
+        "TAP_B3",
+        "TAP_B4",
+        "TAP_B5",
+        "TAP_B6",
+        "TAP_B7",
+        "TAP_B8",
+        "TAP_B9"
+      ],
+      "missing_net_names": []
+    }
+  },
+  "interfaces": [
+    {
+      "ref": "J_CELL_SERVICE",
+      "status": "manual_pcb_pads_required",
+      "purpose": "电芯抽头维护线束的 PCB 板端焊线组",
+      "pad_group": "1x10 PTH single row",
+      "finished_hole_mm": 2.0,
+      "copper_pad_diameter_mm": 4.0,
+      "pitch_mm": 5.0,
+      "insulation_goal_vdc": 60,
+      "mpn": null,
+      "schematic_component": false,
+      "pins": {
+        "1": "B0",
+        "2": "TAP_B1",
+        "3": "TAP_B2",
+        "4": "TAP_B3",
+        "5": "TAP_B4",
+        "6": "TAP_B5",
+        "7": "TAP_B6",
+        "8": "TAP_B7",
+        "9": "TAP_B8",
+        "10": "TAP_B9"
+      },
+      "notes": [
+        "TAP_B1…TAP_B9 均为各电芯源端保险下游节点。",
+        "人工在 PCB 创建焊盘并按对应网名分配；本组不是 EPRJ3 元件。",
+        "焊点、铜箔和线束应力释放需结合温升与故障条件核算。"
+      ]
+    },
+    {
+      "ref": "J_CELL_NTC_SERVICE",
+      "status": "manual_pcb_pads_required",
+      "purpose": "三路电芯温度探头的低压共用回线及信号焊线组",
+      "pad_group": "1x4 PTH single row",
+      "finished_hole_mm": null,
+      "copper_pad_diameter_mm": null,
+      "pitch_mm": null,
+      "dimensions_note": "由人工 layout 按最终低压探头线径和装配方式确定。",
+      "mpn": null,
+      "schematic_component": false,
+      "pins": {
+        "1": "B0",
+        "2": "BQ_TS1",
+        "3": "BQ_DCHG",
+        "4": "BQ_CFETOFF"
+      },
+      "notes": [
+        "B0 为三路探头的共用回线。",
+        "人工在 PCB 创建焊盘并按对应网名分配；本组不是 EPRJ3 元件。",
+        "与 1x10 高压抽头焊盘组分开布置。"
+      ]
+    }
+  ],
+  "bom_impact": {
+    "additional_components": 0,
+    "additional_mpn_types": 0,
+    "note": "手工创建的 PCB 焊盘不计入原理图器件 BOM。"
+  },
+  "layout_cautions": [
+    "PCB 手工焊盘不会自动进入 EPRJ3 原理图网表；layout 时须按本文件的网名逐一分配并核对。",
+    "1x10 高压抽头与 1x4 低压温度接口分组布置。",
+    "B0 是电芯组负端/AFE参考，不得与分流器负载侧 PACK− 短接。",
+    "此映射只支持开始探索性 placement，不代表原理图 ERC、保护配置、电气间距或实物安全验收通过。"
+  ]
+}

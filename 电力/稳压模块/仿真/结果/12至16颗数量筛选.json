@@ -1,0 +1,167 @@
+{
+  "status": "CANDIDATE_MODEL_ONLY_NO_HARDWARE_RELEASE",
+  "cell": "LICAP SC0350-270-RSS",
+  "method_source": "仿真/源码/增容筛选.py::simulate",
+  "method_source_sha256": "2fed6d64b8c1cb45811832f0161ea60ba035a950349a1aac65e3d421146b3d96",
+  "invalidated_prior_result": {
+    "status": "INVALIDATED_DO_NOT_USE",
+    "prior_json_sha256": "b035404ec3201627f67830a4a150c906b8301d95fafd89d15854728f7c88641f",
+    "reason": "旧计算把整包每端0.1V reserve误作每串组0.1V，采用1.8–2.35V/组；该结果已作废，不作为当前结论。"
+  },
+  "conditions": {
+    "series_groups_tested": [
+      6,
+      7,
+      8
+    ],
+    "parallel_per_group": 2,
+    "cell_quantity": [
+      12,
+      14,
+      16
+    ],
+    "EOL_capacitance_F_per_cell": 280.0,
+    "ESR_per_cell_model": "两颗并联；每颗原始ESR 2.8mΩ，放大2倍后再乘1.3",
+    "common_interconnect_ESR_ohm": 0.005,
+    "stack_ESR_formula": "N * ((2*2.8mΩ)/2 * 1.3) + 5mΩ",
+    "efficiency": 0.9,
+    "bus_power_W_each_direction": 800.0,
+    "duration_s_each_direction": 1.0,
+    "bus_voltage_V": 37.8,
+    "hot_L_min_uH": 12,
+    "switching_frequency_kHz": 50,
+    "estimated_half_ripple_A": 7.875,
+    "total_peak_current_limit_A": 80,
+    "per_cell_terminal_window_V": [
+      1.7,
+      2.45
+    ],
+    "pack_endpoint_reserve_each_end_V": 0.1,
+    "effective_pack_window_formula_V": "[N*1.7+0.1, N*2.45-0.1]",
+    "idle_target_scan_domain_formula_V": "[N*1.7, N*2.45]",
+    "actual_start_error_each_direction_pack_V": {
+      "support": -0.1,
+      "absorb": 0.1
+    },
+    "scan": {
+      "pack_idle_target_step_V": 0.001,
+      "coarse_simulation_dt_s": 0.001,
+      "boundary_refinement": "bisection with existing simulate(dt=0.0001 s)"
+    }
+  },
+  "numerical_check": {
+    "max_abs_energy_balance_residual_at_refined_boundaries_J": 0.002994725010012189,
+    "pass_rule": "terminal range inside effective pack window and simulated average port current + 7.875A <= 80A"
+  },
+  "interpretation": "仅枚举12/14/16颗。16颗8S2P在共同idle目标16.9063–17.6058V内双向通过，包含17.2V；14颗无共同起点，卡在支撑的80A峰值下限与吸收的上端电压上限之间；12颗支撑在最高起点仍超过峰值限制。仅为给定模型候选，不放宽电压窗、峰值或物理资格，也不声称数学全局最优或硬件放行。",
+  "candidates": [
+    {
+      "series_groups": 6,
+      "parallel_per_group": 2,
+      "cell_quantity": 12,
+      "EOL_stack_capacitance_F": 93.33333333333333,
+      "stack_ESR_ohm": 0.02684,
+      "effective_pack_window_V": [
+        10.3,
+        14.6
+      ],
+      "support_idle_target_pass_range_pack_V": null,
+      "absorb_idle_target_pass_range_pack_V": [
+        10.2,
+        12.638955034255982
+      ],
+      "common_idle_target_pass_range_pack_V": [],
+      "status": "NO_COMMON_START_POINT",
+      "support_at_highest_idle_target": {
+        "idle_target_pack_V": 14.7,
+        "actual_initial_pack_V": 14.6,
+        "minimum_terminal_pack_V": 11.80205664787842,
+        "maximum_terminal_pack_V": 12.725147207424168,
+        "estimated_peak_current_A": 83.19143978752456,
+        "peak_limit_pass": false,
+        "energy_balance_residual_J": 0.0028147444195383287
+      },
+      "binding_reason": "在最高扫描起点14.7V时，电压范围通过但总峰值估算83.19A>80A；更低起点不能恢复峰值余量。"
+    },
+    {
+      "series_groups": 7,
+      "parallel_per_group": 2,
+      "cell_quantity": 14,
+      "EOL_stack_capacitance_F": 80.0,
+      "stack_ESR_ohm": 0.03048,
+      "effective_pack_window_V": [
+        12.0,
+        17.05
+      ],
+      "support_idle_target_pass_range_pack_V": [
+        15.487681993484497,
+        17.15
+      ],
+      "absorb_idle_target_pass_range_pack_V": [
+        11.9,
+        15.127194741249083
+      ],
+      "common_idle_target_pass_range_pack_V": [],
+      "directional_interval_gap_pack_V": 0.360487252235414,
+      "status": "NO_COMMON_START_POINT",
+      "support_lower_boundary": {
+        "idle_target_pack_V": 15.487681993484497,
+        "estimated_peak_current_A": 79.99999999467653,
+        "peak_limit_pass": true,
+        "minimum_terminal_pack_V": 12.324282689143804,
+        "maximum_terminal_pack_V": 13.359690972678642
+      },
+      "absorb_upper_boundary": {
+        "idle_target_pack_V": 15.127194741249083,
+        "maximum_terminal_pack_V": 17.049999999144568,
+        "estimated_peak_current_A": 51.371713925712264,
+        "peak_limit_pass": true
+      },
+      "binding_reason": "支撑侧需要idle目标至少15.4877V以满足80A总峰值上限；吸收侧因上端终端电压17.05V限制，idle目标至多15.1272V。两侧相差0.3605V，峰值本身不使两侧边界失败。"
+    },
+    {
+      "series_groups": 8,
+      "parallel_per_group": 2,
+      "cell_quantity": 16,
+      "EOL_stack_capacitance_F": 70.0,
+      "stack_ESR_ohm": 0.03412,
+      "effective_pack_window_V": [
+        13.7,
+        19.5
+      ],
+      "support_idle_target_pass_range_pack_V": [
+        16.90631930351257,
+        19.6
+      ],
+      "absorb_idle_target_pass_range_pack_V": [
+        13.6,
+        17.605841886520384
+      ],
+      "common_idle_target_pass_range_pack_V": [
+        [
+          16.90631930351257,
+          17.605841886520384
+        ]
+      ],
+      "status": "COMMON_START_POINT_EXISTS",
+      "reference_point_17_2V": {
+        "support": {
+          "pass": true,
+          "actual_initial_pack_V": 17.1,
+          "minimum_terminal_pack_V": 14.074414085259395,
+          "maximum_terminal_pack_V": 15.090153752864765,
+          "estimated_peak_current_A": 71.03136896173547,
+          "energy_balance_residual_J": 0.002654430830716592
+        },
+        "absorb": {
+          "pass": true,
+          "actual_initial_pack_V": 17.3,
+          "minimum_terminal_pack_V": 18.61939817641968,
+          "maximum_terminal_pack_V": 19.129199419789128,
+          "estimated_peak_current_A": 46.54434866411717,
+          "energy_balance_residual_J": 0.0010395126317916947
+        }
+      }
+    }
+  ]
+}

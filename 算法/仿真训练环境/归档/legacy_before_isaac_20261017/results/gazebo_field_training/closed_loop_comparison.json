@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-17T07:59:04.3292393Z",
+  "title": "Headless Gazebo Harmonic and FieldSim short-run comparison",
+  "source_summary_paths_absolute_windows": {
+    "gazebo_train": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\train_summary.json",
+    "fieldsim_train": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_fieldsim_train_20261017_155648_097\\train_summary.json",
+    "gazebo_benchmark": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_benchmark_20261017_155609_273\\benchmark_summary.json",
+    "fieldsim_benchmark": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_fieldsim_benchmark_20261017_155702_476\\benchmark_summary.json"
+  },
+  "comparison_protocol": {
+    "same_config": true,
+    "config": {
+      "size_m": 100.0,
+      "plants": 400,
+      "dt_s": 0.05,
+      "max_episode_s": 20.0,
+      "seed": 7,
+      "mode": "mixed",
+      "lidar_rays": 400,
+      "lidar_period_s": 0.1,
+      "depth_width": 88,
+      "depth_height": 160,
+      "depth_period_s": 0.4,
+      "action_space": "same 4-D FieldEnv policy interface",
+      "observation_space": "same four-entry policy observation interface"
+    },
+    "training": {
+      "each_backend_independently_initialized": null,
+      "initialization_seed": 7,
+      "total_steps": 512,
+      "n_steps": 128,
+      "n_epochs": 3,
+      "task_mode_coverage": "The first two mixed resets cover search and goto; later resets use 60% goto."
+    },
+    "benchmark": {
+      "same_checkpoint_for_both_backends": true,
+      "checkpoint": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\checkpoint.zip",
+      "unpaced_policy_env_decisions": 128,
+      "paced_control_seconds": 5,
+      "paced_target_hz": 20.0,
+      "cached_and_uncached_policy_inference_repetitions": 200,
+      "gui": null,
+      "monitor": null
+    }
+  },
+  "training": [
+    {
+      "backend": "gazebo",
+      "seed": 7,
+      "mode": "mixed",
+      "episode_modes": [
+        "search",
+        "goto"
+      ],
+      "requested_steps": 512,
+      "actual_steps": 512,
+      "n_steps": 128,
+      "n_epochs": 3,
+      "total_wall_seconds": 26.867471303000002,
+      "model_learn_seconds": 25.23376125499999,
+      "steps_per_wall_second": 19.056501232508264,
+      "reset_count": 2,
+      "mean_reset_ms": 7260.213821500003,
+      "mean_env_step_ms": 15.538080451170222,
+      "p95_env_step_ms": 30.218791899977756,
+      "effective_simulated_seconds": 25.599999999999998,
+      "effective_simulated_seconds_per_wall_second": 0.9528250616254132,
+      "weight_delta_squared": 0.19258722793364313,
+      "weights_finite": true,
+      "checkpoint_reload_passed": true,
+      "initial_checkpoint_absolute_wsl": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_training/headless_gazebo_train_20261017_155524_284/initial_checkpoint.zip",
+      "checkpoint_absolute_windows": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\checkpoint.zip"
+    },
+    {
+      "backend": "fieldsim",
+      "seed": 7,
+      "mode": "mixed",
+      "episode_modes": [
+        "search",
+        "goto"
+      ],
+      "requested_steps": 512,
+      "actual_steps": 512,
+      "n_steps": 128,
+      "n_epochs": 3,
+      "total_wall_seconds": 5.20311437700002,
+      "model_learn_seconds": 4.281577786000014,
+      "steps_per_wall_second": 98.4026033068306,
+      "reset_count": 2,
+      "mean_reset_ms": 190.77705300000503,
+      "mean_env_step_ms": 3.0283582734379477,
+      "p95_env_step_ms": 14.523754649985676,
+      "effective_simulated_seconds": 25.6,
+      "effective_simulated_seconds_per_wall_second": 4.92013016534153,
+      "weight_delta_squared": 0.43528055707406565,
+      "weights_finite": true,
+      "checkpoint_reload_passed": true,
+      "initial_checkpoint_absolute_wsl": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_training/headless_fieldsim_train_20261017_155648_097/initial_checkpoint.zip",
+      "checkpoint_absolute_wsl": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_training/headless_fieldsim_train_20261017_155648_097/checkpoint.zip"
+    }
+  ],
+  "benchmark": [
+    {
+      "backend": "gazebo",
+      "source": "short-trained checkpoint; task competence not established",
+      "checkpoint_absolute_windows": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\checkpoint.zip",
+      "benchmark_steps": 128,
+      "reset_ms": 5681.11094599999,
+      "cached_policy_200_mean_ms": 0.4082894099971668,
+      "uncached_policy_200_mean_ms": 0.6559653549999211,
+      "policy_mean_ms": 1.6173982578120416,
+      "policy_p95_ms": 2.128237200022909,
+      "env_step_mean_ms": 12.139388218748604,
+      "env_step_p95_ms": 22.123363550002743,
+      "combined_mean_ms": 13.756786476560645,
+      "combined_p95_ms": 23.445333850017384,
+      "combined_decision_fps": 72.69139502192895,
+      "paced_target_hz": 20.0,
+      "paced_actual_start_hz": 19.999780446854615,
+      "paced_deadline_misses": 0,
+      "paced_combined_p95_ms": 32.307361450045846,
+      "sensor_fresh_counts": {
+        "lidar": 64,
+        "depth": 16,
+        "camera": 31
+      },
+      "physics_step_size_s": 0.005,
+      "real_time_factor": 0.0
+    },
+    {
+      "backend": "fieldsim",
+      "source": "short-trained checkpoint; task competence not established",
+      "checkpoint_absolute_windows": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\checkpoint.zip",
+      "benchmark_steps": 128,
+      "reset_ms": 195.1967550000404,
+      "cached_policy_200_mean_ms": 0.3437398150003901,
+      "uncached_policy_200_mean_ms": 0.5818688649989667,
+      "policy_mean_ms": 0.9665727656233969,
+      "policy_p95_ms": 1.6960108000120042,
+      "env_step_mean_ms": 3.698711921878761,
+      "env_step_p95_ms": 16.634816099966088,
+      "combined_mean_ms": 4.665284687502158,
+      "combined_p95_ms": 17.310964100013848,
+      "combined_decision_fps": 214.34919131064012,
+      "paced_target_hz": 20.0,
+      "paced_actual_start_hz": 19.999639982238303,
+      "paced_deadline_misses": 0,
+      "paced_combined_p95_ms": 29.93369870001743,
+      "sensor_fresh_counts": {
+        "lidar": 63,
+        "depth": 15,
+        "camera": 31
+      },
+      "physics_step_size_s": null,
+      "real_time_factor": null
+    }
+  ],
+  "checkpoint_fairness": {
+    "gazebo_benchmark_checkpoint": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_training/headless_gazebo_train_20261017_155524_284/checkpoint.zip",
+    "fieldsim_benchmark_checkpoint": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_training/headless_gazebo_train_20261017_155524_284/checkpoint.zip",
+    "same_checkpoint": true,
+    "checkpoint_windows": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\headless_gazebo_train_20261017_155524_284\\checkpoint.zip"
+  },
+  "runtime": {
+    "os": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "wsl_distribution": "Ubuntu-24.04",
+    "cpu_model": "Intel(R) Core(TM) Ultra 9 275HX",
+    "logical_cpu_count": 20,
+    "host_gpu_models": [
+      "Meta Virtual Monitor",
+      "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+      "Intel(R) Graphics"
+    ],
+    "policy_device": "CPU",
+    "torch_threads": 1,
+    "python": "3.12.3",
+    "packages": {
+      "numpy": "2.2.6",
+      "torch": "2.14.0+cpu",
+      "stable-baselines3": "2.9.0",
+      "sb3-contrib": "2.9.0",
+      "Pillow": "12.3.0"
+    },
+    "gazebo_abi": "Gazebo Harmonic / gz-sim 8",
+    "ros_distribution": "jazzy",
+    "physics_step_size_s": 0.005,
+    "real_time_factor": 0.0,
+    "gui": null
+  },
+  "non_headless_monitor_run": {
+    "source_summary_absolute_windows": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\gazebo_field_training\\qa_all512_mixed_monitor_20261017_155340_313\\all_summary.json",
+    "included_in_fair_performance_comparison": false,
+    "reason": "Read-only monitor validation run; excluded from headless throughput comparison."
+  },
+  "limitations": [
+    "One short run per backend; timings are descriptive and not a repeated-run confidence interval.",
+    "Training wall time includes environment setup/export/reset costs; the FieldSim and Gazebo startup/reset costs differ materially.",
+    "The 128-decision benchmark is not an evaluation of task competence. The checkpoint has not been shown to solve held-out tasks.",
+    "Gazebo plants remain visual-only; plant detection and damage rewards use the shared FieldSim geometric proxy, not flexible-plant physics or real-robot recognition.",
+    "GPU is present on the host but policy/training device was CPU; GPU utilization was not measured.",
+    "The Gazebo physics values are the runtime SDF settings; real_time_factor=0 selects unpaced simulation and is not a measured wall/simulation throughput ratio."
+  ]
+}

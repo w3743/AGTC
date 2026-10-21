@@ -1,0 +1,184 @@
+[WARN] [1790132332.530520773] [rtabmap]: Parameter "queue_size" has been renamed to "sync_queue_size" and will be removed in future versions! The value (30) is copied to "sync_queue_size".
+[INFO] [1790132332.539673162] [rtabmap]: rtabmap(maps): latch                      = true
+[INFO] [1790132332.539764042] [rtabmap]: rtabmap(maps): map_filter_radius          = 0.000000
+[INFO] [1790132332.539849248] [rtabmap]: rtabmap(maps): map_filter_angle           = 30.000000
+[INFO] [1790132332.539932943] [rtabmap]: rtabmap(maps): map_cleanup                = true
+[INFO] [1790132332.540022688] [rtabmap]: rtabmap(maps): map_always_update          = false
+[INFO] [1790132332.540108928] [rtabmap]: rtabmap(maps): map_empty_ray_tracing      = true
+[INFO] [1790132332.540395509] [rtabmap]: rtabmap(maps): map_cache_loaded_on_init   = true
+[INFO] [1790132332.540501300] [rtabmap]: rtabmap(maps): cloud_output_voxelized     = true
+[INFO] [1790132332.540589953] [rtabmap]: rtabmap(maps): cloud_subtract_filtering   = false
+[INFO] [1790132332.540677709] [rtabmap]: rtabmap(maps): cloud_subtract_filtering_min_neighbors = 2
+[INFO] [1790132332.540785704] [rtabmap]: rtabmap(maps): octomap_tree_depth         = 16
+[INFO] [1790132332.549990185] [rtabmap]: rtabmap: frame_id      = "base_link"
+[INFO] [1790132332.550163188] [rtabmap]: rtabmap: odom_frame_id = ""
+[INFO] [1790132332.550300220] [rtabmap]: rtabmap: ground_truth_frame_id = "" -> ground_truth_base_frame_id = "base_link"
+[INFO] [1790132332.550400785] [rtabmap]: rtabmap: map_frame_id  = "map"
+[INFO] [1790132332.550504264] [rtabmap]: rtabmap: log_to_rosout_level  = 4
+[INFO] [1790132332.550609903] [rtabmap]: rtabmap: initial_pose  = ""
+[INFO] [1790132332.550693822] [rtabmap]: rtabmap: use_action_for_goal  = false
+[INFO] [1790132332.550804353] [rtabmap]: rtabmap: tf_delay      = 0.050000
+[INFO] [1790132332.550907460] [rtabmap]: rtabmap: tf_tolerance  = 0.100000
+[INFO] [1790132332.551008040] [rtabmap]: rtabmap: odom_sensor_sync   = false
+[INFO] [1790132332.551106862] [rtabmap]: rtabmap: pub_loc_pose_only_when_localizing = false
+[INFO] [1790132332.551206866] [rtabmap]: rtabmap: wait_for_transform = 0.200000
+[INFO] [1790132332.551332285] [rtabmap]: rtabmap: staleness_factor = 0.000000
+[INFO] [1790132332.551438122] [rtabmap]: rtabmap: gen_scan  = false
+[INFO] [1790132332.551536604] [rtabmap]: rtabmap: gen_depth  = false
+[INFO] [1790132332.692103936] [rtabmap]: RTAB-Map detection rate = 1.000000 Hz
+[INFO] [1790132332.692895038] [rtabmap]: rtabmap: Using database from "/mnt/e/Pioneer/虚拟训练环境/results/mapping_gpu/map.db" (0 MB).
+[INFO] [1790132332.713627064] [rtabmap]: rtabmap: Database version = "0.23.7".
+[INFO] [1790132332.713767181] [rtabmap]: rtabmap: SLAM mode (Mem/IncrementalMemory=true)
+[INFO] [1790132332.720761485] [rtabmap]: Setup callbacks
+[INFO] [1790132332.721004118] [rtabmap]: rtabmap: subscribe_depth = true
+[INFO] [1790132332.721103871] [rtabmap]: rtabmap: subscribe_rgb = true
+[INFO] [1790132332.721219604] [rtabmap]: rtabmap: subscribe_stereo = false
+[INFO] [1790132332.721315969] [rtabmap]: rtabmap: subscribe_rgbd = false (rgbd_cameras=1)
+[INFO] [1790132332.721412267] [rtabmap]: rtabmap: subscribe_sensor_data = false
+[INFO] [1790132332.721495458] [rtabmap]: rtabmap: subscribe_odom = true
+[INFO] [1790132332.721563647] [rtabmap]: rtabmap: subscribe_odom_info = false
+[INFO] [1790132332.721630303] [rtabmap]: rtabmap: subscribe_user_data = false
+[INFO] [1790132332.721705928] [rtabmap]: rtabmap: subscribe_scan = false
+[INFO] [1790132332.721781571] [rtabmap]: rtabmap: subscribe_scan_cloud = false
+[INFO] [1790132332.721867535] [rtabmap]: rtabmap: subscribe_scan_descriptor = false
+[INFO] [1790132332.721939291] [rtabmap]: rtabmap: topic_queue_size = 10
+[INFO] [1790132332.722036066] [rtabmap]: rtabmap: sync_queue_size  = 30
+[INFO] [1790132332.722133301] [rtabmap]: rtabmap: qos_image       = 2
+[INFO] [1790132332.722246172] [rtabmap]: rtabmap: qos_camera_info = 2
+[INFO] [1790132332.722338606] [rtabmap]: rtabmap: qos_scan        = 2
+[INFO] [1790132332.722411811] [rtabmap]: rtabmap: qos_odom        = 2
+[INFO] [1790132332.722474260] [rtabmap]: rtabmap: qos_user_data   = 2
+[INFO] [1790132332.722575997] [rtabmap]: rtabmap: approx_sync     = false
+[INFO] [1790132332.722645044] [rtabmap]: rtabmap: image_transport = raw
+[INFO] [1790132332.722704871] [rtabmap]: rtabmap: depth_transport = raw
+[INFO] [1790132332.722775583] [rtabmap]: Setup depth callback
+[INFO] [1790132332.726087326] [rtabmap]: 
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132342.728091782] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132347.728117973] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132352.728119305] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132357.728116767] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132362.728093502] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132367.728138640] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132372.728155474] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132377.728130800] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132382.728115820] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132387.728123696] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132392.728137550] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132397.728103486] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132402.728216646] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132407.728125781] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132412.728125313] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132417.728094434] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132422.728069618] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132427.728196129] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132432.728133194] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[WARN] [1790132437.728198500] [rtabmap]: rtabmap: Did not receive data since 5 seconds! Make sure the input topics are published ("$ ros2 topic hz my_topic") and the timestamps in their header are set. If topics are coming from different computers, make sure the clocks of the computers are synchronized ("ntpdate"). Ajusting topic_queue_size (10) and sync_queue_size (30) can also help for better synchronization if framerates and/or delays are different. Parameter "approx_sync" is false, which means that input topics should have all the exact timestamp for the callback to be called.
+rtabmap subscribed to (exact sync):
+   /visual/odom \
+   /camera/color/image_raw \
+   /camera/depth/image_raw \
+   /camera/color/camera_info
+[INFO] [1790132442.381689875] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [1790132442.383518399] [rtabmap]: Parameters are not saved (No configuration file provided...)
+rtabmap: Saving database/long-term memory... (located at /mnt/e/Pioneer/虚拟训练环境/results/mapping_gpu/map.db)
+rtabmap: Saving database/long-term memory...done! (located at /mnt/e/Pioneer/虚拟训练环境/results/mapping_gpu/map.db, 0 MB)

@@ -1,0 +1,42 @@
+{
+  "schema": "arm-offline-test-evidence/v1",
+  "created_local": "2026-10-21T01:58:24.2062283+08:00",
+  "device": {
+    "adb_serial": "b1371e33e9f6e49e",
+    "adb_devices_state": "device (online)",
+    "adb_exit_code": 0,
+    "remote_exit_code": 0
+  },
+  "test": {
+    "command": "PYTHONPATH=/opt/rk-lightstereo/runtime/vendor python3 -B -m unittest discover -s tests -p 'test_depth_*.py' -v",
+    "working_directory": "/tmp/rk-depth-interface-offline-20261021-015630-3b40be2a",
+    "tests_run": 23,
+    "result": "passed",
+    "python": "Python 3.9.2 (GCC 10.2.1)",
+    "numpy": "1.26.4",
+    "opencv": "4.10.0",
+    "stdout": "test_age_uses_source_time_not_publish_time (test_depth_adapter.DepthAdapterTests) ... ok\ntest_cross_host_requires_stable_validated_clock_mapping (test_depth_adapter.DepthAdapterTests) ... ok\ntest_duplicate_old_sequence_epoch_reset_and_clock_regressions (test_depth_adapter.DepthAdapterTests) ... ok\ntest_future_source_time_is_not_clipped_to_zero_age (test_depth_adapter.DepthAdapterTests) ... ok\ntest_mask_is_applied_before_normalization (test_depth_adapter.DepthAdapterTests) ... ok\ntest_nearest_geometry_preserves_same_depth_mask_and_crop_edges (test_depth_adapter.DepthAdapterTests) ... ok\ntest_nearest_ties_round_half_up_and_honor_source_mask (test_depth_adapter.DepthAdapterTests) ... ok\ntest_range_endpoints_and_invalid_values_are_not_clipped (test_depth_adapter.DepthAdapterTests) ... ok\ntest_rejects_unsupported_or_mismatched_intrinsics (test_depth_adapter.DepthAdapterTests) ... ok\ntest_rejects_wire_profile_length_and_layout_mismatches (test_depth_adapter.DepthAdapterTests) ... ok\ntest_row_major_little_endian_marker_and_producer_record_roundtrip (test_depth_adapter.DepthAdapterTests) ... ok\ntest_unknown_extrinsics_clock_or_left_pts_are_parseable_but_unready (test_depth_adapter.DepthAdapterTests) ... ok\ntest_unknown_registry_and_source_state_are_not_ready (test_depth_adapter.DepthAdapterTests) ... ok\ntest_real_handler_sends_one_complete_record_and_exact_length (test_depth_http_transport.DepthHTTPTransportTests) ... ok\ntest_real_route_rejects_bad_sequence_and_unavailable_states (test_depth_http_transport.DepthHTTPTransportTests) ... ok\ntest_concurrent_http_reader_never_mixes_published_frames (test_depth_producer_http.DepthProducerTests) ... ok\ntest_epoch_transition_rejects_late_capture_sample (test_depth_producer_http.DepthProducerTests) ... ok\ntest_fast_k_comes_from_source_calibration_transform (test_depth_producer_http.DepthProducerTests) ... ok\ntest_http_statuses_return_same_immutable_record_without_refresh (test_depth_producer_http.DepthProducerTests) ... ok\ntest_little_endian_range_and_source_precision (test_depth_producer_http.DepthProducerTests) ... ok\ntest_multiwriter_sequence_metadata_and_payload_commit_atomically (test_depth_producer_http.DepthProducerTests) ... ok\ntest_record_is_immutable_and_large_ns_stays_integer (test_depth_producer_http.DepthProducerTests) ... ok\ntest_stale_generation_or_epoch_work_is_discarded (test_depth_producer_http.DepthProducerTests) ... ok\n\n----------------------------------------------------------------------\nRan 23 tests in 4.657s\n\nOK\nREMOTE_EXIT=0",
+    "stderr": ""
+  },
+  "staging": {
+    "local_archive": "C:\\Users\\wangj\\AppData\\Local\\Temp\\rk-depth-interface-offline-20261021-015630-3b40be2a\\candidate.tar",
+    "archive_sha256": "f3b4907a986b03e538c9e145832c6581dc73dab08386619c56498b77926b99cf",
+    "archived_paths": 19,
+    "remote_directory": "/tmp/rk-depth-interface-offline-20261021-015630-3b40be2a",
+    "contents": "candidate app/*.py + app/calibration.npz and tests/*.py only; runtime/models not copied",
+    "warnings": "tar extraction emitted future-timestamp warnings due to host/board clock difference; extraction completed and all 19 expected files were listed"
+  },
+  "dependency_path_check": {
+    "initial_path": "/opt/rk-lightstereo/vendor",
+    "initial_result": "import failed: ModuleNotFoundError: No module named numpy",
+    "corrected_path": "/opt/rk-lightstereo/runtime/vendor",
+    "corrected_result": "read-only import succeeded",
+    "live_version_check": "Python 3.9.2; NumPy 1.26.4; OpenCV 4.10.0"
+  },
+  "scope": {
+    "camera_access": false,
+    "service_started_or_restarted": false,
+    "opt_files_modified": false,
+    "remote_writes": "only extracted candidate files under the unique /tmp directory"
+  }
+}

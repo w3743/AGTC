@@ -1,0 +1,2025 @@
+{
+  "schema": "field-policy-curriculum-v1",
+  "timestamp_utc": "2026-10-17T08:48:46.798929+00:00",
+  "stage": "easy",
+  "config": {
+    "size": 100.0,
+    "cell": 0.5,
+    "plants": 0,
+    "dry_fraction": 0.25,
+    "leaves_per_plant": 8,
+    "plant_height": 1.0,
+    "plant_height_spread": 0.05,
+    "stem_radius": 0.012,
+    "robot_length": 0.8,
+    "robot_width": 0.3,
+    "max_speed": 4.166666666666667,
+    "max_turn_rate": 1.5,
+    "acceleration": 1.5,
+    "angular_acceleration": 4.0,
+    "camera_height": 0.4,
+    "pitch_min": -0.4363323129985824,
+    "pitch_max": 1.0471975511965976,
+    "gimbal_yaw_rate": 1.8,
+    "gimbal_pitch_rate": 1.2,
+    "dt": 0.05,
+    "max_time": 20.0,
+    "lidar_model": "X2",
+    "lidar_rays": 400,
+    "lidar_range": 8.0,
+    "lidar_min_range": 0.12,
+    "lidar_relative_error": 0.05,
+    "lidar_period": 0.1,
+    "lidar_latency": 0.03,
+    "depth_height": 160,
+    "depth_width": 88,
+    "depth_min_range": 0.3,
+    "depth_range": 5.0,
+    "depth_period": 0.4,
+    "depth_latency": 0.3,
+    "camera_range": 7.0,
+    "camera_period": 0.2,
+    "camera_latency": 0.12,
+    "max_detections": 16,
+    "position_noise": 0.025,
+    "range_noise": 0.01,
+    "detection_drop": 0.08,
+    "class_error": 0.015,
+    "goal_tolerance": 0.4,
+    "goal_hold": 0.3,
+    "damage_penalty": 4.0,
+    "collision_penalty": 0.1,
+    "time_penalty": 0.02,
+    "progress_weight": 1.0,
+    "stop_on_damage": false,
+    "validate_scene": false,
+    "terrain_enabled": false,
+    "terrain_amplitude": 0.35,
+    "terrain_wavelength_min": 4.0,
+    "terrain_wavelength_max": 10.0,
+    "rock_density": 0.01,
+    "large_rock_fraction": 0.2,
+    "terrain_seed": null
+  },
+  "task_distribution": {
+    "goal_min_m_requested": 0.45,
+    "goal_max_m_requested": 1.05,
+    "goal_angle_deg_requested": 10.0,
+    "goal_min_m_effective": 0.45,
+    "goal_max_m_effective": 1.05,
+    "goal_angle_deg_effective": 10.0,
+    "episode_steps": 160,
+    "episode_time_limit_seconds": 8.0,
+    "config_max_time_seconds": 20.0
+  },
+  "training_reward_transform": {
+    "distance_cost": 1.0,
+    "formula": "r' = r - coefficient * ||goal - robot_xy|| * cfg.dt",
+    "scope": "training environments only; fixed full-field validation uses unmodified FieldEnv reward"
+  },
+  "device_requested": "cpu",
+  "vec_backend_requested": "dummy",
+  "stop_on_two_zero_success_negative_progress": true,
+  "training_parameters_requested": {
+    "steps": 32768,
+    "chunk_steps": 8192,
+    "wall_seconds": 240.0,
+    "n_env": 4,
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 10,
+    "learning_rate": 0.0003,
+    "gamma": 0.995,
+    "goal_gain": 100.0,
+    "seed": 7,
+    "goal_min_m": 0.45,
+    "goal_max_m": 1.05,
+    "goal_angle_deg": 10.0,
+    "episode_steps": 160,
+    "device": "cpu",
+    "vec_backend": "dummy",
+    "distance_cost": 1.0,
+    "use_sde": false,
+    "sde_sample_freq": -1,
+    "log_std_init": -2.0,
+    "squash_output": false,
+    "target_kl": 0.03
+  },
+  "checkpoint_source": null,
+  "validation_seeds": [
+    20007,
+    20008,
+    20009
+  ],
+  "validation_log": [
+    {
+      "kind": "chunk",
+      "chunk": 1,
+      "seeds": [
+        20007,
+        20008,
+        20009
+      ],
+      "complete": true,
+      "score": [
+        0.0,
+        0.30272145263978006,
+        -0.0,
+        -0.0
+      ],
+      "episodes": [
+        {
+          "seed": 20007,
+          "complete": true,
+          "timed_out": false,
+          "mode": "goto",
+          "steps": 400,
+          "simulated_seconds": 20.00000000000015,
+          "initial_distance_m": 3.0000000000000004,
+          "final_distance_m": 2.1230002837255184,
+          "progress_m": 0.876999716274482,
+          "progress_fraction": 0.29233323875816064,
+          "goal_reached": false,
+          "safe_success": false,
+          "damage": 0,
+          "collisions": 0,
+          "return": 0.4769997162744817,
+          "reason": "time_limit",
+          "normalized_action_mean_4d": [
+            0.01299930093344301,
+            0.11480588468140923,
+            -0.026677495799958706,
+            0.13021821404807268
+          ],
+          "normalized_action_std_4d": [
+            0.015216364193774364,
+            0.0265595025994771,
+            0.007194576413161784,
+            0.030287058974408143
+          ],
+          "physical_control_units": [
+            "m/s",
+            "rad/s",
+            "rad/s",
+            "rad/s"
+          ],
+          "physical_control_mean_4d": [
+            0.054163753889345904,
+            0.17220882702211385,
+            -0.04801949243992566,
+            0.1562618568576873
+          ],
+          "physical_control_std_4d": [
+            0.06340151747405985,
+            0.039839253899215665,
+            0.012950237543691286,
+            0.036344470769289774
+          ],
+          "mean_abs_v_mps": 0.06248730298114242,
+          "final_v_mps": -0.01507197692990303,
+          "final_w_radps": 0.17952212691307068,
+          "route": {
+            "requested_distance_m": 3.0,
+            "selected_distance_m": 3.0000000000000004,
+            "corridor_clearance_m": 0.31604850320880973,
+            "heading_offset_rad": 0.0,
+            "fallback_distance_used": false
+          },
+          "wall_seconds": 2.242656000002171
+        },
+        {
+          "seed": 20008,
+          "complete": true,
+          "timed_out": false,
+          "mode": "goto",
+          "steps": 400,
+          "simulated_seconds": 20.00000000000015,
+          "initial_distance_m": 3.0000000000000004,
+          "final_distance_m": 2.115707769373506,
+          "progress_m": 0.8842922306264946,
+          "progress_fraction": 0.29476407687549816,
+          "goal_reached": false,
+          "safe_success": false,
+          "damage": 0,
+          "collisions": 0,
+          "return": 0.4842922306264943,
+          "reason": "time_limit",
+          "normalized_action_mean_4d": [
+            0.0122601087577641,
+            0.11482831828470808,
+            -0.02658673421945423,
+            0.13032690989319234
+          ],
+          "normalized_action_std_4d": [
+            0.015311812239694177,
+            0.028824773558581384,
+            0.0063591026822236215,
+            0.027973399355218576
+          ],
+          "physical_control_units": [
+            "m/s",
+            "rad/s",
+            "rad/s",
+            "rad/s"
+          ],
+          "physical_control_mean_4d": [
+            0.05108378649068375,
+            0.1722424774270621,
+            -0.04785612159501763,
+            0.15639229187183093
+          ],
+          "physical_control_std_4d": [
+            0.06379921766539243,
+            0.0432371603378721,
+            0.011446384828002512,
+            0.033568079226262273
+          ],
+          "mean_abs_v_mps": 0.059511850104725456,
+          "final_v_mps": -0.012875440530478954,
+          "final_w_radps": 0.1787288784980774,
+          "route": {
+            "requested_distance_m": 3.0,
+            "selected_distance_m": 3.0000000000000004,
+            "corridor_clearance_m": 0.4498843811480465,
+            "heading_offset_rad": 0.0,
+            "fallback_distance_used": false
+          },
+          "wall_seconds": 1.9920482000015909
+        },
+        {
+          "seed": 20009,
+          "complete": true,
+          "timed_out": false,
+          "mode": "goto",
+          "steps": 400,
+          "simulated_seconds": 20.00000000000015,
+          "initial_distance_m": 3.0000000000000004,
+          "final_distance_m": 2.0367988731429563,
+          "progress_m": 0.9632011268570442,
+          "progress_fraction": 0.32106704228568134,
+          "goal_reached": false,
+          "safe_success": false,
+          "damage": 0,
+          "collisions": 0,
+          "return": 0.5632011268570438,
+          "reason": "time_limit",
+          "normalized_action_mean_4d": [
+            0.014785045016324147,
+            0.10859113798185717,
+            -0.02613585165236145,
+            0.12926469007506966
+          ],
+          "normalized_action_std_4d": [
+            0.018369571035977347,
+            0.03773122092583698,
+            0.01092054046048364,
+            0.0275839747746788
+          ],
+          "physical_control_units": [
+            "m/s",
+            "rad/s",
+            "rad/s",
+            "rad/s"
+          ],
+          "physical_control_mean_4d": [
+            0.06160435423468393,
+            0.16288670697278576,
+            -0.0470445329742506,
+            0.1551176280900836
+          ],
+          "physical_control_std_4d": [
+            0.07653987931657232,
+            0.05659683138875541,
+            0.01965697282887054,
+            0.033100769729614545
+          ],
+          "mean_abs_v_mps": 0.06785284496258828,
+          "final_v_mps": -0.018818819895386696,
+          "final_w_radps": 0.1844731569290161,
+          "route": {
+            "requested_distance_m": 3.0,
+            "selected_distance_m": 3.0000000000000004,
+            "corridor_clearance_m": 0.2919786629429024,
+            "heading_offset_rad": 0.0,
+            "fallback_distance_used": false
+          },
+          "wall_seconds": 3.064600200003042
+        }
+      ],
+      "score_order": [
+        "safe_arrival_rate",
+        "mean_progress_fraction",
+        "negative_mean_damage",
+        "negative_mean_collisions"
+      ]
+    },
+    {
+      "kind": "chunk",
+      "chunk": 2,
+      "seeds": [
+        20007,
+        20008,
+        20009
+      ],
+      "complete": false,
+      "score": null,
+      "episodes": [
+        {
+          "seed": 20007,
+          "complete": true,
+          "timed_out": false,
+          "mode": "goto",
+          "steps": 400,
+          "simulated_seconds": 20.00000000000015,
+          "initial_distance_m": 3.0000000000000004,
+          "final_distance_m": 1.633569349550093,
+          "progress_m": 1.3664306504499075,
+          "progress_fraction": 0.45547688348330245,
+          "goal_reached": false,
+          "safe_success": false,
+          "damage": 0,
+          "collisions": 0,
+          "return": 0.9664306504499355,
+          "reason": "time_limit",
+          "normalized_action_mean_4d": [
+            0.026942698354832827,
+            0.051502665397711096,
+            -0.026838187591638415,
+            0.14273659066297115
+          ],
+          "normalized_action_std_4d": [
+            0.013518513491074809,
+            0.005432263125382465,
+            0.01456242726724021,
+            0.018492843366491162
+          ],
+          "physical_control_units": [
+            "m/s",
+            "rad/s",
+            "rad/s",
+            "rad/s"
+          ],
+          "physical_control_mean_4d": [
+            0.11226124314513662,
+            0.07725399809656665,
+            -0.04830873766494915,
+            0.17128390879556535
+          ],
+          "physical_control_std_4d": [
+            0.05632713954614506,
+            0.008148394688073702,
+            0.026212369081032364,
+            0.02219141203978939
+          ],
+          "mean_abs_v_mps": 0.11212950426712633,
+          "final_v_mps": 0.06088710576295853,
+          "final_w_radps": 0.0795302540063858,
+          "route": {
+            "requested_distance_m": 3.0,
+            "selected_distance_m": 3.0000000000000004,
+            "corridor_clearance_m": 0.31604850320880973,
+            "heading_offset_rad": 0.0,
+            "fallback_distance_used": false
+          },
+          "wall_seconds": 1.649569099998189
+        },
+        {
+          "seed": 20008,
+          "complete": false,
+          "timed_out": true,
+          "mode": "goto",
+          "steps": 278,
+          "simulated_seconds": 13.900000000000063,
+          "initial_distance_m": 3.0000000000000004,
+          "final_distance_m": 1.4680127679124493,
+          "progress_m": 1.5319872320875512,
+          "progress_fraction": 0.5106624106958503,
+          "goal_reached": false,
+          "safe_success": false,
+          "damage": 0,
+          "collisions": 0,
+          "return": 1.2539872320875682,
+          "reason": "",
+          "normalized_action_mean_4d": [
+            0.03266993251448269,
+            0.0499492321002612,
+            -0.03413516698445348,
+            0.15119965650516448
+          ],
+          "normalized_action_std_4d": [
+            0.014070905339309575,
+            0.0061665087467892695,
+            0.0066951116703924925,
+            0.014510753993907454
+          ],
+          "physical_control_units": [
+            "m/s",
+            "rad/s",
+            "rad/s",
+            "rad/s"
+          ],
+          "physical_control_mean_4d": [
+            0.13612471881034463,
+            0.0749238481503918,
+            -0.06144330057201627,
+            0.18143958780619732
+          ],
+          "physical_control_std_4d": [
+            0.058628772247123234,
+            0.0092497631201839,
+            0.012051201006706489,
+            0.017412904792688953
+          ],
+          "mean_abs_v_mps": 0.13575151893142745,
+          "final_v_mps": 0.06934789568185806,
+          "final_w_radps": 0.07895015180110931,
+          "route": {
+            "requested_distance_m": 3.0,
+            "selected_distance_m": 3.0000000000000004,
+            "corridor_clearance_m": 0.4498843811480465,
+            "heading_offset_rad": 0.0,
+            "fallback_distance_used": false
+          },
+          "wall_seconds": 1.2801546999980928
+        },
+        {
+          "seed": 20009,
+          "complete": false,
+          "skipped_wall_limit": true
+        }
+      ],
+      "score_order": [
+        "safe_arrival_rate",
+        "mean_progress_fraction",
+        "negative_mean_damage",
+        "negative_mean_collisions"
+      ]
+    }
+  ],
+  "chunks": [
+    {
+      "index": 1,
+      "requested_steps": 8192,
+      "actual_steps": 8192,
+      "cumulative_additional_steps": 8192,
+      "wall_seconds": 119.9881699999969,
+      "training_completed_episodes": 78,
+      "training_success_rate": 0.6538461538461539,
+      "training_episode_rows": [
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.097366165819798
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.738465802297644
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8168271586090884
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.0367022489226352
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.30750393858347885
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.0880664088014296
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8606832465428169
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.2619515730598758
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.0199739870908173
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.15039544984363223
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5672710678507557
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.9668644464074024
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.17563382359495625
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5157649757506514
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.7888349560923578
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.17563620861352727
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.34369405352800186
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.15845397819537244
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.14982728715097157
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.0938312420060832
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3407981163495011
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5319639478411277
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.501996600223297
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.12646862630276107
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3498568425271698
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.16775801621071298
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.6797208070882799
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.09846948124849286
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1528616935954683
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.35343427594125626
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2110748389199943
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.039091203341759216
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.100526339358808
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.15991925174638696
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3770930174361689
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1702263228398472
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.2096374014505982
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.16370458136591506
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.160048100588122
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.09203311654475511
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.283290608652275
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2592036130750108
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.22107754822106618
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2859788016746834
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1888769837644263
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.4409588942614566
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.6016251949737839
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.38997472056808946
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.32877651732778945
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.27240364903258424
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1255815274337884
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5474271141390075
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.31230677191689743
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.24146818788336968
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8714802086228637
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.044978614378097644
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.27239886690845166
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2561818110804428
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.17821945190275454
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3242127390464299
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3839624974845158
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.38202241120938846
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.24961384641689943
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.6182885094900076
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.31613687633152554
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2902218232584965
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.07212771497340406
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.9710419590954522
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.19370890372717922
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.10172240034579566
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1560227096192349
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.0401587451579832
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3042418970568699
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.35847814308842413
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3969075669966903
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1784115304665432
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3532187976328563
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1184895125018905
+        }
+      ],
+      "timed_out": false,
+      "validation": {
+        "seeds": [
+          20007,
+          20008,
+          20009
+        ],
+        "complete": true,
+        "score": [
+          0.0,
+          0.30272145263978006,
+          -0.0,
+          -0.0
+        ],
+        "episodes": [
+          {
+            "seed": 20007,
+            "complete": true,
+            "timed_out": false,
+            "mode": "goto",
+            "steps": 400,
+            "simulated_seconds": 20.00000000000015,
+            "initial_distance_m": 3.0000000000000004,
+            "final_distance_m": 2.1230002837255184,
+            "progress_m": 0.876999716274482,
+            "progress_fraction": 0.29233323875816064,
+            "goal_reached": false,
+            "safe_success": false,
+            "damage": 0,
+            "collisions": 0,
+            "return": 0.4769997162744817,
+            "reason": "time_limit",
+            "normalized_action_mean_4d": [
+              0.01299930093344301,
+              0.11480588468140923,
+              -0.026677495799958706,
+              0.13021821404807268
+            ],
+            "normalized_action_std_4d": [
+              0.015216364193774364,
+              0.0265595025994771,
+              0.007194576413161784,
+              0.030287058974408143
+            ],
+            "physical_control_units": [
+              "m/s",
+              "rad/s",
+              "rad/s",
+              "rad/s"
+            ],
+            "physical_control_mean_4d": [
+              0.054163753889345904,
+              0.17220882702211385,
+              -0.04801949243992566,
+              0.1562618568576873
+            ],
+            "physical_control_std_4d": [
+              0.06340151747405985,
+              0.039839253899215665,
+              0.012950237543691286,
+              0.036344470769289774
+            ],
+            "mean_abs_v_mps": 0.06248730298114242,
+            "final_v_mps": -0.01507197692990303,
+            "final_w_radps": 0.17952212691307068,
+            "route": {
+              "requested_distance_m": 3.0,
+              "selected_distance_m": 3.0000000000000004,
+              "corridor_clearance_m": 0.31604850320880973,
+              "heading_offset_rad": 0.0,
+              "fallback_distance_used": false
+            },
+            "wall_seconds": 2.242656000002171
+          },
+          {
+            "seed": 20008,
+            "complete": true,
+            "timed_out": false,
+            "mode": "goto",
+            "steps": 400,
+            "simulated_seconds": 20.00000000000015,
+            "initial_distance_m": 3.0000000000000004,
+            "final_distance_m": 2.115707769373506,
+            "progress_m": 0.8842922306264946,
+            "progress_fraction": 0.29476407687549816,
+            "goal_reached": false,
+            "safe_success": false,
+            "damage": 0,
+            "collisions": 0,
+            "return": 0.4842922306264943,
+            "reason": "time_limit",
+            "normalized_action_mean_4d": [
+              0.0122601087577641,
+              0.11482831828470808,
+              -0.02658673421945423,
+              0.13032690989319234
+            ],
+            "normalized_action_std_4d": [
+              0.015311812239694177,
+              0.028824773558581384,
+              0.0063591026822236215,
+              0.027973399355218576
+            ],
+            "physical_control_units": [
+              "m/s",
+              "rad/s",
+              "rad/s",
+              "rad/s"
+            ],
+            "physical_control_mean_4d": [
+              0.05108378649068375,
+              0.1722424774270621,
+              -0.04785612159501763,
+              0.15639229187183093
+            ],
+            "physical_control_std_4d": [
+              0.06379921766539243,
+              0.0432371603378721,
+              0.011446384828002512,
+              0.033568079226262273
+            ],
+            "mean_abs_v_mps": 0.059511850104725456,
+            "final_v_mps": -0.012875440530478954,
+            "final_w_radps": 0.1787288784980774,
+            "route": {
+              "requested_distance_m": 3.0,
+              "selected_distance_m": 3.0000000000000004,
+              "corridor_clearance_m": 0.4498843811480465,
+              "heading_offset_rad": 0.0,
+              "fallback_distance_used": false
+            },
+            "wall_seconds": 1.9920482000015909
+          },
+          {
+            "seed": 20009,
+            "complete": true,
+            "timed_out": false,
+            "mode": "goto",
+            "steps": 400,
+            "simulated_seconds": 20.00000000000015,
+            "initial_distance_m": 3.0000000000000004,
+            "final_distance_m": 2.0367988731429563,
+            "progress_m": 0.9632011268570442,
+            "progress_fraction": 0.32106704228568134,
+            "goal_reached": false,
+            "safe_success": false,
+            "damage": 0,
+            "collisions": 0,
+            "return": 0.5632011268570438,
+            "reason": "time_limit",
+            "normalized_action_mean_4d": [
+              0.014785045016324147,
+              0.10859113798185717,
+              -0.02613585165236145,
+              0.12926469007506966
+            ],
+            "normalized_action_std_4d": [
+              0.018369571035977347,
+              0.03773122092583698,
+              0.01092054046048364,
+              0.0275839747746788
+            ],
+            "physical_control_units": [
+              "m/s",
+              "rad/s",
+              "rad/s",
+              "rad/s"
+            ],
+            "physical_control_mean_4d": [
+              0.06160435423468393,
+              0.16288670697278576,
+              -0.0470445329742506,
+              0.1551176280900836
+            ],
+            "physical_control_std_4d": [
+              0.07653987931657232,
+              0.05659683138875541,
+              0.01965697282887054,
+              0.033100769729614545
+            ],
+            "mean_abs_v_mps": 0.06785284496258828,
+            "final_v_mps": -0.018818819895386696,
+            "final_w_radps": 0.1844731569290161,
+            "route": {
+              "requested_distance_m": 3.0,
+              "selected_distance_m": 3.0000000000000004,
+              "corridor_clearance_m": 0.2919786629429024,
+              "heading_offset_rad": 0.0,
+              "fallback_distance_used": false
+            },
+            "wall_seconds": 3.064600200003042
+          }
+        ],
+        "score_order": [
+          "safe_arrival_rate",
+          "mean_progress_fraction",
+          "negative_mean_damage",
+          "negative_mean_collisions"
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "requested_steps": 8192,
+      "actual_steps": 8192,
+      "cumulative_additional_steps": 16384,
+      "wall_seconds": 107.60286619999897,
+      "training_completed_episodes": 85,
+      "training_success_rate": 0.611764705882353,
+      "training_episode_rows": [
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.9232368050096249
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.10866869647196625
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.6501881594101447
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3626342430673067
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.4867927159088
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.06142684149443647
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1324210391662156
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5047048370270368
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.26921474806289886
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5919389019297314
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1403520767570388
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.5613693298415943
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2630677357516627
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.3662002666090318
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1556028858498637
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.10945201194102296
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.11345710346469216
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1461349147319745
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3076261893460255
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3508667962832072
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1804937986014217
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1182687089688617
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5985230563339087
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3109600782528803
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.271921429534768
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8728994945610538
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.20479647783648086
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3240263056553997
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2620023354851166
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 2.277783204606452
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.36034953721262913
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.36059926598317593
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.289824973022839
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.12775048319553844
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.22489553116859165
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.30611809648130095
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.05844788794187471
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.07020287351626052
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.46701147541357024
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2953825761576595
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 2.7083642689233662
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.514391742871291
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 2.750579137368644
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.1827885385266133
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.676015571426832
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.28771415926642196
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2669577722220989
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.6877098492804292
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.37472867247468844
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.188838902654008
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.24244998052439984
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.16531219645230313
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.4757613511891663
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.5779109527169385
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2390852150392167
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.37440686667344397
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.19173459809155532
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.880331319501552
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.33630487439806417
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.1638845120282162
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2667478093411713
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.27821983602121403
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.28578875665711684
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.19585383716556182
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.3134495305713344
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.33783647040561804
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.19326077534899305
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 2.178206081656457
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2965568754800074
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.19828850524111344
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.31330484031150185
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.080162593344544
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.14531671418332412
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.07949577002380172
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.21270650011562242
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.21992497131871233
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2831389794215912
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8744753078362019
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.272260526314658
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.07788760151097238
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 1.2632875969097954
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.2155836679449798
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.14736110937287195
+        },
+        {
+          "success": false,
+          "reason": "",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.8558321989930721
+        },
+        {
+          "success": true,
+          "reason": "goal_reached",
+          "damage": 0,
+          "collisions": 0,
+          "distance_m": 0.03186681110325206
+        }
+      ],
+      "timed_out": false,
+      "validation": {
+        "seeds": [
+          20007,
+          20008,
+          20009
+        ],
+        "complete": false,
+        "score": null,
+        "episodes": [
+          {
+            "seed": 20007,
+            "complete": true,
+            "timed_out": false,
+            "mode": "goto",
+            "steps": 400,
+            "simulated_seconds": 20.00000000000015,
+            "initial_distance_m": 3.0000000000000004,
+            "final_distance_m": 1.633569349550093,
+            "progress_m": 1.3664306504499075,
+            "progress_fraction": 0.45547688348330245,
+            "goal_reached": false,
+            "safe_success": false,
+            "damage": 0,
+            "collisions": 0,
+            "return": 0.9664306504499355,
+            "reason": "time_limit",
+            "normalized_action_mean_4d": [
+              0.026942698354832827,
+              0.051502665397711096,
+              -0.026838187591638415,
+              0.14273659066297115
+            ],
+            "normalized_action_std_4d": [
+              0.013518513491074809,
+              0.005432263125382465,
+              0.01456242726724021,
+              0.018492843366491162
+            ],
+            "physical_control_units": [
+              "m/s",
+              "rad/s",
+              "rad/s",
+              "rad/s"
+            ],
+            "physical_control_mean_4d": [
+              0.11226124314513662,
+              0.07725399809656665,
+              -0.04830873766494915,
+              0.17128390879556535
+            ],
+            "physical_control_std_4d": [
+              0.05632713954614506,
+              0.008148394688073702,
+              0.026212369081032364,
+              0.02219141203978939
+            ],
+            "mean_abs_v_mps": 0.11212950426712633,
+            "final_v_mps": 0.06088710576295853,
+            "final_w_radps": 0.0795302540063858,
+            "route": {
+              "requested_distance_m": 3.0,
+              "selected_distance_m": 3.0000000000000004,
+              "corridor_clearance_m": 0.31604850320880973,
+              "heading_offset_rad": 0.0,
+              "fallback_distance_used": false
+            },
+            "wall_seconds": 1.649569099998189
+          },
+          {
+            "seed": 20008,
+            "complete": false,
+            "timed_out": true,
+            "mode": "goto",
+            "steps": 278,
+            "simulated_seconds": 13.900000000000063,
+            "initial_distance_m": 3.0000000000000004,
+            "final_distance_m": 1.4680127679124493,
+            "progress_m": 1.5319872320875512,
+            "progress_fraction": 0.5106624106958503,
+            "goal_reached": false,
+            "safe_success": false,
+            "damage": 0,
+            "collisions": 0,
+            "return": 1.2539872320875682,
+            "reason": "",
+            "normalized_action_mean_4d": [
+              0.03266993251448269,
+              0.0499492321002612,
+              -0.03413516698445348,
+              0.15119965650516448
+            ],
+            "normalized_action_std_4d": [
+              0.014070905339309575,
+              0.0061665087467892695,
+              0.0066951116703924925,
+              0.014510753993907454
+            ],
+            "physical_control_units": [
+              "m/s",
+              "rad/s",
+              "rad/s",
+              "rad/s"
+            ],
+            "physical_control_mean_4d": [
+              0.13612471881034463,
+              0.0749238481503918,
+              -0.06144330057201627,
+              0.18143958780619732
+            ],
+            "physical_control_std_4d": [
+              0.058628772247123234,
+              0.0092497631201839,
+              0.012051201006706489,
+              0.017412904792688953
+            ],
+            "mean_abs_v_mps": 0.13575151893142745,
+            "final_v_mps": 0.06934789568185806,
+            "final_w_radps": 0.07895015180110931,
+            "route": {
+              "requested_distance_m": 3.0,
+              "selected_distance_m": 3.0000000000000004,
+              "corridor_clearance_m": 0.4498843811480465,
+              "heading_offset_rad": 0.0,
+              "fallback_distance_used": false
+            },
+            "wall_seconds": 1.2801546999980928
+          },
+          {
+            "seed": 20009,
+            "complete": false,
+            "skipped_wall_limit": true
+          }
+        ],
+        "score_order": [
+          "safe_arrival_rate",
+          "mean_progress_fraction",
+          "negative_mean_damage",
+          "negative_mean_collisions"
+        ]
+      }
+    }
+  ],
+  "best_checkpoint": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\field_policy_improvement\\easy_distancecost_gain100_20261017_164842\\best_checkpoint.zip",
+  "training_completed": false,
+  "timed_out": true,
+  "limitation": "Short curriculum optimization and fixed-seed validation do not establish real-world competence.",
+  "effective_goal_gain": 100.0,
+  "device_effective": "cpu",
+  "vec_backend_effective": "DummyVecEnv",
+  "goal_gain_note": "Configured when the new policy was constructed.",
+  "effective_model_hyperparameters": {
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 10,
+    "gamma": 0.995,
+    "learning_rate": 0.0003,
+    "num_timesteps_at_start": 0,
+    "use_sde": false,
+    "sde_sample_freq": -1,
+    "target_kl": 0.03
+  },
+  "effective_exploration": {
+    "log_std_init": -2.0,
+    "squash_output": false
+  },
+  "exploration_resume_note": "Exploration settings were applied during fresh model construction.",
+  "observation_shapes": {
+    "depth": [
+      2,
+      160,
+      88
+    ],
+    "detections": [
+      16,
+      10
+    ],
+    "lidar": [
+      2,
+      400
+    ],
+    "state": [
+      44
+    ]
+  },
+  "action_shape": [
+    4
+  ],
+  "initial_checkpoint": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\field_policy_improvement\\easy_distancecost_gain100_20261017_164842\\initial_checkpoint.zip",
+  "initial_checkpoint_note": "Untrained or resumed starting weights; saved for comparison, not used as a validation claim.",
+  "best_validation_score": [
+    0.0,
+    0.30272145263978006,
+    -0.0,
+    -0.0
+  ],
+  "actual_additional_steps": 16384,
+  "model_num_timesteps": 16384,
+  "training_wall_seconds_including_validation": 240.00420400000075,
+  "policy_parameters_finite": true,
+  "checkpoint": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\field_policy_improvement\\easy_distancecost_gain100_20261017_164842\\checkpoint.zip",
+  "validation_claim": false,
+  "training_claim": false
+}

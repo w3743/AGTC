@@ -1,0 +1,122 @@
+{
+  "schema": "isaac-field-checkpoint-metadata-audit-v1",
+  "inspection": {
+    "device": "cpu",
+    "simulation_started": false,
+    "checkpoint_stable_during_read": true,
+    "checkpoint_path": "results/isaac_field_improvement/fresh_foundation_20261017_stem_v2/stage_1_near/checkpoints/field_policy_near_8192_steps.zip",
+    "checkpoint_sha256": "6516e46404f70604290afb9c3000998f280f586137c5669efa354de801266522",
+    "size_bytes": 5184451,
+    "zip_integrity": true
+  },
+  "checkpoint": {
+    "num_timesteps_archive": 8192,
+    "num_timesteps_model": 8192,
+    "n_envs": 4,
+    "seed": 69001,
+    "algorithm": "RecurrentPPO",
+    "policy": "RecurrentMultiInputActorCriticPolicy",
+    "action_distribution": "DiagGaussianDistribution",
+    "use_sde": false,
+    "log_std": [
+      -2.0065183639526367,
+      -1.9954789876937866,
+      -2.0039875507354736,
+      -2.0073697566986084
+    ],
+    "std": [
+      0.13445599377155304,
+      0.1359485238790512,
+      0.13479670882225037,
+      0.13434156775474548
+    ],
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 5,
+    "learning_rate": 0.0003,
+    "optimizer_learning_rate": 0.0003,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "rollout_buffer_gamma": 0.995,
+    "rollout_buffer_gae_lambda": 0.95,
+    "target_kl": 0.03,
+    "goal_gain": 100.0
+  },
+  "field_damage_config": {
+    "metric": "stem-contact-v2",
+    "penalty_per_plant": 20.0,
+    "track_geometry": "two swept rectangular contact bands",
+    "track_contact_length_m": 0.595,
+    "track_band_width_m": 0.06,
+    "track_center_separation_m": 0.25,
+    "track_outer_width_proxy_m": 0.31,
+    "track_center_separation_status": "0.25 m current proxy; hardware track separation and overall outside width not confirmed",
+    "track_vertical_model": "union of RobotAssetSpec wheel-cylinder vertical AABBs rotated by current pitch/roll; damage requires overlap with stem root_z +/- stem_radius",
+    "stem_radius_source": "Scene.stem_radius",
+    "chassis_geometry": "RobotAssetSpec box footprint against main stem only",
+    "chassis_length_m": 0.8,
+    "chassis_width_m": 0.3,
+    "chassis_height_m": 0.15,
+    "vertical_model": "2.5D: current engine root Z with pitch/roll-expanded vertical AABB; horizontal footprint remains level; compare against stem root_z..root_z+height"
+  },
+  "field_drive_config": {
+    "interface": "forward_and_differential_track_speed_v2",
+    "max_track_speed_mps": 4.166666666666667,
+    "steering_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.5,
+    "wheel_effort_limit_nm": 2.0,
+    "wheel_effort_limit_basis": "per_proxy_wheel_joint_effort; not measured motor torque",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "6f6595db0909c709f0233dd32ff8c90ada345a84e28882f7f06f5b4e2c7daa65",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating."
+  },
+  "field_observation_config": {
+    "schema": "state-last-command-v2",
+    "state_dim": 44,
+    "measured_velocity_indices": [
+      8,
+      9
+    ],
+    "previous_command_indices": [
+      13,
+      14,
+      15,
+      16
+    ],
+    "previous_command_semantics": "normalized_policy_command",
+    "action_components": [
+      "forward",
+      "differential",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ]
+  },
+  "checks": {
+    "zip_integrity": true,
+    "num_timesteps_8192": true,
+    "damage_metric_stem_contact_v2": true,
+    "damage_penalty_20": true,
+    "track_contact_band_0_06m": true,
+    "body_width_0_30m": true,
+    "track_separation_0_25m": true,
+    "drive_gain_0_5": true,
+    "drive_asset_hash_present": true,
+    "state_last_command_v2": true,
+    "four_envs": true,
+    "epochs_5": true,
+    "gae_lambda_0_95": true,
+    "goal_gain_100": true,
+    "gaussian": true
+  },
+  "all_checks_pass": true,
+  "scope_note": "Checkpoint metadata audit only. Near-stage training is still in progress; callback episode outcomes are training data, not held-out validation or field-competence evidence."
+}

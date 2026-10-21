@@ -1,0 +1,109 @@
+[
+  {
+    "ref": "J_FAN",
+    "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+    "libUuid": "",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libType": "3",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "B0"
+    },
+    "value": "5 V fan power / return",
+    "note": "DEGSON 2EDGVC-5.08-02P-14-100A(H), 2-position 5.08 mm PCB terminal block; pin 1=VOUT_5V, pin 2=B0. Mating connector is J_FAN_MATE. External fan is Delta KSB0405HBF0D, 5 V four-wire PWM with tach feedback; power and control use separate 2-position connectors.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "x": 2850,
+    "y": 200,
+    "xy": {
+      "x": 2850,
+      "y": 200
+    },
+    "addIntoPcb": true,
+    "addIntoBom": true,
+    "keepExisting": false,
+    "unresolved": [],
+    "libraryNote": "Old Phoenix component/footprint association cleared. Human PCB layout must create or select the DEGSON footprint from the manufacturer drawing, verify pad orientation, and mark pin 1; quotation remains pending."
+  },
+  {
+    "ref": "Q_FAN_PWM",
+    "mpn": "AO3400A",
+    "libUuid": "ce3bf8afe66241198c3f6478c6919622",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "pins": {
+      "1": "FAN_PWM_GATE",
+      "2": "B0",
+      "3": "FAN_PWM_OD"
+    },
+    "value": "AO3400A",
+    "note": "AO3400A open-drain PWM sink: pin 1=FAN_PWM_GATE, 2=B0, 3=FAN_PWM_OD to fan PWM input. Keep the control ground common at B0.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "addIntoPcb": true,
+    "addIntoBom": true
+  },
+  {
+    "ref": "R_FAN_PWM_GATE",
+    "mpn": "RMC06031K1%N",
+    "libUuid": "b003a1f0d1e342bead8e0fa975a8f532",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "pins": {
+      "1": "FAN_PWM_MCU",
+      "2": "FAN_PWM_GATE"
+    },
+    "value": "RMC06031K1%N",
+    "note": "1 kOhm series gate resistor from FAN_PWM_MCU to FAN_PWM_GATE; limits MCU drive and damps gate transitions.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "addIntoPcb": true,
+    "addIntoBom": true
+  },
+  {
+    "ref": "R_FAN_PWM_PD",
+    "mpn": "RMC0603100K1%N",
+    "libUuid": "e78687933cd54a68b95e75fa28dfee3d",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "pins": {
+      "1": "FAN_PWM_GATE",
+      "2": "B0"
+    },
+    "value": "RMC0603100K1%N",
+    "note": "100 kOhm gate pulldown from FAN_PWM_GATE to B0; keeps MOSFET off during MCU reset/high impedance. Off means PWM line released, which is the fan full-speed state.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "addIntoPcb": true,
+    "addIntoBom": true
+  },
+  {
+    "ref": "R_FAN_TACH_PU",
+    "mpn": "RS-03K1002FT",
+    "libUuid": "76d105d271254800b23e914f247a8575",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "FAN_TACH_3V3"
+    },
+    "value": "RS-03K1002FT",
+    "note": "10 kOhm pull-up from CORE_3V3 to FAN_TACH_3V3 for the fan open-collector tach output; limits pull-up voltage to MCU logic rail.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "addIntoPcb": true,
+    "addIntoBom": true
+  },
+  {
+    "ref": "J_FAN_CTRL",
+    "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+    "libUuid": "e2136f2a86054070a01a98a1b42be9ea",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "pins": {
+      "1": "FAN_PWM_OD",
+      "2": "FAN_TACH_3V3"
+    },
+    "value": "2EDGVC-5.08-02P-14-100A(H)",
+    "note": "DEGSON 2EDGVC-5.08-02P-14-100A(H) PWM/tach connector. Pin 1=FAN_PWM_OD, pin 2=FAN_TACH_3V3; mating cable connector is separately procured as J_FAN_CTRL_MATE.",
+    "sourceFile": "风扇元件连接.json",
+    "pageGroup": "IF_FAN_POWER",
+    "addIntoPcb": true,
+    "addIntoBom": true
+  }
+]

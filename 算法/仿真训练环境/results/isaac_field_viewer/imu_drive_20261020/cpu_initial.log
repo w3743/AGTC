@@ -1,0 +1,49 @@
+.......ssssssssssFF..................................................... [ 34%]
+.........................................................F.............. [ 68%]
+.................................................................        [100%]
+=================================== FAILURES ===================================
+__________ test_feedback_contract_scale_order_and_valid_static_values __________
+tests/test_feedback.py:73: in test_feedback_contract_scale_order_and_valid_static_values
+    np.testing.assert_allclose(vector[FEEDBACK_VALUE_SLICES["accel"]], [2.0, 0.0, 0.0], atol=1e-6)
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=1e-06
+E   
+E   Mismatched elements: 1 / 3 (33.3%)
+E   Mismatch at index:
+E    [0]: 19.613300323486328 (ACTUAL), 2.0 (DESIRED)
+E   Max absolute difference among violations: 17.61330032
+E   Max relative difference among violations: 8.80665016
+E    ACTUAL: array([19.6133,  0.    ,  0.    ], dtype=float32)
+E    DESIRED: array([2., 0., 0.])
+______ test_missing_and_stale_groups_are_zero_flagged_and_age_is_bounded _______
+tests/test_feedback.py:102: in test_missing_and_stale_groups_are_zero_flagged_and_age_is_bounded
+    np.testing.assert_allclose(held.feedback[FEEDBACK_VALUE_SLICES["motor_left"]], [2.5, 1.6])
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0
+E   
+E   Mismatched elements: 2 / 2 (100%)
+E   Mismatch at indices:
+E    [0]: 250.0 (ACTUAL), 2.5 (DESIRED)
+E    [1]: 16000.0 (ACTUAL), 1.6 (DESIRED)
+E   Max absolute difference among violations: 15998.4
+E   Max relative difference among violations: 9999.
+E    ACTUAL: array([  250., 16000.], dtype=float32)
+E    DESIRED: array([2.5, 1.6])
+__ test_sensor_input_shapes_and_state_field_labels_match_simplified_contract ___
+tests/test_network_2d.py:218: in test_sensor_input_shapes_and_state_field_labels_match_simplified_contract
+    assert state_detail["fields"][41:] == ["车体横滚角 / π", "车体俯仰角 / π"]
+E   AssertionError: assert [] == ['车体横滚角 / π', '车体俯仰角 / π']
+E     
+E     Right contains 2 more items, first extra item: '车体横滚角 / π'
+E     Use -v to get more diff
+=============================== warnings summary ===============================
+tests/test_network_2d.py::test_extreme_finite_values_and_all_nonfinite_frames_have_safe_ranges
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_feedback.py::test_feedback_contract_scale_order_and_valid_static_values
+FAILED tests/test_feedback.py::test_missing_and_stale_groups_are_zero_flagged_and_age_is_bounded
+FAILED tests/test_network_2d.py::test_sensor_input_shapes_and_state_field_labels_match_simplified_contract
+3 failed, 196 passed, 10 skipped, 1 warning in 11.59s

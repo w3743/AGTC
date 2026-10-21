@@ -1,0 +1,163 @@
+只读预览。复核以下diff后，使用 --apply 才会写入文档。
+--- BMS模块\README.md
++++ BMS模块\README.md
+@@ -2,7 +2,7 @@
+ 
+ 当前工程：[BMS-9S4P.eprj3](BMS-9S4P.eprj3)，必须与同目录 `sch/` 一起保留。206板上元件、51种归一化采购MPN （52个原始MPN字符串）；另含2个板外CAD载体，共208个CAD位号、700针。
+ 
+-已整理到人工Layout交接，可按约束开展可回退初摆；冻结布线和投板仍为HOLD。当前官方根路径重开：PASS_READBACK，208 CAD位号/700针，DRC 0致命/0错误/1警告；P1 SHA=24204acdd408812d2f4fd9209f109e8348fd414caf052ab0befa9a21e60a0f15，逐项快照一致=True。剩余1条警告，明细待最新导出日志确认。 原理图连线几何 PASS；700针、1198条活动原生LINE、381个wire group、347个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 旧独立路径记录中的112条警告明确属于历史，不作为本轮独立路径通过证据。详见[DRC修复结论](检查/DRC修复结论.md)。
++已整理到人工Layout交接，可按约束开展可回退初摆；冻结布线和投板仍为HOLD。同字节副本重开PASS；根路径图页打开超时待用户核对；副本项目=E:\Pioneer\先进通用履带底盘工程\电力\归档\原始材料\bms-final-readback\BMS-9S4P.eprj3，208 CAD位号/700针，DRC 0致命/0错误/12警告；P1 SHA=807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd，快照记录ID比较匹配=True（针脚x/y绝对容差1e-09，最大实际偏差0）；快照文件字节相同=True。正式根路径图页状态=HOLD_OPEN_DOCUMENT_TIMEOUT，待用户核对。当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD。 本轮按U18完成VC/SRP局部连线重画读回核验：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。 原理图连线几何 PASS；700针、1246条活动原生LINE、331个wire group、285个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 旧独立路径记录中的112条警告明确属于历史，不作为本轮独立路径通过证据。详见[DRC修复结论](检查/DRC修复结论.md)。
+ 
+ 入口：[项目要求](项目要求.md) · [Layout交接](原理图准备/Layout交接.md) · [当前状态](检查/当前设计状态.md) · [前置审查](检查/Layout前置审查.md) · [BOM设计输入](原理图准备/BOM.csv) · [当前证据](检查/Layout验证/当前发布.json)。
+ 
+--- BMS模块\TODO.md
++++ BMS模块\TODO.md
+@@ -2,9 +2,10 @@
+ 
+ 当前阶段为人工Layout初摆交接；布线冻结与投板HOLD。原生文件、BOM、布局约束入口见[README](README.md)。
+ 
+-- [x] 官方重开正式根EPRJ3，208CAD位号/700针，0致命/0错误/1警告；本轮源文件读回与计数见Layout验证证据。
+-- [x] 本轮DRC定点修复：此前修复97项重复NET、7处off-grid、1处板外R_PRE缺失的原理图表达、145个空Value，并纠正光耦错误C号映射；本轮187个器件仅规范目录Name/附加属性，DRC由7组降为1组，实际MPN及逐针连接保持不变。
+-- [ ] 用户重新导出本轮修复后的DRC警告明细，确认并逐项审查剩余1条警告，明细待最新导出日志确认后再冻结布线；当前HOLD。修复记录见[DRC结论](检查/DRC修复结论.md)。
++- [ ] 官方重开正式根EPRJ3：图页打开超时，待用户核对；同字节副本重开PASS，208CAD位号/700针，0致命/0错误/12警告。
++- [x] 本轮U18局部连线重画：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。
++- [x] 历史DRC/原理图定点修复记录：既往修复细节仅作历史；当前局部连线与DRC状态以本轮发布证据为准。
++- [ ] 定位并逐项审查当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD；未关闭前布线冻结和投板保持HOLD。不能把既往DRC日志或旧修复计数当成本轮结论；详见[DRC结论](检查/DRC修复结论.md)。
+ - [ ] 人工按Layout交接完成机械初摆、功率铜排/过孔、Kelvin采样、隔离/间距与热设计。
+ - [ ] 核实保险/座DC分断配合、输入浪涌/I²t、细线温升；补充厂家数据或首板故障证据。
+ - [ ] 实测预充栅压、物理电流截止、热态QPRE、主MOS热/均流/短路及失电默认态。
+--- BMS模块\检查\当前设计状态.md
++++ BMS模块\检查\当前设计状态.md
+@@ -4,14 +4,15 @@
+ 
+ | 项目 | 本轮结论 | 证据与边界 |
+ |---|---|---|
+-| 原生文件/采购输入 | PASS_READBACK | 206板上元件，208CAD位号、700针；板外载体不计入PCB数量 |
++| 原生文件/采购输入 | PASS_IDENTICAL_COPY_SHA_ROOT_PATH_HOLD | 同字节副本与正式native SHA一致；正式根路径图页打开超时待用户核对；206板上元件，208CAD位号、700针；板外载体不计入PCB数量 |
+ | 料号计数 | 已核对 | 52个原始MPN字符串、51种归一化采购MPN；采购身份不按载体名覆盖 |
+ | 官方独立路径重开 | 历史记录 | 历史独立路径记录为112条警告；未作为本轮独立路径PASS证据，当前独立路径仍需单独复核 |
+-| 根路径客户端重开 | PASS_READBACK | 208位号/700针，DRC 0致命/0错误/1警告；P1 SHA=24204acdd408812d2f4fd9209f109e8348fd414caf052ab0befa9a21e60a0f15，快照匹配=True；剩余1条警告，明细待最新导出日志确认 |
++| 根路径客户端重开 | HOLD_OPEN_DOCUMENT_TIMEOUT | 同字节副本官方重开PASS，项目=E:\Pioneer\先进通用履带底盘工程\电力\归档\原始材料\bms-final-readback\BMS-9S4P.eprj3；正式根路径图页打开超时待用户核对；208位号/700针，DRC 0致命/0错误/12警告；当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD |
+ | 板外R_PRE与QPRE_SW语义 | PASS | R_PRE在正式快照中存在（MPN CJP300J8R2J；BOM标记=False、PCB标记=False表示该板外件不重复计入）；R_PRE.1=QPRE_SW、R_PRE.2=PACK+、Q_PRE2.2=QPRE_SW均逐针PASS，QPRE_SW已闭合。 |
+-| 局部连线几何 | PASS | 700针、1198条活动原生LINE、381个wire group、347个网标；列出的几何异常0项；不代替ERC/DRC或PCB/实物验证 |
++| 局部连线几何 | PASS | 700针、1246条活动原生LINE、331个wire group、285个网标；列出的几何异常0项；不代替ERC/DRC或PCB/实物验证 |
++| U18局部连线重画 | PASS_ELECTRICAL_IDENTICAL_COPY_READBACK_ROOT_HOLD | 本轮按U18完成VC/SRP局部连线重画读回核验：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。 |
+ | 旧注释清理 | PASS | 48条旧TEXT已持久删除，1条标题更新；其余原生记录字节保持 |
+-| DRC定点修复 | 已完成记录 | 此前修复97项重复NET、7处off-grid、1处板外R_PRE缺失的原理图表达、145个空Value，并纠正光耦错误C号映射；本轮187个器件仅规范目录Name/附加属性，DRC由7组降为1组，实际MPN及逐针连接保持不变。 剩余1条警告，明细待最新导出日志确认；布线冻结仍HOLD；见[DRC修复结论](DRC修复结论.md) |
++| DRC定点修复 | 历史记录 | 既往修复信息不代表本轮DRC结果；当前状态见同字节副本重开记录证据：当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD；见[DRC修复结论](DRC修复结论.md) |
+ | 风扇撤除 | PASS | 6个板上位号及3项外部配套退出，P2.14/.17为NC；只上传温度 |
+ | HiLink取电 | 已落实 | 4个输入/旁路引脚改TAP_B9；源端既有5A保险必须先于细线，详见PSU报告 |
+ | 预充纸面模型 | 逻辑窗口PASS/物理HOLD | FF-B供电至DRV低电平上界 2.8577405271378624s；不含BJT/MOSFET物理释放，整链最大关断时间未形成保证；旧2.970s仅为历史对照 |
+--- BMS模块\项目要求.md
++++ BMS模块\项目要求.md
+@@ -90,7 +90,7 @@
+ 
+ 2026-10-16模块根目录EPRJ3及sch当前读回：206板上元件、51种归一化采购MPN （52个原始MPN字符串）；另含2个板外CAD载体，共208个CAD位号、700针。 已完成97项重复NET清理、7处off-grid修正、补齐板外R_PRE原理图表达、145个空Value及光耦错误C号映射修正；采购MPN保持原身份。
+ 
+-正式根入口当前官方重开：208位号/700针，DRC 0致命/0错误/1警告；P1 SHA=24204acdd408812d2f4fd9209f109e8348fd414caf052ab0befa9a21e60a0f15，逐项快照匹配=True。原理图连线几何 PASS；700针、1198条活动原生LINE、381个wire group、347个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 独立路径旧记录的112条警告属于历史，本轮未据此宣称独立路径通过。剩余1条警告，明细待最新导出日志确认；审查完成前布线冻结和投板均HOLD。R_PRE在正式快照中存在（MPN CJP300J8R2J；BOM标记=False、PCB标记=False表示该板外件不重复计入）；R_PRE.1=QPRE_SW、R_PRE.2=PACK+、Q_PRE2.2=QPRE_SW均逐针PASS，QPRE_SW已闭合。 16A净充电参考算法：PASS executable reference algorithm and deterministic fail-safe tests; NOT firmware/hardware/vehicle acceptance；检查 17/17 项通过，故障注入 18/18 项收敛至CCL=0，母线能量参数情景 756 组；发布门禁=BLOCKED pending physical input qualification, firmware implementation/readback, branch-current, local source-response, and sink validation。保护模型：PASS_WITH_OPEN_ITEMS，检查 17/17 项通过，仍有7项开放事项。预充定时模型：PASS for TMR_ACTIVE/logic-window deassertion only; excludes BJT and MOSFET physical release；FF-B供电至DRV低电平上界 2.8577405271378624 s；MOSFET物理关断最大时间有保证=False，整链物理最大时间=未形成。这些是参考算法/纸面模型结果，不构成固件、硬件、台架或整车验收。 PCB布局布线仍由人类完成，代理未创建PCB。详见[DRC修复结论](检查/DRC修复结论.md)。
++同字节副本当前重开（正式根路径待核）：同字节副本重开PASS；根路径图页打开超时待用户核对；本次读取项目=E:\Pioneer\先进通用履带底盘工程\电力\归档\原始材料\bms-final-readback\BMS-9S4P.eprj3；正式根路径状态=HOLD_OPEN_DOCUMENT_TIMEOUT。208位号/700针，DRC 0致命/0错误/12警告；P1 SHA=807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd，快照记录ID比较匹配=True（针脚x/y绝对容差1e-09，最大实际偏差0）；快照文件字节相同=True。本轮按U18完成VC/SRP局部连线重画读回核验：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。 原理图连线几何 PASS；700针、1246条活动原生LINE、331个wire group、285个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 独立路径旧记录的112条警告属于历史，本轮未据此宣称独立路径通过。当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD；审查完成前布线冻结和投板均HOLD。R_PRE在正式快照中存在（MPN CJP300J8R2J；BOM标记=False、PCB标记=False表示该板外件不重复计入）；R_PRE.1=QPRE_SW、R_PRE.2=PACK+、Q_PRE2.2=QPRE_SW均逐针PASS，QPRE_SW已闭合。 16A净充电参考算法：PASS executable reference algorithm and deterministic fail-safe tests; NOT firmware/hardware/vehicle acceptance；检查 17/17 项通过，故障注入 18/18 项收敛至CCL=0，母线能量参数情景 756 组；发布门禁=BLOCKED pending physical input qualification, firmware implementation/readback, branch-current, local source-response, and sink validation。保护模型：PASS_WITH_OPEN_ITEMS，检查 17/17 项通过，仍有7项开放事项。预充定时模型：PASS for TMR_ACTIVE/logic-window deassertion only; excludes BJT and MOSFET physical release；FF-B供电至DRV低电平上界 2.8577405271378624 s；MOSFET物理关断最大时间有保证=False，整链物理最大时间=未形成。这些是参考算法/纸面模型结果，不构成固件、硬件、台架或整车验收。 PCB布局布线仍由人类完成，代理未创建PCB。详见[DRC修复结论](检查/DRC修复结论.md)。
+ 
+ 预充逻辑慢角2.857741s，未证明全链路物理截止最大值；2.970s是历史对照情景，不能当保证额定。源端辅助支路须先保险后细线，DC分断/I²t故障配合未完全证明。净充电16A为上界，CCL须资格降额；资格缺失CCL=0。30W太阳能独立MPPT接母线，超额回收由超容DC/DC承接，整车回馈额定未定。无样板，模型不等于实物验收；200元目标未证明。
+ 
+--- BMS模块\原理图准备\Layout交接.md
++++ BMS模块\原理图准备\Layout交接.md
+@@ -2,7 +2,7 @@
+ 
+ 2026-10-16。当前输入为[根目录EPRJ3](../BMS-9S4P.eprj3)及其 `sch/`、[BOM](BOM.csv)、[器件映射](../检查/Layout器件映射.json)。206板上元件、51种归一化采购MPN；208CAD位号/700针，其中2个板外载体不计入PCB。
+ 
+-**可开展可回退初摆；冻结布线和投板HOLD。** 当前官方根路径重开：PASS_READBACK，208 CAD位号/700针，DRC 0致命/0错误/1警告；P1 SHA=24204acdd408812d2f4fd9209f109e8348fd414caf052ab0befa9a21e60a0f15，逐项快照一致=True。剩余1条警告，明细待最新导出日志确认。 原理图连线几何 PASS；700针、1198条活动原生LINE、381个wire group、347个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 旧独立路径的112条警告属于历史，不能证明本轮独立路径已通过；明细核实前不冻结布线。详见[当前证据](../检查/Layout验证/当前发布.json)和[DRC修复结论](../检查/DRC修复结论.md)。
++**可开展可回退初摆；冻结布线和投板HOLD。** 同字节副本重开PASS；根路径图页打开超时待用户核对；副本项目=E:\Pioneer\先进通用履带底盘工程\电力\归档\原始材料\bms-final-readback\BMS-9S4P.eprj3，208 CAD位号/700针，DRC 0致命/0错误/12警告；P1 SHA=807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd，快照记录ID比较匹配=True（针脚x/y绝对容差1e-09，最大实际偏差0）；快照文件字节相同=True。正式根路径图页状态=HOLD_OPEN_DOCUMENT_TIMEOUT，待用户核对。当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD。 本轮按U18完成VC/SRP局部连线重画读回核验：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。 原理图连线几何 PASS；700针、1246条活动原生LINE、331个wire group、285个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 旧独立路径的112条警告属于历史，不能证明本轮独立路径已通过；明细核实前不冻结布线。详见[当前证据](../检查/Layout验证/当前发布.json)和[DRC修复结论](../检查/DRC修复结论.md)。
+ 
+ ## 功能分区与落位顺序
+ 
+@@ -23,7 +23,7 @@
+ 
+ ## 冻结和首板门禁
+ 
+-1. 用户重新导出当前DRC明细，逐项核实剩余1条警告，明细待最新导出日志确认；审查完成前冻结原理图和布线仍为HOLD。旧独立路径112警告只是历史记录，不能替代本轮独立路径复核。
++1. 定位并逐项审查当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD；审查完成前冻结原理图和布线仍为HOLD。旧独立路径112警告只是历史记录，不能替代本轮独立路径复核。
+ 2. 查明源端保险组合的DC短路分断适配、输入浪涌/I²t及线束温升；名义5A大于正常负载不构成故障配合证明。
+ 3. 核对主MOS热/均流/短路SOA、预充栅压与实际关断电流、HiLink启动/打嗝/反灌、TVS瞬态及ETA低压启停。最大物理截止时间、热态QPRE导通电阻仍待厂家或首板证据。
+ 4. 固件读回BQ保护、温度模型、失电默认态和故障锁存；任何资格缺失CCL=0，温度经CAN附有效/过期状态。16A为电池净充电上界，超额回馈由超容DC/DC按实际能力承接，源端必须能减功率。
+--- BMS模块\检查\DRC修复结论.md
++++ BMS模块\检查\DRC修复结论.md
+@@ -1,6 +1,6 @@
+ # BMS 当前DRC修复与Layout证据结论
+ 
+-日期：2026-10-16。当前输入：[发布清单](Layout验证/当前发布.json)、[根路径重开读回](Layout验证/root-after-cleanup-reopen.json)、[几何核验](Layout验证/final-geometry.json)。采购映射细节见[采购身份核查](DRC修复/采购身份核查.md)。
++日期：2026-10-16。当前输入：[发布清单](Layout验证/当前发布.json)、[同字节副本重开读回](Layout验证/root-after-cleanup-reopen.json)、[几何核验](Layout验证/final-geometry.json)。采购映射细节见[采购身份核查](DRC修复/采购身份核查.md)。
+ 
+ ## 当前计数与验证状态
+ 
+@@ -8,10 +8,12 @@
+ | --- | --- |
+ | 板上元件 / 归一化采购MPN | 206 / 51（原始MPN字符串 52） |
+ | CAD位号 / 针 | 208 / 700（含2个板外载体） |
+-| 根路径官方重开 | PASS_READBACK；P1 SHA=24204acdd408812d2f4fd9209f109e8348fd414caf052ab0befa9a21e60a0f15；逐项快照匹配=True |
+-| 根路径当前DRC | 0致命/0错误/1警告 |
+-| 警告明细 | 剩余1条警告，明细待最新导出日志确认 |
+-| 原理图连线几何 | 原理图连线几何 PASS；700针、1198条活动原生LINE、381个wire group、347个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 |
++| 同字节副本重开 / 正式根路径状态 | 同字节副本重开PASS；根路径图页打开超时待用户核对；副本项目=E:\Pioneer\先进通用履带底盘工程\电力\归档\原始材料\bms-final-readback\BMS-9S4P.eprj3；根路径=HOLD_OPEN_DOCUMENT_TIMEOUT；P1 SHA=807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd；记录ID比较匹配=True，针脚x/y绝对容差=1e-09，最大实际偏差=0；快照文件字节相同=True |
++| 同字节副本当前DRC | 0致命/0错误/12警告 |
++| DRC review / Layout正式放行 | HOLD / HOLD |
++| 警告明细 | 当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD |
++| U18局部连线重画 | 本轮按U18完成VC/SRP局部连线重画读回核验：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。208位号/700针严格语义PASS，采购身份、NC、BOM及PCB锁定PASS；同字节副本重开PASS；根路径图页打开超时待用户核对；drcReview=HOLD，Layout正式放行=HOLD。 |
++| 原理图连线几何 | 原理图连线几何 PASS；700针、1246条活动原生LINE、331个wire group、285个网标，列出的几何异常项 0 项。该检查不替代ERC/DRC、PCB布局或实物验证。 |
+ | 独立路径 | 旧记录中的112条警告只作历史，不能作为本轮独立路径通过证据 |
+ | 板外R_PRE/QPRE_SW | R_PRE在正式快照中存在（MPN CJP300J8R2J；BOM标记=False、PCB标记=False表示该板外件不重复计入）；R_PRE.1=QPRE_SW、R_PRE.2=PACK+、Q_PRE2.2=QPRE_SW均逐针PASS，QPRE_SW已闭合。 |
+ 
+@@ -19,7 +21,7 @@
+ 
+ 16A净充电参考算法：PASS executable reference algorithm and deterministic fail-safe tests; NOT firmware/hardware/vehicle acceptance；检查 17/17 项通过，故障注入 18/18 项收敛至CCL=0，母线能量参数情景 756 组；发布门禁=BLOCKED pending physical input qualification, firmware implementation/readback, branch-current, local source-response, and sink validation。保护模型：PASS_WITH_OPEN_ITEMS，检查 17/17 项通过，仍有7项开放事项。预充定时模型：PASS for TMR_ACTIVE/logic-window deassertion only; excludes BJT and MOSFET physical release；FF-B供电至DRV低电平上界 2.8577405271378624 s；MOSFET物理关断最大时间有保证=False，整链物理最大时间=未形成。这些是参考算法/纸面模型结果，不构成固件、硬件、台架或整车验收。
+ 
+-此前定点修复记录（将历史112组降至7组）：
++## 既往原理图修复记录
+ 
+ - 清理97项重复NET。
+ - 修正7处off-grid坐标。
+@@ -27,8 +29,8 @@
+ - 补齐145个空Value字段。
+ - 纠正光耦错误C号映射；采购MPN `VO617A-2X007T` 身份保持不变，不用不同等级载体号覆盖采购身份。
+ 
+-本轮已审阅用户导出的7组供应商属性警告，对187个器件规范目录Name/附加属性，并将旧描述保存在Engineering Description中。官方保存重开后为1组警告；208个器件、700针以及全部导线、网标和文本均保持等价。详见[标准化与剩余差异](DRC标准化/remaining-catalog-differences.json)。剩余1组的逐位号归属仍待用户重新导出，1组不等于1个器件。
++供应商属性规范化及其历史DRC计数属于既往记录，不作为本轮告警清除依据。当前告警状态以本轮同字节副本重开读回为准：当前同字节副本重开计数为12条DRC警告；规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD。不能把旧的112警告记录当成本轮结果。
+ 
+-当前只允许按交接开展可回退的人工Layout初摆。**冻结布线和投板继续HOLD**，直至用户重新导出最新DRC日志并确认剩余1条警告的明细；不能把旧的112警告记录当成本轮结果。以上模型状态只引用现有结果文件，不替代固件、硬件、台架或实物验收；无样板，热、保护、EMC及整车验证仍未完成。PCB布局布线由人类完成，代理未创建PCB。
++当前原理图图面按U18完成VC/SRP局部连线重画的保存/重开和逐针语义核验；这不替代DRC告警关闭、人工PCB布局布线或实物验证。**冻结布线和投板继续HOLD**，直至当前告警完成定位、审阅并按项目门槛闭合。以上模型状态只引用现有结果文件，不替代固件、硬件、台架或整车验收；无样板，热、保护、EMC及整车验证仍未完成。PCB布局布线由人类完成，代理未创建PCB。
+ 
+ 文档入口：[模块README](../README.md) · [当前设计状态](当前设计状态.md) · [Layout交接](../原理图准备/Layout交接.md) · [项目要求](../项目要求.md)。
+--- BMS模块\检查\PSU支路闭合.md
++++ BMS模块\检查\PSU支路闭合.md
+@@ -1,7 +1,7 @@
+ # B9 到海凌科 5V 电源支路保护闭合建议
+ 
+ 日期：2026-10-16  
+-状态：条件纸面方案，仅供 Layout 初始摆放；当前原理图已将控制电源输入侧接到 TAP_B9，并经官方根工程重开读取核对。**辅助正极线支路故障/短路分断验收仍 OPEN**：电芯 DC 最大预期短路电流、熔断总清除 I²t 配合及首板试验未闭合；未冻结或放行投板。
++状态：条件纸面方案，仅供 Layout 初始摆放；PSU 输入已接到 TAP_B9；同字节副本重开PASS；根路径图页打开超时待用户核对（208器件/700引脚）。当前读回DRC为0 fatal/0 error/12 warning；警告规则/位号明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD。辅助正极线支路故障/短路分断验收仍 OPEN：电芯 DC 最大预期短路电流、熔断总清除 I²t 配合及首板试验未闭合；未冻结或放行投板。
+ 
+ ## 唯一建议
+ 
+@@ -11,7 +11,7 @@
+ 
+ `B0 → J_CELL_SERVICE.1 → PSU5_EXT.1/5` 为回路返回，不熔断。现有 100 A 主保险不是此细线支路的保护器件，不能代替 5 A 源端熔丝。
+ 
+-当前 final P1 已将 `PSU5_EXT.2`、`C_PSU_IN1.1`、`C_PSU_IN2.1`、`C_PSU_IN3.1` 接到 `TAP_B9`，三只旁路电容另一端保持 `B0`；板端复用 `J_CELL_SERVICE.10=TAP_B9`，不增加第二只保险。当前 P1 SHA256 为 `7338c38954e8d456c87ed69aad2c4ac23593f4b53c54dee3c6d6a64c38cad88a`。本轮严格语义几何逐针证明四个输入正端均实际连接到唯一 `TAP_B9`、非 NC 且有物理线段/netport 证据；官方根工程只读重开也绑定同一 P1。该核对证明当前原理图连接和记录几何，不是 PCB DRC、布线/载流验收或实物检查。
++当前 P1 已将 `PSU5_EXT.2`、`C_PSU_IN1.1`、`C_PSU_IN2.1`、`C_PSU_IN3.1` 接到 `TAP_B9`，三只旁路电容另一端保持 `B0`；板端复用 `J_CELL_SERVICE.10=TAP_B9`，不增加第二只保险。当前 P1 SHA256 为 `807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd`。严格语义几何逐针证明四个输入正端均实际连接到唯一 `TAP_B9`、非 NC 且有物理线段/netport 证据；同字节隔离副本官方只读重开PASS并绑定相同的三份正式原生文件SHA，正式根路径图页打开超时、待用户核对。该核对证明当前原理图连接和记录几何，不是 PCB DRC、布线/载流验收或实物检查。
+ 
+ ## 线束与接口约束
+ 
+@@ -48,12 +48,12 @@
+ ## 当前原理图证据与 Layout 边界
+ 
+ - 接口连接输入 SHA256：`5f74ca3a72d25b354d5819ae2a908ac260c620b428ca4a8e472981f03fb7f573`；维护线束连接输入 SHA256：`cc9703f57095dd33ec03fcc8bfd8f575bf45de755112ed62a754d1311fb132c7`。前者记载 `PSU5_EXT.2` 与三只输入电容正端为 `TAP_B9`，后者记载 `F_CELL_B9/FH_CELL_B9`、`K_CELL_BATTERY.10`、`K_CELL_BMS.10` 和 `J_CELL_SERVICE.10` 的支路关系。
+-- 当前官方快照 `BMS模块/检查/Layout验证/current-snapshot.json` SHA256 `483a74407a45e9864d1727ac3714edf6eef25491ab4b8bb616ff289b1ae1e26f`：208 个器件、700 个 pin。当前严格语义几何记录 `BMS模块/检查/Layout验证/final-geometry.json` SHA256 `1bbca6e733d1d3303ee39eb71f2403f58023d0a22b5e0759d15727b7c206c1df`：208 个器件、700 个 pin、1198 条原生 LINE 记录、347 个活动 netport；语义状态 PASS，所有 defectCounts 为 0。官方根工程重开记录 `BMS模块/检查/Layout验证/root-after-cleanup-reopen.json` SHA256 `687dfd05ece425ca754edaf9a95969c8829033e605c8b80b4300288e5058fd5b`：208/700，P1 源 SHA 前后相同，快照差异 0；DRC 记录为 7 warn，警告详情尚未审查。旧独立重开记录 `BMS模块/检查/Layout验证/final-independent-reopen.json` SHA256 `83d0650d553b82ccdab3a4e70b7fb3c335604c22096a3f8e846354407469d13f` 属于修复前历史证据，不代表当前重开。以上均为原理图记录/重开证据，不是 PCB 布线、铜箔载流、温升或支路分断验收。
++- 当前保存快照 `BMS模块/检查/Layout验证/current-snapshot.json` SHA256 `ee8f022ea6d92d15556395b01e3264ec5d1f78b8139b2ee2da71e42b83d94ac6`：208 个器件、700 个 pin。当前严格语义几何记录 `BMS模块/检查/Layout验证/final-geometry.json` SHA256 `2101579150ce1dd55dd08833404b1c1b44fa914b6024b8db5fad0343aca4e376`：208 个器件、700 个 pin、1246 条原生 LINE、285 个 netport；语义状态 PASS，defectCounts 全零=True。同字节隔离副本官方重开记录 `BMS模块/检查/Layout验证/root-after-cleanup-reopen.json` SHA256 `bd916037b484a0f403181acc2b4806fc5189c0d4c4d54e5cfb6d72fdea8cb448`：208/700，rows/ports/wires/texts按ID比较全部一致，快照文件字节相同=True；当前读回DRC 0致命/0错误/12警告，警告明细尚未审阅，drcReview=HOLD；正式根路径图页打开超时、待用户核对。旧独立重开记录 `BMS模块/检查/Layout验证/final-independent-reopen.json` SHA256 `83d0650d553b82ccdab3a4e70b7fb3c335604c22096a3f8e846354407469d13f` 属于修复前历史证据，不代表当前重开。以上均为原理图记录/重开证据，不是 PCB 布线、铜箔载流、温升或支路分断验收。
+ - 允许 Layout 以源端保险、整段 16 AWG 线束和 TAP_B9 输入拓扑进行初始摆放；冻结前仍须确认整段线束/连接器/板端焊点按实际降额持续承载至少 5 A、60 Vdc 净距及瞬态边界、熔断总清除能量配合。当前不构成板级 DRC、PCB 铜箔宽度、温升、短路分断或实物验收。源端保险和线束是施工要求/设计输入，未声称已经安装。
+ 
+ 
+ ## 当前正式源绑定与故障分断状态
+ 
+ - 当前 BOM：`BMS模块/原理图准备/BOM.csv`，SHA256 `3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219`。该 SHA 已绑定本报告和计算 JSON；本轮只记录源身份，没有修改 BOM。
+-- 当前原理图：`BMS模块/sch/Schematic1/P1.esch2`，SHA256 `7338c38954e8d456c87ed69aad2c4ac23593f4b53c54dee3c6d6a64c38cad88a`。官方根工程只读重开为 208 器件/700 引脚、快照差异 0；记录 7 条警告，详情尚未审查。
++- 当前原理图：`BMS模块/sch/Schematic1/P1.esch2`，SHA256 `807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd`。同字节隔离副本官方只读重开PASS（208器件/700引脚、记录ID比较匹配=True）；正式根路径图页打开超时，待用户核对。当前读回DRC为0 fatal/0 error/12 warning，警告明细尚未审阅，drcReview=HOLD，Layout正式放行=HOLD。
+ - **辅助正极线支路故障/短路切断能力保持 OPEN。** 实际电池 DC 预期短路电流未知，33 kA 目录组合边界不等于当前电池系统通过，19 A²s 预弧数据不等于总清除 I²t。线缆、触点、接线点、PCB 铜箔与外壳的能量配合须完成后再评估首板受控试验；不得据此签发故障分断 PASS。

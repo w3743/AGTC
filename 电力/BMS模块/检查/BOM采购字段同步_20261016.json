@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-16",
+  "purpose": "正式BMS采购BOM风扇项清理及Manufacturer读取适配；未同步共用索引或修改EDA源。",
+  "formal_bom": {
+    "path": "BMS模块/原理图准备/BOM.csv",
+    "old_sha256": "4b0d4698249d82b6b7039c7d447055966da6f644ff6291a6f7e88ee56acea6fd",
+    "old_rows": 257,
+    "new_sha256": "f1576157044e3c9c6dc7d03e3381ebd0be2ec2593d36fd9fcb56b9f53a2a7f55",
+    "new_rows": 248,
+    "archived_in": "BMS模块/归档/历史与调试.zip::原理图准备/BOM.csv.before_20261016_bms_sync",
+    "archived_sha256": "4b0d4698249d82b6b7039c7d447055966da6f644ff6291a6f7e88ee56acea6fd",
+    "removed_refs": [
+      "FAN_EXT",
+      "J_FAN",
+      "J_FAN_CTRL",
+      "J_FAN_CTRL_MATE",
+      "J_FAN_MATE",
+      "Q_FAN_PWM",
+      "R_FAN_PWM_GATE",
+      "R_FAN_PWM_PD",
+      "R_FAN_TACH_PU"
+    ],
+    "manufacturer_rows": [
+      "C_AND2",
+      "C_CAN_PWR_IN2",
+      "C_CAN_PWR_OUT2",
+      "C_GATE1",
+      "C_POR",
+      "C_PSU_IN2",
+      "C_SEQ",
+      "C_SRP",
+      "C_TIMER"
+    ],
+    "board_off_switch": {
+      "ref": "SW_RUN_STORE",
+      "mpn": "MN22SS1G01",
+      "manufacturer": "NKK Switches"
+    }
+  },
+  "updater": {
+    "path": "元件封装库/工具/更新采购补充.py",
+    "old_sha256": "795535f187e87886a7bb32a207cf20365655156e609760e347da08cf5130b251",
+    "new_sha256": "51023042ff0cd7afa606f63e83506c0b40c2ff55d376b5cbfe5e91b945561523",
+    "change": "BMS分支从row.get(\"Manufacturer\", \"\")读取采购制造商字段。",
+    "archived_in": "归档/工程过程.zip::元件封装库/工具/更新采购补充.py.before_20261016_bms_manufacturer",
+    "archived_sha256": "795535f187e87886a7bb32a207cf20365655156e609760e347da08cf5130b251",
+    "syntax_check": "ast.parse passed; updater was not run."
+  },
+  "candidate_manifest_sha256": "2296e497cde8c487e929b6ee3dab5739d2ddefb5f3c1244b046c02f2443def58",
+  "archive_verification": {
+    "bms_archive_member": "原理图准备/BOM.csv.before_20261016_bms_sync",
+    "bms_archive_record_member": "检查/BOM采购字段同步_20261016.json",
+    "process_archive_member": "元件封装库/工具/更新采购补充.py.before_20261016_bms_manufacturer",
+    "all_old_entries_crc_tested_and_metadata_preserved": true,
+    "new_members_readback_sha256_verified": true
+  },
+  "not_run": [
+    "同步全部.py",
+    "同步全部.py --check",
+    "旧PDF/EPRO2发布门禁"
+  ],
+  "not_modified": [
+    "EPRJ3/SCH源",
+    "来源配置.json",
+    "连接JSON",
+    "共用库索引"
+  ],
+  "price_status": "本次未新增价格；无足够当前报价计算正式BMS总价或预算缺口。"
+}

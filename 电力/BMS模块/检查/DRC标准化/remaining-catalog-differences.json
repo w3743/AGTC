@@ -1,0 +1,913 @@
+{
+  "reportType": "saved_snapshot_vs_supplier_catalog_query",
+  "generatedDate": "2026-10-16",
+  "sources": {
+    "savedSnapshot": {
+      "path": "BMS模块/检查/DRC标准化/saved-snapshot.json",
+      "sha256": "E96472DAF4AD19E6AC571A7C0830510DB8B8A4197AB96CDAE8FEC1ECCA963D32",
+      "componentRows": 208,
+      "drcSummary": [
+        {
+          "type": "warn",
+          "count": 1
+        }
+      ]
+    },
+    "supplierIdLibraryQuery": {
+      "path": "BMS模块/检查/DRC修复/supplier-id-library-query.json",
+      "sha256": "791266028E1239E8E5F03EB9141C60B3A0F039E4FC70101FDEF842F5610F8DB7",
+      "queryMethod": "LIB_Device.getByLcscIds",
+      "records": 41,
+      "uniqueSupplierIds": 41
+    },
+    "formal187SetBaseline": {
+      "path": "BMS模块/检查/DRC修复/值建议与采购身份核验.json",
+      "sha256": "E3800B5F82ECF50DC8E3910D2F2EA63D902F345D37405080DDB4E822CC99B49F",
+      "note": "仅用于复核187目标Refs集合的来源与排除关系；不是本轮官方逐条DRC告警名单。"
+    }
+  },
+  "scopeReconciliation": {
+    "priorAuditWarningRefs": 188,
+    "excludedRef": "U_LOAD_POWER_VALID",
+    "excludedSupplierId": "UNVERIFIED_2X",
+    "target187Refs": 187,
+    "currentQueryMatchedRefs": 188,
+    "queryMatchedRefsAfterRemoving": "U_AND2",
+    "queryMatchedRefsAfterRemovingUAnd2": 187,
+    "target187SetEqualsCurrentQueryMatchedMinusUAnd2": true,
+    "addedMatchedRefOutsideTarget": "U_AND2",
+    "exactOfficialCurrentWarningRefSetConfirmed": false,
+    "limit": "saved-snapshot仅给出warn count=1，不含该条警告的官方逐Ref归属；此报告不能确认最后warn的精确Refs。"
+  },
+  "coverage": {
+    "snapshotRows": 208,
+    "queryRecords": 41,
+    "currentRowsMatchedBySupplierId": 188,
+    "queryMatchedUniqueRefs": 188,
+    "rowsWithoutQueriedSupplierId": [
+      {
+        "ref": "D_CAN_TVS",
+        "supplierId": "C552486",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "J_CAN",
+        "supplierId": "C581329",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "J_CORE_P1",
+        "supplierId": "C53202169",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "J_CORE_P2",
+        "supplierId": "C53202169",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "J_LOAD_POWER_VALID",
+        "supplierId": "C581328",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "PSU5_EXT",
+        "supplierId": "C5365326",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_BREG",
+        "supplierId": "C150457",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_CHG1",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_CHG2",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_CHG3",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_DSG1",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_DSG2",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_DSG3",
+        "supplierId": "C2925050",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_PRE1",
+        "supplierId": "C115991",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "Q_PRE2",
+        "supplierId": "C115991",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "SW_RUN_STORE",
+        "supplierId": "C34982",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "U1",
+        "supplierId": "C3038665",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "U_CAN",
+        "supplierId": "C22438481",
+        "category": "supplier_id_not_in_query"
+      },
+      {
+        "ref": "R_PRE",
+        "supplierId": "SEE_BOM_CSV",
+        "category": "bom_only_supplier_id"
+      },
+      {
+        "ref": "U_LOAD_POWER_VALID",
+        "supplierId": "UNVERIFIED_2X",
+        "category": "excluded_unverified_2x"
+      }
+    ],
+    "querySupplierIdsUnusedBySnapshot": [
+      "C17528767"
+    ],
+    "unmatchedSummary": {
+      "otherSupplierIdsNotInQuery": 18,
+      "bomOnlyRef": "R_PRE",
+      "unverifiedExcludedRef": "U_LOAD_POWER_VALID"
+    }
+  },
+  "comparisonMethod": {
+    "identityFields": "snapshot row.name/mpn/manufacturer/supplier/supplierId vs catalog otherProperty.Name and catalog manufacturerId/manufacturer/supplier/supplierId; nested Manufacturer Part and Supplier Part consistency checked.",
+    "attributes": "Compare properties present on both snapshot row.other and catalog otherProperty, excluding local engineering notes, PCB/control fields, and identity fields; catalog metadata and electrical/device attributes are reported separately.",
+    "queryInternalIdentityConsistency": {
+      "records": 41,
+      "uniqueSupplierIds": 41,
+      "manufacturerIdEqualsManufacturerPart": 41,
+      "supplierIdEqualsSupplierPart": 41,
+      "manufacturerEqualsNestedManufacturer": 41,
+      "supplierEqualsNestedSupplier": 41
+    }
+  },
+  "summary": {
+    "all188MatchedRefs": {
+      "Name": {
+        "equal": 187,
+        "different": 1
+      },
+      "MPN": {
+        "equal": 179,
+        "different": 9
+      },
+      "manufacturer": {
+        "equal": 179,
+        "different": 9
+      },
+      "supplier": {
+        "equal": 188,
+        "different": 0
+      },
+      "supplierId": {
+        "equal": 188,
+        "different": 0
+      },
+      "commonCatalogPropertyPairsCompared": 2020,
+      "uniqueCommonPropertyNamesCompared": 121,
+      "catalogMetadataDifferences": 4,
+      "electricalOrDeviceAttributeDifferences": 15
+    },
+    "formal187": {
+      "NameDifferences": 0,
+      "MPNDifferences": 9,
+      "manufacturerDifferences": 9,
+      "supplierDifferences": 0,
+      "supplierIdDifferences": 0,
+      "commonCatalogPropertyDifferences": 0,
+      "preservedMPNManufacturerPrefixCases": 7,
+      "preservedMPNWhitespaceCases": 2,
+      "preservedEmptyCatalogManufacturerCases": 9
+    }
+  },
+  "preservedIdentityExceptions": {
+    "manufacturerPrefixMPN": {
+      "count": 7,
+      "refs": [
+        "C_CP1",
+        "D_TVS",
+        "DZ_QPRE",
+        "U_GATE1",
+        "U_POR",
+        "U_SEQ",
+        "U_TIMER"
+      ],
+      "note": "catalog MPN不带厂家前缀；保留工程/BOM采购MPN。"
+    },
+    "whitespaceOnlyMPN": {
+      "count": 2,
+      "refs": [
+        "NTC_BOARD",
+        "NTC_MOS"
+      ],
+      "note": "NTC的MPN空格差异；保留工程/BOM实际MPN。"
+    },
+    "emptyCatalogManufacturer": {
+      "count": 9,
+      "refs": [
+        "C_AND2",
+        "C_CAN_PWR_IN2",
+        "C_CAN_PWR_OUT2",
+        "C_GATE1",
+        "C_POR",
+        "C_PSU_IN2",
+        "C_SEQ",
+        "C_SRP",
+        "C_TIMER"
+      ],
+      "catalogSupplierId": "C9900019564",
+      "snapshotManufacturer": "Murata Manufacturing Co., Ltd.",
+      "catalogManufacturer": "",
+      "note": "目录厂家字段为空；保留当前真实身份，不自动改。"
+    }
+  },
+  "remainingDifferencesByRef": [
+    {
+      "ref": "C_AND2",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_CAN_PWR_IN2",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_CAN_PWR_OUT2",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_CP1",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "Murata GCM219R71E474KA55D",
+          "catalogValue": "GCM219R71E474KA55D",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_GATE1",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_POR",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_PSU_IN2",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_SEQ",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_SRP",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "C_TIMER",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "manufacturer",
+          "category": "identity",
+          "snapshotValue": "Murata Manufacturing Co., Ltd.",
+          "catalogValue": "",
+          "classification": "catalog_manufacturer_empty",
+          "preserveAsIdentity": true,
+          "note": "The matched directory record has an empty manufacturer field; preserve the saved actual manufacturer identity."
+        }
+      ]
+    },
+    {
+      "ref": "D_TVS",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "Littelfuse SMCJ45A",
+          "catalogValue": "SMCJ45A",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "DZ_QPRE",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "onsemi MMSZ5242BT1G",
+          "catalogValue": "MMSZ5242BT1G",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "NTC_BOARD",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "MF52A103F3950(A1)",
+          "catalogValue": "MF52A103F3950 (A1)",
+          "classification": "whitespace_only",
+          "preserveAsIdentity": true,
+          "note": "Whitespace-only carrier/display difference; retain the documented procurement MPN."
+        }
+      ]
+    },
+    {
+      "ref": "NTC_MOS",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "MF52A103F3950(A1)",
+          "catalogValue": "MF52A103F3950 (A1)",
+          "classification": "whitespace_only",
+          "preserveAsIdentity": true,
+          "note": "Whitespace-only carrier/display difference; retain the documented procurement MPN."
+        }
+      ]
+    },
+    {
+      "ref": "U_AND2",
+      "inFormal187": false,
+      "differences": [
+        {
+          "field": "Name",
+          "category": "identity",
+          "snapshotValue": "SN74LVC1G11DCKR",
+          "catalogValue": "={Manufacturer Part}",
+          "classification": "catalog_formula_vs_evaluated_name",
+          "preserveAsIdentity": false,
+          "note": "Catalog Name is a formula expression; saved Name equals the evaluated manufacturer part."
+        },
+        {
+          "field": "LCSC Part Name",
+          "category": "catalog_metadata",
+          "snapshotValue": "",
+          "catalogValue": "单路三输入正与门",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Supplier Footprint",
+          "category": "catalog_metadata",
+          "snapshotValue": "",
+          "catalogValue": "SC-70-6",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "JLCPCB Part Class",
+          "category": "catalog_metadata",
+          "snapshotValue": "",
+          "catalogValue": "Extended Part",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Datasheet",
+          "category": "catalog_metadata",
+          "snapshotValue": "",
+          "catalogValue": "https://www.ti.com/cn/lit/ds/symlink/sn74lvc1g11.pdf",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Logic Type",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "与门",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Number of Gates",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "1",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Voltage - Supply",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "1.65V~5.5V",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Quiescent Current",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "10uA",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Current - Output Low(IOL)",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "32mA",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Current - Output High(IOH)",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "32mA",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Input Logic Level - High",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "1.7V~2V",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Input Logic Level - Low",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "700mV~800mV",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Output Logic Level - High",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "3.8V",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Output Logic Level - Low",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "550mV",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Series",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "74LVC系列",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Propagation Delay",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "3.5ns@5V,50pF",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Operating Temperature",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "-40℃~+125℃",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Inputs per Gates",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "3",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        },
+        {
+          "field": "Features",
+          "category": "electrical_or_device_attribute",
+          "snapshotValue": "",
+          "catalogValue": "局部关断模式；过压容忍输入",
+          "classification": "value_difference",
+          "preserveAsIdentity": false,
+          "note": "Raw common property values differ; this is a catalog comparison candidate only."
+        }
+      ]
+    },
+    {
+      "ref": "U_GATE1",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "TI SN74LVC1G11DCKR",
+          "catalogValue": "SN74LVC1G11DCKR",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "U_POR",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "TI TPS3809K33DBVR",
+          "catalogValue": "TPS3809K33DBVR",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "U_SEQ",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "TI SN74LVC74ADR",
+          "catalogValue": "SN74LVC74ADR",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    },
+    {
+      "ref": "U_TIMER",
+      "inFormal187": true,
+      "differences": [
+        {
+          "field": "MPN",
+          "category": "identity",
+          "snapshotValue": "TI TPL5111DDCR",
+          "catalogValue": "TPL5111DDCR",
+          "classification": "manufacturer_prefix",
+          "preserveAsIdentity": true,
+          "note": "Catalog has bare MPN while the saved instance preserves manufacturer-prefixed procurement identity."
+        }
+      ]
+    }
+  ],
+  "strongestFieldToCheckWithin187": {
+    "field": "manufacturer",
+    "refs": [
+      "C_AND2",
+      "C_CAN_PWR_IN2",
+      "C_CAN_PWR_OUT2",
+      "C_GATE1",
+      "C_POR",
+      "C_PSU_IN2",
+      "C_SEQ",
+      "C_SRP",
+      "C_TIMER"
+    ],
+    "evidence": "9个同属C9900019564的Ref在saved-snapshot中均为Murata Manufacturing Co., Ltd.，查询目录manufacturer字段均为空；这是187范围内最统一的单字段差异。",
+    "caution": "这是候选定位线索，不等于官方确认的最后warn归属；不要以此自动覆盖目录或实例身份。",
+    "secondaryIdentityDifferences": "另有7个MPN带manufacturer前缀、2个NTC MPN存在空格差异，均按真实采购身份保留。"
+  },
+  "extraDifferenceOutside187": {
+    "ref": "U_AND2",
+    "status": "queryMatchedExtraRef_notInFormal187",
+    "differences": [
+      {
+        "field": "Name",
+        "category": "identity",
+        "snapshotValue": "SN74LVC1G11DCKR",
+        "catalogValue": "={Manufacturer Part}",
+        "classification": "catalog_formula_vs_evaluated_name",
+        "preserveAsIdentity": false,
+        "note": "Catalog Name is a formula expression; saved Name equals the evaluated manufacturer part."
+      },
+      {
+        "field": "LCSC Part Name",
+        "category": "catalog_metadata",
+        "snapshotValue": "",
+        "catalogValue": "单路三输入正与门",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Supplier Footprint",
+        "category": "catalog_metadata",
+        "snapshotValue": "",
+        "catalogValue": "SC-70-6",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "JLCPCB Part Class",
+        "category": "catalog_metadata",
+        "snapshotValue": "",
+        "catalogValue": "Extended Part",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Datasheet",
+        "category": "catalog_metadata",
+        "snapshotValue": "",
+        "catalogValue": "https://www.ti.com/cn/lit/ds/symlink/sn74lvc1g11.pdf",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Logic Type",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "与门",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Number of Gates",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "1",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Voltage - Supply",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "1.65V~5.5V",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Quiescent Current",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "10uA",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Current - Output Low(IOL)",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "32mA",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Current - Output High(IOH)",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "32mA",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Input Logic Level - High",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "1.7V~2V",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Input Logic Level - Low",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "700mV~800mV",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Output Logic Level - High",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "3.8V",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Output Logic Level - Low",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "550mV",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Series",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "74LVC系列",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Propagation Delay",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "3.5ns@5V,50pF",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Operating Temperature",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "-40℃~+125℃",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Inputs per Gates",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "3",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      },
+      {
+        "field": "Features",
+        "category": "electrical_or_device_attribute",
+        "snapshotValue": "",
+        "catalogValue": "局部关断模式；过压容忍输入",
+        "classification": "value_difference",
+        "preserveAsIdentity": false,
+        "note": "Raw common property values differ; this is a catalog comparison candidate only."
+      }
+    ],
+    "note": "Name为目录公式表达式而快照为公式求值后的MPN；另外4项目录元数据及15项电气/器件属性在快照other中为空。它不属于187基准Ref集合，不能据此认定当前warn归属。"
+  },
+  "officialWarningAttribution": "未确认：输入快照只提供DRC汇总warn=1，没有官方逐Ref警告明细；比较结果不替代该明细。"
+}

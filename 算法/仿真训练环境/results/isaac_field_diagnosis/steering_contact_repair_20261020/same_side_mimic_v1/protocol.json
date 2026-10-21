@@ -1,0 +1,72 @@
+{
+  "schema": "isaac-field-same-side-mimic-diagnostic-v1",
+  "status": "authorized_single_case_retry_after_pre_motion_audit_failure",
+  "treatment": {
+    "mechanism": "same_side_wheel0_master_6_mimic_followers_each_side",
+    "relationship": "q_follower = 0 + 1 * q_master",
+    "left_master": "left_wheel_0_wheel_joint",
+    "right_master": "right_wheel_0_wheel_joint",
+    "follower_indices_per_side": [1, 2, 3, 4, 5, 6],
+    "expected_mimic_constraints": 12,
+    "coefficient_basis": "same authored local +Y joint axis and identical 0.045 m proxy radius; runtime axis audit must confirm before execution"
+  },
+  "retained_v4_contract": {
+    "physics_dt_s": 0.002,
+    "policy_dt_s": 0.05,
+    "decimation": 25,
+    "solver_cone": "elliptic",
+    "solver_impratio": 1.0,
+    "shape_mu": 0.8,
+    "shape_kf": 1000.0,
+    "seed": 90231,
+    "settle_s": 1.0,
+    "drive_s": 8.0,
+    "action": [0.1, -0.1, 0.0, 0.0],
+    "P_gain": 0.04,
+    "side_integral_gain": 0.1,
+    "wheel_actuator_count": 14,
+    "actuator_effort_cap_nm_per_wheel": 2.0,
+    "joint_effort_cap_nm_per_wheel": 2.0,
+    "actuator_note": "Retain all original per-wheel PI actuators and caps for this mechanism-only diagnostic. This is not a single-motor-per-side physical drivetrain model."
+  },
+  "comparison_contract": {
+    "mechanism_treatment_is_explicit_full_contract_field": true,
+    "mechanism_treatment_is_explicit_fixed_contract_field": true,
+    "baseline_pairing": "Do not claim same-physical-contract equivalence to v4: the new mimic treatment changes the constraint graph.",
+    "source_usd_hash": "Expected unchanged and recorded by the v4-derived summary; builder adds constraints after USD import."
+  },
+  "reset": {
+    "v4_reset_joint_position_rad": 0.0,
+    "v4_reset_joint_velocity_rad_s": 0.0,
+    "compatibility": "Zero position offset and zero velocity satisfy all same-side mimic equations. Any nonzero reset must satisfy q_f=coef0+coef1*q_m and qd_f=coef1*qd_m."
+  },
+  "sampling": {
+    "final_solver_audit": "Count Newton mimic rows and host MuJoCo/MJWarp equality rows/types before reset or motion; require all 12 follower/master pairs to appear once as mjEQ_JOINT.",
+    "runtime_q_qd": "After each policy env.step, read Newton state_0 joint_q/joint_qd and record leader/follower values plus q and qd residuals.",
+    "not_collected_by_new_hook": ["body velocity", "external force"]
+  },
+  "attempt_history": [
+    {
+      "attempt": 1,
+      "actual_exit_code": 1,
+      "failure_stage": "The patched v4 main function retained its copied default OUT_ROOT and rejected the new output directory before IsaacFieldEnv construction.",
+      "motion_started": false,
+      "evidence": "contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic.log and .exit.json"
+    },
+    {
+      "attempt": 2,
+      "actual_exit_code": 1,
+      "failure_stage": "Pre-motion final-model audit saw all 12 mimic constraints and mjEQ_JOINT rows, but compared unprefixed basenames against MuJoCo's sanitized _World_envs_env_0_Robot_ joint names.",
+      "motion_started": false,
+      "evidence": "contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic__attempt2.log and .exit.json"
+    },
+    {
+      "attempt": 3,
+      "actual_exit_code": 1,
+      "failure_stage": "Runtime q/qd reader rejected joint-coordinate start arrays longer than joint_label; the frozen v4 helper intentionally slices starts to the label count. Failure occurred after the first 0.05 s zero-action settle step and before any drive action.",
+      "motion_started": false,
+      "evidence": "contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic__attempt3.log and .exit.json"
+    }
+  ],
+  "execution_gate": "Parent authorized exactly one 2 ms, elliptic/impratio 1, mu 0.8, kf 1000 same-action case after CPU hook/API checks. Retry only the same case with the coordinate-start slicing aligned to v4; do not run additional physics combinations."
+}

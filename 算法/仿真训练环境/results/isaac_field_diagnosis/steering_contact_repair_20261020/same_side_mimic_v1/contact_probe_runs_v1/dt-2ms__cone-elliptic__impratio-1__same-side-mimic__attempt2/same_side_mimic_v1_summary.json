@@ -1,0 +1,160 @@
+{
+  "schema": "isaac-field-same-side-mimic-v1",
+  "mechanism_treatment": "same_side_wheel0_master_6_mimic_followers_each_side_coef0_0_coef1_1; all_original_14_per_wheel_PI_actuators_and_2Nm_caps_retained",
+  "status": "failed",
+  "physics_dt_s": 0.002,
+  "decimation": 25,
+  "solver_treatment": {
+    "cone": "elliptic",
+    "impratio": 1.0
+  },
+  "comparison_note": "Compare only with an external baseline whose full canonical initial-state hash and fixed physics contract match; no automatic dt-only pairing is performed.",
+  "policy_dt_s": 0.05,
+  "policy_dt_product_s": 0.05,
+  "seed": 90231,
+  "start_xy_yaw": [
+    50.0,
+    50.0,
+    0.0
+  ],
+  "goal_xy": [
+    90.0,
+    50.0
+  ],
+  "settle_s": 1.0,
+  "drive_s": 8.0,
+  "action": [
+    0.1,
+    -0.1,
+    0.0,
+    0.0
+  ],
+  "contact_source": "Newton collision pipeline (use_mujoco_contacts=False)",
+  "output_paths": {
+    "policy_samples": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/same_side_mimic_v1/contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic__attempt2/policy_step_contact_samples.jsonl",
+    "native_physics_samples": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/same_side_mimic_v1/contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic__attempt2/physics_step_native_qd_effort.jsonl",
+    "mjwarp_contact_parameter_snapshots": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/same_side_mimic_v1/contact_probe_runs_v1/dt-2ms__cone-elliptic__impratio-1__same-side-mimic__attempt2/mjwarp_contact_parameter_snapshots.jsonl"
+  },
+  "contact_capture_plan": {
+    "policy_steps": {
+      "settle_end": 20,
+      "drive_2s": 60,
+      "drive_4s": 100,
+      "drive_8s": 180
+    },
+    "source": "solver.mjw_data.nacon and solver.mjw_data.contact fields read on CPU after env.step completes",
+    "valid_slice": "Only contact arrays [:nacon] are serialized; padded MJWarp capacity is excluded.",
+    "refsafe": "No model option is modified; host and MJWarp disableflags are recorded when available."
+  },
+  "training_source_sha256": {
+    "external/llm-viz/LICENSE": "97780c03931db18c9770a3932a264182d3d3603d142a72cba8033c94786e0f93",
+    "external/llm-viz/src/llm/Sidebar.module.scss": "8ae013ffce4f5a4a411c248240cecbf97e733c00d689c2c0c93b7523a8c91e15",
+    "external/llm-viz/src/llm/Sidebar.tsx": "535e34d3f73ec1373da20e651bcc66b2e5dcfb3b6e2937265443f8a86dc7cf4e",
+    "external/llm-viz/src/llm/components/TocDiagram.module.scss": "9e8bb281e6eb9480c8102c4ee987ea29fb4ae31f02e48629af0e99eb158d203e",
+    "external/llm-viz/src/llm/components/TocDiagram.tsx": "5577a1948d6a107cc9179879760fd37eb1e934611c91182269f7a08b4336604e",
+    "external/llm-viz/src/utils/bezier.ts": "cccab942a1d7e1933ff14f8e93e558417e5d484b4b151e30dc4a3e5b2ab3737f",
+    "isaac_field/__init__.py": "fa5d679eaafe1d5e4f4be39c62971aa65b7086ed5ce473de5fad3eeec748e08c",
+    "isaac_field/__main__.py": "952c1b3dbd5a15fa3fd871cd4822c817242d0977f9a12a4f130384907e0f5641",
+    "isaac_field/action_contract.py": "5e3e2207301d5d7407e640d8f16e1847ccfee3dbdf4df401a77af7697dab9b91",
+    "isaac_field/adversarial_training.py": "127cd8ebb8b71b6385aaf5a902a0f23106f311fad58edb81d1e80278e168408f",
+    "isaac_field/adversary.py": "a37c5d5b29308e1905fe947f7c72051ab5b4bcec133890a93653404816ba135d",
+    "isaac_field/assets.py": "274bef8b1d0e58036ed3809046045cfd5197d0178e62bd4a3a76451a84f254f0",
+    "isaac_field/drive_control.py": "245e1afb80a229fd651b7fcb9acbf755b2188d5e5f83fe0e7aa50e98939b33eb",
+    "isaac_field/env.py": "a145a6aff4a9eacaa8a198251e29e84f04946c7f4859e4177f49311036854c53",
+    "isaac_field/feedback.py": "25216fb7dcb3e7cee2a66c8e6e8cba08c656cde0cccb02712242684f4dbdd88f",
+    "isaac_field/layouts.py": "d1119c485432df397fa7c62d90b12a6ac230db95c8a404ad9dc826ab7bc0b2fc",
+    "isaac_field/learning.py": "fc8b10c4a07f2082cf7e3ee7341527e12a6a74318d2df1b2e67bfea366a08ad7",
+    "isaac_field/navigation.py": "946403a2884756dd9408561a82eb84f6aeca977b328e8400f133b0dd511470d8",
+    "isaac_field/policy.py": "23c3bd2046449318d7a72f9697010f5ad4f533e397186c4750ae31aff21493f5",
+    "isaac_field/scene_assets.py": "3b06c408fc9fde114e2fba1ab933cbc2ccd8f76a9454d9cd8785ca31117698c7",
+    "isaac_field/task.py": "09caf163a51c835a38adbd64661a7f5fdfcaae2aafab04fd313e068aed8ab8b2",
+    "isaac_field/tasks.py": "f3e2b2373d01281a74b91250c4e66767a6c7a48d43c69501a5e8daa186e167ce",
+    "isaac_field/telemetry.py": "7e613d172649d282640f70a092a423919b189f0829bdb76bd5c114f866b7402c",
+    "isaac_field/terrain.py": "78dea28ecd281a1730a71673fa1a31edc06e896d925c46a0fde4cab016785e71",
+    "isaac_field/training.py": "3e329372db08c6513730c21c972d1ed039f2026e8139f8d3964ecd2cbbd7b9dc",
+    "isaac_field/viewer.py": "d2e5c341551cfa61a7d02e4c44fa74327e814553b65f5eaa00fe82daa9ccfb12",
+    "isaac_field/visualization/THIRD_PARTY_NOTICES.md": "77d601bb1c3428f6ff6f3f5bc1d92d9c29784cb5da4a969f3b4588c86ecbd0c1",
+    "isaac_field/visualization/__init__.py": "dbcf4fea4fbe34c62a6f5fa3767f3f81b9d02db2a80c504defe31c920cc7b54b",
+    "isaac_field/visualization/activation_maps.py": "c88528885400711cb707d7215a8748ab59d4bcc2d4f4fc3f97d27a0cd439ba08",
+    "isaac_field/visualization/inspection.py": "3416f8aa84e2fa94116ad08ff1665f472ecd2eba37b32e7d4449a24a9519da0e",
+    "isaac_field/visualization/network_2d.html": "eac6fc0a399151cc05c1e0469d6ba2556468df6ff0e3479705b6a4f4d6f4bb67",
+    "isaac_field/visualization/network_2d.py": "c66d4fa41afc1818c0441753bd7febfffe7e01e8684f6a1c79ffa45170a81e0c",
+    "isaac_field/visualization/network_layout.py": "e95cea733099913c81827dccab6dab20877acca956d1c1a440f9ac49d601508b",
+    "isaac_field/visualization/network_panel.py": "8c1ab0ca79deafd1987e02dbf9101d61ab2f227056dcc8c30918fadb0b384933",
+    "pyproject.toml": "18491b1d8d1a0a93bfddc3663c1542c31744b11bb6df3ac1b5caa998be085d7b",
+    "scripts/compare_isaac_exploration.py": "481dfcc98cfe1c19787d781c633b333575bcfd4dceeaa22768aa7622232dfb33",
+    "scripts/improve_isaac_policy.py": "d05892b00da3583ca12d59076b388f15cec3916a4bc2f144abbc1894299151b8",
+    "scripts/install_isaaclab.sh": "445e206c21fb7c6cfc19b4f18da55e1a74238893528b3c503bb9e2b032aeca56",
+    "scripts/isaaclab_python.sh": "1bd069fd07fd5cac2cb4759c24bfdf43fab3741018020261261cb7890000b5fd",
+    "scripts/train_isaac_foundation.py": "2994f890b8897e64f29c1f51124a6b30357d546dd3c4979b1f6e39d871d66617",
+    "scripts/train_isaac_foundation_fresh.py": "291ad07dde39feddc85ab78924202418ada6910f692f3e3858fb9ba714994f8d"
+  },
+  "training_source_file_count": 41,
+  "training_protocol_sha256": "0a356055c2ff08e13133ebfe12c71e90c63612a8efce7ea0db8b1187aafd10b8",
+  "training_protocol": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/fresh_side_pi_20261020/protocol.json",
+  "diagnostic_source_sha256": {
+    "isaac_field/env.py": "a145a6aff4a9eacaa8a198251e29e84f04946c7f4859e4177f49311036854c53",
+    "isaac_field/assets.py": "274bef8b1d0e58036ed3809046045cfd5197d0178e62bd4a3a76451a84f254f0",
+    "isaac_field/task.py": "09caf163a51c835a38adbd64661a7f5fdfcaae2aafab04fd313e068aed8ab8b2",
+    "isaac_field/scene_assets.py": "3b06c408fc9fde114e2fba1ab933cbc2ccd8f76a9454d9cd8785ca31117698c7",
+    "isaac_field/terrain.py": "78dea28ecd281a1730a71673fa1a31edc06e896d925c46a0fde4cab016785e71",
+    "tests/test_env_integration.py": "9c0fc4ab6893c47b44bae538d56848e1595e9bd36d76c33e7ec04641a22a7afe",
+    "tests/newton_effort_capture.py": "b35b9172c452a29498c05cfb32f9cabbee2acc0bddb926c7b9aa536bc5e8e288",
+    "scripts/isaaclab_python.sh": "1bd069fd07fd5cac2cb4759c24bfdf43fab3741018020261261cb7890000b5fd",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py": "20cf0270ad6074ec031edf4ccb1fb6543b55bd0924b18917ed5d629665cc65c6",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/mjwarp_manager.py": "6ea6d24184b82395c08c8213d5de2c9b82abba94e0bbe6a3621542259ab83f3e",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/sensors/contact_sensor/contact_sensor.py": "32f04ed5516134d22407aec2dd826bb5cee854f2f2f46826ec620779a4b7540e",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/sensors/contact_sensor/contact_sensor_data.py": "6d0dd5b6cb822dea9db1b3d83b8ee6d969cf7f2f6efa518667786a38990128ea",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/sensors/contact_sensor/contact_sensor_kernels.py": "6dde230db156877699d64e1307a2741d0f88f57920f12653d5f53df836f6304a",
+    "external/IsaacLab/source/isaaclab/isaaclab/sensors/contact_sensor/contact_sensor_cfg.py": "5d5a9f0bbd2e7e7b35b36db5a5c93386ff3c4fbabb55486fd67d0cf5c766e10f",
+    "external/IsaacLab/source/isaaclab_newton/test/sensors/test_contact_sensor.py": "3a8b4b21389cc187ee731965d24c53df84198caadb008fffae0a49fc8136762a",
+    "external/IsaacLab/source/isaaclab_newton/test/physics/physics_test_utils.py": "1e7306d81ed44640473391f5736878c1a2dd793e51a4d124c8e46b555efa78f2",
+    "scripts/diagnose_isaac_ground_contact.py": "40960591c02765c5178b12eec43ce287170bbb6c85c9a68e4fa5ad266ee300a8",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/confirmation_protocol.json": "1236e551140423afd21749fd31a9431436fbf810d47f1331a83d36e0960fc8d0",
+    "results/isaac_field_diagnosis/side_pi_physics_gap_20261020/physics_gap_diagnosis.md": "a8648ea7e10d2efdeac6f30fde611cd515d68908ca6b81f15b1c101cf43e9a58",
+    "results/isaac_field_diagnosis/side_pi_physics_gap_20261020/contact_transfer_probe.py": "65df8df2d513b062059554fac170994d29023322ab26876da747c20265a2ed58",
+    "results/isaac_field_diagnosis/side_pi_physics_gap_20261020/inspect_newton_contact_api.py": "2c73f95226f8682e430ea28c5165feb16504b57733e3d50591481be19718a667",
+    "training_protocol_sha256": "0a356055c2ff08e13133ebfe12c71e90c63612a8efce7ea0db8b1187aafd10b8",
+    "training_source_file_count": "41",
+    "runtime_newton_contacts_source_sha256": "84d3ccff76e8c2c10706dff557459aab57474e73aad1a1ef8a429c36fe51fea1",
+    "runtime_newton_sensor_contact_source_sha256": "6ec9b973ed43cf96c6d6882b610f849a4627616dd2e60a586ace537d201fb803"
+  },
+  "v1_helper_sha256": "4e32bfe3c6643778e9c67f6fe055c1ce17d0b28c82c43baaceaef5842936d8f9",
+  "v4_helper_sha256": "f882506743cf129938fef49ccf662c9468e31ca0ebe645cd94d816e4ba76b989",
+  "v4_runner_sha256": "b88603f502ff89107025200d3f09e4679270ec8e7cfa51915a2aabf588d94e46",
+  "same_side_mimic_runner_sha256": "2a127d726667da5169ffac94cf166fe961862f2ee42a1730a19ce7bc32c7a5a7",
+  "same_side_mimic_hook_sha256": "05adc545ed5f98fa4ae3720b0e4cab7429f12681aa2f0df0ee6d09c6477b1e41",
+  "same_side_mimic_protocol_sha256": "0edad333490a90040d3dc8e0cccd19870d3a312a3e22786a89a5302a3dba445c",
+  "patched_v4_main_sha256": "1c1a8638c06824cab2a73b8e833d201ce2e11d135d1e0131fc390fed32deddae",
+  "installed_versions_record": {
+    "path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/installed_versions.json",
+    "sha256": "1aa52830830716098095b6a45a7ddf5381dae92deb6a447d642b6271494c3860",
+    "checked_at": "2026-10-20T10:00:35.663781+08:00",
+    "versions": {
+      "newton": "1.6.1",
+      "mujoco": "3.12.0",
+      "mujoco-warp": "3.12.0",
+      "warp-lang": "1.17.0"
+    },
+    "source_actual_exit_code": 0
+  },
+  "decision_protocol_sha256": "cf33f05e172f95b05f81c23d527525b9b1f435d426bcf33d4fb96abd93531339",
+  "installed_newton_contact_source_evidence": {
+    "solver_mujoco.py": {
+      "path": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py",
+      "sha256": "a2f2466ad9d35e32f6e87f12bbaa0e08d18295f4e95b1c059c805d2ff4091178",
+      "relevant_lines": "4643-4687: reads model.mujoco.solref_mode and converts Newton contacts into mjw_data.contact fields"
+    },
+    "kernels.py": {
+      "path": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/kernels.py",
+      "sha256": "bd770d39d20c208e980477e0186799f531364b03f16d76968ee69bacdc490a3d",
+      "relevant_lines": "637-648: maps mixed shape_material_kf, body_invweight0, solimp dmax, and impratio_invsqrt to per-contact solreffriction time constant"
+    },
+    "test_mujoco_solver.py": {
+      "path": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/tests/test_mujoco_solver.py",
+      "sha256": "d10d10af2692ca7fb480a3eeedb02f4ac638b66a32df37dcae50c7f46d2e56db",
+      "relevant_lines": "5073-5097: reads nacon and per-contact fields, independently states expected kf/impratio formula"
+    }
+  },
+  "error": "RuntimeError: host MuJoCo model has no unique mjEQ_JOINT for ('left_wheel_4_wheel_joint', 'left_wheel_0_wheel_joint'): [('_World_envs_env_0_Robot_left_wheel_1_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_left_wheel_2_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_left_wheel_3_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_left_wheel_4_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_left_wheel_5_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_left_wheel_6_wheel_joint', '_World_envs_env_0_Robot_left_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_1_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_2_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_3_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_4_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_5_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint'), ('_World_envs_env_0_Robot_right_wheel_6_wheel_joint', '_World_envs_env_0_Robot_right_wheel_0_wheel_joint')]"
+}

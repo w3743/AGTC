@@ -1,0 +1,615 @@
+{
+  "method": "four input-only conditions on five saved held-out pairs, common unscaled rectified 352x640 crop; native ONNX CPU inference with 4 threads",
+  "scope": "offline photometric direction screening only; no camera/calibration/LRC/range changes; no hole filling",
+  "calibration_id": "fc0ee7b44fe5",
+  "heldout_ids": [
+    "20240825T221611745554Z-6ba94b9b",
+    "20240825T221614900592Z-d973e0a1",
+    "20240825T221617815306Z-b1024a25",
+    "20240825T221620622446Z-de013c47",
+    "20240825T221623918473Z-946d97fc"
+  ],
+  "preprocessing": {
+    "original_gray": "gray replicated to RGB, ImageNet normalization",
+    "shared_percentile_1_99": "one pairwise 1st-99th percentile transfer shared by both images",
+    "pair_mean_std": "affine-match each image to the arithmetic mean of pair means and standard deviations",
+    "fixed_filters": "existing source remap masks and correspondence xright=round(xleft-disparity), reverse disparity sampled at xright within 1 px, 0.3-5 m; original local-texture filter is not added to LightStereo"
+  },
+  "common_board_error_definition": "Per capture and candidate, compare original and candidate on their pairwise intersection with PnP board pixels; the extra five_method_common_valid_board_points count uses .values() across all method validity masks. This is internal solvePnP plane consistency, not measured accuracy.",
+  "aggregate": {
+    "original_gray": {
+      "mean_checked_coverage": 0.47595170454545455,
+      "per_capture_checked_coverage": [
+        0.5672407670454546,
+        0.47131569602272727,
+        0.4474875710227273,
+        0.469970703125,
+        0.42374378551136366
+      ],
+      "mean_forward_ms": 79.99653999941074,
+      "mean_reverse_ms": 81.69813999993494
+    },
+    "shared_percentile_1_99": {
+      "mean_checked_coverage": 0.47916015624999997,
+      "per_capture_checked_coverage": [
+        0.5784579190340909,
+        0.48122780539772725,
+        0.4456143465909091,
+        0.47173295454545455,
+        0.4187677556818182
+      ],
+      "mean_forward_ms": 79.72474000052898,
+      "mean_reverse_ms": 82.9282200007583,
+      "median_of_capture_medians_common_board_abs_error_m": {
+        "original_gray": 0.003673851490020752,
+        "shared_percentile_1_99": 0.0037471652030944824,
+        "mean_pairwise_common_points": 3592.2,
+        "mean_five_method_common_points": 3586.0
+      }
+    },
+    "pair_mean_std": {
+      "mean_checked_coverage": 0.4723313210227273,
+      "per_capture_checked_coverage": [
+        0.5605069247159091,
+        0.4751331676136364,
+        0.4411709872159091,
+        0.46220259232954547,
+        0.4226429332386364
+      ],
+      "mean_forward_ms": 85.33236000002944,
+      "mean_reverse_ms": 83.07648000045447,
+      "median_of_capture_medians_common_board_abs_error_m": {
+        "original_gray": 0.003673851490020752,
+        "pair_mean_std": 0.0037556886672973633,
+        "mean_pairwise_common_points": 3597.4,
+        "mean_five_method_common_points": 3586.0
+      }
+    }
+  },
+  "captures": [
+    {
+      "id": "20240825T221611745554Z-6ba94b9b",
+      "methods": {
+        "original_gray": {
+          "checked_coverage": 0.5672407670454546,
+          "forward_ms": 84.08919999783393,
+          "reverse_ms": 83.28289999917615
+        },
+        "shared_percentile_1_99": {
+          "checked_coverage": 0.5784579190340909,
+          "forward_ms": 77.2915000015928,
+          "reverse_ms": 77.54600000043865,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3650,
+              "median_abs_error_m": 0.00263059139251709,
+              "p90_abs_error_m": 0.007080596871674061
+            },
+            "shared_percentile_1_99": {
+              "common_valid_board_points": 3650,
+              "median_abs_error_m": 0.0027403533458709717,
+              "p90_abs_error_m": 0.007602131459861994
+            },
+            "five_method_common_valid_board_points": 3650
+          }
+        },
+        "pair_mean_std": {
+          "checked_coverage": 0.5605069247159091,
+          "forward_ms": 78.6608000016713,
+          "reverse_ms": 76.00749999983236,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3677,
+              "median_abs_error_m": 0.0026221871376037598,
+              "p90_abs_error_m": 0.007076728157699108
+            },
+            "pair_mean_std": {
+              "common_valid_board_points": 3677,
+              "median_abs_error_m": 0.0025874972343444824,
+              "p90_abs_error_m": 0.006862151436507702
+            },
+            "five_method_common_valid_board_points": 3650
+          }
+        }
+      }
+    },
+    {
+      "id": "20240825T221614900592Z-d973e0a1",
+      "methods": {
+        "original_gray": {
+          "checked_coverage": 0.47131569602272727,
+          "forward_ms": 72.97400000243215,
+          "reverse_ms": 74.52410000041709
+        },
+        "shared_percentile_1_99": {
+          "checked_coverage": 0.48122780539772725,
+          "forward_ms": 73.53359999979148,
+          "reverse_ms": 72.84419999996317,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3252,
+              "median_abs_error_m": 0.003581911325454712,
+              "p90_abs_error_m": 0.009037047624588013
+            },
+            "shared_percentile_1_99": {
+              "common_valid_board_points": 3252,
+              "median_abs_error_m": 0.0037471652030944824,
+              "p90_abs_error_m": 0.009061271324753761
+            },
+            "five_method_common_valid_board_points": 3252
+          }
+        },
+        "pair_mean_std": {
+          "checked_coverage": 0.4751331676136364,
+          "forward_ms": 77.84479999827454,
+          "reverse_ms": 75.50780000019586,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3261,
+              "median_abs_error_m": 0.00358659029006958,
+              "p90_abs_error_m": 0.00905829668045044
+            },
+            "pair_mean_std": {
+              "common_valid_board_points": 3261,
+              "median_abs_error_m": 0.0037556886672973633,
+              "p90_abs_error_m": 0.009337007999420166
+            },
+            "five_method_common_valid_board_points": 3252
+          }
+        }
+      }
+    },
+    {
+      "id": "20240825T221617815306Z-b1024a25",
+      "methods": {
+        "original_gray": {
+          "checked_coverage": 0.4474875710227273,
+          "forward_ms": 74.25369999691611,
+          "reverse_ms": 80.6016999995336
+        },
+        "shared_percentile_1_99": {
+          "checked_coverage": 0.4456143465909091,
+          "forward_ms": 74.82320000053733,
+          "reverse_ms": 74.17660000282922,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3215,
+              "median_abs_error_m": 0.005028426647186279,
+              "p90_abs_error_m": 0.01373755931854248
+            },
+            "shared_percentile_1_99": {
+              "common_valid_board_points": 3215,
+              "median_abs_error_m": 0.00511544942855835,
+              "p90_abs_error_m": 0.014042520895600319
+            },
+            "five_method_common_valid_board_points": 3202
+          }
+        },
+        "pair_mean_std": {
+          "checked_coverage": 0.4411709872159091,
+          "forward_ms": 75.87260000218521,
+          "reverse_ms": 73.02619999973103,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3214,
+              "median_abs_error_m": 0.005028277635574341,
+              "p90_abs_error_m": 0.013697254471480846
+            },
+            "pair_mean_std": {
+              "common_valid_board_points": 3214,
+              "median_abs_error_m": 0.005106478929519653,
+              "p90_abs_error_m": 0.01366657018661499
+            },
+            "five_method_common_valid_board_points": 3202
+          }
+        }
+      }
+    },
+    {
+      "id": "20240825T221620622446Z-de013c47",
+      "methods": {
+        "original_gray": {
+          "checked_coverage": 0.469970703125,
+          "forward_ms": 74.74290000027395,
+          "reverse_ms": 74.45250000091619
+        },
+        "shared_percentile_1_99": {
+          "checked_coverage": 0.47173295454545455,
+          "forward_ms": 75.85710000057588,
+          "reverse_ms": 92.34070000093197,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3892,
+              "median_abs_error_m": 0.0070653557777404785,
+              "p90_abs_error_m": 0.014294463209807873
+            },
+            "shared_percentile_1_99": {
+              "common_valid_board_points": 3892,
+              "median_abs_error_m": 0.007012784481048584,
+              "p90_abs_error_m": 0.013978475704789162
+            },
+            "five_method_common_valid_board_points": 3891
+          }
+        },
+        "pair_mean_std": {
+          "checked_coverage": 0.46220259232954547,
+          "forward_ms": 107.66169999988051,
+          "reverse_ms": 89.9669000027643,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3891,
+              "median_abs_error_m": 0.007061660289764404,
+              "p90_abs_error_m": 0.014296293258666992
+            },
+            "pair_mean_std": {
+              "common_valid_board_points": 3891,
+              "median_abs_error_m": 0.0068642497062683105,
+              "p90_abs_error_m": 0.013745784759521484
+            },
+            "five_method_common_valid_board_points": 3891
+          }
+        }
+      }
+    },
+    {
+      "id": "20240825T221623918473Z-946d97fc",
+      "methods": {
+        "original_gray": {
+          "checked_coverage": 0.42374378551136366,
+          "forward_ms": 93.92289999959758,
+          "reverse_ms": 95.62949999963166
+        },
+        "shared_percentile_1_99": {
+          "checked_coverage": 0.4187677556818182,
+          "forward_ms": 97.11830000014743,
+          "reverse_ms": 97.7335999996285,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3952,
+              "median_abs_error_m": 0.003673851490020752,
+              "p90_abs_error_m": 0.010646152310073376
+            },
+            "shared_percentile_1_99": {
+              "common_valid_board_points": 3952,
+              "median_abs_error_m": 0.0036660730838775635,
+              "p90_abs_error_m": 0.010958081111311913
+            },
+            "five_method_common_valid_board_points": 3935
+          }
+        },
+        "pair_mean_std": {
+          "checked_coverage": 0.4226429332386364,
+          "forward_ms": 86.62189999813563,
+          "reverse_ms": 100.87399999974878,
+          "paired_common_board": {
+            "original_gray": {
+              "common_valid_board_points": 3944,
+              "median_abs_error_m": 0.003673851490020752,
+              "p90_abs_error_m": 0.010660326108336449
+            },
+            "pair_mean_std": {
+              "common_valid_board_points": 3944,
+              "median_abs_error_m": 0.0036916136741638184,
+              "p90_abs_error_m": 0.010658234357833862
+            },
+            "five_method_common_valid_board_points": 3935
+          }
+        }
+      }
+    }
+  ],
+  "heldout_rectified_sift_vertical_residual": [
+    {
+      "id": "20240825T221611745554Z-6ba94b9b",
+      "keypoints_left": 706,
+      "keypoints_right": 618,
+      "ratio_matches": 243,
+      "ransac_inliers": 203,
+      "fundamental_method": "USAC_MAGSAC",
+      "signed_dy_p50_p90_p95_px": [
+        0.260711669921875,
+        0.976898193359375,
+        1.0789321899414057
+      ],
+      "abs_dy_p50_p90_p95_px": [
+        0.318115234375,
+        1.007598876953125,
+        1.0997909545898432
+      ],
+      "linear_dy_xy_coefficients": [
+        -0.0007390672401938471,
+        1.4719861957071968e-06,
+        0.43309305883014876
+      ],
+      "linear_fit_abs_residual_p50_p90_p95_px": [
+        0.20845799424977368,
+        0.7959712356254288,
+        1.1147137501525004
+      ]
+    },
+    {
+      "id": "20240825T221614900592Z-d973e0a1",
+      "keypoints_left": 698,
+      "keypoints_right": 601,
+      "ratio_matches": 200,
+      "ransac_inliers": 175,
+      "fundamental_method": "USAC_MAGSAC",
+      "signed_dy_p50_p90_p95_px": [
+        -0.205841064453125,
+        0.2113159179687499,
+        0.5911773681640605
+      ],
+      "abs_dy_p50_p90_p95_px": [
+        0.2394256591796875,
+        0.9393859863281249,
+        1.1263641357421874
+      ],
+      "linear_dy_xy_coefficients": [
+        0.0015830834285050451,
+        4.8539370593615044e-06,
+        -0.4613600668160471
+      ],
+      "linear_fit_abs_residual_p50_p90_p95_px": [
+        0.14229596848221676,
+        0.8222638012512952,
+        1.1726671558526915
+      ]
+    },
+    {
+      "id": "20240825T221617815306Z-b1024a25",
+      "keypoints_left": 497,
+      "keypoints_right": 389,
+      "ratio_matches": 137,
+      "ransac_inliers": 108,
+      "fundamental_method": "USAC_MAGSAC",
+      "signed_dy_p50_p90_p95_px": [
+        -0.26568603515625,
+        -0.026603698730468806,
+        0.5446269512176476
+      ],
+      "abs_dy_p50_p90_p95_px": [
+        0.28478264808654785,
+        0.8880401611328121,
+        1.0838821411132806
+      ],
+      "linear_dy_xy_coefficients": [
+        -0.00021298036939250648,
+        0.0005906506716241855,
+        -0.37887391927119113
+      ],
+      "linear_fit_abs_residual_p50_p90_p95_px": [
+        0.1135038986858086,
+        0.800200526289869,
+        1.009143904345494
+      ]
+    },
+    {
+      "id": "20240825T221620622446Z-de013c47",
+      "keypoints_left": 482,
+      "keypoints_right": 397,
+      "ratio_matches": 130,
+      "ransac_inliers": 114,
+      "fundamental_method": "USAC_MAGSAC",
+      "signed_dy_p50_p90_p95_px": [
+        0.03864288330078125,
+        0.2581283569335938,
+        0.7425582885742171
+      ],
+      "abs_dy_p50_p90_p95_px": [
+        0.13091278076171875,
+        0.7537094116210942,
+        1.17325439453125
+      ],
+      "linear_dy_xy_coefficients": [
+        0.0024714760818064694,
+        0.0003642412389962737,
+        -0.5071996581104992
+      ],
+      "linear_fit_abs_residual_p50_p90_p95_px": [
+        0.11556745445013625,
+        0.6847839779968738,
+        1.1349970198336012
+      ]
+    },
+    {
+      "id": "20240825T221623918473Z-946d97fc",
+      "keypoints_left": 459,
+      "keypoints_right": 419,
+      "ratio_matches": 125,
+      "ransac_inliers": 113,
+      "fundamental_method": "USAC_MAGSAC",
+      "signed_dy_p50_p90_p95_px": [
+        0.0230255126953125,
+        0.19260253906249997,
+        0.4173919677734367
+      ],
+      "abs_dy_p50_p90_p95_px": [
+        0.104339599609375,
+        0.5980224609374996,
+        0.9717956542968745
+      ],
+      "linear_dy_xy_coefficients": [
+        0.0014765887089777314,
+        0.0007368841239342437,
+        -0.42898502192721655
+      ],
+      "linear_fit_abs_residual_p50_p90_p95_px": [
+        0.07518572984347971,
+        0.606853886028299,
+        0.8544514719098583
+      ]
+    }
+  ],
+  "preview_direction_check": {
+    "image": {
+      "file": "optimization-stereo.jpg",
+      "input_metadata": "optimization-input.json",
+      "source_size_wh": [
+        1920,
+        540
+      ],
+      "split_halves_wh": [
+        960,
+        540
+      ],
+      "processing": "split side-by-side JPEG; upscale each half to 3840x2160; existing fixed rectify; crop 4 px per side",
+      "is_original_sensor_frame": false,
+      "has_ground_truth": false,
+      "sift_rectified_vertical_residual": {
+        "keypoints_left": 602,
+        "keypoints_right": 621,
+        "ratio_matches": 143,
+        "ransac_inliers": 115,
+        "fundamental_method": "USAC_MAGSAC",
+        "signed_dy_p50_p90_p95_px": [
+          5.04254150390625,
+          6.289588165283203,
+          6.623437881469727
+        ],
+        "abs_dy_p50_p90_p95_px": [
+          5.04254150390625,
+          6.289588165283203,
+          6.623437881469727
+        ],
+        "linear_dy_xy_coefficients": [
+          7.626759186604521e-05,
+          -0.006245470808271522,
+          6.1306934059820115
+        ],
+        "linear_fit_abs_residual_p50_p90_p95_px": [
+          0.33527184369678054,
+          1.227088931918824,
+          1.5216982988677776
+        ]
+      }
+    },
+    "methods": {
+      "original_gray": {
+        "checked_coverage": 0.22927911931818182,
+        "forward_ms": 109.92360000091139,
+        "reverse_ms": 91.57599999889499
+      },
+      "shared_percentile_1_99": {
+        "checked_coverage": 0.21092862215909092,
+        "forward_ms": 102.43669999908889,
+        "reverse_ms": 89.30099999997765
+      },
+      "pair_mean_std": {
+        "checked_coverage": 0.22171519886363636,
+        "forward_ms": 117.30719999832218,
+        "reverse_ms": 94.08970000004047
+      },
+      "right_vertical_shift_diagnostic": {
+        "shift_y_px": 5,
+        "sign_basis": "dy = y_left - y_right; positive value moves right image down",
+        "checked_coverage": 0.47452503551136366,
+        "coverage_delta_percentage_points_vs_original_gray": 24.524591619318183,
+        "forward_ms": 103.57500000100117,
+        "reverse_ms": 85.35090000077616,
+        "sift_rectified_vertical_residual": {
+          "keypoints_left": 602,
+          "keypoints_right": 630,
+          "ratio_matches": 146,
+          "ransac_inliers": 117,
+          "fundamental_method": "USAC_MAGSAC",
+          "signed_dy_p50_p90_p95_px": [
+            0.04254150390625,
+            1.1377456665039067,
+            1.3499038696289059
+          ],
+          "abs_dy_p50_p90_p95_px": [
+            0.5232391357421875,
+            1.3573413848876956,
+            1.7558914184570311
+          ],
+          "linear_dy_xy_coefficients": [
+            -0.0008660269480615769,
+            -0.005041682233431561,
+            1.1456656516206616
+          ],
+          "linear_fit_abs_residual_p50_p90_p95_px": [
+            0.3710733101044752,
+            1.0850058491549766,
+            1.6159925400604565
+          ]
+        },
+        "mask_handling": "right rectification support mask translated with nearest-neighbor interpolation; out-of-frame pixels invalid; left mask unchanged",
+        "limits": "one interpolated JPEG preview only; diagnostic alignment probe, not an estimated calibration or deployment recommendation"
+      }
+    },
+    "warning": "The supplied JPEG halves were independently upscaled before rectification. This interpolated preview is not original sensor data, held-out data, or ground truth."
+  },
+  "preview_geometry_shift_finding": {
+    "interpretation": "USAC_MAGSAC retains 115/143 ratio-tested SIFT matches; held-out rectified median signed dy ranges -0.266 to +0.261 px, while the preview median is +5.043 px and its xy-linear-fit p90 absolute residual is 1.227 px. The preview offset is therefore coherent and unlike these held-out examples, rather than explained by scattered descriptor mismatches.",
+    "diagnostic_only_right_y_shift": {
+      "shift_y_px": 5,
+      "sign_basis": "dy = y_left - y_right; positive value moves right image down",
+      "checked_coverage": 0.47452503551136366,
+      "coverage_delta_percentage_points_vs_original_gray": 24.524591619318183,
+      "forward_ms": 103.57500000100117,
+      "reverse_ms": 85.35090000077616,
+      "sift_rectified_vertical_residual": {
+        "keypoints_left": 602,
+        "keypoints_right": 630,
+        "ratio_matches": 146,
+        "ransac_inliers": 117,
+        "fundamental_method": "USAC_MAGSAC",
+        "signed_dy_p50_p90_p95_px": [
+          0.04254150390625,
+          1.1377456665039067,
+          1.3499038696289059
+        ],
+        "abs_dy_p50_p90_p95_px": [
+          0.5232391357421875,
+          1.3573413848876956,
+          1.7558914184570311
+        ],
+        "linear_dy_xy_coefficients": [
+          -0.0008660269480615769,
+          -0.005041682233431561,
+          1.1456656516206616
+        ],
+        "linear_fit_abs_residual_p50_p90_p95_px": [
+          0.3710733101044752,
+          1.0850058491549766,
+          1.6159925400604565
+        ]
+      },
+      "mask_handling": "right rectification support mask translated with nearest-neighbor interpolation; out-of-frame pixels invalid; left mask unchanged",
+      "limits": "one interpolated JPEG preview only; diagnostic alignment probe, not an estimated calibration or deployment recommendation"
+    },
+    "deployment_effect": "No calibration, service, camera transform, or model input correction is authorized by this single interpolated preview; the photometric candidates remain unrecommended."
+  },
+  "screening_rule": ">=1.0 percentage point mean checked coverage gain, and candidate median-of-capture-medians common-board absolute error <= 110% of the paired baseline",
+  "recommendation": {
+    "decision": "do_not_recommend_deployment",
+    "candidate": "shared_percentile_1_99",
+    "reason": "no candidate met the coverage and common-board error screening rule"
+  },
+  "model": {
+    "file": "lightstereo_640_352.onnx",
+    "sha256": "b440019eec7f9ad9a1d23ef21e03ac0112349dd06a84da30460016ea4a9503d9",
+    "input": [
+      {
+        "name": "left_img",
+        "shape": [
+          1,
+          3,
+          640,
+          352
+        ],
+        "type": "tensor(float)"
+      },
+      {
+        "name": "right_img",
+        "shape": [
+          1,
+          3,
+          640,
+          352
+        ],
+        "type": "tensor(float)"
+      }
+    ]
+  }
+}

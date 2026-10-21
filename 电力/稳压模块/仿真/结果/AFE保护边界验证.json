@@ -1,0 +1,315 @@
+{
+  "status": "CONDITIONAL_DESIGN_CALCULATIONS_ONLY_NO_HARDWARE_RELEASE",
+  "source_sha256": "5ba3212ee54c8f27f0df0cad63c39d97cf121f47a7af025d1abd507c99ebf0bb",
+  "config_sha256": "07e3ef92478e83cda2298e7ef055541fbe86d605c52298789eb62cdf3b1a945c",
+  "all_checks_pass": true,
+  "checks": [
+    {
+      "name": "eight_real_channels_only",
+      "passed": true,
+      "expected_mask": "0x807f",
+      "channels": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        16
+      ]
+    },
+    {
+      "name": "no_fake_current_protection",
+      "passed": true
+    },
+    {
+      "name": "fast_digital_fault_output_mapping",
+      "passed": true
+    },
+    {
+      "name": "autonomous_output_logic_enabled",
+      "passed": true
+    },
+    {
+      "name": "no_charge_pump_no_internal_balancing",
+      "passed": true
+    },
+    {
+      "name": "healthy_high_logic",
+      "passed": true
+    },
+    {
+      "name": "drv_enable_high_level",
+      "passed": true,
+      "node_V_min": 2.241366166044065,
+      "drv_VIH_max_V": 2.2,
+      "assumed_and_VOH_min_V": 2.4,
+      "and_VDD_min_V": 3.0
+    },
+    {
+      "name": "fault_output_sink",
+      "passed": true,
+      "current_at_0p4V_A": 0.0048019207683073235,
+      "qualified_sink_A": 0.005
+    },
+    {
+      "name": "all_four_permissions_required",
+      "passed": true,
+      "rows": [
+        {
+          "charge_ok": false,
+          "discharge_ok": false,
+          "mcu_ok": false,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": false,
+          "mcu_ok": false,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": false,
+          "mcu_ok": true,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": false,
+          "mcu_ok": true,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": true,
+          "mcu_ok": false,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": true,
+          "mcu_ok": false,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": true,
+          "mcu_ok": true,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": false,
+          "discharge_ok": true,
+          "mcu_ok": true,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": false,
+          "mcu_ok": false,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": false,
+          "mcu_ok": false,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": false,
+          "mcu_ok": true,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": false,
+          "mcu_ok": true,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": true,
+          "mcu_ok": false,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": true,
+          "mcu_ok": false,
+          "total_ov_ok": true,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": true,
+          "mcu_ok": true,
+          "total_ov_ok": false,
+          "enabled": false
+        },
+        {
+          "charge_ok": true,
+          "discharge_ok": true,
+          "mcu_ok": true,
+          "total_ov_ok": true,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "mcu_off_analog_pins",
+      "passed": true,
+      "voltage_bound_V": 0.09494,
+      "assumed_full_temperature_Ipoff_A": 2e-06
+    },
+    {
+      "name": "tmux_off_signal_range",
+      "passed": true,
+      "raw_bus_at_80V_V": 2.5806451612903225,
+      "raw_sc_at_21p6V_V": 2.7692307692307696,
+      "raw_imon_at_drv_absolute_6V_V": 3.0,
+      "warning": "Absolute maximum is only a containment check, never an operating permission."
+    },
+    {
+      "name": "preregulator_static_load_budget",
+      "passed": true,
+      "available_A": 0.006534653465346534,
+      "allocation_A": 0.006,
+      "min_stack_V": 13.6,
+      "diode_drop_assumption_V": 1.0,
+      "max_prereg_output_V": 5.8,
+      "transistor_headroom_allocation_V": 0.2
+    },
+    {
+      "name": "soft_uv_stops_before_operating_floor",
+      "passed": true,
+      "true_voltage_lower_bound_V": 1.707857142857143,
+      "floor_V": 1.7
+    },
+    {
+      "name": "soft_ov_within_cell_rating",
+      "passed": true,
+      "true_voltage_upper_bound_V": 2.532142857142857,
+      "rating_V": 2.7
+    },
+    {
+      "name": "hard_ov_backstop_conditional",
+      "passed": true,
+      "voltage_upper_bound_V": 2.6110285714285713,
+      "response_budget_s": 0.15,
+      "note": "Response time budget requires fault injection; not a manufacturer timing guarantee."
+    },
+    {
+      "name": "hard_uv_avoids_reversal_conditional",
+      "passed": true,
+      "voltage_lower_bound_V": 1.4675714285714287,
+      "note": "Emergency threshold permits loss of normal voltage window; it does not prove sustained power."
+    },
+    {
+      "name": "800W_one_second_both_directions_conditional",
+      "passed": true,
+      "idle_target_V": 17.45,
+      "measurement_allocation_V": 0.025,
+      "true_imbalance_allocation_V": 0.025
+    },
+    {
+      "name": "do_not_claim_fixed_1kW_both_directions",
+      "passed": true
+    }
+  ],
+  "analog_transfer_functions": {
+    "bus_volts_per_adc_volt": 37.38594680851064,
+    "sc_total_volts_per_adc_volt": 9.247555319148935,
+    "csa_volts_per_adc_volt": 2.2129574468085105,
+    "imon_nominal_zero_V": 0.7456085531059813,
+    "imon_nominal_V_per_A": 0.004518839715793826,
+    "imon_adc_12bit_step_A": 0.1782900286735372,
+    "imon_filter_approx_tau_s": 5e-07
+  },
+  "energy_rows": [
+    {
+      "power_W": 800.0,
+      "support": {
+        "quadratic_solution_exists": true,
+        "initial_internal_V": 17.349999999999998,
+        "end_internal_V": 16.496912138454437,
+        "minimum_terminal_V": 14.389151358612814,
+        "maximum_terminal_V": 15.377740940175972,
+        "maximum_average_port_current_A": 61.774934930879915,
+        "resistive_loss_J": 121.71730556804356,
+        "stored_energy_change_J": -1010.6036463640098,
+        "energy_balance_residual_J": 0.002548092922666001,
+        "estimated_inductor_peak_A": 69.64993493087991,
+        "adverse_measured_cell_V": 1.748643919826602,
+        "conditional_screen_pass": true
+      },
+      "absorb": {
+        "quadratic_solution_exists": true,
+        "initial_internal_V": 17.55,
+        "end_internal_V": 18.08837555105925,
+        "minimum_terminal_V": 18.853046685742232,
+        "maximum_terminal_V": 19.357467201543425,
+        "maximum_average_port_current_A": 38.19011388459064,
+        "resistive_loss_J": 48.46196186229675,
+        "stored_energy_change_J": 671.5390526655322,
+        "energy_balance_residual_J": 0.001014527828942846,
+        "estimated_inductor_peak_A": 46.06511388459064,
+        "adverse_measured_cell_V": 2.469683400192928,
+        "conditional_screen_pass": true
+      }
+    },
+    {
+      "power_W": 1000.0,
+      "support": {
+        "quadratic_solution_exists": true,
+        "initial_internal_V": 17.349999999999998,
+        "end_internal_V": 16.223866017289165,
+        "minimum_terminal_V": 13.39325348989039,
+        "maximum_terminal_V": 14.786015782084748,
+        "maximum_average_port_current_A": 82.96050783700983,
+        "resistive_loss_J": 212.19683198365237,
+        "stored_energy_change_J": -1323.3035008567404,
+        "energy_balance_residual_J": 0.004442238023102618,
+        "estimated_inductor_peak_A": 90.83550783700983,
+        "adverse_measured_cell_V": 1.6241566862362988,
+        "conditional_screen_pass": false
+      },
+      "absorb": {
+        "quadratic_solution_exists": true,
+        "initial_internal_V": 17.55,
+        "end_internal_V": 18.21074383504288,
+        "minimum_terminal_V": 19.153276591033794,
+        "maximum_terminal_V": 19.76444306637808,
+        "maximum_average_port_current_A": 46.98934909243237,
+        "resistive_loss_J": 72.99734226967732,
+        "stored_energy_change_J": 827.004185894329,
+        "energy_balance_residual_J": 0.0015281640063449231,
+        "estimated_inductor_peak_A": 54.86434909243237,
+        "adverse_measured_cell_V": 2.52055538329726,
+        "conditional_screen_pass": false
+      }
+    }
+  ],
+  "residuals": [
+    "Native netlist and actual selected component bindings require independent verification.",
+    "The 25mV measurement, 25mV group imbalance, 50ms/150ms response allocations require hardware tests.",
+    "80A peak screen is not a qualified hard current clamp. Calibrate CSA and validate COMP/TIM1 propagation.",
+    "High/low power MOS short and fuse clearing/energy isolation are separate unresolved fault cases.",
+    "No zero-volt autonomous recovery is implemented. Commissioning charging remains controlled."
+  ]
+}

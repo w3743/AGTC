@@ -1,0 +1,399 @@
+{
+  "recordType": "conditional_engineering_verification",
+  "status": "纸面计算与受限模型已更新；输入旁路、启动、热、CTRL故障与回灌仍待闭合；非正式工程验收",
+  "createdLocalDate": "2026-10-15",
+  "purpose": "响应已保存的5V模块、最小负载、开关状态及重复下拉精简实现，核对正式连接源并更新计算/受限模型；不修改正式工程或BOM",
+  "implementedConfiguration": {
+    "moduleMpn": "URB4805YMD-10WR3",
+    "commonLibraryCadComponent": "C5365326",
+    "commonLibraryUuid": "bd9ce49027fc4c83a722f82268af98d2",
+    "switchPinMap": {
+      "1": null,
+      "2": "PRE_CTRL_3V3",
+      "3": "REG1",
+      "4": "B0",
+      "5": "CTRL_MODULE",
+      "6": null
+    },
+    "loadBankMpn": "RC0603FR-07510RL",
+    "loadBankQty": 7,
+    "loadBankRefs": [
+      "R_PSU_MINLOAD1",
+      "R_PSU_MINLOAD2",
+      "R_PSU_MINLOAD3",
+      "R_PSU_MINLOAD4",
+      "R_PSU_MINLOAD5",
+      "R_PSU_MINLOAD6",
+      "R_PSU_MINLOAD7"
+    ],
+    "switchPurchaseQuantity": 1
+  },
+  "verifiedImplementationDelta": {
+    "removeRefs": [
+      "C_PSU_BOOT",
+      "C_PSU_FF",
+      "R_PSU_FB_TOP",
+      "R_PSU_FB_BOT",
+      "L_PSU",
+      "D_PSU",
+      "R_PSU_EN",
+      "R_IF_RUN_PD"
+    ],
+    "replaceInPlace": {
+      "ref": "U_PSU",
+      "from_mpn": "SCT2A26STER",
+      "to_mpn": "URB4805YMD-10WR3",
+      "to_ref": "PSU5_EXT"
+    },
+    "addComponents": [
+      {
+        "refs": [
+          "R_PSU_MINLOAD1",
+          "R_PSU_MINLOAD2",
+          "R_PSU_MINLOAD3",
+          "R_PSU_MINLOAD4",
+          "R_PSU_MINLOAD5",
+          "R_PSU_MINLOAD6",
+          "R_PSU_MINLOAD7"
+        ],
+        "quantity": 7,
+        "mpn": "RC0603FR-07510RL",
+        "each": "510Ω ±1%, 100ppm/°C, 0603, 100mW",
+        "pins": {
+          "1": "VOUT_5V",
+          "2": "B0"
+        }
+      }
+    ],
+    "retainRefs": [
+      "C_PSU_IN1",
+      "C_PSU_IN2",
+      "C_PSU_IN3",
+      "C_PSU_OUT1",
+      "C_PSU_OUT2",
+      "C_CAN_PWR_IN1",
+      "C_FAN_IN1",
+      "R_PRE_CTRL_PD",
+      "U_POR"
+    ],
+    "netRename": {
+      "from": "SW_RUN",
+      "to": "PRE_CTRL_3V3"
+    },
+    "removeDuplicatePulldown": "R_IF_RUN_PD",
+    "keepPulldown": "R_PRE_CTRL_PD",
+    "preservePor": "U_POR",
+    "perPinModuleMap": {
+      "1": "B0 (-Vin)",
+      "2": "CELL_B9 (+Vin)",
+      "3": "VOUT_5V (+Vo)",
+      "4": "NC (NP)",
+      "5": "B0 (module output GND; intentionally commoned with input return)",
+      "6": "CTRL_MODULE"
+    },
+    "currentSourceContainsImplementation": true,
+    "currentSourceWasModifiedByThisVerifier": false
+  },
+  "scopeCounts": {
+    "procurement_bom_scope": {
+      "rows_observed_in_current_bom": 261,
+      "per_set_quantity_observed_in_current_bom": 284,
+      "raw_mpn_text_variants_observed_in_current_bom": 77,
+      "normalized_mpn_types_including_core_board_from_bound_count_evidence": 76,
+      "normalized_selected_mpn_types_excluding_core_board_from_bound_count_evidence": 75,
+      "count_evidence_sha256": "413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc",
+      "bom_sha256": "2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2",
+      "scope": "当前全采购BOM含板外风扇、配套、插头和线束；与PCB实装统计分开。规范化料号数来自与此BOM SHA绑定的当前计数证据；不从电源局部变化推导全板数量。"
+    }
+  },
+  "modelFile": "BMS模块/仿真/结果/HLK_implementation_model.json",
+  "openAcceptanceItems": [
+    "厂家明确不支持热插拔；落实避免模块输入直接带电插拔的连接与上电约束，不能凭RC或功率计算认定热插拔可用。",
+    "在18–75V输入范围、实际电池22.5–37.8V及最大浪涌下验证模块输入端纹波、超调和与现有PI输入网络的稳定性；特别确认72.7V纸面TVS钳位边界有足够瞬态裕量。",
+    "向海凌科澄清V1.7典型启动时间第1页10ms与第2页1ms不一致、低线和容性负载条件；实测最大输出爬升/跌落及风扇启动同时发生时的电流/欠压。",
+    "验证现有9.5uF输入陶瓷的37.8V偏压后有效容量；必要时按原厂答复与可复用共用库补足100V输入电容，不把典型47–100uF参考当作硬下限。",
+    "首板验证7×510Ω最低负载在输出精度、温度和有效阻值角落；逐颗温升、焊盘温度、输出纹波、空载/轻载行为。",
+    "验证模块CTRL的内部上拉/灌电流、触点允许电流、开关接点弹跳与方向；断线/接触故障是否导致5V意外开启；核对U_GATE1掉电时B/C输入灌电、Y输出状态与反向供电路径。",
+    "确认REG1/BREG失电时RUN档5V仍可能开启是否符合系统策略；确认外部MCU GPIO、通信口和其他电源的反向供电路径。",
+    "用首板和真实外壳在0–60°C、最大负载、风扇失效/受限气流测壳温；手册热曲线仅用于纸面功率边界，不是具体板级热验收。",
+    "确认输出陶瓷在5V偏压/温度下的有效总电容；CTRL关断后以示波器确认7×510Ω实测放电轨迹和其他负载影响。"
+  ],
+  "sourceHashes": [
+    {
+      "path": "BMS模块/项目要求.md",
+      "sha256": "c6198cd62d7710fdd6cd9f280c82ea8668b527c2b23a96eb50182bc04a3f6b22",
+      "bytes": 13925
+    },
+    {
+      "path": "BMS模块/检查/最大料号归并候选.json",
+      "sha256": "7326b21ed30b2084f3be636a4e2716135133e2dc635b51be2ea4dd42884e9b21",
+      "bytes": 4365
+    },
+    {
+      "path": "BMS模块/检查/URB4805替换候选.json",
+      "sha256": "b2b9b39e5df9d9daf514518bef1109c8024e8ba8866f0a757b5cdbf5d8cbe8ee",
+      "bytes": 8557
+    },
+    {
+      "path": "BMS模块/检查/5V电源预算.md",
+      "sha256": "5758d6f43e4bd74dfc0dc8ba6de6c31d4b491bb421e2bed4cc4e10cb392f0250",
+      "bytes": 6264
+    },
+    {
+      "path": "BMS模块/检查/风扇调速支持审查.json",
+      "sha256": "b7a651e82665500f8362a61cd852d402b5a4b1c58cee33680b9ce601bca799bc",
+      "bytes": 15379
+    },
+    {
+      "path": "BMS模块/原理图准备/接口元件连接.json",
+      "sha256": "ca5caf9237f966db1de3d7c219a4046bc9870286ab9ad08c13b02fd67f7d96d3",
+      "bytes": 33585
+    },
+    {
+      "path": "BMS模块/原理图准备/功率元件连接.json",
+      "sha256": "fa04dd717fe733251c5b1d919089118fe745b6eab28aacf17163ff5c871f81be",
+      "bytes": 31832
+    },
+    {
+      "path": "BMS模块/原理图准备/风扇元件连接.json",
+      "sha256": "b30b7b38323455d81a960c432477d1fe8e59704e1db963bca84033e81aa5472a",
+      "bytes": 9240
+    },
+    {
+      "path": "BMS模块/原理图准备/AFE元件连接.json",
+      "sha256": "874fba89731a5312d594a114a13cc2f2e8a2b48fb9926860502aaed00271a991",
+      "bytes": 94119
+    },
+    {
+      "path": "BMS模块/原理图准备/BOM.csv",
+      "sha256": "2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2",
+      "bytes": 161112
+    },
+    {
+      "path": "BMS模块/检查/当前BOM计数证据.json",
+      "sha256": "413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc",
+      "bytes": 14715
+    },
+    {
+      "path": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+      "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d",
+      "bytes": 1490874
+    },
+    {
+      "path": "元件封装库/资产索引.json",
+      "sha256": "516db47a2d0a0f91fa6a7b50b6b4d44ca6d7b3c3f0b67e9a76012a7e54fd672a",
+      "bytes": 837094
+    }
+  ],
+  "checks": [
+    {
+      "item": "海凌科官方V1.7资料哈希",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf SHA256=1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d; compared with the cached official-PDF digest"
+    },
+    {
+      "item": "实现前连接源归档哈希",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "BMS模块/归档/历史与调试.zip!20261015_141128_电源调速精简过程/检查/tmp/source_before_implementation.zip SHA256=2995779953965e11a21cfa504db869e76dd66b49f271da9d053086dbce88c9a1"
+    },
+    {
+      "item": "归档基线DPDT针图与原始记录一致",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline SW_RUN_STORE pins={'1': None, '2': 'SW_RUN', '3': 'REG1', '4': None, '5': 'PRE_CTRL_3V3', '6': 'REG1'}"
+    },
+    {
+      "item": "当前DPDT正式连接源符合冻结针图",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "SW_RUN_STORE current pins={'1': None, '2': 'PRE_CTRL_3V3', '3': 'REG1', '4': 'B0', '5': 'CTRL_MODULE', '6': None}"
+    },
+    {
+      "item": "归档基线含原SCT2A26STER且正式源已更换为海凌科模块",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline U_PSU=SCT2A26STER; current PSU5_EXT=URB4805YMD-10WR3, libUuid=bd9ce49027fc4c83a722f82268af98d2, pins={'1': 'B0', '2': 'CELL_B9', '3': 'VOUT_5V', '5': 'B0', '6': 'CTRL_MODULE'}"
+    },
+    {
+      "item": "归档基线两只控制下拉合并后同值同地且正式源保留一只",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline R_IF_RUN_PD={'1': 'SW_RUN', '2': 'B0'}; baseline R_PRE_CTRL_PD={'1': 'PRE_CTRL_3V3', '2': 'B0'}; current R_PRE_CTRL_PD={'1': 'PRE_CTRL_3V3', '2': 'B0'}; duplicate absent=True"
+    },
+    {
+      "item": "U_GATE1合并后pin1与VCC同接PRE_CTRL_3V3",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "U_GATE1 A(pin1)=PRE_CTRL_3V3, VCC(pin5)=PRE_CTRL_3V3; RUN时为高，STORE掉电输入注入与Y状态仍待验证"
+    },
+    {
+      "item": "正式源已移除舊位号：C_PSU_BOOT",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：C_PSU_FF",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_FB_TOP",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_FB_BOT",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：L_PSU",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：D_PSU",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_EN",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_IF_RUN_PD",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源含7只准确MPN和并联网络的最低负载",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "refs=['R_PSU_MINLOAD1', 'R_PSU_MINLOAD2', 'R_PSU_MINLOAD3', 'R_PSU_MINLOAD4', 'R_PSU_MINLOAD5', 'R_PSU_MINLOAD6', 'R_PSU_MINLOAD7']; all_match=True; source quantities=7"
+    },
+    {
+      "item": "保留输入电容仍跨CELL_B9/B0",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "C_PSU_IN1,C_PSU_IN2,C_PSU_IN3"
+    },
+    {
+      "item": "保留输出电容仍跨VOUT_5V/B0",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "C_PSU_OUT1,C_PSU_OUT2,C_CAN_PWR_IN1,C_FAN_IN1"
+    },
+    {
+      "item": "BREG/REGIN/REG1链与5V模块输入分开",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "U1 BREG/REGIN/REG1 pins=[(37, 'BREG'), (36, 'REGIN'), (35, 'REG1')]; Q_BREG={'1': 'BREG', '2': 'BREG_COLLECTOR', '3': 'REGIN'}"
+    },
+    {
+      "item": "510Ω精确MPN可在项目共用库索引命中",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "current DEVICE assets=3; current common-library-backed asset=True"
+    },
+    {
+      "item": "510Ω复用MPN已出现在现行采购BOM",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "R_LOAD_POWER_VALID_LED MPN=RC0603FR-07510RL"
+    },
+    {
+      "item": "7×510Ω并联在官方输出精度下限仍超过3%最低负载",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "Imin=66.357mA, requirement=60.000mA"
+    },
+    {
+      "item": "纸面输出功率及温度曲线读图边界",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "候选风扇铭牌最大支路3.533088W；旧风扇限流压力7.733088W；V1.7曲线60°C读图100%功率；仅算术/读图，不代表板级热验收"
+    },
+    {
+      "item": "188uF输出标称容量低于2200uF上限",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "nominal=188.0uF; datasheet max=2200.0uF"
+    },
+    {
+      "item": "采购BOM同步到正式模块/删除/最低负载位号",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "current BOM SHA256=2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2; target module rows=1; removed refs still present=[]; missing added refs=[]; all added row MPN/qty correct=True"
+    },
+    {
+      "item": "当前全采购BOM计数证据与BOM哈希一致",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "BOM SHA256=2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2; evidence SHA256=413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc; rows=261; qty=284; raw MPN variants=77; normalized MPN types incl. core board=76; selected excluding core board=75; evidence bound and local module implementation=True"
+    },
+    {
+      "item": "9.5uF输入旁路可满足模块动态条件",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "手册page 6 C1=47–100uF为测试电路参考；现有输入仅9.5uF标称且高压陶瓷有效值未核，动态阻抗/PI稳定性未仿真。"
+    },
+    {
+      "item": "模块启动时间足以保证并发负载",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "V1.7第1页典型10ms与第2页典型1ms矛盾，均无最大值；低线、实际电容、风扇启动场景未建模。"
+    },
+    {
+      "item": "CTRL关断与失电安全已通过硬件验证",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "CTRL开路即开；STORE触点/引线故障可使模块开启；REG1丢失时RUN档CTRL仍开路；U_GATE1掉电时B/C输入注入及Y输出状态未验证；尚无硬件样板。"
+    },
+    {
+      "item": "模块温升和效率边界已验收",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "效率81%仅在48V额定阻性负载/25°C条件；22.5V外推损耗约1.8W，实际效率、外壳热阻、舱体气流与风扇失效未测。"
+    },
+    {
+      "item": "5V/REG1跨域回灌已经排除",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "无规划直接连接，但跨域GPIO/外部供电与IC保护结构没有闭合；本轮未声称无回灌。"
+    }
+  ],
+  "summary": {
+    "pass_count": 26,
+    "fail_count": 0,
+    "open_count": 5,
+    "model_or_hardware_acceptance": false,
+    "ngspice_available": false,
+    "ngspice_binary_path": null,
+    "formal_native_source_current_implementation_verified": true,
+    "procurement_bom_current_implementation_verified": true
+  },
+  "currentLayoutOverride": {
+    "status": "正式212件/51种；旧SGM相关字段仅历史",
+    "currentReport": "本轮落实与验证.md",
+    "currentFanEvidence": "风扇直供验证.md",
+    "removedRefs": [
+      "U_FAN_SW",
+      "R_FAN_ILIM",
+      "C_FAN_IN1",
+      "C_FAN_OUT1"
+    ],
+    "fanPowerNet": "VOUT_5V",
+    "date": "2026-10-15"
+  }
+}

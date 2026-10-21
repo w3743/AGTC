@@ -1,0 +1,108 @@
+{
+  "recordType": "conditional_candidate_design",
+  "status": "待审候选；未落正式BOM或原生工程",
+  "candidate": {
+    "module": {
+      "mpn": "URB4805YMD-10WR3",
+      "manufacturer": "Shenzhen Hi-Link Electronics",
+      "ratedOutput": "5 V, 2 A, 10 W",
+      "inputRange": "18–75 VDC",
+      "singleOutputPinMap": {
+        "1": {"name": "-Vin", "candidateNet": "B0"},
+        "2": {"name": "+Vin", "candidateNet": "CELL_B9"},
+        "3": {"name": "+Vo", "candidateNet": "VOUT_5V"},
+        "4": {"name": "NP", "candidateNet": "NC"},
+        "5": {"name": "GND output", "candidateNet": "B0"},
+        "6": {"name": "CTRL", "candidateNet": "CTRL_MODULE"}
+      },
+      "pinMapCaveat": "官方手册脚位图为单路输出版本；将隔离输出GND pin 5接回B0是本板接口方案，正式落源前需复核原生符号/封装针号。"
+    },
+    "oldBuckRemoval": {
+      "removedRefs": ["U_PSU", "C_PSU_BOOT", "C_PSU_FF", "R_PSU_FB_TOP", "R_PSU_FB_BOT", "L_PSU", "D_PSU"],
+      "removedRefCount": 7,
+      "mpnsDisappearing": ["SCT2A26STER", "0603CG680G500NT", "RT0603BRD0795K3L", "RT0603BRD0730K1L", "CXP1250-330M-HG", "SS510"],
+      "disappearingMpnCount": 6,
+      "mpnRetainedDespiteRefRemoval": {"mpn": "GRM188R72A104KA35J", "reason": "C_PSU_IN2仍使用同一MPN。"},
+      "newMpn": "URB4805YMD-10WR3",
+      "netMpnDeltaForBuckSwap": -5
+    },
+    "retainedInputCapacitors": [
+      {"refs": ["C_PSU_IN1", "C_PSU_IN3"], "mpn": "GRM32ER72A475KE14L", "qty": 2, "value": "4.7 uF each, 100 V, X7R, 1210"},
+      {"refs": ["C_PSU_IN2"], "mpn": "GRM188R72A104KA35J", "qty": 1, "value": "100 nF, 100 V, X7R, 0603"}
+    ],
+    "retainedOutputCapacitors": {
+      "refs": ["C_PSU_OUT1", "C_PSU_OUT2", "C_CAN_PWR_IN1", "C_FAN_IN1"],
+      "mpn": "GRM32ER61C476KE15L",
+      "qtyOnVOUT_5V": 4,
+      "nominalTotal": "188 uF",
+      "status": "低于2200 uF手册最大容性负载；实效电容、上电与环路仍需验证。"
+    },
+    "inputCapRecommendation": {
+      "preserveExistingCandidate": true,
+      "nominalTotal": "9.5 uF (2 x 4.7 uF + 0.1 uF)",
+      "datasheetTestCircuitReference": "手册通用测试/应用电路给C1输入电容47–100 uF参考；未见将其表述为保证的最小输入电容。",
+      "preferredAction": "为最低复杂度，保留现有两颗4.7 uF/100 V与100 nF作为候选，不因通用测试电路推荐值单独增加新MPN；将输入纹波、模块动态输入阻抗/负阻特性、PI输入滤波器稳定性列为上电前模型与厂商确认项。若模型或厂商确认不通过，再优先寻找满足最高浪涌电压的100 V器件。",
+      "sharedLibraryScreen": [
+        {"mpn": "RYHG35V100UF6*8", "rating": "35 V, 100 uF", "result": "电压等级不足，不能用于CELL_B9输入。"},
+        {"mpnOrAsset": "RYHG63V470UF10*16 symbol; common index model is KEMET PEH226ML3900QE4", "rating": "63 V class shown in symbol title", "result": "低于72.7 V纸面浪涌钳位，且共用索引中的目标MPN/符号资产对应关系需先澄清；不作为输入替换件。"},
+        {"mpn": "GRM32ER72A475KE14L", "rating": "100 V, 4.7 uF, X7R, 1210", "result": "当前板上唯一已确认适用的高压大容量电容MPN；维持原数量2。"}
+      ],
+      "risk": "手册输入范围18–75 V；最高设计/TVS纸面边界72.7 V，63 V器件没有额定裕量；现有100 V陶瓷在37.8 V直流偏置下的有效容量仍待厂家曲线与本地仿真确认。"
+    },
+    "controlCandidate": {
+      "function": "SW_RUN低/失电时AO3400A将CTRL拉低关闭模块；SW_RUN有效时MMBT5551拉低AO3400A栅极并释放CTRL，使模块开启。",
+      "parts": [
+        {"mpn": "AO3400A", "qty": 1, "role": "CTRL下拉开关"},
+        {"mpn": "MMBT5551", "qty": 1, "role": "SW_RUN控制NPN"},
+        {"mpn": "RMC0603100K1%N", "qty": 2, "role": "AO门极分压上臂2 x 100 kOhm"},
+        {"mpn": "RMC060347K1%N", "qty": 1, "role": "AO门极分压下臂，与100 kOhm并联"},
+        {"mpn": "RMC0603100K1%N", "qty": 1, "role": "新增分压下臂，与47 kOhm并联；复用已有料号"},
+        {"mpn": "RMC06031K1%N", "qty": 1, "role": "NPN基极串联，复用既有1 kOhm候选位号"},
+        {"mpn": "RMC0603100K1%N", "qty": 1, "role": "新增NPN基极-发射极下拉，复用已有料号"}
+      ],
+      "connections": {
+        "Q_PSU_OFF": {"mpn": "AO3400A", "G": "PSU_CLAMP_G", "D": "CTRL_MODULE", "S": "B0"},
+        "Q_PSU_RUN": {"mpn": "MMBT5551", "B": "PSU_RUN_BASE", "C": "PSU_CLAMP_G", "E": "B0"},
+        "upperDivider": "CELL_B9 -> 100k -> PSU_DIV_MID -> 100k -> PSU_CLAMP_G",
+        "lowerDivider": "47k and 100k in parallel, PSU_CLAMP_G to B0",
+        "baseDrive": "SW_RUN -> existing R_PSU_EN 1k -> PSU_RUN_BASE",
+        "basePulldown": "new 100k, PSU_RUN_BASE to B0",
+        "netAddedParts": 7
+      },
+      "staticPaperCheck": {"vgsAt22_5V_minCorner": "3.030 V", "vgsAt72_7V_maxCorner": "10.256 V", "resistorAssumptions": "±1%, ±100ppm/°C, reference25°C to60°C; excludes self heating and semiconductor leakage", "ao3400aAbsMax": "±12 V", "result": "静态分压角落低于栅压绝对最大值；不是浪涌/时序/失效安全验收。"},
+      "notClosed": ["CTRL端内部偏置/吸收电流与启动态黑盒", "上电及SW_RUN转换瞬态", "CTRL关闭时输入待机电流", "浪涌动态超调", "单故障关断能力"]
+    },
+    "minimumLoad": {
+      "datasheetRule": "容性负载时最低负载为额定输出电流的3%",
+      "requiredCurrent": "60 mA at 5 V / 2 A model",
+      "resistorArray": {"mpn": "RC0603FR-07510RL", "qty": 7, "connection": "7 x 510 Ohm in parallel", "nominalCurrentAt5V": "68.6 mA", "nominalPowerTotalAt5V": "0.343 W", "status": "纸面满足；首板温升与实测输出仍需确认。"}
+    },
+    "inventoryEstimate": {
+      "parentProvidedArithmetic": "233 - 7 + 1 + 7 + 7 = 241 pieces",
+      "status": "估算候选；各新增/复用位号与采购数需在最终BOM逐项映射。",
+      "conditionalMpnGoal": 53,
+      "mpnGoalStatus": "外围电阻共料后的未冻结条件目标，不是正式BOM计数或已验证选型。"
+    },
+    "optionalOptocouplerBranch": {
+      "status": "附加条件候选，非本文件主方案且未应用",
+      "claim": "parent review: substitute a suitable AT3 channel/part without net optocoupler count increase; parallel one additional existing 510 Ohm resistor (net +1 part) to target one MPN reduction (52 types / 242 pieces).",
+      "openChecks": ["verify exact selected AT3 MPN/CTR grade, pinout and isolation function", "LED forward voltage max and IF at component tolerances", "CTR min over temperature and aging", "VO low level and existing EN load", "confirm no unintended cross-channel coupling"]
+    }
+  },
+  "sourceState": {
+    "formalBomChanged": false,
+    "nativeEprj3Changed": false,
+    "edaOperated": false,
+    "thisRecordIsAProposalOnly": true
+  },
+  "evidence": [
+    {"path": "BMS模块/原理图准备/BOM.csv", "use": "位号、MPN、数量和标称属性；正式源本轮未修改。"},
+    {"path": "BMS模块/原理图准备/接口元件连接.json", "use": "当前U_PSU、输入/输出网络与SW_RUN相关信号。"},
+    {"path": "BMS模块/检查/5V电源预算.md", "use": "现有5 V负载规划与相关待验边界。"},
+    {"path": "BMS模块/检查/tmp/hlk_module/URB_YMD_10WR3_V1.7.pdf", "pages": [1, 2, 5, 6], "sha256": "1C55E95B4C6457F75984519C61BA2C544B15F9E65016E8EBF4CC286B545FF49D", "use": "模块额定、输入范围、启动/UVLO、容性负载、最小负载、脚位定义和测试电路参考。"},
+    {"path": "tmp/vehicle-power-hardware-common-publish/库/当前型号与原生资产.json", "use": "共用库现有电容资产核对；35 V/100 uF和63 V候选不足以覆盖72.7 V边界。"}
+  ],
+  "requiredBeforeFormalChange": ["按计算/模型核输入电容、供电预算与电压边界，并记录无法由现有手册证明的启动/CTRL假设", "完成原生符号/封装pin-map及BOM逐项映射", "在隔离副本通过官方API修改、保存、重开及网表回读；记录ERC/DRC结果后再决定是否推广正式工程"],
+  "requiredBeforeHardwareAcceptance": ["验证输入纹波及动态输入阻抗/滤波稳定性", "验证CTRL默认关断与启动/掉电时序", "验证最小负载、输出纹波、启动与温升", "核实际浪涌波形及绝对最大值；完成硬件保护验收"],
+  "calculationEvidence": "BMS模块/仿真/结果/HLK_CTRL_candidate.json; arithmetic corner calculations, not SPICE or hardware validation"
+}

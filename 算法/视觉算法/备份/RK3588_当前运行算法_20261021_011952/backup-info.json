@@ -1,0 +1,105 @@
+{
+  "backup_created_local": "2026-10-21 01:19:52 +08:00",
+  "device": {
+    "serial": "b1371e33e9f6e49e",
+    "hostname": "quarkpi-ca2",
+    "os": "Debian GNU/Linux 11 (bullseye)",
+    "kernel": "Linux 5.10.209 aarch64",
+    "python": "3.9.2",
+    "opencv": "4.10.0",
+    "numpy": "1.26.4",
+    "rknnlite": "2.3.2 (bundled)",
+    "rknn_driver": "0.9.6 (built-in RKNPU)",
+    "camera_service": "rkaiq_3A.service active/enabled"
+  },
+  "active_algorithm": {
+    "service": "rk-lightstereo.service",
+    "state": "active/enabled",
+    "working_directory": "/opt/rk-lightstereo",
+    "exec_start": "/bin/sh /opt/rk-lightstereo/run.sh serve",
+    "actual_process": "python3 -B /opt/rk-lightstereo/app/server.py --host 0.0.0.0",
+    "runtime_vendor": "/opt/rk-lightstereo/runtime/vendor",
+    "runtime_library": "/opt/rk-lightstereo/runtime/librknnrt.so"
+  },
+  "related_installations": {
+    "rk_stereo": {
+      "path": "/opt/rk-stereo",
+      "service": "rk-stereo.service inactive/disabled",
+      "exec_start": "/usr/bin/python3 -B /opt/rk-stereo/server.py --host 0.0.0.0",
+      "included": "service unit only; program/vendor tree omitted because not active or referenced by active service"
+    },
+    "lightstereo": {
+      "path": "/opt/lightstereo",
+      "included": false,
+      "reason": "No active service or process references this directory."
+    }
+  },
+  "archive": {
+    "path": "rk-lightstereo.tar.gz",
+    "bytes": 76113801,
+    "sha256": "2a524b2dc9c64e90c92eeb6d5f76e9443db3e6506b3b33b2c9bdff61c7a2e89a",
+    "format": "GNU tar.gz with numeric owner, ACLs, xattrs and symlink metadata"
+  },
+  "scope": {
+    "included": [
+      "/opt/rk-lightstereo except captures/output/validation image files",
+      "active and legacy RK systemd units",
+      "rkaiq_3A unit/init script",
+      "Rockchip camera udev rules"
+    ],
+    "excluded": [
+      "/opt/rk-lightstereo/captures/",
+      "/opt/rk-lightstereo/output/",
+      "/opt/rk-lightstereo/validation/*.png,*.jpg,*.jpeg,*.bmp",
+      "inactive /opt/rk-stereo program/runtime and captures",
+      "unreferenced /opt/lightstereo runtime/vendor",
+      "operating system and system packages"
+    ]
+  },
+  "verification": {
+    "source_file_count": 1226,
+    "system_file_count": 6,
+    "archive_regular_file_count": 1232,
+    "payload_hashes_checked": 1232,
+    "source_pre_post_manifests_match": true,
+    "system_pre_post_manifests_match": true,
+    "symlink_pre_post_manifests_match": true,
+    "symlink_count": 2,
+    "archive_payload_sha256_matches_device_source": true,
+    "device_tar_sha256_matches_local_copy": true,
+    "camera_data_excluded": true
+  },
+  "checksums": {
+    "installed_fast_depth_sha256": "df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4",
+    "backup_fast_depth_sha256": "b4d3430420b629a3efbc1dace640a94f1ff5e9b21621ad6e0f4e2731acc43d8f",
+    "archive_sha256": "2a524b2dc9c64e90c92eeb6d5f76e9443db3e6506b3b33b2c9bdff61c7a2e89a"
+  },
+  "services": [
+    {
+      "name": "rk-lightstereo.service",
+      "state": "active/enabled",
+      "fragment_path": "/etc/systemd/system/rk-lightstereo.service",
+      "exec_start": "/bin/sh /opt/rk-lightstereo/run.sh serve",
+      "working_directory": "/opt/rk-lightstereo",
+      "runtime_vendor": "/opt/rk-lightstereo/runtime/vendor",
+      "port": 8088
+    },
+    {
+      "name": "rk-stereo.service",
+      "state": "inactive/disabled",
+      "fragment_path": "/etc/systemd/system/rk-stereo.service",
+      "exec_start": "/usr/bin/python3 -B /opt/rk-stereo/server.py --host 0.0.0.0",
+      "working_directory": "/opt/rk-stereo",
+      "environment": "PYTHONPATH=/opt/rk-stereo/vendor",
+      "note": "unit recorded; program/runtime omitted because inactive and unused by active service"
+    },
+    {
+      "name": "rkaiq_3A.service",
+      "state": "active/enabled",
+      "fragment_path": "/lib/systemd/system/rkaiq_3A.service",
+      "exec_start": "/etc/init.d/rkaiq_3A.sh start",
+      "working_directory": null,
+      "note": "Rockchip camera ISP support"
+    }
+  ]
+}

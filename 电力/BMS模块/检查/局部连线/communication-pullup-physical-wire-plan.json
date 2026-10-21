@@ -1,0 +1,3053 @@
+{
+  "title": "BMS通信上拉电阻局部实体连线候选计划",
+  "status": "read_only_geometry_candidate_not_applied",
+  "scope": "仅基线几何审查与父代理执行候选；未打开EasyEDA、未写入原理图工程、未改变器件位置。",
+  "baseline": {
+    "snapshot": "BMS模块/检查/局部连线/baseline-snapshot.json",
+    "sha256": "afcfcd44eac29ed54acfc4b718d9805cd7fe2d6ec33cafe5dda14c44309deddd",
+    "matchesLayoutValidationCurrentSnapshotByteForByte": true,
+    "rows": 208,
+    "pins": 700,
+    "ports": 347,
+    "wireGroups": 381,
+    "nonzeroWireSegments": 947,
+    "audit": "BMS模块/检查/局部连线/rc-physical-wire-audit.json",
+    "auditSha256": "3613f4343bbda96213d21bfa8bc819eebec56e87f0296425f2f8fab64715a338"
+  },
+  "scopeExclusions": {
+    "parentAgent": [
+      "VC input filter",
+      "SRP current-sense"
+    ],
+    "wireToolsAgent": [
+      "control/timer decoupling"
+    ],
+    "ETA": "R_BAL_ISET1..8/C_BAL_ISET1..8/C_BAL_BIAS1..8 are absent from isolated inventory because the audit reports nonzero physical wires; preserve unchanged. Other isolated pins in the ETA/balancing block remain listed for triage; no route generated here."
+  },
+  "candidateGroup": {
+    "id": "AFE_BREG_HOST_communication_pullups",
+    "priority": "high",
+    "components": [
+      "R_SCL_PU",
+      "R_SDA_PU",
+      "R_ALERT_PU",
+      "R_ALERT_SER",
+      "U1"
+    ],
+    "why": "Three local orthogonal routes make the SCL pull-up, shared CORE_3V3 feed for SCL/SDA pull-ups, and ALERT pull-up-to-series-resistor node visibly wired. Preserve original net-name anchor ports and reduce duplicate local labels. SDA signal pin2 and ALERT_SER.1 already have physical wires and are unchanged.",
+    "newWires": [
+      {
+        "id": "core_3v3_pullup_rail",
+        "net": "CORE_3V3",
+        "from": {
+          "ref": "R_SCL_PU",
+          "pin": "1",
+          "pinName": "1",
+          "xy": [
+            2850,
+            1950
+          ],
+          "nc": false,
+          "portIds": [
+            "2dd5b33782b9736b"
+          ],
+          "portNames": [
+            "CORE_3V3"
+          ],
+          "portNets": [
+            "CORE_3V3"
+          ],
+          "zeroWireIds": [
+            "7be399f34a5467ce"
+          ],
+          "nonzeroWireIds": []
+        },
+        "to": {
+          "ref": "R_SDA_PU",
+          "pin": "1",
+          "pinName": "1",
+          "xy": [
+            2960,
+            1950
+          ],
+          "nc": false,
+          "portIds": [
+            "5857f31d68a4c75d"
+          ],
+          "portNames": [
+            "CORE_3V3"
+          ],
+          "portNets": [
+            "CORE_3V3"
+          ],
+          "zeroWireIds": [
+            "0e916364f03706ab"
+          ],
+          "nonzeroWireIds": []
+        },
+        "vertices": [
+          [
+            2850,
+            1950
+          ],
+          [
+            2830,
+            1950
+          ],
+          [
+            2830,
+            1940
+          ],
+          [
+            2950,
+            1940
+          ],
+          [
+            2950,
+            1950
+          ],
+          [
+            2960,
+            1950
+          ]
+        ],
+        "lengthUnits": 170,
+        "collisionCheck": {
+          "segments": 5,
+          "lengthUnits": 170,
+          "foreignNetWireIntersections": 0,
+          "foreignPinsOnPath": 0,
+          "foreignPortsOnPath": 0,
+          "foreignWireEndpointsOnPath": 0,
+          "nearestForeignPin": {
+            "distanceUnits": 10.0,
+            "ref": "R_SCL_PU",
+            "pin": "2",
+            "xy": [
+              2890,
+              1950
+            ]
+          },
+          "nearestForeignPort": {
+            "distanceUnits": 40.0,
+            "id": "9ffeca9d4fd4b683",
+            "net": "BQ_I2C_SDA",
+            "xy": [
+              3000,
+              1950
+            ]
+          }
+        }
+      },
+      {
+        "id": "i2c_scl_to_u1",
+        "net": "BQ_I2C_SCL",
+        "from": {
+          "ref": "R_SCL_PU",
+          "pin": "2",
+          "pinName": "2",
+          "xy": [
+            2890,
+            1950
+          ],
+          "nc": false,
+          "portIds": [
+            "35a8e40f6c632d94"
+          ],
+          "portNames": [
+            "BQ_I2C_SCL"
+          ],
+          "portNets": [
+            "BQ_I2C_SCL"
+          ],
+          "zeroWireIds": [
+            "4f117ba40ca7bc6c"
+          ],
+          "nonzeroWireIds": []
+        },
+        "to": {
+          "ref": "U1",
+          "pin": "26",
+          "pinName": "SCL",
+          "xy": [
+            2580,
+            2045
+          ],
+          "nc": false,
+          "portIds": [
+            "7c887ae477239e1a"
+          ],
+          "portNames": [
+            "BQ_I2C_SCL"
+          ],
+          "portNets": [
+            "BQ_I2C_SCL"
+          ],
+          "zeroWireIds": [
+            "8c4eb62ea5fbe5c5"
+          ],
+          "nonzeroWireIds": []
+        },
+        "vertices": [
+          [
+            2890,
+            1950
+          ],
+          [
+            2910,
+            1950
+          ],
+          [
+            2910,
+            1965
+          ],
+          [
+            3010,
+            1965
+          ],
+          [
+            3010,
+            2040
+          ],
+          [
+            2670,
+            2040
+          ],
+          [
+            2670,
+            2045
+          ],
+          [
+            2580,
+            2045
+          ]
+        ],
+        "lengthUnits": 645,
+        "collisionCheck": {
+          "segments": 7,
+          "lengthUnits": 645,
+          "foreignNetWireIntersections": 0,
+          "foreignPinsOnPath": 0,
+          "foreignPortsOnPath": 0,
+          "foreignWireEndpointsOnPath": 0,
+          "nearestForeignPin": {
+            "distanceUnits": 10.0,
+            "ref": "U1",
+            "pin": "25",
+            "xy": [
+              2580,
+              2035
+            ]
+          },
+          "nearestForeignPort": {
+            "distanceUnits": 10.0,
+            "id": "1b9b743b305c0712",
+            "net": "BQ_ALERT_N",
+            "xy": [
+              3000,
+              2020
+            ]
+          }
+        }
+      },
+      {
+        "id": "alert_pullup_to_alert_series",
+        "net": "BQ_ALERT_N",
+        "from": {
+          "ref": "R_ALERT_PU",
+          "pin": "2",
+          "pinName": "2",
+          "xy": [
+            2890,
+            2020
+          ],
+          "nc": false,
+          "portIds": [
+            "ae50618fd90c7f25"
+          ],
+          "portNames": [
+            "BQ_ALERT_N"
+          ],
+          "portNets": [
+            "BQ_ALERT_N"
+          ],
+          "zeroWireIds": [
+            "73cdb48703d0fbd3"
+          ],
+          "nonzeroWireIds": []
+        },
+        "to": {
+          "ref": "R_ALERT_SER",
+          "pin": "2",
+          "pinName": "2",
+          "xy": [
+            3000,
+            2020
+          ],
+          "nc": false,
+          "portIds": [
+            "1b9b743b305c0712"
+          ],
+          "portNames": [
+            "BQ_ALERT_N"
+          ],
+          "portNets": [
+            "BQ_ALERT_N"
+          ],
+          "zeroWireIds": [
+            "afc754477fbb0191"
+          ],
+          "nonzeroWireIds": []
+        },
+        "vertices": [
+          [
+            2890,
+            2020
+          ],
+          [
+            2910,
+            2020
+          ],
+          [
+            2910,
+            2030
+          ],
+          [
+            3000,
+            2030
+          ],
+          [
+            3000,
+            2020
+          ]
+        ],
+        "lengthUnits": 130,
+        "collisionCheck": {
+          "segments": 4,
+          "lengthUnits": 130,
+          "foreignNetWireIntersections": 0,
+          "foreignPinsOnPath": 0,
+          "foreignPortsOnPath": 0,
+          "foreignWireEndpointsOnPath": 0,
+          "nearestForeignPin": {
+            "distanceUnits": 10.0,
+            "ref": "R_ALERT_SER",
+            "pin": "1",
+            "xy": [
+              2960,
+              2020
+            ]
+          },
+          "nearestForeignPort": {
+            "distanceUnits": 10.0,
+            "id": "a00e8a82f475a986",
+            "net": "BQ_ALERT_IC_N",
+            "xy": [
+              2960,
+              2020
+            ]
+          }
+        }
+      }
+    ],
+    "removeRedundantPorts": [
+      {
+        "id": "5857f31d68a4c75d",
+        "ref": "R_SDA_PU",
+        "pin": "1",
+        "net": "CORE_3V3",
+        "reason": "该CORE_3V3局部支路由保留的R_SCL_PU.1端口命名"
+      },
+      {
+        "id": "35a8e40f6c632d94",
+        "ref": "R_SCL_PU",
+        "pin": "2",
+        "net": "BQ_I2C_SCL",
+        "reason": "由实体线连到仍保留端口的U1.26"
+      },
+      {
+        "id": "ae50618fd90c7f25",
+        "ref": "R_ALERT_PU",
+        "pin": "2",
+        "net": "BQ_ALERT_N",
+        "reason": "由实体线连到仍保留端口的R_ALERT_SER.2"
+      }
+    ],
+    "removeZeroLengthWiresAtNewlyWiredPins": [
+      {
+        "id": "7be399f34a5467ce",
+        "ref": "R_SCL_PU",
+        "pin": "1",
+        "xy": [
+          2850,
+          1950
+        ]
+      },
+      {
+        "id": "0e916364f03706ab",
+        "ref": "R_SDA_PU",
+        "pin": "1",
+        "xy": [
+          2960,
+          1950
+        ]
+      },
+      {
+        "id": "4f117ba40ca7bc6c",
+        "ref": "R_SCL_PU",
+        "pin": "2",
+        "xy": [
+          2890,
+          1950
+        ]
+      },
+      {
+        "id": "8c4eb62ea5fbe5c5",
+        "ref": "U1",
+        "pin": "26",
+        "xy": [
+          2580,
+          2045
+        ]
+      },
+      {
+        "id": "73cdb48703d0fbd3",
+        "ref": "R_ALERT_PU",
+        "pin": "2",
+        "xy": [
+          2890,
+          2020
+        ]
+      },
+      {
+        "id": "afc754477fbb0191",
+        "ref": "R_ALERT_SER",
+        "pin": "2",
+        "xy": [
+          3000,
+          2020
+        ]
+      }
+    ],
+    "preservePorts": [
+      {
+        "id": "2dd5b33782b9736b",
+        "ref": "R_SCL_PU",
+        "pin": "1",
+        "net": "CORE_3V3"
+      },
+      {
+        "id": "7c887ae477239e1a",
+        "ref": "U1",
+        "pin": "26",
+        "net": "BQ_I2C_SCL"
+      },
+      {
+        "id": "1b9b743b305c0712",
+        "ref": "R_ALERT_SER",
+        "pin": "2",
+        "net": "BQ_ALERT_N"
+      }
+    ],
+    "explicitlyKeepLabelOnly": {
+      "ref": "R_ALERT_PU",
+      "pin": "1",
+      "net": "CORE_3V3",
+      "portId": "7ef8fc7b7a3dae16",
+      "zeroWireId": "d399a28f774d332e",
+      "reason": "A direct path to the shared CORE_3V3 rail would cross existing BQ_ALERT_IC_N geometry; keep the local port and zero wire rather than force a crossing."
+    },
+    "componentPinInvariant": {
+      "componentRowsBefore": 208,
+      "componentRowsAfterCandidate": 208,
+      "pinsBefore": 700,
+      "pinsAfterCandidate": 700
+    }
+  },
+  "geometryValidation": {
+    "method": "Parse each 4-value wire.line tuple as a segment. Test proposed orthogonal segments against different-net existing wires (including endpoint contact), component pins, port pins, existing foreign-net segment endpoints, and other candidate nets. Geometry is checked on the baseline only and does not replace native netlist validation.",
+    "baselineNonzeroWireSegments": 947,
+    "routes": {
+      "core_3v3_pullup_rail": {
+        "segments": 5,
+        "lengthUnits": 170,
+        "foreignNetWireIntersections": 0,
+        "foreignPinsOnPath": 0,
+        "foreignPortsOnPath": 0,
+        "foreignWireEndpointsOnPath": 0,
+        "nearestForeignPin": {
+          "distanceUnits": 10.0,
+          "ref": "R_SCL_PU",
+          "pin": "2",
+          "xy": [
+            2890,
+            1950
+          ]
+        },
+        "nearestForeignPort": {
+          "distanceUnits": 40.0,
+          "id": "9ffeca9d4fd4b683",
+          "net": "BQ_I2C_SDA",
+          "xy": [
+            3000,
+            1950
+          ]
+        }
+      },
+      "i2c_scl_to_u1": {
+        "segments": 7,
+        "lengthUnits": 645,
+        "foreignNetWireIntersections": 0,
+        "foreignPinsOnPath": 0,
+        "foreignPortsOnPath": 0,
+        "foreignWireEndpointsOnPath": 0,
+        "nearestForeignPin": {
+          "distanceUnits": 10.0,
+          "ref": "U1",
+          "pin": "25",
+          "xy": [
+            2580,
+            2035
+          ]
+        },
+        "nearestForeignPort": {
+          "distanceUnits": 10.0,
+          "id": "1b9b743b305c0712",
+          "net": "BQ_ALERT_N",
+          "xy": [
+            3000,
+            2020
+          ]
+        }
+      },
+      "alert_pullup_to_alert_series": {
+        "segments": 4,
+        "lengthUnits": 130,
+        "foreignNetWireIntersections": 0,
+        "foreignPinsOnPath": 0,
+        "foreignPortsOnPath": 0,
+        "foreignWireEndpointsOnPath": 0,
+        "nearestForeignPin": {
+          "distanceUnits": 10.0,
+          "ref": "R_ALERT_SER",
+          "pin": "1",
+          "xy": [
+            2960,
+            2020
+          ]
+        },
+        "nearestForeignPort": {
+          "distanceUnits": 10.0,
+          "id": "a00e8a82f475a986",
+          "net": "BQ_ALERT_IC_N",
+          "xy": [
+            2960,
+            2020
+          ]
+        }
+      }
+    },
+    "crossCandidateNetIntersections": [],
+    "result": "PASS geometry only: all three routes are orthogonal, have no foreign-net wire/pin/port/endpoint intersections, and no cross-route foreign-net intersections; nearest foreign geometry is 10 units."
+  },
+  "remainingIsolatedRCInventory": {
+    "count": 55,
+    "isolatedPinCount": 84,
+    "groupCountsByBlock": {
+      "负载有效/电源有效支路": 2,
+      "AFE/ETA均衡及控制": 6,
+      "BQ76952主控及供电/保护外围": 20,
+      "BQ76952采样输入滤波": 5,
+      "CAN收发器/隔离电源": 6,
+      "预充控制": 2,
+      "定时器支路": 3,
+      "外部接口下拉/控制信号": 3,
+      "充放电门极/指示支路": 6,
+      "其它辅助RC（待按原理图块复核）": 1,
+      "板上电源模块": 1
+    },
+    "excludedAgentOwnedBlocks": "Block labels containing 父代理负责VC, 父代理负责SRP, or wire_tools代理负责 are omitted from this remaining list; see source audit for full baseline inventory.",
+    "entries": [
+      {
+        "ref": "R_LOAD_POWER_VALID_LED",
+        "block": "负载有效/电源有效支路",
+        "componentXY": [
+          650,
+          400
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              670,
+              400
+            ],
+            "portIds": [
+              "87cff6ffb08a9dac"
+            ],
+            "portNames": [
+              "LOAD_VALID_LED_A"
+            ],
+            "portNets": [
+              "LOAD_VALID_LED_A"
+            ],
+            "zeroWireIds": [
+              "a934036bdb20e558"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              630,
+              400
+            ],
+            "portIds": [
+              "af4a792fddd95635"
+            ],
+            "portNames": [
+              "VOUT_5V"
+            ],
+            "portNets": [
+              "VOUT_5V"
+            ],
+            "zeroWireIds": [
+              "7a9a880121952c95"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL_CELL1",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1680,
+          1690
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1665,
+              1690
+            ],
+            "portIds": [
+              "23e42b1c02be68de"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "77ea8e66083496a0"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BAT1",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2715,
+          2220
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2695,
+              2220
+            ],
+            "portIds": [
+              "dded36889a661bb1"
+            ],
+            "portNames": [
+              "BAT"
+            ],
+            "portNets": [
+              "BAT"
+            ],
+            "zeroWireIds": [
+              "ec6f5bf296a2fb93"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2735,
+              2220
+            ],
+            "portIds": [
+              "825dc9cc8196cad8"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "7bb7480906298290"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BREG_COL",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2940,
+          2300
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2920,
+              2300
+            ],
+            "portIds": [
+              "5c252e3a18045ea4"
+            ],
+            "portNames": [
+              "BREG_COLLECTOR"
+            ],
+            "portNets": [
+              "BREG_COLLECTOR"
+            ],
+            "zeroWireIds": [
+              "65e5085d08f8a69b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2960,
+              2300
+            ],
+            "portIds": [
+              "2f47f56962076841"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "de0826dc0c2921e2"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BQ_DCHG_FILT",
+        "block": "BQ76952采样输入滤波",
+        "componentXY": [
+          3060,
+          1840
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3045,
+              1840
+            ],
+            "portIds": [
+              "cfb71a45eea85025"
+            ],
+            "portNames": [
+              "BQ_DCHG"
+            ],
+            "portNets": [
+              "BQ_DCHG"
+            ],
+            "zeroWireIds": [
+              "6aa6aeaccba571fb"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3075,
+              1840
+            ],
+            "portIds": [
+              "481f1c6a9744c848"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "f448bbd00f69915b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BQ_TS1_FILT",
+        "block": "BQ76952采样输入滤波",
+        "componentXY": [
+          3060,
+          1750
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3045,
+              1750
+            ],
+            "portIds": [
+              "f2d695ff7b31dc04"
+            ],
+            "portNames": [
+              "BQ_TS1"
+            ],
+            "portNets": [
+              "BQ_TS1"
+            ],
+            "zeroWireIds": [
+              "c44b6787135ba832"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3075,
+              1750
+            ],
+            "portIds": [
+              "b10252697f5103a5"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "0e70892730c0e57d"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BQ_TS3_FILT",
+        "block": "BQ76952采样输入滤波",
+        "componentXY": [
+          3060,
+          1660
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3045,
+              1660
+            ],
+            "portIds": [
+              "e90cead5874b2b2d"
+            ],
+            "portNames": [
+              "BQ_TS3"
+            ],
+            "portNets": [
+              "BQ_TS3"
+            ],
+            "zeroWireIds": [
+              "baf551b32c27abb6"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3075,
+              1660
+            ],
+            "portIds": [
+              "8802d30bb981dfad"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "9098260728115df7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_NTC_BOARD_FILT",
+        "block": "BQ76952采样输入滤波",
+        "componentXY": [
+          2780,
+          1700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2795,
+              1700
+            ],
+            "portIds": [
+              "7e0ecdfdbf0d3fbf"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "43f58fe337ea1e6b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_NTC_CELL5_FILT",
+        "block": "BQ76952采样输入滤波",
+        "componentXY": [
+          2890,
+          1700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2875,
+              1700
+            ],
+            "portIds": [
+              "32887ea6c47d3bca"
+            ],
+            "portNames": [
+              "BQ_CFETOFF"
+            ],
+            "portNets": [
+              "BQ_CFETOFF"
+            ],
+            "zeroWireIds": [
+              "53135d7d1b67d1ed"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2905,
+              1700
+            ],
+            "portIds": [
+              "b262b6653cf11e45"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "819c042800f7bda5"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CAN_PWR_IN1",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          940,
+          700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              920,
+              700
+            ],
+            "portIds": [
+              "e83907ee142f20e2"
+            ],
+            "portNames": [
+              "VOUT_5V"
+            ],
+            "portNets": [
+              "VOUT_5V"
+            ],
+            "zeroWireIds": [
+              "1c2cbe1e9b37cfed"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              960,
+              700
+            ],
+            "portIds": [
+              "834ea99851450686"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "d2c5728c7dd15f0f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CAN_PWR_OUT1",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          1180,
+          700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1160,
+              700
+            ],
+            "portIds": [
+              "9a6a94cec54e864e"
+            ],
+            "portNames": [
+              "CAN_ISO_5V"
+            ],
+            "portNets": [
+              "CAN_ISO_5V"
+            ],
+            "zeroWireIds": [
+              "eeed80b577f91bee"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1200,
+              700
+            ],
+            "portIds": [
+              "ddfd82b6746713ee"
+            ],
+            "portNames": [
+              "PACK-"
+            ],
+            "portNets": [
+              "PACK-"
+            ],
+            "zeroWireIds": [
+              "02fcf1b2605d5423"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CAN_VCC2_2",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          1310,
+          500
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1290,
+              500
+            ],
+            "portIds": [
+              "fef4cd771dbd9cab"
+            ],
+            "portNames": [
+              "CORE_3V3"
+            ],
+            "portNets": [
+              "CORE_3V3"
+            ],
+            "zeroWireIds": [
+              "8df9351b0c7ca24c"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1330,
+              500
+            ],
+            "portIds": [
+              "b4bc64df4ddc3495"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "4de882d258511fc5"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_REG1",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2700,
+          2050
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2680,
+              2050
+            ],
+            "portIds": [
+              "dba3733685c5e153"
+            ],
+            "portNames": [
+              "REG1"
+            ],
+            "portNets": [
+              "REG1"
+            ],
+            "zeroWireIds": [
+              "fb2e06be1b32473f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2720,
+              2050
+            ],
+            "portIds": [
+              "49724378d278db14"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "0815255ecce7707a"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CP1",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2680,
+          2340
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2700,
+              2340
+            ],
+            "portIds": [
+              "0ff4d1bddb8bd5a3"
+            ],
+            "portNames": [
+              "BAT"
+            ],
+            "portNets": [
+              "BAT"
+            ],
+            "zeroWireIds": [
+              "5c0fad64bb0d0b4a"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_REG18",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2290,
+          2380
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2275,
+              2380
+            ],
+            "portIds": [
+              "b585824f87488b55"
+            ],
+            "portNames": [
+              "BQ_REG18"
+            ],
+            "portNets": [
+              "BQ_REG18"
+            ],
+            "zeroWireIds": [
+              "814d648259ba6a49"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2305,
+              2380
+            ],
+            "portIds": [
+              "ce7932a07c10b966"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "738b3ae760048841"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_REGIN",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2700,
+          2120
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2685,
+              2120
+            ],
+            "portIds": [
+              "57f6182a561a4971"
+            ],
+            "portNames": [
+              "REGIN"
+            ],
+            "portNets": [
+              "REGIN"
+            ],
+            "zeroWireIds": [
+              "fdbbd6a0e24b29d4"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2715,
+              2120
+            ],
+            "portIds": [
+              "54ca06160ab85efb"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "c71cceca953a16b4"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_ALERT_PU",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2870,
+          2020
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2890,
+              2020
+            ],
+            "portIds": [
+              "ae50618fd90c7f25"
+            ],
+            "portNames": [
+              "BQ_ALERT_N"
+            ],
+            "portNets": [
+              "BQ_ALERT_N"
+            ],
+            "zeroWireIds": [
+              "73cdb48703d0fbd3"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2850,
+              2020
+            ],
+            "portIds": [
+              "7ef8fc7b7a3dae16"
+            ],
+            "portNames": [
+              "CORE_3V3"
+            ],
+            "portNets": [
+              "CORE_3V3"
+            ],
+            "zeroWireIds": [
+              "d399a28f774d332e"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_CAN_TXD_PU",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          980,
+          520
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              960,
+              520
+            ],
+            "portIds": [
+              "56c61b46b4b6706c"
+            ],
+            "portNames": [
+              "CORE_3V3"
+            ],
+            "portNets": [
+              "CORE_3V3"
+            ],
+            "zeroWireIds": [
+              "15e57a6a8c73f6b6"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_SCL_PU",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2870,
+          1950
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2890,
+              1950
+            ],
+            "portIds": [
+              "35a8e40f6c632d94"
+            ],
+            "portNames": [
+              "BQ_I2C_SCL"
+            ],
+            "portNets": [
+              "BQ_I2C_SCL"
+            ],
+            "zeroWireIds": [
+              "4f117ba40ca7bc6c"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2850,
+              1950
+            ],
+            "portIds": [
+              "2dd5b33782b9736b"
+            ],
+            "portNames": [
+              "CORE_3V3"
+            ],
+            "portNets": [
+              "CORE_3V3"
+            ],
+            "zeroWireIds": [
+              "7be399f34a5467ce"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_SDA_PU",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2980,
+          1950
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2960,
+              1950
+            ],
+            "portIds": [
+              "5857f31d68a4c75d"
+            ],
+            "portNames": [
+              "CORE_3V3"
+            ],
+            "portNets": [
+              "CORE_3V3"
+            ],
+            "zeroWireIds": [
+              "0e916364f03706ab"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_ALERT_SER",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2980,
+          2020
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3000,
+              2020
+            ],
+            "portIds": [
+              "1b9b743b305c0712"
+            ],
+            "portNames": [
+              "BQ_ALERT_N"
+            ],
+            "portNets": [
+              "BQ_ALERT_N"
+            ],
+            "zeroWireIds": [
+              "afc754477fbb0191"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_DFETOFF_GATE",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2910,
+          1810
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2890,
+              1810
+            ],
+            "portIds": [
+              "628399255cf052a3"
+            ],
+            "portNames": [
+              "FET_RELEASE"
+            ],
+            "portNets": [
+              "FET_RELEASE"
+            ],
+            "zeroWireIds": [
+              "cd48fb751b7e943a"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_LOAD_POWER_VALID_GATE",
+        "block": "负载有效/电源有效支路",
+        "componentXY": [
+          300,
+          420
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              280,
+              420
+            ],
+            "portIds": [
+              "a35ad0bdfe569cef"
+            ],
+            "portNames": [
+              "FET_RELEASE"
+            ],
+            "portNets": [
+              "FET_RELEASE"
+            ],
+            "zeroWireIds": [
+              "b896093de536374e"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_QPRE_BASE",
+        "block": "预充控制",
+        "componentXY": [
+          790,
+          1380
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              770,
+              1380
+            ],
+            "portIds": [
+              "1c7d4b0a908c1e4e"
+            ],
+            "portNames": [
+              "PRECHARGE_WINDOW"
+            ],
+            "portNets": [
+              "PRECHARGE_WINDOW"
+            ],
+            "zeroWireIds": [
+              "6054ef935ecd09aa"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_RST_SHUT",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2880,
+          1850
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2900,
+              1850
+            ],
+            "portIds": [
+              "8180fcf840a533c4"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "d91b42f5e1c7d75a"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2860,
+              1850
+            ],
+            "portIds": [
+              "c2c5bb3b5228ebbc"
+            ],
+            "portNames": [
+              "RST_SHUT"
+            ],
+            "portNets": [
+              "RST_SHUT"
+            ],
+            "zeroWireIds": [
+              "06a65c643f1bba8e"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_TIMER_SUPPLY",
+        "block": "定时器支路",
+        "componentXY": [
+          3290,
+          2320
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3310,
+              2320
+            ],
+            "portIds": [
+              "82765158a0ff8453"
+            ],
+            "portNames": [
+              "TMR_VDD"
+            ],
+            "portNets": [
+              "TMR_VDD"
+            ],
+            "zeroWireIds": [
+              "e941c70c7ed8bcac"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3270,
+              2320
+            ],
+            "portIds": [
+              "98a30e638c369840"
+            ],
+            "portNames": [
+              "TMR_TRIG"
+            ],
+            "portNets": [
+              "TMR_TRIG"
+            ],
+            "zeroWireIds": [
+              "27f5d3086df4ad5f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL_ENABLE_BASE",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1090,
+          1450
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1070,
+              1450
+            ],
+            "portIds": [
+              "a0fa9a2410d0d1f9"
+            ],
+            "portNames": [
+              "BAL_ENABLE_CMD"
+            ],
+            "portNets": [
+              "BAL_ENABLE_CMD"
+            ],
+            "zeroWireIds": [
+              "04210f21469af3b7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL_MAINCLR_BASE",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1320,
+          1450
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1340,
+              1450
+            ],
+            "portIds": [
+              "b999bc6b183ac545"
+            ],
+            "portNames": [
+              "BAL_MAINCLR_BASE"
+            ],
+            "portNets": [
+              "BAL_MAINCLR_BASE"
+            ],
+            "zeroWireIds": [
+              "8e97432e800b6562"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1300,
+              1450
+            ],
+            "portIds": [
+              "81be0e210c741dcf"
+            ],
+            "portNames": [
+              "MAIN_CLR_N"
+            ],
+            "portNets": [
+              "MAIN_CLR_N"
+            ],
+            "zeroWireIds": [
+              "f582ef46225ca246"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL_ENABLE_BE",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1210,
+          1450
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1230,
+              1450
+            ],
+            "portIds": [
+              "e7196da06bfddfdf"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "2e9620efb9ce018b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL_MAINCLR_BE",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1420,
+          1450
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1400,
+              1450
+            ],
+            "portIds": [
+              "8c6b26da2855d622"
+            ],
+            "portNames": [
+              "BAL_MAINCLR_BASE"
+            ],
+            "portNets": [
+              "BAL_MAINCLR_BASE"
+            ],
+            "zeroWireIds": [
+              "c5f3c90d422f33cd"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_DFETOFF_GS",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          3030,
+          1790
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3050,
+              1790
+            ],
+            "portIds": [
+              "3657be2c9cc5c650"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "d5d743429d5d8b34"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_IF_LOCAL_OK_PD",
+        "block": "外部接口下拉/控制信号",
+        "componentXY": [
+          3240,
+          1770
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3260,
+              1770
+            ],
+            "portIds": [
+              "69b247ffd0b32304"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "0f5d60b3c15b19dc"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3220,
+              1770
+            ],
+            "portIds": [
+              "b5e878fe091bd7d9"
+            ],
+            "portNames": [
+              "BMS_LOCAL_OK"
+            ],
+            "portNets": [
+              "BMS_LOCAL_OK"
+            ],
+            "zeroWireIds": [
+              "1aefb3c28b1ca08f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_IF_MAIN_REQ_PD",
+        "block": "外部接口下拉/控制信号",
+        "componentXY": [
+          3400,
+          1770
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3420,
+              1770
+            ],
+            "portIds": [
+              "8de316c4e1607d35"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "ecc880446f0475a8"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3380,
+              1770
+            ],
+            "portIds": [
+              "dcc41a0d195528ed"
+            ],
+            "portNames": [
+              "MAIN_REQ"
+            ],
+            "portNets": [
+              "MAIN_REQ"
+            ],
+            "zeroWireIds": [
+              "c0500b1900ef257e"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_IF_PRE_REQ_PD",
+        "block": "外部接口下拉/控制信号",
+        "componentXY": [
+          3560,
+          1770
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3580,
+              1770
+            ],
+            "portIds": [
+              "e63ca12435102b45"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "b0d68ff4ce05d36a"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3540,
+              1770
+            ],
+            "portIds": [
+              "f3d14e52363b97d6"
+            ],
+            "portNames": [
+              "PRE_REQ"
+            ],
+            "portNets": [
+              "PRE_REQ"
+            ],
+            "zeroWireIds": [
+              "402a47e5df1ad79b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_PRE_CTRL_PD",
+        "block": "预充控制",
+        "componentXY": [
+          3710,
+          1770
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3730,
+              1770
+            ],
+            "portIds": [
+              "4614058fbb6f2b36"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "6d6c90548d0e617e"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              3690,
+              1770
+            ],
+            "portIds": [
+              "f32df74f47f9487c"
+            ],
+            "portNames": [
+              "PRE_CTRL_3V3"
+            ],
+            "portNets": [
+              "PRE_CTRL_3V3"
+            ],
+            "zeroWireIds": [
+              "7e8a2baa3247e0f4"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL_OPTO_TOP",
+        "block": "AFE/ETA均衡及控制",
+        "componentXY": [
+          1120,
+          1260
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1140,
+              1260
+            ],
+            "portIds": [
+              "98eee2d6fb558deb"
+            ],
+            "portNames": [
+              "BAL_OPTO_LED_0"
+            ],
+            "portNets": [
+              "BAL_OPTO_LED_0"
+            ],
+            "zeroWireIds": [
+              "1548d14388ac0dcb"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1100,
+              1260
+            ],
+            "portIds": [
+              "beb51090b48f9546"
+            ],
+            "portNames": [
+              "TAP_B9"
+            ],
+            "portNets": [
+              "TAP_B9"
+            ],
+            "zeroWireIds": [
+              "e3bf6398bc3d5b5f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BREG_FEED",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2790,
+          2350
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2810,
+              2350
+            ],
+            "portIds": [
+              "2ab9747aa01dbd63"
+            ],
+            "portNames": [
+              "BREG_COLLECTOR"
+            ],
+            "portNets": [
+              "BREG_COLLECTOR"
+            ],
+            "zeroWireIds": [
+              "81c155b460946f21"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BAT",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2670,
+          2260
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2690,
+              2260
+            ],
+            "portIds": [
+              "5e52f1014378fa03"
+            ],
+            "portNames": [
+              "BAT"
+            ],
+            "portNets": [
+              "BAT"
+            ],
+            "zeroWireIds": [
+              "b95634fddb8e6972"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_CHG1",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          315,
+          2500
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              295,
+              2500
+            ],
+            "portIds": [
+              "c11ec24edaa89968"
+            ],
+            "portNames": [
+              "CHG"
+            ],
+            "portNets": [
+              "CHG"
+            ],
+            "zeroWireIds": [
+              "636125917a613d24"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_CHG2",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          315,
+          2300
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              295,
+              2300
+            ],
+            "portIds": [
+              "db32013d85338743"
+            ],
+            "portNames": [
+              "CHG"
+            ],
+            "portNets": [
+              "CHG"
+            ],
+            "zeroWireIds": [
+              "a0227b20e33bed4b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_CHG3",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          315,
+          2100
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              295,
+              2100
+            ],
+            "portIds": [
+              "990f43837bee7043"
+            ],
+            "portNames": [
+              "CHG"
+            ],
+            "portNets": [
+              "CHG"
+            ],
+            "zeroWireIds": [
+              "a61ad3703310a5e7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_DSG1",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          925,
+          2500
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              905,
+              2500
+            ],
+            "portIds": [
+              "002c3ffc68eb916b"
+            ],
+            "portNames": [
+              "DSG"
+            ],
+            "portNets": [
+              "DSG"
+            ],
+            "zeroWireIds": [
+              "2525cb9a68e12115"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_DSG2",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          925,
+          2300
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              905,
+              2300
+            ],
+            "portIds": [
+              "4d2b85b8b5879a94"
+            ],
+            "portNames": [
+              "DSG"
+            ],
+            "portNets": [
+              "DSG"
+            ],
+            "zeroWireIds": [
+              "a79577263ccc7b05"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_G_DSG3",
+        "block": "充放电门极/指示支路",
+        "componentXY": [
+          925,
+          2100
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              905,
+              2100
+            ],
+            "portIds": [
+              "94d47d3cf3435810"
+            ],
+            "portNames": [
+              "DSG"
+            ],
+            "portNets": [
+              "DSG"
+            ],
+            "zeroWireIds": [
+              "3cbd77a265005ba7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_SRN",
+        "block": "其它辅助RC（待按原理图块复核）",
+        "componentXY": [
+          1510,
+          1745
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1530,
+              1745
+            ],
+            "portIds": [
+              "aaba4f0c65952eba"
+            ],
+            "portNames": [
+              "SRN"
+            ],
+            "portNets": [
+              "SRN"
+            ],
+            "zeroWireIds": [
+              "580916331296bf36"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1490,
+              1745
+            ],
+            "portIds": [
+              "3e475b3d7201c62a"
+            ],
+            "portNames": [
+              "PACK-"
+            ],
+            "portNets": [
+              "PACK-"
+            ],
+            "zeroWireIds": [
+              "8f364ac6a2691516"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_BREG_PD",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2940,
+          2200
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2960,
+              2200
+            ],
+            "portIds": [
+              "52ab617efbd3ae19"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "8a915fbaa899a277"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_DFETOFF_PU",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2920,
+          1750
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2940,
+              1750
+            ],
+            "portIds": [
+              "969f6988c050dc4a"
+            ],
+            "portNames": [
+              "DFETOFF"
+            ],
+            "portNets": [
+              "DFETOFF"
+            ],
+            "zeroWireIds": [
+              "15b16fd613f5308f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2900,
+              1750
+            ],
+            "portIds": [
+              "05d1bc657ae4c6b2"
+            ],
+            "portNames": [
+              "REG1"
+            ],
+            "portNets": [
+              "REG1"
+            ],
+            "zeroWireIds": [
+              "5fb22fbcb52938a7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_TIMER_ACTIVE_PD",
+        "block": "定时器支路",
+        "componentXY": [
+          3430,
+          2310
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3450,
+              2310
+            ],
+            "portIds": [
+              "bc616def0c987c9e"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "de042c57c8ba2eb4"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_LD",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2740,
+          1850
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2760,
+              1850
+            ],
+            "portIds": [
+              "a8a9b95f003973ed"
+            ],
+            "portNames": [
+              "BQ_LD"
+            ],
+            "portNets": [
+              "BQ_LD"
+            ],
+            "zeroWireIds": [
+              "ad63a98bac0e45b7"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2720,
+              1850
+            ],
+            "portIds": [
+              "1ac9bca95af9585a"
+            ],
+            "portNames": [
+              "PACK+"
+            ],
+            "portNets": [
+              "PACK+"
+            ],
+            "zeroWireIds": [
+              "4452124de9c9f039"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_PACK",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2700,
+          2200
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2680,
+              2200
+            ],
+            "portIds": [
+              "cb3eab5546095cf8"
+            ],
+            "portNames": [
+              "PACK+"
+            ],
+            "portNets": [
+              "PACK+"
+            ],
+            "zeroWireIds": [
+              "df9e52c900bb9e4f"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "R_TIMER_SET",
+        "block": "定时器支路",
+        "componentXY": [
+          3170,
+          2320
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              3190,
+              2320
+            ],
+            "portIds": [
+              "2ac999a4a9a69fe4"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "905c730301c476b9"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CAN_PWR_IN2",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          1020,
+          700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1040,
+              700
+            ],
+            "portIds": [
+              "5d680df5eba15329"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "378df9ef07b5546b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1000,
+              700
+            ],
+            "portIds": [
+              "26e214dfaeb5b95e"
+            ],
+            "portNames": [
+              "VOUT_5V"
+            ],
+            "portNets": [
+              "VOUT_5V"
+            ],
+            "zeroWireIds": [
+              "0225dbe04f0619eb"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_CAN_PWR_OUT2",
+        "block": "CAN收发器/隔离电源",
+        "componentXY": [
+          1260,
+          700
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              1280,
+              700
+            ],
+            "portIds": [
+              "054cdb53ea6ed36c"
+            ],
+            "portNames": [
+              "PACK-"
+            ],
+            "portNets": [
+              "PACK-"
+            ],
+            "zeroWireIds": [
+              "18e5532ca5d9c072"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              1240,
+              700
+            ],
+            "portIds": [
+              "d5b088815b903f38"
+            ],
+            "portNames": [
+              "CAN_ISO_5V"
+            ],
+            "portNets": [
+              "CAN_ISO_5V"
+            ],
+            "zeroWireIds": [
+              "d1236ffc4a123fb8"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_PSU_IN2",
+        "block": "板上电源模块",
+        "componentXY": [
+          290,
+          1000
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 1,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              270,
+              1000
+            ],
+            "portIds": [
+              "0161211ef5630999"
+            ],
+            "portNames": [
+              "TAP_B9"
+            ],
+            "portNets": [
+              "TAP_B9"
+            ],
+            "zeroWireIds": [
+              "6264ad9caed452f2"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      },
+      {
+        "ref": "C_BAT2",
+        "block": "BQ76952主控及供电/保护外围",
+        "componentXY": [
+          2790,
+          2220
+        ],
+        "rotation": 0,
+        "isolatedPinCount": 2,
+        "electricalPinCount": 2,
+        "isolatedPins": [
+          {
+            "number": "1",
+            "name": "1",
+            "xy": [
+              2775,
+              2220
+            ],
+            "portIds": [
+              "9ea03bf6e331b7d2"
+            ],
+            "portNames": [
+              "BAT"
+            ],
+            "portNets": [
+              "BAT"
+            ],
+            "zeroWireIds": [
+              "e032a134c590eab6"
+            ],
+            "nonzeroWireSegmentCount": 0
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "xy": [
+              2805,
+              2220
+            ],
+            "portIds": [
+              "624bade1be14aa84"
+            ],
+            "portNames": [
+              "B0"
+            ],
+            "portNets": [
+              "B0"
+            ],
+            "zeroWireIds": [
+              "ac0288b4f7773b7b"
+            ],
+            "nonzeroWireSegmentCount": 0
+          }
+        ]
+      }
+    ]
+  },
+  "validationBoundary": "After implementation, the parent should compare native netlist equivalence on the original 208-component/700-pin project and run DRC. This JSON does not establish post-edit native connectivity or acceptance."
+}

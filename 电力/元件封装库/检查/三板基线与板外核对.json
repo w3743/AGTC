@@ -1,0 +1,1031 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-15T18:29:37+08:00",
+  "scope": "只读核对当前登记的三块板原生页、原生工程/页配置、当前采购BOM、README及BMS项目要求；不修改工程或BOM。报告不代表电气、PCB、制造、实物或整车验收。",
+  "method": {
+    "native_parser": "只读读取元件总表/采购补充生成的当前库存字段；逐行用标准库csv核验采购raw与现行CSV。",
+    "mpn_key": "NFKC、大小写折叠、连续空白归一；保留标点及厂商前缀。采购MPN与原生MPN逐位号比较。",
+    "source_hashes_stable_during_audit": true,
+    "source_sha256": {
+      "AGENTS.md": "d0d502ac3175f1de4a54c4446cd12338b040f25c2eee89bb422fdbc545f103ee",
+      "BMS模块/README.md": "5caf2f92999a86dc1162ffe5f2a920e0d9a19b8cd48e0d7bd1f905e77884df80",
+      "BMS模块/eda工程文件/BMS-9S4P.eprj3": "796ad20763b5a6f67f0c678b8197a9fbd1687dda8d41020e9531c5e8e91fe40a",
+      "BMS模块/eda工程文件/sch/Schematic1/P1.esch2": "cd00f3727ad4d559f1378ec2fc10372725682336c2a19e1edba8f0d3ce7979ca",
+      "BMS模块/eda工程文件/sch/Schematic1/Schematic1.ecfg": "bfe75fb3c482489942f311084de1343c2b4dcf0425eb7afd8b82793d7703d477",
+      "BMS模块/原理图准备/BOM.csv": "4b0d4698249d82b6b7039c7d447055966da6f644ff6291a6f7e88ee56acea6fd",
+      "BMS模块/项目要求.md": "31480eb7e5f379a146d0fae7e108a821030ed6b8ce8a650819d04b5c47a3c2e7",
+      "FOC驱动模块/README.md": "f4b5583e2343eb057c818bef1d3f483aa0910253764d352f26fd553f9eeeacc2",
+      "FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3": "75bf696fbb586e9d2f0e405fa4215eb3cf69d203ee8a963fbb6dd9deabf695f9",
+      "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2": "46cc3fddea3c62352f977bbc39ed3c327f0228409bff7ebdb0f35b4b46d6c81f",
+      "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg": "082cb6543c2eff9f1a66143c15717d03f57340284aa223fae27ccbe48867ccca",
+      "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv": "729903c03ab0bb7ac4121dafc5b487f7d69f277698b5d21d30ea695b1e2105e7",
+      "FOC驱动模块/参考资料/电机资料/BDUAV_N5065_用户提供.jpg": "b749623c1dc91eb6fdca7041db6c395739a517791268c00bcec4bb652221cae4",
+      "FOC驱动模块/参考资料/电机资料/N5065参数证据.md": "b39466641e45c81bc37331d21e3a52ae902c2d77b93124ef0f5eb171c1d840d8",
+      "FOC驱动模块/参考资料/电机资料/电机接口用户确认.json": "a70b03241c2a08337aaadc2a5c74d0a2d7b5995c978fce41b17eb126a0efb97c",
+      "FOC驱动模块/检查/三板共用修复/修改前API器件.json": "7f40ee02f2bfd5bf7a963d8d8fc99b72e85b531958811528de70db771a6d48e6",
+      "README.md": "eed55eb55fccf1dc7622551e0a714af6530893157e6bad812c64ff343c457aec",
+      "元件封装库/README.md": "ab2cc233ce1f2f52da113cf3583f0cf7b4207809b13f4915a3eda46b876b7d56",
+      "元件封装库/来源配置.json": "703cee7a8449a355c1570ef235aa20f5d8601388a5901d0113e67954c2088811",
+      "元件封装库/检查/三板共用修复/本轮结论.md": "7c754f16d779fc71393b520cbb4e1fd9d13366ca4afc8a5550a863f322aa020e",
+      "元件封装库/检查/三板共用选型候选.json": "01737669aadc48a049339f52d333ae3983f01211f17fe70d19701cdc84fa44b0",
+      "元件封装库/检查/共享仓库发布.json": "d737038dd6d7c09f2835c7f482cfb35fb7ada582b6b7e0f2dd97e62ac80e8edf",
+      "元件封装库/检查/有源与连接器共用核对.json": "830393390b37085a7c3e5fb0321f10679fa43de50b96a17ff6f5053ca33d71d4",
+      "元件封装库/检查/有源与连接器共用核对.md": "06e2f4fd60b71246dd53a0829ec730a66413eb249a71ca5863630f96c2a491f2",
+      "元件封装库/检查/未通过项修复/本轮结论.md": "1f638334d1fc28ed6294af7abd95c9f6a457975c508941b4db22696e7a1a1b5c",
+      "元件封装库/检查/被动件共用核对.json": "aff57a4858ec381ccae9ac4600695002bc7775d682fa9ad07004b93dc731b087",
+      "元件封装库/索引/元件总表.json": "c1c5b4ea602d396d5d7258156df0f5a142bd96cbb85de4272075a3270cba8ef0",
+      "元件封装库/索引/采购补充.csv": "60f2beef1d4d30ba262eff73147ec08aeef0d83dfada3bc990a70cfdf2c403f0",
+      "元件封装库/索引/采购补充.json": "75612ed83cb5ae57894a76e00c297f1ca15b9cf0504ea928fc57c2cc8d4211f3",
+      "稳压模块/README.md": "c436b08108f74437fe78b567d11bc940e806e826577082e1fb1a96cb70d417fc",
+      "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": "ad07848a477dd3e0605559f20bd5f122ef6a3f9c2b46321c84f989e68f565c95",
+      "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2": "b3e59ef0ae3aad47eb9a4ffc69ac7cf055c8ec021d21c5916cad92e7418a0e42",
+      "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg": "8df8037ae27a2aae55bdaba53d79e7f98f6f086bc3a9ff0ea228732cd1d15149",
+      "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv": "17c5c06655ba29bee01d75ff68e4130c063967ccd13e328275e9a79b17dcd874"
+    }
+  },
+  "boards": [
+    {
+      "module": "BMS模块",
+      "readme_path": "BMS模块/README.md",
+      "source_files": {
+        "native_page": {
+          "path": "BMS模块/eda工程文件/sch/Schematic1/P1.esch2",
+          "exists": true,
+          "sha256": "cd00f3727ad4d559f1378ec2fc10372725682336c2a19e1edba8f0d3ce7979ca",
+          "bom_included_instances": 212,
+          "native_mpn_missing_count": 0,
+          "pcb_counts": {
+            "yes": 212
+          },
+          "distinct_mpn_normalized_raw_fields": 52,
+          "distinct_manufacturer_mpn_pairs": 52
+        },
+        "native_project": {
+          "path": "BMS模块/eda工程文件/BMS-9S4P.eprj3",
+          "exists": true,
+          "sha256": "796ad20763b5a6f67f0c678b8197a9fbd1687dda8d41020e9531c5e8e91fe40a"
+        },
+        "page_config": {
+          "path": "BMS模块/eda工程文件/sch/Schematic1/Schematic1.ecfg",
+          "exists": true,
+          "sha256": "bfe75fb3c482489942f311084de1343c2b4dcf0425eb7afd8b82793d7703d477"
+        },
+        "procurement_bom": {
+          "path": "BMS模块/原理图准备/BOM.csv",
+          "exists": true,
+          "sha256": "4b0d4698249d82b6b7039c7d447055966da6f644ff6291a6f7e88ee56acea6fd",
+          "delimiter": ","
+        }
+      },
+      "native_project_page_link": {
+        "project_default_sheet": "350a4904c4ec87b3",
+        "project_sheet_title": "P1",
+        "project_sheet_schematic_uuid": "1c3e06662fdc8e9a",
+        "page_local_uuid": "350a4904c4ec87b3",
+        "page_title": "P1",
+        "ecfg_schematic_uuid": "1c3e06662fdc8e9a",
+        "default_sheet_points_to_configured_page": true,
+        "project_schematic_matches_ecfg": true
+      },
+      "bom": {
+        "row_count": 257,
+        "reference_count": 257,
+        "quantity_sum": 280,
+        "distinct_nonblank_mpn_normalized": 75,
+        "purchase_status_counts": {
+          "待询价；未采购/未验收": 249,
+          "前轮报价待刷新；未采购/未验收": 6,
+          "已询价；未采购/未验收": 1,
+          "候选：板型指定，未采购/未验收": 1
+        },
+        "native_refs_present_in_bom": 212,
+        "native_refs_missing_from_bom": [],
+        "bom_refs_matching_native": 212,
+        "bom_only_ref_count": 45,
+        "bom_only_items": [
+          {
+            "ref": "BOOT_SB175_BMS",
+            "mpn": "Anderson 3-6037P1",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "BMS侧load boot带盖；按厂家外形安装。"
+          },
+          {
+            "ref": "BOOT_SB175_CELL",
+            "mpn": "Anderson 3-6036P1",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "电池侧source boot带盖；按厂家外形安装。不是主触点防误接或带载分断证明。"
+          },
+          {
+            "ref": "CAP_CELL_BATTERY",
+            "mpn": "TE DT12S-DC",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT06 battery-side disconnected half protective cover×1。"
+          },
+          {
+            "ref": "CAP_CELL_BMS",
+            "mpn": "TE DT12P-DC",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT04 BMS-side disconnected half protective cover×1。"
+          },
+          {
+            "ref": "CORE_BOARD",
+            "mpn": "WeAct Normal STM32G431CBU6 QFN48 core board",
+            "quantity": "1",
+            "scope": "外部控制板",
+            "procurement_status": "候选：板型指定，未采购/未验收",
+            "note": "独立WeAct核心板，不是BMS主板；两组2×12排母J_CORE_P1/P2已在接口清单计入。按官方QFN48版本核实启动/焊桥约束。"
+          },
+          {
+            "ref": "F1",
+            "mpn": "Littelfuse JLLN100.VXP",
+            "quantity": "1",
+            "scope": "功率/预充",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "外置100A Class T保险；125VDC/20kA DC额定。安装座及铜鼻子按原厂尺寸；最终包短路电流和37.8V总清除I²t协调须取得书面曲线。不得用预熔I²t代替总清除。"
+          },
+          {
+            "ref": "FAN_EXT",
+            "mpn": "Delta KSB0405HBF0D",
+            "quantity": "1",
+            "scope": "板外/装配配套",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "One external Delta KSB0405HBF0D 5 V four-wire fan. Power mates to J_FAN; PWM and tach mate to J_FAN_CTRL. Startup current is not guaranteed by the current evidence; verify on first article against converter and SGM2593 limits."
+          },
+          {
+            "ref": "FH_CELL_B1",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B1，pin2接保险后TAP_B1；承载F_CELL_B1。"
+          },
+          {
+            "ref": "FH_CELL_B2",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B2，pin2接保险后TAP_B2；承载F_CELL_B2。"
+          },
+          {
+            "ref": "FH_CELL_B3",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B3，pin2接保险后TAP_B3；承载F_CELL_B3。"
+          },
+          {
+            "ref": "FH_CELL_B4",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B4，pin2接保险后TAP_B4；承载F_CELL_B4。"
+          },
+          {
+            "ref": "FH_CELL_B5",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B5，pin2接保险后TAP_B5；承载F_CELL_B5。"
+          },
+          {
+            "ref": "FH_CELL_B6",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B6，pin2接保险后TAP_B6；承载F_CELL_B6。"
+          },
+          {
+            "ref": "FH_CELL_B7",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B7，pin2接保险后TAP_B7；承载F_CELL_B7。"
+          },
+          {
+            "ref": "FH_CELL_B8",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B8，pin2接保险后TAP_B8；承载F_CELL_B8。"
+          },
+          {
+            "ref": "FH_CELL_B9",
+            "mpn": "Eaton CHPV1U",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "单极10×38 mm保险座×1；pin1接电芯端CELL_B9，pin2接保险后TAP_B9；承载F_CELL_B9。"
+          },
+          {
+            "ref": "F_CELL_B1",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B1电芯端输入，pin2输出TAP_B1，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B2",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B2电芯端输入，pin2输出TAP_B2，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B3",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B3电芯端输入，pin2输出TAP_B3，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B4",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B4电芯端输入，pin2输出TAP_B4，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B5",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B5电芯端输入，pin2输出TAP_B5，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B6",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B6电芯端输入，pin2输出TAP_B6，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B7",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B7电芯端输入，pin2输出TAP_B7，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B8",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B8电芯端输入，pin2输出TAP_B8，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "F_CELL_B9",
+            "mpn": "Eaton PV-5A10F",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "Eaton PV-5A10F，5 A/1000 Vdc gPV，10×38 mm；pin1由CELL_B9电芯端输入，pin2输出TAP_B9，保护该共用抽头线束及板内AFE/均衡分支。与主回路熔断器功能不同；实际短路电流、分断能力、熔断曲线与导线/触点配合尚待核算。"
+          },
+          {
+            "ref": "J_CAN_MATE",
+            "mpn": "2EDGK-5.08-03P-14-1000A(H)",
+            "quantity": "1",
+            "scope": "板外/装配配套",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "One 3P wire-side mating plug for J_CAN. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C528723 is catalog identification only; current RMB price remains 待询价."
+          },
+          {
+            "ref": "J_CELL_BATTERY",
+            "mpn": "TE DT06-12SA-P004",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "电池侧DT12 A键plug；pin1=B0，pin2..10=TAP_B1..TAP_B9（源端各自保险后的节点）。电芯CELL_Bn先经F_CELL_Bn/FH_CELL_Bn，再由TAP_Bn进入plug、共用线束及BMS侧receptacle；11/12封堵。"
+          },
+          {
+            "ref": "J_CELL_BMS",
+            "mpn": "TE DT04-12PA",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "外置共用电芯抽头维护线束BMS侧DT04-12PA插接半边；pin1=B0，pin2..10=TAP_B1..TAP_B9（对应各保险下游），与电池侧逐pin相连。该连接器不焊在PCB；线束逐线焊至板端唯一共用接口J_CELL_SERVICE。11/12封堵；零电流维护插拔。"
+          },
+          {
+            "ref": "J_FAN_CTRL_MATE",
+            "mpn": "2EDGK-5.08-02P-14-1000A(H)",
+            "quantity": "1",
+            "scope": "板外/装配配套",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "One additional 2P wire-side mating plug for fan PWM/tach connector J_FAN_CTRL; same exact MPN as J_FAN_MATE to reuse the existing connector family. Current RMB quote remains 待询价."
+          },
+          {
+            "ref": "J_FAN_MATE",
+            "mpn": "2EDGK-5.08-02P-14-1000A(H)",
+            "quantity": "1",
+            "scope": "板外/装配配套",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "One 2P wire-side mating plug for J_FAN. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C581323 is catalog identification only; current RMB price remains 待询价."
+          },
+          {
+            "ref": "J_LOAD_POWER_VALID_MATE",
+            "mpn": "2EDGK-5.08-02P-14-1000A(H)",
+            "quantity": "1",
+            "scope": "板外/装配配套",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "One 2P wire-side mating plug for J_LOAD_POWER_VALID. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C581323 is catalog identification only; current RMB price remains 待询价. Preserve the two signal wires and VO617A isolation boundary; no ground conductor is added."
+          },
+          {
+            "ref": "J_SB175_BMS",
+            "mpn": "Anderson 940-BK",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "BMS侧主输入半边；与J_SB175_CELL成对插合，供维护时同时拆开CELL_B9/B0。搭配1384-BK×2触点、4 AWG候选线及3-6037P1带盖load boot。无性别触点，不保证内部先后断极；零电流时作为一对操作。"
+          },
+          {
+            "ref": "J_SB175_CELL",
+            "mpn": "Anderson 940-BK",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "电池/电芯侧主输入半边；SB175灰色2极壳体。搭配1384-BK×2触点、4 AWG候选线及3-6036P1带盖source boot。位置号为本线束逻辑位置，装配方位须按Anderson图纸与另一半一致。"
+          },
+          {
+            "ref": "K_CELL_BATTERY",
+            "mpn": "TE 0462-201-16141",
+            "quantity": "10",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT电池侧socket触点×10；pin1=B0，pin2..10=TAP_B1..TAP_B9（源端各自保险后的节点），适用16–20 AWG / 0.5–1.5 mm²。保险须位于CELL_Bn电芯源端和两半维护连接器之前。"
+          },
+          {
+            "ref": "K_CELL_BMS",
+            "mpn": "TE 0460-202-16141",
+            "quantity": "10",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT BMS侧pin触点×10；pin1=B0，pin2..10=TAP_B1..TAP_B9（各抽头保险下游），适用16–20 AWG / 0.5–1.5 mm²。"
+          },
+          {
+            "ref": "K_SB175_CONTACTS_BMS",
+            "mpn": "Anderson 1384-BK",
+            "quantity": "2",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "BMS侧SB175触点×2，银镀层、适配4 AWG。 脚1接CELL_B9，脚2接B0。"
+          },
+          {
+            "ref": "K_SB175_CONTACTS_CELL",
+            "mpn": "Anderson 1384-BK",
+            "quantity": "2",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "电池侧SB175触点×2，银镀层、适配4 AWG。 脚1接CELL_B9，脚2接B0。"
+          },
+          {
+            "ref": "NTC_CELL1",
+            "mpn": "NTCLE100E3103GB0",
+            "quantity": "1",
+            "scope": "MCU/接口/测温/CAN",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "10 kOhm at 25 C, B25/85 3977 K; representative cell-pack thermal zone A sensor connected to BQ76952 TS1 pin21. Human assigns the physical location to a representative thermal zone; this is not individual monitoring of every cell group. Preserve electrical insulation and existing BQ thermistor configuration."
+          },
+          {
+            "ref": "NTC_CELL3",
+            "mpn": "NTCLE100E3103GB0",
+            "quantity": "1",
+            "scope": "MCU/接口/测温/CAN",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "10 kOhm at 25 C, B25/85 3977 K; representative cell-pack thermal zone B sensor connected to BQ76952 DCHG pin31. Human assigns the physical location to a representative thermal zone; this is not individual monitoring of every cell group. Preserve electrical insulation and existing BQ thermistor configuration."
+          },
+          {
+            "ref": "NTC_CELL5",
+            "mpn": "NTCLE100E3103GB0",
+            "quantity": "1",
+            "scope": "MCU/接口/测温/CAN",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "10 kOhm at 25 C, B25/85 3977 K; representative cell-pack thermal zone C sensor connected to BQ76952 CFETOFF pin29. Human assigns the physical location to a representative thermal zone; this is not individual monitoring of every cell group. Preserve electrical insulation and existing BQ thermistor configuration."
+          },
+          {
+            "ref": "PLUG_CELL_CAVITIES",
+            "mpn": "TE 114017-ZZ",
+            "quantity": "4",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT腔位封堵塞×4；每半边未用腔11、12各装1只。"
+          },
+          {
+            "ref": "R_PRE",
+            "mpn": "TE Connectivity CJP300J8R2J",
+            "quantity": "1",
+            "scope": "功率/预充",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "外置300W free-air线绕功率电阻；8.2Ω±5%。37.8V/Rmin初始183.4W，最大2.970s硬超时下约545J；安装降额后须仍能承受183.4W，重复启动冷却时间实测。不是板上贴片。"
+          },
+          {
+            "ref": "SW_RUN_STORE",
+            "mpn": "MN22SS1G01",
+            "quantity": "1",
+            "scope": "MCU/接口/测温/CAN",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "NKK recommended DPDT gold-contact replacement for M2022SS1G01; maintained ON-ON, solder lug. Official terminal map: commons 2/5; ON closes 2-3 and 5-6; other position closes 2-1 and 5-4. Poles switch REG1 only to SW_RUN and PRE_CTRL_3V3; pins 1/4 NC. Control signals only, never B9 or main current; verify ON/OFF panel orientation."
+          },
+          {
+            "ref": "W_CELL_BATTERY",
+            "mpn": "TE W12S",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT06-12SA-P004 plug housing侧wedge/secondary lock×1。"
+          },
+          {
+            "ref": "W_CELL_BMS",
+            "mpn": "TE W12P",
+            "quantity": "1",
+            "scope": "维护线束",
+            "procurement_status": "待询价；未采购/未验收",
+            "note": "DT04-12PA receptacle housing侧wedge/secondary lock×1。"
+          }
+        ],
+        "procurement_mpn_equal_native_count": 212,
+        "procurement_mpn_blank_for_native_refs": [],
+        "procurement_mpn_mismatch": [],
+        "procurement_supplement_raw_rows_checked": 257,
+        "procurement_supplement_raw_rows_match": true
+      },
+      "native_board_off_parts_pcb_no": [],
+      "documented_baseline": {
+        "claimed_bom_instances": 212,
+        "claimed_normalized_mpn_count": 51,
+        "claimed_cad_designators": 213,
+        "claimed_pin_count": 711,
+        "note": "README/项目要求称含1个板外DPDT载体；直接原生BOM实例为212。按同步脚本规则只做NFKC/大小写/空白归一，原生MPN字符串为52种；仅去除一个前缀TI 后为51，故报告两种口径。"
+      },
+      "native_mpn_count_after_leading_ti_prefix_removed": 51
+    },
+    {
+      "module": "FOC驱动模块",
+      "readme_path": "FOC驱动模块/README.md",
+      "source_files": {
+        "native_page": {
+          "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+          "exists": true,
+          "sha256": "46cc3fddea3c62352f977bbc39ed3c327f0228409bff7ebdb0f35b4b46d6c81f",
+          "bom_included_instances": 145,
+          "native_mpn_missing_count": 1,
+          "pcb_counts": {
+            "yes": 137,
+            "no": 8
+          },
+          "distinct_mpn_normalized_raw_fields": 62,
+          "distinct_manufacturer_mpn_pairs": 61
+        },
+        "native_project": {
+          "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3",
+          "exists": true,
+          "sha256": "75bf696fbb586e9d2f0e405fa4215eb3cf69d203ee8a963fbb6dd9deabf695f9"
+        },
+        "page_config": {
+          "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg",
+          "exists": true,
+          "sha256": "082cb6543c2eff9f1a66143c15717d03f57340284aa223fae27ccbe48867ccca"
+        },
+        "procurement_bom": {
+          "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+          "exists": true,
+          "sha256": "729903c03ab0bb7ac4121dafc5b487f7d69f277698b5d21d30ea695b1e2105e7",
+          "delimiter": "tab"
+        }
+      },
+      "native_project_page_link": {
+        "project_default_sheet": "90aa6c46493624cf",
+        "project_sheet_title": "P1",
+        "project_sheet_schematic_uuid": "92981e4f130526a7",
+        "page_local_uuid": "90aa6c46493624cf",
+        "page_title": "P1",
+        "ecfg_schematic_uuid": "92981e4f130526a7",
+        "default_sheet_points_to_configured_page": true,
+        "project_schematic_matches_ecfg": true
+      },
+      "bom": {
+        "row_count": 86,
+        "reference_count": 145,
+        "quantity_sum": 145,
+        "distinct_nonblank_mpn_normalized": 62,
+        "purchase_status_counts": null,
+        "native_refs_present_in_bom": 145,
+        "native_refs_missing_from_bom": [],
+        "bom_refs_matching_native": 145,
+        "bom_only_ref_count": 0,
+        "bom_only_items": [],
+        "procurement_mpn_equal_native_count": 144,
+        "procurement_mpn_blank_for_native_refs": [
+          {
+            "ref": "J_BRAKE_R",
+            "native_mpn": null,
+            "carrier_mpn": "HC-XH2.54-2AW-M"
+          }
+        ],
+        "procurement_mpn_mismatch": [],
+        "procurement_supplement_raw_rows_checked": 86,
+        "procurement_supplement_raw_rows_match": true
+      },
+      "native_board_off_parts_pcb_no": [
+        {
+          "ref": "CBUS1",
+          "manufacturer": "KEMET",
+          "mpn": "PEH200PJ5100MB2",
+          "carrier_mpn": null
+        },
+        {
+          "ref": "CBUS2",
+          "manufacturer": "KEMET",
+          "mpn": "PEH200PJ5100MB2",
+          "carrier_mpn": null
+        },
+        {
+          "ref": "CBUS3",
+          "manufacturer": "KEMET",
+          "mpn": "PEH200PJ5100MB2",
+          "carrier_mpn": null
+        },
+        {
+          "ref": "F_BRAKE",
+          "manufacturer": null,
+          "mpn": "Eaton CBBF-60",
+          "carrier_mpn": "FUSE"
+        },
+        {
+          "ref": "F_MAIN",
+          "manufacturer": "Eaton Bussmann",
+          "mpn": "Eaton CBBF-100",
+          "carrier_mpn": "FUSE"
+        },
+        {
+          "ref": "J_BRAKE_R",
+          "manufacturer": "Anderson Power Products",
+          "mpn": null,
+          "carrier_mpn": "HC-XH2.54-2AW-M"
+        },
+        {
+          "ref": "R_DUMP_A",
+          "manufacturer": "Vishay Sfernice",
+          "mpn": "LPS0300H2R00FB",
+          "carrier_mpn": null
+        },
+        {
+          "ref": "R_DUMP_B",
+          "manufacturer": "Vishay Sfernice",
+          "mpn": "LPS0300H2R00FB",
+          "carrier_mpn": null
+        }
+      ]
+    },
+    {
+      "module": "稳压模块",
+      "readme_path": "稳压模块/README.md",
+      "source_files": {
+        "native_page": {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+          "exists": true,
+          "sha256": "b3e59ef0ae3aad47eb9a4ffc69ac7cf055c8ec021d21c5916cad92e7418a0e42",
+          "bom_included_instances": 165,
+          "native_mpn_missing_count": 4,
+          "pcb_counts": {
+            "yes": 156,
+            "no": 9
+          },
+          "distinct_mpn_normalized_raw_fields": 53,
+          "distinct_manufacturer_mpn_pairs": 51
+        },
+        "native_project": {
+          "path": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+          "exists": true,
+          "sha256": "ad07848a477dd3e0605559f20bd5f122ef6a3f9c2b46321c84f989e68f565c95"
+        },
+        "page_config": {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg",
+          "exists": true,
+          "sha256": "8df8037ae27a2aae55bdaba53d79e7f98f6f086bc3a9ff0ea228732cd1d15149"
+        },
+        "procurement_bom": {
+          "path": "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv",
+          "exists": true,
+          "sha256": "17c5c06655ba29bee01d75ff68e4130c063967ccd13e328275e9a79b17dcd874",
+          "delimiter": ","
+        }
+      },
+      "native_project_page_link": {
+        "project_default_sheet": "9546dca0bc8bce7f",
+        "project_sheet_title": "01 稳压模块全部电路",
+        "project_sheet_schematic_uuid": "539d677ac9095954",
+        "page_local_uuid": "9546dca0bc8bce7f",
+        "page_title": "01 稳压模块全部电路",
+        "ecfg_schematic_uuid": "539d677ac9095954",
+        "default_sheet_points_to_configured_page": true,
+        "project_schematic_matches_ecfg": true
+      },
+      "bom": {
+        "row_count": 168,
+        "reference_count": 168,
+        "quantity_sum": 168,
+        "distinct_nonblank_mpn_normalized": 54,
+        "purchase_status_counts": {
+          "library_candidate": 47,
+          "": 87,
+          "on_board_footprint_import_pending": 8,
+          "custom_library_import_required": 3,
+          "candidate_or_placeholder": 2,
+          "USER_FOOTPRINT_BOUND_MECHANICAL_FIT_PENDING": 8,
+          "module_symbol_placeholder": 1,
+          "two_pin_power_symbol_placeholder": 4,
+          "CANDIDATE_NOT_QUALIFIED": 1,
+          "external_fuse_symbol_placeholder": 2,
+          "external_resistor_assembly": 1,
+          "OFF_BOARD_EXTERNAL": 3,
+          "REUSE_EXISTING_5V_FIRST": 1
+        },
+        "native_refs_present_in_bom": 165,
+        "native_refs_missing_from_bom": [],
+        "bom_refs_matching_native": 165,
+        "bom_only_ref_count": 3,
+        "bom_only_items": [
+          {
+            "ref": "COREBOARD_WEACT",
+            "mpn": "",
+            "quantity": "1",
+            "scope": "OFF_BOARD_EXTERNAL",
+            "procurement_status": "CANDIDATE_NOT_QUALIFIED",
+            "note": "The plan includes J_CORE_P1/P2 carrier-board connectors; this row represents the separate core-board assembly once. Exact revision, included headers and installed board identity are unverified."
+          },
+          {
+            "ref": "PSU5_EXT",
+            "mpn": "URB4805YMD-10WR3",
+            "quantity": "1",
+            "scope": "CONDITIONAL_EXTERNAL_CANDIDATE",
+            "procurement_status": "REUSE_EXISTING_5V_FIRST",
+            "note": "Only install if the existing vehicle 5 V source cannot be reused after checking its identity and spare capacity. Rated 2 A is not confirmed available current."
+          },
+          {
+            "ref": "R_DUMP_EXT",
+            "mpn": "",
+            "quantity": "1",
+            "scope": "OFF_BOARD_EXTERNAL",
+            "procurement_status": "external_resistor_assembly",
+            "note": "1.8 ohm +/-1%; design ceiling 42 V; maximum 1000 W; at least 1 kJ for 1 s; physical qualification pending"
+          }
+        ],
+        "procurement_mpn_equal_native_count": 161,
+        "procurement_mpn_blank_for_native_refs": [
+          {
+            "ref": "J_5V_EXT",
+            "native_mpn": null,
+            "carrier_mpn": "2PINA-power"
+          },
+          {
+            "ref": "J_BUS_POWER",
+            "native_mpn": null,
+            "carrier_mpn": "2PINA-power"
+          },
+          {
+            "ref": "J_DUMP",
+            "native_mpn": null,
+            "carrier_mpn": "2PINA-power"
+          },
+          {
+            "ref": "J_SC_POWER",
+            "native_mpn": null,
+            "carrier_mpn": "2PINA-power"
+          }
+        ],
+        "procurement_mpn_mismatch": [],
+        "procurement_supplement_raw_rows_checked": 168,
+        "procurement_supplement_raw_rows_match": true
+      },
+      "native_board_off_parts_pcb_no": [
+        {
+          "ref": "F_BUS",
+          "manufacturer": "Eaton",
+          "mpn": "AMG-80",
+          "carrier_mpn": "FUSE"
+        },
+        {
+          "ref": "F_SC",
+          "manufacturer": "Eaton",
+          "mpn": "AMG-80",
+          "carrier_mpn": "FUSE"
+        },
+        {
+          "ref": "J_5V_EXT",
+          "manufacturer": null,
+          "mpn": null,
+          "carrier_mpn": "2PINA-power"
+        },
+        {
+          "ref": "J_BUS_POWER",
+          "manufacturer": null,
+          "mpn": null,
+          "carrier_mpn": "2PINA-power"
+        },
+        {
+          "ref": "J_DUMP",
+          "manufacturer": null,
+          "mpn": null,
+          "carrier_mpn": "2PINA-power"
+        },
+        {
+          "ref": "J_SC_POWER",
+          "manufacturer": null,
+          "mpn": null,
+          "carrier_mpn": "2PINA-power"
+        },
+        {
+          "ref": "TH_DUMP",
+          "manufacturer": "ATI(恒光)",
+          "mpn": "ATH10K1R8B3950K",
+          "carrier_mpn": "ATH10K1R8B3950K"
+        },
+        {
+          "ref": "TH_MAIN",
+          "manufacturer": "ATI(恒光)",
+          "mpn": "ATH10K1R8B3950K",
+          "carrier_mpn": "ATH10K1R8B3950K"
+        },
+        {
+          "ref": "TH_SC",
+          "manufacturer": "ATI(恒光)",
+          "mpn": "ATH10K1R8B3950K",
+          "carrier_mpn": "ATH10K1R8B3950K"
+        }
+      ]
+    }
+  ],
+  "cross_board": {
+    "strict_manufacturer_and_mpn_shared_identity_count": 5,
+    "strict_shared_identities": [
+      {
+        "manufacturer": "Milliohm(毫欧)",
+        "mpn": "HoLRS2512-6W-0.5mR-1%",
+        "uses": {
+          "BMS模块": [
+            "RSHUNT"
+          ],
+          "稳压模块": [
+            "R_SC_SHUNT"
+          ]
+        },
+        "strict_part_key": "MODEL-100967525bd9adf0"
+      },
+      {
+        "manufacturer": "Tyohm(幸亚电阻)",
+        "mpn": "RMC0603100K1%N",
+        "uses": {
+          "BMS模块": [
+            "R_BAL_ENABLE_BE",
+            "R_BAL_EN_GATE_PU1",
+            "R_BAL_EN_GATE_PU2",
+            "R_BAL_EN_GATE_PU3",
+            "R_BAL_EN_GATE_PU4",
+            "R_BAL_EN_GATE_PU5",
+            "R_BAL_EN_GATE_PU6",
+            "R_BAL_EN_GATE_PU7",
+            "R_BAL_EN_GATE_PU8",
+            "R_BAL_ISET1",
+            "R_BAL_ISET2",
+            "R_BAL_ISET3",
+            "R_BAL_ISET4",
+            "R_BAL_ISET5",
+            "R_BAL_ISET6",
+            "R_BAL_ISET7",
+            "R_BAL_ISET8",
+            "R_BAL_MAINCLR_BE",
+            "R_DFETOFF_GS",
+            "R_FAN_PWM_PD",
+            "R_IF_LOCAL_OK_PD",
+            "R_IF_MAIN_REQ_PD",
+            "R_IF_PRE_REQ_PD",
+            "R_LOAD_POWER_VALID_GS",
+            "R_PRE_CTRL_PD",
+            "R_QPRE_BE"
+          ],
+          "稳压模块": [
+            "R_QP_BE"
+          ]
+        },
+        "strict_part_key": "MODEL-72e7898e5e455170"
+      },
+      {
+        "manufacturer": "Tyohm(幸亚电阻)",
+        "mpn": "RMC06031K1%N",
+        "uses": {
+          "BMS模块": [
+            "R_ALERT_SER",
+            "R_DFETOFF_GATE",
+            "R_FAN_PWM_GATE",
+            "R_LOAD_POWER_VALID_GATE",
+            "R_QPRE_BASE",
+            "R_RST_SHUT",
+            "R_TIMER_SUPPLY"
+          ],
+          "稳压模块": [
+            "R_PB5_PERMIT"
+          ]
+        },
+        "strict_part_key": "MODEL-90c4875209853c7b"
+      },
+      {
+        "manufacturer": "Tyohm(幸亚电阻)",
+        "mpn": "RMC06033.3K1%N",
+        "uses": {
+          "BMS模块": [
+            "R_BAL_ENABLE_BASE",
+            "R_BAL_MAINCLR_BASE"
+          ],
+          "稳压模块": [
+            "R_DRV_DT"
+          ]
+        },
+        "strict_part_key": "MODEL-3bbfcdb334a92f8f"
+      },
+      {
+        "manufacturer": "Tyohm(幸亚电阻)",
+        "mpn": "RMC060347K1%N",
+        "uses": {
+          "BMS模块": [
+            "R_DFETOFF_PU",
+            "R_TIMER_ACTIVE_PD"
+          ],
+          "稳压模块": [
+            "R_PWM_H_PD",
+            "R_PWM_L_PD",
+            "R_QP_GS"
+          ]
+        },
+        "strict_part_key": "MODEL-4f6937f4d450a07a"
+      }
+    ],
+    "same_mpn_native_cross_board_model_count": 10,
+    "same_mpn_but_manufacturer_field_differs": [
+      {
+        "mpn": "IRLB4030PBF",
+        "uses": {
+          "FOC驱动模块": [
+            "Q7"
+          ],
+          "稳压模块": [
+            "Q_DUMP",
+            "Q_MAIN_H",
+            "Q_MAIN_L"
+          ]
+        },
+        "manufacturer_spellings_by_module": {
+          "FOC驱动模块": "Infineon",
+          "稳压模块": "Infineon(英飞凌)"
+        }
+      },
+      {
+        "mpn": "JXT-PM2.54-2X12P-A9",
+        "uses": {
+          "FOC驱动模块": [
+            "J_MCU_L",
+            "J_MCU_R"
+          ],
+          "稳压模块": [
+            "J_CORE_P1",
+            "J_CORE_P2"
+          ]
+        },
+        "manufacturer_spellings_by_module": {
+          "FOC驱动模块": "JXT",
+          "稳压模块": "JXTCONN(聚兴泰)"
+        }
+      },
+      {
+        "mpn": "MMBT5551",
+        "uses": {
+          "BMS模块": [
+            "Q_BAL_ENABLE",
+            "Q_BAL_MAINCLR",
+            "Q_QPRE_DRV"
+          ],
+          "稳压模块": [
+            "Q_PMOS_CTRL"
+          ]
+        },
+        "manufacturer_spellings_by_module": {
+          "BMS模块": "MDD(辰达半导体)",
+          "稳压模块": "JKSEMI(金开盛)"
+        }
+      },
+      {
+        "mpn": "PESD2CANFD24V-TR",
+        "uses": {
+          "BMS模块": [
+            "D_CAN_TVS"
+          ],
+          "FOC驱动模块": [
+            "D_CAN_ESD"
+          ]
+        },
+        "manufacturer_spellings_by_module": {
+          "BMS模块": "Nexperia(安世)",
+          "FOC驱动模块": "Nexperia"
+        }
+      },
+      {
+        "mpn": "RC0603FR-0710RL",
+        "uses": {
+          "FOC驱动模块": [
+            "R_DUMP_GATE"
+          ],
+          "稳压模块": [
+            "R_DUMP_OH",
+            "R_DUMP_OL"
+          ]
+        },
+        "manufacturer_spellings_by_module": {
+          "FOC驱动模块": "Yageo",
+          "稳压模块": "YAGEO(国巨)"
+        }
+      }
+    ],
+    "external_procurement_entry_matching_other_board_native_model": [
+      {
+        "external_module": "稳压模块",
+        "external_ref": "PSU5_EXT",
+        "mpn": "URB4805YMD-10WR3",
+        "scope": "CONDITIONAL_EXTERNAL_CANDIDATE",
+        "procurement_status": "REUSE_EXISTING_5V_FIRST",
+        "existing_module": "BMS模块",
+        "existing_ref": "PSU5_EXT",
+        "existing_native_mpn": "URB4805YMD-10WR3"
+      }
+    ],
+    "exact_mpn_overlap_between_board_offboard_entries": []
+  },
+  "public_library_snapshot": {
+    "publish_directory": "tmp/vehicle-power-hardware-common-publish",
+    "shared_repository": "元件封装库/共享仓库",
+    "files_in_publish_excluding_git": 424,
+    "files_in_shared_repo_excluding_git": 424,
+    "publish_only_paths": [],
+    "repo_only_paths": [],
+    "sha_mismatch_paths": [],
+    "manifest_part_identities": 197,
+    "manifest_asset_files": 405,
+    "manifest_asset_file_sha_errors": [],
+    "native_asset_reference_count": 612,
+    "native_asset_reference_missing_paths": [],
+    "native_asset_reference_sha_errors": [],
+    "shared_repo_git_status_entry_count": 0,
+    "shared_repo_working_tree_clean": true,
+    "shared_repo_git_status_sample": [],
+    "shared_repo_head": "9130f6a7ce20e16ed5b573c1cfb1855454280aa5",
+    "shared_repo_head_commit_time": "2026-10-15T17:30:27+08:00",
+    "shared_repo_head_subject": "Respect explicitly cleared procurement attributes in current library snapshot",
+    "shared_repo_origin_main": "9130f6a7ce20e16ed5b573c1cfb1855454280aa5",
+    "shared_repo_head_matches_origin_main": true,
+    "current_common_candidate_table": {
+      "path": "元件封装库/检查/三板共用选型候选.json",
+      "sha256": "01737669aadc48a049339f52d333ae3983f01211f17fe70d19701cdc84fa44b0",
+      "finding_count": 18,
+      "N08_present": true
+    },
+    "published_evidence": {
+      "path": "元件封装库/检查/共享仓库发布.json",
+      "sha256": "d737038dd6d7c09f2835c7f482cfb35fb7ada582b6b7e0f2dd97e62ac80e8edf",
+      "published_commit": "9130f6a7ce20e16ed5b573c1cfb1855454280aa5",
+      "remote_main": "9130f6a7ce20e16ed5b573c1cfb1855454280aa5",
+      "all_published_files_equal_prepared_output": true,
+      "all_current_source_checks_pass": true
+    }
+  },
+  "limitations": [
+    "BMS文件记载212颗/51种归一化采购MPN、213个CAD位号/711针；本文按原生BOM实例直接复算为212。原始MPN文本按库同步工具规则规整为52种；仅去掉前缀TI 后为51种，已将口径差异列明。",
+    "制造商字段差异时，相同MPN列为待审阅复用线索；不据此自动合并或替换。",
+    "BOM中采购状态、候选与板外范围照源文件记录；未据此声称已采购、已验收或电气/实物等效。"
+  ],
+  "procurement_source_consistency": {
+    "source_rows_checked_against_raw_records": 511,
+    "source_row_mismatches": [],
+    "source_file_count": 3,
+    "all_source_hashes_match_recorded": true
+  }
+}

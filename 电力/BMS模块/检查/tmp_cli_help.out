@@ -1,0 +1,29 @@
+
+JLCEDA Pro 4.1.60.198f38ab
+
+Usage:
+  lceda-pro <command> [options]
+  lceda-pro [global flags]
+
+Commands:
+  activate          Bring the server window up and focus it
+  open              Open a project and return its session id (visible editor window; --headless for a hidden render)
+  stop              Gracefully stop the server
+  doctor            Probe the endpoint and report its identity
+  session/          Manage sessions (one per opened project)
+    list            List sessions
+    close           Close a session (visible windows are kept by default; --destroy also closes them)
+  invoke            Invoke a registered function by extension id + name (source runs on the editor command space; omit extUuid to run with independent script permission)
+  functions         List extensions known to the session (editor command space extension index)
+  doc/              Query the editor API reference (eda / external / format)
+    api             Query the eda namespace (static editor API) progressively (surface / class / method)
+    external        Query the external namespace (extension-injected API; requires a session) progressively (group / interface)
+    format          Query the format namespace (design format reference) progressively (surface / type)
+
+Global flags:
+  --help              Show help for any command:
+    lceda-pro <command> --help
+  --search <query>    Fuzzy-search commands when unsure of the name:
+    lceda-pro --search <query>
+  --mcp stdio|http    Start MCP server (details: lceda-pro --mcp --help):
+    lceda-pro --mcp http --port 3030

@@ -1,0 +1,938 @@
+{
+  "base_drive_config": {
+    "actuator_effort_limit_nm": 2.0,
+    "actuator_model": "explicit_IdealPD_velocity_servo",
+    "current_feedback_source": "equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured",
+    "drive_efficiency_assumption": 1.0,
+    "drive_reduction_ratio": 4.0,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_sprocket_radius_m": 0.03,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+    "effort_clamp_source": "NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward",
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "gimbal_effort_limit_basis": "implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range",
+    "gimbal_solver_joint_effort_limit_nm": 1.0,
+    "interface": "independent_left_right_track_speed_explicit_v5",
+    "joint_effort_limit_nm": 2.0,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "max_track_speed_mps": 4.166666666666667,
+    "motor_torque_constant_nm_per_a": 0.035,
+    "proxy_wheel_count_per_side": 7,
+    "proxy_wheel_radius_m": 0.045,
+    "robot_asset_spec_sha256": "b58fc3385035fb40add366320bd57f49d3174698fb8e265b4351bc3d7a52149e",
+    "track_acceleration_mps2": 1.5,
+    "track_ground_contact_length_m": 0.595,
+    "velocity_gain": 0.04,
+    "wheel_effort_limit_basis": "actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+    "wheel_effort_limit_nm": 2.0
+  },
+  "case_count": 4,
+  "cases": [
+    {
+      "all_recorded_policy_values_finite": true,
+      "case": "diff_left_plus_0.05",
+      "drive": {
+        "antiwindup_blocked_side_samples": 0,
+        "cumulative_abs_yaw_path_rad": 0.3209876781293133,
+        "duration_s": 8.0,
+        "end_actual_v_w": [
+          -0.017589803785085678,
+          -0.0666765570640564
+        ],
+        "end_xy_m": [
+          49.87085723876953,
+          50.02326965332031
+        ],
+        "end_yaw_unwrapped_rad": -0.32101985812187195,
+        "last_1s_mean_abs_qd_tracking_error_rad_s": {
+          "left": 2.3799395347280163,
+          "right": 3.518968455892589
+        },
+        "last_1s_track_side_means": {
+          "left_actual_qd_mean_rad_s": 3.5284441335925036,
+          "left_applied_effort_mean_nm": 0.42437744678588524,
+          "left_target_mean_rad_s": 4.629629135131836,
+          "right_actual_qd_mean_rad_s": -4.033976343939346,
+          "right_applied_effort_mean_nm": -0.4942612475917225,
+          "right_target_mean_rad_s": -4.629629135131836
+        },
+        "max_abs_applied_effort_nm": 0.6698240041732788,
+        "max_abs_roll_pitch_rad_all_phases": {
+          "pitch": 0.0005721384077332914,
+          "roll": 0.0014188009081408381
+        },
+        "max_abs_side_integral_feedforward_nm_per_proxy_wheel": 0.5084575414657593,
+        "mean_abs_actual_yaw_rate_last_1s_rad_s": 0.03901102468371391,
+        "mean_abs_command_yaw_rate_last_1s_rad_s": 1.016260138372096,
+        "mean_actual_v_w": [
+          -0.01730130478125602,
+          -0.03966807094111573
+        ],
+        "mean_signed_actual_yaw_rate_first_1s_rad_s": -0.013254421181045473,
+        "mean_signed_actual_yaw_rate_last_1s_rad_s": -0.03901102468371391,
+        "net_xy_displacement_m": 0.13122244298852767,
+        "net_yaw_delta_unwrapped_rad": -0.3209876781293133,
+        "path_length_m": 0.23488865000068718,
+        "start_actual_v_w": [
+          -2.82708351733163e-05,
+          -0.0006965204374864697
+        ],
+        "start_xy_m": [
+          50.0,
+          50.0
+        ],
+        "start_yaw_unwrapped_rad": -3.2179992558667436e-05,
+        "yaw_sign_matches_raw_command_last_1s": true
+      },
+      "historical_action_source_only": {
+        "policy_normalized_action": [
+          0.05000000074505806,
+          -0.05000000074505806,
+          0.0,
+          0.0
+        ],
+        "summary_case": "diff_left_plus_0.05"
+      },
+      "initial_state_after_settle": {
+        "actual_v_w": [
+          -3.0058738047955558e-05,
+          -6.461708039751102e-07
+        ],
+        "position_xy_m": [
+          50.0,
+          50.0
+        ],
+        "roll_pitch_yaw_rad": [
+          -9.815425983106252e-07,
+          -2.7532528292795178e-06,
+          -7.573052016596193e-07
+        ],
+        "root_z_m": 0.1539611518383026,
+        "track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "wheel_actual_qd_rad_s": [
+          -0.00054370635189116,
+          -0.0005453784833662212,
+          -0.0005438990774564445,
+          -0.000543541566003114,
+          -0.0005444285925477743,
+          -0.0005439271917566657,
+          -0.0005429697339423001,
+          -0.0005498536629602313,
+          -0.0005493180942721665,
+          -0.0005490530747920275,
+          -0.000549429387319833,
+          -0.0005496012163348496,
+          -0.000550030788872391,
+          -0.0005493185599334538
+        ],
+        "wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "nominal_yaw_rate_raw_action_rad_s": -1.0162601777450826,
+      "physics_substep_applied_effort": {
+        "brake": null,
+        "drive": {
+          "captured_physics_iterations": 1600,
+          "max_abs_applied_effort_nm": 0.6698240041732788,
+          "physics_iteration_end_exclusive": 1800,
+          "physics_iteration_start_inclusive": 200
+        },
+        "settle": {
+          "captured_physics_iterations": 200,
+          "max_abs_applied_effort_nm": 3.60299127351027e-05,
+          "physics_iteration_end_exclusive": 200,
+          "physics_iteration_start_inclusive": 0
+        }
+      },
+      "policy_normalized_action": [
+        0.05000000074505806,
+        -0.05000000074505806,
+        0.0,
+        0.0
+      ],
+      "raw_track_command_mps": [
+        0.20833333643774193,
+        -0.20833333643774193
+      ],
+      "samples_including_settle": 180,
+      "settle_control_strategy": "native capped per-wheel IdealPD; per-side integral disabled and feedforward exactly zero"
+    },
+    {
+      "all_recorded_policy_values_finite": true,
+      "case": "diff_left_plus_0.10",
+      "drive": {
+        "antiwindup_blocked_side_samples": 0,
+        "cumulative_abs_yaw_path_rad": 0.62957196163552,
+        "duration_s": 8.0,
+        "end_actual_v_w": [
+          -0.04775955528020859,
+          -0.081804059445858
+        ],
+        "end_xy_m": [
+          50.051509857177734,
+          50.01479721069336
+        ],
+        "end_yaw_unwrapped_rad": -0.6296042203903198,
+        "last_1s_mean_abs_qd_tracking_error_rad_s": {
+          "left": 4.695392360272153,
+          "right": 4.046233923094613
+        },
+        "last_1s_track_side_means": {
+          "left_actual_qd_mean_rad_s": 9.093778153562116,
+          "left_applied_effort_mean_nm": 0.5155153193311499,
+          "left_target_mean_rad_s": 9.259258270263672,
+          "right_actual_qd_mean_rad_s": -9.581255561964856,
+          "right_applied_effort_mean_nm": -0.409082115950462,
+          "right_target_mean_rad_s": -9.259258270263672
+        },
+        "max_abs_applied_effort_nm": 0.8843938708305359,
+        "max_abs_roll_pitch_rad_all_phases": {
+          "pitch": 0.0008583421586081386,
+          "roll": 0.002159759169444442
+        },
+        "max_abs_side_integral_feedforward_nm_per_proxy_wheel": 0.5641410946846008,
+        "mean_abs_actual_yaw_rate_last_1s_rad_s": 0.07474662521854043,
+        "mean_abs_command_yaw_rate_last_1s_rad_s": 2.032520276744192,
+        "mean_actual_v_w": [
+          0.004814442666190644,
+          -0.07801833007251843
+        ],
+        "mean_signed_actual_yaw_rate_first_1s_rad_s": -0.054644422978162764,
+        "mean_signed_actual_yaw_rate_last_1s_rad_s": -0.07474662521854043,
+        "net_xy_displacement_m": 0.053593122980231916,
+        "net_yaw_delta_unwrapped_rad": -0.62957196163552,
+        "path_length_m": 0.32649312106295975,
+        "start_actual_v_w": [
+          -2.571336335677188e-05,
+          -0.0006979481549933553
+        ],
+        "start_xy_m": [
+          50.0,
+          50.0
+        ],
+        "start_yaw_unwrapped_rad": -3.225875479984097e-05,
+        "yaw_sign_matches_raw_command_last_1s": true
+      },
+      "historical_action_source_only": {
+        "policy_normalized_action": [
+          0.10000000149011612,
+          -0.10000000149011612,
+          0.0,
+          0.0
+        ],
+        "summary_case": "diff_left_plus_0.10"
+      },
+      "initial_state_after_settle": {
+        "actual_v_w": [
+          -2.706681152631063e-05,
+          -5.780908622909919e-07
+        ],
+        "position_xy_m": [
+          50.0,
+          50.0
+        ],
+        "roll_pitch_yaw_rad": [
+          -1.3826490885548992e-07,
+          -3.505778295220807e-06,
+          -7.446233212249354e-07
+        ],
+        "root_z_m": 0.15396109223365784,
+        "track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "wheel_actual_qd_rad_s": [
+          -0.000516225234605372,
+          -0.0005184694891795516,
+          -0.0005163321038708091,
+          -0.0005165382754057646,
+          -0.0005167712224647403,
+          -0.0005163599853403866,
+          -0.0005159957217983902,
+          -0.000521707464940846,
+          -0.0005212781834416091,
+          -0.000521022011525929,
+          -0.0005212804535403848,
+          -0.0005213817348703742,
+          -0.0005217732978053391,
+          -0.0005210262024775147
+        ],
+        "wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "nominal_yaw_rate_raw_action_rad_s": -2.032520355490165,
+      "physics_substep_applied_effort": {
+        "brake": null,
+        "drive": {
+          "captured_physics_iterations": 1600,
+          "max_abs_applied_effort_nm": 0.8843938708305359,
+          "physics_iteration_end_exclusive": 3600,
+          "physics_iteration_start_inclusive": 2000
+        },
+        "settle": {
+          "captured_physics_iterations": 200,
+          "max_abs_applied_effort_nm": 3.4503631468396634e-05,
+          "physics_iteration_end_exclusive": 2000,
+          "physics_iteration_start_inclusive": 1800
+        }
+      },
+      "policy_normalized_action": [
+        0.10000000149011612,
+        -0.10000000149011612,
+        0.0,
+        0.0
+      ],
+      "raw_track_command_mps": [
+        0.41666667287548387,
+        -0.41666667287548387
+      ],
+      "samples_including_settle": 180,
+      "settle_control_strategy": "native capped per-wheel IdealPD; per-side integral disabled and feedforward exactly zero"
+    },
+    {
+      "all_recorded_policy_values_finite": true,
+      "brake": {
+        "duration_s": 5.0,
+        "end_actual_v_w": [
+          -3.829865818261169e-06,
+          3.188994378433563e-05
+        ],
+        "end_track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "end_wheel_actual_qd_rad_s": [
+          -0.00039112442755140364,
+          -0.00036565287155099213,
+          -0.0003483040491119027,
+          -0.00034486697404645383,
+          -0.00034918318851850927,
+          -0.0003652885206975043,
+          -0.00036958613782189786,
+          0.0001511598820798099,
+          0.00013343071623239666,
+          0.0001254164963029325,
+          0.00012080562009941787,
+          0.00012500166485551745,
+          0.00013328854402061552,
+          0.00011585273750824854
+        ],
+        "end_wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end_yaw_unwrapped_rad": 0.0014481712132692337,
+        "last_0_3s_all_samples_meet_low_speed_threshold": true,
+        "last_0_3s_all_samples_meet_low_yaw_rate_threshold": true,
+        "last_0_3s_low_speed_threshold_mps": 0.2,
+        "last_0_3s_low_yaw_rate_threshold_rad_s": 0.3,
+        "last_0_3s_max_abs_actual_v_mps": 1.352882190985838e-05,
+        "last_0_3s_max_abs_actual_yaw_rate_rad_s": 3.188994378433563e-05,
+        "last_0_3s_mean_actual_v_w": [
+          -4.289264400843725e-06,
+          3.061613460886292e-05
+        ],
+        "last_0_3s_meets_both_low_speed_thresholds": true,
+        "last_0_3s_policy_steps": 6,
+        "last_0_3s_side_integral_feedforward_nm_per_proxy_wheel": {
+          "end_broadcast_per_wheel": [
+            -0.003531269496306777,
+            -0.003531269496306777,
+            -0.003531269496306777,
+            -0.003531269496306777,
+            -0.003531269496306777,
+            -0.003531269496306777,
+            -0.003531269496306777,
+            0.0022924013901501894,
+            0.0022924013901501894,
+            0.0022924013901501894,
+            0.0022924013901501894,
+            0.0022924013901501894,
+            0.0022924013901501894,
+            0.0022924013901501894
+          ],
+          "end_per_side": [
+            -0.003531269496306777,
+            0.0022924013901501894
+          ],
+          "max_abs": 0.0035392805002629757,
+          "mean_abs_per_side": 0.002914793265517801
+        },
+        "max_abs_applied_effort_nm": 0.24108360707759857,
+        "net_yaw_delta_rad": 0.00035339652094990015,
+        "start_actual_v_w": [
+          0.8378206491470337,
+          0.00016963564848992974
+        ],
+        "start_yaw_unwrapped_rad": 0.0010947746923193336
+      },
+      "case": "brake_straight_0.20_to_zero",
+      "drive": {
+        "antiwindup_blocked_side_samples": 0,
+        "cumulative_abs_yaw_path_rad": 0.002632605766166307,
+        "duration_s": 8.0,
+        "end_actual_v_w": [
+          0.8607760071754456,
+          0.001389524550177157
+        ],
+        "end_xy_m": [
+          56.757057189941406,
+          50.00438690185547
+        ],
+        "end_yaw_unwrapped_rad": 0.001086241565644741,
+        "last_1s_mean_abs_qd_tracking_error_rad_s": {
+          "left": 0.033817032405308825,
+          "right": 0.035162612370082516
+        },
+        "last_1s_track_side_means": {
+          "left_actual_qd_mean_rad_s": 18.521755150386262,
+          "left_applied_effort_mean_nm": 0.0003256129157112549,
+          "left_target_mean_rad_s": 18.518516540527344,
+          "right_actual_qd_mean_rad_s": 18.52167632239205,
+          "right_applied_effort_mean_nm": 0.002457574800272206,
+          "right_target_mean_rad_s": 18.518516540527344
+        },
+        "max_abs_applied_effort_nm": 0.23943382501602173,
+        "max_abs_roll_pitch_rad_all_phases": {
+          "pitch": 0.0005498779355548322,
+          "roll": 0.0009839298436418176
+        },
+        "max_abs_side_integral_feedforward_nm_per_proxy_wheel": 0.15790344774723053,
+        "mean_abs_actual_yaw_rate_last_1s_rad_s": 0.0014232769066438778,
+        "mean_abs_command_yaw_rate_last_1s_rad_s": 0.0,
+        "mean_actual_v_w": [
+          0.8468875724589452,
+          2.673852017238687e-05
+        ],
+        "mean_signed_actual_yaw_rate_first_1s_rad_s": 0.00031120547398586493,
+        "mean_signed_actual_yaw_rate_last_1s_rad_s": -0.0010385040270193713,
+        "net_xy_displacement_m": 6.756196492600806,
+        "net_yaw_delta_unwrapped_rad": 0.001087046178554374,
+        "path_length_m": 6.756200001580068,
+        "start_actual_v_w": [
+          0.029562052339315414,
+          3.281917543063173e-06
+        ],
+        "start_xy_m": [
+          50.00086212158203,
+          50.0
+        ],
+        "start_yaw_unwrapped_rad": -8.046129096328514e-07,
+        "yaw_sign_matches_raw_command_last_1s": true
+      },
+      "historical_action_source_only": null,
+      "initial_state_after_settle": {
+        "actual_v_w": [
+          -2.7676385798258707e-05,
+          -5.373471481107117e-07
+        ],
+        "position_xy_m": [
+          50.0,
+          50.0
+        ],
+        "roll_pitch_yaw_rad": [
+          -4.4071845195503556e-07,
+          -3.487350568320835e-06,
+          -7.450384487128758e-07
+        ],
+        "root_z_m": 0.15396089851856232,
+        "track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "wheel_actual_qd_rad_s": [
+          -0.0007978264475241303,
+          -0.0008004203555174172,
+          -0.0007981524686329067,
+          -0.0007982796523720026,
+          -0.0007984545663930476,
+          -0.0007980302325449884,
+          -0.0007982326787896454,
+          -0.0008032406913116574,
+          -0.0008025008137337863,
+          -0.0008021859684959054,
+          -0.0008028504089452326,
+          -0.0008028687443584204,
+          -0.0008031691540963948,
+          -0.0008024065755307674
+        ],
+        "wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "nominal_yaw_rate_raw_action_rad_s": 0.0,
+      "physics_substep_applied_effort": {
+        "brake": {
+          "captured_physics_iterations": 1000,
+          "max_abs_applied_effort_nm": 0.24108360707759857,
+          "physics_iteration_end_exclusive": 6400,
+          "physics_iteration_start_inclusive": 5400
+        },
+        "drive": {
+          "captured_physics_iterations": 1600,
+          "max_abs_applied_effort_nm": 0.23943382501602173,
+          "physics_iteration_end_exclusive": 5400,
+          "physics_iteration_start_inclusive": 3800
+        },
+        "settle": {
+          "captured_physics_iterations": 200,
+          "max_abs_applied_effort_nm": 4.17696064687334e-05,
+          "physics_iteration_end_exclusive": 3800,
+          "physics_iteration_start_inclusive": 3600
+        }
+      },
+      "policy_normalized_action": [
+        0.2,
+        0.2,
+        0.0,
+        0.0
+      ],
+      "raw_track_command_mps": [
+        0.8333333333333335,
+        0.8333333333333335
+      ],
+      "samples_including_settle": 280,
+      "settle_control_strategy": "native capped per-wheel IdealPD; per-side integral disabled and feedforward exactly zero"
+    },
+    {
+      "all_recorded_policy_values_finite": true,
+      "brake": {
+        "duration_s": 5.0,
+        "end_actual_v_w": [
+          -8.246832294389606e-05,
+          -0.002701663877815008
+        ],
+        "end_track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "end_wheel_actual_qd_rad_s": [
+          0.018751878291368484,
+          0.04859079793095589,
+          0.024898100644350052,
+          0.024607382714748383,
+          0.017401883378624916,
+          0.018602687865495682,
+          0.02130367048084736,
+          -0.02204175293445587,
+          -0.030850857496261597,
+          -0.026919299736618996,
+          -0.02394852414727211,
+          -0.026523150503635406,
+          -0.02910257689654827,
+          -0.021852418780326843
+        ],
+        "end_wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "end_yaw_unwrapped_rad": -6.495337430630819,
+        "last_0_3s_all_samples_meet_low_speed_threshold": true,
+        "last_0_3s_all_samples_meet_low_yaw_rate_threshold": true,
+        "last_0_3s_low_speed_threshold_mps": 0.2,
+        "last_0_3s_low_yaw_rate_threshold_rad_s": 0.3,
+        "last_0_3s_max_abs_actual_v_mps": 8.246832294389606e-05,
+        "last_0_3s_max_abs_actual_yaw_rate_rad_s": 0.003332659834995866,
+        "last_0_3s_mean_actual_v_w": [
+          -3.614196756037321e-05,
+          -0.002937460783869028
+        ],
+        "last_0_3s_meets_both_low_speed_thresholds": true,
+        "last_0_3s_policy_steps": 6,
+        "last_0_3s_side_integral_feedforward_nm_per_proxy_wheel": {
+          "end_broadcast_per_wheel": [
+            0.3481207489967346,
+            0.3481207489967346,
+            0.3481207489967346,
+            0.3481207489967346,
+            0.3481207489967346,
+            0.3481207489967346,
+            0.3481207489967346,
+            -0.34821608662605286,
+            -0.34821608662605286,
+            -0.34821608662605286,
+            -0.34821608662605286,
+            -0.34821608662605286,
+            -0.34821608662605286,
+            -0.34821608662605286
+          ],
+          "end_per_side": [
+            0.3481207489967346,
+            -0.34821608662605286
+          ],
+          "max_abs": 0.3488757014274597,
+          "mean_abs_per_side": 0.3485026756922404
+        },
+        "max_abs_applied_effort_nm": 2.0,
+        "net_yaw_delta_rad": -0.9799984693527222,
+        "start_actual_v_w": [
+          0.020862312987446785,
+          -0.5505544543266296
+        ],
+        "start_yaw_unwrapped_rad": -5.515338961278097
+      },
+      "case": "brake_diff_left_plus_0.80_to_zero",
+      "drive": {
+        "antiwindup_blocked_side_samples": 10,
+        "cumulative_abs_yaw_path_rad": 5.480467127559017,
+        "duration_s": 8.0,
+        "end_actual_v_w": [
+          0.08985145390033722,
+          -0.6987068057060242
+        ],
+        "end_xy_m": [
+          49.9932975769043,
+          49.8067626953125
+        ],
+        "end_yaw_unwrapped_rad": -5.480499450360433,
+        "last_1s_mean_abs_qd_tracking_error_rad_s": {
+          "left": 21.86966552734375,
+          "right": 16.40182798249381
+        },
+        "last_1s_track_side_means": {
+          "left_actual_qd_mean_rad_s": 66.7042297908238,
+          "left_applied_effort_mean_nm": 0.7380801832230646,
+          "left_target_mean_rad_s": 74.07406616210938,
+          "right_actual_qd_mean_rad_s": -71.33916802406311,
+          "right_applied_effort_mean_nm": -0.4054506874595972,
+          "right_target_mean_rad_s": -74.07406616210938
+        },
+        "max_abs_applied_effort_nm": 2.0,
+        "max_abs_roll_pitch_rad_all_phases": {
+          "pitch": 0.008279296569526196,
+          "roll": 0.021887581795454025
+        },
+        "max_abs_side_integral_feedforward_nm_per_proxy_wheel": 0.9093806147575378,
+        "mean_abs_actual_yaw_rate_last_1s_rad_s": 0.8815540224313736,
+        "mean_abs_command_yaw_rate_last_1s_rad_s": 16.260162213953535,
+        "mean_actual_v_w": [
+          -0.0042724868080881604,
+          -0.6871615076441231
+        ],
+        "mean_signed_actual_yaw_rate_first_1s_rad_s": -0.17304082364134957,
+        "mean_signed_actual_yaw_rate_last_1s_rad_s": -0.8815540224313736,
+        "net_xy_displacement_m": 0.19335350629932607,
+        "net_yaw_delta_unwrapped_rad": -5.480467127559017,
+        "path_length_m": 0.4617782782318117,
+        "start_actual_v_w": [
+          -2.8884645871585235e-05,
+          -0.0006969675305299461
+        ],
+        "start_xy_m": [
+          50.0,
+          50.0
+        ],
+        "start_yaw_unwrapped_rad": -3.232280141673982e-05,
+        "yaw_sign_matches_raw_command_last_1s": true
+      },
+      "historical_action_source_only": null,
+      "initial_state_after_settle": {
+        "actual_v_w": [
+          -3.084452691837214e-05,
+          -6.920989221725904e-07
+        ],
+        "position_xy_m": [
+          50.0,
+          50.0
+        ],
+        "roll_pitch_yaw_rad": [
+          4.8683897801993226e-08,
+          -4.577394520310918e-06,
+          -7.696311854488158e-07
+        ],
+        "root_z_m": 0.15396028757095337,
+        "track_command_mps": [
+          0.0,
+          0.0
+        ],
+        "wheel_actual_qd_rad_s": [
+          -0.0006339997635222971,
+          -0.000635067408438772,
+          -0.0006342256092466414,
+          -0.0006329223979264498,
+          -0.000634764030110091,
+          -0.0006341565167531371,
+          -0.0006331074400804937,
+          -0.0006407479522749782,
+          -0.000640007434412837,
+          -0.0006396794924512506,
+          -0.0006400698912329972,
+          -0.0006403448642231524,
+          -0.000640753423795104,
+          -0.0006399601697921753
+        ],
+        "wheel_target_rad_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "nominal_yaw_rate_raw_action_rad_s": -16.26016260162602,
+      "physics_substep_applied_effort": {
+        "brake": {
+          "captured_physics_iterations": 1000,
+          "max_abs_applied_effort_nm": 2.0,
+          "physics_iteration_end_exclusive": 9200,
+          "physics_iteration_start_inclusive": 8200
+        },
+        "drive": {
+          "captured_physics_iterations": 1600,
+          "max_abs_applied_effort_nm": 2.0,
+          "physics_iteration_end_exclusive": 8200,
+          "physics_iteration_start_inclusive": 6600
+        },
+        "settle": {
+          "captured_physics_iterations": 200,
+          "max_abs_applied_effort_nm": 3.5958677472081035e-05,
+          "physics_iteration_end_exclusive": 6600,
+          "physics_iteration_start_inclusive": 6400
+        }
+      },
+      "policy_normalized_action": [
+        0.8,
+        -0.8,
+        0.0,
+        0.0
+      ],
+      "raw_track_command_mps": [
+        3.333333333333334,
+        -3.333333333333334
+      ],
+      "samples_including_settle": 280,
+      "settle_control_strategy": "native capped per-wheel IdealPD; per-side integral disabled and feedforward exactly zero"
+    }
+  ],
+  "counterfactual_controller": {
+    "actual_applied_effort_capture": "NewtonManager.register_post_actuator_callback + Warp tape after actuator step on each internal Newton physics iteration",
+    "conditional_antiwindup": "block integration only when estimated P+I is outside +/-2 Nm and error pushes farther into saturation",
+    "configured_actuator_effort_limit_nm_per_wheel": 2.0,
+    "configured_joint_effort_limit_nm_per_wheel": 2.0,
+    "controller_architecture": "side_integral_plus_native_per_wheel_P",
+    "controller_state_count": 2,
+    "controller_state_order": [
+      "left_track_mean",
+      "right_track_mean"
+    ],
+    "drive_and_brake_integrator_active": true,
+    "implementation": "left/right mean-speed integral feedforward added through public target_command.set_effort_index after the original _apply_action; each side value is broadcast to its seven proxy wheels while native per-wheel IdealPD remains active",
+    "integral_clip_nm": [
+      -2.0,
+      2.0
+    ],
+    "integral_feedforward_broadcast": "one side value applied equally to each of that side's seven proxy wheels",
+    "integral_state_basis": "mean target-minus-actual angular velocity over seven proxy wheels per side",
+    "integration_timebase": "policy step at _pre_physics_step",
+    "ki_nm_per_proxy_wheel_per_rad_s_side_mean_s": 0.1,
+    "ki_status": "uncalibrated assumption",
+    "ki_units_note": "Nm per proxy wheel / (rad/s side-mean proxy wheel speed * s)",
+    "kp_nm_per_rad_s": 0.04,
+    "name": "runtime_pi_counterfactual",
+    "observed_applied_effort_assert_nm": 2.0001,
+    "settle_integral_enabled": false,
+    "state_and_feedforward_reset": "clear selected environment rows in _reset_idx wrapper"
+  },
+  "environment": {
+    "brake_observation_s": 5.0,
+    "decimation": 10,
+    "drive_s": 8.0,
+    "goal_xy": [
+      90.0,
+      50.0
+    ],
+    "max_time_s": 20.0,
+    "max_track_speed_mps": 4.166666666666667,
+    "physics_dt_s": 0.005,
+    "plants": 0,
+    "policy_dt_s": 0.05,
+    "seed": 90231,
+    "settle_s": 1.0,
+    "start_pose_xy_yaw": [
+      50.0,
+      50.0,
+      0.0
+    ],
+    "terrain_enabled": false,
+    "track_acceleration_mps2": 1.5,
+    "track_separation_m": 0.41,
+    "wheel_count": 14,
+    "wheel_radius_m": 0.045
+  },
+  "expected_physics_substeps": 9200,
+  "historical_action_source": {
+    "case_actions_read_from_existing_v4_p_summary": true,
+    "historical_policy_outcomes_used_as_v5_baseline": false,
+    "matched_case_count": 2,
+    "summary_path": "/mnt/e/Pioneer/\u5148\u8fdb\u901a\u7528\u5c65\u5e26\u5e95\u76d8\u5de5\u7a0b/\u7b97\u6cd5/\u4eff\u771f\u8bad\u7ec3\u73af\u5883/results/isaac_field_diagnosis/minimal_inputs_20261020/turn_response/turn_response_summary.json",
+    "summary_sha256": "545a4b56b14a65b3b5342618da0c08a7efe2f0a53d8fac3c02414102393fcd2e"
+  },
+  "interpretation_guard": [
+    "This is a runtime-only counterfactual. The base env.drive_config remains the original drive contract; PI is recorded separately.",
+    "Ki=0 is the capped-P reference with an explicit assertion that integral and feedforward remain zero; nonzero Ki is an uncalibrated diagnostic assumption, not a hardware value.",
+    "Every Newton actuator iteration is captured inside the physics loop and checked against the configured 2 Nm native actuator clamp plus 1e-4.",
+    "The old v4 P summary supplies only the eight action vectors; it is not used as the capped-v5 performance baseline.",
+    "Architecture label: side_integral_plus_native_per_wheel_P. The two-state left/right integral is a diagnostic arrangement for the vehicle's two drive motors; native P remains per proxy wheel and this is not a complete hardware controller.",
+    "The eight drive cases and two brake cases are intended for exact pairing across capped-P and PI output directories.",
+    "Newton applied effort is simulator output, not measured motor torque or proof of an actual hardware PI loop."
+  ],
+  "physics_substep_applied_effort_monitor": {
+    "by_case_phase": {
+      "brake_diff_left_plus_0.80_to_zero/brake": {
+        "checks": 1000,
+        "max_abs_applied_effort_nm": 2.0
+      },
+      "brake_diff_left_plus_0.80_to_zero/drive": {
+        "checks": 1600,
+        "max_abs_applied_effort_nm": 2.0
+      },
+      "brake_diff_left_plus_0.80_to_zero/settle": {
+        "checks": 200,
+        "max_abs_applied_effort_nm": 3.5958677472081035e-05
+      },
+      "brake_straight_0.20_to_zero/brake": {
+        "checks": 1000,
+        "max_abs_applied_effort_nm": 0.24108360707759857
+      },
+      "brake_straight_0.20_to_zero/drive": {
+        "checks": 1600,
+        "max_abs_applied_effort_nm": 0.23943382501602173
+      },
+      "brake_straight_0.20_to_zero/settle": {
+        "checks": 200,
+        "max_abs_applied_effort_nm": 4.17696064687334e-05
+      },
+      "diff_left_plus_0.05/drive": {
+        "checks": 1600,
+        "max_abs_applied_effort_nm": 0.6698240041732788
+      },
+      "diff_left_plus_0.05/settle": {
+        "checks": 200,
+        "max_abs_applied_effort_nm": 3.60299127351027e-05
+      },
+      "diff_left_plus_0.10/drive": {
+        "checks": 1600,
+        "max_abs_applied_effort_nm": 0.8843938708305359
+      },
+      "diff_left_plus_0.10/settle": {
+        "checks": 200,
+        "max_abs_applied_effort_nm": 3.4503631468396634e-05
+      }
+    },
+    "checked_physics_substeps": 9200,
+    "max_abs_applied_effort_nm": 2.0
+  },
+  "purpose": "runtime PI counterfactual; not training, not a calibrated hardware controller, and not causal training evidence",
+  "requested_case_filter": [
+    "diff_left_plus_0.05,diff_left_plus_0.10,brake_straight_0.20_to_zero,brake_diff_left_plus_0.80_to_zero"
+  ],
+  "run_label": "confirmation_pi",
+  "sample_count": 920,
+  "sample_outputs": {
+    "physics_substeps_path": "/mnt/e/Pioneer/\u5148\u8fdb\u901a\u7528\u5c65\u5e26\u5e95\u76d8\u5de5\u7a0b/\u7b97\u6cd5/\u4eff\u771f\u8bad\u7ec3\u73af\u5883/results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/confirmation_pi/physics_substep_effort.jsonl",
+    "policy_steps_path": "/mnt/e/Pioneer/\u5148\u8fdb\u901a\u7528\u5c65\u5e26\u5e95\u76d8\u5de5\u7a0b/\u7b97\u6cd5/\u4eff\u771f\u8bad\u7ec3\u73af\u5883/results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/confirmation_pi/policy_step_samples.jsonl"
+  },
+  "schema": "isaac-field-capped-drive-counterfactual-v1",
+  "selected_case_names": [
+    "diff_left_plus_0.05",
+    "diff_left_plus_0.10",
+    "brake_straight_0.20_to_zero",
+    "brake_diff_left_plus_0.80_to_zero"
+  ],
+  "source_sha256": {
+    "external/IsaacLab/source/isaaclab/isaaclab/actuators/actuator_pd.py": "bc9aa1e6264889a27211bc413cac24fb2811c26b9ec66ec63909f064a4e4ba3f",
+    "external/IsaacLab/source/isaaclab/isaaclab/actuators/newton/kernels.py": "1da47064c9571e7aa2169ee5c26061ce379d4e3cb4ba5a4fbc0e3da8244e44bd",
+    "external/IsaacLab/source/isaaclab/isaaclab/sim/schemas/schemas_actuators.py": "fd63a2ecda844d1260023ed3d1929b92db84917b36a4f559538b9ecffdaac313",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/assets/articulation/actuator_control.py": "8faca36954307dfa228046bf89a7666a57918637b9b6559e6ab7f6f3b89228ef",
+    "external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py": "20cf0270ad6074ec031edf4ccb1fb6543b55bd0924b18917ed5d629665cc65c6",
+    "isaac_field/action_contract.py": "5e3e2207301d5d7407e640d8f16e1847ccfee3dbdf4df401a77af7697dab9b91",
+    "isaac_field/assets.py": "274bef8b1d0e58036ed3809046045cfd5197d0178e62bd4a3a76451a84f254f0",
+    "isaac_field/env.py": "26e1d3148fa6a718b1d5286b300c24e1ae4a73446606f69d1baea5e82f12bc10",
+    "isaac_field/task.py": "09caf163a51c835a38adbd64661a7f5fdfcaae2aafab04fd313e068aed8ab8b2",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/effort_limit_smoke/effort_limit_smoke.py": "7ab418dd34c4df9affef29fc140337b6567d9115f9ff439c5f00f376eca4cdc6",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/pi_counterfactual_probe.py": "22c637d5257f8fded068b2b673dc264f1e0346430b42c80e8fbcc74c0c0fe754",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/runtime_pi.py": "7f6ddbdc5d72600ddbcb638293001aa82c04d06820389f729f3eedc5be83e926",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/turn_response/turn_response_probe.py": "965cb7c76440cbf014596323936a87bfa13aa27c1132b397409ef5f58bdb9d50",
+    "results/isaac_field_diagnosis/minimal_inputs_20261020/turn_response/turn_response_summary.json": "545a4b56b14a65b3b5342618da0c08a7efe2f0a53d8fac3c02414102393fcd2e",
+    "scripts/train_isaac_foundation_fresh.py": "d92da08783b463e29dbbc11eb46eac26fab459dec9efc16c243ce008a4bcaad9",
+    "tests/newton_effort_capture.py": "b35b9172c452a29498c05cfb32f9cabbee2acc0bddb926c7b9aa536bc5e8e288",
+    "tests/test_env_integration.py": "cd5880c54e66c81cc0a01ac30f569bad860aed1738b7350fa6e5385916a25f88"
+  }
+}

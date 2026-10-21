@@ -1,0 +1,41 @@
+{
+  "schema": "contact-probe-launcher-repair-v1",
+  "reason": "Launcher previously created OUTPUT_DIR and wrote contact_transfer_probe.log inside it before invoking the helper; helper correctly rejects every nonempty OUTPUT_DIR, making a native run impossible.",
+  "change": "Require a nonexistent output directory; create it empty for the helper; keep the log in the adjacent sibling path OUTPUT_DIR.log with no-clobber creation; write the exit record inside OUTPUT_DIR after completion and include log_path.",
+  "files": {
+    "before_launcher_sha256": "9a57c21735b94166c34a7cb8d1b7565230956aa288783a997ce8ef269e911b2d",
+    "after_launcher_sha256": "8c0dd96057c834a0ea94ed67fbddfec532701e7fed182ced05ac11698513b70b",
+    "probe_helper_sha256": "65df8df2d513b062059554fac170994d29023322ab26876da747c20265a2ed58",
+    "inspector_sha256": "2c73f95226f8682e430ea28c5165feb16504b57733e3d50591481be19718a667",
+    "attempt2_static_runner_sha256": "e119feb98d1c099423d8ca2805bcb03c1f692c9b62b117415fb67ea0a0ee3f07",
+    "after_snapshot_launcher_sha256": "8c0dd96057c834a0ea94ed67fbddfec532701e7fed182ced05ac11698513b70b",
+    "after_snapshot_probe_sha256": "65df8df2d513b062059554fac170994d29023322ab26876da747c20265a2ed58",
+    "after_snapshot_inspector_sha256": "2c73f95226f8682e430ea28c5165feb16504b57733e3d50591481be19718a667"
+  },
+  "training_freeze": {
+    "protocol_path": "results/isaac_field_improvement/fresh_side_pi_20261020/protocol.json",
+    "protocol_sha256": "0a356055c2ff08e13133ebfe12c71e90c63612a8efce7ea0db8b1187aafd10b8",
+    "source_count": 41,
+    "all_snapshot_files_match": true,
+    "mismatches": []
+  },
+  "static_validation": {
+    "attempt2_log_path": "results\\isaac_field_diagnosis\\side_pi_physics_gap_20261020\\contact_probe_launcher_fix_static_validation_attempt2.log",
+    "attempt2_log_sha256": "9e3760c346d88d07ef7c12b1c3855038badde970c46dc6d6be273b75846fc4c3",
+    "attempt2_exit_record_path": "results\\isaac_field_diagnosis\\side_pi_physics_gap_20261020\\contact_probe_launcher_fix_static_validation_attempt2_exit.json",
+    "attempt2_exit_record_sha256": "b476b70107cb0bb84edfe01a4f11cd651bebe8b5f5cbe511ddbd2fbf82d6a23d",
+    "actual_exit_code": 0,
+    "py_compile_exit_code": 0,
+    "bash_n_per_file_exit_code": 0,
+    "api_inspection_previous_exit_code": 0,
+    "api_inspection_source_unchanged": true,
+    "previous_static_log_retained_sha256": "f764c71fd7ef95ab35406ee5b946d96d4411406b532b8f468854ad5f232f283a",
+    "previous_static_exit_retained_sha256": "b783282bfcf27b75cdcb07ad98097e15ad1087162802bc8057f3662dd89b7096",
+    "attempt1_note": "First launcher-fix static attempt preserved; bash -n was given multiple file arguments and therefore did not independently parse every target. Attempt 2 is the authoritative per-file syntax validation."
+  },
+  "execution": {
+    "native_or_gpu_run_started": false,
+    "probe_helper_unchanged": true,
+    "output_directory_contract": "A fresh output directory is created empty; runner log is adjacent as <output-dir>.log; final exit JSON is written inside output dir."
+  }
+}

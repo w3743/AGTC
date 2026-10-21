@@ -1,0 +1,152 @@
+{
+  "schema": "bms-protection-reduction-review-v1",
+  "date": "2026-10-15",
+  "status": "PASS_WITH_OPEN_ITEMS",
+  "decision": "本轮没有批准删除保护功能器件；落实两项料号归并，分别减少1种MPN但不减少物理器件。",
+  "scope": "只读检查当前连接源、当前施工输入、保存重开网表及共享DEVICE；未改原理图、BOM或EasyEDA。",
+  "verification": {
+    "command": "python BMS模块/仿真/源码/verify_protection_reduction.py",
+    "result": "13/13 checks PASS; 7 OPEN; PASS_WITH_OPEN_ITEMS",
+    "coverage": "当前施工输入的217个器件与BMS-9S4P.enet的MPN和逐引脚网络逐项相同；并对保护子电路、两项归并、逻辑真值表及计算复算。",
+    "script_sha256": "d22eaed2ea8330380550a15e069289adadacb1c4db92a49721f821c54d8ee40e",
+    "audit_input_sha256": "3dade315f190df163f851ba029b3a10d165df221b6949859adc7ca7e4d8f76f5",
+    "calculation_result_sha256": "21e653840641fe886dd2151d640e3965f91ad63d89c73f6ba527c33a40b2af4b"
+  },
+  "implemented_reductions": [
+    {
+      "change": "U_AND2由两输入SN74LVC1G08DBVR改用SN74LVC1G11DCKR；额外输入固定接PRE_CTRL_3V3。",
+      "result": "AND3在C=1时对4种A/B输入组合均等价于AND2；DCK pin1=A、pin3=B、pin6=C、pin4=Y、pin5=VCC、pin2=GND。U_GATE1为另一颗1G11，保持原样。",
+      "physical_parts_removed": 0,
+      "mpn_types_removed": 1
+    },
+    {
+      "change": "8颗100nF 16V X7R统一为Murata GRM188R72A104KA35J（100nF±10%、100V、X7R、0603）。",
+      "result": "8颗均保留；逐颗保持原网络及两端连接；源、ENET载体和共享DEVICE身份一致。",
+      "physical_parts_removed": 0,
+      "mpn_types_removed": 1,
+      "refs": [
+        "C_SRP",
+        "C_TIMER",
+        "C_AND2",
+        "C_GATE1",
+        "C_SEQ",
+        "C_POR",
+        "C_CAN_PWR_IN2",
+        "C_CAN_PWR_OUT2"
+      ]
+    }
+  ],
+  "protection_review": {
+    "no_safe_direct_deletion_found": true,
+    "approved_protection_removals": [],
+    "retain": [
+      "BQ76952负责电芯/电流/温度监测和配置后的保护动作；它不能替代物理熔断器、浪涌钳位、采样通路、支路限流或独立外部预充窗口。BQ寄存器配置与动作仍需实机读回验证。",
+      "Q_PRE背靠背MOS与R_PRE构成独立预充/反向阻断路径；TPL5111单次定时、SN74LVC74锁存、U_GATE1硬件窗口、POR和DFETOFF默认关断链承担不同的时序、重试和复位职责。",
+      "FF-A的MAIN_REQ仍由MCU最终许可；当前没有独立硬件PRE_OK差压判断。外部窗口逻辑不证明MCU拿到新鲜有效的预充电压/电流数据。",
+      "BQ76952的PDSG非零timeout到期会转入DSG；timeout设0仍依赖LD电压条件。PTO为不同超时机制，不能据此删除外部预充窗口或主关断链。",
+      "D_TVS/SMCJ45A抑制端口瞬态；45V VRWM不能证明适用于48V连续工作，TVS也不能吸收60mF母线储能。",
+      "BAT46W的BAT与BREG支路各自承担供电隔离/导向，FCX495TA提供BREG预稳压；两路用途不同。",
+      "SGM2593和R_FAN_ILIM限制独立风扇5V支路的过流/短路并有芯片热保护，和BQ电池包电流保护不是重复。两片四路光耦隔离八路均衡控制；两颗MMBT5551分别承担均衡主清除与MCU许可开关。"
+    ],
+    "not_adopted": [
+      "当前R_FAN_ILIM=RC0603FR-076K8L（6.8kΩ）保持不变。SGM2593官方规格在6.8kΩ时给出全温限流915mA(min)/1010mA(typ)/1088mA(max)；按限流与RILIM反比，5.1kΩ的标称估算约为1.35A，非该规格表直接保证值。启动峰值及5V模块余量未知，故未提高限流阈值，也未改正式BOM。",
+      "AFE原生预充比较器拓扑文档属于历史候选；当前源没有U_COMP1/U_COMP2，故本轮没有把历史候选说成当前器件删除。"
+    ],
+    "pinmap_corrections": [
+      "SN74LVC74A标准SOIC-14：pin9=2Q接TMR_TRIG，pin12=2D接PRE_CTRL_3V3；先前按16-pin RGY列误报已纠正。"
+    ],
+    "other_merge_note": "8颗ISET本地滤波电容各自保留且原本同一料号，不产生新的SKU节省；不批准删除。"
+  },
+  "recalculated_bounds": {
+    "tpl5111_7.32k_nominal_tIP_s": 2.577521,
+    "tpl5111_one_shot_active_high_approx_s": 2.527521,
+    "precharge_Rmin_ohm": 7.79,
+    "precharge_initial_current_a": 4.852375,
+    "precharge_initial_power_w": 183.419769,
+    "precharge_resistor_energy_at_2.970s_upper_bound_j": 544.7567,
+    "60mF_bus_stored_energy_j": 42.8652,
+    "boundary": "标称公式和保守纸面上界；不代表计时器全角落最坏值、安装热设计、脉冲耐量或首板实测。"
+  },
+  "open_items": [
+    "MAIN_REQ依赖MCU完成新鲜数据和状态校验；当前无独立硬件PRE_OK差压判据，软件失效/过期数据风险仍在。",
+    "PDSG timeout与DSG转换行为不同于PTO；不以BQ原生功能作为删外部预充窗口的依据。",
+    "R_PRE约545J硬短路脉冲需验证安装降额、重复启动间隔、温升及独立热断开。",
+    "风扇启动峰值未由厂家保证；需实测峰值并核对5V模块压降/余量及SGM2593限流。",
+    "SMCJ45A的连续电压边界和整车线束瞬态仍需核实；其不承担母线电容放能。",
+    "BQ保护阈值、CHG/DSG动作和寄存器必须配置、读回并系统试验；当前未验证。",
+    "BQ76952EVM仅作成熟AFE/FET拓扑参考，不代表本设计9S/60A通路的热、铜箔、短路开断或整车验收。"
+  ],
+  "known_source_note": "源JSON含板外器件/服务接口，源行集合不要求等于PCB集合；当前施工输入和正式重开ENET的217个CAD位号映射完全一致，其中216个入板、1个为板外开关载体。SW_RUN_STORE为CAD 8针符号，其中7、8脚NC，外购物理开关仍按6端子计。",
+  "not_tested": [
+    "台架实测",
+    "温升与脉冲耐量",
+    "EMC/线束浪涌",
+    "固件端到端关断",
+    "车辆放行"
+  ],
+  "primary_sources": [
+    {
+      "title": "TI BQ76952 Technical Reference Manual",
+      "url": "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+      "relevance": "PDSG timeout及LD退出行为；PTO独立。"
+    },
+    {
+      "title": "TI BQ76952 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/bq76952.pdf",
+      "relevance": "AFE、PCHG/PDSG及保护功能边界。"
+    },
+    {
+      "title": "TI BQ76952EVM",
+      "url": "https://www.ti.com/tool/BQ76952EVM",
+      "relevance": "成熟AFE/FET拓扑参考，不移用其电流能力。"
+    },
+    {
+      "title": "TI SN74LVC1G11 datasheet",
+      "url": "https://www.ti.com/lit/gpn/SN74LVC1G11",
+      "relevance": "DCK脚位及三输入AND功能。"
+    },
+    {
+      "title": "TI SN74LVC74A datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74lvc74a.pdf",
+      "relevance": "14-pin pin9=2Q、pin12=2D。"
+    },
+    {
+      "title": "TI TPL5111 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/tpl5111.pdf",
+      "relevance": "one-shot时序公式及DRVn脉冲。"
+    },
+    {
+      "title": "Murata GRM188R72A104KA35J",
+      "url": "https://www.murata.com/products/productdetail?partno=GRM188R72A104KA35%23",
+      "relevance": "100nF、100V、X7R、0603精确器件参数。"
+    },
+    {
+      "title": "SG Micro SGM2593 datasheet",
+      "url": "https://www.sg-micro.com/rect/assets/4c0699d6-d8dc-4bdd-bbb6-45bdec34c0f8/SGM2593_SGM2593D.pdf",
+      "relevance": "RILIM设定、6.8kΩ限流规格及过流/短路/热保护。"
+    },
+    {
+      "title": "Delta KSB0405HBF0D datasheet",
+      "url": "https://www.delta-fan.com/Download/Spec/KSB0405HBF0D.pdf",
+      "relevance": "5V风扇运行参数；启动峰值仍需实测。"
+    },
+    {
+      "title": "Littelfuse SMCJ TVS datasheet",
+      "url": "https://www.littelfuse.com/assetdocs/littelfuse_tvs_diode_smcj_datasheet.pdf?assetguid=37388813-0d6d-4329-969b-1aa8b7614ac1",
+      "relevance": "TVS瞬态抑制规格；不作为48V连续耐压或储能负载。"
+    }
+  ],
+  "currentLayoutOverride": {
+    "status": "正式212件/51种；旧SGM相关字段仅历史",
+    "currentReport": "本轮落实与验证.md",
+    "currentFanEvidence": "风扇直供验证.md",
+    "removedRefs": [
+      "U_FAN_SW",
+      "R_FAN_ILIM",
+      "C_FAN_IN1",
+      "C_FAN_OUT1"
+    ],
+    "fanPowerNet": "VOUT_5V",
+    "date": "2026-10-15"
+  }
+}

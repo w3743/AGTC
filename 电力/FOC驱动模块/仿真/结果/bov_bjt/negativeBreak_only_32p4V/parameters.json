@@ -1,0 +1,19 @@
+{
+  "name": "negativeBreak_only_32p4V",
+  "case": {
+    "core5_v": 5.0,
+    "logic3v3_v": 3.3,
+    "bus_profile": "normal",
+    "negative_break_fault": true,
+    "safe5_v": 4.9764817276,
+    "vol_max_v": 0.9,
+    "c_ov_sense_f": 1e-09
+  },
+  "candidate_topology": "BC857C PNP E=SAFE_5V, B through 10k from BUSOV_N, C drives BC847C base through R_BOV_DRIVE=4.7k; BC847C NPN E=GND, C=BREAK_N; 10k base pulldown; 2.2k BREAK_N pullup to MCU_3V3",
+  "bjt_model": "standard Gummel-Poon models with BF=420 (datasheet BC847C/BC857C C-group minimum hFE at the specified 2mA test point); not manufacturer device-specific SPICE files, and low-current/temperature behavior is not guaranteed",
+  "comparator_model": "actual resistor ratios/hysteresis and C_OV_SENSE, behavioral open-collector comparator with VOL corner; no TLV1704 macromodel, propagation delay/noise/overdrive omitted",
+  "chopper_gate_logic": "BUSOV_N < 1.0V and SAFE_5V present; BREAK_N is separately logged and does not enable Q7",
+  "q7": "SW Ron=11.25mOhm behavior model from 4.5mOhm max at VGS=4.5V times 2.5 hot factor; no IRLB manufacturer macro",
+  "supply_measurement_scope": "SAFE rail current includes modeled OVP reference/comparator and BJT path; Bdrv is an ideal behavioral voltage source, so UCC27511 gate-charge/quiescent current and its 10k gate pulldown are not included",
+  "scope": "topology/polarity and BJT current-limiting check only; 4ms short transient; not 1s thermal or board validation"
+}

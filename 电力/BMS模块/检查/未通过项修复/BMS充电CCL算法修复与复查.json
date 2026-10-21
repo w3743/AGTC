@@ -1,0 +1,279 @@
+{
+  "schema_version": 2,
+  "date": "2026-10-15",
+  "scope": "仅BMS充电CCL模型/算法、对应输入/结果及复查记录；不改CAD、BOM、风扇文档、共享项目要求或其他模块。",
+  "objective": "保留OCC code 3保护，并将16A作为净充电上限；实现覆盖测量欠读、温度区间、最大支路份额和源端超调设计界限的失效安全限幅。",
+  "model_status": "PASS executable reference algorithm and deterministic fail-safe tests; NOT firmware/hardware/vehicle acceptance",
+  "release_status": "BLOCKED pending physical input qualification, firmware implementation/readback, branch-current, local source-response, and sink validation",
+  "repair_plan": [
+    "OCC code 3早动作角减0.5A工程规划余量作为条件峰值上界，不放宽保护。",
+    "按BQ电流读数最坏比例、分流器容差/TCR、采样路径单边欠读及源本地动态超调预算计算向下量化CCL。",
+    "全部36颗电芯须有有效、覆盖、未过期的保守温度下界和上界，并保证每颗区间均处于23..27°C；否则CCL=0。",
+    "alpha未验证时仅在无支路反向/循环电流已资格时使用alpha=1回退，否则CCL=0；已验证alpha必须覆盖最坏支路及循环电流。",
+    "拒绝数值布尔值、非数、NaN、越界量和低于四并联同向数学下界1/4的alpha。",
+    "配置/校准读回、源能力新鲜度、单体电压余量、温度/分流器热边界任一未资格或超限时CCL=0。"
+  ],
+  "modifications": [
+    "新增共享有限数值校验器，明确排除Python bool类型，应用于请求电流、分流器温度、采样路径欠读、源端超调、单体温度边界及alpha。",
+    "验证alpha的合法区间从(0,1]修正为[1/并联数,1]；4P中alpha=0.01作为虚假上界被故障注入并fail-closed。",
+    "修正自动结果algorithm_temperature_rule，明确全36颗覆盖、保守上下界、下界≤上界且每个温度区间完整落在23..27°C。",
+    "刷新输入/结果/检查及修复报告；仍保持真实温度、alpha、无反流、标定、寄存器读回和源响应硬件门禁为false。"
+  ],
+  "changed_files": [
+    "BMS模块/仿真/源码/verify_charge_limit_16a.py",
+    "BMS模块/仿真/输入/16A净充电上限验证_input.json",
+    "BMS模块/仿真/结果/16A净充电上限验证_result.json",
+    "BMS模块/检查/16A净充电上限验证.json",
+    "BMS模块/检查/16A净充电上限验证.md",
+    "BMS模块/检查/未通过项修复/BMS充电CCL算法修复与复查.md",
+    "BMS模块/检查/未通过项修复/BMS充电CCL算法修复与复查.json"
+  ],
+  "calculations": [
+    {
+      "condition": "假设alpha≤1/3经验证、温度和电压资格成立、75°C分流器角、路径欠读≤20µΩ、总源超调≤1A",
+      "request_A": 16.0,
+      "command_A": 5.5,
+      "predicted_peak_A": 7.327896737410044,
+      "predicted_max_branch_A": 2.442632245803348
+    },
+    {
+      "condition": "alpha未验证且无反向/循环电流已资格、其余条件成立；alpha=1回退",
+      "request_A": 16.0,
+      "command_A": 2.3000000000000003,
+      "predicted_peak_A": 3.893297825523524,
+      "predicted_max_branch_A": 3.893297825523524
+    }
+  ],
+  "checks": {
+    "netlist_and_bom_shunt_match": true,
+    "net_charge_command_never_exceeds_user_16A_ceiling": true,
+    "modeled_peak_respects_user_cell_and_OCC_constraints": true,
+    "OCC_early_and_late_corners_include_shunt_TCR_at_75C": true,
+    "validated_alpha_16A_request_is_limited_under_OCC_margin": true,
+    "unvalidated_alpha_uses_full_single_branch_fallback": true,
+    "all_36_cell_temperature_lower_and_upper_bounds_required": true,
+    "validated_alpha_respects_four_branch_mathematical_minimum": true,
+    "boolean_numeric_inputs_fail_closed": true,
+    "alpha_fallback_requires_qualified_no_counterflow": true,
+    "requested_current_is_never_raised": true,
+    "all_fault_cases_fail_closed_to_zero": true,
+    "OCC_design_candidate_write_readback_status_unverified": true,
+    "old_3mV_wording_removed": true,
+    "corrected_OCC_wording_present": true,
+    "alpha_is_unvalidated_assumption": true,
+    "release_blocked_by_unresolved_gates": true
+  },
+  "fault_injection_results": {
+    "outside_manufacturer_max_rate_test_window": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "CELL_TEMPERATURE_BOUNDS_OUTSIDE_QUALIFIED_MAX_RATE_TEST_WINDOW"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "one_or_more_cells_below_test_window": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "CELL_TEMPERATURE_BOUNDS_OUTSIDE_QUALIFIED_MAX_RATE_TEST_WINDOW"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "temperature_bounds_reversed": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "CELL_TEMPERATURE_BOUNDS_REVERSED"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "temperature_bound_nan": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_CELL_TEMPERATURE_LOWER_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "temperature_lower_bound_missing": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_CELL_TEMPERATURE_LOWER_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "stale_temperature_input": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_OR_MISSING_TEMPERATURE_INPUT_FRESH"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "source_overshoot_exceeds_design_budget": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "SOURCE_OVERSHOOT_BOUND_EXCEEDS_DESIGN_BUDGET"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "sense_path_bound_exceeds_design_limit": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "SENSE_PATH_UNDERREAD_BOUND_EXCEEDS_DESIGN_LIMIT"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "cell_voltage_headroom_invalid": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_OR_MISSING_CELL_VOLTAGE_HEADROOM_VALID"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "invalid_claimed_alpha_bound": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_VALIDATED_ALPHA_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "claimed_alpha_below_four_branch_mathematical_minimum": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_VALIDATED_ALPHA_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "boolean_request_rejected": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": null,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_CCL_REQUEST"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "boolean_shunt_temperature_rejected": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_SHUNT_TEMPERATURE_UPPER_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "boolean_sense_path_bound_rejected": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_SENSE_PATH_UNDERREAD_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "boolean_source_overshoot_bound_rejected": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_SOURCE_OVERSHOOT_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "boolean_alpha_bound_rejected": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_VALIDATED_ALPHA_BOUND"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "missing_temperature_qualification": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "INVALID_OR_MISSING_CELL_TEMPERATURE_BOUNDS_QUALIFIED_ALL_36_CELLS"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    },
+    "unvalidated_alpha_without_no_counterflow_qualification": {
+      "status": "FAIL_CLOSED_CCL_ZERO",
+      "requested_CCL_A": 16.0,
+      "command_CCL_A": 0.0,
+      "reason_codes": [
+        "ALPHA_FALLBACK_REQUIRES_QUALIFIED_NO_COUNTERFLOW"
+      ],
+      "actuation_status": "reference_algorithm_only_not_deployed"
+    }
+  },
+  "hardware_gates": {
+    "alpha_max_branch_share_measured": false,
+    "temperature_lower_and_upper_bounds_qualified_for_all_36_cells": false,
+    "no_counterflow_current_qualified": false,
+    "validated_alpha_bound_includes_counterflow_current": false,
+    "bq_current_gain_and_offset_readback_and_calibrated": false,
+    "occ_code3_configuration_written_and_readback_verified": false,
+    "two_terminal_shunt_kelvin_layout_and_installed_sense_error_measured": false,
+    "source_current_overshoot_and_local_response_measured": false,
+    "shunt_thermal_limit_75C_qualified": false,
+    "bidirectional_dc_dc_supercap_power_and_energy_validated": false,
+    "eves_30p_temperature_derating_curve_for_4a_charge_obtained": false
+  },
+  "missing_evidence": [
+    "覆盖36颗电芯的保守温度下界和上界；当前代表区NTC未证明全覆盖。",
+    "四并联支路最大充电电流份额alpha及反向/循环电流边界实测或可追溯证明。",
+    "BQ电流增益/偏置标定读回及OCC code 3写入/读回。",
+    "实际PCB Kelvin路径欠读、分流器热界限和温度条件。",
+    "充电源本地响应时间、斜率及总峰值超调波形；1A只是接受设计界限。",
+    "双向DC/DC/超容吸收功率、能量与响应验证，以及固件部署和故障注入。"
+  ],
+  "project_requirement_append_proposal": "充电CCL将16A作为净充电上限，保留OCC code 3；CCL须按覆盖全部36颗电芯的有效保守温度上下界、最大支路份额、最坏电流测量/采样误差和资格化的本地源动态上界计算。四并联同向净充电时alpha数学下界为1/4；未验证alpha时，仅在无支路反向/循环电流已资格时按alpha=1回退，否则CCL=0。不得放宽硬保护提高工作电流；参考模型不能标成固件、实物或整车验收。",
+  "shared_project_requirements_edited": false,
+  "cad_or_bom_edited": false,
+  "fan_documents_edited": false,
+  "native_design_changed": false,
+  "drc_saved_baseline": {
+    "evidence_file": "BMS模块/检查/未通过项修复/官方DRC与逐项日志.json",
+    "official_api_status": "0 errors, 8 warnings",
+    "warning_classification_in_existing_review": "1 QPRE_SW external precharge resistor boundary warning; 7 supplier-attribute warning groups.",
+    "scope_note": "主代理对保存基线官方API复跑；该复查不包含另一BMS会话后续修改。CCL本轮未修改CAD。"
+  },
+  "bus_energy_scenarios": 756,
+  "bus_energy_headroom_J": 17.88480000000001,
+  "artifact_sha256": {
+    "BMS模块/仿真/源码/verify_charge_limit_16a.py": "1a0c9ad5cc11ce82f5572bac91cfa337b4fd2797c27bf73e580e23cae1466e36",
+    "BMS模块/仿真/输入/16A净充电上限验证_input.json": "52ab010728f1676c05e8bd78c6e3a5bfbedd7b712ab897c4e6e067b5c17951ed",
+    "BMS模块/仿真/结果/16A净充电上限验证_result.json": "c52ffb00866117d4a4faac33ebed735b30d0381b9f8379e63fda9ede1af5a37a",
+    "BMS模块/检查/16A净充电上限验证.json": "40fc14f47484b162efcd1cf9de8c60fcc631a9449de4cb71f1755ce8da1ddcab",
+    "BMS模块/检查/16A净充电上限验证.md": "7a988070f39763ae07f4a040c0f89a04e47e85b7e9ea5b5678bcefbd03bdc314",
+    "BMS模块/检查/未通过项修复/BMS充电CCL算法修复与复查.md": "81cf1ba792409e59c3a88c98ea164b94555a2f9956cd46ca10ff282bb391e8aa"
+  },
+  "archive_evidence": {
+    "archive": "BMS模块/归档/历史与调试.zip",
+    "verification": "BMS模块/检查/未通过项修复/BMS充电CCL归档校验.json",
+    "file_sha_manifest": "BMS模块/检查/未通过项修复/BMS充电CCL修复SHA256_20261015.json",
+    "final_archive_sha256_is_recorded_externally": true,
+    "note": "The archive hash is stored in external verification evidence to avoid self-referential hashing."
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "schema": "isaac-field-contact-friction-v4-protocol",
+  "date": "2026-10-20",
+  "scope": "One read-only Newton/MJWarp 2 ms elliptic impratio=1 dump baseline to inspect realized contact parameters and solver statistics. No production edits, training, FPS, or 830xx use.",
+  "treatment": {
+    "physics_dt_s": 0.002,
+    "policy_decimation": 25,
+    "policy_dt_s": 0.05,
+    "cone": "elliptic",
+    "impratio": 1.0,
+    "contact_mu": 0.8,
+    "seed": 90231,
+    "start_xy_yaw": [50.0, 50.0, 0.0],
+    "goal_xy": [90.0, 50.0],
+    "settle_s": 1.0,
+    "drive_s": 8.0,
+    "normalized_action": [0.1, -0.1, 0.0, 0.0],
+    "drive_interface": "independent_left_right_track_speed_explicit_pi_v6",
+    "drive_p_gain": 0.04,
+    "drive_ki_gain": 0.1,
+    "wheel_effort_cap_nm": 2.0,
+    "contact_source": "Newton collision pipeline; use_mujoco_contacts=false",
+    "reference_pair": {
+      "v2_2ms_pyramidal_impratio1_summary": "contact_probe_runs_v2/newton_2ms_v2/contact_dt_v2_summary.json",
+      "expected_initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "expected_fixed_physical_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+      "pair_status": "pending until the v4 run reproduces both hashes"
+    }
+  },
+  "contact_capture": {
+    "samples": ["settle_end", "drive_2s", "drive_4s", "drive_8s"],
+    "timing": "After env.step returns; MJWarp fields are from the final completed solver substep of that policy step.",
+    "valid_slice": "Serialize mjw_data.contact arrays only for [0:nacon], never the padded naconmax tail.",
+    "fields": ["solreffriction", "solref", "solimp", "geom", "dist", "efc_address", "worldid"],
+    "body_map": "Map each contact geom through mjw_model.geom_bodyid[world,geom], then record body_invweight0[world,body] (including both components and component 0 used in Newton's kf mapping).",
+    "shape_map": "Record Newton shape index/label, mapped MuJoCo geom, shape_material_kf, shape body label, and model.mujoco.solref_mode code/name.",
+    "formula": "Newton 1.6.1 contact kernel: tc=2/[mixed_kf*(body_invweight0[a][0]+body_invweight0[b][0])*((1-dmax)*impratio_invsqrt^2+dmax)] where dmax=contact.solimp[1]. Compare the actual contact.solreffriction[0] to this value and 2*dt=0.004 s.",
+    "solreffriction_format": "Only a positive first solreffriction value is interpreted as a time constant for the 2dt/refsafe comparison; zero inherits normal solref and a negative value is direct-format, so those are recorded but excluded from that test.",
+    "refsafe": "Do not alter solver disableflags. Record host and MJWarp disableflags/refsafe status if available.",
+    "solver_statistics": "At the same four snapshots, copy solver_niter and supported candidate solver_gradient/solver_improvement/solver_fwdinv/solver_residual/solver_grad/solver_iter fields; unsupported fields are explicit NA."
+  },
+  "source_hashes": {
+    "v1_helper_sha256": "4e32bfe3c6643778e9c67f6fe055c1ce17d0b28c82c43baaceaef5842936d8f9",
+    "v2_helper_sha256": "b0179b031bda0f6bd0414fc29b38b0aed5b07f7bf605a4cb345d4e60ee206a1a",
+    "v2_runner_sha256": "5920f2d910cca6e8c332655fe3a6d4f7d2c2e74f98d1f2b029c963f54a28ae97",
+    "v3_helper_sha256": "894c58870ff387a2860df0fe7eb7cde77841f210e40fbd13d8a750cc54e05c39",
+    "v3_runner_sha256": "a478fd2aff49688c0e24024f9152ed63d30d7c192a0ae9e7ac0e998ed80a0dc4",
+    "v4_helper_sha256": "F882506743CF129938FEF49CCF662C9468E31CA0EBE645CD94D816E4BA76B989",
+    "v4_runner_sha256": "B88603F502FF89107025200D3F09E4679270EC8E7CFA51915A2AABF588D94E46",
+    "installed_newton_1_6_1": {
+      "solver_mujoco.py": "a2f2466ad9d35e32f6e87f12bbaa0e08d18295f4e95b1c059c805d2ff4091178",
+      "kernels.py": "bd770d39d20c208e980477e0186799f531364b03f16d76968ee69bacdc490a3d",
+      "test_mujoco_solver.py": "d10d10af2692ca7fb480a3eeedb02f4ac638b66a32df37dcae50c7f46d2e56db",
+      "mujoco_warp_types.py": "a49625a8994db0d3b52dd34f98adac7f70882d473108c4e4793e4830e81ea71c"
+    }
+  },
+  "official_source_evidence": {
+    "newton_solver_conversion": "newton/_src/solvers/mujoco/solver_mujoco.py:4643-4687 reads model.mujoco.solref_mode and writes the valid MJWarp contact arrays including solref, solreffriction, solimp, geom, efc_address and worldid.",
+    "newton_kf_map": "newton/_src/solvers/mujoco/kernels.py:637-648 computes contact solreffriction timeconst from mixed shape_material_kf, body_invweight0, solimp dmax and impratio_invsqrt.",
+    "newton_test_formula": "newton/tests/test_mujoco_solver.py:5073-5097 reads nacon/actual contact rows and independently calculates the same expected solreffriction time constant.",
+    "mujoco_warp_data": "mujoco_warp/_src/types.py:2070-2230 documents solver_niter and the MJWarp contact data layout; unsupported solver statistics are preserved as NA."
+  },
+  "acceptance": [
+    "Unique output/log/exit paths; no overwrite.",
+    "Runtime host and MJWarp cone/impratio fields match elliptic/1; physics configuration and existing v3 physical contract remain fixed.",
+    "Retain the full canonical reset hash and mark pairing pending if it does not equal the pinned v2 reference hash.",
+    "Retain native qd/target/integral/applied effort samples and the existing PI/cap verification.",
+    "At four policy boundaries, dump only valid MJWarp contact rows and the supported solver iteration statistics; preserve NA explicitly.",
+    "Record actual tc, independently recomputed tc, 2dt threshold, refsafe state, solver_niter, and the true runner exit code.",
+    "No additional parameter runs follow this baseline without explicit parent authorization."
+  ]
+}

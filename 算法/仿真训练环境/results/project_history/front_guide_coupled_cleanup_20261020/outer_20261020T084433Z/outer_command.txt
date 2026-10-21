@@ -1,0 +1,12 @@
+Main exact command:
+env -u RUN_ISAAC_PHYSICS CUDA_VISIBLE_DEVICES= bash results/project_history/front_guide_coupled_cleanup_20261020/run_front_guide_coupled_validation.sh
+
+Static-only additional checks:
+bash -n results/project_history/front_guide_coupled_cleanup_20261020/run_front_guide_coupled_validation.sh
+bash -n results/isaac_field_viewer/front_guides_coupled_rough_20261020/run_viewer.sh
+bash -n results/isaac_field_diagnosis/front_guide_coupled_20261020/attempt8_native_full_pass/run_native.sh
+bash -n results/isaac_field_diagnosis/front_guide_coupled_20261020/attempt9_native_legacy14/run_native.sh
+bash -n results/isaac_field_diagnosis/front_guide_coupled_step_probe_20261020/run_pair_attempt1.sh
+env -u RUN_ISAAC_PHYSICS CUDA_VISIBLE_DEVICES= scripts/isaaclab_python.sh -m py_compile results/isaac_field_diagnosis/front_guide_coupled_step_probe_20261020/probe.py results/isaac_field_diagnosis/front_guide_coupled_step_probe_20261020/verify_pair_attempt1.py
+
+The runner executes CPU pytest, compileall, project-shell syntax checks and hash stability only. It does not prepare a trial, run the paired physics probe, launch a viewer, or start training. Child checks unset RUN_ISAAC_PHYSICS and set CUDA_VISIBLE_DEVICES to the empty string.

@@ -1,0 +1,442 @@
+{
+  "schema": "fieldsim-stationary-cpu-benchmark-v1",
+  "comparison_scope": "FieldSim Gym step throughput with its simulated sensors, detections, and reward; Gazebo's scene/sensor smoke run has no matching full Gym observation/reward loop, so this is not an equal-feature training-throughput ranking.",
+  "protocol": {
+    "seed": 7,
+    "repeats": 3,
+    "mode": "search",
+    "action": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "warmup_sim_seconds": 1.0,
+    "measurement_sim_seconds": 20.0,
+    "cpu_thread_environment": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "config": {
+      "dt_s": 0.05,
+      "lidar_period_s": 0.1,
+      "depth_period_s": 0.4,
+      "camera_period_s": 0.2,
+      "plants": 400,
+      "leaves_per_plant": 8,
+      "lidar_rays": 400,
+      "depth_shape_hw": [
+        160,
+        88
+      ],
+      "validate_scene": true,
+      "terrain_enabled": true
+    },
+    "python_version": "3.11.9",
+    "numpy_version": "2.4.6",
+    "field_sim_module": "field_sim.env"
+  },
+  "repeats_results": [
+    {
+      "repeat": 1,
+      "seed": 7,
+      "mode": "search",
+      "scene_id": 1,
+      "terrain_seed": 8150262340054433613,
+      "terrain_enabled": true,
+      "reset_wall_seconds_excluded": 0.2142597999991267,
+      "warmup_sim_seconds": 1.0,
+      "warmup_steps": 20,
+      "warmup_wall_seconds_excluded": 0.0844969999998284,
+      "warmup_reward_excluded": -0.26,
+      "action": {
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "meaning": "stationary zero command"
+      },
+      "measurement": {
+        "sim_seconds": 20.000000000000163,
+        "wall_seconds": 1.6573239999997895,
+        "steps": 400,
+        "steps_per_wall_second": 241.35292797307636,
+        "rtf_sim_over_wall": 12.067646398653917,
+        "reward_sum": -0.20000000000000015,
+        "reward_per_step": -0.0005000000000000003,
+        "sim_start_s": 1.0000000000000002,
+        "sim_end_s": 21.000000000000163
+      },
+      "sensor_freshness": {
+        "lidar": {
+          "fresh_frames": 200,
+          "fresh_hz_sim": 9.999999999999918,
+          "expected_period_s": 0.1,
+          "expected_hz": 10.0,
+          "unique_capture_timestamps": 200,
+          "capture_timestamp_span_s": 19.9,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.10000000000000142,
+          "capture_times_monotonic": true
+        },
+        "depth": {
+          "fresh_frames": 50,
+          "fresh_hz_sim": 2.4999999999999796,
+          "expected_period_s": 0.4,
+          "expected_hz": 2.5,
+          "unique_capture_timestamps": 50,
+          "capture_timestamp_span_s": 19.599999999999998,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.6000000000000085,
+          "capture_times_monotonic": true
+        },
+        "camera": {
+          "fresh_frames": 100,
+          "fresh_hz_sim": 4.999999999999959,
+          "expected_period_s": 0.2,
+          "expected_hz": 5.0,
+          "unique_capture_timestamps": 100,
+          "capture_timestamp_span_s": 19.8,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.20000000000000284,
+          "capture_times_monotonic": true
+        }
+      },
+      "final_episode_info": {
+        "time": 21.000000000000163,
+        "found": 0,
+        "targets": 89,
+        "false_reports": 1,
+        "damage": 0,
+        "collisions": 0,
+        "distance": 135.7645019878171,
+        "reason": "",
+        "is_success": false,
+        "sensor_sequences": {
+          "lidar": 210,
+          "depth": 52,
+          "camera": 105
+        },
+        "sensor_dropped": {
+          "lidar": 0,
+          "depth": 0,
+          "camera": 0
+        }
+      },
+      "observation_contract": {
+        "lidar": {
+          "shape": [
+            2,
+            400
+          ],
+          "dtype": "float32"
+        },
+        "depth": {
+          "shape": [
+            2,
+            160,
+            88
+          ],
+          "dtype": "float32"
+        },
+        "detections": {
+          "shape": [
+            16,
+            10
+          ],
+          "dtype": "float32"
+        },
+        "state": {
+          "shape": [
+            44
+          ],
+          "dtype": "float32"
+        }
+      }
+    },
+    {
+      "repeat": 2,
+      "seed": 7,
+      "mode": "search",
+      "scene_id": 1,
+      "terrain_seed": 8150262340054433613,
+      "terrain_enabled": true,
+      "reset_wall_seconds_excluded": 0.20901430000049004,
+      "warmup_sim_seconds": 1.0,
+      "warmup_steps": 20,
+      "warmup_wall_seconds_excluded": 0.07370910000099684,
+      "warmup_reward_excluded": -0.26,
+      "action": {
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "meaning": "stationary zero command"
+      },
+      "measurement": {
+        "sim_seconds": 20.000000000000163,
+        "wall_seconds": 1.6462129999999888,
+        "steps": 400,
+        "steps_per_wall_second": 242.98192275240368,
+        "rtf_sim_over_wall": 12.149096137620283,
+        "reward_sum": -0.20000000000000015,
+        "reward_per_step": -0.0005000000000000003,
+        "sim_start_s": 1.0000000000000002,
+        "sim_end_s": 21.000000000000163
+      },
+      "sensor_freshness": {
+        "lidar": {
+          "fresh_frames": 200,
+          "fresh_hz_sim": 9.999999999999918,
+          "expected_period_s": 0.1,
+          "expected_hz": 10.0,
+          "unique_capture_timestamps": 200,
+          "capture_timestamp_span_s": 19.9,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.10000000000000142,
+          "capture_times_monotonic": true
+        },
+        "depth": {
+          "fresh_frames": 50,
+          "fresh_hz_sim": 2.4999999999999796,
+          "expected_period_s": 0.4,
+          "expected_hz": 2.5,
+          "unique_capture_timestamps": 50,
+          "capture_timestamp_span_s": 19.599999999999998,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.6000000000000085,
+          "capture_times_monotonic": true
+        },
+        "camera": {
+          "fresh_frames": 100,
+          "fresh_hz_sim": 4.999999999999959,
+          "expected_period_s": 0.2,
+          "expected_hz": 5.0,
+          "unique_capture_timestamps": 100,
+          "capture_timestamp_span_s": 19.8,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.20000000000000284,
+          "capture_times_monotonic": true
+        }
+      },
+      "final_episode_info": {
+        "time": 21.000000000000163,
+        "found": 0,
+        "targets": 89,
+        "false_reports": 1,
+        "damage": 0,
+        "collisions": 0,
+        "distance": 135.7645019878171,
+        "reason": "",
+        "is_success": false,
+        "sensor_sequences": {
+          "lidar": 210,
+          "depth": 52,
+          "camera": 105
+        },
+        "sensor_dropped": {
+          "lidar": 0,
+          "depth": 0,
+          "camera": 0
+        }
+      },
+      "observation_contract": {
+        "lidar": {
+          "shape": [
+            2,
+            400
+          ],
+          "dtype": "float32"
+        },
+        "depth": {
+          "shape": [
+            2,
+            160,
+            88
+          ],
+          "dtype": "float32"
+        },
+        "detections": {
+          "shape": [
+            16,
+            10
+          ],
+          "dtype": "float32"
+        },
+        "state": {
+          "shape": [
+            44
+          ],
+          "dtype": "float32"
+        }
+      }
+    },
+    {
+      "repeat": 3,
+      "seed": 7,
+      "mode": "search",
+      "scene_id": 1,
+      "terrain_seed": 8150262340054433613,
+      "terrain_enabled": true,
+      "reset_wall_seconds_excluded": 0.2117740000012418,
+      "warmup_sim_seconds": 1.0,
+      "warmup_steps": 20,
+      "warmup_wall_seconds_excluded": 0.07327189999887196,
+      "warmup_reward_excluded": -0.26,
+      "action": {
+        "values": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "meaning": "stationary zero command"
+      },
+      "measurement": {
+        "sim_seconds": 20.000000000000163,
+        "wall_seconds": 1.6344972999995662,
+        "steps": 400,
+        "steps_per_wall_second": 244.72356118306598,
+        "rtf_sim_over_wall": 12.2361780591534,
+        "reward_sum": -0.20000000000000015,
+        "reward_per_step": -0.0005000000000000003,
+        "sim_start_s": 1.0000000000000002,
+        "sim_end_s": 21.000000000000163
+      },
+      "sensor_freshness": {
+        "lidar": {
+          "fresh_frames": 200,
+          "fresh_hz_sim": 9.999999999999918,
+          "expected_period_s": 0.1,
+          "expected_hz": 10.0,
+          "unique_capture_timestamps": 200,
+          "capture_timestamp_span_s": 19.9,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.10000000000000142,
+          "capture_times_monotonic": true
+        },
+        "depth": {
+          "fresh_frames": 50,
+          "fresh_hz_sim": 2.4999999999999796,
+          "expected_period_s": 0.4,
+          "expected_hz": 2.5,
+          "unique_capture_timestamps": 50,
+          "capture_timestamp_span_s": 19.599999999999998,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.6000000000000085,
+          "capture_times_monotonic": true
+        },
+        "camera": {
+          "fresh_frames": 100,
+          "fresh_hz_sim": 4.999999999999959,
+          "expected_period_s": 0.2,
+          "expected_hz": 5.0,
+          "unique_capture_timestamps": 100,
+          "capture_timestamp_span_s": 19.8,
+          "dropped_frames": 0,
+          "final_frame_age_s": 0.20000000000000284,
+          "capture_times_monotonic": true
+        }
+      },
+      "final_episode_info": {
+        "time": 21.000000000000163,
+        "found": 0,
+        "targets": 89,
+        "false_reports": 1,
+        "damage": 0,
+        "collisions": 0,
+        "distance": 135.7645019878171,
+        "reason": "",
+        "is_success": false,
+        "sensor_sequences": {
+          "lidar": 210,
+          "depth": 52,
+          "camera": 105
+        },
+        "sensor_dropped": {
+          "lidar": 0,
+          "depth": 0,
+          "camera": 0
+        }
+      },
+      "observation_contract": {
+        "lidar": {
+          "shape": [
+            2,
+            400
+          ],
+          "dtype": "float32"
+        },
+        "depth": {
+          "shape": [
+            2,
+            160,
+            88
+          ],
+          "dtype": "float32"
+        },
+        "detections": {
+          "shape": [
+            16,
+            10
+          ],
+          "dtype": "float32"
+        },
+        "state": {
+          "shape": [
+            44
+          ],
+          "dtype": "float32"
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "measurement.steps_per_wall_second": {
+      "mean": 243.019470636182,
+      "median": 242.98192275240368,
+      "min": 241.35292797307636,
+      "max": 244.72356118306598,
+      "stdev_sample": 1.685630280267119
+    },
+    "measurement.rtf_sim_over_wall": {
+      "mean": 12.1509735318092,
+      "median": 12.149096137620283,
+      "min": 12.067646398653917,
+      "max": 12.2361780591534,
+      "stdev_sample": 0.08428151401335665
+    },
+    "measurement.wall_seconds": {
+      "mean": 1.6460114333331148,
+      "median": 1.6462129999999888,
+      "min": 1.6344972999995662,
+      "max": 1.6573239999997895,
+      "stdev_sample": 0.011414684843040795
+    },
+    "sensor_freshness.lidar.fresh_hz_sim": {
+      "mean": 9.999999999999918,
+      "median": 9.999999999999918,
+      "min": 9.999999999999918,
+      "max": 9.999999999999918
+    },
+    "sensor_freshness.depth.fresh_hz_sim": {
+      "mean": 2.4999999999999796,
+      "median": 2.4999999999999796,
+      "min": 2.4999999999999796,
+      "max": 2.4999999999999796
+    },
+    "sensor_freshness.camera.fresh_hz_sim": {
+      "mean": 4.999999999999959,
+      "median": 4.999999999999959,
+      "min": 4.999999999999959,
+      "max": 4.999999999999959
+    }
+  }
+}

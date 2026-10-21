@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "generated_at_utc": "2026-10-15T10:27:33.287192+00:00",
+  "engineering_acceptance_all_pass": false,
+  "formal_part_substitutions_this_round": [],
+  "candidate_constraints": {
+    "N01": [
+      "UCC27511A共用候选不能解决SAFE_5V失电时的耗能失效；更换后须重新核对供电、UVLO、默认态与母线残能。FOC额度过期后仍有18.179J/1774W的模型尾流压力，须独立闭合实际吸收路径。"
+    ],
+    "N04": [
+      "FOC ±100A命令/5000A/s仅为参考控制模型；120A是模型筛查线。共用MOS须按PWM瞬态、实测电机参数、损耗/热/SOA重新验证，不能继承BMS电池直流工况。"
+    ],
+    "N06": [
+      "BMS温度须覆盖全部36颗电芯的保守上下界；稳压逐节电压误差与温度漂移也须闭合。换NTC后重算R/T、采样误差及安装响应，不能直接继承现有资格。"
+    ],
+    "N08": [
+      "BMS另一对话正在落实12V两线风扇；现用/条件5V模块与12V风扇分别管理，不把旧5V四线风扇检查当新风扇验证。"
+    ],
+    "P01": [
+      "SAFE_5V和采样去耦换型后复查启动、瞬态与有效容量；不能通过删减去耦降低失电保护要求。"
+    ],
+    "P04": [
+      "驱动/电荷泵电容换型后核对有效容量、供电启动与故障恢复；当前电流模型未包含真实器件开关过程。"
+    ],
+    "P08": [
+      "温敏测量偏置换型必须重新闭合温度覆盖与保护误差，不把普通偏置位的通过结论套入采样位。"
+    ],
+    "P09": [
+      "稳压逐节保护暂以±100mV总误差、50ms到电流归零为资格条件；已知项条件应力和339.174mV超预算，ADC/VREF/泄漏/温漂未闭合。精密分压不得换为普通10k料。"
+    ]
+  },
+  "scope": "三板当前保存快照的参考控制/保护模型修复；不等于固件实施、实物或整车验收。BMS另一对话后续CAD/BOM修改须另行同步复查。",
+  "confirmed_motor": {
+    "model": "BDUAV N5065",
+    "KV": 270,
+    "pole_pairs": 7,
+    "status": "用户已确认，禁止重复询问；R/L和Ke定义未作为已测事实。"
+  },
+  "sources": [
+    {
+      "path": "BMS模块/eda工程文件/sch/Schematic1/P1.esch2",
+      "sha256": "cd00f3727ad4d559f1378ec2fc10372725682336c2a19e1edba8f0d3ce7979ca"
+    },
+    {
+      "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+      "sha256": "46cc3fddea3c62352f977bbc39ed3c327f0228409bff7ebdb0f35b4b46d6c81f"
+    },
+    {
+      "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+      "sha256": "b3e59ef0ae3aad47eb9a4ffc69ac7cf055c8ec021d21c5916cad92e7418a0e42"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+Direct tracks UI validation — 2026-10-20
+
+CPU regression set
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh -m pytest -q tests/test_isaac_field_viewer.py tests/test_activation_maps.py tests/test_policy_inspection.py tests/test_network_panel.py tests/test_network_2d.py"
+Result: exit 0; 60 passed, 1 warning in 10.29s.
+Warning: test_extreme_finite_values_and_all_nonfinite_frames_have_safe_ranges triggered NumPy RuntimeWarning for overflow in float32 standard-deviation squaring; the test passed.
+
+Action-contract snapshot/export follow-up
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh -m pytest -q tests/test_policy_inspection.py tests/test_network_panel.py"
+Result: exit 0; 15 passed in 2.55s.
+
+Embedded JavaScript syntax
+PowerShell extraction and check:
+$tempJs = Join-Path ([System.IO.Path]::GetTempPath()) ('network_2d_' + [guid]::NewGuid().ToString('N') + '.js')
+$html = Get-Content -LiteralPath 'isaac_field/visualization/network_2d.html' -Raw
+$scriptText = [regex]::Match($html, '(?s)<script>\s*(.*?)</script>').Groups[1].Value
+Set-Content -LiteralPath $tempJs -Value $scriptText -Encoding utf8
+node --check $tempJs
+$checkResult = $LASTEXITCODE
+Remove-Item -LiteralPath $tempJs
+exit $checkResult
+Result: exit 0.
+
+WSL wrapper shell syntax
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -n '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/scripts/isaaclab_python.sh'
+Result: exit 0.
+
+Final graph audit reproducibility
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh results/isaac_field_viewer/direct_tracks_20261020/graph_audit.py"
+Result: exit 0; report passed=true. Actual CPU PolicyInspector graph has 57 layers, action.applied shape [4] with contract labels in left track/right track/gimbal yaw/gimbal pitch order, all parent refs resolve, no actuator.* or motion.actual nodes; inspector snapshot and NetworkPanel export layer lists match, sidecar action_config matches, and overview ends at four-dimensional action.applied.
+
+Read-only live paused-frame capture
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh results/isaac_field_viewer/direct_tracks_20261020/capture_frame_tensors.py --out-dir results/isaac_field_viewer/direct_tracks_20261020 --prefix before"
+Result: exit 0; paused sequence=1 at sim_time=0.0; captured 57 actual nodes plus detail stats and index-0 elements for 12 metadata-resolved input/conv/encoder/state/fusion/actor-LSTM/action nodes. Wrote frame_before.json and tensors_before.json.
+
+After-run paused-frame capture
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh results/isaac_field_viewer/direct_tracks_20261020/capture_frame_tensors.py --out-dir results/isaac_field_viewer/direct_tracks_20261020 --prefix after"
+Result: exit 0; paused sequence=149 at sim_time=7.349999999999982; captured same 12 keys to frame_after.json and tensors_after.json.
+
+Runtime acceptance comparison
+Command:
+wsl.exe -d Ubuntu-24.04 -- bash -lc "cd '/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境' && bash scripts/isaaclab_python.sh results/isaac_field_viewer/direct_tracks_20261020/audit_runtime_acceptance.py"
+Result: exit 0; runtime_acceptance.json passed. Repeat paused GETs retained sequence 149, sim_time 7.35, scale 2.2358174324035645, errors=[], 57 nodes, running=false. No actuator.* / motion.actual nodes. Raw detail stats changed in 8/12 tensors; selected index-0 element changed in actor LSTM and action.applied (2/12). Several sensor/encoder index-0 elements remained equal, so the check is based on raw stats and does not claim every value changed. Before/after scale moved 2.2587428092956543→2.2358174324035645 during the intervening run; paused repeated GETs were stable.

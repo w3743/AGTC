@@ -1,0 +1,400 @@
+{
+  "title": "CAD接力闭合验证",
+  "date": "2026-10-15",
+  "scope": {
+    "projectCopy": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力CAD闭合副本\\eda工程文件\\BMS-9S4P.eprj3",
+    "operation": "初始只读导入后，仅在隔离副本中通过官方原理图属性API移动U1左侧可见网络名；保存、关闭、重开、网表/导线对照均完成。未改正式源/BOM/共享库，未创建PCB。",
+    "copiedNativeFileCount": 5,
+    "copiedNativeBytes": 31975244,
+    "finalCopyHashesMatchSource": false,
+    "initialCopyHashesMatchSource": true,
+    "initialCopiedNativeBytes": 31975244,
+    "finalCopiedNativeBytes": 31975359,
+    "finalCopyChangeSummary": "只修改隔离副本sch/Schematic1/P1.esch2中U1左侧23个可见wire Name属性；正式原文件仍与原记录hash一致。",
+    "copyEntrySha256AfterTrial": "7509EFB1B48A30D2CBF20131C79D0B3AFA33D6CE6E735084978CD07F3B949C71",
+    "copyP1Sha256AfterTrial": "AFF02FD638E91B2695D770FA88EC4C24B433FA87E0769B8BFDAE7FC6A849C37E",
+    "copyEntryBytesAfterTrial": 2055
+  },
+  "evidence": {
+    "baseline": {
+      "open": "PASS",
+      "sessionId": "c2d2cb1b-99fb-4285-90af-bf6ffdd6d52b",
+      "headless": true,
+      "page": "P1",
+      "pageUuid": "350a4904c4ec87b3",
+      "note": "872为COMPONENT记录数（含网络端口），不是物理器件数；网表独立确认213器件。其他原生记录类型统计见闭合报告。",
+      "primitiveCountMeaning": "Legacy field name retained for compatibility; 872 is COMPONENT record count including 659 netport records, not count of all schematic graphical primitives.",
+      "componentRecordCount": 872,
+      "componentRecordBreakdown": {
+        "physicalOrNetlistComponentParts": 213,
+        "netportComponentRecords": 659
+      },
+      "primitiveCount": 872
+    },
+    "netlist": {
+      "status": "PASS",
+      "method": "SCH_ManufactureData.getNetlistFile('P1_9S4P.net','EasyEDA')",
+      "referenceFile": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\当前BMS9S4P官方网表.enet",
+      "copyComponentCount": 213,
+      "referenceComponentCount": 213,
+      "referenceSetEqual": true,
+      "perReferenceDataEqual": true,
+      "copyPins": 711,
+      "connectedPins": 659,
+      "unconnectedPins": 52,
+      "canonicalComponentsSha256": "3A6AD8937A9A4CA724CD0AB30A67EAD833F438F56AF70A844C3420B91E3E9950",
+      "comparisonEvidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力_netlist_compare.json",
+      "note": "比较忽略project UUID；完整213 refs和每器件引脚/网络数据一致。"
+    },
+    "drc": {
+      "status": "WARNINGS_AGGREGATED_NO_ITEMIZED_RESULT",
+      "method": "SCH_Drc.check(true,false,true)",
+      "returned": [
+        {
+          "type": "warn",
+          "count": 10
+        }
+      ],
+      "logs": [],
+      "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_followup_drc_geometry.json",
+      "note": "正确213器件副本一次详细模式调用只返回warning类别/总数10；无逐项错误、器件或坐标字段，不能判PASS。此前false-only返回false且无日志。完整技能签名与本机CLI doc api introspection不一致；详情见officialApiFeasibilityAudit。",
+      "resultType": "array",
+      "itemizedDetailsReturned": false,
+      "previousBooleanOnlyAttempt": {
+        "method": "SCH_Drc.check(true,false,false)",
+        "returned": false,
+        "logs": []
+      }
+    },
+    "rPsuFbTop": {
+      "designator": "R_PSU_FB_TOP",
+      "name": "RT0603BRD0795K3L",
+      "value": "",
+      "manufacturer": "YAGEO(国巨)",
+      "manufacturerPart": "RT0603BRD0795K3L",
+      "deviceName": "RT0603BRD0730K1L",
+      "deviceUuid": "41bb4f84306d93f3",
+      "symbolName": "RT0603BRD0730K1L",
+      "footprintName": "R0603",
+      "supplier": "LCSC",
+      "supplierPart": "C705764",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "pinNets": {
+        "1": "VOUT_5V",
+        "2": "PSU_FB"
+      },
+      "tolerance": "",
+      "displaySwitches": "早次元件状态未含属性显示开关；本次属性API确认Designator和Name的valueVisible=true；其他字段显示状态不推断。",
+      "interpretation": "Name/Manufacturer Part及BOM设计注释目标为95.3kΩ±0.1%；DeviceName及供应商料号C705764指向30.1kΩ载体/料号，Value为空。属于载体与采购元数据不一致；不能据此断言已装配为30.1kΩ或电源必为2.4V。",
+      "exactTargetDeviceSearch": "未返回RT0603BRD0795K3L目标器件；未创建替换件。",
+      "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力_netlist_compare.json"
+    },
+    "carrierDifferences": {
+      "U_FAN_SW": {
+        "deviceName": "SGM2593AXN6G/TR",
+        "manufacturerPart": "SGM2593XN6G/TR",
+        "supplierPart": "C9900302687"
+      },
+      "U_LOAD_POWER_VALID": {
+        "deviceName": "VO617A-4X007T",
+        "manufacturerPart": "VO617A-2X007T",
+        "supplierPart": "C17528767"
+      },
+      "note": "仍需器件/采购主数据一致化；本轮未换绑。"
+    },
+    "lPsuFootprint": {
+      "status": "BLOCKED_NO_SUPPORTED_PROJECT_LOCAL_EDIT_PATH_FOUND",
+      "currentCenterDistanceMm": 11.999976,
+      "targetCenterDistanceMm": 11.25,
+      "requiredInwardShiftEachPadMm": 0.374988,
+      "currentLibraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "projectCopyApiProbe": {
+        "method": "SYS_FileManager.getDocumentFootprintSources()",
+        "count": 0
+      },
+      "apiBoundary": "LIB_Footprint.get只回元数据；modify没有焊盘几何字段；updateDocumentSource需要本轮不可得的documentSource。该封装属于共享/系统库，本轮未写共享库。",
+      "priorIsolatedProbeEvidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\L_PSU封装官方API只读回读_20261015.json",
+      "priorResults": {
+        "copy": "Error: [object Object] targeting project library",
+        "create": "null; subsequent project-library search empty",
+        "openNonexistentProjectFootprint": "undefined; no document tab opened"
+      },
+      "manualWorkOrder": "在EasyEDA中从共享封装复制到项目库；只将1/2焊盘中心分别向内移动0.374988mm至±5.625mm，保持焊盘几何/编号/层/角度；保存并关闭重开副本，再核对1/2网络。"
+    },
+    "pdfExport": {
+      "status": "RAW_OFFICIAL_PDF_CROPPED; POSTPROCESSED_REVIEW_CONTENT_COMPLETE_READABILITY_FAIL",
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力CAD闭合副本\\P1_9S4P_handoff.pdf",
+      "bytes": 830783,
+      "sha256": "4AFFD1F622FD04EEF1613ED2D6BE17B89F8448D1ABDC0534D9AA18356D254DAC",
+      "pageCount": 1,
+      "pageSizePoints": "14400 x 14400",
+      "referencesFoundByParentTextReview": 104,
+      "referencesExpected": 213,
+      "referencesMissing": 109,
+      "visualReview": "raw PDF普通页面裁切只检出104/213；无限clip及扩边后确认213/213。后处理导航审阅件内容完整，但全页稀疏且U1局部文字重叠，可读性FAIL；不能由raw PDF裁切推断原生网表缺器件。",
+      "sizeRetry": {
+        "documentedParam": "size:{width:297,height:210,unit:'mm'}",
+        "result": "REQUEST_TIMEOUT after 59.75s (60000ms budget); no revised PDF produced; no retry"
+      },
+      "originalPdfEvidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力_pdf_export_probe.json",
+      "rawOfficialExport": {
+        "defaultPageTextReferenceHits": 104,
+        "expectedReferences": 213,
+        "infiniteClipReferenceHits": 213,
+        "pageSizePoints": "14400 x 14400",
+        "textBoundsPoints": {
+          "x": [
+            15,
+            22597
+          ],
+          "y": [
+            4,
+            19229
+          ]
+        },
+        "drawingBoundsPoints": {
+          "x": [
+            -1227,
+            22602
+          ],
+          "y": [
+            -4.625,
+            20112
+          ]
+        },
+        "diagnosis": "MediaBox边界裁切；无限clip与扩边后的页面均能检出213 refs，不是隐藏位号，也不证明原生网表缺器件。"
+      },
+      "reviewArtifact": {
+        "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\当前原理图导航审阅.pdf",
+        "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\当前原理图导航审阅.json",
+        "sha256": "bd0845f745c49bfb12a4345b7891b25e5b23bcc3dc06ce824dc13263c5dfd4b3",
+        "pageCount": 1,
+        "pageSizePoints": [
+          11940.0,
+          10080.0
+        ],
+        "scale": 0.5,
+        "sourceAndOutputReferenceHits": [
+          213,
+          213
+        ],
+        "bookmarkCount": 213,
+        "vectorPreserved": true,
+        "contentCompleteness": "PASS",
+        "readability": "FAIL:原生全页布局稀疏，U1局部引脚/网络文字重叠；不能以213/213可检索代替可读性。",
+        "acceptanceBoundary": "仅证明后处理文件的页面缩放、文本保留与书签覆盖；不代表ERC通过、电气验收或实物验证。"
+      }
+    },
+    "apiGeometry": {
+      "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_followup_drc_geometry.json",
+      "documentUuid": "350a4904c4ec87b3",
+      "uniqueDesignators": 213,
+      "netlistComponents": 213,
+      "netlistPins": 711,
+      "coordinateUnit": "0.01 inch (per DMT_EditorControl reference)",
+      "refCoordinateExtents": {
+        "minX": 1800,
+        "maxX": 33000,
+        "minY": 1800,
+        "maxY": 27900
+      },
+      "targetAttributeVisibility": {
+        "L_PSU": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        },
+        "R_PSU_FB_TOP": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        },
+        "U1": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        },
+        "U_PSU": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        },
+        "U_FAN_SW": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        },
+        "U_LOAD_POWER_VALID": {
+          "designatorValueVisible": true,
+          "nameValueVisible": true
+        }
+      },
+      "note": "872为COMPONENT记录总数，由213器件component与659个netport组成；并非所有原理图图元的总数。",
+      "componentRecords": 872,
+      "physicalOrNetlistComponents": 213,
+      "netportComponentRecords": 659
+    },
+    "u1LeftLabelLayoutTrial": {
+      "status": "PASS_ISOLATED_COPY_PERSISTENT_LAYOUT_REPAIR",
+      "copyEntry": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力CAD闭合副本\\eda工程文件\\BMS-9S4P.eprj3",
+      "copyP1": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力CAD闭合副本\\eda工程文件\\sch\\Schematic1\\P1.esch2",
+      "api": "SCH_PrimitiveAttribute.modify",
+      "apiScope": "BETA schematic attribute API; used only on isolated project copy; no library write.",
+      "target": "U1 left-side visible wire Name labels only",
+      "changedAttributeCount": 23,
+      "selection": "U1 has 40 connected wire endpoints. For 23 visible Name attributes associated with left pins 1-18 and 20-24, only text x/alignment were changed; Name values, NET values, visibility and y were unchanged. Pin 19 had no visible Name attribute and was not changed. All wire geometry and connectivity stayed unchanged.",
+      "change": {
+        "xRule": "min(wire line.x)-10",
+        "xObserved": 21795,
+        "y": "unchanged",
+        "alignMode": 8,
+        "alignMeaning": "RIGHT_MIDDLE",
+        "nameValues": "unchanged",
+        "visibility": "unchanged",
+        "wireNET": "unchanged",
+        "wireGeometry": "unchanged",
+        "portNameAttributes": "unchanged"
+      },
+      "saveResult": true,
+      "closeAndReopen": {
+        "sessionId": "e0662ff3-9f4d-46fa-94f0-7f3c9d73dfc9",
+        "headless": true,
+        "apiReadbackAfterReopen": true,
+        "readbackEvidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_reopen_verify.json",
+        "finalCloseEvidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_final_close_hashes.json",
+        "closeResult": "ok=true; status=closed; exitCode=0",
+        "finalSessionListStatus": "closed"
+      },
+      "readback": {
+        "attributesReadBack": 23,
+        "allAtEndpointMinus10": true,
+        "allRIGHT_MIDDLE": true,
+        "valuesVisibilityAndYUnchanged": true
+      },
+      "netlistComparisonAfterReopen": {
+        "status": "PASS",
+        "baselineAndTrialRefs": 213,
+        "referenceSetEqual": true,
+        "pins": 711,
+        "perReferenceComponentDataEqual": true,
+        "canonicalSha256Baseline": "3A6AD8937A9A4CA724CD0AB30A67EAD833F438F56AF70A844C3420B91E3E9950",
+        "canonicalSha256Trial": "3A6AD8937A9A4CA724CD0AB30A67EAD833F438F56AF70A844C3420B91E3E9950"
+      },
+      "wireComparisonAfterReopen": {
+        "status": "PASS",
+        "baselineAndTrialWires": 659,
+        "sameIdSet": true,
+        "sameLineAndNetForAll": true,
+        "differences": 0
+      },
+      "visualReview": {
+        "status": "PASS",
+        "scope": "Only U1 left-side labels; not whole-sheet readability or ERC.",
+        "reviewer": "Parent-agent visual review confirmed all 23 labels no longer overlap pin numbers or symbol boundary.",
+        "beforePng": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\当前原理图导航审阅_U1.png",
+        "afterPng": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_left_bulk_trial_local.png",
+        "afterPngSizePixels": [
+          1500,
+          900
+        ],
+        "renderSourceSvg": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_left_bulk_trial.svg"
+      },
+      "evidence": {
+        "modify": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_left_bulk_modify.json",
+        "reopenReadback": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_reopen_verify.json",
+        "netlistWireValidation": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_validation.json",
+        "closeAndFormalHashes": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_final_close_hashes.json"
+      },
+      "notCovered": [
+        "formal source application",
+        "carrier/BOM consistency",
+        "L_PSU footprint correction",
+        "itemized ERC/DRC",
+        "full-sheet readability",
+        "electrical or physical acceptance"
+      ],
+      "u1WireEndpointConnections": 40
+    }
+  },
+  "formalFileHashes": {
+    "eprj3": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\eda工程文件\\BMS-9S4P.eprj3",
+      "sha256": "FE4F325C50613ABDC9C8A4F719E138FB5752FB6A646692D0710554B0DC073DD9"
+    },
+    "P1": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\eda工程文件\\sch\\Schematic1\\P1.esch2",
+      "sha256": "CC1A211574E829C44D0557182A67790F24DAAA5C81F594FF5271ED384BE990C2"
+    },
+    "BOM": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\原理图准备\\BOM.csv",
+      "sha256": "43B7C50E53DA9509B600904B6FD300B3EEFB9C47E40A13C84555A0D0DD6FA00E"
+    }
+  },
+  "sessionClose": {
+    "sessionId": "c2d2cb1b-99fb-4285-90af-bf6ffdd6d52b",
+    "closeResult": "closed",
+    "verifiedByFinalSessionList": true,
+    "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\接力_final_sessions.json",
+    "followupSession": {
+      "sessionId": "ecc0a01e-078d-46c2-a48b-21290171ed63",
+      "closeResult": "ok=true; status=closed",
+      "verifiedByFinalSessionList": true,
+      "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_followup_session_close.json"
+    },
+    "u1LayoutTrial": {
+      "sessionId": "e0662ff3-9f4d-46fa-94f0-7f3c9d73dfc9",
+      "headless": true,
+      "closeResult": "ok=true; status=closed; exitCode=0",
+      "verifiedByFinalSessionList": true,
+      "finalStatus": "closed",
+      "evidence": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\tmp\\cad_u1_bulk_final_close_hashes.json"
+    }
+  },
+  "overall": "PARTIAL: U1隔离副本已取得可保存重开的左侧标签布局修复，局部可读；正式源仍未修订，carrier/L_PSU/ERC未闭合。副本213 refs/711 pins网表和659条导线网络几何对照PASS；DRC仍只有10条聚合warning，不可逐项验收。raw官方PDF边界裁切已确认；后处理导航审阅PDF内容213/213完整但全页排版可读性未通过。正式EPRJ3/P1/BOM SHA256与前记一致。",
+  "officialApiFeasibilityAudit": {
+    "drcReference": ".agents/skills/easyeda-api-skill/references/classes/SCH_Drc.md",
+    "documentedOverloads": [
+      {
+        "signature": "check(strict:boolean,userInterface:boolean,includeVerboseError:false):Promise<boolean>"
+      },
+      {
+        "signature": "check(strict:boolean,userInterface:boolean,includeVerboseError:true):Promise<Array<any>>"
+      }
+    ],
+    "installedCliIntrospection": {
+      "command": "lceda-pro doc api --class-name SCH_Drc --method-name check",
+      "evidence": "BMS模块/检查/tmp/handoff_sig_SCH_Drc_check.out",
+      "reportedSignature": "includeVerboseError:false; returns boolean",
+      "mismatch": "本机CLI introspection未显示true overload；按技能完整版文档仍实际调用true一次。"
+    },
+    "runtimeTrueOverloadResult": "[{\"type\":\"warn\",\"count\":10}]，只有聚合计数，无逐项内容。",
+    "exportFeasibility": {
+      "documentedApi": "SCH_ManufactureData.getExportDocumentFile",
+      "exportRangeAndSizeOptions": "支持导出size及范围等参数；未见fit-to-content/origin/scale-to-page专用参数。",
+      "a4Retry": "59.75s/60s REQUEST_TIMEOUT，未重试。",
+      "usablePathFound": "仅通过对官方raw PDF进行PyMuPDF扩边、等比例矢量页面复用得到导航审阅PDF；这是PDF后处理，不是CAD修改，也不更改raw文件。",
+      "documentedSignature": "getExportDocumentFile(fileName?:string,fileType?:ESCH_ExportDocumentFileType,typeSpecificParams?:{theme?:Default|White on Black|Black on White;lineWidth?:Default|Always 1px|Follow the Zoom Change;displayAttributesAsMenu?:boolean;size?:Original Size|string|{width:number;height:number;unit:ESYS_Unit.INCH|ESYS_Unit.MILLIMETER}},object?:All Schematic|Current Schematic|Current Schematic Page|string,objectSpecificParams?:{range?:All|[number,number];outputMethod?:Merged sheet|Separated sheet}):Promise<File|undefined>",
+      "missingCapability": "未发现导出坐标原点、按全部图元边界fit、或导出页面内缩放因子参数；size是页面尺寸，range是页/对象范围而非图元坐标框。"
+    },
+    "noProjectModification": true,
+    "geometryAndViewportReferences": {
+      "bboxSignature": "SCH_Primitive.getPrimitivesBBox(primitiveIds:Array<string | ISCH_Primitive>):Promise<{minX:number;minY:number;maxX:number;maxY:number}|undefined>",
+      "attributeSignature": "SCH_PrimitiveAttribute.getAll(parentPrimitiveId?:string):Promise<Array<ISCH_PrimitiveAttribute>>",
+      "viewportSignatures": [
+        "DMT_EditorControl.zoomToAllPrimitives(tabId?:string):Promise<{left:number;right:number;top:number;bottom:number}|false>",
+        "DMT_EditorControl.zoomTo(x?:number,y?:number,scaleRatio?:number,tabId?:string):Promise<{left:number;right:number;top:number;bottom:number}|false>"
+      ],
+      "conclusion": "bbox及attribute API用于读取；zoom API只调整/回报画布视口，不能改变导出PDF范围。"
+    }
+  },
+  "formalHashesVerifiedAfterU1Trial": {
+    "eprj3": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\eda工程文件\\BMS-9S4P.eprj3",
+      "sha256": "FE4F325C50613ABDC9C8A4F719E138FB5752FB6A646692D0710554B0DC073DD9"
+    },
+    "P1": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\eda工程文件\\sch\\Schematic1\\P1.esch2",
+      "sha256": "CC1A211574E829C44D0557182A67790F24DAAA5C81F594FF5271ED384BE990C2"
+    },
+    "BOM": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\原理图准备\\BOM.csv",
+      "sha256": "43B7C50E53DA9509B600904B6FD300B3EEFB9C47E40A13C84555A0D0DD6FA00E"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+const out=[];for(const t of await eda.sch_PrimitiveText.getAll()){const s=t.getState_Content();if(s.includes('2026-10-18')){await eda.sch_PrimitiveText.modify(t.getState_PrimitiveId(),{content:s.replaceAll('2026-10-18','2026-10-19')});out.push(s);}}await eda.sch_Document.save();return out;

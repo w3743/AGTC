@@ -1,0 +1,147 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 92041
+	Physics step-size     : 0.001
+	Rendering step-size   : 0.05
+	Environment step-size : 0.05
+[INFO]: Time taken for scene creation Last: 2.756309 s, Mean: 2.756309 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 2
+	Environment spacing   : 110.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+Finalize builder took: Last: 0.630642 s, Mean: 0.630642 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for NewtonSegmentationMapper.build_mapping (instance_segmentation, colorize=False) Last: 0.001044 s, Mean: 0.001044 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 5.879532 s, Mean: 5.879532 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 15.628548 s, Mean: 15.628548 s, Std: 0.000000 s, N: 1
+[INFO]: Completed setting up the environment...
+F
+=================================== FAILURES ===================================
+_ test_native_passive_front_guides_keep_drive_isolated_and_stability_diagnostic _
+
+    def test_native_passive_front_guides_keep_drive_isolated_and_stability_diagnostic():
+        """Check live masses, joints, materials, reset clearance and per-world state."""
+        import re
+    
+        import mujoco
+        import torch
+    
+        from isaac_field.assets import FrontGuideSpec, ROBOT_SPEC
+        from isaac_field.body_stability import BodyStabilityConfig
+        from isaac_field.env import make_env
+        from isaac_field.task import Config
+    
+        guides = FrontGuideSpec()
+        cfg = Config(
+            size=100.0,
+            plants=0,
+            terrain_enabled=True,
+            terrain_amplitude=0.35,
+            terrain_wavelength_min=4.0,
+            terrain_wavelength_max=10.0,
+            rock_density=0.0,
+            validate_scene=False,
+            max_time=2.0,
+            lidar_rays=400,
+            depth_height=160,
+            depth_width=88,
+        )
+        env = make_env(
+            cfg,
+            mode="search",
+            num_envs=2,
+            seed=92041,
+            auto_reset=False,
+            front_guide_spec=guides,
+            body_stability_config=BodyStabilityConfig(),
+        )
+        try:
+            assert env.front_guide_spec == guides
+            assert env.body_stability_config is not None
+            assert env._wheel_ids.numel() == 14
+            assert env.drive_config["proxy_wheel_count_per_side"] == 7
+            assert env.drive_config["same_side_wheel_coupling"]["relations_per_world"] == 12
+            assert env._same_side_mimic_model_audit["worlds_checked"] == 2
+            assert env._same_side_mimic_model_audit["relations_per_world"] == 12
+            assert env._same_side_mimic_model_audit["cross_world_pairs"] == 0
+            assert env.drive_config["front_guide"]["enabled"] is True
+            assert env.drive_config["front_guide"]["drive_motor_count"] == 0
+            assert env.drive_config["front_guide"]["added_drive_torque_nm"] == 0.0
+    
+            guide_specs = guides.wheel_specs(ROBOT_SPEC)
+            assert len(guide_specs) == 2
+            assert all(guide_specs[i].side != guide_specs[j].side
+                       for i in range(len(guide_specs)) for j in range(i + 1, len(guide_specs)))
+            drive_cfg = env.cfg.scene.robot.actuators["drive"]
+            assert all(
+                not any(re.fullmatch(expression, guide.joint_name) for expression in drive_cfg.joint_names_expr)
+                for guide in guide_specs
+            ), "passive guide joints must not match the driven-wheel actuator expression"
+    
+            # Verify the imported articulation contract, not just the USD fields.
+            body_mass = env.rover.data.body_mass.torch
+            torch.testing.assert_close(
+                body_mass.sum(dim=1),
+                torch.full((2,), 30.0, dtype=body_mass.dtype, device=body_mass.device),
+                rtol=0.0,
+                atol=1e-4,
+            )
+            model = env.sim.physics_manager.get_model()
+            joint_labels = [str(label) for label in model.joint_label]
+            joint_world_raw = model.joint_world
+            joint_world = _to_numpy(joint_world_raw).reshape(-1).astype(np.int64)
+            guide_joint_ids: dict[int, list[int]] = {0: [], 1: []}
+            for world in (0, 1):
+                for guide in guide_specs:
+                    hits = [index for index, label in enumerate(joint_labels)
+                            if joint_world[index] == world
+                            and label.rsplit("/", 1)[-1] == guide.joint_name]
+                    assert len(hits) == 1, f"world {world}, {guide.joint_name}: found {hits}"
+                    guide_joint_ids[world].extend(hits)
+            assert set(guide_joint_ids[0]).isdisjoint(set(guide_joint_ids[1]))
+    
+            solver = env.sim.physics_manager._solver
+            host = solver.mj_model
+            # Newton's replicated joint ids and DOF starts are not MuJoCo template
+            # ids. Resolve each passive guide by the finalized MuJoCo joint name
+            # before checking actuator/equality rows or generalized actuator force.
+            host_guide_joint_ids = {}
+            for guide in guide_specs:
+                host_hits = []
+                for joint_id in range(int(host.njnt)):
+                    name = mujoco.mj_id2name(host, mujoco.mjtObj.mjOBJ_JOINT, joint_id)
+                    if name is not None and (name == guide.joint_name or name.endswith("/" + guide.joint_name)):
+                        host_hits.append(joint_id)
+>               assert len(host_hits) == 1, f"MuJoCo template joint {guide.joint_name}: found {host_hits}"
+E               AssertionError: MuJoCo template joint left_front_guide_joint: found []
+E               assert 0 == 1
+E                +  where 0 = len([])
+
+tests/test_front_guide_native.py:122: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  isaaclab.utils.sensors:sensors.py:40 Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+WARNING  isaaclab.utils.sensors:sensors.py:40 Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+INFO     isaaclab.sensors.camera.camera:camera.py:288 Using renderer: NewtonWarpRenderer
+INFO     isaaclab.sensors.camera.camera:camera.py:288 Using renderer: NewtonWarpRenderer
+WARNING  isaaclab.actuators.actuator_collection:actuator_collection.py:559 Actuator groups cover 16 joints; expected 18 after accounting for fixed tendons.
+=============================== warnings summary ===============================
+tests/test_front_guide_native.py: 35 warnings
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_script.py:1488: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_front_guide_native.py::test_native_passive_front_guides_keep_drive_isolated_and_stability_diagnostic
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab/isaaclab/actuators/newton/adapter.py:30: DeprecationWarning: newton.actuators.Clamping is deprecated in Newton 1.6; use newton.actuators.ClampingBase instead.
+    from newton.actuators import Actuator, Clamping, Delay
+
+tests/test_front_guide_native.py::test_native_passive_front_guides_keep_drive_isolated_and_stability_diagnostic
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:165: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+    replace_newton_builder_shape_colors(builder, stage)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_front_guide_native.py::test_native_passive_front_guides_keep_drive_isolated_and_stability_diagnostic
+1 failed, 37 warnings in 27.30s
+ACTUAL_EXIT_CODE=1

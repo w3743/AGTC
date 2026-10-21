@@ -1,0 +1,112 @@
+{
+  "checked_at_utc": "2026-10-15T09:51:25.558984+00:00",
+  "evidence_integrity_pass": true,
+  "model_acceptance_all_pass": false,
+  "native_sources_unchanged": true,
+  "baseline_sources_verified": 33,
+  "confirmed_motor": {
+    "model": "BDUAV N5065",
+    "selected_KV_rpm_per_V": 270,
+    "pole_pairs": 7,
+    "provided_image_matches_existing_evidence": true
+  },
+  "modules": [
+    {
+      "module": "BMS模块",
+      "source_files_verified": 11,
+      "persisted_results_verified": 4,
+      "engineering_result": {
+        "status": "计算模型可运行；电气/硬件放行仍BLOCKED",
+        "fan_model": "PASS_FOR_LAYOUT_WITH_EXPLICIT_BOUNDARIES",
+        "charge_limit_release": "BLOCKED pending calibration, branch-current, local source-response, temperature, and sink validation",
+        "protection_audit": "PASS_WITH_OPEN_ITEMS",
+        "result_note": "所有本轮运行写入tmp隔离副本。保护审查修复前曾按旧U_FAN_SW断言退出1；修复后重跑rc=0，最终证据为持久化副本。"
+      }
+    },
+    {
+      "module": "FOC驱动模块",
+      "source_files_verified": 8,
+      "persisted_results_verified": 9,
+      "engineering_result": {
+        "status": "脚本均rc=0；关键保护筛查有FAIL，不能放行",
+        "switch_peak_phase_current_a": 146.149,
+        "screening_threshold_a": 120,
+        "safe5v_loss_case": "SAFE_5V于100ms失电，母线越75V约131.714ms、越100V约168.228ms；1秒行为轨迹最高331.31V，但越阈后不再是有效安全运行预测。",
+        "no_dump_case": "75V约38.594ms、100V约75.108ms，1秒数学外推347.757V；阈值后仅表示失控趋势。",
+        "current_loop": "硬阶跃峰值121.252A、含PWM纹波筛查131.377A；5000A/s斜率峰值110.777A、含纹波120.902A；两者均超过120A筛查线。",
+        "positive_case": "正向开环工况相峰111.064A，低于120A静态筛查线；不能抵消上述失败。",
+        "tvs_case": "TVS线性代理未触发（峰值母线43.518V低于49.1V代理截距），不能据此证明真实TVS夹位。"
+      }
+    },
+    {
+      "module": "稳压模块",
+      "source_files_verified": 6,
+      "persisted_results_verified": 2,
+      "engineering_result": {
+        "status": "历史模型可复算；当前BUSFIX无本轮模型入口/不能视为验证",
+        "current_design_version": "README当前指向V1.6-BUSFIX",
+        "boundary": "80A只为历史模型候选，不是温升、控制、可靠性或实物额定值；历史跑通不验证BUSFIX。"
+      }
+    }
+  ],
+  "broken_local_links": [],
+  "evidence": [
+    {
+      "path": "BMS模块/检查/三板共用修复/仿真复查.json",
+      "sha256": "94297a8eadd8c22154c091619a192ba2bdf6bcc9562fb5f2b7dbf6274c7ec841"
+    },
+    {
+      "path": "FOC驱动模块/检查/三板共用修复/仿真复查.json",
+      "sha256": "c21fa04e0040c73ef4818504b429751fce4abd8cdfcaa8cab10233f73b0091af"
+    },
+    {
+      "path": "稳压模块/检查/三板共用修复/仿真复查.json",
+      "sha256": "9b432b1599407d2922f2b7dd1282d2265f6a38a03ff21c8c82610c6c581b2d4b"
+    },
+    {
+      "path": "元件封装库/检查/三板共用修复/解析属性覆盖回归.json",
+      "sha256": "d3610a7f011014a0182f5a6aa4c1c4266d994ab2a923a58ddb1f7bff4a91bc3c"
+    },
+    {
+      "path": "元件封装库/检查/三板共用修复/采购补充空MPN回归.json",
+      "sha256": "66a52695aa4e62f5ad1ebcdb4f878abc8ac3452ae81b6b81e0063a3ae109f37b"
+    },
+    {
+      "path": "元件封装库/检查/三板共用修复/官方API与索引一致性.json",
+      "sha256": "9835772656b81dafd40297f97240875878f1e52738de4147dc6195b636f7ef14"
+    },
+    {
+      "path": "元件封装库/检查/三板共用覆盖验证.json",
+      "sha256": "55cda01d0480507e50beb942062bd1ff5f4dc53ff7df515284c293252da5429b"
+    },
+    {
+      "path": "元件封装库/检查/三板基线与板外核对.json",
+      "sha256": "cefb59e1713b64f2b0ac72460fb5702e5d400dbf63d6988a90150799928513a8"
+    },
+    {
+      "path": "FOC驱动模块/参考资料/电机资料/电机接口用户确认.json",
+      "sha256": "a70b03241c2a08337aaadc2a5c74d0a2d7b5995c978fce41b17eb126a0efb97c"
+    },
+    {
+      "path": "FOC驱动模块/参考资料/电机资料/BDUAV_N5065_用户提供.jpg",
+      "sha256": "b749623c1dc91eb6fdca7041db6c395739a517791268c00bcec4bb652221cae4"
+    },
+    {
+      "path": "元件封装库/检查/三板共用修复/N01单向替代核对.json",
+      "sha256": "3ed044ea7a4d082e864c6df3a51f8e234df3746b095f9cf1f4411bc257f8e479"
+    },
+    {
+      "path": "元件封装库/检查/三板共用修复/本轮结论.md",
+      "sha256": "b4191c853d60bdb542fb035f4616506f6829648bb9993a534d7a84c76c9da8c9"
+    },
+    {
+      "path": "元件封装库/README.md",
+      "sha256": "e96c2d49e0b884b9bfeee32f8cda3e537a4bbe1aa04ca8bf90158be4737d364e"
+    },
+    {
+      "path": "元件封装库/索引/可能共用型号.md",
+      "sha256": "8c66425e82dc4778f5f86fb6415088dc5b4a8b7e53dbdd8d44a06f7bfe52b0a8"
+    }
+  ],
+  "boundary": "只验证执行源码、持久化结果、当前原生来源与报告链接的完整性；各模型的FAIL/BLOCKED保持原判，不作为整板或实物验收。"
+}

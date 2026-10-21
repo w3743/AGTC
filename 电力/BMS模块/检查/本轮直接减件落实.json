@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-14",
+  "archivePrefix": "PACK取样简化_20261014_004117",
+  "changes": [
+    {
+      "function": "PACK output sense",
+      "removedRefs": [
+        "Q_SN_PACK",
+        "R_SN_PACK_PU",
+        "R_SN_PACK_GS",
+        "DZ_SN_PACK",
+        "Q_SN_PACK_DRV",
+        "R_SN_PACK_BASE",
+        "R_SN_PACK_BE"
+      ],
+      "removedQty": 7,
+      "kept": "BAT divider disconnect; independent voltage window; POR and main switch interlock",
+      "source": "功率元件连接.json"
+    },
+    {
+      "function": "NTC_CELL5 on CFETOFF",
+      "removedRefs": [
+        "R_NTC_CELL5_PU",
+        "R_NTC_CELL5_SER"
+      ],
+      "removedQty": 2,
+      "kept": "9 cell temperature points; CFETOFF thermistor config 0x92FA=0x07; TS2 left floating; DFETOFF BOTHOFF unchanged"
+    },
+    {
+      "function": "QXV integrated selector",
+      "oldMatrixQty": 144,
+      "newMatrixQty": 33,
+      "removedBiasQty": 4,
+      "netReductionQty": 115,
+      "hallLocation": "selected cell positive",
+      "ocpResistors": "30.1k/100k",
+      "buffer": "4S2P"
+    }
+  ],
+  "status": "当前源535件/491采购位号，完整型号以当前BOM计数证据为准；累计净减146件。原生待同步、无测试/实物验收。",
+  "bufferDecision": {
+    "current": "4S2P",
+    "reverted": "3S2P",
+    "reason": "16F weakest bank with two 24F banks reaches 2.67V at 6.23V total before ESR; incompatible with current 2.50/2.55V bank OVP. Restore eight parts, no new prebalance startup procedure.",
+    "netReductionVersus681": 31
+  }
+}

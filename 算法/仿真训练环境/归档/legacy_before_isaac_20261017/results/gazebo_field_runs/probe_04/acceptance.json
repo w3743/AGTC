@@ -1,0 +1,263 @@
+{
+  "kind": "gazebo_scene_sensor_smoke",
+  "training_throughput_claim": false,
+  "world": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field/benchmark/world.sdf",
+  "world_name": "field_training",
+  "robot_model": "field_robot",
+  "export_summary": {
+    "schema": "gazebo-field-export-v1",
+    "scene_id": 1,
+    "vehicle": {
+      "model_name": "field_robot",
+      "mass_kg": 30.0,
+      "center_of_mass_height_m": 0.15,
+      "center_of_mass_status": "assumed_configurable_proxy",
+      "mass_distribution_kg": {
+        "base_link": 27.0,
+        "left_track": 1.0,
+        "right_track": 1.0,
+        "gimbal_yaw_link": 0.6,
+        "gimbal_pitch_link": 0.4
+      },
+      "dimensions_m": {
+        "length": 0.8,
+        "width": 0.3,
+        "track_length_axis": "+X",
+        "track_orientation_rpy": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "gimbal": {
+        "yaw_joint": "gimbal_yaw_joint",
+        "pitch_joint": "gimbal_pitch_joint",
+        "pitch_axis_in_yaw_link": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "pitch_positive_direction": "raises camera +X forward vector",
+        "pitch_limits_rad": [
+          -0.4363323129985824,
+          1.0471975511965976
+        ],
+        "initial_position_rad": {
+          "yaw": 0.0,
+          "pitch": 0.0
+        },
+        "initialization": "controller target only; link poses use zero joint angles",
+        "lidar_and_depth_camera_share_pitch_link": true
+      },
+      "sensors": {
+        "lidar": {
+          "topic": "/field/lidar/scan",
+          "type": "gpu_lidar",
+          "horizontal_samples": 400,
+          "min_angle_rad": -3.141592653589793,
+          "max_angle_rad": 3.1258846903218442,
+          "endpoint_policy": "no duplicate +/-pi endpoint; uniform 2pi/400 azimuth steps",
+          "range_m": [
+            0.12,
+            8.0
+          ],
+          "update_rate_hz": 10.0,
+          "mount": "gimbal_pitch_link"
+        },
+        "depth": {
+          "topic": "/field/depth/image",
+          "camera_info_topic": "/field/depth/camera_info",
+          "type": "depth_camera",
+          "format": "R_FLOAT32",
+          "convention": "camera_z",
+          "resolution_wh": [
+            88,
+            160
+          ],
+          "intrinsics_K": [
+            [
+              98.32479858398438,
+              0.0,
+              44.011253356933594
+            ],
+            [
+              0.0,
+              98.32479858398438,
+              80.557861328125
+            ],
+            [
+              0.0,
+              0.0,
+              1.0
+            ]
+          ],
+          "range_m": [
+            0.3,
+            5.0
+          ],
+          "update_rate_hz": 2.5,
+          "mount": "gimbal_pitch_link",
+          "rgb_enabled": false
+        },
+        "imu": {
+          "topic": "/field/imu/data",
+          "mount": "base_link"
+        },
+        "magnetometer": {
+          "topic": "/field/magnetometer/data",
+          "mount": "base_link"
+        }
+      }
+    },
+    "geometry_counts": {
+      "plants": 400,
+      "leaves": 3200,
+      "healthy_leaves": 3022,
+      "dry_leaves": 178,
+      "stems": 400,
+      "rocks": 105,
+      "blocking_rocks": 25,
+      "nonblocking_rocks": 80,
+      "merged_plant_visual_meshes": 3,
+      "plant_collision_meshes": 0,
+      "leaf_boundary_samples_per_side": 25,
+      "leaf_mesh_faces": {
+        "healthy": 302200,
+        "dry": 17800
+      },
+      "stem_mesh_faces": 25600,
+      "unit_rock_mesh_faces": 720
+    },
+    "terrain": {
+      "enabled": true,
+      "source": "four_sine_waves",
+      "resolution_px": [
+        513,
+        513
+      ],
+      "horizontal_size_m": [
+        100.0,
+        100.0
+      ],
+      "heightmap_size_z_m": 0.7000000029802322,
+      "heightmap_pos_z_m": -0.3500000014901161,
+      "max_sample_quantization_error_m": 0.001372548054859618,
+      "rock_count": 105,
+      "scene_seed": 8150262340054433613
+    },
+    "uwb": {
+      "enabled": false,
+      "reason": "optional UWB integration disabled by default"
+    }
+  },
+  "partition": "field_migration_442_56bce031",
+  "ros_domain_id": 73,
+  "unlimited": false,
+  "motion_enabled": true,
+  "target_sim_seconds": 8.0,
+  "measured_wall_seconds": 4.9667203340000015,
+  "measured_sim_seconds": 0.0,
+  "topics": {
+    "cmd_vel": "/field/cmd_vel",
+    "odom": "/field/odom",
+    "joint_states": "/field/joint_states",
+    "lidar": "/field/lidar/scan",
+    "depth": "/field/depth/image",
+    "world_pose": "/world/field_training/dynamic_pose/info",
+    "imu": "/field/imu/data",
+    "magnetometer": "/field/magnetometer/data",
+    "gimbal_yaw": "/field/gimbal/yaw/cmd_pos",
+    "gimbal_pitch": "/field/gimbal/pitch/cmd_pos"
+  },
+  "sensor_frames": {
+    "depth": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0
+    },
+    "lidar": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0
+    },
+    "odom": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0
+    },
+    "world_pose": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0
+    },
+    "imu": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0,
+      "saved_finite": 0
+    },
+    "magnetometer": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0
+    },
+    "joint_states": {
+      "received_total": 0,
+      "saved": 0,
+      "measured_saved": 0,
+      "unique_sim_timestamps": 0,
+      "new_hz_sim": 0.0,
+      "wall_hz": 0.0,
+      "timestamp_span_sim_seconds": 0.0,
+      "finite_joint_axis_samples": 0
+    }
+  },
+  "range_valid_fraction": {
+    "depth": 0.0,
+    "lidar": 0.0
+  },
+  "physics": {},
+  "errors": [],
+  "trajectory_samples_finite": 0,
+  "physical_world_displacement_m": 0.0,
+  "odom_integrated_displacement_m": 0.0,
+  "rate_targets_hz": {
+    "lidar_expected_min": 9.0,
+    "depth_expected_min": 2.25,
+    "lidar_met": false,
+    "depth_met": false
+  },
+  "smoke_passed": false,
+  "notes": [
+    "Scene/sensor smoke only; no Gym step, policy inference, reward, or training throughput was measured.",
+    "Measured sensor rates use distinct message simulation timestamps over measured simulation seconds.",
+    "IMU rows are copied from Gazebo messages; no synthetic gyro or pose correction is applied."
+  ],
+  "commands_published": 0,
+  "failure": "RuntimeError: Gazebo exited during startup with code -11; see /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/gazebo_field_runs/probe_04/gazebo.log",
+  "status": "failed"
+}

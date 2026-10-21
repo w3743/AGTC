@@ -1,0 +1,938 @@
+#!/usr/bin/env python3
+"""Fixed-action front-guide coupling-mode comparison at a 60 mm step; no trained-policy comparison."""
+from __future__ import annotations
+
+import argparse
+from dataclasses import asdict
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+import traceback
+from typing import Any
+
+import numpy as np
+
+
+ROOT = Path(__file__).resolve().parents[3]
+EXPERIMENT_DIR = ROOT / "results/isaac_field_diagnosis/front_guide_coupled_step_probe_20261020"
+OUTPUT_DIR: Path | None = None
+SAMPLE_PATH: Path | None = None
+SUMMARY_PATH: Path | None = None
+SEED = 80003
+RESET_SEED = 87001
+START = [2.0, 2.0, 0.0]
+GOAL = [6.0, 2.0]
+ACTION = [0.05, 0.05, 0.0, 0.0]
+POLICY_STEPS = 200
+POLICY_DT_S = 0.05
+STEP_SIZE_M = [0.8, 2.0, 0.06]
+STEP_CENTER_M = [3.0, 2.0, 0.03]
+
+
+def as_numpy(value: Any) -> np.ndarray:
+    """Convert Isaac/torch arrays without attempting implicit CUDA conversion."""
+    value = getattr(value, "torch", value)
+    if hasattr(value, "detach"):
+        value = value.detach().cpu().numpy()
+    elif hasattr(value, "numpy") and not isinstance(value, np.ndarray):
+        value = value.numpy()
+    return np.asarray(value)
+
+
+def json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [json_safe(item) for item in value]
+    if isinstance(value, np.ndarray):
+        return json_safe(value.tolist())
+    if isinstance(value, np.generic):
+        return json_safe(value.item())
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, float) and not math.isfinite(value):
+        return "NaN" if math.isnan(value) else "Infinity" if value > 0 else "-Infinity"
+    return value
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def shape_inventory(model, newton_module, guide_body_names: set[str]) -> dict[str, Any]:
+    shape_labels = [str(label) for label in model.shape_label]
+    body_labels = [str(label) for label in model.body_label]
+    shape_body = as_numpy(model.shape_body).reshape(-1).astype(np.int64)
+    shape_flags = as_numpy(model.shape_flags).reshape(-1).astype(np.int64)
+    shape_types = as_numpy(model.shape_type).reshape(-1).astype(np.int64)
+    shape_scale_raw = getattr(model, "shape_scale", None)
+    shape_scale = (
+        as_numpy(shape_scale_raw).reshape(-1, 3)
+        if shape_scale_raw is not None else None
+    )
+    step_ids = [index for index, label in enumerate(shape_labels)
+                if "DiagnosticStep" in label]
+
+    guide_ids = []
+    for shape_id, label in enumerate(shape_labels):
+        body_id = int(shape_body[shape_id]) if shape_id < len(shape_body) else -1
+        body_name = (body_labels[body_id].rsplit("/", 1)[-1]
+                     if 0 <= body_id < len(body_labels) else "")
+        if any(name in label for name in guide_body_names) or body_name in guide_body_names:
+            guide_ids.append(shape_id)
+
+    def material_values(field: str, indices: list[int]) -> dict[str, float | str]:
+        raw = getattr(model, field, None)
+        if raw is None:
+            return {str(index): "unavailable" for index in indices}
+        values = as_numpy(raw).reshape(-1)
+        return {str(index): float(values[index]) if index < len(values) else "index_out_of_range"
+                for index in indices}
+
+    def shape_row(shape_id: int) -> dict[str, Any]:
+        body_id = int(shape_body[shape_id]) if shape_id < len(shape_body) else -1
+        body_label = body_labels[body_id] if 0 <= body_id < len(body_labels) else None
+        raw_geo = int(shape_types[shape_id]) if shape_id < len(shape_types) else None
+        try:
+            geo_type = newton_module.GeoType(raw_geo).name if raw_geo is not None else "unavailable"
+        except Exception:
+            geo_type = raw_geo
+        flags = int(shape_flags[shape_id]) if shape_id < len(shape_flags) else 0
+        return {
+            "shape_id": shape_id,
+            "shape_label": shape_labels[shape_id],
+            "shape_type": geo_type,
+            "shape_scale_xyz_raw": (
+                shape_scale[shape_id].astype(float).tolist()
+                if shape_scale is not None and shape_id < len(shape_scale)
+                else "unavailable"
+            ),
+            "shape_flags": flags,
+            "collide_shapes": bool(flags & int(newton_module.ShapeFlags.COLLIDE_SHAPES)),
+            "shape_body_id": body_id,
+            "shape_body_label": body_label,
+            "shape_material_mu": material_values("shape_material_mu", [shape_id]).get(str(shape_id)),
+        }
+
+    guide_body_names_seen = sorted({
+        record["shape_body_label"].rsplit("/", 1)[-1]
+        for record in (shape_row(shape_id) for shape_id in guide_ids)
+        if record["shape_body_label"] is not None
+    })
+    return {
+        "shape_count": len(shape_labels),
+        "body_count": len(body_labels),
+        "diagnostic_step_shape_ids": step_ids,
+        "front_guide_shape_ids": guide_ids,
+        "front_guide_shape_body_names_seen": guide_body_names_seen,
+        "diagnostic_step_shapes": [shape_row(index) for index in step_ids],
+        "front_guide_shapes": [shape_row(index) for index in guide_ids],
+        "step_mu_by_shape_id": material_values("shape_material_mu", step_ids),
+        "guide_mu_by_shape_id": material_values("shape_material_mu", guide_ids),
+        "relevant_shape_inventory": [shape_row(index) for index in sorted(set(step_ids + guide_ids))],
+    }
+
+
+def contact_snapshot(NewtonManager, model, shape_info: dict[str, Any]) -> dict[str, Any]:
+    """Return public Newton pair identities only; never infer per-pair forces."""
+    contacts = NewtonManager.get_contacts()
+    if contacts is None:
+        return {"available": False, "reason": "NewtonManager.get_contacts() returned None"}
+
+    count_values = as_numpy(contacts.rigid_contact_count).reshape(-1)
+    contact_count = int(count_values[0]) if count_values.size else 0
+    shape0 = as_numpy(contacts.rigid_contact_shape0).reshape(-1)
+    shape1 = as_numpy(contacts.rigid_contact_shape1).reshape(-1)
+    labels = [str(label) for label in model.shape_label]
+    body_labels = [str(label) for label in model.body_label]
+    shape_body = as_numpy(model.shape_body).reshape(-1).astype(np.int64)
+    step_ids = set(shape_info["diagnostic_step_shape_ids"])
+    guide_ids = set(shape_info["front_guide_shape_ids"])
+    available_records = min(contact_count, shape0.size, shape1.size)
+
+    def shape_record(shape_id: int) -> dict[str, Any]:
+        label = labels[shape_id] if 0 <= shape_id < len(labels) else None
+        body_id = int(shape_body[shape_id]) if 0 <= shape_id < len(shape_body) else -1
+        body_label = body_labels[body_id] if 0 <= body_id < len(body_labels) else None
+        return {
+            "shape_id": shape_id,
+            "shape_label": label,
+            "shape_body_id": body_id,
+            "shape_body_label": body_label,
+        }
+
+    relevant_pairs = []
+    guide_step_pairs = []
+    for record_index in range(available_records):
+        id0, id1 = int(shape0[record_index]), int(shape1[record_index])
+        touches_step = id0 in step_ids or id1 in step_ids
+        touches_guide = id0 in guide_ids or id1 in guide_ids
+        if not (touches_step or touches_guide):
+            continue
+        pair = {
+            "contact_record_index": record_index,
+            "shape0": shape_record(id0),
+            "shape1": shape_record(id1),
+            "touches_diagnostic_step": touches_step,
+            "touches_front_guide": touches_guide,
+        }
+        relevant_pairs.append(pair)
+        if touches_step and touches_guide:
+            guide_step_pairs.append(pair)
+
+    return {
+        "available": True,
+        "recorded_contact_count": contact_count,
+        "identity_records_available": available_records,
+        "shape_array_lengths": [int(shape0.size), int(shape1.size)],
+        "relevant_shape_pairs": relevant_pairs,
+        "guide_step_pairs": guide_step_pairs,
+        "semantics": (
+            "Newton public contact identity snapshot from the final physics substep of this policy step; "
+            "no per-pair force/normal or force direction is inferred."
+        ),
+    }
+
+
+def guide_articulation_audit(
+    env,
+    newton_model,
+    guide_joint_names,
+    leader_joint_names_by_side,
+    expected_guide_ratio,
+    rotation_coupling,
+    robot_usd_path,
+    mujoco,
+    Usd,
+    UsdPhysics,
+):
+    """Verify USD drive isolation and the finalized runtime equality topology."""
+    solver = env.sim.physics_manager._solver
+    host_model = solver.mj_model
+    joint_labels = [str(label) for label in newton_model.joint_label]
+    joint_world = as_numpy(newton_model.joint_world).reshape(-1).astype(np.int64)
+    newton_joint_to_host = as_numpy(solver.mjc_jnt_to_newton_jnt).astype(np.int64)
+    newton_dof_to_host = as_numpy(solver.mjc_dof_to_newton_dof).astype(np.int64)
+    host_dof_to_newton = as_numpy(solver.mjc_jnt_to_newton_dof).astype(np.int64)
+    newton_qd_start = as_numpy(newton_model.joint_qd_start).reshape(-1).astype(np.int64)
+    if (newton_joint_to_host.shape != (1, int(host_model.njnt))
+            or newton_dof_to_host.shape != (1, int(host_model.nv))
+            or host_dof_to_newton.shape != (1, int(host_model.njnt))):
+        raise RuntimeError(
+            "solver Newton/MuJoCo reverse maps have unexpected shapes: "
+            f"joint_to_host={newton_joint_to_host.shape}, dof_to_host={newton_dof_to_host.shape}, "
+            f"host_dof_to_newton={host_dof_to_newton.shape}, "
+            f"expected=(1,njnt={host_model.njnt},nv={host_model.nv})"
+        )
+
+    def map_newton_joint_to_host(joint_name: str) -> tuple[int, int, int, bool]:
+        newton_hits = [
+            index for index, label in enumerate(joint_labels)
+            if int(joint_world[index]) == 0 and label.rsplit("/", 1)[-1] == joint_name
+        ]
+        if len(newton_hits) != 1:
+            raise RuntimeError(
+                f"expected one world-0 Newton joint named {joint_name}, found {newton_hits}"
+            )
+        newton_joint_id = int(newton_hits[0])
+        host_hits = np.flatnonzero(newton_joint_to_host[0] == newton_joint_id)
+        if len(host_hits) != 1:
+            raise RuntimeError(
+                f"Newton joint {joint_name} id {newton_joint_id} maps to host joints {host_hits.tolist()}"
+            )
+        host_joint_id = int(host_hits[0])
+        expected_newton_dof = int(newton_qd_start[newton_joint_id])
+        host_dof_id = int(as_numpy(host_model.jnt_dofadr).reshape(-1)[host_joint_id])
+        dof_hits = np.flatnonzero(newton_dof_to_host[0] == expected_newton_dof)
+        dof_mapping_matches = (
+            int(host_dof_to_newton[0, host_joint_id]) == expected_newton_dof
+            and dof_hits.tolist() == [host_dof_id]
+        )
+        if not dof_mapping_matches:
+            raise RuntimeError(
+                f"Newton/MuJoCo DOF maps disagree for {joint_name}: expected Newton DOF "
+                f"{expected_newton_dof}, host joint/DOF {host_joint_id}/{host_dof_id}, "
+                f"reverse hits={dof_hits.tolist()}"
+            )
+        return newton_joint_id, host_joint_id, host_dof_id, dof_mapping_matches
+
+    guide_newton_joint_ids = {}
+    guide_joint_ids = {}
+    guide_dof_ids = {}
+    guide_dof_mapping_matches = {}
+    for name in guide_joint_names:
+        newton_id, host_id, dof_id, mapping_matches = map_newton_joint_to_host(name)
+        guide_newton_joint_ids[name] = newton_id
+        guide_joint_ids[name] = host_id
+        guide_dof_ids[name] = dof_id
+        guide_dof_mapping_matches[name] = mapping_matches
+
+    actuator_joint_ids = set(
+        as_numpy(host_model.actuator_trnid).reshape(-1, 2)[:, 0].astype(np.int64).tolist()
+    )
+    independent_actuator_by_joint = {
+        name: joint_id in actuator_joint_ids for name, joint_id in guide_joint_ids.items()
+    }
+
+    equality_type = as_numpy(host_model.eq_type).reshape(-1).astype(np.int64)
+    equality_obj1 = as_numpy(host_model.eq_obj1id).reshape(-1).astype(np.int64)
+    equality_obj2 = as_numpy(host_model.eq_obj2id).reshape(-1).astype(np.int64)
+    equality_data = as_numpy(host_model.eq_data).reshape(-1, 11)
+    # Match the already-passing native audit: the finalized MJWarp host model
+    # exposes joint-equality rows by eq_type and their follower/leader joint ids
+    # in eq_obj1id/eq_obj2id. eq_objtype is not the discriminator here.
+    joint_equality_rows = equality_type == int(mujoco.mjtEq.mjEQ_JOINT)
+    equality_rows_by_joint = {
+        name: np.flatnonzero(joint_equality_rows & (equality_obj1 == joint_id)).tolist()
+        for name, joint_id in guide_joint_ids.items()
+    }
+    guide_equality_present = {name: bool(rows) for name, rows in equality_rows_by_joint.items()}
+    guide_equality_polycoef_by_joint = {
+        name: [equality_data[row, :5].astype(float).tolist() for row in rows]
+        for name, rows in equality_rows_by_joint.items()
+    }
+    guide_equality_leader_joint_by_joint = {
+        name: [int(equality_obj2[row]) for row in rows]
+        for name, rows in equality_rows_by_joint.items()
+    }
+    leader_newton_joint_ids_by_side = {}
+    leader_joint_ids_by_side = {}
+    leader_dof_ids_by_side = {}
+    for side, joint_name in leader_joint_names_by_side.items():
+        newton_id, host_id, dof_id, _ = map_newton_joint_to_host(joint_name)
+        leader_newton_joint_ids_by_side[side] = newton_id
+        leader_joint_ids_by_side[side] = host_id
+        leader_dof_ids_by_side[side] = dof_id
+    guide_host_joint_names = {
+        name: mujoco.mj_id2name(host_model, mujoco.mjtObj.mjOBJ_JOINT, joint_id)
+        for name, joint_id in guide_joint_ids.items()
+    }
+    leader_host_joint_names_by_side = {
+        side: mujoco.mj_id2name(host_model, mujoco.mjtObj.mjOBJ_JOINT, joint_id)
+        for side, joint_id in leader_joint_ids_by_side.items()
+    }
+    guide_leader_matches_by_joint = {
+        name: (
+            len(equality_rows_by_joint[name]) == 1
+            and guide_equality_leader_joint_by_joint[name][0]
+            == leader_joint_ids_by_side[name.split("_", 1)[0]]
+        )
+        for name in guide_joint_names
+    }
+    guide_coefficient_matches_by_joint = {
+        name: (
+            len(guide_equality_polycoef_by_joint[name]) == 1
+            and np.allclose(
+                guide_equality_polycoef_by_joint[name][0],
+                [0.0, float(expected_guide_ratio), 0.0, 0.0, 0.0],
+                rtol=0.0,
+                atol=1e-7,
+            )
+        )
+        for name in guide_joint_names
+    }
+
+    usd_stage = Usd.Stage.Open(str(robot_usd_path))
+    if usd_stage is None:
+        raise RuntimeError(f"could not open authored robot USD for DriveAPI audit: {robot_usd_path}")
+    usd_driveapi_by_joint = {}
+    for name in guide_joint_names:
+        joint = UsdPhysics.RevoluteJoint.Get(usd_stage, f"/FieldRobot/{name}")
+        if not joint or not joint.GetPrim().IsValid():
+            raise RuntimeError(f"guide revolute joint is missing from authored USD: {name}")
+        usd_driveapi_by_joint[name] = any(
+            "DriveAPI" in schema for schema in joint.GetPrim().GetAppliedSchemas()
+        )
+
+    audit = getattr(env, "_same_side_mimic_model_audit", None)
+    if not isinstance(audit, dict):
+        raise RuntimeError("the environment did not expose its finalized same-side mimic audit")
+    front_guide = env.drive_config.get("front_guide", {})
+    guide_coupling = front_guide.get("coupling", {})
+    expected_guide_relations = 2 if rotation_coupling == "same_side_track_speed" else 0
+    expected_total_relations = 12 + expected_guide_relations
+    runtime_guide_relations = int(audit.get("guide_relations_per_world", -1))
+    host_equality_count = int(host_model.neq)
+    if (
+        int(audit.get("wheel_relations_per_world", -1)) != 12
+        or runtime_guide_relations != expected_guide_relations
+        or int(audit.get("relations_per_world", -1)) != expected_total_relations
+        or host_equality_count != expected_total_relations
+        or int(guide_coupling.get("relations_per_world", -1)) != expected_guide_relations
+        or any(independent_actuator_by_joint.values())
+        or any(usd_driveapi_by_joint.values())
+        or set(guide_equality_present.values()) != {expected_guide_relations == 2}
+        or any(leader_joint_id < 0 for leader_joint_id in leader_joint_ids_by_side.values())
+        or (rotation_coupling == "same_side_track_speed"
+            and (not all(guide_leader_matches_by_joint.values())
+                 or not all(guide_coefficient_matches_by_joint.values())))
+    ):
+        raise RuntimeError(
+            "guide/same-side finalized constraints differ from the selected mode: "
+            f"audit={audit}, host_neq={host_equality_count}, guide_equality={guide_equality_present}, "
+            f"guide_leaders={guide_leader_matches_by_joint}, "
+            f"guide_coefficients={guide_coefficient_matches_by_joint}, "
+            f"actuator={independent_actuator_by_joint}, usd_driveapi={usd_driveapi_by_joint}"
+        )
+
+    return solver, guide_dof_ids, {
+        "rotation_coupling": rotation_coupling,
+        "couple_same_side_support_wheels": bool(env.cfg.couple_same_side_wheels),
+        "same_side_wheel_coupling_metadata": env.drive_config.get("same_side_wheel_coupling"),
+        "runtime_model_audit": audit,
+        "support_wheel_relations_per_world": int(audit["wheel_relations_per_world"]),
+        "guide_relations_per_world": runtime_guide_relations,
+        "total_mimic_relations_per_world": int(audit["relations_per_world"]),
+        "host_mujoco_equality_count": host_equality_count,
+        "guide_joint_equality_present_by_joint": guide_equality_present,
+        "guide_equality_rows_by_joint": equality_rows_by_joint,
+        "guide_equality_polycoef_by_joint": guide_equality_polycoef_by_joint,
+        "expected_guide_speed_ratio_main_over_guide_radius": float(expected_guide_ratio),
+        "guide_newton_joint_ids_by_joint": guide_newton_joint_ids,
+        "guide_host_joint_ids_by_joint": guide_joint_ids,
+        "guide_host_joint_names_by_joint": guide_host_joint_names,
+        "guide_equality_leader_host_joint_ids_by_joint": guide_equality_leader_joint_by_joint,
+        "expected_same_side_track_leader_host_joint_ids": leader_joint_ids_by_side,
+        "same_side_track_leader_host_joint_names_by_side": leader_host_joint_names_by_side,
+        "same_side_track_leader_newton_joint_ids": leader_newton_joint_ids_by_side,
+        "same_side_track_leader_host_dof_ids": leader_dof_ids_by_side,
+        "guide_newton_to_host_dof_mapping_matches_by_joint": guide_dof_mapping_matches,
+        "guide_equality_leader_matches_same_side_track_by_joint": guide_leader_matches_by_joint,
+        "guide_equality_speed_ratio_matches_by_joint": guide_coefficient_matches_by_joint,
+        "guide_independent_actuator_joint_present_by_joint": independent_actuator_by_joint,
+        "guide_usd_driveapi_present_by_joint": usd_driveapi_by_joint,
+        "guide_actuator_count_from_drive_metadata": int(guide_coupling.get("guide_actuator_count", -1)),
+        "guide_pid_count_added": int(guide_coupling.get("added_pid_count", -1)),
+        "guide_speed_ratio_by_side": guide_coupling.get("ratio_by_side"),
+        "guide_host_joint_ids": guide_joint_ids,
+        "guide_host_dof_ids": guide_dof_ids,
+        "mujoco_actuator_count": int(host_model.nu),
+        "qfrc_actuator_semantics": "Newton/MJWarp generalized actuator force read from the finalized solver data after each policy step.",
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    global OUTPUT_DIR, SAMPLE_PATH, SUMMARY_PATH
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--rotation-coupling",
+        required=True,
+        choices=("free", "same_side_track_speed"),
+        help="Front guide mode for this independent fixed-action run.",
+    )
+    parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="New run directory under this coupled-step probe folder; existing directories are refused.",
+    )
+    args = parser.parse_args(argv)
+    if os.environ.get("RUN_ISAAC_PHYSICS") != "1":
+        raise SystemExit("Prepared only; set RUN_ISAAC_PHYSICS=1 after root grants GPU probe permission")
+    OUTPUT_DIR = args.output.expanduser().resolve()
+    allowed_root = EXPERIMENT_DIR.resolve()
+    if not OUTPUT_DIR.is_relative_to(allowed_root) or OUTPUT_DIR == allowed_root:
+        raise SystemExit(f"Refusing output outside the coupled-step experiment directory: {OUTPUT_DIR}")
+    SAMPLE_PATH = OUTPUT_DIR / "policy_step_samples.jsonl"
+    SUMMARY_PATH = OUTPUT_DIR / "summary.json"
+    if OUTPUT_DIR.exists():
+        raise SystemExit(f"Refusing to overwrite existing probe output directory: {OUTPUT_DIR}")
+    OUTPUT_DIR.mkdir(parents=True)
+
+    env = None
+    summary: dict[str, Any] = {
+        "status": "initializing",
+        "probe": str(Path(__file__).resolve()),
+        "sampling_contract": {
+            "policy_steps": POLICY_STEPS,
+            "physics_dt_s": 0.001,
+            "decimation": 50,
+            "policy_dt_s": POLICY_DT_S,
+            "fixed_normalized_action_left_right_gimbal_yaw_pitch": ACTION,
+            "rotation_coupling": args.rotation_coupling,
+            "trained_policy_comparison": False,
+            "free_vs_coupled_fixed_action_physics_pair": True,
+            "checkpoint_loaded": False,
+            "claim_scope": "paired fixed-action physics diagnostics, not policy learning, navigation competence, or a continuous-track model",
+        },
+        "task_contract": {
+            "mode": "goto",
+            "plants": 0,
+            "terrain_enabled": False,
+            "terrain_amplitude_m": 0.0,
+            "rock_density_per_m2": 0.0,
+            "start_xy_yaw": START,
+            "goal_xy": GOAL,
+            "goal_distance_config": None,
+            "max_time_s": 12.0,
+            "auto_reset": False,
+        },
+        "obstacle_contract": {
+            "primitive": "Isaac Lab USD Cuboid via AssetBaseCfg + sim_utils.CuboidCfg",
+            "prim_path": "{ENV_REGEX_NS}/DiagnosticStep",
+            "size_xyz_m": STEP_SIZE_M,
+            "center_xyz_m": STEP_CENTER_M,
+            "front_edge_x_m": STEP_CENTER_M[0] - STEP_SIZE_M[0] / 2.0,
+            "collision_material_override": None,
+            "collision_note": "Uses the actual configured Newton default shape material; value is recorded from the imported model.",
+        },
+        "source_sha256": {},
+        "error": None,
+    }
+    try:
+        import torch
+        import newton
+        import mujoco
+        import isaaclab.sim as sim_utils
+        from isaaclab.assets import AssetBaseCfg
+        from isaaclab_newton.physics import NewtonManager
+        from pxr import Usd, UsdPhysics
+
+        from isaac_field.assets import FrontGuideSpec, ROBOT_SPEC, robot_asset_spec_sha256
+        from isaac_field.env import FieldEnvCfg, IsaacFieldEnv
+        from isaac_field.task import Config
+
+        guide_spec = FrontGuideSpec(rotation_coupling=args.rotation_coupling)
+        task_cfg = Config(
+            size=12.0,
+            plants=0,
+            terrain_enabled=False,
+            terrain_amplitude=0.0,
+            rock_density=0.0,
+            validate_scene=False,
+            max_time=12.0,
+        )
+        cfg = FieldEnvCfg(task=task_cfg, mode="goto", auto_reset=False, seed=SEED)
+        cfg.scene.num_envs = 1
+        cfg.sim.dt = 0.001
+        cfg.decimation = 50
+        # FieldEnvCfg keeps immutable physics specs as plain mappings; the live
+        # IsaacFieldEnv restores its public FrontGuideSpec object from this data.
+        cfg.front_guide_spec = asdict(guide_spec)
+        cfg.body_stability_config = None
+        cfg.scene.diagnostic_step = AssetBaseCfg(
+            prim_path="{ENV_REGEX_NS}/DiagnosticStep",
+            spawn=sim_utils.CuboidCfg(
+                size=tuple(STEP_SIZE_M),
+                collision_props=sim_utils.CollisionPropertiesCfg(),
+            ),
+            init_state=AssetBaseCfg.InitialStateCfg(pos=tuple(STEP_CENTER_M)),
+        )
+
+        env = IsaacFieldEnv(cfg)
+        reset_observation, reset_info = env.reset(
+            seed=RESET_SEED,
+            options={
+                "mode": "goto",
+                "start": START,
+                "goal": GOAL,
+                "random_start": False,
+            },
+        )
+        guide_wheels = env.front_guide_spec.wheel_specs(ROBOT_SPEC)
+        guide_joint_names = [wheel.joint_name for wheel in guide_wheels]
+        guide_body_names = {wheel.link_name for wheel in guide_wheels}
+        joint_names = list(env.rover.joint_names)
+        missing_guide_joints = [name for name in guide_joint_names if name not in joint_names]
+        if missing_guide_joints:
+            raise RuntimeError(f"front guide joints were not imported into the articulation: {missing_guide_joints}")
+        guide_joint_ids = [joint_names.index(name) for name in guide_joint_names]
+        drive_joint_ids = env._wheel_ids.detach().cpu().numpy().astype(np.int64).tolist()
+        applied_joint_ids = sorted(set(drive_joint_ids + guide_joint_ids))
+        leader_joint_names = {
+            side: f"{side}_wheel_0_wheel_joint" for side in ("left", "right")
+        }
+        leader_joint_ids = {
+            side: joint_names.index(name) for side, name in leader_joint_names.items()
+        }
+        model = env.sim.physics_manager.get_model()
+        solver, guide_dof_ids, guide_constraint_audit = guide_articulation_audit(
+            env,
+            model,
+            guide_joint_names,
+            leader_joint_names,
+            ROBOT_SPEC.wheel_radius_m / guide_spec.radius_m,
+            guide_spec.rotation_coupling,
+            cfg.scene.robot.spawn.usd_path,
+            mujoco,
+            Usd,
+            UsdPhysics,
+        )
+        shapes = shape_inventory(model, newton, guide_body_names)
+
+        initial_robot = as_numpy(env.tasks[0].robot).astype(np.float64).reshape(-1)
+        initial_body_pose = as_numpy(env.tasks[0].body_pose).astype(np.float64).reshape(-1)
+        if initial_robot.size < 5 or initial_body_pose.size < 3:
+            raise RuntimeError(
+                f"reset telemetry has unexpected shape: robot={initial_robot.shape}, body_pose={initial_body_pose.shape}"
+            )
+        initial_joint_pos = as_numpy(env.rover.data.joint_pos)[0]
+        initial_joint_vel = as_numpy(env.rover.data.joint_vel)[0]
+        initial_state_after_reset = {
+            "robot": {
+                "x_m": float(initial_robot[0]),
+                "y_m": float(initial_robot[1]),
+                "yaw_rad": float(initial_robot[2]),
+                "forward_speed_mps": float(initial_robot[3]),
+                "yaw_rate_rad_s": float(initial_robot[4]),
+            },
+            "body_pose": {
+                "z_m": float(initial_body_pose[0]),
+                "pitch_rad": float(initial_body_pose[1]),
+                "roll_rad": float(initial_body_pose[2]),
+            },
+            "track_leader_joints": {
+                side: {
+                    "joint_name": leader_joint_names[side],
+                    "position_rad": float(initial_joint_pos[joint_id]),
+                    "velocity_rad_s": float(initial_joint_vel[joint_id]),
+                }
+                for side, joint_id in leader_joint_ids.items()
+            },
+            "front_guide_joints": {
+                name: {
+                    "position_rad": float(initial_joint_pos[joint_id]),
+                    "velocity_rad_s": float(initial_joint_vel[joint_id]),
+                }
+                for name, joint_id in zip(guide_joint_names, guide_joint_ids)
+            },
+        }
+
+        default_shape_cfg = cfg.sim.physics.default_shape_cfg
+        physics_contact = env.drive_config["physics_contact"]
+        if (not math.isclose(float(cfg.sim.dt), 0.001, abs_tol=1e-12)
+                or int(cfg.decimation) != 50
+                or not math.isclose(float(env.step_dt), POLICY_DT_S, abs_tol=1e-12)
+                or not math.isclose(float(cfg.drive_velocity_gain), 0.04, abs_tol=1e-12)
+                or not math.isclose(
+                    float(cfg.drive_integral_gain_nm_per_proxy_wheel_per_rad_s_s), 0.1, abs_tol=1e-12
+                )
+                or not math.isclose(float(cfg.drive_effort_limit), 2.0, abs_tol=1e-12)
+                or cfg.body_stability_config is not None):
+            raise RuntimeError("probe initialization changed the approved timing/drive/reward defaults")
+        expected_action = torch.tensor([ACTION], dtype=torch.float32, device=env.device)
+        cfg_scene_assets = {
+            "diagnostic_step": {
+                "prim_path": cfg.scene.diagnostic_step.prim_path,
+                "size_xyz_m": list(cfg.scene.diagnostic_step.spawn.size),
+                "initial_center_xyz_m": list(cfg.scene.diagnostic_step.init_state.pos),
+                "collidable_schema_configured": cfg.scene.diagnostic_step.spawn.collision_props is not None,
+                "static_asset_class_type": str(cfg.scene.diagnostic_step.class_type),
+            },
+            "robot_usd_path": str(Path(cfg.scene.robot.spawn.usd_path).resolve()),
+            "field_usd_path": str(Path(cfg.scene.field.spawn.usd_path).resolve()),
+        }
+        summary.update({
+            "status": "sampling",
+            "reset_observation_keys": sorted(reset_observation.keys()) if isinstance(reset_observation, dict) else None,
+            "reset_info": reset_info,
+            "initial_state_after_reset": initial_state_after_reset,
+            "runtime": {
+                "device": str(env.device),
+                "physics_dt_s": float(cfg.sim.dt),
+                "decimation": int(cfg.decimation),
+                "policy_dt_s": float(env.step_dt),
+                "max_episode_steps": int(env.max_episode_length),
+                "body_stability_config": None,
+                "front_guide_spec": asdict(env.front_guide_spec),
+                "front_guide_spec_sha256": robot_asset_spec_sha256(ROBOT_SPEC, env.front_guide_spec),
+                "guide_joint_names": guide_joint_names,
+                "guide_body_names": sorted(guide_body_names),
+                "guide_constraint_audit": guide_constraint_audit,
+                "drive_joint_count": len(drive_joint_ids),
+                "drive_interface": env.drive_config.get("interface"),
+                "drive_velocity_gain": float(cfg.drive_velocity_gain),
+                "drive_integral_gain_nm_per_proxy_wheel_per_rad_s_s": float(
+                    cfg.drive_integral_gain_nm_per_proxy_wheel_per_rad_s_s
+                ),
+                "drive_effort_limit_nm": float(cfg.drive_effort_limit),
+                "newton_contact_backend": physics_contact.get("contact_generation"),
+                "configured_default_shape_material": {
+                    "mu": float(default_shape_cfg.mu),
+                    "margin_m": float(default_shape_cfg.margin),
+                    "gap_m": float(default_shape_cfg.gap),
+                },
+                "physics_contact_metadata": physics_contact,
+            },
+            "scene_assets": cfg_scene_assets,
+            "robot_asset_sha256": sha256_file(Path(cfg_scene_assets["robot_usd_path"])),
+            "field_asset_sha256": sha256_file(Path(cfg_scene_assets["field_usd_path"])),
+            "newton_shape_inventory": shapes,
+            "sampling_timing_note": (
+                "Per-step pose and velocity are read after env.step at policy time; Newton contact identity "
+                "is the public contact buffer snapshot after the final physics substep. Their different sampling "
+                "points are retained and are not combined to infer force direction, sustained support, or cause."
+            ),
+        })
+        source_paths = (
+            Path(__file__).resolve(),
+            ROOT / "isaac_field/env.py",
+            ROOT / "isaac_field/assets.py",
+            ROOT / "isaac_field/newton_drive.py",
+            ROOT / "isaac_field/task.py",
+        )
+        summary["source_sha256"] = {
+            str(path.relative_to(ROOT)): sha256_file(path)
+            for path in source_paths if path.is_file()
+        }
+
+        guide_step_contact_frames = 0
+        guide_any_contact_frames = 0
+        step_any_contact_frames = 0
+        finite_row_count = 0
+        guide_qfrc_actuator_max_abs = 0.0
+        guide_applied_effort_max_abs = 0.0
+        wheel_applied_effort_max_abs = 0.0
+        guide_qfrc_actuator_zero_all = True
+        guide_applied_effort_zero_all = True
+        wheel_effort_cap_respected_all = True
+        max_abs_guide_speed_relation_residual_rad_s = 0.0
+        terminated_steps = []
+        truncated_steps = []
+        with SAMPLE_PATH.open("x", encoding="utf-8") as stream:
+            for step_index in range(1, POLICY_STEPS + 1):
+                _obs, reward, terminated, truncated, _info = env.step(expected_action)
+                task = env.tasks[0]
+                robot_state = as_numpy(task.robot).astype(np.float64).reshape(-1)
+                body_pose = as_numpy(task.body_pose).astype(np.float64).reshape(-1)
+                if robot_state.size < 5 or body_pose.size < 3:
+                    raise RuntimeError(
+                        f"task telemetry has unexpected shape: robot={robot_state.shape}, body_pose={body_pose.shape}"
+                    )
+                x, y, yaw, forward_speed, yaw_rate = robot_state[:5]
+                z, pitch, roll = body_pose[:3]
+                joint_pos = as_numpy(env.rover.data.joint_pos)[0]
+                joint_vel = as_numpy(env.rover.data.joint_vel)[0]
+                applied_effort = as_numpy(env.rover.actuators.applied_effort)[0]
+                reward_value = float(as_numpy(reward).reshape(-1)[0])
+                qfrc_actuator = as_numpy(solver.mjw_data.qfrc_actuator).astype(np.float64)
+                if qfrc_actuator.ndim == 1:
+                    qfrc_actuator = qfrc_actuator.reshape(1, -1)
+                if qfrc_actuator.shape[0] != 1 or max(guide_dof_ids.values()) >= qfrc_actuator.shape[1]:
+                    raise RuntimeError(
+                        "Newton/MJWarp qfrc_actuator telemetry does not cover the guide DOFs: "
+                        f"shape={qfrc_actuator.shape}, guide_dof_ids={guide_dof_ids}"
+                    )
+                guide_qfrc_actuator = {
+                    name: float(qfrc_actuator[0, dof_id])
+                    for name, dof_id in guide_dof_ids.items()
+                }
+                guide_effort = {
+                    name: float(applied_effort[joint_id])
+                    for name, joint_id in zip(guide_joint_names, guide_joint_ids)
+                }
+                wheel_effort = applied_effort[drive_joint_ids].astype(np.float64)
+                wheel_applied_effort_max_abs = max(
+                    wheel_applied_effort_max_abs,
+                    float(np.max(np.abs(wheel_effort))),
+                )
+                guide_applied_effort_max_abs = max(
+                    guide_applied_effort_max_abs,
+                    max((abs(value) for value in guide_effort.values()), default=0.0),
+                )
+                guide_applied_effort_zero_all &= all(
+                    abs(value) <= 1e-9 for value in guide_effort.values()
+                )
+                guide_qfrc_actuator_max_abs = max(
+                    guide_qfrc_actuator_max_abs,
+                    max((abs(value) for value in guide_qfrc_actuator.values()), default=0.0),
+                )
+                guide_qfrc_actuator_zero_all &= all(
+                    abs(value) <= 1e-9 for value in guide_qfrc_actuator.values()
+                )
+                wheel_effort_cap_respected_all &= bool(
+                    np.all(np.abs(wheel_effort) <= float(cfg.drive_effort_limit) + 1e-6)
+                )
+                guide_speed_relation = None
+                if guide_spec.rotation_coupling == "same_side_track_speed":
+                    guide_speed_relation = {}
+                    for side in ("left", "right"):
+                        guide_name = f"{side}_front_guide_joint"
+                        guide_id = joint_names.index(guide_name)
+                        leader_id = leader_joint_ids[side]
+                        expected_guide_qd = (
+                            ROBOT_SPEC.wheel_radius_m / guide_spec.radius_m
+                        ) * float(joint_vel[leader_id])
+                        residual = float(joint_vel[guide_id]) - expected_guide_qd
+                        max_abs_guide_speed_relation_residual_rad_s = max(
+                            max_abs_guide_speed_relation_residual_rad_s, abs(residual)
+                        )
+                        guide_speed_relation[guide_name] = {
+                            "track_leader_joint": leader_joint_names[side],
+                            "leader_velocity_rad_s": float(joint_vel[leader_id]),
+                            "expected_guide_velocity_rad_s": expected_guide_qd,
+                            "observed_guide_velocity_rad_s": float(joint_vel[guide_id]),
+                            "residual_rad_s": residual,
+                        }
+                if max(guide_joint_ids + applied_joint_ids, default=-1) >= min(
+                    len(joint_pos), len(joint_vel), len(applied_effort)
+                ):
+                    raise RuntimeError(
+                        "joint telemetry arrays do not cover all guide/drive articulation indices: "
+                        f"joint_pos={len(joint_pos)}, joint_vel={len(joint_vel)}, "
+                        f"applied_effort={len(applied_effort)}, requested={applied_joint_ids}"
+                    )
+                contact = contact_snapshot(NewtonManager, model, shapes)
+                if contact.get("guide_step_pairs"):
+                    guide_step_contact_frames += 1
+                if any(pair["touches_front_guide"] for pair in contact.get("relevant_shape_pairs", [])):
+                    guide_any_contact_frames += 1
+                if any(pair["touches_diagnostic_step"] for pair in contact.get("relevant_shape_pairs", [])):
+                    step_any_contact_frames += 1
+
+                numeric_values = np.concatenate((
+                    np.asarray([x, y, yaw, z, pitch, roll, forward_speed, yaw_rate], dtype=np.float64),
+                    joint_pos[guide_joint_ids].astype(np.float64),
+                    joint_vel[guide_joint_ids].astype(np.float64),
+                    applied_effort[applied_joint_ids].astype(np.float64),
+                    np.asarray(list(guide_qfrc_actuator.values()), dtype=np.float64),
+                    np.asarray([float(value) for value in joint_vel[list(leader_joint_ids.values())]], dtype=np.float64),
+                    np.asarray([reward_value], dtype=np.float64),
+                ))
+                finite = bool(np.isfinite(numeric_values).all())
+                if finite:
+                    finite_row_count += 1
+                terminated_value = bool(as_numpy(terminated).reshape(-1)[0])
+                truncated_value = bool(as_numpy(truncated).reshape(-1)[0])
+                if terminated_value:
+                    terminated_steps.append(step_index)
+                if truncated_value:
+                    truncated_steps.append(step_index)
+                row = {
+                    "policy_step": step_index,
+                    "simulation_time_s": float(step_index * env.step_dt),
+                    "normalized_action_left_right_gimbal_yaw_pitch": ACTION,
+                    "body_state": {
+                        "x_m": float(x), "y_m": float(y), "yaw_rad": float(yaw), "z_m": float(z),
+                        "pitch_rad": float(pitch), "roll_rad": float(roll),
+                        "forward_speed_mps": float(forward_speed), "yaw_rate_rad_s": float(yaw_rate),
+                    },
+                    "front_guide_joints": {
+                        name: {
+                            "position_rad": float(joint_pos[joint_id]),
+                            "velocity_rad_s": float(joint_vel[joint_id]),
+                        }
+                        for name, joint_id in zip(guide_joint_names, guide_joint_ids)
+                    },
+                    "track_leader_joints": {
+                        side: {
+                            "joint_name": leader_joint_names[side],
+                            "position_rad": float(joint_pos[joint_id]),
+                            "velocity_rad_s": float(joint_vel[joint_id]),
+                        }
+                        for side, joint_id in leader_joint_ids.items()
+                    },
+                    "guide_speed_relation": guide_speed_relation,
+                    "actual_applied_effort_nm_by_joint": {
+                        joint_names[joint_id]: float(applied_effort[joint_id])
+                        for joint_id in applied_joint_ids
+                    },
+                    "actual_front_guide_applied_effort_nm_by_joint": guide_effort,
+                    "newton_mjwarp_qfrc_actuator_by_guide_dof": guide_qfrc_actuator,
+                    "reward": reward_value,
+                    "terminated": terminated_value,
+                    "truncated": truncated_value,
+                    "finite": finite,
+                    "contact_snapshot": contact,
+                    "contact_sampling_point": "Newton final substep buffer; this policy-step post-state row",
+                }
+                stream.write(json.dumps(json_safe(row), ensure_ascii=False, allow_nan=False) + "\n")
+                stream.flush()
+
+        step_ids = shapes["diagnostic_step_shape_ids"]
+        guide_ids = shapes["front_guide_shape_ids"]
+        collidable_step_ids = [row["shape_id"] for row in shapes["diagnostic_step_shapes"]
+                               if row["collide_shapes"]]
+        summary["sampling_result"] = {
+            "sample_count": POLICY_STEPS,
+            "finite_row_count": finite_row_count,
+            "terminated_policy_steps": terminated_steps,
+            "truncated_policy_steps": truncated_steps,
+            "guide_step_contact_policy_step_snapshots": guide_step_contact_frames,
+            "guide_any_contact_policy_step_snapshots": guide_any_contact_frames,
+            "step_any_contact_policy_step_snapshots": step_any_contact_frames,
+            "max_abs_guide_qfrc_actuator_nm": guide_qfrc_actuator_max_abs,
+            "guide_qfrc_actuator_zero_all_policy_steps": guide_qfrc_actuator_zero_all,
+            "max_abs_guide_applied_effort_nm": guide_applied_effort_max_abs,
+            "guide_applied_effort_zero_all_policy_steps": guide_applied_effort_zero_all,
+            "max_abs_driven_wheel_applied_effort_nm": wheel_applied_effort_max_abs,
+            "drive_effort_limit_nm": float(cfg.drive_effort_limit),
+            "wheel_effort_cap_respected_all_policy_steps": wheel_effort_cap_respected_all,
+            "max_abs_guide_speed_relation_residual_rad_s": (
+                max_abs_guide_speed_relation_residual_rad_s
+                if guide_spec.rotation_coupling == "same_side_track_speed" else None
+            ),
+            "contact_snapshot_semantics": "policy-step snapshots with a pair identity; not continuous contact duration",
+            "checks": {
+                "step_shape_imported_by_newton": bool(step_ids),
+                "step_shape_has_collision_flag": bool(step_ids) and len(collidable_step_ids) == len(step_ids),
+                "both_front_guide_shapes_imported_by_newton": guide_body_names <= set(
+                    shapes["front_guide_shape_body_names_seen"]
+                ),
+                "same_side_and_guide_constraint_counts_match_variant": (
+                    guide_constraint_audit["support_wheel_relations_per_world"] == 12
+                    and guide_constraint_audit["guide_relations_per_world"]
+                    == (2 if guide_spec.rotation_coupling == "same_side_track_speed" else 0)
+                    and guide_constraint_audit["total_mimic_relations_per_world"]
+                    == (14 if guide_spec.rotation_coupling == "same_side_track_speed" else 12)
+                ),
+                "guide_rotation_equality_presence_matches_variant": (
+                    all(guide_constraint_audit["guide_joint_equality_present_by_joint"].values())
+                    if guide_spec.rotation_coupling == "same_side_track_speed"
+                    else not any(guide_constraint_audit["guide_joint_equality_present_by_joint"].values())
+                ),
+                "guide_rotation_equality_uses_same_side_leader_and_radius_ratio": (
+                    all(guide_constraint_audit[
+                        "guide_equality_leader_matches_same_side_track_by_joint"
+                    ].values())
+                    and all(guide_constraint_audit[
+                        "guide_equality_speed_ratio_matches_by_joint"
+                    ].values())
+                    if guide_spec.rotation_coupling == "same_side_track_speed"
+                    else True
+                ),
+                "guide_has_no_independent_driveapi_or_actuator": (
+                    not any(guide_constraint_audit["guide_usd_driveapi_present_by_joint"].values())
+                    and not any(guide_constraint_audit["guide_independent_actuator_joint_present_by_joint"].values())
+                    and guide_constraint_audit["guide_actuator_count_from_drive_metadata"] == 0
+                    and guide_constraint_audit["guide_pid_count_added"] == 0
+                ),
+                "guide_qfrc_actuator_zero_all_policy_steps": guide_qfrc_actuator_zero_all,
+                "guide_applied_effort_zero_all_policy_steps": guide_applied_effort_zero_all,
+                "wheel_effort_cap_2nm_respected_all_policy_steps": wheel_effort_cap_respected_all,
+                "all_200_rows_finite": finite_row_count == POLICY_STEPS,
+                "guide_step_contact_observed": guide_step_contact_frames > 0,
+            },
+        }
+        checks = summary["sampling_result"]["checks"]
+        summary["status"] = "passed" if all(checks.values()) else "not_passed"
+        return 0
+    except Exception as exc:
+        summary["status"] = "error"
+        summary["error"] = f"{type(exc).__name__}: {exc}"
+        traceback.print_exc()
+        raise
+    finally:
+        if env is not None:
+            try:
+                env.close()
+            except Exception as close_exc:
+                summary["close_error"] = f"{type(close_exc).__name__}: {close_exc}"
+                summary["status"] = "error"
+        summary["finished_utc"] = __import__("datetime").datetime.now(
+            __import__("datetime").timezone.utc
+        ).isoformat()
+        if not SUMMARY_PATH.exists():
+            with SUMMARY_PATH.open("x", encoding="utf-8") as stream:
+                json.dump(json_safe(summary), stream, ensure_ascii=False, indent=2, allow_nan=False)
+                stream.write("\n")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

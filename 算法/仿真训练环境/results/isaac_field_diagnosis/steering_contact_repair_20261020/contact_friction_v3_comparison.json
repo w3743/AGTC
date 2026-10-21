@@ -1,0 +1,480 @@
+{
+  "schema": "isaac-field-contact-friction-v3-offline-comparison",
+  "created_date": "2026-10-20",
+  "source_protocol": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_friction_v3_protocol.json",
+  "gpu_or_simulator_used_for_this_summary": false,
+  "comparison_checks": {
+    "baseline_initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+    "baseline_fixed_physical_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+    "all_runs_match_both_hashes": true,
+    "v3_treatment_runs": 3,
+    "failed_preflight_attempt_excluded": "dt-2ms__cone-elliptic__impratio-1; retained separately, actual exit 1 before reset/motion"
+  },
+  "metrics": [
+    {
+      "case": "newton_2ms_v2",
+      "summary_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_probe_runs_v2/newton_2ms_v2/contact_dt_v2_summary.json",
+      "status": "complete",
+      "actual_exit_code": "frozen-v2-baseline-exit0",
+      "initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "fixed_physical_comparison_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+      "solver_treatment": {
+        "cone": "pyramidal",
+        "impratio": 1.0
+      },
+      "actual_solver_option_snapshot": {
+        "status": "v2 did not record host mj_model.opt.impratio or MJWarp impratio_invsqrt"
+      },
+      "end_last_1s_mean_root_yaw_rate_rad_s": -0.09604524206370116,
+      "delta_yaw_vs_v2_pyramidal_1_rad_s": null,
+      "native_final_second_samples": 500,
+      "native_qd_mean_and_variability_rad_s": {
+        "left": {
+          "mean_rad_s": 9.237872313805989,
+          "mean_target_rad_s": 9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 3.650754791154449,
+          "max_temporal_std_per_wheel_rad_s": 4.094532237047266
+        },
+        "right": {
+          "mean_rad_s": -9.259637571641377,
+          "mean_target_rad_s": -9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 3.828887744022668,
+          "max_temporal_std_per_wheel_rad_s": 4.17186933021594
+        }
+      },
+      "native_effort_final_second_nm": {
+        "mean_abs": 0.4494172431553847,
+        "p95_abs": 0.6704921454191207,
+        "max_abs": 0.7913132309913635,
+        "full_run_max_abs": 0.8871914744377136,
+        "expression_max_abs_residual_uncapped_nm": 0.0,
+        "uncapped_expression_match_at_1e-4_nm": true
+      },
+      "normal_force_final_second_N": {
+        "total_upward_mean_per_policy_sample": 316.15150871276853,
+        "total_upward_p05_p95": [
+          231.8543562889099,
+          369.62927837371825
+        ],
+        "mean_per_wheel_upward_by_side": {
+          "left": 22.596860081808906,
+          "right": 22.567641162872313
+        },
+        "loaded_wheel_sample_count": 202,
+        "loaded_wheel_upward_force_N": {
+          "count": 202,
+          "mean": 31.30212957552164,
+          "median": 26.648764610290527,
+          "p95": 68.2902862548828,
+          "max_abs": 93.23770141601562
+        }
+      },
+      "approx_flat_contact_slip_final_second_mps": {
+        "formula": "v_root + omega_root x (wheel_center - radius*world_up - root_position) - wheel_qd_post_step*radius*root_forward",
+        "all_wheel_samples": {
+          "count": 280,
+          "mean": 0.38724725548316624,
+          "median": 0.3628147394419344,
+          "p95": 0.7486589140328501,
+          "max_abs": 0.8780204316258479
+        },
+        "loaded_wheel_samples_normal_up_gt_0": {
+          "count": 202,
+          "mean": 0.30232180475913256,
+          "median": 0.26285244656944495,
+          "p95": 0.5166970971614869,
+          "max_abs": 0.6649772731270213
+        },
+        "loaded_forward_signed_mps": {
+          "count": 202,
+          "mean": 0.029008654944511346,
+          "median": 0.1151585752103737,
+          "p95": 0.48597149260867323,
+          "max_abs": 0.6648473197701869
+        },
+        "loaded_lateral_signed_mps": {
+          "count": 202,
+          "mean": 0.0010469502098686316,
+          "median": -0.00032118184998228966,
+          "p95": 0.03077086791126673,
+          "max_abs": 0.041053730899745136
+        },
+        "loaded_aggregate_friction_force_dot_slip_W_proxy": {
+          "count": 202,
+          "mean": -4.467068352021993,
+          "median": -4.076637203627186,
+          "p95": -2.1329463941453475,
+          "max_abs": 8.890997612994333
+        },
+        "positive_friction_dot_slip_fraction": 0.0,
+        "limitation": "kinematic flat-ground contact-point proxy from policy-step aggregated sensor forces; not solver contact-point velocity, per-pair work, or calibrated terrain slip"
+      }
+    },
+    {
+      "case": "dt-2ms__cone-elliptic__impratio-1__attempt-retry-01",
+      "summary_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_probe_runs_v3/dt-2ms__cone-elliptic__impratio-1__attempt-retry-01/contact_friction_v3_summary.json",
+      "status": "complete",
+      "actual_exit_code": 0,
+      "initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "fixed_physical_comparison_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+      "solver_treatment": {
+        "cone": "elliptic",
+        "impratio": 1.0
+      },
+      "actual_solver_option_snapshot": {
+        "configured": {
+          "cone": "elliptic",
+          "impratio": 1.0
+        },
+        "host_mj_model_opt": {
+          "cone": 1,
+          "impratio": 1.0
+        },
+        "mjw_model_opt": {
+          "cone": 1,
+          "impratio_invsqrt": [
+            1.0
+          ],
+          "equivalent_impratio_derived_as_1_over_invsqrt_squared": 1.0
+        },
+        "expected_mujoco_cone_enum": 1,
+        "checks": {
+          "host_mj_model_opt_cone_matches_config": true,
+          "mjw_model_opt_cone_matches_config": true,
+          "host_mj_model_opt_impratio_matches_config": true,
+          "mjw_model_opt_impratio_invsqrt_matches_config": true
+        },
+        "all_checks_pass": true,
+        "note": "MJWarp stores frictional-to-normal impedance as impratio_invsqrt=1/sqrt(impratio); host MuJoCo exposes opt.impratio."
+      },
+      "end_last_1s_mean_root_yaw_rate_rad_s": -0.07829076703637838,
+      "delta_yaw_vs_v2_pyramidal_1_rad_s": 0.017754475027322775,
+      "native_final_second_samples": 500,
+      "native_qd_mean_and_variability_rad_s": {
+        "left": {
+          "mean_rad_s": 9.301415766239167,
+          "mean_target_rad_s": 9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 4.1557636986644875,
+          "max_temporal_std_per_wheel_rad_s": 4.8502792457579185
+        },
+        "right": {
+          "mean_rad_s": -9.058597769601004,
+          "mean_target_rad_s": -9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 3.8549586602195385,
+          "max_temporal_std_per_wheel_rad_s": 4.746294465233509
+        }
+      },
+      "native_effort_final_second_nm": {
+        "mean_abs": 0.5375368568629825,
+        "p95_abs": 0.768041455745697,
+        "max_abs": 0.9010373950004578,
+        "full_run_max_abs": 0.9177819490432739,
+        "expression_max_abs_residual_uncapped_nm": 0.0,
+        "uncapped_expression_match_at_1e-4_nm": true
+      },
+      "normal_force_final_second_N": {
+        "total_upward_mean_per_policy_sample": 307.9409037590027,
+        "total_upward_p05_p95": [
+          173.2240982055664,
+          383.69730377197266
+        ],
+        "mean_per_wheel_upward_by_side": {
+          "left": 20.330043547494068,
+          "right": 23.661514132363457
+        },
+        "loaded_wheel_sample_count": 211,
+        "loaded_wheel_upward_force_N": {
+          "count": 211,
+          "mean": 29.188711256777506,
+          "median": 23.113513946533203,
+          "p95": 56.74820518493652,
+          "max_abs": 97.07603454589844
+        }
+      },
+      "approx_flat_contact_slip_final_second_mps": {
+        "formula": "v_root + omega_root x (wheel_center - radius*world_up - root_position) - wheel_qd_post_step*radius*root_forward",
+        "all_wheel_samples": {
+          "count": 280,
+          "mean": 0.39372244244084786,
+          "median": 0.37523408346328757,
+          "p95": 0.7349238117529687,
+          "max_abs": 0.9109939315474719
+        },
+        "loaded_wheel_samples_normal_up_gt_0": {
+          "count": 211,
+          "mean": 0.3225931181474851,
+          "median": 0.3195667623731898,
+          "p95": 0.5776546584607936,
+          "max_abs": 0.7348312580440323
+        },
+        "loaded_forward_signed_mps": {
+          "count": 211,
+          "mean": 0.01239158811525793,
+          "median": 0.10853614395630626,
+          "p95": 0.5255458161516506,
+          "max_abs": 0.734704482318961
+        },
+        "loaded_lateral_signed_mps": {
+          "count": 211,
+          "mean": -0.0009977206946971738,
+          "median": -0.0009335348156745832,
+          "p95": 0.021281278281027768,
+          "max_abs": 0.03195082149284706
+        },
+        "loaded_aggregate_friction_force_dot_slip_W_proxy": {
+          "count": 211,
+          "mean": -5.217986172786353,
+          "median": -5.219891865107787,
+          "p95": -2.0513413682104806,
+          "max_abs": 11.550842952731925
+        },
+        "positive_friction_dot_slip_fraction": 0.0,
+        "limitation": "kinematic flat-ground contact-point proxy from policy-step aggregated sensor forces; not solver contact-point velocity, per-pair work, or calibrated terrain slip"
+      }
+    },
+    {
+      "case": "dt-2ms__cone-elliptic__impratio-10",
+      "summary_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_probe_runs_v3/dt-2ms__cone-elliptic__impratio-10/contact_friction_v3_summary.json",
+      "status": "complete",
+      "actual_exit_code": 0,
+      "initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "fixed_physical_comparison_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+      "solver_treatment": {
+        "cone": "elliptic",
+        "impratio": 10.0
+      },
+      "actual_solver_option_snapshot": {
+        "configured": {
+          "cone": "elliptic",
+          "impratio": 10.0
+        },
+        "host_mj_model_opt": {
+          "cone": 1,
+          "impratio": 10.0
+        },
+        "mjw_model_opt": {
+          "cone": 1,
+          "impratio_invsqrt": [
+            0.3162277638912201
+          ],
+          "equivalent_impratio_derived_as_1_over_invsqrt_squared": 10.000000134435878
+        },
+        "expected_mujoco_cone_enum": 1,
+        "checks": {
+          "host_mj_model_opt_cone_matches_config": true,
+          "mjw_model_opt_cone_matches_config": true,
+          "host_mj_model_opt_impratio_matches_config": true,
+          "mjw_model_opt_impratio_invsqrt_matches_config": true
+        },
+        "all_checks_pass": true,
+        "note": "MJWarp stores frictional-to-normal impedance as impratio_invsqrt=1/sqrt(impratio); host MuJoCo exposes opt.impratio."
+      },
+      "end_last_1s_mean_root_yaw_rate_rad_s": -0.07434467040002346,
+      "delta_yaw_vs_v2_pyramidal_1_rad_s": 0.021700571663677698,
+      "native_final_second_samples": 500,
+      "native_qd_mean_and_variability_rad_s": {
+        "left": {
+          "mean_rad_s": 8.858484520399145,
+          "mean_target_rad_s": 9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 4.24865732794342,
+          "max_temporal_std_per_wheel_rad_s": 5.134268143304377
+        },
+        "right": {
+          "mean_rad_s": -8.661074110867721,
+          "mean_target_rad_s": -9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 4.024763961902401,
+          "max_temporal_std_per_wheel_rad_s": 5.032956453377257
+        }
+      },
+      "native_effort_final_second_nm": {
+        "mean_abs": 0.5339888749310214,
+        "p95_abs": 0.7683207333087921,
+        "max_abs": 0.8841216564178467,
+        "full_run_max_abs": 0.9148291349411011,
+        "expression_max_abs_residual_uncapped_nm": 0.0,
+        "uncapped_expression_match_at_1e-4_nm": true
+      },
+      "normal_force_final_second_N": {
+        "total_upward_mean_per_policy_sample": 258.10784516334536,
+        "total_upward_p05_p95": [
+          82.50262069702148,
+          366.9069389820099
+        ],
+        "mean_per_wheel_upward_by_side": {
+          "left": 16.178291273117065,
+          "right": 20.694258035932272
+        },
+        "loaded_wheel_sample_count": 173,
+        "loaded_wheel_upward_force_N": {
+          "count": 173,
+          "mean": 29.83905724431738,
+          "median": 22.534420013427734,
+          "p95": 65.84524078369141,
+          "max_abs": 109.40699005126953
+        }
+      },
+      "approx_flat_contact_slip_final_second_mps": {
+        "formula": "v_root + omega_root x (wheel_center - radius*world_up - root_position) - wheel_qd_post_step*radius*root_forward",
+        "all_wheel_samples": {
+          "count": 280,
+          "mean": 0.4002992103976336,
+          "median": 0.38676870040056244,
+          "p95": 0.7087712092978683,
+          "max_abs": 0.9487796001905808
+        },
+        "loaded_wheel_samples_normal_up_gt_0": {
+          "count": 173,
+          "mean": 0.2958523165778875,
+          "median": 0.2701885833605843,
+          "p95": 0.5607715003384587,
+          "max_abs": 0.6198884536632014
+        },
+        "loaded_forward_signed_mps": {
+          "count": 173,
+          "mean": 0.039432337816267295,
+          "median": 0.14269604855667067,
+          "p95": 0.513472232353174,
+          "max_abs": 0.6198377943978249
+        },
+        "loaded_lateral_signed_mps": {
+          "count": 173,
+          "mean": -0.0008234703032073156,
+          "median": -0.0005340885679085555,
+          "p95": 0.021547057594662074,
+          "max_abs": 0.040128541105415284
+        },
+        "loaded_aggregate_friction_force_dot_slip_W_proxy": {
+          "count": 173,
+          "mean": -4.639453209266581,
+          "median": -4.4625911614244975,
+          "p95": -2.3069796826130196,
+          "max_abs": 8.917333226467123
+        },
+        "positive_friction_dot_slip_fraction": 0.0,
+        "limitation": "kinematic flat-ground contact-point proxy from policy-step aggregated sensor forces; not solver contact-point velocity, per-pair work, or calibrated terrain slip"
+      }
+    },
+    {
+      "case": "dt-2ms__cone-elliptic__impratio-100",
+      "summary_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_probe_runs_v3/dt-2ms__cone-elliptic__impratio-100/contact_friction_v3_summary.json",
+      "status": "complete",
+      "actual_exit_code": 0,
+      "initial_state_canonical_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "fixed_physical_comparison_contract_sha256": "6eefae6814dd7fbfda7845238d86a94b6b188d5d09602174cb14e092ab87aa69",
+      "solver_treatment": {
+        "cone": "elliptic",
+        "impratio": 100.0
+      },
+      "actual_solver_option_snapshot": {
+        "configured": {
+          "cone": "elliptic",
+          "impratio": 100.0
+        },
+        "host_mj_model_opt": {
+          "cone": 1,
+          "impratio": 100.0
+        },
+        "mjw_model_opt": {
+          "cone": 1,
+          "impratio_invsqrt": [
+            0.10000000149011612
+          ],
+          "equivalent_impratio_derived_as_1_over_invsqrt_squared": 99.99999701976783
+        },
+        "expected_mujoco_cone_enum": 1,
+        "checks": {
+          "host_mj_model_opt_cone_matches_config": true,
+          "mjw_model_opt_cone_matches_config": true,
+          "host_mj_model_opt_impratio_matches_config": true,
+          "mjw_model_opt_impratio_invsqrt_matches_config": true
+        },
+        "all_checks_pass": true,
+        "note": "MJWarp stores frictional-to-normal impedance as impratio_invsqrt=1/sqrt(impratio); host MuJoCo exposes opt.impratio."
+      },
+      "end_last_1s_mean_root_yaw_rate_rad_s": -0.0697006268426776,
+      "delta_yaw_vs_v2_pyramidal_1_rad_s": 0.026344615221023562,
+      "native_final_second_samples": 500,
+      "native_qd_mean_and_variability_rad_s": {
+        "left": {
+          "mean_rad_s": 8.831775793799332,
+          "mean_target_rad_s": 9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 4.250371506933626,
+          "max_temporal_std_per_wheel_rad_s": 4.983709333047312
+        },
+        "right": {
+          "mean_rad_s": -8.898714880747454,
+          "mean_target_rad_s": -9.259258270263672,
+          "mean_temporal_std_per_wheel_rad_s": 4.3483557029073605,
+          "max_temporal_std_per_wheel_rad_s": 5.339487521097106
+        }
+      },
+      "native_effort_final_second_nm": {
+        "mean_abs": 0.5331183565789833,
+        "p95_abs": 0.7712474077939986,
+        "max_abs": 0.8732478618621826,
+        "full_run_max_abs": 0.9223582744598389,
+        "expression_max_abs_residual_uncapped_nm": 0.0,
+        "uncapped_expression_match_at_1e-4_nm": true
+      },
+      "normal_force_final_second_N": {
+        "total_upward_mean_per_policy_sample": 273.5205920696259,
+        "total_upward_p05_p95": [
+          64.84506483078003,
+          382.813529586792
+        ],
+        "mean_per_wheel_upward_by_side": {
+          "left": 19.089140721729827,
+          "right": 19.985229573931015
+        },
+        "loaded_wheel_sample_count": 186,
+        "loaded_wheel_upward_force_N": {
+          "count": 186,
+          "mean": 29.410816351572674,
+          "median": 21.997821807861328,
+          "p95": 64.72441959381104,
+          "max_abs": 88.14530181884766
+        }
+      },
+      "approx_flat_contact_slip_final_second_mps": {
+        "formula": "v_root + omega_root x (wheel_center - radius*world_up - root_position) - wheel_qd_post_step*radius*root_forward",
+        "all_wheel_samples": {
+          "count": 280,
+          "mean": 0.41843111778560965,
+          "median": 0.4163507834067106,
+          "p95": 0.762439503678154,
+          "max_abs": 0.8715796531605092
+        },
+        "loaded_wheel_samples_normal_up_gt_0": {
+          "count": 186,
+          "mean": 0.34310249971132,
+          "median": 0.3187964963329634,
+          "p95": 0.6107691729408516,
+          "max_abs": 0.7683539864978363
+        },
+        "loaded_forward_signed_mps": {
+          "count": 186,
+          "mean": -0.02645435356309244,
+          "median": -0.09188294057987621,
+          "p95": 0.5070865587648504,
+          "max_abs": 0.7683027630094343
+        },
+        "loaded_lateral_signed_mps": {
+          "count": 186,
+          "mean": -0.0009084740908039182,
+          "median": -0.0012410315114077808,
+          "p95": 0.02004734027299395,
+          "max_abs": 0.033946824299309286
+        },
+        "loaded_aggregate_friction_force_dot_slip_W_proxy": {
+          "count": 186,
+          "mean": -5.289428246423994,
+          "median": -5.090968418806846,
+          "p95": -2.113118294380743,
+          "max_abs": 10.64733473654473
+        },
+        "positive_friction_dot_slip_fraction": 0.0,
+        "limitation": "kinematic flat-ground contact-point proxy from policy-step aggregated sensor forces; not solver contact-point velocity, per-pair work, or calibrated terrain slip"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2149 @@
+{
+  "sequence": 1,
+  "sim_time": 0.0,
+  "output_time": null,
+  "mode": "暂停预览（未施加车辆）",
+  "critic": "价值支路为独立记忆的额外诊断计算；记忆自本段连续采集起累计，不控制车辆",
+  "errors": [],
+  "state": {
+    "running": false,
+    "time": 0.0,
+    "robot": {
+      "x": 48.2548828125,
+      "y": 21.28045654296875,
+      "yaw": -2.321727752685547,
+      "z": 0.1599999964237213,
+      "roll": 0.0,
+      "pitch": -0.0,
+      "v": 0.0,
+      "w": 0.0
+    },
+    "done": false,
+    "status": "已加载未训练的随机初始化模型：results/isaac_field_viewer/imu_drive_20261020/untrained_imu_drive_preview.zip（加载成功不代表策略已具备任务能力）。 当前为手动控制；选择“策略控制”并点击“运行任务”后才会执行策略。",
+    "training_steps": 0
+  },
+  "legend": {
+    "name": "turbo",
+    "colors": [
+      [
+        48,
+        18,
+        59
+      ],
+      [
+        70,
+        107,
+        227
+      ],
+      [
+        40,
+        188,
+        235
+      ],
+      [
+        50,
+        242,
+        152
+      ],
+      [
+        164,
+        252,
+        60
+      ],
+      [
+        238,
+        207,
+        58
+      ],
+      [
+        251,
+        126,
+        33
+      ],
+      [
+        208,
+        47,
+        5
+      ],
+      [
+        122,
+        4,
+        3
+      ]
+    ],
+    "minimum": -2.365260124206543,
+    "zero": 0.0,
+    "maximum": 2.365260124206543,
+    "mode": "adaptive-global",
+    "scale": 2.365260124206543,
+    "observed_max_abs": 2.365260124206543
+  },
+  "nodes": [
+    {
+      "key": "input.lidar",
+      "title": "激光雷达输入",
+      "description": "距离/8米与有效掩码，2×400",
+      "branch": "lidar",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        2,
+        400
+      ]
+    },
+    {
+      "key": "features_extractor.laser.0",
+      "title": "一维卷积 2→16 · 环形填充",
+      "description": "Conv1d(2, 16, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+      "branch": "lidar",
+      "column": 1.0,
+      "parents": [
+        "input.lidar"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        200
+      ]
+    },
+    {
+      "key": "features_extractor.laser.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.laser.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        200
+      ]
+    },
+    {
+      "key": "features_extractor.laser.2",
+      "title": "一维卷积 16→32 · 环形填充",
+      "description": "Conv1d(16, 32, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+      "branch": "lidar",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.laser.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        100
+      ]
+    },
+    {
+      "key": "features_extractor.laser.3",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.laser.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        100
+      ]
+    },
+    {
+      "key": "features_extractor.laser.4",
+      "title": "一维自适应平均池化 · 50",
+      "description": "AdaptiveAvgPool1d(output_size=50)",
+      "branch": "lidar",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.laser.3"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        50
+      ]
+    },
+    {
+      "key": "features_extractor.laser.5",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "lidar",
+      "column": 6.0,
+      "parents": [
+        "features_extractor.laser.4"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        1600
+      ]
+    },
+    {
+      "key": "features_extractor.laser.6",
+      "title": "全连接 1600→32",
+      "description": "Linear(in_features=1600, out_features=32, bias=True)",
+      "branch": "lidar",
+      "column": 7.0,
+      "parents": [
+        "features_extractor.laser.5"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.laser.7",
+      "title": "激光雷达编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 8.0,
+      "parents": [
+        "features_extractor.laser.6"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "input.depth",
+      "title": "深度图输入",
+      "description": "轴向Z深度/量程，1×160×88；无效值为0且无单独掩码；不是RGB图",
+      "branch": "depth",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        1,
+        160,
+        88
+      ]
+    },
+    {
+      "key": "features_extractor.depth.0",
+      "title": "二维卷积 1→8",
+      "description": "Conv2d(1, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 1.0,
+      "parents": [
+        "input.depth"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ]
+    },
+    {
+      "key": "features_extractor.depth.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.depth.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ]
+    },
+    {
+      "key": "features_extractor.depth.2",
+      "title": "二维卷积 8→16",
+      "description": "Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.depth.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ]
+    },
+    {
+      "key": "features_extractor.depth.3",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.depth.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ]
+    },
+    {
+      "key": "features_extractor.depth.4",
+      "title": "二维自适应平均池化 · 8×6",
+      "description": "AdaptiveAvgPool2d(output_size=(8, 6))",
+      "branch": "depth",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.depth.3"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        8,
+        6
+      ]
+    },
+    {
+      "key": "features_extractor.depth.5",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "depth",
+      "column": 6.0,
+      "parents": [
+        "features_extractor.depth.4"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        768
+      ]
+    },
+    {
+      "key": "features_extractor.depth.6",
+      "title": "全连接 768→64",
+      "description": "Linear(in_features=768, out_features=64, bias=True)",
+      "branch": "depth",
+      "column": 7.0,
+      "parents": [
+        "features_extractor.depth.5"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "features_extractor.depth.7",
+      "title": "深度图编码输出 · 64维",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 8.0,
+      "parents": [
+        "features_extractor.depth.6"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "input.detections",
+      "title": "检测框输入",
+      "description": "16个候选×10字段；无效行由presence掩码排除",
+      "branch": "detections",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        10
+      ]
+    },
+    {
+      "key": "features_extractor.boxes.0",
+      "title": "全连接 10→32",
+      "description": "Linear(in_features=10, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 1.0,
+      "parents": [
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.boxes.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.boxes.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.boxes.2",
+      "title": "全连接 32→32",
+      "description": "Linear(in_features=32, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.boxes.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.boxes.3",
+      "title": "检测框编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.boxes.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ]
+    },
+    {
+      "key": "detections.masked",
+      "title": "逐框有效性掩码",
+      "description": "逐框32维特征 × 输入第8列presence；按真实算式重建",
+      "branch": "detections",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.boxes.3",
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        16,
+        32
+      ]
+    },
+    {
+      "key": "detections.pooled",
+      "title": "检测编码输出 · 32维",
+      "description": "沿16个候选逐特征amax；不是求平均",
+      "branch": "detections",
+      "column": 6.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": true,
+      "source": "算式重建",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "detections.winner",
+      "title": "池化来源索引",
+      "description": "每个输出特征来自哪个候选行；并列最大值取首行，空槽可能在零值并列中出现",
+      "branch": "detections",
+      "column": 7.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "input.state",
+      "title": "任务与定位状态输入",
+      "description": "39维任务/定位状态；不含车体速度和横滚俯仰真值",
+      "branch": "state",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        39
+      ]
+    },
+    {
+      "key": "features_extractor.proprioception.0",
+      "title": "全连接 39→32",
+      "description": "Linear(in_features=39, out_features=32, bias=True)",
+      "branch": "state",
+      "column": 1.0,
+      "parents": [
+        "input.state"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.proprioception.1",
+      "title": "任务与定位状态编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "state",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.proprioception.0"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "input.feedback",
+      "title": "惯性与驱动反馈输入",
+      "description": "41维：云台IMU、实测关节、左右电机Iq/RPM及有效性/帧龄；仿真电流为显式驱动力矩模型估计",
+      "branch": "feedback",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        41
+      ]
+    },
+    {
+      "key": "features_extractor.feedback.0",
+      "title": "全连接 41→32",
+      "description": "Linear(in_features=41, out_features=32, bias=True)",
+      "branch": "feedback",
+      "column": 1.0,
+      "parents": [
+        "input.feedback"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "features_extractor.feedback.1",
+      "title": "惯性与驱动反馈编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "feedback",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.feedback.0"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ]
+    },
+    {
+      "key": "features_extractor",
+      "title": "五路特征拼接 · 192维",
+      "description": "按雷达32、深度64、检测32、状态32、反馈32拼成192维；没有注意力权重",
+      "branch": "fusion",
+      "column": 9.0,
+      "parents": [
+        "features_extractor.laser.7",
+        "features_extractor.depth.7",
+        "detections.pooled",
+        "features_extractor.proprioception.1",
+        "features_extractor.feedback.1"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        192
+      ]
+    },
+    {
+      "key": "lstm_actor",
+      "title": "驾驶记忆 LSTM",
+      "description": "LSTM(192, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "actor",
+      "column": 14.0,
+      "parents": [
+        "lstm_actor.h"
+      ],
+      "summary": true,
+      "source": "实际驾驶前向",
+      "shape": [
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.h0",
+      "title": "输入隐状态 h₀",
+      "description": "上一决策步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；回合开始时清零",
+      "branch": "actor_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.c0",
+      "title": "输入记忆 c₀",
+      "description": "上一决策步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；回合开始时清零",
+      "branch": "actor_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.h",
+      "title": "输出隐状态 h₁",
+      "description": "h₁ = o·tanh(c₁)；本次隐状态输出，供下一决策步使用",
+      "branch": "actor_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_actor.o",
+        "lstm_actor.c"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.c",
+      "title": "输出记忆 c₁",
+      "description": "c₁ = f·c₀ + i·g；由本次门值及上一时刻记忆状态计算",
+      "branch": "actor_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_actor.f",
+        "lstm_actor.i",
+        "lstm_actor.g",
+        "lstm_actor.c0"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.i",
+      "title": "输入门 i",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.f",
+      "title": "遗忘门 f",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.g",
+      "title": "候选记忆 g",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_actor.o",
+      "title": "输出门 o",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "mlp_extractor.policy_net.0",
+      "title": "动作头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "actor",
+      "column": 15.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "mlp_extractor.policy_net.1",
+      "title": "动作头 Tanh",
+      "description": "Tanh()",
+      "branch": "actor",
+      "column": 16.0,
+      "parents": [
+        "mlp_extractor.policy_net.0"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "action_net",
+      "title": "动作分布均值 μ",
+      "description": "Linear(in_features=64, out_features=4, bias=True)；均值尚未经过动作范围裁剪",
+      "branch": "actor",
+      "column": 17.0,
+      "parents": [
+        "mlp_extractor.policy_net.1"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        4
+      ]
+    },
+    {
+      "key": "lstm_critic",
+      "title": "价值记忆 LSTM",
+      "description": "LSTM(192, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "critic",
+      "column": 14.0,
+      "parents": [
+        "lstm_critic.h"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.h0",
+      "title": "输入隐状态 h₀",
+      "description": "上一价值诊断步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；诊断开始或回合开始时清零",
+      "branch": "critic_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.c0",
+      "title": "输入记忆 c₀",
+      "description": "上一价值诊断步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；诊断开始或回合开始时清零",
+      "branch": "critic_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.h",
+      "title": "输出隐状态 h₁",
+      "description": "h₁ = o·tanh(c₁)；本次隐状态输出，供下一决策步使用",
+      "branch": "critic_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_critic.o",
+        "lstm_critic.c"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.c",
+      "title": "输出记忆 c₁",
+      "description": "c₁ = f·c₀ + i·g；由本次门值及上一时刻记忆状态计算",
+      "branch": "critic_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_critic.f",
+        "lstm_critic.i",
+        "lstm_critic.g",
+        "lstm_critic.c0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.i",
+      "title": "输入门 i",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.f",
+      "title": "遗忘门 f",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.g",
+      "title": "候选记忆 g",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "lstm_critic.o",
+      "title": "输出门 o",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ]
+    },
+    {
+      "key": "mlp_extractor.value_net.0",
+      "title": "价值头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "critic",
+      "column": 15.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "mlp_extractor.value_net.1",
+      "title": "价值头 Tanh",
+      "description": "Tanh()",
+      "branch": "critic",
+      "column": 16.0,
+      "parents": [
+        "mlp_extractor.value_net.0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ]
+    },
+    {
+      "key": "value_net",
+      "title": "状态价值 V(s)",
+      "description": "Linear(in_features=64, out_features=1, bias=True)；额外只读计算，不参与驾驶",
+      "branch": "critic",
+      "column": 17.0,
+      "parents": [
+        "mlp_extractor.value_net.1"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1
+      ]
+    },
+    {
+      "key": "action.log_std",
+      "title": "Gaussian log_std 参数",
+      "description": "实际策略的全局可训练参数；独立于动作均值 μ，σ = exp(log_std)",
+      "branch": "actor",
+      "column": 18.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际分布参数",
+      "shape": [
+        4
+      ]
+    },
+    {
+      "key": "action.std",
+      "title": "动作分布标准差 σ",
+      "description": "实际对角Gaussian分布的stddev，等于exp(log_std)；它独立于μ，确定性驾驶不采样噪声",
+      "branch": "actor",
+      "column": 19.0,
+      "parents": [
+        "action.log_std"
+      ],
+      "summary": false,
+      "source": "实际分布",
+      "shape": [
+        4
+      ]
+    },
+    {
+      "key": "action.applied",
+      "title": "四维输出动作",
+      "description": "动作分量依次为左履带速度指令、右履带速度指令、云台偏航角速度指令、云台俯仰角速度指令；确定性均值经 SB3 裁剪 / 反归一化后范围为 [-1,1]。前两维分别乘最大履带速度，形成左右独立履带速度指令；后两维保持云台偏航 / 俯仰角速度语义。",
+      "branch": "output",
+      "column": 19.0,
+      "parents": [
+        "action_net"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        4
+      ]
+    }
+  ],
+  "detail": {
+    "key": "action.applied",
+    "title": "四维输出动作",
+    "shape": [
+      4
+    ],
+    "size": 4,
+    "min": -0.000393626163713634,
+    "max": 0.001545100356452167,
+    "mean": 0.0002128459746018052,
+    "std": 0.0007845614454708993,
+    "nonfinite": 0,
+    "index": 0,
+    "coordinate": [
+      0
+    ],
+    "value": 0.001545100356452167,
+    "parameters": [],
+    "description": "动作分量依次为左履带速度指令、右履带速度指令、云台偏航角速度指令、云台俯仰角速度指令；确定性均值经 SB3 裁剪 / 反归一化后范围为 [-1,1]。前两维分别乘最大履带速度，形成左右独立履带速度指令；后两维保持云台偏航 / 俯仰角速度语义。",
+    "source": "实际前向",
+    "fields": [
+      "左履带速度指令",
+      "右履带速度指令",
+      "云台偏航角速度指令",
+      "云台俯仰角速度指令"
+    ]
+  },
+  "layout": {
+    "topology": "922a96a685ecc49ac785f949d77ef7bc18636d0bc0d8a1c6b361ec3e83223829",
+    "engine": "Graphviz dot · 分层避障圆角贝塞尔",
+    "status": "graphviz",
+    "reason": "",
+    "positions": {
+      "input.lidar": {
+        "x": 42.0,
+        "y": 823.0
+      },
+      "features_extractor.laser.0": {
+        "x": 297.0,
+        "y": 823.0
+      },
+      "features_extractor.laser.1": {
+        "x": 552.0,
+        "y": 823.0
+      },
+      "features_extractor.laser.2": {
+        "x": 807.0,
+        "y": 817.0
+      },
+      "features_extractor.laser.3": {
+        "x": 1062.0,
+        "y": 807.0
+      },
+      "features_extractor.laser.4": {
+        "x": 1317.0,
+        "y": 802.0
+      },
+      "features_extractor.laser.5": {
+        "x": 1572.0,
+        "y": 786.0
+      },
+      "features_extractor.laser.6": {
+        "x": 1827.0,
+        "y": 786.0
+      },
+      "features_extractor.laser.7": {
+        "x": 2082.0,
+        "y": 786.0
+      },
+      "input.depth": {
+        "x": 42.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.0": {
+        "x": 297.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.1": {
+        "x": 552.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.2": {
+        "x": 807.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.3": {
+        "x": 1062.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.4": {
+        "x": 1317.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.5": {
+        "x": 1572.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.6": {
+        "x": 1827.0,
+        "y": 1184.0
+      },
+      "features_extractor.depth.7": {
+        "x": 2082.0,
+        "y": 1002.0
+      },
+      "input.detections": {
+        "x": 42.0,
+        "y": 989.0
+      },
+      "features_extractor.boxes.0": {
+        "x": 297.0,
+        "y": 1039.0
+      },
+      "features_extractor.boxes.1": {
+        "x": 552.0,
+        "y": 1039.0
+      },
+      "features_extractor.boxes.2": {
+        "x": 807.0,
+        "y": 1039.0
+      },
+      "features_extractor.boxes.3": {
+        "x": 1062.0,
+        "y": 1039.0
+      },
+      "detections.masked": {
+        "x": 1317.0,
+        "y": 963.0
+      },
+      "detections.pooled": {
+        "x": 1572.0,
+        "y": 931.0
+      },
+      "detections.winner": {
+        "x": 1827.0,
+        "y": 1039.0
+      },
+      "input.state": {
+        "x": 42.0,
+        "y": 533.0
+      },
+      "features_extractor.proprioception.0": {
+        "x": 297.0,
+        "y": 533.0
+      },
+      "features_extractor.proprioception.1": {
+        "x": 552.0,
+        "y": 533.0
+      },
+      "input.feedback": {
+        "x": 42.0,
+        "y": 678.0
+      },
+      "features_extractor.feedback.0": {
+        "x": 297.0,
+        "y": 678.0
+      },
+      "features_extractor.feedback.1": {
+        "x": 552.0,
+        "y": 678.0
+      },
+      "features_extractor": {
+        "x": 2337.0,
+        "y": 796.0
+      },
+      "lstm_actor": {
+        "x": 3357.0,
+        "y": 246.0
+      },
+      "lstm_actor.h0": {
+        "x": 2082.0,
+        "y": 367.0
+      },
+      "lstm_actor.c0": {
+        "x": 2082.0,
+        "y": 54.0
+      },
+      "lstm_actor.h": {
+        "x": 3102.0,
+        "y": 274.0
+      },
+      "lstm_actor.c": {
+        "x": 2847.0,
+        "y": 195.0
+      },
+      "lstm_actor.i": {
+        "x": 2592.0,
+        "y": 91.0
+      },
+      "lstm_actor.f": {
+        "x": 2592.0,
+        "y": 236.0
+      },
+      "lstm_actor.g": {
+        "x": 2592.0,
+        "y": 381.0
+      },
+      "lstm_actor.o": {
+        "x": 2592.0,
+        "y": 526.0
+      },
+      "mlp_extractor.policy_net.0": {
+        "x": 3612.0,
+        "y": 246.0
+      },
+      "mlp_extractor.policy_net.1": {
+        "x": 3867.0,
+        "y": 246.0
+      },
+      "action_net": {
+        "x": 4122.0,
+        "y": 246.0
+      },
+      "lstm_critic": {
+        "x": 3357.0,
+        "y": 1404.0
+      },
+      "lstm_critic.h0": {
+        "x": 2082.0,
+        "y": 1394.0
+      },
+      "lstm_critic.c0": {
+        "x": 2082.0,
+        "y": 1592.0
+      },
+      "lstm_critic.h": {
+        "x": 3102.0,
+        "y": 1432.0
+      },
+      "lstm_critic.c": {
+        "x": 2847.0,
+        "y": 1397.0
+      },
+      "lstm_critic.i": {
+        "x": 2592.0,
+        "y": 1120.0
+      },
+      "lstm_critic.f": {
+        "x": 2592.0,
+        "y": 1265.0
+      },
+      "lstm_critic.g": {
+        "x": 2592.0,
+        "y": 1410.0
+      },
+      "lstm_critic.o": {
+        "x": 2592.0,
+        "y": 1555.0
+      },
+      "mlp_extractor.value_net.0": {
+        "x": 3612.0,
+        "y": 1404.0
+      },
+      "mlp_extractor.value_net.1": {
+        "x": 3867.0,
+        "y": 1404.0
+      },
+      "value_net": {
+        "x": 4122.0,
+        "y": 1404.0
+      },
+      "action.log_std": {
+        "x": 4122.0,
+        "y": 481.0
+      },
+      "action.std": {
+        "x": 4377.0,
+        "y": 481.0
+      },
+      "action.applied": {
+        "x": 4377.0,
+        "y": 246.0
+      }
+    },
+    "edges": [
+      {
+        "source": "input.lidar",
+        "target": "features_extractor.laser.0",
+        "path": "M 212.000,878.000 C 237.933,878.000 263.867,878.000 289.800,878.000"
+      },
+      {
+        "source": "features_extractor.laser.0",
+        "target": "features_extractor.laser.1",
+        "path": "M 467.000,878.000 C 492.933,878.000 518.867,878.000 544.800,878.000"
+      },
+      {
+        "source": "features_extractor.laser.1",
+        "target": "features_extractor.laser.2",
+        "path": "M 722.000,875.000 C 747.933,875.000 773.867,875.000 799.800,875.000"
+      },
+      {
+        "source": "features_extractor.laser.2",
+        "target": "features_extractor.laser.3",
+        "path": "M 977.000,867.000 C 1002.933,867.000 1028.867,867.000 1054.800,867.000"
+      },
+      {
+        "source": "features_extractor.laser.3",
+        "target": "features_extractor.laser.4",
+        "path": "M 1232.000,859.500 C 1257.933,859.500 1283.867,859.500 1309.800,859.500"
+      },
+      {
+        "source": "features_extractor.laser.4",
+        "target": "features_extractor.laser.5",
+        "path": "M 1487.000,849.000 C 1512.933,849.000 1538.867,849.000 1564.800,849.000"
+      },
+      {
+        "source": "features_extractor.laser.5",
+        "target": "features_extractor.laser.6",
+        "path": "M 1742.000,841.000 C 1767.933,841.000 1793.867,841.000 1819.800,841.000"
+      },
+      {
+        "source": "features_extractor.laser.6",
+        "target": "features_extractor.laser.7",
+        "path": "M 1997.000,841.000 C 2022.933,841.000 2048.867,841.000 2074.800,841.000"
+      },
+      {
+        "source": "input.depth",
+        "target": "features_extractor.depth.0",
+        "path": "M 212.000,1239.000 C 237.933,1239.000 263.867,1239.000 289.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.0",
+        "target": "features_extractor.depth.1",
+        "path": "M 467.000,1239.000 C 492.933,1239.000 518.867,1239.000 544.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.1",
+        "target": "features_extractor.depth.2",
+        "path": "M 722.000,1239.000 C 747.933,1239.000 773.867,1239.000 799.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.2",
+        "target": "features_extractor.depth.3",
+        "path": "M 977.000,1239.000 C 1002.933,1239.000 1028.867,1239.000 1054.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.3",
+        "target": "features_extractor.depth.4",
+        "path": "M 1232.000,1239.000 C 1257.933,1239.000 1283.867,1239.000 1309.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.4",
+        "target": "features_extractor.depth.5",
+        "path": "M 1487.000,1239.000 C 1512.933,1239.000 1538.867,1239.000 1564.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.5",
+        "target": "features_extractor.depth.6",
+        "path": "M 1742.000,1239.000 C 1767.933,1239.000 1793.867,1239.000 1819.800,1239.000"
+      },
+      {
+        "source": "features_extractor.depth.6",
+        "target": "features_extractor.depth.7",
+        "path": "M 1997.000,1199.330 C 2033.667,1199.330 2089.327,1199.330 2107.000,1199.330 C 2124.673,1199.330 2139.000,1185.003 2139.000,1167.330 C 2139.000,1149.657 2139.000,1098.577 2139.000,1064.200"
+      },
+      {
+        "source": "input.detections",
+        "target": "features_extractor.boxes.0",
+        "path": "M 212.000,1069.000 C 237.933,1069.000 263.867,1069.000 289.800,1069.000"
+      },
+      {
+        "source": "features_extractor.boxes.0",
+        "target": "features_extractor.boxes.1",
+        "path": "M 467.000,1094.000 C 492.933,1094.000 518.867,1094.000 544.800,1094.000"
+      },
+      {
+        "source": "features_extractor.boxes.1",
+        "target": "features_extractor.boxes.2",
+        "path": "M 722.000,1094.000 C 747.933,1094.000 773.867,1094.000 799.800,1094.000"
+      },
+      {
+        "source": "features_extractor.boxes.2",
+        "target": "features_extractor.boxes.3",
+        "path": "M 977.000,1094.000 C 1002.933,1094.000 1028.867,1094.000 1054.800,1094.000"
+      },
+      {
+        "source": "features_extractor.boxes.3",
+        "target": "detections.masked",
+        "path": "M 1232.000,1056.000 C 1257.933,1056.000 1283.867,1056.000 1309.800,1056.000"
+      },
+      {
+        "source": "input.detections",
+        "target": "detections.masked",
+        "path": "M 212.000,1014.000 C 254.000,1014.000 1267.800,1014.000 1309.800,1014.000"
+      },
+      {
+        "source": "detections.masked",
+        "target": "detections.pooled",
+        "path": "M 1487.000,1002.000 C 1512.933,1002.000 1538.867,1002.000 1564.800,1002.000"
+      },
+      {
+        "source": "detections.masked",
+        "target": "detections.winner",
+        "path": "M 1487.000,1057.000 C 1529.000,1057.000 1777.800,1057.000 1819.800,1057.000"
+      },
+      {
+        "source": "input.state",
+        "target": "features_extractor.proprioception.0",
+        "path": "M 212.000,588.000 C 237.933,588.000 263.867,588.000 289.800,588.000"
+      },
+      {
+        "source": "features_extractor.proprioception.0",
+        "target": "features_extractor.proprioception.1",
+        "path": "M 467.000,588.000 C 492.933,588.000 518.867,588.000 544.800,588.000"
+      },
+      {
+        "source": "input.feedback",
+        "target": "features_extractor.feedback.0",
+        "path": "M 212.000,733.000 C 237.933,733.000 263.867,733.000 289.800,733.000"
+      },
+      {
+        "source": "features_extractor.feedback.0",
+        "target": "features_extractor.feedback.1",
+        "path": "M 467.000,733.000 C 492.933,733.000 518.867,733.000 544.800,733.000"
+      },
+      {
+        "source": "features_extractor.laser.7",
+        "target": "features_extractor",
+        "path": "M 2252.000,846.000 C 2277.933,846.000 2303.867,846.000 2329.800,846.000"
+      },
+      {
+        "source": "features_extractor.depth.7",
+        "target": "features_extractor",
+        "path": "M 2167.000,1057.000 C 2167.000,1016.223 2167.000,952.343 2167.000,934.670 C 2167.000,916.997 2181.327,902.670 2199.000,902.670 C 2216.673,902.670 2287.800,902.670 2329.800,902.670"
+      },
+      {
+        "source": "detections.pooled",
+        "target": "features_extractor",
+        "path": "M 1657.000,986.000 C 1657.000,967.777 1657.000,949.003 1657.000,931.330 C 1657.000,913.657 1671.327,899.330 1689.000,899.330 C 1706.673,899.330 2287.800,899.330 2329.800,899.330"
+      },
+      {
+        "source": "features_extractor.proprioception.1",
+        "target": "features_extractor",
+        "path": "M 722.000,601.670 C 764.000,601.670 2336.327,601.670 2354.000,601.670 C 2371.673,601.670 2386.000,615.997 2386.000,633.670 C 2386.000,651.343 2386.000,765.800 2386.000,807.800"
+      },
+      {
+        "source": "features_extractor.feedback.1",
+        "target": "features_extractor",
+        "path": "M 722.000,732.000 C 764.000,732.000 2312.327,732.000 2330.000,732.000 C 2347.673,732.000 2362.000,746.327 2362.000,764.000 C 2362.000,781.673 2362.000,801.867 2362.000,820.800"
+      },
+      {
+        "source": "lstm_actor.h",
+        "target": "lstm_actor",
+        "path": "M 3272.000,315.000 C 3297.933,315.000 3323.867,315.000 3349.800,315.000"
+      },
+      {
+        "source": "lstm_actor.o",
+        "target": "lstm_actor.h",
+        "path": "M 2762.000,558.500 C 2804.000,558.500 3137.327,558.500 3155.000,558.500 C 3172.673,558.500 3187.000,544.173 3187.000,526.500 C 3187.000,508.827 3187.000,406.200 3187.000,364.200"
+      },
+      {
+        "source": "lstm_actor.c",
+        "target": "lstm_actor.h",
+        "path": "M 3017.000,289.500 C 3042.933,289.500 3068.867,289.500 3094.800,289.500"
+      },
+      {
+        "source": "lstm_actor.f",
+        "target": "lstm_actor.c",
+        "path": "M 2762.000,270.500 C 2787.933,270.500 2813.867,270.500 2839.800,270.500"
+      },
+      {
+        "source": "lstm_actor.i",
+        "target": "lstm_actor.c",
+        "path": "M 2677.000,118.000 C 2677.000,138.890 2677.000,162.997 2677.000,180.670 C 2677.000,198.343 2691.327,212.670 2709.000,212.670 C 2726.673,212.670 2797.800,212.670 2839.800,212.670"
+      },
+      {
+        "source": "lstm_actor.g",
+        "target": "lstm_actor.c",
+        "path": "M 2762.000,432.500 C 2804.000,432.500 2911.327,432.500 2929.000,432.500 C 2946.673,432.500 2961.000,418.173 2961.000,400.500 C 2961.000,382.827 2961.000,331.633 2961.000,297.200"
+      },
+      {
+        "source": "lstm_actor.c0",
+        "target": "lstm_actor.c",
+        "path": "M 2139.000,109.000 C 2139.000,136.777 2139.000,174.657 2139.000,192.330 C 2139.000,210.003 2153.327,224.330 2171.000,224.330 C 2188.673,224.330 2797.800,224.330 2839.800,224.330"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_actor.i",
+        "path": "M 2410.000,802.000 C 2410.000,760.000 2410.000,238.343 2410.000,220.670 C 2410.000,202.997 2424.327,188.670 2442.000,188.670 C 2459.673,188.670 2542.800,188.670 2584.800,188.670"
+      },
+      {
+        "source": "lstm_actor.h0",
+        "target": "lstm_actor.i",
+        "path": "M 2196.000,407.000 C 2196.000,365.000 2196.000,226.003 2196.000,208.330 C 2196.000,190.657 2210.327,176.330 2228.000,176.330 C 2245.673,176.330 2542.800,176.330 2584.800,176.330"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_actor.f",
+        "path": "M 2435.000,815.000 C 2435.000,773.000 2435.000,340.673 2435.000,323.000 C 2435.000,305.327 2449.327,291.000 2467.000,291.000 C 2484.673,291.000 2545.533,291.000 2584.800,291.000"
+      },
+      {
+        "source": "lstm_actor.h0",
+        "target": "lstm_actor.f",
+        "path": "M 2252.000,374.000 C 2294.000,374.000 2627.327,374.000 2645.000,374.000 C 2662.673,374.000 2677.000,359.673 2677.000,342.000 C 2677.000,324.327 2677.000,294.133 2677.000,270.200"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_actor.g",
+        "path": "M 2459.000,828.000 C 2459.000,786.000 2459.000,533.673 2459.000,516.000 C 2459.000,498.327 2473.327,484.000 2491.000,484.000 C 2508.673,484.000 2553.533,484.000 2584.800,484.000"
+      },
+      {
+        "source": "lstm_actor.h0",
+        "target": "lstm_actor.g",
+        "path": "M 2252.000,429.000 C 2294.000,429.000 2542.800,429.000 2584.800,429.000"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_actor.o",
+        "path": "M 2483.000,841.000 C 2483.000,799.000 2483.000,617.003 2483.000,599.330 C 2483.000,581.657 2497.327,567.330 2515.000,567.330 C 2532.673,567.330 2561.533,567.330 2584.800,567.330"
+      },
+      {
+        "source": "lstm_actor.h0",
+        "target": "lstm_actor.o",
+        "path": "M 2167.000,462.000 C 2167.000,475.050 2167.000,485.493 2167.000,501.150 C 2167.000,516.807 2179.693,529.500 2195.350,529.500 C 2211.007,529.500 2542.800,529.500 2584.800,529.500"
+      },
+      {
+        "source": "lstm_actor",
+        "target": "mlp_extractor.policy_net.0",
+        "path": "M 3527.000,301.000 C 3552.933,301.000 3578.867,301.000 3604.800,301.000"
+      },
+      {
+        "source": "mlp_extractor.policy_net.0",
+        "target": "mlp_extractor.policy_net.1",
+        "path": "M 3782.000,301.000 C 3807.933,301.000 3833.867,301.000 3859.800,301.000"
+      },
+      {
+        "source": "mlp_extractor.policy_net.1",
+        "target": "action_net",
+        "path": "M 4037.000,301.000 C 4062.933,301.000 4088.867,301.000 4114.800,301.000"
+      },
+      {
+        "source": "lstm_critic.h",
+        "target": "lstm_critic",
+        "path": "M 3272.000,1473.000 C 3297.933,1473.000 3323.867,1473.000 3349.800,1473.000"
+      },
+      {
+        "source": "lstm_critic.o",
+        "target": "lstm_critic.h",
+        "path": "M 2677.000,1582.000 C 2677.000,1572.140 2677.000,1564.250 2677.000,1552.420 C 2677.000,1540.590 2686.590,1531.000 2698.420,1531.000 C 2710.250,1531.000 3052.800,1531.000 3094.800,1531.000"
+      },
+      {
+        "source": "lstm_critic.c",
+        "target": "lstm_critic.h",
+        "path": "M 3017.000,1469.500 C 3042.933,1469.500 3068.867,1469.500 3094.800,1469.500"
+      },
+      {
+        "source": "lstm_critic.f",
+        "target": "lstm_critic.c",
+        "path": "M 2706.000,1292.000 C 2706.000,1317.777 2706.000,1351.657 2706.000,1369.330 C 2706.000,1387.003 2720.327,1401.330 2738.000,1401.330 C 2755.673,1401.330 2805.867,1401.330 2839.800,1401.330"
+      },
+      {
+        "source": "lstm_critic.i",
+        "target": "lstm_critic.c",
+        "path": "M 2762.000,1175.000 C 2798.667,1175.000 2854.327,1175.000 2872.000,1175.000 C 2889.673,1175.000 2904.000,1189.327 2904.000,1207.000 C 2904.000,1224.673 2904.000,1360.800 2904.000,1402.800"
+      },
+      {
+        "source": "lstm_critic.g",
+        "target": "lstm_critic.c",
+        "path": "M 2762.000,1458.500 C 2787.933,1458.500 2813.867,1458.500 2839.800,1458.500"
+      },
+      {
+        "source": "lstm_critic.c0",
+        "target": "lstm_critic.c",
+        "path": "M 2252.000,1683.500 C 2294.000,1683.500 2882.327,1683.500 2900.000,1683.500 C 2917.673,1683.500 2932.000,1669.173 2932.000,1651.500 C 2932.000,1633.827 2932.000,1541.200 2932.000,1499.200"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_critic.i",
+        "path": "M 2473.000,855.000 C 2473.000,897.000 2473.000,1084.827 2473.000,1102.500 C 2473.000,1120.173 2487.327,1134.500 2505.000,1134.500 C 2522.673,1134.500 2558.200,1134.500 2584.800,1134.500"
+      },
+      {
+        "source": "lstm_critic.h0",
+        "target": "lstm_critic.i",
+        "path": "M 2196.000,1434.000 C 2196.000,1392.000 2196.000,1264.343 2196.000,1246.670 C 2196.000,1228.997 2210.327,1214.670 2228.000,1214.670 C 2245.673,1214.670 2542.800,1214.670 2584.800,1214.670"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_critic.f",
+        "path": "M 2439.000,868.000 C 2439.000,910.000 2439.000,1229.827 2439.000,1247.500 C 2439.000,1265.173 2453.327,1279.500 2471.000,1279.500 C 2488.673,1279.500 2546.867,1279.500 2584.800,1279.500"
+      },
+      {
+        "source": "lstm_critic.h0",
+        "target": "lstm_critic.f",
+        "path": "M 2252.000,1405.670 C 2294.000,1405.670 2616.096,1405.670 2627.803,1405.670 C 2639.510,1405.670 2649.000,1396.180 2649.000,1384.473 C 2649.000,1372.766 2649.000,1364.958 2649.000,1355.200"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_critic.g",
+        "path": "M 2405.000,881.000 C 2405.000,923.000 2405.000,1391.657 2405.000,1409.330 C 2405.000,1427.003 2419.327,1441.330 2437.000,1441.330 C 2454.673,1441.330 2542.800,1441.330 2584.800,1441.330"
+      },
+      {
+        "source": "lstm_critic.h0",
+        "target": "lstm_critic.g",
+        "path": "M 2252.000,1472.670 C 2294.000,1472.670 2542.800,1472.670 2584.800,1472.670"
+      },
+      {
+        "source": "features_extractor",
+        "target": "lstm_critic.o",
+        "path": "M 2371.000,894.000 C 2371.000,936.000 2371.000,1517.657 2371.000,1535.330 C 2371.000,1553.003 2385.327,1567.330 2403.000,1567.330 C 2420.673,1567.330 2542.800,1567.330 2584.800,1567.330"
+      },
+      {
+        "source": "lstm_critic.h0",
+        "target": "lstm_critic.o",
+        "path": "M 2167.000,1489.000 C 2167.000,1508.557 2167.000,1529.997 2167.000,1547.670 C 2167.000,1565.343 2181.327,1579.670 2199.000,1579.670 C 2216.673,1579.670 2542.800,1579.670 2584.800,1579.670"
+      },
+      {
+        "source": "lstm_critic",
+        "target": "mlp_extractor.value_net.0",
+        "path": "M 3527.000,1459.000 C 3552.933,1459.000 3578.867,1459.000 3604.800,1459.000"
+      },
+      {
+        "source": "mlp_extractor.value_net.0",
+        "target": "mlp_extractor.value_net.1",
+        "path": "M 3782.000,1459.000 C 3807.933,1459.000 3833.867,1459.000 3859.800,1459.000"
+      },
+      {
+        "source": "mlp_extractor.value_net.1",
+        "target": "value_net",
+        "path": "M 4037.000,1459.000 C 4062.933,1459.000 4088.867,1459.000 4114.800,1459.000"
+      },
+      {
+        "source": "action.log_std",
+        "target": "action.std",
+        "path": "M 4292.000,536.000 C 4317.933,536.000 4343.867,536.000 4369.800,536.000"
+      },
+      {
+        "source": "action_net",
+        "target": "action.applied",
+        "path": "M 4292.000,301.000 C 4317.933,301.000 4343.867,301.000 4369.800,301.000"
+      }
+    ],
+    "regions": [
+      {
+        "key": "actor",
+        "label": "策略与动作",
+        "x": 2064.0,
+        "y": 20.0,
+        "width": 2501.0,
+        "height": 634.0
+      },
+      {
+        "key": "sensor-state",
+        "label": "状态输入支路",
+        "x": 24.0,
+        "y": 499.0,
+        "width": 716.0,
+        "height": 162.0
+      },
+      {
+        "key": "sensor-feedback",
+        "label": "负载与云台反馈输入支路",
+        "x": 24.0,
+        "y": 644.0,
+        "width": 716.0,
+        "height": 162.0
+      },
+      {
+        "key": "sensor-lidar",
+        "label": "雷达输入支路",
+        "x": 24.0,
+        "y": 752.0,
+        "width": 2246.0,
+        "height": 199.0
+      },
+      {
+        "key": "fusion",
+        "label": "传感融合",
+        "x": 2319.0,
+        "y": 762.0,
+        "width": 206.0,
+        "height": 162.0
+      },
+      {
+        "key": "sensor-detections",
+        "label": "检测输入支路",
+        "x": 24.0,
+        "y": 897.0,
+        "width": 1991.0,
+        "height": 270.0
+      },
+      {
+        "key": "sensor-depth",
+        "label": "深度输入支路",
+        "x": 24.0,
+        "y": 968.0,
+        "width": 2246.0,
+        "height": 344.0
+      },
+      {
+        "key": "critic",
+        "label": "独立价值诊断",
+        "x": 2064.0,
+        "y": 1086.0,
+        "width": 2246.0,
+        "height": 634.0
+      }
+    ],
+    "bounds": {
+      "minX": 0.0,
+      "minY": 0.0,
+      "maxX": 4601.0,
+      "maxY": 1756.0
+    },
+    "diagnostics": {
+      "card_overlap_pairs": [],
+      "curve_card_intersections": [],
+      "shared_path_pairs": [],
+      "crossing_pairs": [
+        [
+          "features_extractor→lstm_actor.f",
+          "lstm_actor.h0→lstm_actor.f"
+        ],
+        [
+          "features_extractor→lstm_actor.f",
+          "lstm_actor.h0→lstm_actor.g"
+        ],
+        [
+          "features_extractor→lstm_actor.f",
+          "lstm_actor.h0→lstm_actor.o"
+        ],
+        [
+          "features_extractor→lstm_actor.g",
+          "lstm_actor.h0→lstm_actor.o"
+        ],
+        [
+          "features_extractor→lstm_actor.i",
+          "lstm_actor.c0→lstm_actor.c"
+        ],
+        [
+          "features_extractor→lstm_actor.i",
+          "lstm_actor.h0→lstm_actor.f"
+        ],
+        [
+          "features_extractor→lstm_actor.i",
+          "lstm_actor.h0→lstm_actor.g"
+        ],
+        [
+          "features_extractor→lstm_actor.i",
+          "lstm_actor.h0→lstm_actor.o"
+        ],
+        [
+          "features_extractor→lstm_critic.f",
+          "lstm_critic.h0→lstm_critic.i"
+        ],
+        [
+          "features_extractor→lstm_critic.g",
+          "lstm_critic.h0→lstm_critic.f"
+        ],
+        [
+          "features_extractor→lstm_critic.g",
+          "lstm_critic.h0→lstm_critic.i"
+        ],
+        [
+          "features_extractor→lstm_critic.o",
+          "lstm_critic.h0→lstm_critic.f"
+        ],
+        [
+          "features_extractor→lstm_critic.o",
+          "lstm_critic.h0→lstm_critic.g"
+        ],
+        [
+          "features_extractor→lstm_critic.o",
+          "lstm_critic.h0→lstm_critic.i"
+        ],
+        [
+          "lstm_actor.c0→lstm_actor.c",
+          "lstm_actor.h0→lstm_actor.i"
+        ],
+        [
+          "lstm_critic.c0→lstm_critic.c",
+          "lstm_critic.o→lstm_critic.h"
+        ]
+      ],
+      "counts": {
+        "card_overlap_pairs": 0,
+        "curve_card_intersections": 0,
+        "shared_path_pairs": 0,
+        "crossing_pairs": 16,
+        "crossing_points": 16
+      },
+      "missing_parent_edges": []
+    },
+    "crossings": [
+      {
+        "x": 2410.0,
+        "y": 224.33,
+        "first": "lstm_actor.c0→lstm_actor.c",
+        "second": "features_extractor→lstm_actor.i",
+        "under": "features_extractor→lstm_actor.i",
+        "over": "lstm_actor.c0→lstm_actor.c",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "x": 2196.0,
+        "y": 224.33,
+        "first": "lstm_actor.c0→lstm_actor.c",
+        "second": "lstm_actor.h0→lstm_actor.i",
+        "under": "lstm_actor.c0→lstm_actor.c",
+        "over": "lstm_actor.h0→lstm_actor.i",
+        "under_tangent": [
+          1.0,
+          -0.0
+        ],
+        "over_tangent": [
+          -0.0,
+          -1.0
+        ]
+      },
+      {
+        "x": 2410.0,
+        "y": 374.0,
+        "first": "features_extractor→lstm_actor.i",
+        "second": "lstm_actor.h0→lstm_actor.f",
+        "under": "features_extractor→lstm_actor.i",
+        "over": "lstm_actor.h0→lstm_actor.f",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "x": 2410.0,
+        "y": 429.0,
+        "first": "features_extractor→lstm_actor.i",
+        "second": "lstm_actor.h0→lstm_actor.g",
+        "under": "features_extractor→lstm_actor.i",
+        "over": "lstm_actor.h0→lstm_actor.g",
+        "under_tangent": [
+          -0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2410.0,
+        "y": 529.5,
+        "first": "features_extractor→lstm_actor.i",
+        "second": "lstm_actor.h0→lstm_actor.o",
+        "under": "features_extractor→lstm_actor.i",
+        "over": "lstm_actor.h0→lstm_actor.o",
+        "under_tangent": [
+          -0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2435.0,
+        "y": 374.0,
+        "first": "features_extractor→lstm_actor.f",
+        "second": "lstm_actor.h0→lstm_actor.f",
+        "under": "features_extractor→lstm_actor.f",
+        "over": "lstm_actor.h0→lstm_actor.f",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2435.0,
+        "y": 429.0,
+        "first": "features_extractor→lstm_actor.f",
+        "second": "lstm_actor.h0→lstm_actor.g",
+        "under": "features_extractor→lstm_actor.f",
+        "over": "lstm_actor.h0→lstm_actor.g",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "x": 2435.0,
+        "y": 529.5,
+        "first": "features_extractor→lstm_actor.f",
+        "second": "lstm_actor.h0→lstm_actor.o",
+        "under": "features_extractor→lstm_actor.f",
+        "over": "lstm_actor.h0→lstm_actor.o",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2459.0,
+        "y": 529.5,
+        "first": "features_extractor→lstm_actor.g",
+        "second": "lstm_actor.h0→lstm_actor.o",
+        "under": "features_extractor→lstm_actor.g",
+        "over": "lstm_actor.h0→lstm_actor.o",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2932.0,
+        "y": 1531.0,
+        "first": "lstm_critic.o→lstm_critic.h",
+        "second": "lstm_critic.c0→lstm_critic.c",
+        "under": "lstm_critic.c0→lstm_critic.c",
+        "over": "lstm_critic.o→lstm_critic.h",
+        "under_tangent": [
+          0.0,
+          -1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2439.0,
+        "y": 1214.67,
+        "first": "lstm_critic.h0→lstm_critic.i",
+        "second": "features_extractor→lstm_critic.f",
+        "under": "features_extractor→lstm_critic.f",
+        "over": "lstm_critic.h0→lstm_critic.i",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "x": 2405.0,
+        "y": 1214.67,
+        "first": "lstm_critic.h0→lstm_critic.i",
+        "second": "features_extractor→lstm_critic.g",
+        "under": "features_extractor→lstm_critic.g",
+        "over": "lstm_critic.h0→lstm_critic.i",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2371.0,
+        "y": 1214.67,
+        "first": "lstm_critic.h0→lstm_critic.i",
+        "second": "features_extractor→lstm_critic.o",
+        "under": "features_extractor→lstm_critic.o",
+        "over": "lstm_critic.h0→lstm_critic.i",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2405.0,
+        "y": 1405.67,
+        "first": "lstm_critic.h0→lstm_critic.f",
+        "second": "features_extractor→lstm_critic.g",
+        "under": "features_extractor→lstm_critic.g",
+        "over": "lstm_critic.h0→lstm_critic.f",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      },
+      {
+        "x": 2371.0,
+        "y": 1405.67,
+        "first": "lstm_critic.h0→lstm_critic.f",
+        "second": "features_extractor→lstm_critic.o",
+        "under": "features_extractor→lstm_critic.o",
+        "over": "lstm_critic.h0→lstm_critic.f",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          -0.0
+        ]
+      },
+      {
+        "x": 2371.0,
+        "y": 1472.67,
+        "first": "lstm_critic.h0→lstm_critic.g",
+        "second": "features_extractor→lstm_critic.o",
+        "under": "features_extractor→lstm_critic.o",
+        "over": "lstm_critic.h0→lstm_critic.g",
+        "under_tangent": [
+          0.0,
+          1.0
+        ],
+        "over_tangent": [
+          1.0,
+          0.0
+        ]
+      }
+    ]
+  },
+  "capture_metadata": {
+    "captured_at_utc": "2026-10-19T18:10:31.689891+00:00",
+    "base_url": "http://127.0.0.1:8770",
+    "endpoint": "/api/frame",
+    "method": "GET only; no vehicle control or state mutation",
+    "paused": true,
+    "sequence": 1,
+    "sim_time": 0.0,
+    "node_keys_source": "live frame.nodes; every returned key queried dynamically",
+    "node_count": 60,
+    "detail_get_count": 100,
+    "all_detail_reads_same_sequence_and_time": true,
+    "feedback_key": "input.feedback",
+    "feedback_scalar_indices_captured": [
+      0,
+      40
+    ],
+    "feedback_validity_indices": [
+      25,
+      32
+    ],
+    "feedback_age_indices": [
+      33,
+      40
+    ],
+    "png_fields_removed": true,
+    "shared_auto_legend": {
+      "name": "turbo",
+      "colors": [
+        [
+          48,
+          18,
+          59
+        ],
+        [
+          70,
+          107,
+          227
+        ],
+        [
+          40,
+          188,
+          235
+        ],
+        [
+          50,
+          242,
+          152
+        ],
+        [
+          164,
+          252,
+          60
+        ],
+        [
+          238,
+          207,
+          58
+        ],
+        [
+          251,
+          126,
+          33
+        ],
+        [
+          208,
+          47,
+          5
+        ],
+        [
+          122,
+          4,
+          3
+        ]
+      ],
+      "minimum": -2.365260124206543,
+      "zero": 0.0,
+      "maximum": 2.365260124206543,
+      "mode": "adaptive-global",
+      "scale": 2.365260124206543,
+      "observed_max_abs": 2.365260124206543
+    },
+    "all_detail_gets_share_same_legend": true
+  }
+}

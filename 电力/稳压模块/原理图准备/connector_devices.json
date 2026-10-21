@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Read-only system-library candidates for the regulator schematic; candidate metadata only, not verified physical mating, pin numbering, current path, or assembly fit.",
+  "sessionId": "4bf19e4e-9d6c-4548-9d36-e2e8686f9f74",
+  "systemLibraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+  "method": "Official installed EasyEDA CLI Invoke-Lceda.ps1, read-only LIB_Device.search / LIB_Device.get / LIB_Symbol.search / LIB_Symbol.get. No schematic/page mutation.",
+  "sourceLogs": [
+    "logs/20261010T065610101Z-invoke-59b09e2b.json",
+    "logs/20261010T065648058Z-invoke-956d6510.json",
+    "logs/20261010T065755916Z-invoke-01da8c93.json",
+    "logs/20261010T065821742Z-invoke-aa878e0e.json"
+  ],
+  "pinNumberPolicy": "actualPinNumbers is null until the candidate is placed and its live primitive pins are read. Do not infer pin order from name, footprint, or pin count.",
+  "candidates": {
+    "powerTerminal": {
+      "selectedCandidate": {
+        "name": "8191",
+        "deviceUuid": "3257c6ce970e45bf8245984ee5c0d460",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "8191",
+        "symbolUuid": "4fe617cdd2514923998404dfcf15809e",
+        "footprintName": "TH_L7.9-W7.9-P6.90-T44008",
+        "footprintUuid": "118d3db3d1a5474f995a4e8cd1b17edf",
+        "manufacturer": "",
+        "manufacturerPart": "8191",
+        "supplier": "",
+        "supplierPart": "C238175",
+        "declaredPinCount": "4 contacts reported in catalog description",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "15A",
+          "Datasheet": "https://item.szlcsc.com/datasheet/8191/237423.html"
+        },
+        "assessment": "PCB screw terminal candidate. Library lists 15 A; catalog does not verify 6-32 or M6 thread, single-electrode lug geometry, or mating hardware. Confirm manufacturer drawing and footprint before use."
+      },
+      "alternate": {
+        "name": "8191-5",
+        "deviceUuid": "d3058e6b64bb40d3a17e3c514ae0536b",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "8191-5",
+        "symbolUuid": "eb6b6aaba3104d2289b056d19ca12645",
+        "footprintName": "TH_L7.9-W7.9-P6.90-T44008",
+        "footprintUuid": "118d3db3d1a5474f995a4e8cd1b17edf",
+        "manufacturer": "",
+        "manufacturerPart": "8191-5",
+        "supplier": "",
+        "supplierPart": "C5530188",
+        "declaredPinCount": "4 contacts reported in catalog description",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "15A",
+          "Datasheet": "https://item.szlcsc.com/datasheet/8191-5/6446363.html"
+        },
+        "assessment": "Same general terminal family; catalog lists 15 A. Thread size and mechanical fit remain unverified."
+      },
+      "searchFinding": "No confirmed M6 PCB lug or exact Keystone 8192 item found in the inspected system-library searches. Do not call this an M6 or 6-32 connection."
+    },
+    "highCurrentInductor": {
+      "verifiedThroughHole100A": null,
+      "nearCandidate": {
+        "name": "FP1308-R21-R",
+        "deviceUuid": "900e1288e30546848ce8c1e323754776",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "FP1308-R21-R",
+        "symbolUuid": "49ab2c3ae9944881a75ef80e2e90ac64",
+        "footprintName": "IND-SMD_L13.7-W13.0_FP1308",
+        "footprintUuid": "3ec5054d32d04dd3842d1cc4b7e6f072",
+        "manufacturer": "EATON(伊顿)",
+        "manufacturerPart": "FP1308-R21-R",
+        "supplier": "LCSC",
+        "supplierPart": "C2453860",
+        "declaredPinCount": null,
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "68A",
+          "Current - Saturation(Isat)": "72A",
+          "Datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20210416/E3417072ADF073782C57D60FF87CE951.pdf"
+        },
+        "assessment": "Not a qualifying choice: system library rates it 68 A current and 72 A saturation, with an SMD footprint; it is below the requested 100 A and not through-hole."
+      },
+      "genericSymbolOnly": {
+        "name": "INDUCTOR_4T",
+        "symbolUuid": "fbd4c365c63b45a8aeafb3d3644eebf3",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "actualPinNumbers": null,
+        "assessment": "Generic symbol only; no physical 100 A through-hole device/rating found."
+      }
+    },
+    "externalFuse": {
+      "AMG80ExactMatchFound": false,
+      "genericSymbol": {
+        "name": "FUSE",
+        "symbolUuid": "445fd9a658964814aae27cc2d15314f8",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "assessment": "Symbol only; leave MPN, supplier, voltage/current rating and safety claims blank until an external fuse is specified."
+      },
+      "genericDeviceNotForHarness": {
+        "name": "FUSE",
+        "deviceUuid": "7ca98e80db23424eab96d66d19717fc8",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "FUSE",
+        "symbolUuid": "445fd9a658964814aae27cc2d15314f8",
+        "footprintName": "F1206",
+        "footprintUuid": "bceff88935294c458669a62ec8559940",
+        "manufacturer": "",
+        "manufacturerPart": "FUSE",
+        "supplier": "LCSC",
+        "supplierPart": "C9900021114",
+        "declaredPinCount": "2 symbol terminals",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {},
+        "assessment": "The catalog device binds to an F1206 SMD footprint and has no verified external harness fuse rating; do not use it as the physical external fuse."
+      },
+      "searchFinding": "No Eaton AMG-80 exact device was found."
+    },
+    "canConnector3Pin": {
+      "selectedCandidate": {
+        "name": "B3B-XH-A(LF)(SN)",
+        "deviceUuid": "6e805ec5cb864bd19e328ebbf2e17903",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "B3B-XH-A(LF)(SN)",
+        "symbolUuid": "b5f9aa68610a414883a196c71cc021f6",
+        "footprintName": "CONN-TH_3P-P2.50_A2501WV2-3P",
+        "footprintUuid": "9054811df59a44d793d623424f169ff2",
+        "manufacturer": "JST",
+        "manufacturerPart": "B3B-XH-A(LF)(SN)",
+        "supplier": "LCSC",
+        "supplierPart": "C144394",
+        "declaredPinCount": "3",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "3A",
+          "Pitch": "2.5mm",
+          "Number of Pins": "3P",
+          "Pins Structure": "1x3P",
+          "Datasheet": "https://item.szlcsc.com/datasheet/B3B-XH-A(LF)(SN)/155726.html"
+        },
+        "assessment": "JST XH series through-hole 1x3, 2.50 mm pitch, library catalog current rating 3 A. Confirm mating housing, pin numbering, and actual cable orientation."
+      },
+      "alternate254mm": {
+        "name": "B3B-XH-A-3PZZ",
+        "deviceUuid": "ca786ed9cdbc4acabe67e8008e4d892a",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "B3B-XH-A-3PZZ",
+        "symbolUuid": "161480c1c33d49a2acf3750581cc2b99",
+        "footprintName": "CONN-TH_3P-P2.54_B3B-XH-A-3PZZ",
+        "footprintUuid": "289d49b77c0240cba5e375a09bc23231",
+        "manufacturer": "BXCONN(宝讯)",
+        "manufacturerPart": "B3B-XH-A-3PZZ",
+        "supplier": "LCSC",
+        "supplierPart": "C54444768",
+        "declaredPinCount": "3",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "2A",
+          "Pitch": "2.54mm",
+          "Number of Pins": "3P",
+          "Pins Structure": "1x3P",
+          "Datasheet": "https://item.szlcsc.com/datasheet/B3B-XH-A-3PZZ/57781635.html"
+        },
+        "assessment": "XH-compatible 1x3 through-hole, 2.54 mm pitch; library catalog current rating 2 A. This is not the exact JST device."
+      }
+    },
+    "scTapConnector9Pin": {
+      "selectedCandidate": {
+        "name": "B9B-XH-A(LF)(SN)",
+        "deviceUuid": "277ca6e8032f470f8c86486e2c53b12a",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "B9B-XH-A (LF)(SN)",
+        "symbolUuid": "4337f3a61a704745940ae32c95608d8b",
+        "footprintName": "CONN-TH_B9B-XH-A-LF-SN",
+        "footprintUuid": "8ce75268cd074e7ea439760be5e829c0",
+        "manufacturer": "JST",
+        "manufacturerPart": "B9B-XH-A(LF)(SN)",
+        "supplier": "LCSC",
+        "supplierPart": "C157966",
+        "declaredPinCount": "9",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Current Rating": "3A",
+          "Pitch": "2.5mm",
+          "Number of Pins": "9P",
+          "Pins Structure": "1x9P",
+          "Datasheet": "https://item.szlcsc.com/datasheet/B9B-XH-A(LF)(SN)/169314.html"
+        },
+        "assessment": "XH series through-hole 1x9, 2.50 mm pitch; catalog reports 3 A. Confirm keyed/mating housing and balance-tap connector orientation."
+      },
+      "alternate254mm": {
+        "name": "XH2.54-LI-9P",
+        "deviceUuid": "9ac5f0e29ece40979c110f039bcf16e4",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "XH2.54-LI-9P_C9900019255",
+        "symbolUuid": "0864d3696927463a9b40bdbcf2eeebed",
+        "footprintName": "CONN-TH_9P-P2.54_XHB-9P-B",
+        "footprintUuid": "956e546d09184e0c9020ec6981486051",
+        "manufacturer": "",
+        "manufacturerPart": "XH2.54-LI-9P",
+        "supplier": "LCSC",
+        "supplierPart": "C9900019255",
+        "declaredPinCount": "9 per catalog name/footprint only",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {},
+        "assessment": "Catalog search identifies a 2.54 mm 9-position XH-style footprint, but detailed pin/current/mating metadata is sparse; verify datasheet and mating part before use."
+      }
+    },
+    "remoteNtc10kB3950": {
+      "selectedCandidate": {
+        "name": "ATH10K1R8B3950K",
+        "deviceUuid": "4b212cbca71a4ad7a703524e9e1a9a8b",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+        "symbolName": "ATH10K1R8B3950K",
+        "symbolUuid": "4b45b33acf724133b77d59ae053b1b4e",
+        "footprintName": "RES-TH_BD1.8-L3.9-P6.50-D0.5",
+        "footprintUuid": "06baf419b8764766832bbe8baa7c9fdd",
+        "manufacturer": "ATI(恒光)",
+        "manufacturerPart": "ATH10K1R8B3950K",
+        "supplier": "LCSC",
+        "supplierPart": "C20606749",
+        "declaredPinCount": "2",
+        "actualPinNumbers": null,
+        "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+        "keyProperties": {
+          "Resistance @ 25℃": "10kΩ",
+          "Datasheet": "https://item.szlcsc.com/datasheet/ATH10K1R8B3950K/21949236.html"
+        },
+        "assessment": "System-library description/property identifies a 10 kΩ, B=3950 K through-hole bead NTC. Treat as the external thermistor element, not the fixed pull-up resistor; verify probe packaging and lead length for the actual remote sensor."
+      },
+      "alternates": [
+        {
+          "name": "B3950-10K 1%",
+          "deviceUuid": "994988929f9a40edbade2ad8c88f578b",
+          "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+          "symbolName": "B3950-10K 1%",
+          "symbolUuid": "3e06a63145594abda93bd4d01368d075",
+          "footprintName": "RES-TH_BD2.5_NTC-10K",
+          "footprintUuid": "52f7edc2243f45ad8215725fa058d4bb",
+          "manufacturer": "",
+          "manufacturerPart": "B3950-10K 1%",
+          "supplier": "LCSC",
+          "supplierPart": "C9900005609",
+          "declaredPinCount": "2",
+          "actualPinNumbers": null,
+          "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+          "keyProperties": {},
+          "assessment": "Name identifies 10 kΩ/B3950 NTC; sparse manufacturer and physical package data."
+        },
+        {
+          "name": "MF52B103F3950L060",
+          "deviceUuid": "a03bba07876b4d64a07e3cf03fb69b0a",
+          "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+          "symbolName": "MF52B103F3950L060",
+          "symbolUuid": "5b7252d68d2f461a9c6a08276e8a81cc",
+          "footprintName": "RES-TH_BD2.8_NTC-10K",
+          "footprintUuid": "244e9c91b18e4bf0a47c42f6982ebfe6",
+          "manufacturer": "",
+          "manufacturerPart": "MF52B103F3950L060",
+          "supplier": "LCSC",
+          "supplierPart": "C9900004066",
+          "declaredPinCount": "2",
+          "actualPinNumbers": null,
+          "pinNumberLimitation": "Library search/get metadata does not expose the placed primitive pin-number list; verify after placement with SCH_PrimitiveComponent.getAllPinsByPrimitiveId(...).getState_PinNumber().",
+          "keyProperties": {},
+          "assessment": "Name identifies the B3950 10 kΩ NTC variant; library metadata is sparse."
+        }
+      ]
+    }
+  },
+  "validationBoundary": "Library metadata lookup only. It does not prove symbol pin numbering, mating connector compatibility, mechanical thread, harness/current adequacy, or component physical suitability."
+}

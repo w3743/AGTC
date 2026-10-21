@@ -1,0 +1,221 @@
+{
+  "status": "PREPARED_FOR_ROOT_REVIEW_ONLY",
+  "implementation_status": "NOT_IMPLEMENTED",
+  "no_eda_session_started": true,
+  "no_native_plan_or_bom_changes": true,
+  "scope": "稳压模块原理图整改准备：8S2P逐节监控、输入采样隔离、硬件许可门、明确旧累计ADC/TEST删除；不改PCB、不烧写寄存器、不做总库同步。",
+  "baseline_restore": {
+    "evidence": "检查/原理整改/误删回退验证.json",
+    "status": "父任务已验证eprj3/esch2/ecfg三个native SHA256均回到修改前",
+    "baseline_netlist_file": "检查/当前官方网表.enet",
+    "baseline_netlist_sha256": "E7589F1D6E02B8A9C2AE45E8EA693F8105A95DCBEDE1333683779B002BFBD3CE",
+    "note": "当前官方网表.enet与仿真输入source_snapshot同SHA，作为原始每脚net基线；后续须先重新导出当前官方网表并确认项目/文档ID后再与其比较。"
+  },
+  "source_evidence": [
+    {"path":"原理图准备/AFE启动配置.json","sha256":"8D2AE592BD869D1820865D918DE589F64D3B835041BEA491E667539BA0DD24EF"},
+    {"path":"原理图准备/采样与硬关断实现.md","sha256":"55C42CD80D25CF8B48C189F1A412100AD0D6A59A83F3ED0F14169B6455B6601C"},
+    {"path":"检查/原理整改/关键引脚-整改前.json","sha256":"78CB8A9AA68F8034D87BCDCB5D146071A948744041562EB4692BF93767651CE0"},
+    {"path":"检查/原理整改/误删回退验证.json","sha256":"70B7DBC3ACCCC4346F929ECB40D76231A4B906907AD0CA7C4E83F966971AEDC7"}
+  ],
+  "guardrails": {
+    "delete_wires_by_region": false,
+    "delete_ground_flags_by_region": false,
+    "delete_or_rename_T1_T7_SC_PLUS_SC_MINUS_or_BALn_IOUT": false,
+    "all_wires_to_delete_in_first_removal_batch": [],
+    "only_delete_components_in_allowlist": true,
+    "all_other_kept_refs_per_pin_net_must_match_baseline": true,
+    "explicit_netlist_exceptions_only": ["J_CORE_P1", "J_CORE_P2", "R_BUS_HI", "R_BUS_LO", "C_BUS_ADC", "R_T8_HI", "R_T8_LO", "C_T8_FILTER", "R_DRV_SO_SER", "C_DRV_SO", "R_PB5_PERMIT", "U_SC_OV"],
+    "protected_refs": "除31个删除ref及上述明确netlist例外外，所有现存器件的每个引脚net均须与基线.enet相同；特别SC1..SC8、U_BAL1..U_BAL8、C_BAL1..C_BAL8、R_BAL1..R_BAL8及U1/功率级。"
+  },
+  "delete_components_exact_allowlist": [
+    "C_T1_FILTER", "C_T2_FILTER", "C_T3_FILTER", "C_T4_FILTER", "C_T5_FILTER", "C_T6_FILTER", "C_T7_FILTER", "C_TEST_FB",
+    "R_T1_HI", "R_T1_LO", "R_T1_TEST", "R_T2_HI", "R_T2_LO", "R_T2_TEST", "R_T3_HI", "R_T3_LO", "R_T3_TEST",
+    "R_T4_HI", "R_T4_LO", "R_T4_TEST", "R_T5_HI", "R_T5_LO", "R_T5_TEST", "R_T6_HI", "R_T6_LO", "R_T6_TEST",
+    "R_T7_HI", "R_T7_LO", "R_T7_TEST", "R_TEST_HI", "R_TEST_LO"
+  ],
+  "delete_independent_obsolete_ports_exact_baseline_id_only": [
+    {"id":"194619fda6f2a294","net":"AD_T1","x":870,"y":1555,"role":"J_CORE_P2 pin20 old cumulative ADC port"},
+    {"id":"86e6711c6f4dbbad","net":"AD_T1","x":1600,"y":790,"role":"obsolete ADC node label"},
+    {"id":"31053b122f063227","net":"AD_T2","x":650,"y":1565,"role":"J_CORE_P2 pin17 old cumulative ADC port"},
+    {"id":"ac6c34d4dde789a7","net":"AD_T2","x":2200,"y":790,"role":"obsolete ADC node label"},
+    {"id":"c17fcdf0efd3d5ba","net":"AD_T3","x":870,"y":1565,"role":"J_CORE_P2 pin18 old cumulative ADC port"},
+    {"id":"f3af393df7ca7d8a","net":"AD_T3","x":2800,"y":790,"role":"obsolete ADC node label"},
+    {"id":"29f1a1f643954c06","net":"AD_T4","x":650,"y":1575,"role":"J_CORE_P2 pin15 old cumulative ADC port"},
+    {"id":"cf39ef43febc657b","net":"AD_T4","x":3400,"y":790,"role":"obsolete ADC node label"},
+    {"id":"8b0c3602cde1b639","net":"AD_T5","x":870,"y":1575,"role":"J_CORE_P2 pin16 old cumulative ADC port"},
+    {"id":"1272a0430dc865b6","net":"AD_T5","x":3400,"y":190,"role":"obsolete ADC node label"},
+    {"id":"32f827f208f48ad5","net":"AD_T6","x":650,"y":1585,"role":"J_CORE_P2 pin13 old cumulative ADC port"},
+    {"id":"f45622316a36684b","net":"AD_T6","x":2800,"y":190,"role":"obsolete ADC node label"},
+    {"id":"33f3a23f47e0d142","net":"AD_T7","x":870,"y":1585,"role":"J_CORE_P2 pin14 old cumulative ADC port"},
+    {"id":"db50b42e2759270b","net":"AD_T7","x":2200,"y":190,"role":"obsolete ADC node label"},
+    {"id":"9cd3eac57024a010","net":"TEST","x":650,"y":1625,"role":"J_CORE_P2 pin5 old TEST control port"},
+    {"id":"e070fceae6003ffa","net":"TEST","x":1600,"y":850,"role":"obsolete test injection label"},
+    {"id":"16e305c413a9e698","net":"TEST","x":1670,"y":1270,"role":"obsolete test injection label"},
+    {"id":"cee02e643eab290e","net":"TEST","x":2200,"y":250,"role":"obsolete test injection label"},
+    {"id":"c9dc9cf0bd3735e8","net":"TEST","x":2200,"y":850,"role":"obsolete test injection label"},
+    {"id":"027bd79cebeadd99","net":"TEST","x":2800,"y":250,"role":"obsolete test injection label"},
+    {"id":"686e6fe119e24c15","net":"TEST","x":2800,"y":850,"role":"obsolete test injection label"},
+    {"id":"7c612aa36ee95d16","net":"TEST","x":3400,"y":250,"role":"obsolete test injection label"},
+    {"id":"5b2979fc72435feb","net":"TEST","x":3400,"y":850,"role":"obsolete test injection label"},
+    {"id":"4cdce91aa896de8d","net":"TEST_FB","x":350,"y":1615,"role":"J_CORE_P1 pin8 old analog feedback port"},
+    {"id":"e52781b48a714f50","net":"TEST_FB","x":2070,"y":1270,"role":"obsolete TEST_FB node label"},
+    {"id":"df217b7f3958eb7e","net":"NTC_MAIN","x":870,"y":1625,"role":"move NTC_MAIN away from J_CORE_P2 pin6"}
+  ],
+  "ports_to_relabel_or_replace_exact_baseline_id": [
+    {"id":"ac75d06bf61e8782","old":"AD_T8","new":"SC_SUM","x":130,"y":1615,"role":"J_CORE_P1 pin7"},
+    {"id":"1de5b4e533aa4b6f","old":"AD_T8","new":"SC_SUM_RAW","x":1600,"y":190,"role":"T8 divider output before TMUX"},
+    {"id":"0ef84038c66b9f1b","old":"BUS_ADC","new":"BUS_ADC_RAW","x":1520,"y":1270,"role":"BUS divider output before TMUX"},
+    {"id":"245e1a11b7d693b9","old":"IMON","new":"IMON_RAW","x":900,"y":1780,"role":"DRV_SO sense node before TMUX"},
+    {"id":"2be5923f5eeab898","old":"BUS_EXT","new":"BUS_HI_MID","x":1120,"y":1330,"role":"existing R_BUS_HI pin1 side; relabel only after the new R_BUS_HI2 is placed and verified"}
+  ],
+  "header_reconnection": [
+    {"connector":"J_CORE_P1","pin":7,"pin_xy":[210,1615],"old_port":{"id":"ac75d06bf61e8782","xy":[130,1615],"net":"AD_T8"},"new_net":"SC_SUM","action":"retain independent total-voltage divider; route through TMUX channel 2"},
+    {"connector":"J_CORE_P1","pin":8,"pin_xy":[270,1615],"old_port":{"id":"4cdce91aa896de8d","xy":[350,1615],"net":"TEST_FB"},"new_net":"NC","action":"remove exact port; mark pin NC after checking no wire stub remains attached to another net"},
+    {"connector":"J_CORE_P1","pin":20,"pin_xy":[270,1555],"old_port":{"id":"49a13b49ab0da341","xy":[350,1555],"net":"PERMIT"},"new_net":"PERMIT","mcu":"PB5","action":"preserve MCU-side signal; series R_PB5_PERMIT changes to 4.7k and terminates at MCU_PERMIT_AFE"},
+    {"connector":"J_CORE_P2","pin":5,"pin_xy":[730,1625],"old_port":{"id":"9cd3eac57024a010","xy":[650,1625],"net":"TEST"},"new_net":"BQ_I2C_SCL","mcu":"PB10 / I2C2_SCL / AF4","action":"replace port at same verified stub endpoint"},
+    {"connector":"J_CORE_P2","pin":6,"pin_xy":[790,1625],"old_port":{"id":"df217b7f3958eb7e","xy":[870,1625],"net":"NTC_MAIN"},"new_net":"BQ_I2C_SDA","mcu":"PB11 / I2C2_SDA / AF4","action":"replace port at same verified stub endpoint; NTC moved to P2-20"},
+    {"connector":"J_CORE_P2","pin":9,"pin_xy":[730,1605],"old_net":"BUS_ADC","new_net":"BUS_ADC","action":"preserve core-side label; output of TMUX channel 1"},
+    {"connector":"J_CORE_P2","pin":10,"pin_xy":[790,1605],"old_net":"IMON","new_net":"IMON","action":"preserve"},
+    {"connector":"J_CORE_P2","pin":11,"pin_xy":[730,1595],"old_port":{"id":"7635b48bb30902f1","xy":[650,1595],"net":"IMON"},"new_net":"IMON","action":"preserve; channel 3 output"},
+    {"connector":"J_CORE_P2","pin":13,"pin_xy":[730,1585],"old_net":"AD_T6","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":14,"pin_xy":[790,1585],"old_net":"AD_T7","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":15,"pin_xy":[730,1575],"old_net":"AD_T4","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":16,"pin_xy":[790,1575],"old_net":"AD_T5","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":17,"pin_xy":[730,1565],"old_net":"AD_T2","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":18,"pin_xy":[790,1565],"old_net":"AD_T3","new_net":"NC","action":"remove old label and mark NC"},
+    {"connector":"J_CORE_P2","pin":20,"pin_xy":[790,1555],"old_port":{"id":"194619fda6f2a294","xy":[870,1555],"net":"AD_T1"},"new_net":"NTC_MAIN","mcu":"PA0","action":"replace port at the verified P2-20 stub endpoint"},
+    {"connector":"J_CORE_P2","pin":7,"pin_xy":[730,1615],"old_net":"NC","new_net":"NC","action":"permanent board VBUS sense reservation; never use as GPIO"},
+    {"connector":"J_CORE_P2","pin":8,"pin_xy":[790,1615],"old_net":"NC","new_net":"NC","action":"permanent VREF+ reservation; never use as GPIO"}
+  ],
+  "expected_additions": [
+    {"ref":"U_AFE","mpn":"BQ7695202PFBR","quantity":1,"source":"full lib_Device.search result for exact MPN; instantiate that returned ILIB_DeviceSearchItem; do not pass a hand-built {libraryUuid,uuid}","footprint":"TQFP-48 7x7","note":"Use actual created symbol pin readback before routing; old off-sheet short-object probe is provisional only."},
+    {"ref":"U_AFE_GATE","mpn":"SN74LVC1G11DCKR","quantity":1,"source":"full search result; existing BMS instance confirms logical pin map 1=A,2=GND,3=B,4=Y,5=VCC,6=C"},
+    {"ref":"U_ADC_ISO","mpn":"TMUX1511PWR","quantity":1,"source":"full search result; assert all 14 pin numbers/names before routing"},
+    {"ref":"Q_AFE_PRE","mpn":"FCX495TA","quantity":1,"pins":{"1":"B","2":"C","3":"E"},"source":"reuse exact BMS part identity and confirm full search item"},
+    {"ref":"D_AFE_BAT","mpn":"BAT46W","libraryDeviceName":"BAT46W_C915627","quantity":1,"logical_pins":{"A":"SC_PLUS","K":"BAT_DIODE_K"},"source":"reuse the BMS snapshot's selected BAT46W_C915627 identity; resolve by full search item and verify actual device pin polarity before routing"},
+    {"ref":"D_AFE_BREG","mpn":"BAT46W","libraryDeviceName":"BAT46W_C915627","quantity":1,"logical_pins":{"A":"SC_PLUS","K":"BREG_DIODE_K"},"source":"reuse the same BMS-selected BAT46W_C915627 identity; verify actual device pin polarity before routing"},
+    {"ref_pattern":"SC9..SC16","mpn":"SC0350-270-RSS","quantity":8,"connection":"pair in parallel with SC1..SC8 respectively; preserve all existing SC1..SC8 pins and wires","source":"project-local custom symbol/footprint already used by SC1..SC8; only clone through a supported full library item or root-approved duplicate operation; do not hand-create from short device UUID","status":"custom device library lookup/duplicate method must be confirmed before placement"},
+    {"ref_pattern":"R_VC0,R_VC1..R_VC7,R_VC16","mpn":"ABD03K1000FT","quantity":9,"value":"100Ω ±1%","source":"full exact-MPN search item"},
+    {"ref":"R_AFE_BAT_SER","mpn":"ABD03K1000FT","quantity":1,"value":"100Ω ±1%","source":"same exact-MPN search item as cell input resistors"},
+    {"ref_pattern":"C_VC0,C_VC1..C_VC7,C_VC16","mpn":"0603B224K500NT","quantity":9,"value":"220nF","source":"full exact-MPN search item"},
+    {"ref":"C_AFE_BAT","mpn":"TCC1210X7R225K101MT","quantity":1,"value":"2.2µF 100V","source":"full exact-MPN search item"},
+    {"ref":"C_AFE_REGIN","mpn":"GRM188R71H223KA01D","quantity":1,"value":"22nF","source":"use H223 exact MPN from shared asset index; earlier local query accidentally searched E223 and must not be copied"},
+    {"ref":"C_AFE_REG1","mpn":"GRM32ER72A475KE14L","quantity":1,"value":"4.7µF","source":"full exact-MPN search item"},
+    {"ref":"C_AFE_REG18","mpn":"GRM32ER72A475KE14L","quantity":1,"value":"4.7µF","source":"full exact-MPN search item"},
+    {"ref":"C_AFE_CP1","mpn":"GRM188R71E105KA12D","quantity":1,"value":"1µF 25V","source":"reuse exact BMS/shared-library item"},
+    {"ref":"C_MUX_VDD","mpn":"C0805C104K5RAC7800","quantity":1,"value":"100nF","source":"reuse existing module/common-library exact part"},
+    {"ref":"R_AFE_BREG_FEED","mpn":"RC2512FK-7W1KL","quantity":1,"value":"1kΩ 2W","source":"root-approved BMS BREG supply candidate"},
+    {"ref":"R_AFE_BREG_PD","mpn":"RS-03L1005FT","quantity":1,"value":"10MΩ","source":"full exact-MPN search item"},
+    {"ref":"R_AFE_PACK","mpn":"PTFR0805B10K0N9","quantity":1,"value":"10kΩ","source":"reuse current module exact 10k part"},
+    {"ref_pattern":"R_AFE_DCHG_PD,R_AFE_DDSG_PD,R_AFE_PERMIT_PD,R_MUX_BUS_PD,R_MUX_SUM_PD,R_MUX_IMON_PD","mpn":"PTFR0805B47K0N9","quantity":6,"value":"47kΩ","source":"reuse existing module part identity; 3 AND inputs and 3 TMUX outputs"},
+    {"ref_pattern":"R_I2C_SCL_PU,R_I2C_SDA_PU","mpn":"RC0603FR-074K7L","quantity":2,"value":"4.7kΩ","source":"full exact-MPN search item; pull up to 3V3_CORE"},
+    {"ref":"R_AFE_GATE_SER","mpn":"RC0603FR-07680RL","quantity":1,"value":"680Ω","source":"full exact-MPN search item"},
+    {"ref":"R_BUS_HI2","mpn":"RT1206BRD07150KL","quantity":1,"value":"150kΩ ±0.1%","source":"same exact part as existing R_BUS_HI; adds no new MPN"},
+    {"ref":"R_IMON_PD","mpn":"HoAR0603-1/10W-10KR-0.1%-TCR25","quantity":1,"value":"10kΩ ±0.1%","source":"full exact-MPN search item required"}
+  ],
+  "expected_instance_delta": {
+    "baseline_native_components": 166,
+    "new_component_instances": 53,
+    "explicitly_deleted_component_instances": 31,
+    "target_component_count_after_all_additions_and_deletions": 188,
+    "existing_refs_with_pin_net_or_identity_changes": 10,
+    "note": "Count is a planned instance delta, not post-edit evidence. Wires and ports are excluded. SC9..SC16 make the physical bank 8S2P / 16 identical LICAP parts."
+  },
+  "afe_configuration_contract_not_flashed": {
+    "VcellMode":"0x807F",
+    "DCHG_Pin_Config":"0xAA",
+    "DDSG_Pin_Config":"0xAA",
+    "FET_Options":"0x08",
+    "MfgStatus_Init":"0x0050",
+    "Chg_Pump_Control":"0x00",
+    "CUV":"0x1E with 0x001C delay",
+    "COV":"0x33 with 0x001C delay",
+    "internal_balancing":"disabled with 0x10; BW6101 hardware remains unchanged",
+    "status":"schematic/configuration contract only; no register writes or firmware claims"
+  },
+  "existing_component_edits": [
+    {"ref":"R_PB5_PERMIT","pins":{"1":"PERMIT","2":"MCU_PERMIT_AFE"},"old_mpn":"RMC06031K1%N","new_mpn":"RC0603FR-074K7L","new_value":"4.7kΩ","reason":"PB5 now enters three-input AND permit via 4.7k series; no push-pull contention with AND output"},
+    {"ref":"R_DRV_SO_SER","pins":{"1":"DRV_SO","2":"IMON_RAW"},"old_mpn":"RMC0603221%N","old_value":"22Ω","new_mpn":"HoAR0603-1/10W-10KR-0.1%-TCR25","new_value":"10kΩ ±0.1%","reason":"limit TMUX powered-off input below 3.6V; verify the selected resistor's actual pulse/continuous voltage and power rating"},
+    {"ref":"R_BUS_HI","pins":{"1":"BUS_HI_MID","2":"BUS_ADC_RAW"},"old_pins":{"1":"BUS_EXT","2":"BUS_ADC"},"reason":"insert R_BUS_HI2 in series; preserve existing component and upper-arm value"},
+    {"ref":"R_BUS_LO","pins":{"1":"BUS_ADC_RAW","2":"GND_SYS"},"old_pins":{"1":"BUS_ADC","2":"GND_SYS"}},
+    {"ref":"C_BUS_ADC","pins":{"1":"BUS_ADC_RAW","2":"GND_SYS"},"old_pins":{"1":"BUS_ADC","2":"GND_SYS"}},
+    {"ref":"R_T8_HI","pins":{"1":"SC_PLUS","2":"SC_SUM_RAW"},"old_pins":{"1":"SC_PLUS","2":"AD_T8"}},
+    {"ref":"R_T8_LO","pins":{"1":"SC_SUM_RAW","2":"GND_SYS"},"old_pins":{"1":"AD_T8","2":"GND_SYS"}},
+    {"ref":"C_T8_FILTER","pins":{"1":"SC_SUM_RAW","2":"GND_SYS"},"old_pins":{"1":"AD_T8","2":"GND_SYS"}},
+    {"ref":"C_DRV_SO","pins":{"1":"IMON_RAW","2":"GND_SYS"},"old_pins":{"1":"IMON","2":"GND_SYS"}},
+    {"ref":"U_SC_OV","pins":{"6":"MCU_PERMIT_AFE"},"old_pins":{"6":"DRV_FAULT_N"},"note":"keep all other U_SC_OV pins unchanged"}
+  ],
+  "expected_pin_nets": {
+    "U_AFE_BQ7695202PFBR": [
+      {"pin":1,"name":"VC15","net":"VC7_FILT"},{"pin":2,"name":"VC14","net":"VC7_FILT"},{"pin":3,"name":"VC13","net":"VC7_FILT"},{"pin":4,"name":"VC12","net":"VC7_FILT"},
+      {"pin":5,"name":"VC11","net":"VC7_FILT"},{"pin":6,"name":"VC10","net":"VC7_FILT"},{"pin":7,"name":"VC9","net":"VC7_FILT"},{"pin":8,"name":"VC8","net":"VC7_FILT"},
+      {"pin":9,"name":"VC7","net":"VC7_FILT"},{"pin":10,"name":"VC6","net":"VC6_FILT"},{"pin":11,"name":"VC5","net":"VC5_FILT"},{"pin":12,"name":"VC4","net":"VC4_FILT"},
+      {"pin":13,"name":"VC3","net":"VC3_FILT"},{"pin":14,"name":"VC2","net":"VC2_FILT"},{"pin":15,"name":"VC1","net":"VC1_FILT"},{"pin":16,"name":"VC0","net":"VC0_FILT"},
+      {"pin":17,"name":"VSS","net":"GND_SYS"},{"pin":18,"name":"SRP","net":"GND_SYS"},{"pin":19,"name":"NC","net":null,"nc":true},{"pin":20,"name":"SRN","net":"GND_SYS"},
+      {"pin":21,"name":"TS1","net":"GND_SYS"},{"pin":22,"name":"TS2","net":"GND_SYS"},{"pin":23,"name":"TS3","net":"GND_SYS"},{"pin":24,"name":"REG18","net":"AFE_REG18"},
+      {"pin":25,"name":"ALERT","net":"GND_SYS"},{"pin":26,"name":"SCL","net":"BQ_I2C_SCL"},{"pin":27,"name":"SDA","net":"BQ_I2C_SDA"},{"pin":28,"name":"HDQ","net":"GND_SYS"},
+      {"pin":29,"name":"CFETOFF","net":"GND_SYS"},{"pin":30,"name":"DFETOFF","net":"GND_SYS"},{"pin":31,"name":"DCHG","net":"AFE_DCHG_HEALTHY"},{"pin":32,"name":"DDSG","net":"AFE_DDSG_HEALTHY"},
+      {"pin":33,"name":"RST_SHUT","net":"GND_SYS"},{"pin":34,"name":"REG2","net":null,"nc":true},{"pin":35,"name":"REG1","net":"AFE_REG1_3V3"},{"pin":36,"name":"REGIN","net":"AFE_REGIN"},
+      {"pin":37,"name":"BREG","net":"AFE_BREG"},{"pin":38,"name":"FUSE","net":null,"nc":true},{"pin":39,"name":"PDSG","net":null,"nc":true},{"pin":40,"name":"PCHG","net":null,"nc":true},
+      {"pin":41,"name":"LD","net":"GND_SYS"},{"pin":42,"name":"PACK","net":"AFE_PACK"},{"pin":43,"name":"DSG","net":null,"nc":true},{"pin":44,"name":"NC","net":null,"nc":true},
+      {"pin":45,"name":"CHG","net":null,"nc":true},{"pin":46,"name":"CP1","net":"AFE_CP1"},{"pin":47,"name":"BAT","net":"AFE_BAT"},{"pin":48,"name":"VC16","net":"VC16_FILT"}
+    ],
+    "U_AFE_GATE_SN74LVC1G11DCKR": [
+      {"pin":1,"name":"A","net":"AFE_DCHG_HEALTHY"},{"pin":2,"name":"GND","net":"GND_SYS"},{"pin":3,"name":"B","net":"AFE_DDSG_HEALTHY"},
+      {"pin":4,"name":"Y","net":"AFE_GATE_RAW"},{"pin":5,"name":"VCC","net":"AFE_REG1_3V3"},{"pin":6,"name":"C","net":"MCU_PERMIT_AFE"}
+    ],
+    "U_ADC_ISO_TMUX1511PWR": [
+      {"pin":1,"name":"SEL1","net":"3V3_CORE"},{"pin":2,"name":"S1","net":"BUS_ADC_RAW"},{"pin":3,"name":"D1","net":"BUS_ADC"},
+      {"pin":4,"name":"SEL2","net":"3V3_CORE"},{"pin":5,"name":"S2","net":"SC_SUM_RAW"},{"pin":6,"name":"D2","net":"SC_SUM"},
+      {"pin":7,"name":"GND","net":"GND_SYS"},{"pin":8,"name":"D3","net":"IMON"},{"pin":9,"name":"S3","net":"IMON_RAW"},
+      {"pin":10,"name":"SEL3","net":"3V3_CORE"},{"pin":11,"name":"D4","net":"GND_SYS"},{"pin":12,"name":"S4","net":"GND_SYS"},
+      {"pin":13,"name":"SEL4","net":"GND_SYS"},{"pin":14,"name":"VDD","net":"3V3_CORE"}
+    ],
+    "Q_AFE_PRE_FCX495TA": [
+      {"pin":1,"name":"B","net":"AFE_BREG"},{"pin":2,"name":"C","net":"BREG_COLLECTOR"},{"pin":3,"name":"E","net":"AFE_REGIN"}
+    ],
+    "R_VC_INPUTS": "R_VC0 pin1=SC_MINUS; R_VC1..R_VC7 pin1=T1..T7 respectively; R_VC16 pin1=SC_PLUS; each pin2=its VCn_FILT net. All use 100Ω.",
+    "C_VC_FILTERS": "C_VC0 between VC0_FILT and GND_SYS; C_VC1..C_VC7 each between VCn_FILT and VC(n-1)_FILT; C_VC16 between VC16_FILT and VC7_FILT. Nine 220nF caps total.",
+    "AFE_SUPPLY": "SC_PLUS -> D_AFE_BAT(A-K) -> R_AFE_BAT_SER(100Ω) -> AFE_BAT; C_AFE_BAT from AFE_BAT to GND_SYS. Separately SC_PLUS -> D_AFE_BREG(A-K) -> R_AFE_BREG_FEED(1kΩ/2W) -> Q_AFE_PRE.C; Q.B=AFE_BREG, Q.E=AFE_REGIN; R_AFE_BREG_PD 10M from AFE_BREG to GND_SYS; C_AFE_REGIN 22nF from AFE_REGIN to GND_SYS. REG1 and REG18 each have 4.7µF to GND_SYS. CP1-BAT has 1µF/25V. PACK via 10k from SC_PLUS.",
+    "SAFE_GATE": "DCHG and DDSG are healthy-high only under the contracted BQ configuration; each feeds one AND input and has its own 47k pulldown. MCU PERMIT through changed R_PB5_PERMIT=4.7k and TLV6700 OUTB share MCU_PERMIT_AFE; this third AND input has 47k pulldown. AND Y passes through 680Ω to DRV_FAULT_N; existing 10k R_DRV_FAULT_PD stays. No AND output may connect directly to the MCU/TLV open-drain node.",
+    "BUS_DIVIDER": "BUS_EXT -> R_BUS_HI2(150k) -> BUS_HI_MID -> existing R_BUS_HI(150k) -> BUS_ADC_RAW; existing R_BUS_LO(10k) and C_BUS_ADC remain from BUS_ADC_RAW to GND_SYS. The local BUS_EXT port at x1120,y1330 is to be relabelled BUS_HI_MID only after the new resistor is placed and routed.",
+    "IMON_DIVIDER": "DRV_SO -> existing R_DRV_SO_SER changed to 10k ±0.1% -> IMON_RAW; add R_IMON_PD 10k ±0.1% from IMON_RAW to GND_SYS; existing C_DRV_SO stays from IMON_RAW to GND_SYS; TMUX channel 3 connects IMON_RAW to IMON.",
+    "SC_SUM_DIVIDER": "SC_PLUS -> existing R_T8_HI 68k -> SC_SUM_RAW; existing R_T8_LO 10k and C_T8_FILTER remain from SC_SUM_RAW to GND_SYS; TMUX channel 2 connects SC_SUM_RAW to SC_SUM. Do not delete T8 divider."
+  },
+  "supercapacitor_8s2p_pairs": [
+    {"new_ref":"SC9","parallel_with":"SC1","pins":{"1":"T1","2":"SC_MINUS"}},
+    {"new_ref":"SC10","parallel_with":"SC2","pins":{"1":"T2","2":"T1"}},
+    {"new_ref":"SC11","parallel_with":"SC3","pins":{"1":"T3","2":"T2"}},
+    {"new_ref":"SC12","parallel_with":"SC4","pins":{"1":"T4","2":"T3"}},
+    {"new_ref":"SC13","parallel_with":"SC5","pins":{"1":"T5","2":"T4"}},
+    {"new_ref":"SC14","parallel_with":"SC6","pins":{"1":"T6","2":"T5"}},
+    {"new_ref":"SC15","parallel_with":"SC7","pins":{"1":"T7","2":"T6"}},
+    {"new_ref":"SC16","parallel_with":"SC8","pins":{"1":"SC_PLUS","2":"T7"}}
+  ],
+  "required_unchanged_baseline_nets": {
+    "SC1..SC8": [
+      {"ref":"SC1","pins":{"1":"T1","2":"SC_MINUS"}},{"ref":"SC2","pins":{"1":"T2","2":"T1"}},{"ref":"SC3","pins":{"1":"T3","2":"T2"}},{"ref":"SC4","pins":{"1":"T4","2":"T3"}},
+      {"ref":"SC5","pins":{"1":"T5","2":"T4"}},{"ref":"SC6","pins":{"1":"T6","2":"T5"}},{"ref":"SC7","pins":{"1":"T7","2":"T6"}},{"ref":"SC8","pins":{"1":"SC_PLUS","2":"T7"}}
+    ],
+    "C_BAL1..C_BAL8": "Every pin remains as baseline: C_BAL1 1=T1/2=SC_MINUS; C_BALn (n=2..7) 1=Tn/2=T(n-1); C_BAL8 1=SC_PLUS/2=T7.",
+    "U_BAL1..U_BAL8": "Every pin remains as baseline: U_BAL1 1=T1/2=SC_MINUS/3=SC_MINUS/4=NC/5=BAL1_IOUT; U_BALn n=2..7 has 1=Tn/2=T(n-1)/3=T(n-1)/4=NC/5=BALn_IOUT; U_BAL8 1=SC_PLUS/2=T7/3=T7/4=NC/5=BAL8_IOUT.",
+    "R_BAL1..R_BAL8": "Every pin remains as baseline: pin1=BALn_IOUT; pin2=SC_MINUS for n=1, otherwise T(n-1).",
+    "power_stage": "All pins/nets of U1, QH/QL and all other unmodified power, fuse, shunt, driver, CAN and thermal components must match baseline .enet exactly."
+  },
+  "pre_execution_assertions": [
+    "Reopen restored baseline in the parent-owned EDA session and capture a fresh official baseline netlist; verify current project UUID and page UUID first.",
+    "Before any delete, assert the exact 31 ref allowlist exists once each and every exact port ID/net/coordinate in the list matches baseline; abort on any difference.",
+    "Do not delete or modify any wire in the first old-network-removal batch. Dangling isolated stubs are acceptable until reviewed.",
+    "Search exact MPNs via lib_Device.search and pass the complete returned ILIB_DeviceSearchItem to sch_PrimitiveComponent.create. Never hand-build a short UUID object for library parts.",
+    "After each new complex component is instantiated, read back all pins and assert number/name/coordinate before routing. If symbol pin map differs from this plan or official datasheet map, stop and amend the contract first.",
+    "Save, close, reopen, export fresh official .enet; compare every pin of every retained unmodified ref with baseline. Only allow the explicit exception/deletion set above; separately assert all SC1..SC8, U_BAL1..8, C_BAL1..8, R_BAL1..8 and U1 unchanged.",
+    "DRC is a secondary check; it cannot replace per-pin netlist equivalence."
+  ],
+  "staged_scripts": [
+    {"path":"工具/待审AFE批次0_库搜索.js","purpose":"只读检索所有新增精确MPN并返回完整库搜索项；不实例化、不编辑。"},
+    {"path":"工具/待审AFE批次1_精确删除旧采样.js","purpose":"dry-run默认。仅删除31个明确ref及上列26个精确旧端口ID；wire删除数组固定为空。"},
+    {"path":"工具/待审AFE批次2_精确排针与RAW端口.js","purpose":"dry-run默认。在上述确切端点替换/改名网端口；不删wire、不触碰BAL/tap/ground标签。BUS_EXT→BUS_HI_MID仅在R_BUS_HI2已放置并核验后执行。"},
+    {"path":"工具/待审AFE批次3_完整搜索项临时pin探测.js","purpose":"默认关闭；经根审阅后用lib_Device.search返回的完整ILIB_DeviceSearchItem临时create/read pin/delete，不使用短device UUID，不调用保存。"},
+    {"note":"器件放置与逐pin路由脚本待根审阅放置表和实际库引脚回读后再生成；本文件不指定新器件坐标，避免再次凭区域猜连接。"}
+  ]
+}

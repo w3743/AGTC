@@ -1,0 +1,1630 @@
+{
+  "document": "稳压模块单板单页原理图准备功率连接计划",
+  "date": "2026-10-10",
+  "status": "candidate_layout_and_nets_not_frozen",
+  "boardCount": 1,
+  "schematicPageCount": 1,
+  "coordinateUnits": "layout-plan units; placements are approximate, not dimensions or routing",
+  "components": [
+    {
+      "ref": "F_BUS",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "7ca98e80db23424eab96d66d19717fc8",
+      "x": 500,
+      "y": 2150,
+      "rotation": 0,
+      "value": "Eaton AMG-80 candidate",
+      "pins": {
+        "1": "BUS_SOURCE",
+        "2": "BUS_EXT"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "Eaton AMG-80 candidate, 80A/70VDC/2.5kA; external inline fuse, fault interrupt coordination pending",
+        "productUrl": "https://www.eaton.com/us/en-us/skuPage.AMG-80.html",
+        "requirements": "off-board inline fuse; validate minimum source ESR/fault current, interrupt capacity and semiconductor/cable coordination",
+        "status": "external_fuse_symbol_placeholder",
+        "candidate": "Eaton AMG-80, 80A/70VDC/2.5kA"
+      }
+    },
+    {
+      "ref": "F_SC",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "7ca98e80db23424eab96d66d19717fc8",
+      "x": 500,
+      "y": 2450,
+      "rotation": 0,
+      "value": "Eaton AMG-80 candidate",
+      "pins": {
+        "1": "SC_PLUS",
+        "2": "SC_FUSED"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "Eaton AMG-80 candidate, 80A/70VDC/2.5kA; external inline fuse, fault interrupt coordination pending",
+        "productUrl": "https://www.eaton.com/us/en-us/skuPage.AMG-80.html",
+        "requirements": "off-board inline fuse; validate minimum source ESR/fault current, interrupt capacity and semiconductor/cable coordination",
+        "status": "external_fuse_symbol_placeholder",
+        "candidate": "Eaton AMG-80, 80A/70VDC/2.5kA"
+      }
+    },
+    {
+      "ref": "U_AUX12",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "3d79b1575e1f4ba082581a8f1fa2e9da",
+      "x": 600,
+      "y": 2300,
+      "rotation": 0,
+      "value": "URB4812YMD-10WR3",
+      "pins": {
+        "6": null,
+        "1": "GND_SYS",
+        "2": "BUS_EXT",
+        "4": null,
+        "3": "12V_DRV",
+        "5": "GND_SYS"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "URB4812YMD-10WR3 candidate, 18-75V to 12V/0.833A; generic symbol/package pending",
+        "requirements": "18-75V input, 12V/0.833A; custom footprint must follow 25.4mm module datasheet pin coordinates; do not use 1x6 header footprint",
+        "status": "module_symbol_placeholder",
+        "candidate": "URB4812YMD-10WR3"
+      },
+      "noConnectReasons": {
+        "4": "Module pin 4 is NP/NC per manufacturer pinout.",
+        "6": "Module pin 6 is CTRL; left floating for this use per current plan, verify required default state before release."
+      }
+    },
+    {
+      "ref": "J_5V_EXT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cfa85ffc978b462db32379cafd690b3d",
+      "x": 450,
+      "y": 2700,
+      "rotation": 0,
+      "value": "2-pin external 5V interface",
+      "pins": {
+        "1": "VCC5V",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "2-pin external 5V interface, exact connector pending",
+        "requirements": "schematic-only symbol; PCB footprint/connector rating not selected",
+        "status": "two_pin_power_symbol_placeholder"
+      }
+    },
+    {
+      "ref": "C_12V_IN",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "2ccfd8c338bc493898d7708c148f83a0",
+      "x": 850,
+      "y": 2180,
+      "rotation": 0,
+      "value": "10uF 100V X7S",
+      "pins": {
+        "1": "BUS_EXT",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10uF >=100V provisional module input bypass",
+        "libraryCandidate": "CGA9N3X7S2A106M230KB",
+        "supplierId": "C2168351",
+        "package": "C2220",
+        "footprintUuid": "b763cbc2350a40339ce0d97adda7b4fd",
+        "libraryDescription": "10uF, 100V, X7S",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_12V_IN_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "1ca6d269eb8c4abb89cd8b546fad66f5",
+      "x": 850,
+      "y": 2330,
+      "rotation": 0,
+      "value": "100nF 100V X7R",
+      "pins": {
+        "1": "BUS_EXT",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF >=100V provisional module input bypass",
+        "libraryCandidate": "C2225C104K1RACTU",
+        "supplierId": "C2411772",
+        "package": "C2225",
+        "footprintUuid": "de26e9d22a0d4b87b62f7c0ddfabae1f",
+        "libraryDescription": "100nF, 100V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_12V_OUT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "14a45615b51a4008aec9dcaec7fc6e86",
+      "x": 850,
+      "y": 2480,
+      "rotation": 0,
+      "value": "10uF 25V polymer",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10uF >=25V provisional 12V output bypass",
+        "libraryCandidate": "RYHT25V10UF5*8",
+        "supplierId": "C48970488",
+        "package": "CAP-TH_BD5.0-P2.00-D0.5-FD",
+        "footprintUuid": "dea7334ff73b4567819e1d5352d4b4dd",
+        "libraryDescription": "10uF, 25V polymer; ripple 1.05A, ESR 85mΩ@100kHz",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_12V_OUT_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "79c2bdde96324f8fa321b4c5c00fcd5e",
+      "x": 850,
+      "y": 2630,
+      "rotation": 0,
+      "value": "100nF 50V X7R",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF >=25V provisional 12V output bypass",
+        "libraryCandidate": "CGA3E2X7R1H104KT0Y0S",
+        "supplierId": "C342998",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100nF, 50V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_12V_PRELOAD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "c884831a75044c28be942102a242b02d",
+      "x": 600,
+      "y": 2630,
+      "rotation": 0,
+      "value": "390R 2W ±10%",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "390ohm, 2W; candidate 12V module preload only, nominal 0.37W",
+        "libraryCandidate": "OY391K",
+        "supplierId": "C19566024",
+        "package": "RES-TH_BD7.0-L19.0-P23.00-D0.8",
+        "footprintUuid": "2c6e929d21c84a0cabe88293aec8cd8b",
+        "libraryDescription": "390Ω ±10%, 2W ceramic resistor; preload candidate",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "Q_MAIN_H",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5456048653cb47a788415073eca75d0b",
+      "x": 1900,
+      "y": 1650,
+      "rotation": 0,
+      "value": "IRLB4030PBF",
+      "pins": {
+        "1": "GATE_H",
+        "3": "SW",
+        "2": "BUS_BR"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "IRLB4030PBF, main high-side N-MOS; candidate, TO-220 thermal/layout validation pending",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "Q_MAIN_L",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5456048653cb47a788415073eca75d0b",
+      "x": 1900,
+      "y": 2050,
+      "rotation": 0,
+      "value": "IRLB4030PBF",
+      "pins": {
+        "1": "GATE_L",
+        "3": "GND_SYS",
+        "2": "SW"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "IRLB4030PBF, main low-side N-MOS; candidate, TO-220 thermal/layout validation pending",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "L_MAIN",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "f004d8b9e494489fa9353d67377266de",
+      "x": 2350,
+      "y": 1850,
+      "rotation": 0,
+      "value": "22uH candidate",
+      "pins": {
+        "1": "SW",
+        "2": "SC_FUSED"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "22uH candidate; Lhot>=16uH@80A, Ipk>=100A, DCRhot<=2mohm; no qualified library footprint",
+        "requirements": "22uH candidate; Lhot>=16uH at 80A; Ipk>=100A; DCRhot<=2mohm; source/footprint unresolved",
+        "status": "unqualified_power_inductor_symbol"
+      }
+    },
+    {
+      "ref": "R_SC_SHUNT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "8fa42017ea454a2ba89f39101fda437b",
+      "x": 2350,
+      "y": 2250,
+      "rotation": 0,
+      "value": "0.5mR 6W 1%",
+      "pins": {
+        "1": "GND_SYS",
+        "2": "SC_MINUS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "0.5mΩ 6W 1% shunt candidate; Kelvin connection and thermal/pulse qualification pending.",
+        "libraryCandidate": "HoLRS2512-6W-0.5mR-1%",
+        "manufacturer": "Milliohm",
+        "supplierId": "C55113221",
+        "package": "2512",
+        "footprintUuid": "f9c68fea22384582a77ed9930f733777",
+        "libraryDescription": "0.5mΩ alloy shunt, ±1%, 6W, ±50ppm/°C; library current rating 109.54A",
+        "status": "library_candidate",
+        "qualification": "Kelvin sense routing, pulse/thermal/SOA and actual current capability remain unverified"
+      }
+    },
+    {
+      "ref": "J_BUS_POWER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cfa85ffc978b462db32379cafd690b3d",
+      "x": 1450,
+      "y": 2350,
+      "rotation": 0,
+      "value": "High-current BUS interface",
+      "pins": {
+        "1": "BUS_EXT",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending",
+        "requirements": "schematic-only symbol; PCB footprint/connector rating not selected",
+        "status": "two_pin_power_symbol_placeholder"
+      }
+    },
+    {
+      "ref": "J_SC_POWER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cfa85ffc978b462db32379cafd690b3d",
+      "x": 2650,
+      "y": 2350,
+      "rotation": 0,
+      "value": "High-current SC interface after external F",
+      "pins": {
+        "1": "SC_FUSED",
+        "2": "SC_MINUS"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending",
+        "requirements": "schematic-only symbol; PCB footprint/connector rating not selected",
+        "status": "two_pin_power_symbol_placeholder"
+      }
+    },
+    {
+      "ref": "C_BUS_BULK",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "ed6649798c6b4e168b078a6fc471d773",
+      "x": 1450,
+      "y": 2150,
+      "rotation": 0,
+      "value": "470uF 63V polymer",
+      "pins": {
+        "1": "BUS_BR",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "470uF 63V bus bulk candidate; ripple, current, temperature rating and mounting pending",
+        "libraryCandidate": "RYHG63V470UF10*16",
+        "supplierId": "C48970459",
+        "package": "CAP-TH_BD10.0-P5.00-D0.6-FD",
+        "footprintUuid": "00bc12d88a7845c5aba380d79ac495f1",
+        "libraryDescription": "470uF, 63V polymer; ripple 3.15A, ESR 32mΩ@100kHz",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_BUS_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "efaeb1e3bde84d4499a909a9f9baef21",
+      "x": 1650,
+      "y": 2350,
+      "rotation": 0,
+      "value": "1uF 100V X7R",
+      "pins": {
+        "1": "BUS_BR",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "1uF 100V local bridge bypass candidate",
+        "libraryCandidate": "C3225X7R2A105K200AA",
+        "supplierId": "C2167578",
+        "package": "C1210",
+        "footprintUuid": "d98380dbde964cff944f829800b236c1",
+        "libraryDescription": "1uF ±10%, 100V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "Q_BUS_P",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "1bd5775cdac341caa5712f075c96650d",
+      "x": 1250,
+      "y": 1950,
+      "rotation": 0,
+      "value": "IXTH76P10T candidate",
+      "pins": {
+        "1": "PMOS_GATE",
+        "3": "BUS_BR",
+        "2": "BUS_EXT"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "IXTH76P10T candidate, TO-247; D=BUS_EXT S=BUS_BR; thermal/SOA/drive not yet accepted",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "Q_PMOS_CTRL",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "c0b65ffc9f424d11a36a1209eb20da80",
+      "x": 950,
+      "y": 2480,
+      "rotation": 0,
+      "value": "MMBT5551 NPN",
+      "pins": {
+        "1": "PMOS_CTRL_BASE",
+        "3": "PMOS_CTRL_COLLECTOR",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "MMBT5551 NPN, SOT-23; pinout verified from onsemi data sheet",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "R_QP_GS",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "da73b02cb7e346f592328496a3e390f7",
+      "x": 1370,
+      "y": 2100,
+      "rotation": 0,
+      "value": "47k 1%",
+      "pins": {
+        "1": "PMOS_GATE",
+        "2": "BUS_BR"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "47kohm Q_BUS_P gate-to-source default-off resistor",
+        "libraryCandidate": "RMC060347K1%N",
+        "supplierId": "C269715",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "47kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "D_QP_GS_ZENER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "af565ed1dfee4633949bbee790923990",
+      "x": 1370,
+      "y": 2250,
+      "rotation": 0,
+      "value": "BZT52C10 10V",
+      "pins": {
+        "1": "BUS_BR",
+        "2": "PMOS_GATE"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10V zener; cathode pin 1 to BUS_BR/source, anode pin 2 to PMOS_GATE.",
+        "libraryCandidate": "BZT52C10",
+        "supplierId": "C707140",
+        "package": "SOD-123",
+        "footprintUuid": "1b8b3d7324614d54bbe2e659eb37cdec",
+        "libraryDescription": "Slkor 10V zener, 9.4–10.6V, 500mW",
+        "status": "library_candidate",
+        "qualification": "VGS clamp pulse rating and actual stress/SOA仍待核"
+      }
+    },
+    {
+      "ref": "R_PB6_BASE",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 800,
+      "y": 2630,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "PB6_PMOS_CTRL",
+        "2": "PMOS_CTRL_BASE"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm PB6 base series resistor",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_QP_BE",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "e78687933cd54a68b95e75fa28dfee3d",
+      "x": 1050,
+      "y": 2630,
+      "rotation": 0,
+      "value": "100k 1%",
+      "pins": {
+        "1": "PMOS_CTRL_BASE",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100kohm QP base-emitter pulldown",
+        "libraryCandidate": "RMC0603100K1%N",
+        "supplierId": "C269699",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "100kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_QP_COL",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 1200,
+      "y": 2480,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "PMOS_CTRL_COLLECTOR",
+        "2": "PMOS_GATE"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm QP collector-to-PMOS-gate resistor",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_DT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "c937a4c7153748f897d3787bf8f038cd",
+      "x": 1370,
+      "y": 1500,
+      "rotation": 0,
+      "value": "3.3k 1%",
+      "pins": {
+        "1": "DRV_DT",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "3.3kohm DRV DT/MODE resistor; selects 2-pin PWM candidate",
+        "libraryCandidate": "RMC06033.3K1%N",
+        "supplierId": "C269710",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "3.3kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_PWM_H_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5e03c61d36774a939987ce73b1a35063",
+      "x": 1370,
+      "y": 1800,
+      "rotation": 0,
+      "value": "100R 1%",
+      "pins": {
+        "1": "PA8_TIM1_CH1_PWM_H",
+        "2": "DRV_INH"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100ohm PWM_H series resistor",
+        "libraryCandidate": "RC0603FR-07100RL",
+        "supplierId": "C105588",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "100Ω ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_PWM_L_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5e03c61d36774a939987ce73b1a35063",
+      "x": 1370,
+      "y": 1950,
+      "rotation": 0,
+      "value": "100R 1%",
+      "pins": {
+        "1": "PB13_TIM1_CH1N_PWM_L",
+        "2": "DRV_INL"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100ohm PWM_L series resistor",
+        "libraryCandidate": "RC0603FR-07100RL",
+        "supplierId": "C105588",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "100Ω ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_PWM_H_PD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "da73b02cb7e346f592328496a3e390f7",
+      "x": 1500,
+      "y": 1800,
+      "rotation": 0,
+      "value": "47k 1%",
+      "pins": {
+        "1": "DRV_INH",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "47kohm PWM_H input pulldown",
+        "libraryCandidate": "RMC060347K1%N",
+        "supplierId": "C269715",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "47kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_PWM_L_PD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "da73b02cb7e346f592328496a3e390f7",
+      "x": 1500,
+      "y": 1950,
+      "rotation": 0,
+      "value": "47k 1%",
+      "pins": {
+        "1": "DRV_INL",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "47kohm PWM_L input pulldown",
+        "libraryCandidate": "RMC060347K1%N",
+        "supplierId": "C269715",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "47kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_VDSLVL",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "1646f331ce8547c0b227a7415a1f5577",
+      "x": 1370,
+      "y": 2100,
+      "rotation": 0,
+      "value": "27k 1%",
+      "pins": {
+        "1": "DRV_VDS",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "27kΩ to GND_SYS selects DRV8161 LEVEL4; Table 7-5 gives typical 0.8V DC / 0.7V after one pulse. The electrical-characteristic table states RVDSLVL=26kΩ typ for these threshold limits. VDS short-circuit screening only, not an accurate 80A current limit.",
+        "libraryCandidate": "RMC060327K1%N",
+        "supplierId": "C325610",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "27kΩ ±1%, 100mW, 50V, ±100ppm/°C",
+        "status": "library_candidate",
+        "qualification": "VDS trip varies with resistor/MOSFET RDS(on), temperature, unit and switching conditions. Normal-cycle current control is intended through the shunt→SO→G431 COMP→TIM1 Break hardware path; threshold/configuration/latency validation remains pending."
+      }
+    },
+    {
+      "ref": "C_DRV_CSAREF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "79c2bdde96324f8fa321b4c5c00fcd5e",
+      "x": 1650,
+      "y": 1500,
+      "rotation": 0,
+      "value": "100nF 50V X7R",
+      "pins": {
+        "1": "3V3_CORE",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF CSAREF bypass close to U1 pins 6 and 12 return",
+        "libraryCandidate": "CGA3E2X7R1H104KT0Y0S",
+        "supplierId": "C342998",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100nF, 50V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_SO_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "f0d869cd9eed4621a641c66128aad6c7",
+      "x": 1750,
+      "y": 1500,
+      "rotation": 0,
+      "value": "22R 1%",
+      "pins": {
+        "1": "DRV_SO",
+        "2": "IMON"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "22ohm DRV SO series resistor",
+        "libraryCandidate": "RMC0603221%N",
+        "supplierId": "C269708",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "22Ω ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "C_DRV_SO",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cee4b480d85841249c55176068aa2826",
+      "x": 1900,
+      "y": 1500,
+      "rotation": 0,
+      "value": "100pF 50V C0G",
+      "pins": {
+        "1": "IMON",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100pF SO edge/RF filter candidate",
+        "libraryCandidate": "C1608C0G1H101J080AE",
+        "supplierId": "C3848670",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100pF ±5%, 50V, C0G",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_GAIN",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cbe662ffe3274f6e8d6ac8bdabe45072",
+      "x": 1650,
+      "y": 1800,
+      "rotation": 0,
+      "value": "30k 1%",
+      "pins": {
+        "1": "DRV_GAIN",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "30kohm CSAGAIN-to-GND_SYS gain setting candidate",
+        "libraryCandidate": "RMC060330K1%N",
+        "supplierId": "C269901",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "30kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_ID1",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "d724ebbeb999455ca5d9bcef6ce55773",
+      "x": 1650,
+      "y": 1950,
+      "rotation": 0,
+      "value": "5.6k 1%",
+      "pins": {
+        "1": "DRV_ID1",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "5.6kohm DRV IDRIVE1 setting candidate",
+        "libraryCandidate": "HoLTT0603-1/10W-5.6K-1%",
+        "supplierId": "C2904527",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "5.6kΩ ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_ID2",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "d724ebbeb999455ca5d9bcef6ce55773",
+      "x": 1650,
+      "y": 2100,
+      "rotation": 0,
+      "value": "5.6k 1%",
+      "pins": {
+        "1": "DRV_ID2",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "5.6kohm DRV IDRIVE2 setting candidate",
+        "libraryCandidate": "HoLTT0603-1/10W-5.6K-1%",
+        "supplierId": "C2904527",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "5.6kΩ ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "C_DRV_GVDD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "14a45615b51a4008aec9dcaec7fc6e86",
+      "x": 1800,
+      "y": 1800,
+      "rotation": 0,
+      "value": "10uF 25V polymer",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10uF DRV GVDD bypass candidate",
+        "libraryCandidate": "RYHT25V10UF5*8",
+        "supplierId": "C48970488",
+        "package": "CAP-TH_BD5.0-P2.00-D0.5-FD",
+        "footprintUuid": "dea7334ff73b4567819e1d5352d4b4dd",
+        "libraryDescription": "10uF, 25V polymer; ripple 1.05A, ESR 85mΩ@100kHz",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_DRV_GVDD_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "79c2bdde96324f8fa321b4c5c00fcd5e",
+      "x": 1800,
+      "y": 1950,
+      "rotation": 0,
+      "value": "100nF 50V X7R",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF DRV GVDD high-frequency bypass",
+        "libraryCandidate": "CGA3E2X7R1H104KT0Y0S",
+        "supplierId": "C342998",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100nF, 50V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_GH_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "021ae732c446445f962fe7835a39c893",
+      "x": 2050,
+      "y": 1650,
+      "rotation": 0,
+      "value": "2.2R 1% 1.5W",
+      "pins": {
+        "1": "DRV_GH",
+        "2": "GATE_H"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "2.2Ω series gate resistor on DRV GH; first-prototype starting value, tune after waveform measurement.",
+        "libraryCandidate": "CRCW25122R20FKEGHP",
+        "manufacturer": "Vishay",
+        "supplierId": "C4168885",
+        "package": "R2512",
+        "footprintUuid": "7ab38fe3a2e64d01a1bea3ef8ce9e7f3",
+        "libraryDescription": "2.2Ω ±1%, 1.5W, CRCW-HP pulse-proof high-power thick-film resistor",
+        "status": "library_candidate",
+        "qualification": "Resistor value is an initial prototype choice; verify gate waveform, pulse/thermal derating and switching loss before freeze."
+      }
+    },
+    {
+      "ref": "R_DRV_GL_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "021ae732c446445f962fe7835a39c893",
+      "x": 2050,
+      "y": 2050,
+      "rotation": 0,
+      "value": "2.2R 1% 1.5W",
+      "pins": {
+        "1": "DRV_GL",
+        "2": "GATE_L"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "2.2Ω series gate resistor on DRV GL; first-prototype starting value, tune after waveform measurement.",
+        "libraryCandidate": "CRCW25122R20FKEGHP",
+        "manufacturer": "Vishay",
+        "supplierId": "C4168885",
+        "package": "R2512",
+        "footprintUuid": "7ab38fe3a2e64d01a1bea3ef8ce9e7f3",
+        "libraryDescription": "2.2Ω ±1%, 1.5W, CRCW-HP pulse-proof high-power thick-film resistor",
+        "status": "library_candidate",
+        "qualification": "Resistor value is an initial prototype choice; verify gate waveform, pulse/thermal derating and switching loss before freeze."
+      }
+    },
+    {
+      "ref": "R_QH_GS",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 2200,
+      "y": 1650,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "GATE_H",
+        "2": "SW"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm high-side gate-to-source pulldown",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_QL_GS",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 2200,
+      "y": 2050,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "GATE_L",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm low-side gate-to-source pulldown",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "C_DRV_BOOT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "892f1d0ff001405b964c7bdb2aeca943",
+      "x": 2050,
+      "y": 1800,
+      "rotation": 0,
+      "value": "1uF 25V X7R",
+      "pins": {
+        "1": "BOOT",
+        "2": "SW"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "1uF >=25V bootstrap capacitor from BOOT to SW",
+        "libraryCandidate": "C3216X7R1E105K160AA",
+        "supplierId": "C3869375",
+        "package": "C1206",
+        "footprintUuid": "f9883b5edc654f83a19cf28e812ef37d",
+        "libraryDescription": "1uF ±10%, 25V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_DRV_VDRAIN",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "1ca6d269eb8c4abb89cd8b546fad66f5",
+      "x": 2050,
+      "y": 2200,
+      "rotation": 0,
+      "value": "100nF 100V X7R",
+      "pins": {
+        "1": "BUS_BR",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF >=100V local VDRAIN bypass; not a bulk capacitor replacement",
+        "libraryCandidate": "C2225C104K1RACTU",
+        "supplierId": "C2411772",
+        "package": "C2225",
+        "footprintUuid": "de26e9d22a0d4b87b62f7c0ddfabae1f",
+        "libraryDescription": "100nF, 100V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_PB5_PERMIT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "b003a1f0d1e342bead8e0fa975a8f532",
+      "x": 2200,
+      "y": 2250,
+      "rotation": 0,
+      "value": "1k 1%",
+      "pins": {
+        "1": "PB5_DRV_PERMIT",
+        "2": "DRV_FAULT_N"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "1kohm PB5 series connection to active-low permit/DRV_FAULT_N line",
+        "libraryCandidate": "RMC06031K1%N",
+        "supplierId": "C269704",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "1kΩ ±1%, 100mW, 50V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DRV_FAULT_PD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "209453f1b0764552b318805e2b7a5c99",
+      "x": 2350,
+      "y": 2400,
+      "rotation": 0,
+      "value": "10kohm default-low pulldown on DRV_FAULT_N",
+      "pins": {
+        "1": "DRV_FAULT_N",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm default-low pulldown on DRV_FAULT_N",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "U_SC_OV",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "b4f3407da07f43c99b00543ecdaa188b",
+      "x": 2700,
+      "y": 1650,
+      "rotation": 0,
+      "value": "TLV6700DDCR",
+      "pins": {
+        "1": null,
+        "5": "12V_DRV",
+        "3": "SC_MINUS",
+        "6": "DRV_FAULT_N",
+        "4": "SC_OV_DIV",
+        "2": "SC_MINUS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "TLV6700DDCR; SC total-voltage comparator only; 20.8V nominal candidate, not a cell OV limit",
+        "status": "candidate_or_placeholder"
+      },
+      "noConnectReasons": {
+        "1": "Unused OUT_A output; SC total-voltage comparator uses OUT_B only."
+      }
+    },
+    {
+      "ref": "R_SC_OV_TOP1",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
+      "x": 2500,
+      "y": 1500,
+      "rotation": 0,
+      "value": "255k 0.1%",
+      "pins": {
+        "1": "SC_PLUS",
+        "2": "SC_OV_MID"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "255kohm 0.1% SC overvoltage comparator top divider segment; two in series",
+        "libraryCandidate": "PTFR0805B255KP9",
+        "supplierId": "C2849126",
+        "package": "R0805",
+        "footprintUuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryDescription": "255kΩ ±0.1%, 130mW, 150V, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_SC_OV_TOP2",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
+      "x": 2650,
+      "y": 1500,
+      "rotation": 0,
+      "value": "255k 0.1%",
+      "pins": {
+        "1": "SC_OV_MID",
+        "2": "SC_OV_DIV"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "255kohm 0.1% SC overvoltage comparator top divider segment; two in series",
+        "libraryCandidate": "PTFR0805B255KP9",
+        "supplierId": "C2849126",
+        "package": "R0805",
+        "footprintUuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryDescription": "255kΩ ±0.1%, 130mW, 150V, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_SC_OV_BOT",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 2800,
+      "y": 1500,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "SC_OV_DIV",
+        "2": "SC_MINUS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm 0.1% SC overvoltage comparator bottom divider segment",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "C_SC_OV_VDD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "79c2bdde96324f8fa321b4c5c00fcd5e",
+      "x": 2850,
+      "y": 1800,
+      "rotation": 0,
+      "value": "100nF 50V X7R",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "SC_MINUS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF TLV6700 local bypass from VDD to SC_MINUS Kelvin",
+        "libraryCandidate": "CGA3E2X7R1H104KT0Y0S",
+        "supplierId": "C342998",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100nF, 50V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "U_DUMP_DRV",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "d090b841f25e4b6e9dd9772bdbc0c040",
+      "x": 3300,
+      "y": 1500,
+      "rotation": 0,
+      "value": "UCC27511ADBVR",
+      "pins": {
+        "1": "12V_DRV",
+        "5": "GND_SYS",
+        "3": "UCC_OUT_L",
+        "6": "DUMP_IN",
+        "4": "GND_SYS",
+        "2": "UCC_OUT_H"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "UCC27511ADBVR; non-inverting low-side gate driver candidate",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "C_DUMP_DRV_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "79c2bdde96324f8fa321b4c5c00fcd5e",
+      "x": 3150,
+      "y": 1400,
+      "rotation": 0,
+      "value": "100nF 50V X7R",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100nF UCC27511A VDD bypass",
+        "libraryCandidate": "CGA3E2X7R1H104KT0Y0S",
+        "supplierId": "C342998",
+        "package": "C0603",
+        "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+        "libraryDescription": "100nF, 50V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_DUMP_DRV_BULK",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "892f1d0ff001405b964c7bdb2aeca943",
+      "x": 3150,
+      "y": 1550,
+      "rotation": 0,
+      "value": "1uF 25V X7R",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "1uF UCC27511A VDD bypass",
+        "libraryCandidate": "C3216X7R1E105K160AA",
+        "supplierId": "C3869375",
+        "package": "C1206",
+        "footprintUuid": "f9883b5edc654f83a19cf28e812ef37d",
+        "libraryDescription": "1uF ±10%, 25V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "R_DUMP_OH",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "91ed62e3d3584de481255b4ba4b37f6f",
+      "x": 3450,
+      "y": 1400,
+      "rotation": 0,
+      "value": "10R 1%",
+      "pins": {
+        "1": "UCC_OUT_H",
+        "2": "GATE_DUMP"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10ohm UCC27511A OUTH turn-on gate resistor candidate",
+        "libraryCandidate": "RC0603FR-0710RL",
+        "supplierId": "C109318",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10Ω ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DUMP_OL",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "91ed62e3d3584de481255b4ba4b37f6f",
+      "x": 3450,
+      "y": 1550,
+      "rotation": 0,
+      "value": "10R 1%",
+      "pins": {
+        "1": "UCC_OUT_L",
+        "2": "GATE_DUMP"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10ohm UCC27511A OUTL turn-off gate resistor candidate",
+        "libraryCandidate": "RC0603FR-0710RL",
+        "supplierId": "C109318",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10Ω ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DUMP_IN_SER",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5e03c61d36774a939987ce73b1a35063",
+      "x": 3150,
+      "y": 1700,
+      "rotation": 0,
+      "value": "100R 1%",
+      "pins": {
+        "1": "PB7_DUMP_PWM",
+        "2": "DUMP_IN"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100ohm PB7 dump-driver input series resistor",
+        "libraryCandidate": "RC0603FR-07100RL",
+        "supplierId": "C105588",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "100Ω ±1%, 100mW, 75V",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "R_DUMP_IN_PD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 3300,
+      "y": 1750,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "DUMP_IN",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm dump driver input pulldown",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "Q_DUMP",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "5456048653cb47a788415073eca75d0b",
+      "x": 3600,
+      "y": 1700,
+      "rotation": 0,
+      "value": "IRLB4030PBF dump low-side MOSFET",
+      "pins": {
+        "1": "GATE_DUMP",
+        "3": "GND_SYS",
+        "2": "DUMP_SW"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "IRLB4030PBF dump low-side MOSFET; pulse current/thermal validation pending",
+        "status": "candidate_or_placeholder"
+      }
+    },
+    {
+      "ref": "R_DUMP_GATE_PD",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "0000710e20ba46548d289313b6ed6dd9",
+      "x": 3750,
+      "y": 1700,
+      "rotation": 0,
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "GATE_DUMP",
+        "2": "GND_SYS"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "10kohm dump MOSFET gate-to-source pulldown",
+        "libraryCandidate": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplierId": "C5123581",
+        "package": "R0603",
+        "footprintUuid": "50b4943912284dab97752312e589e9e2",
+        "libraryDescription": "10kΩ ±0.1%, 100mW, ±25ppm/°C",
+        "status": "library_candidate",
+        "qualification": "库器件候选；具体应力、布局和热降额仍待核"
+      }
+    },
+    {
+      "ref": "J_DUMP",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "cfa85ffc978b462db32379cafd690b3d",
+      "x": 3600,
+      "y": 1900,
+      "rotation": 0,
+      "value": "External resistor interface",
+      "pins": {
+        "1": "BUS_EXT",
+        "2": "DUMP_SW"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "External resistor interface; high-current stud/connector footprint pending",
+        "requirements": "schematic-only symbol; PCB footprint/connector rating not selected",
+        "status": "two_pin_power_symbol_placeholder"
+      }
+    },
+    {
+      "ref": "C_SC_BULK",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "02805c411202408ea5d19f39b834b1ad",
+      "x": 2500,
+      "y": 2150,
+      "rotation": 0,
+      "value": "100uF 35V polymer",
+      "pins": {
+        "2": "SC_MINUS",
+        "1": "SC_FUSED"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "100uF 35V candidate across SC_FUSED to SC_MINUS",
+        "libraryCandidate": "RYHG35V100UF6*8",
+        "supplierId": "C48970442",
+        "package": "CAP-TH_BD6.3-P2.5-D0.6-FD-RYHG35V100UF",
+        "footprintUuid": "c96b53add15541a48e14108efc121182",
+        "libraryDescription": "100uF, 35V polymer; ripple 2.25A@100kHz, ESR 38mΩ",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_SC_HF",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "efaeb1e3bde84d4499a909a9f9baef21",
+      "x": 2650,
+      "y": 2150,
+      "rotation": 0,
+      "value": "1uF 100V X7R",
+      "pins": {
+        "2": "SC_MINUS",
+        "1": "SC_FUSED"
+      },
+      "addIntoPcb": true,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "1uF 50V candidate across SC_FUSED to SC_MINUS",
+        "libraryCandidate": "C3225X7R2A105K200AA",
+        "supplierId": "C2167578",
+        "package": "C1210",
+        "footprintUuid": "d98380dbde964cff944f829800b236c1",
+        "libraryDescription": "1uF ±10%, 100V, X7R",
+        "status": "library_candidate",
+        "qualification": "库器件候选；直流偏压、纹波、热与布局仍待核"
+      }
+    },
+    {
+      "ref": "C_BUS_FILM1",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "675130f1546b4395912f01f306cd566e",
+      "x": 1800,
+      "y": 2350,
+      "rotation": 0,
+      "value": "2.2uF 250V PP",
+      "pins": {
+        "2": "GND_SYS",
+        "1": "BUS_BR"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "KEMET R76IR4220SE40J, 2.2uF 250V PP ±5%; 3 pcs. Datasheet: 13.3Arms each at 100kHz/85°C; bank current/thermal distribution still unverified.",
+        "libraryCandidate": "R76IR4220SE40J",
+        "supplier": "KEMET",
+        "package": "radial film, 32x14x28mm, pitch 27.5mm",
+        "datasheet": "https://content.kemet.com/datasheets/KEM_F3034_R76.pdf",
+        "datasheetRating": "13.3Arms at 100kHz, 85°C; ΔT 20°C to 105°C hotspot",
+        "referenceOnlyDeviceUuid": "3168f8221f4aa4a2",
+        "referenceOnlyFootprintUuid": "86d1aff7974043ff",
+        "referenceOnlySource": "E:\\Pioneer\\FOC驱动审阅\\硬件\\库\\封装绑定.json; not resolved in this project library",
+        "status": "custom_library_import_required",
+        "qualification": "系统库无可检索绑定；导入/核对该定制器件与封装前不得布入PCB。原厂单颗额定不等于本模块bank电流分配或热设计已通过。"
+      }
+    },
+    {
+      "ref": "C_BUS_FILM2",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "675130f1546b4395912f01f306cd566e",
+      "x": 1950,
+      "y": 2350,
+      "rotation": 0,
+      "value": "2.2uF 250V PP",
+      "pins": {
+        "2": "GND_SYS",
+        "1": "BUS_BR"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "KEMET R76IR4220SE40J, 2.2uF 250V PP ±5%; 3 pcs. Datasheet: 13.3Arms each at 100kHz/85°C; bank current/thermal distribution still unverified.",
+        "libraryCandidate": "R76IR4220SE40J",
+        "supplier": "KEMET",
+        "package": "radial film, 32x14x28mm, pitch 27.5mm",
+        "datasheet": "https://content.kemet.com/datasheets/KEM_F3034_R76.pdf",
+        "datasheetRating": "13.3Arms at 100kHz, 85°C; ΔT 20°C to 105°C hotspot",
+        "referenceOnlyDeviceUuid": "3168f8221f4aa4a2",
+        "referenceOnlyFootprintUuid": "86d1aff7974043ff",
+        "referenceOnlySource": "E:\\Pioneer\\FOC驱动审阅\\硬件\\库\\封装绑定.json; not resolved in this project library",
+        "status": "custom_library_import_required",
+        "qualification": "系统库无可检索绑定；导入/核对该定制器件与封装前不得布入PCB。原厂单颗额定不等于本模块bank电流分配或热设计已通过。"
+      }
+    },
+    {
+      "ref": "C_BUS_FILM3",
+      "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+      "deviceUuid": "675130f1546b4395912f01f306cd566e",
+      "x": 2100,
+      "y": 2350,
+      "rotation": 0,
+      "value": "2.2uF 250V PP",
+      "pins": {
+        "2": "GND_SYS",
+        "1": "BUS_BR"
+      },
+      "addIntoPcb": false,
+      "addIntoBom": true,
+      "procurementSpec": {
+        "recordedRequirement": "KEMET R76IR4220SE40J, 2.2uF 250V PP ±5%; 3 pcs. Datasheet: 13.3Arms each at 100kHz/85°C; bank current/thermal distribution still unverified.",
+        "libraryCandidate": "R76IR4220SE40J",
+        "supplier": "KEMET",
+        "package": "radial film, 32x14x28mm, pitch 27.5mm",
+        "datasheet": "https://content.kemet.com/datasheets/KEM_F3034_R76.pdf",
+        "datasheetRating": "13.3Arms at 100kHz, 85°C; ΔT 20°C to 105°C hotspot",
+        "referenceOnlyDeviceUuid": "3168f8221f4aa4a2",
+        "referenceOnlyFootprintUuid": "86d1aff7974043ff",
+        "referenceOnlySource": "E:\\Pioneer\\FOC驱动审阅\\硬件\\库\\封装绑定.json; not resolved in this project library",
+        "status": "custom_library_import_required",
+        "qualification": "系统库无可检索绑定；导入/核对该定制器件与封装前不得布入PCB。原厂单颗额定不等于本模块bank电流分配或热设计已通过。"
+      }
+    }
+  ],
+  "notes": [
+    "Do not duplicate U1. Existing u1-plan.json has immutable placement (1550,1650) and pins: 1 DRV_DT; 2 DRV_INH; 3 DRV_INL; 4 DRV_FAULT_N; 5 DRV_VDS; 6 3V3_CORE; 7 DRV_SO; 8 DRV_GAIN; 9 DRV_ID1; 10 12V_DRV; 11 DRV_ID2; 12 GND_SYS; 13 SC_MINUS; 14 GND_SYS; 15 GND_SYS; 16 DRV_GL; 17 DRV_GH; 18 SW; 19 BOOT; 20 BUS_BR. This plan follows those exact net names.",
+    "F_BUS and F_SC are external inline fuses, not PCB fuse-holder footprints. Route raw BUS_SOURCE through F_BUS to BUS_EXT and raw SC_PLUS through F_SC to SC_FUSED; J_SC_POWER and L_MAIN use SC_FUSED. Keep cell-tap/TLV sensing on raw SC_PLUS. Eaton AMG-80 80A/70VDC/2.5kA is a candidate only; interrupt suitability and coordination require minimum source ESR/fault-current and device SOA review.",
+    "Normal braking is first absorbed by the battery and supercapacitor. Dump absorbs surplus; only if both are near full and remaining absorption reserve is insufficient does CAN request regenerative-power limitation. External dump resistor: 1.8ohm +/-1%, at least 1kJ for a 1s pulse; at BUS=42V and Rmin=1.782ohm, Pmax=989.9W and E1s=989.9J. Treat this as a roughly 1kW/1s pulse/thermal budget, not an unlimited continuous rating; supplier pulse curve, cooling, repetition interval and continuous dissipation remain open.",
+    "42V is a candidate design BUS upper bound, not a physical clamp guarantee. There is no hardware BUS_OV comparator in this plan and no claim that the 42V downstream limit is protected.",
+    "URB4812YMD-10WR3 is a separate 12V module candidate from BUS_EXT, not a shared FOC 12V branch. Local library variants were package/pin mismatches, so U_AUX12 uses a generic symbol and unresolved footprint. Pin map follows manufacturer view: 1 GND_SYS (-Vin), 2 BUS_EXT (+Vin), 3 12V_DRV (+Vo), 4 NP/NC, 5 GND_SYS (return), 6 CTRL left floating. Use a custom PCB footprint from the 25.4mm module drawing; do not substitute a 1x6 header footprint.",
+    "5V reuse direction is selected from the existing Hi-Link source to WeAct coreboard VCC5V; exact installed model, wiring and remaining output current are unverified. Do not infer current margin from separate URB4805 candidate.",
+    "The 390ohm/2W 12V preload is a candidate: 12^2/390=0.369W at nominal 12V. Verify module minimum-load and thermal requirements before fixing value. External/input/output capacitance limits are also not represented as guaranteed by the provisional bypass capacitors.",
+    "Power components and high-current external interfaces are candidates only. No 22uH library inductor met hot-bias/saturation need; keep L_MAIN generic and procure to Lhot>=16uH@80A, Ipk>=100A and DCRhot<=2mohm. The 0.5mohm 6W R2512 shunt library item is not proof of PCB/Kelvin/continuous-80A thermal capability.",
+    "QP candidate pinout: pin1 Gate, pin2 Drain, pin3 Source per Littelfuse TO-247 data sheet. IRLB4030: pin1 Gate, pin2 Drain, pin3 Source per Infineon data sheet. MMBT5551: pin1 Base, pin2 Emitter, pin3 Collector per onsemi. Verify selected EasyEDA symbol/device pin mappings before schematic import.",
+    "J_BUS_POWER, J_SC_POWER and J_DUMP are generic high-current interfaces: use M6 studs/large-current terminals or separate high-current holes with verified copper/wire; do not substitute small low-current screw-terminal symbols as a current rating.",
+    "TLV6700 is only the SC total-voltage comparator; 510kohm/10kohm split top (255k+255k) and 10kohm bottom gives nominal 20.8V. Threshold tolerance, reference shift, wiring/layout and startup/diagnostic behavior remain unapproved.",
+    "DRV8161 CSA candidate settings are gain20 (30kohm) and 0.5mohm shunt; U1 SO goes through 22ohm to IMON, then PB1 ADC/COMP1 and PA7 COMP2. COMP DAC threshold, COMP-to-TIM1-break route, polarity and shutdown timing remain unverified.",
+    "Coordinates are spacing/layout suggestions only; keep active power loops compact and Kelvin/shunt/TLV references separate. No EDA application, import, ERC, routing or electrical test was run.",
+    "Add C_SC_BULK=100uF/35V and C_SC_HF=1uF/50V across SC_FUSED-SC_MINUS. Add two 4.7uF/100V film-capacitor candidates across BUS_BR-GND_SYS; total purchased film-capacitor ripple rating must be at least 30Arms at 100kHz. The generic 4.7uF values do not claim a qualified supplier, ripple rating, footprint, or that the existing 470uF electrolytic alone handles the estimated QH RMS ripple (about 27Arms at 55A and D=0.5). Do not replace these film candidates with small ceramics as if their ripple rating were met.",
+    "External fuse candidate source: Eaton AMG-80 product page https://www.eaton.com/us/en-us/skuPage.AMG-80.html. The 80A/70VDC/2.5kA ratings do not establish fault interruption suitability; verify minimum source ESR/fault current, cable and semiconductor SOA/coordination."
+  ]
+}

@@ -1,0 +1,431 @@
+{
+  "schema": "isaac-field-foundation-stage01-goal-conditioning-cpu-v1",
+  "analysis_device": "cpu",
+  "simulation_started": false,
+  "checkpoint": {
+    "path": "results/isaac_field_improvement/fresh_foundation_20261017_stem_v2/stage_01_near.zip",
+    "sha256": "5912bd648fe24bade74b2aee2beed614e07537ad8ee3eea93afd095796a1ca00",
+    "size_bytes": 5187902,
+    "stable_during_analysis": true,
+    "num_timesteps": 32768,
+    "checkpoint_step_label": 32768,
+    "use_sde": false,
+    "goal_gain": 100.0,
+    "policy_squash_output": false,
+    "actor_hidden_size": 128
+  },
+  "native_observation_capture": {
+    "path": "results/isaac_field_diagnosis/goal_conditioning_20261017/goal_observations.npz",
+    "manifest": "results/isaac_field_diagnosis/goal_conditioning_20261017/manifest.json",
+    "seed": 78021,
+    "start_xy_yaw": [
+      50.0,
+      50.0,
+      0.0
+    ],
+    "plant_count": 0,
+    "angles_deg": [
+      -90.0,
+      -60.0,
+      -30.0,
+      0.0,
+      30.0,
+      60.0,
+      90.0
+    ],
+    "non_goal_sensor_and_state_invariance": {
+      "lidar": {
+        "shape": [
+          2,
+          400
+        ],
+        "dtype": "float32",
+        "max_abs_diff_from_angle_-90": 0.0,
+        "exactly_equal_to_angle_-90_under_comparison": true,
+        "comparison": "all elements"
+      },
+      "depth": {
+        "shape": [
+          2,
+          160,
+          88
+        ],
+        "dtype": "float32",
+        "max_abs_diff_from_angle_-90": 0.0,
+        "exactly_equal_to_angle_-90_under_comparison": true,
+        "comparison": "all elements"
+      },
+      "detections": {
+        "shape": [
+          16,
+          10
+        ],
+        "dtype": "float32",
+        "max_abs_diff_from_angle_-90": 0.0,
+        "exactly_equal_to_angle_-90_under_comparison": true,
+        "comparison": "all elements"
+      },
+      "state": {
+        "shape": [
+          44
+        ],
+        "dtype": "float32",
+        "max_abs_diff_from_angle_-90": 0.0,
+        "exactly_equal_to_angle_-90_under_comparison": true,
+        "comparison": "excluding state[2:4] goal encoding"
+      }
+    },
+    "state_goal_encoding_error_max": 7.485559914977014e-10,
+    "physics_scope": "This is the saved zero-plant native capture from the earlier physics/spec version. It diagnoses policy input response only; it does not establish behavior under the current robot geometry or closed-loop navigation."
+  },
+  "counterfactual_action_summary": {
+    "method": "Reused the archived CPU analysis helpers: reset LSTM per target, then 64 deterministic predictions on the same recorded observation; no environment steps.",
+    "first_step_action_component_ranges": [
+      0.11714570969343185,
+      0.006815450266003609,
+      0.006617548875510693,
+      0.0015763044357299805
+    ],
+    "differential_action_by_angle": [
+      0.01650586724281311,
+      0.020238904282450676,
+      0.02259254641830921,
+      0.02332131750881672,
+      0.02291692979633808,
+      0.02118390053510666,
+      0.017452387139201164
+    ],
+    "differential_sign_by_angle": [
+      "positive",
+      "positive",
+      "positive",
+      "positive",
+      "positive",
+      "positive",
+      "positive"
+    ],
+    "minus_90_deg": {
+      "angle_deg": -90.0,
+      "step_1": {
+        "forward": 0.12101714313030243,
+        "differential": 0.01650586724281311
+      },
+      "step_20": {
+        "forward": 0.1800505667924881,
+        "differential": 0.03888722136616707
+      },
+      "step_64": {
+        "forward": 0.17917358875274658,
+        "differential": 0.038955364376306534
+      }
+    },
+    "plus_90_deg": {
+      "angle_deg": 90.0,
+      "step_1": {
+        "forward": 0.11269325762987137,
+        "differential": 0.017452387139201164
+      },
+      "step_20": {
+        "forward": 0.1299823671579361,
+        "differential": 0.04188041761517525
+      },
+      "step_64": {
+        "forward": 0.1274484395980835,
+        "differential": 0.04191197454929352
+      }
+    },
+    "by_angle_first_20th_64th": [
+      {
+        "angle_deg": -90.0,
+        "step_1": {
+          "forward": 0.12101714313030243,
+          "differential": 0.01650586724281311
+        },
+        "step_20": {
+          "forward": 0.1800505667924881,
+          "differential": 0.03888722136616707
+        },
+        "step_64": {
+          "forward": 0.17917358875274658,
+          "differential": 0.038955364376306534
+        }
+      },
+      {
+        "angle_deg": -60.0,
+        "step_1": {
+          "forward": 0.18101949989795685,
+          "differential": 0.020238904282450676
+        },
+        "step_20": {
+          "forward": 0.32150551676750183,
+          "differential": 0.042600154876708984
+        },
+        "step_64": {
+          "forward": 0.3214261829853058,
+          "differential": 0.04265280440449715
+        }
+      },
+      {
+        "angle_deg": -30.0,
+        "step_1": {
+          "forward": 0.220172718167305,
+          "differential": 0.02259254641830921
+        },
+        "step_20": {
+          "forward": 0.37091124057769775,
+          "differential": 0.044761087745428085
+        },
+        "step_64": {
+          "forward": 0.3707437217235565,
+          "differential": 0.04484569653868675
+        }
+      },
+      {
+        "angle_deg": 0.0,
+        "step_1": {
+          "forward": 0.22983896732330322,
+          "differential": 0.02332131750881672
+        },
+        "step_20": {
+          "forward": 0.3805848956108093,
+          "differential": 0.04557812586426735
+        },
+        "step_64": {
+          "forward": 0.38041552901268005,
+          "differential": 0.045670751482248306
+        }
+      },
+      {
+        "angle_deg": 30.0,
+        "step_1": {
+          "forward": 0.2196672111749649,
+          "differential": 0.02291692979633808
+        },
+        "step_20": {
+          "forward": 0.3690813481807709,
+          "differential": 0.045510631054639816
+        },
+        "step_64": {
+          "forward": 0.36895209550857544,
+          "differential": 0.04560331255197525
+        }
+      },
+      {
+        "angle_deg": 60.0,
+        "step_1": {
+          "forward": 0.1838526725769043,
+          "differential": 0.02118390053510666
+        },
+        "step_20": {
+          "forward": 0.32301416993141174,
+          "differential": 0.04415915161371231
+        },
+        "step_64": {
+          "forward": 0.3231029808521271,
+          "differential": 0.04423150420188904
+        }
+      },
+      {
+        "angle_deg": 90.0,
+        "step_1": {
+          "forward": 0.11269325762987137,
+          "differential": 0.017452387139201164
+        },
+        "step_20": {
+          "forward": 0.1299823671579361,
+          "differential": 0.04188041761517525
+        },
+        "step_64": {
+          "forward": 0.1274484395980835,
+          "differential": 0.04191197454929352
+        }
+      }
+    ],
+    "jacobian_distribution_mean_wrt_raw_goal_state": {
+      "shape": [
+        7,
+        4,
+        2
+      ],
+      "per_angle_action_by_goal_channel": [
+        [
+          [
+            6.837134838104248,
+            0.07081475108861923
+          ],
+          [
+            0.4599620997905731,
+            0.08827869594097137
+          ],
+          [
+            0.351256787776947,
+            -0.03482874482870102
+          ],
+          [
+            0.0607965849339962,
+            0.023037251085042953
+          ]
+        ],
+        [
+          [
+            5.487524509429932,
+            -0.10337221622467041
+          ],
+          [
+            0.32532432675361633,
+            0.05221635848283768
+          ],
+          [
+            0.2982558012008667,
+            -0.03313468396663666
+          ],
+          [
+            -0.06859523057937622,
+            -0.0168001689016819
+          ]
+        ],
+        [
+          [
+            3.6436095237731934,
+            -0.03539660573005676
+          ],
+          [
+            0.16851340234279633,
+            0.028229475021362305
+          ],
+          [
+            0.25410059094429016,
+            0.023544494062662125
+          ],
+          [
+            -0.14640894532203674,
+            0.010046797804534435
+          ]
+        ],
+        [
+          [
+            3.5420498847961426,
+            -0.0297959316521883
+          ],
+          [
+            0.16558891534805298,
+            0.02346685901284218
+          ],
+          [
+            0.22019599378108978,
+            0.018623115494847298
+          ],
+          [
+            -0.2058081030845642,
+            -0.03333842754364014
+          ]
+        ],
+        [
+          [
+            3.756027936935425,
+            -0.053992971777915955
+          ],
+          [
+            0.19609183073043823,
+            -0.004298534244298935
+          ],
+          [
+            0.23047420382499695,
+            0.01898016408085823
+          ],
+          [
+            -0.17812563478946686,
+            -0.06037110462784767
+          ]
+        ],
+        [
+          [
+            6.451134204864502,
+            -0.47022345662117004
+          ],
+          [
+            0.35899707674980164,
+            0.024896306917071342
+          ],
+          [
+            0.3081498146057129,
+            -0.009283593855798244
+          ],
+          [
+            -0.09488316625356674,
+            -0.10723334550857544
+          ]
+        ],
+        [
+          [
+            7.434601306915283,
+            -0.3718053102493286
+          ],
+          [
+            0.39885392785072327,
+            0.03938755393028259
+          ],
+          [
+            0.42638272047042847,
+            0.013331581838428974
+          ],
+          [
+            -0.021307528018951416,
+            0.08077747374773026
+          ]
+        ]
+      ],
+      "per_angle_frobenius_norm": [
+        6.862915349681522,
+        5.507015117458569,
+        3.6596440977767757,
+        3.5591118398330486,
+        3.7733252715366454,
+        6.4871631438192,
+        7.467337583308258
+      ],
+      "differential_action_row_by_goal_channel": [
+        [
+          0.4599620997905731,
+          0.08827869594097137
+        ],
+        [
+          0.32532432675361633,
+          0.05221635848283768
+        ],
+        [
+          0.16851340234279633,
+          0.028229475021362305
+        ],
+        [
+          0.16558891534805298,
+          0.02346685901284218
+        ],
+        [
+          0.19609183073043823,
+          -0.004298534244298935
+        ],
+        [
+          0.35899707674980164,
+          0.024896306917071342
+        ],
+        [
+          0.39885392785072327,
+          0.03938755393028259
+        ]
+      ]
+    },
+    "goal_encoder_scaling_probe": {
+      "proprioception_input_state_goal_xy": [
+        0.0053038266487419605,
+        -2.01729416847229
+      ],
+      "expected_raw_state_goal_xy_times_goal_gain": [
+        0.005303826765157282,
+        -2.017294056713581
+      ],
+      "matches": true
+    }
+  },
+  "interpretation": "The Jacobian reports whether goal channels affect the policy mean; differential actions and their variation report how this checkpoint maps the fixed goal inputs. These repeated-observation counterfactuals are not physical trajectories, and action[1] is not a measured yaw response. Interpret any weak or one-sided response as an input-conditioned policy diagnostic, not as proof that the new-physics curriculum can or cannot navigate."
+}

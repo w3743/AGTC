@@ -1,0 +1,1039 @@
+{
+  "schema": "fast-stop-resume-paired-development-evaluation-v1",
+  "status": "completed",
+  "recorded_at_utc": "2026-10-21T03:16:48.314226+00:00",
+  "control_trial": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2",
+  "output": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2_evaluation",
+  "device": "cuda:0",
+  "trial_protocol_sha256": "5b1b1c91fc1647a3c84b9cecfa9ad6d37b9fb193c4fc621898020c1807dec2b7",
+  "parent_protocol_sha256": "3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c",
+  "recovery_manifest_sha256": "e1281947324ff1f1f7c87b721e741d8c00d0355d756123f37cb57f6525890dbd",
+  "checkpoint_manifest_sha256": "4a3926e8ee15f8aaac403c590b63921253a6a4d5a764961041eac87202fda9e8",
+  "run_status": {
+    "status": "completed",
+    "protocol_sha256": "5b1b1c91fc1647a3c84b9cecfa9ad6d37b9fb193c4fc621898020c1807dec2b7",
+    "num_timesteps": 196608,
+    "updated_at": "2026-10-21T03:12:01.805086+00:00",
+    "phase": "completed",
+    "summary": "resume_summary.json",
+    "exit_code": 0,
+    "checkpoint_final": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2/stage_01_global_random.zip",
+    "checkpoint_final_sha256": "c5ab17ceb785e1abfed0a1bfc292b1ad31912801ea91b6e77f672463a508585b"
+  },
+  "process_exit": {
+    "launcher_pid": 330,
+    "python_pid": 422,
+    "exit_code": 0,
+    "actual_exit_code": 0,
+    "started_utc": "2026-10-21T02:39:29.690622+00:00",
+    "finished_utc": "2026-10-21T03:12:04.200232+00:00",
+    "source": "resume_fast_stop_supervisor_waited_for_worker"
+  },
+  "resume_summary": {
+    "schema": "isaac-field-fast-stop-resume-v1",
+    "status": "training_completed_no_evaluation",
+    "parent_protocol_sha256": "3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c",
+    "parent_checkpoint_sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a",
+    "checkpoint_start": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2/parent_checkpoint_baseline.zip",
+    "checkpoint_final": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2/stage_01_global_random.zip",
+    "checkpoint_final_sha256": "c5ab17ceb785e1abfed0a1bfc292b1ad31912801ea91b6e77f672463a508585b",
+    "starting_num_timesteps": 57344,
+    "additional_timesteps": 139264,
+    "actual_final_num_timesteps": 196608,
+    "initialization_audit": "initialization.json",
+    "first_periodic_checkpoint_audit": "first_periodic_checkpoint.json",
+    "first_periodic_checkpoint_num_timesteps": 65536,
+    "checkpoint_count": 19,
+    "development_evaluation": "not run",
+    "blind_830xx": "not evaluated or observed",
+    "claim_limit": "Continuation completion is not evidence of navigation improvement."
+  },
+  "initialization": {
+    "status": "passed",
+    "checkpoint_path": "parent_checkpoint_baseline.zip",
+    "checkpoint_sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a",
+    "num_timesteps": 57344,
+    "policy_weights_equal_checkpoint": true,
+    "policy_state_sha256": "5007de29c7a4cc6693cff52321cb011ba2eb356a94def279b4ca5289f8dbb8c6",
+    "adam_optimizer": "Adam",
+    "adam_state_equal_checkpoint": true,
+    "adam_state_sha256": "3dbb2388f761404e02b71c5568cebcc77f4a5e7bd34021227d365cd10fccd44c",
+    "live_environment_contract": {
+      "action_config": {
+        "schema": "direct-track-speed-v1",
+        "components": [
+          "left_track_speed",
+          "right_track_speed",
+          "gimbal_yaw_rate",
+          "gimbal_pitch_rate"
+        ],
+        "normalized_range": [
+          -1.0,
+          1.0
+        ]
+      },
+      "drive_config": {
+        "interface": "independent_left_right_track_speed_coupled_pi_v7",
+        "actuator_model": "explicit_IdealPD_velocity_servo",
+        "controller": "native_per_wheel_P_plus_two_state_side_integral_feedforward",
+        "motor_torque_constant_nm_per_a": 0.035,
+        "current_feedback_source": "equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured",
+        "max_track_speed_mps": 4.166666666666667,
+        "track_acceleration_mps2": 1.5,
+        "velocity_gain": 0.04,
+        "integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+        "integral_update_period_s": 0.05,
+        "integral_state_count_per_env": 2,
+        "integral_state_unit": "Nm_per_proxy_wheel",
+        "integral_error_source": "per_side_mean_target_minus_actual_wheel_qd_rad_s",
+        "integral_broadcast": "same_side_integral_ff_to_each_of_7_proxy_wheels",
+        "integral_limit_nm_per_proxy_wheel": 2.0,
+        "integral_antiwindup": "conditional_on_side_mean_P_estimate; final_safety_is_Newton_native_per_wheel_clamp",
+        "integral_gain_status": "uncalibrated simulation candidate; not real motor/controller calibration",
+        "wheel_effort_limit_nm": 2.0,
+        "actuator_effort_limit_nm": 2.0,
+        "joint_effort_limit_nm": 2.0,
+        "effort_clamp_source": "NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward",
+        "wheel_effort_limit_basis": "actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+        "gimbal_solver_joint_effort_limit_nm": 1.0,
+        "gimbal_effort_limit_basis": "implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range",
+        "drive_sprocket_radius_m": 0.03,
+        "drive_sprocket_diameter_m": 0.06,
+        "drive_reduction_ratio": 4.0,
+        "proxy_wheel_radius_m": 0.045,
+        "proxy_wheel_count_per_side": 7,
+        "track_ground_contact_length_m": 0.595,
+        "robot_asset_spec_sha256": "b381e579e3d80259c6fd8a953907f35e866dd2df74bebd5cab4e0205df794718",
+        "drive_efficiency_assumption": 1.0,
+        "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+        "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+        "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+        "same_side_wheel_coupling": {
+          "enabled": true,
+          "treatment": "same_side_wheel0_master_six_mimic_followers_each_side",
+          "relation": "q_follower = 0 + 1*q_leader",
+          "relations_per_world": 14,
+          "leader_wheel_index_per_side": 0,
+          "follower_wheel_indices_per_side": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "equality_solref": [
+            0.004,
+            1.0
+          ],
+          "equality_solimp": [
+            0.999,
+            0.9999,
+            0.001,
+            0.5,
+            2.0
+          ],
+          "execution": "retain existing per-wheel actuators, PI state and configured effort limits",
+          "source_usd_changed": false,
+          "wheel_relations_per_world": 12,
+          "guide_relations_per_world": 2,
+          "front_guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0"
+        },
+        "physics_contact": {
+          "backend": "NewtonCfg",
+          "physics_manager": "ResolvableString",
+          "solver_cfg": "MJWarpSolverCfg",
+          "solver_type": "mujoco_warp",
+          "solver": "newton",
+          "physics_dt_s": 0.001,
+          "decimation": 50,
+          "policy_dt_s": 0.05,
+          "newton_num_substeps": 1,
+          "collision_decimation": 0,
+          "cone": "elliptic",
+          "impratio": 1.0,
+          "njmax": 256,
+          "nconmax": 128,
+          "iterations": 40,
+          "ls_iterations": 30,
+          "tolerance": 1e-06,
+          "integrator": "implicitfast",
+          "use_mujoco_contacts": false,
+          "disable_contacts": false,
+          "contact_generation": "newton_collision_pipeline",
+          "shape_cfg_defaults": {
+            "mu": 0.8,
+            "kf": null,
+            "ke": 2500.0,
+            "kd": 100.0,
+            "margin": 0.002,
+            "gap": 0.005,
+            "kf_source": "not_exposed_by_NewtonShapeCfg"
+          },
+          "actual_wheel_ground_shape_materials": {
+            "ground": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            },
+            "wheel": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            },
+            "passive_front_guide": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            }
+          },
+          "front_guide_contact_body_names": [
+            "left_front_guide_link",
+            "right_front_guide_link"
+          ]
+        },
+        "front_guide": {
+          "enabled": true,
+          "model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+          "wheels": [
+            {
+              "name": "left_front_guide",
+              "side": "left",
+              "x_m": 0.42,
+              "y_m": 0.205,
+              "z_m": -0.05499999999999999,
+              "radius_m": 0.045,
+              "width_m": 0.06,
+              "mass_kg": 0.25
+            },
+            {
+              "name": "right_front_guide",
+              "side": "right",
+              "x_m": 0.42,
+              "y_m": -0.205,
+              "z_m": -0.05499999999999999,
+              "radius_m": 0.045,
+              "width_m": 0.06,
+              "mass_kg": 0.25
+            }
+          ],
+          "drive_motor_count": 0,
+          "added_drive_torque_nm": 0.0,
+          "rotation_coupling": "same_side_track_speed",
+          "coupling": {
+            "enabled": true,
+            "relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+            "relations_per_world": 2,
+            "leader_joint_by_side": {
+              "left": "left_wheel_0_wheel_joint",
+              "right": "right_wheel_0_wheel_joint"
+            },
+            "ratio_by_side": {
+              "left": 1.0,
+              "right": 1.0
+            },
+            "guide_actuator_count": 0,
+            "added_pid_count": 0
+          }
+        },
+        "body_stability": {
+          "enabled": true,
+          "config": {
+            "excess_tilt_threshold_rad": 0.6108652381980153,
+            "tilt_weight": 0.0,
+            "angular_rate_weight": 0.0
+          },
+          "rate_source": "root_link_com_angular_velocity_world_rotated_to_body",
+          "policy_observation_included": false,
+          "hard_tilt_termination_rad": 1.2
+        }
+      },
+      "observation_config": {
+        "schema": "sensor-minimal-v6",
+        "state_dim": 33,
+        "state_fields": [
+          "mode_0_search_1_goto",
+          "goal_local_x_over_field_size",
+          "goal_local_y_over_field_size",
+          "estimated_x_normalized",
+          "estimated_y_normalized",
+          "heading_sin",
+          "heading_cos",
+          "previous_left_track_speed",
+          "previous_right_track_speed",
+          "previous_gimbal_yaw_rate",
+          "previous_gimbal_pitch_rate",
+          "episode_time_ratio",
+          "lidar_age_ratio",
+          "lidar_new_frame",
+          "lidar_motion_dx_over_lidar_range",
+          "lidar_motion_dy_over_lidar_range",
+          "lidar_heading_delta_over_pi",
+          "lidar_gimbal_yaw_delta_over_pi",
+          "lidar_gimbal_pitch_delta_over_pi",
+          "depth_age_ratio",
+          "depth_new_frame",
+          "depth_motion_dx_over_lidar_range",
+          "depth_motion_dy_over_lidar_range",
+          "depth_heading_delta_over_pi",
+          "depth_gimbal_yaw_delta_over_pi",
+          "depth_gimbal_pitch_delta_over_pi",
+          "camera_age_ratio",
+          "camera_new_frame",
+          "camera_motion_dx_over_lidar_range",
+          "camera_motion_dy_over_lidar_range",
+          "camera_heading_delta_over_pi",
+          "camera_gimbal_yaw_delta_over_pi",
+          "camera_gimbal_pitch_delta_over_pi"
+        ],
+        "observation_shapes": {
+          "lidar": [
+            1,
+            400
+          ],
+          "depth": [
+            1,
+            160,
+            88
+          ],
+          "detections": [
+            16,
+            8
+          ],
+          "state": [
+            33
+          ],
+          "feedback": [
+            37
+          ]
+        },
+        "lidar_fields": [
+          "normalized_range"
+        ],
+        "lidar_invalid_value": 0.0,
+        "detection_fields": [
+          "cx",
+          "cy",
+          "width",
+          "height",
+          "class_id",
+          "confidence",
+          "range",
+          "range_valid"
+        ],
+        "detection_presence": "positive width and height",
+        "feedback": {
+          "input_schema": "sensor-minimal-v6",
+          "state_dim": 33,
+          "schema": "gimbal-imu-drive-feedback-v2",
+          "dimension": 37,
+          "value_dimension": 21,
+          "value_order": [
+            "云台IMU加速度X / 9.80665（g）",
+            "云台IMU加速度Y / 9.80665（g）",
+            "云台IMU加速度Z / 9.80665（g）",
+            "云台IMU角速度X / π（rad/s）",
+            "云台IMU角速度Y / π（rad/s）",
+            "云台IMU角速度Z / π（rad/s）",
+            "磁场X计数 / 32768",
+            "磁场Y计数 / 32768",
+            "磁场Z计数 / 32768",
+            "云台IMU姿态四元数X",
+            "云台IMU姿态四元数Y",
+            "云台IMU姿态四元数Z",
+            "云台IMU姿态四元数W",
+            "云台偏航关节角 / π（rad）",
+            "云台偏航关节速率 / π（rad/s）",
+            "云台俯仰关节角 / π（rad）",
+            "云台俯仰关节速率 / π（rad/s）",
+            "左侧等效Iq / 100（A）",
+            "左侧机械转速 / 10000（rpm）",
+            "右侧等效Iq / 100（A）",
+            "右侧机械转速 / 10000（rpm）"
+          ],
+          "valid_order": [
+            "accel",
+            "gyro",
+            "mag",
+            "attitude",
+            "gimbal_yaw",
+            "gimbal_pitch",
+            "motor_left",
+            "motor_right"
+          ],
+          "age_order": [
+            "accel",
+            "gyro",
+            "mag",
+            "attitude",
+            "gimbal_yaw",
+            "gimbal_pitch",
+            "motor_left",
+            "motor_right"
+          ],
+          "group_slices": {
+            "accel": {
+              "start": 0,
+              "stop": 3
+            },
+            "gyro": {
+              "start": 3,
+              "stop": 6
+            },
+            "mag": {
+              "start": 6,
+              "stop": 9
+            },
+            "attitude": {
+              "start": 9,
+              "stop": 13
+            },
+            "gimbal_yaw": {
+              "start": 13,
+              "stop": 15
+            },
+            "gimbal_pitch": {
+              "start": 15,
+              "stop": 17
+            },
+            "motor_left": {
+              "start": 17,
+              "stop": 19
+            },
+            "motor_right": {
+              "start": 19,
+              "stop": 21
+            }
+          },
+          "valid_slice": {
+            "start": 21,
+            "stop": 29
+          },
+          "age_slice": {
+            "start": 29,
+            "stop": 37
+          },
+          "labels": [
+            "云台IMU加速度X / 9.80665（g）",
+            "云台IMU加速度Y / 9.80665（g）",
+            "云台IMU加速度Z / 9.80665（g）",
+            "云台IMU角速度X / π（rad/s）",
+            "云台IMU角速度Y / π（rad/s）",
+            "云台IMU角速度Z / π（rad/s）",
+            "磁场X计数 / 32768",
+            "磁场Y计数 / 32768",
+            "磁场Z计数 / 32768",
+            "云台IMU姿态四元数X",
+            "云台IMU姿态四元数Y",
+            "云台IMU姿态四元数Z",
+            "云台IMU姿态四元数W",
+            "云台偏航关节角 / π（rad）",
+            "云台偏航关节速率 / π（rad/s）",
+            "云台俯仰关节角 / π（rad）",
+            "云台俯仰关节速率 / π（rad/s）",
+            "左侧等效Iq / 100（A）",
+            "左侧机械转速 / 10000（rpm）",
+            "右侧等效Iq / 100（A）",
+            "右侧机械转速 / 10000（rpm）",
+            "有效标记：accel",
+            "有效标记：gyro",
+            "有效标记：mag",
+            "有效标记：attitude",
+            "有效标记：gimbal_yaw",
+            "有效标记：gimbal_pitch",
+            "有效标记：motor_left",
+            "有效标记：motor_right",
+            "数据年龄 / 2秒：accel",
+            "数据年龄 / 2秒：gyro",
+            "数据年龄 / 2秒：mag",
+            "数据年龄 / 2秒：attitude",
+            "数据年龄 / 2秒：gimbal_yaw",
+            "数据年龄 / 2秒：gimbal_pitch",
+            "数据年龄 / 2秒：motor_left",
+            "数据年龄 / 2秒：motor_right"
+          ],
+          "simulation_assumptions": {
+            "name": "simulated-gimbal-imu-drive-feedback-v1",
+            "dt_s": 0.05,
+            "filter_rate_hz": 20.0,
+            "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+            "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+            "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+            "magnetic_reference": "ENU with magnetic north along +Y",
+            "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+            "sensor_mount_rot_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+            "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+            "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+            "accel_white_noise_std_mps2": 0.025,
+            "accel_episode_bias_std_mps2": 0.05,
+            "gyro_white_noise_std_rad_s": 0.0015,
+            "gyro_episode_bias_std_rad_s": 0.003,
+            "mag_white_noise_std_counts": 12.0,
+            "mag_episode_bias_std_counts": 24.0,
+            "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+            "gimbal_position_white_noise_std_rad": 0.0005,
+            "gimbal_rate_white_noise_std_rad_s": 0.003,
+            "motor_iq_white_noise_std_A": 0.02,
+            "motor_rpm_white_noise_std_rpm": 1.0,
+            "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+            "timeout_s": 0.25,
+            "age_max_s": 2.0,
+            "value_scaling": {
+              "accel": {
+                "factor": 0.10197162129779283,
+                "unit": "g (m/s^2 divided by 9.80665)"
+              },
+              "gyro": {
+                "factor": 0.3183098861837907,
+                "unit": "rad/s divided by pi"
+              },
+              "mag_counts": {
+                "factor": 3.0517578125e-05,
+                "unit": "raw signed counts / 32768"
+              },
+              "attitude_quaternion": {
+                "factor": 1.0,
+                "unit": "unitless xyzw"
+              },
+              "gimbal_position": {
+                "factor": 0.3183098861837907,
+                "unit": "rad / pi"
+              },
+              "gimbal_rate": {
+                "factor": 0.3183098861837907,
+                "unit": "rad/s / pi"
+              },
+              "motor_iq": {
+                "factor": 0.01,
+                "unit": "A / 100; simulation value is model-equivalent"
+              },
+              "motor_rpm": {
+                "factor": 0.0001,
+                "unit": "mechanical rpm / 10000"
+              },
+              "age": {
+                "factor": 0.5,
+                "unit": "s / age_max_s; bounded, not signal-clipped"
+              }
+            }
+          },
+          "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+        },
+        "feedback_dim": 37,
+        "estimated_pose": {
+          "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+          "position_noise_std_m": 0.025,
+          "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+          "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+          "gimbal_source": "feedback measured joint positions; zero when invalid"
+        },
+        "imu_mount_body": "gimbal_pitch_link",
+        "imu_offset_pos_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "imu_offset_rot_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "depth_channels": 1,
+        "depth_invalid_value": 0.0,
+        "depth_value_range": [
+          0.0,
+          1.0
+        ],
+        "depth_space_bounds": [
+          -1.0,
+          1.0
+        ],
+        "measured_velocity_indices": [],
+        "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+        "previous_command_indices": [
+          7,
+          8,
+          9,
+          10
+        ],
+        "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+        "action_components": [
+          "left_track_speed",
+          "right_track_speed",
+          "gimbal_yaw_rate",
+          "gimbal_pitch_rate"
+        ]
+      }
+    },
+    "environment_rng_reinitialized": true,
+    "bitwise_resume": false
+  },
+  "checkpoints": {
+    "57344_baseline": {
+      "path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2/parent_checkpoint_baseline.zip",
+      "sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a",
+      "num_timesteps": 57344,
+      "adam_optimizer_state_present": true,
+      "zip_integrity": true
+    },
+    "196608_final": {
+      "path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_resume_20261021_attempt2/stage_01_global_random.zip",
+      "sha256": "c5ab17ceb785e1abfed0a1bfc292b1ad31912801ea91b6e77f672463a508585b",
+      "num_timesteps": 196608,
+      "adam_optimizer_state_present": true,
+      "zip_integrity": true
+    }
+  },
+  "development_splits": {
+    "rough_a": {
+      "environment_seed": 80003,
+      "episode_seeds": [
+        87001,
+        87002,
+        87003,
+        87004
+      ],
+      "plants": 0,
+      "goal_angle_deg": 180.0,
+      "goal_distance_m": null
+    },
+    "rough_b": {
+      "environment_seed": 80004,
+      "episode_seeds": [
+        82001,
+        82002,
+        82003,
+        82004
+      ],
+      "plants": 0,
+      "goal_angle_deg": 180.0,
+      "goal_distance_m": null
+    }
+  },
+  "child_source_hashes": [
+    {
+      "path": "external/llm-viz/LICENSE",
+      "sha256": "97780c03931db18c9770a3932a264182d3d3603d142a72cba8033c94786e0f93"
+    },
+    {
+      "path": "external/llm-viz/src/llm/Sidebar.module.scss",
+      "sha256": "8ae013ffce4f5a4a411c248240cecbf97e733c00d689c2c0c93b7523a8c91e15"
+    },
+    {
+      "path": "external/llm-viz/src/llm/Sidebar.tsx",
+      "sha256": "535e34d3f73ec1373da20e651bcc66b2e5dcfb3b6e2937265443f8a86dc7cf4e"
+    },
+    {
+      "path": "external/llm-viz/src/llm/components/TocDiagram.module.scss",
+      "sha256": "9e8bb281e6eb9480c8102c4ee987ea29fb4ae31f02e48629af0e99eb158d203e"
+    },
+    {
+      "path": "external/llm-viz/src/llm/components/TocDiagram.tsx",
+      "sha256": "5577a1948d6a107cc9179879760fd37eb1e934611c91182269f7a08b4336604e"
+    },
+    {
+      "path": "external/llm-viz/src/utils/bezier.ts",
+      "sha256": "cccab942a1d7e1933ff14f8e93e558417e5d484b4b151e30dc4a3e5b2ab3737f"
+    },
+    {
+      "path": "isaac_field/__init__.py",
+      "sha256": "fa5d679eaafe1d5e4f4be39c62971aa65b7086ed5ce473de5fad3eeec748e08c"
+    },
+    {
+      "path": "isaac_field/__main__.py",
+      "sha256": "f0aaf87dbf8881e65bbf9fc941e029871deffab03019c4c9165dc4067fdbcce0"
+    },
+    {
+      "path": "isaac_field/action_contract.py",
+      "sha256": "5e3e2207301d5d7407e640d8f16e1847ccfee3dbdf4df401a77af7697dab9b91"
+    },
+    {
+      "path": "isaac_field/adversarial_training.py",
+      "sha256": "127cd8ebb8b71b6385aaf5a902a0f23106f311fad58edb81d1e80278e168408f"
+    },
+    {
+      "path": "isaac_field/adversary.py",
+      "sha256": "a37c5d5b29308e1905fe947f7c72051ab5b4bcec133890a93653404816ba135d"
+    },
+    {
+      "path": "isaac_field/assets.py",
+      "sha256": "d6e5f07e6c6170dd04dfb7c7febd187a811eaa8886fea1e976b2bc3521da41f0"
+    },
+    {
+      "path": "isaac_field/body_stability.py",
+      "sha256": "7d3430a15026285c7a0119239b5c7a6aaba6f36cdc07bb387bc5fb4cc6b3eaad"
+    },
+    {
+      "path": "isaac_field/curriculum_control.py",
+      "sha256": "e9c0ee9b7be232f10f9d55988911dd20ae85f458d21d48a7a745163b8f2e49d6"
+    },
+    {
+      "path": "isaac_field/drive_control.py",
+      "sha256": "245e1afb80a229fd651b7fcb9acbf755b2188d5e5f83fe0e7aa50e98939b33eb"
+    },
+    {
+      "path": "isaac_field/env.py",
+      "sha256": "42126df14257a90594b08ea63e6d05f6d48fb9ed47617511e147ef824156f934"
+    },
+    {
+      "path": "isaac_field/feedback.py",
+      "sha256": "25216fb7dcb3e7cee2a66c8e6e8cba08c656cde0cccb02712242684f4dbdd88f"
+    },
+    {
+      "path": "isaac_field/layouts.py",
+      "sha256": "d1119c485432df397fa7c62d90b12a6ac230db95c8a404ad9dc826ab7bc0b2fc"
+    },
+    {
+      "path": "isaac_field/learning.py",
+      "sha256": "37765bea7047663b8c8c339eb3542dd85db3bf477043f05107bee8f3ea143467"
+    },
+    {
+      "path": "isaac_field/navigation.py",
+      "sha256": "946403a2884756dd9408561a82eb84f6aeca977b328e8400f133b0dd511470d8"
+    },
+    {
+      "path": "isaac_field/newton_drive.py",
+      "sha256": "97fd298606c4e3d00759bed2d50ca92d88675bc8b78d6cd8cfc2890423538789"
+    },
+    {
+      "path": "isaac_field/policy.py",
+      "sha256": "a758cacaf8ef80dd9b263797870c12630b9448948ecf720c59bf9657fe357858"
+    },
+    {
+      "path": "isaac_field/scene_assets.py",
+      "sha256": "3b06c408fc9fde114e2fba1ab933cbc2ccd8f76a9454d9cd8785ca31117698c7"
+    },
+    {
+      "path": "isaac_field/task.py",
+      "sha256": "01f53d03599843ed9b0cc20c93788a1237d806509867b985c1edb1931739294f"
+    },
+    {
+      "path": "isaac_field/tasks.py",
+      "sha256": "f3e2b2373d01281a74b91250c4e66767a6c7a48d43c69501a5e8daa186e167ce"
+    },
+    {
+      "path": "isaac_field/telemetry.py",
+      "sha256": "7e613d172649d282640f70a092a423919b189f0829bdb76bd5c114f866b7402c"
+    },
+    {
+      "path": "isaac_field/terrain.py",
+      "sha256": "78dea28ecd281a1730a71673fa1a31edc06e896d925c46a0fde4cab016785e71"
+    },
+    {
+      "path": "isaac_field/training.py",
+      "sha256": "3e329372db08c6513730c21c972d1ed039f2026e8139f8d3964ecd2cbbd7b9dc"
+    },
+    {
+      "path": "isaac_field/training_diagnostics.py",
+      "sha256": "37be9c02a62f7a30d7d3d43eee7f9bb37b4fc332b79ac540be93a40c0d904eb3"
+    },
+    {
+      "path": "isaac_field/viewer.py",
+      "sha256": "366e2c8d5318f54f49e70d088eda21360843557232ac48a7ea6d96a687403c22"
+    },
+    {
+      "path": "isaac_field/visualization/THIRD_PARTY_NOTICES.md",
+      "sha256": "e3099d5d4b8a17631cd8a4180447b646821735d9118c02e0dde3245891a65af6"
+    },
+    {
+      "path": "isaac_field/visualization/__init__.py",
+      "sha256": "dbcf4fea4fbe34c62a6f5fa3767f3f81b9d02db2a80c504defe31c920cc7b54b"
+    },
+    {
+      "path": "isaac_field/visualization/activation_maps.py",
+      "sha256": "c88528885400711cb707d7215a8748ab59d4bcc2d4f4fc3f97d27a0cd439ba08"
+    },
+    {
+      "path": "isaac_field/visualization/inspection.py",
+      "sha256": "3416f8aa84e2fa94116ad08ff1665f472ecd2eba37b32e7d4449a24a9519da0e"
+    },
+    {
+      "path": "isaac_field/visualization/network_2d.html",
+      "sha256": "16d80835e24ce4b92f91caa73d1f3ca7f3289fbdefca9bcb057dce181745487b"
+    },
+    {
+      "path": "isaac_field/visualization/network_2d.py",
+      "sha256": "dbbef3ec06c74d9af7bb0c9487ad09eab4e04035bda361fe07dbba4eb3b4d875"
+    },
+    {
+      "path": "isaac_field/visualization/network_layout.py",
+      "sha256": "e95cea733099913c81827dccab6dab20877acca956d1c1a440f9ac49d601508b"
+    },
+    {
+      "path": "isaac_field/visualization/network_panel.py",
+      "sha256": "8c1ab0ca79deafd1987e02dbf9101d61ab2f227056dcc8c30918fadb0b384933"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "18491b1d8d1a0a93bfddc3663c1542c31744b11bb6df3ac1b5caa998be085d7b"
+    },
+    {
+      "path": "scripts/compare_isaac_exploration.py",
+      "sha256": "481dfcc98cfe1c19787d781c633b333575bcfd4dceeaa22768aa7622232dfb33"
+    },
+    {
+      "path": "scripts/improve_isaac_policy.py",
+      "sha256": "d05892b00da3583ca12d59076b388f15cec3916a4bc2f144abbc1894299151b8"
+    },
+    {
+      "path": "scripts/install_isaaclab.sh",
+      "sha256": "445e206c21fb7c6cfc19b4f18da55e1a74238893528b3c503bb9e2b032aeca56"
+    },
+    {
+      "path": "scripts/isaaclab_python.sh",
+      "sha256": "1bd069fd07fd5cac2cb4759c24bfdf43fab3741018020261261cb7890000b5fd"
+    },
+    {
+      "path": "scripts/resume_fast_stop.py",
+      "sha256": "f14ecb87f4574e1518e1afd64941df73ed934e7831a197449675f3d85c3fe2a2"
+    },
+    {
+      "path": "scripts/train_isaac_foundation.py",
+      "sha256": "2994f890b8897e64f29c1f51124a6b30357d546dd3c4979b1f6e39d871d66617"
+    },
+    {
+      "path": "scripts/train_isaac_foundation_fresh.py",
+      "sha256": "4002196608616a5e57fba7716659da6f41ddd7ec77a84fd0c0ae6508f7565eae"
+    }
+  ],
+  "parent_source_hashes": [
+    {
+      "path": "external/llm-viz/LICENSE",
+      "sha256": "97780c03931db18c9770a3932a264182d3d3603d142a72cba8033c94786e0f93"
+    },
+    {
+      "path": "external/llm-viz/src/llm/Sidebar.module.scss",
+      "sha256": "8ae013ffce4f5a4a411c248240cecbf97e733c00d689c2c0c93b7523a8c91e15"
+    },
+    {
+      "path": "external/llm-viz/src/llm/Sidebar.tsx",
+      "sha256": "535e34d3f73ec1373da20e651bcc66b2e5dcfb3b6e2937265443f8a86dc7cf4e"
+    },
+    {
+      "path": "external/llm-viz/src/llm/components/TocDiagram.module.scss",
+      "sha256": "9e8bb281e6eb9480c8102c4ee987ea29fb4ae31f02e48629af0e99eb158d203e"
+    },
+    {
+      "path": "external/llm-viz/src/llm/components/TocDiagram.tsx",
+      "sha256": "5577a1948d6a107cc9179879760fd37eb1e934611c91182269f7a08b4336604e"
+    },
+    {
+      "path": "external/llm-viz/src/utils/bezier.ts",
+      "sha256": "cccab942a1d7e1933ff14f8e93e558417e5d484b4b151e30dc4a3e5b2ab3737f"
+    },
+    {
+      "path": "isaac_field/__init__.py",
+      "sha256": "fa5d679eaafe1d5e4f4be39c62971aa65b7086ed5ce473de5fad3eeec748e08c"
+    },
+    {
+      "path": "isaac_field/__main__.py",
+      "sha256": "f0aaf87dbf8881e65bbf9fc941e029871deffab03019c4c9165dc4067fdbcce0"
+    },
+    {
+      "path": "isaac_field/action_contract.py",
+      "sha256": "5e3e2207301d5d7407e640d8f16e1847ccfee3dbdf4df401a77af7697dab9b91"
+    },
+    {
+      "path": "isaac_field/adversarial_training.py",
+      "sha256": "127cd8ebb8b71b6385aaf5a902a0f23106f311fad58edb81d1e80278e168408f"
+    },
+    {
+      "path": "isaac_field/adversary.py",
+      "sha256": "a37c5d5b29308e1905fe947f7c72051ab5b4bcec133890a93653404816ba135d"
+    },
+    {
+      "path": "isaac_field/assets.py",
+      "sha256": "d6e5f07e6c6170dd04dfb7c7febd187a811eaa8886fea1e976b2bc3521da41f0"
+    },
+    {
+      "path": "isaac_field/body_stability.py",
+      "sha256": "7d3430a15026285c7a0119239b5c7a6aaba6f36cdc07bb387bc5fb4cc6b3eaad"
+    },
+    {
+      "path": "isaac_field/curriculum_control.py",
+      "sha256": "e9c0ee9b7be232f10f9d55988911dd20ae85f458d21d48a7a745163b8f2e49d6"
+    },
+    {
+      "path": "isaac_field/drive_control.py",
+      "sha256": "245e1afb80a229fd651b7fcb9acbf755b2188d5e5f83fe0e7aa50e98939b33eb"
+    },
+    {
+      "path": "isaac_field/env.py",
+      "sha256": "42126df14257a90594b08ea63e6d05f6d48fb9ed47617511e147ef824156f934"
+    },
+    {
+      "path": "isaac_field/feedback.py",
+      "sha256": "25216fb7dcb3e7cee2a66c8e6e8cba08c656cde0cccb02712242684f4dbdd88f"
+    },
+    {
+      "path": "isaac_field/layouts.py",
+      "sha256": "d1119c485432df397fa7c62d90b12a6ac230db95c8a404ad9dc826ab7bc0b2fc"
+    },
+    {
+      "path": "isaac_field/learning.py",
+      "sha256": "37765bea7047663b8c8c339eb3542dd85db3bf477043f05107bee8f3ea143467"
+    },
+    {
+      "path": "isaac_field/navigation.py",
+      "sha256": "946403a2884756dd9408561a82eb84f6aeca977b328e8400f133b0dd511470d8"
+    },
+    {
+      "path": "isaac_field/newton_drive.py",
+      "sha256": "97fd298606c4e3d00759bed2d50ca92d88675bc8b78d6cd8cfc2890423538789"
+    },
+    {
+      "path": "isaac_field/policy.py",
+      "sha256": "a758cacaf8ef80dd9b263797870c12630b9448948ecf720c59bf9657fe357858"
+    },
+    {
+      "path": "isaac_field/scene_assets.py",
+      "sha256": "3b06c408fc9fde114e2fba1ab933cbc2ccd8f76a9454d9cd8785ca31117698c7"
+    },
+    {
+      "path": "isaac_field/task.py",
+      "sha256": "01f53d03599843ed9b0cc20c93788a1237d806509867b985c1edb1931739294f"
+    },
+    {
+      "path": "isaac_field/tasks.py",
+      "sha256": "f3e2b2373d01281a74b91250c4e66767a6c7a48d43c69501a5e8daa186e167ce"
+    },
+    {
+      "path": "isaac_field/telemetry.py",
+      "sha256": "7e613d172649d282640f70a092a423919b189f0829bdb76bd5c114f866b7402c"
+    },
+    {
+      "path": "isaac_field/terrain.py",
+      "sha256": "78dea28ecd281a1730a71673fa1a31edc06e896d925c46a0fde4cab016785e71"
+    },
+    {
+      "path": "isaac_field/training.py",
+      "sha256": "3e329372db08c6513730c21c972d1ed039f2026e8139f8d3964ecd2cbbd7b9dc"
+    },
+    {
+      "path": "isaac_field/training_diagnostics.py",
+      "sha256": "37be9c02a62f7a30d7d3d43eee7f9bb37b4fc332b79ac540be93a40c0d904eb3"
+    },
+    {
+      "path": "isaac_field/viewer.py",
+      "sha256": "366e2c8d5318f54f49e70d088eda21360843557232ac48a7ea6d96a687403c22"
+    },
+    {
+      "path": "isaac_field/visualization/THIRD_PARTY_NOTICES.md",
+      "sha256": "e3099d5d4b8a17631cd8a4180447b646821735d9118c02e0dde3245891a65af6"
+    },
+    {
+      "path": "isaac_field/visualization/__init__.py",
+      "sha256": "dbcf4fea4fbe34c62a6f5fa3767f3f81b9d02db2a80c504defe31c920cc7b54b"
+    },
+    {
+      "path": "isaac_field/visualization/activation_maps.py",
+      "sha256": "c88528885400711cb707d7215a8748ab59d4bcc2d4f4fc3f97d27a0cd439ba08"
+    },
+    {
+      "path": "isaac_field/visualization/inspection.py",
+      "sha256": "3416f8aa84e2fa94116ad08ff1665f472ecd2eba37b32e7d4449a24a9519da0e"
+    },
+    {
+      "path": "isaac_field/visualization/network_2d.html",
+      "sha256": "16d80835e24ce4b92f91caa73d1f3ca7f3289fbdefca9bcb057dce181745487b"
+    },
+    {
+      "path": "isaac_field/visualization/network_2d.py",
+      "sha256": "dbbef3ec06c74d9af7bb0c9487ad09eab4e04035bda361fe07dbba4eb3b4d875"
+    },
+    {
+      "path": "isaac_field/visualization/network_layout.py",
+      "sha256": "e95cea733099913c81827dccab6dab20877acca956d1c1a440f9ac49d601508b"
+    },
+    {
+      "path": "isaac_field/visualization/network_panel.py",
+      "sha256": "8c1ab0ca79deafd1987e02dbf9101d61ab2f227056dcc8c30918fadb0b384933"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "18491b1d8d1a0a93bfddc3663c1542c31744b11bb6df3ac1b5caa998be085d7b"
+    },
+    {
+      "path": "scripts/compare_isaac_exploration.py",
+      "sha256": "481dfcc98cfe1c19787d781c633b333575bcfd4dceeaa22768aa7622232dfb33"
+    },
+    {
+      "path": "scripts/improve_isaac_policy.py",
+      "sha256": "d05892b00da3583ca12d59076b388f15cec3916a4bc2f144abbc1894299151b8"
+    },
+    {
+      "path": "scripts/install_isaaclab.sh",
+      "sha256": "445e206c21fb7c6cfc19b4f18da55e1a74238893528b3c503bb9e2b032aeca56"
+    },
+    {
+      "path": "scripts/isaaclab_python.sh",
+      "sha256": "1bd069fd07fd5cac2cb4759c24bfdf43fab3741018020261261cb7890000b5fd"
+    },
+    {
+      "path": "scripts/train_isaac_foundation.py",
+      "sha256": "2994f890b8897e64f29c1f51124a6b30357d546dd3c4979b1f6e39d871d66617"
+    },
+    {
+      "path": "scripts/train_isaac_foundation_fresh.py",
+      "sha256": "4002196608616a5e57fba7716659da6f41ddd7ec77a84fd0c0ae6508f7565eae"
+    }
+  ],
+  "evaluation_runner_sha256": "402e2c5764d35022fc0ad236f8d58a8e1b0770ceaad63487d07b6ee8f8a427c1",
+  "blind_830xx": {
+    "used": false,
+    "observed": false
+  },
+  "completed_at_utc": "2026-10-21T03:28:09.543758+00:00"
+}

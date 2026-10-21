@@ -1,0 +1,242 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-10-21",
+  "status": "signed32_le_raw_format_confirmed_threshold_candidate_not_device_qualified_or_firmware_release",
+  "source_p1_sha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef",
+  "raw_format": {
+    "source": "BQ76952 TRM Rev B, DASTATUS6 0x0076 and DASTATUS7 0x0077",
+    "width_bits": 32,
+    "type": "I4 signed two's complement, positive thermistor counts expected; treat negative/impossible values as sensor/AFE fault",
+    "byte_order": "little-endian",
+    "unit": "raw ADC counts",
+    "thermistor_lsb_volts": 3.5762786865234375e-07,
+    "open_circuit_ideal_asymptote_counts": 5033164.8,
+    "open_circuit_note": "Ideal open-circuit analog asymptote before integer quantization (approximately 5,033,165 counts); this is not the ADC digital full-scale code.",
+    "do_not_confuse_with": "TSx/CFETOFF/DCHG Temperature command I2 readings in 0.1 K"
+  },
+  "equation": "raw = ((3/5)*2^23) * (R_NTC + Rseries) / (R_NTC + Rseries + Rpullup)",
+  "stress_assumptions": {
+    "internal_pullup_ohm_bracket": [
+      15000.0,
+      22000.0
+    ],
+    "pin_series_ohm_bracket": [
+      400.0,
+      600.0
+    ],
+    "notice": "These are deliberately conservative sensitivity brackets for paper screening only, not TI guaranteed resistor tolerances. TI says the 18k pullups and pad resistances are factory measured/stored for temperature calculation. Actual firmware thresholds must be confirmed using the actual device raw counts."
+  },
+  "candidate_fault_thresholds": {
+    "short_or_impossibly_hot": "raw <= 250000 counts",
+    "open_or_impossibly_cold": "raw >= 4700000 counts",
+    "valid": "250000 < raw < 4700000 counts",
+    "reason": "Separates modelled hard short/open from Semitec cell envelope -20..75 C and A1 board/MOS envelope -20..80 C within the stated stress bracket. Candidate only; lower threshold also fails closed for extreme hot readings."
+  },
+  "scenarios": {
+    "semitec_103at2_cell_envelope_-20_to_75C": {
+      "-20C": {
+        "raw_min": 3898541.5639031986,
+        "raw_max": 4242762.954532832,
+        "resistance_min_ohm": 75191.53706469042,
+        "resistance_max_ohm": 79917.83366013913
+      },
+      "+75C": {
+        "raw_min": 469157.8115086133,
+        "raw_max": 734497.7950366298,
+        "resistance_min_ohm": 1861.4934375026478,
+        "resistance_max_ohm": 1962.996136436795
+      }
+    },
+    "a1_board_mos_envelope_-20_to_80C": {
+      "-20C": {
+        "raw_min": 4019695.529099928,
+        "raw_max": 4335322.434466248,
+        "resistance_min_ohm": 86858.0,
+        "resistance_max_ohm": 92587.0
+      },
+      "+80C": {
+        "raw_min": 339441.5326522826,
+        "raw_max": 557118.5558546274,
+        "resistance_min_ohm": 1191.0,
+        "resistance_max_ohm": 1267.0
+      }
+    },
+    "hard_short_Rntc_0": {
+      "raw_min": 89877.94285714286,
+      "raw_max": 193583.26153846155
+    },
+    "hard_open_Rntc_infinity": {
+      "raw": 5033164.8
+    }
+  },
+  "channels": [
+    {
+      "channel": "TS1",
+      "pin": 21,
+      "designator": "NTC_CELL1",
+      "zone": "A",
+      "sensor": "Semitec 103AT-2",
+      "net": "BQ_TS1",
+      "temperature_command_i2": "0x70 TS1 Temperature(), 0.1 K",
+      "raw_source": {
+        "subcommand": "0x0076 DASTATUS6",
+        "byte_offsets_in_subcommand": [
+          24,
+          25,
+          26,
+          27
+        ],
+        "format": "32-bit little-endian signed I4"
+      },
+      "candidate_model": "TI 18K default",
+      "candidate_pin_byte": "0x07",
+      "raw_window_candidate": {
+        "raw_le_250000": "fault_short_or_hot",
+        "raw_ge_4700000": "fault_open_or_cold",
+        "strict_valid": "250000 < signed-I4-count < 4700000",
+        "status": "candidate_sensitivity_window_only; validate against actual silicon and each channel before firmware release"
+      }
+    },
+    {
+      "channel": "DCHG",
+      "pin": 31,
+      "designator": "NTC_CELL2",
+      "zone": "B",
+      "sensor": "Semitec 103AT-2",
+      "net": "BQ_DCHG",
+      "temperature_command_i2": "0x78 DCHG Temperature(), 0.1 K",
+      "raw_source": {
+        "subcommand": "0x0077 DASTATUS7",
+        "byte_offsets_in_subcommand": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "format": "32-bit little-endian signed I4"
+      },
+      "candidate_model": "TI 18K default",
+      "candidate_pin_byte": "0x07",
+      "raw_window_candidate": {
+        "raw_le_250000": "fault_short_or_hot",
+        "raw_ge_4700000": "fault_open_or_cold",
+        "strict_valid": "250000 < signed-I4-count < 4700000",
+        "status": "candidate_sensitivity_window_only; validate against actual silicon and each channel before firmware release"
+      }
+    },
+    {
+      "channel": "CFETOFF",
+      "pin": 29,
+      "designator": "NTC_CELL3",
+      "zone": "C",
+      "sensor": "Semitec 103AT-2",
+      "net": "BQ_CFETOFF",
+      "temperature_command_i2": "0x6A CFETOFF Temperature(), 0.1 K",
+      "raw_source": {
+        "subcommand": "0x0076 DASTATUS6",
+        "byte_offsets_in_subcommand": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "format": "32-bit little-endian signed I4"
+      },
+      "candidate_model": "TI 18K default",
+      "candidate_pin_byte": "0x07",
+      "raw_window_candidate": {
+        "raw_le_250000": "fault_short_or_hot",
+        "raw_ge_4700000": "fault_open_or_cold",
+        "strict_valid": "250000 < signed-I4-count < 4700000",
+        "status": "candidate_sensitivity_window_only; validate against actual silicon and each channel before firmware release"
+      }
+    },
+    {
+      "channel": "TS2",
+      "pin": 22,
+      "designator": "NTC_BOARD",
+      "zone": "board",
+      "sensor": "MF52A103F3950(A1)",
+      "net": "NTC_BOARD_NODE",
+      "temperature_command_i2": "0x72 TS2 Temperature(), 0.1 K",
+      "raw_source": {
+        "subcommand": "0x0076 DASTATUS6",
+        "byte_offsets_in_subcommand": [
+          28,
+          29,
+          30,
+          31
+        ],
+        "format": "32-bit little-endian signed I4"
+      },
+      "candidate_model": "Custom",
+      "candidate_pin_byte": "0x2B",
+      "raw_window_candidate": {
+        "raw_le_250000": "fault_short_or_hot",
+        "raw_ge_4700000": "fault_open_or_cold",
+        "strict_valid": "250000 < signed-I4-count < 4700000",
+        "status": "candidate_sensitivity_window_only; validate against actual silicon and each channel before firmware release"
+      }
+    },
+    {
+      "channel": "TS3",
+      "pin": 23,
+      "designator": "NTC_MOS",
+      "zone": "MOS hotspot",
+      "sensor": "MF52A103F3950(A1)",
+      "net": "BQ_TS3",
+      "temperature_command_i2": "0x74 TS3 Temperature(), 0.1 K",
+      "raw_source": {
+        "subcommand": "0x0077 DASTATUS7",
+        "byte_offsets_in_subcommand": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "format": "32-bit little-endian signed I4"
+      },
+      "candidate_model": "Custom",
+      "candidate_pin_byte": "0x2F",
+      "raw_window_candidate": {
+        "raw_le_250000": "fault_short_or_hot",
+        "raw_ge_4700000": "fault_open_or_cold",
+        "strict_valid": "250000 < signed-I4-count < 4700000",
+        "status": "candidate_sensitivity_window_only; validate against actual silicon and each channel before firmware release"
+      }
+    }
+  ],
+  "unresolved": "TI 18k default-model temperature error for Semitec 103AT-2 is not bench-qualified; the Shiheng MF52A103F3950(A1) GPC input package is prepared but returned coefficients have not been received, and no target-chip write/readback occurred; die-specific raw ranges, trip-window qualification, physical mounting, open/short response, and fault output action remain unverified.",
+  "sources": [
+    {
+      "title": "TI BQ76952 TRM Rev B",
+      "url": "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+      "sections": "4.8, 4.6, 12.4, 3.3.2"
+    },
+    {
+      "title": "Semitec AT thermistor product data",
+      "url": "https://www.semitec.co.jp/products/thermistor_at/",
+      "notes": "103AT-2,3: 10k, B=3435K +/-1%, -50..+110C; the beta equation here is only a tolerance-envelope proxy."
+    },
+    {
+      "title": "A1 manufacturer R/T table",
+      "path": "../../../BMS模块/厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+      "rows": "-20 C and +80 C min/max resistance rows"
+    }
+  ],
+  "threshold_qualification": {
+    "rawEncodingConfirmed": true,
+    "encoding": "signed 32-bit two's-complement little-endian raw ADC counts",
+    "candidateWindowCounts": {
+      "shortOrHotAtOrBelow": 250000,
+      "openOrColdAtOrAbove": 4700000,
+      "strictValid": "250000 < raw < 4700000"
+    },
+    "qualificationStatus": "candidate only; no per-device/per-channel characterization or firmware acceptance is evidenced",
+    "requiredBeforeEnable": [
+      "read back the configured model and channel routing on the target BQ76952",
+      "characterize realistic sensor envelope and injected hard open/short at each of the five channels",
+      "confirm fault action forces charge/discharge/precharge/balance off and latches fault"
+    ]
+  }
+}

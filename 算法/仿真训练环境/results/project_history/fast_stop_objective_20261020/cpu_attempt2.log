@@ -1,0 +1,87 @@
+.......................................................ssssssssssssssss. [ 18%]
+...................................F......................sss........... [ 36%]
+........................................................................ [ 54%]
+........................................................................ [ 72%]
+........................................................................ [ 90%]
+..............................s......                                    [100%]
+=================================== FAILURES ===================================
+__ test_fast_stop_evaluation_records_native_terminal_stop_contract_and_times ___
+
+    def test_fast_stop_evaluation_records_native_terminal_stop_contract_and_times() -> None:
+        objective = runner._fast_stop_objective_contract(
+            runner._profile_config(runner.PROFILE_RANDOM_ROUGH_FAST_STOP)
+        )
+    
+        def row(seed: int, success: bool, time_s: float, linear: float, angular: float, hold: float):
+            return {
+                "seed": seed, "success": success, "episode_time_s": time_s,
+                "final_distance": 0.3 if success else 2.0,
+                "goal_stop": {
+                    "schema": "goal_stop_v1", "profile": "fast_stop_v1",
+                    "linear_speed_m_s": linear, "angular_speed_rad_s": angular, "hold_s": hold,
+                    "stop_speed_limit_m_s": 0.05, "stop_angular_speed_limit_rad_s": 0.1,
+                    "hold_required_s": 0.5, "distance_tolerance_m": 0.4,
+                    "within_stop_limits": linear < 0.05 and angular < 0.1,
+                    "speed_source": "root_com_vel_w",
+                },
+            }
+    
+        report = {
+            "rows": [row(1, True, 12.0, 0.049, 0.099, 0.5), row(2, False, 60.0, 0.2, 0.4, 0.1)],
+            "summary": {"episodes": 2, "successes": 1},
+        }
+        result = runner._add_fast_stop_evaluation_summaries(report, objective)
+        assert result["summary"]["mean_success_time_s"] == 12.0
+        assert result["summary"]["median_success_time_s"] == 12.0
+        assert result["summary"]["goal_stop_contract"] == objective["goal_stop"]
+        assert report["summary"] == {"episodes": 2, "successes": 1}
+    
+        fallback = copy.deepcopy(report)
+        fallback["rows"][0]["goal_stop"]["speed_source"] = "task_forward_speed_fallback"
+        with pytest.raises(ValueError, match="native root_com_vel_w"):
+            runner._add_fast_stop_evaluation_summaries(fallback, objective)
+        threshold = copy.deepcopy(report)
+        threshold["rows"][0]["goal_stop"]["linear_speed_m_s"] = 0.05
+>       with pytest.raises(ValueError, match="violates its frozen goal-stop contract"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'violates its frozen goal-stop contract'
+E         Actual message: 'fast-stop episode row 0 has a goal_stop.within_stop_limits value inconsistent with strict speed thresholds'
+
+tests/test_fresh_foundation.py:650: AssertionError
+=============================== warnings summary ===============================
+tests/test_network_2d.py::test_extreme_finite_values_and_all_nonfinite_frames_have_safe_ranges
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_trace.py:1006: DeprecationWarning: `torch.jit.trace` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_trace.py:1145: DeprecationWarning: `torch.jit.trace_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:126: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if caching:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:131: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if caching:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:58: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if value.ndim < 2 or value.shape[-1] != 8:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/nn/modules/rnn.py:328: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if self.input_size != input.size(-1):
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/nn/modules/rnn.py:361: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if hx.size() != expected_hidden_size:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_fresh_foundation.py::test_fast_stop_evaluation_records_native_terminal_stop_contract_and_times
+1 failed, 376 passed, 20 skipped, 8 warnings in 15.80s

@@ -1,0 +1,1316 @@
+{
+  "report": "BMS schematic DRC log classification",
+  "generatedLocal": "2026-10-16 01:25:25",
+  "scope": "只读审计用户导出的DRC日志并核对QPRE_SW原理图语境；本文件为分类证据，不修改CAD或ZIP。",
+  "source": {
+    "path": "C:\\Users\\wangj\\Downloads\\schDrcLog_2026-10-16.txt",
+    "byteLength": 38209,
+    "lastWriteLocal": "2026-10-16 01:17:05",
+    "sha256": "1443410b8df55dc4377896846c396902072a7e7b8b5067dd43faa8da511f6ae9",
+    "runTimeRange": "2026-10-16 01:16:57—01:17:01",
+    "contextSources": [
+      {
+        "path": "BMS模块/检查/Layout验证/current-snapshot.json",
+        "establishes": "快照中QPRE_SW端口位于Q_PRE2 pin 2（D）同坐标；端口名为QPRE_SW。"
+      },
+      {
+        "path": "BMS模块/原理图准备/功率元件连接.json",
+        "establishes": "Q_PRE2 pin 2=QPRE_SW；板外R_PRE pin 1=QPRE_SW、pin 2=PACK+，8.2Ω，且备注标明不在板上。"
+      },
+      {
+        "path": "BMS模块/原理图准备/功率与预充设计.md",
+        "establishes": "预充路径为BATT+_FUSED→Q_PRE1/Q_PRE2→QPRE_SW→外置R_PRE→PACK+；外置电阻及其实际接线尚待系统/实物核对。"
+      }
+    ]
+  },
+  "result": {
+    "fatal": 0,
+    "errors": 0,
+    "warnings": 112,
+    "information": 216,
+    "logPhysicalLines": 330,
+    "parsedWarningTaggedLines": 112,
+    "parsedInformationTaggedLinesIncludingStartAndSummary": 218,
+    "countedInformationResultLines": 216,
+    "excludedProceduralInformationLines": [
+      1,
+      330
+    ],
+    "summaryLine": "2026-10-16 01:17:01[信息] :  完成设计规则检查。 致命错误： 0, 错误：0，警告：112，信息：216。",
+    "countBasis": "警告按[警告]记录逐行计数；信息按[信息]中逐个元件/规则结果计数，排除“开始设计规则检查”和完成摘要两条流程行；结果与完成摘要中的0致命、0错误、112警告、216信息一致。"
+  },
+  "warnings": {
+    "classCount": 4,
+    "electricalActionItemCount": 1,
+    "classes": [
+      {
+        "id": "single-component-pin-net",
+        "count": 1,
+        "sourceLines": [
+          2
+        ],
+        "rawExample": "2026-10-16 01:16:57[警告] :  导线 QPRE_SW $1N1141 是单网络，仅连接了一个元件引脚。",
+        "wireId": "$1N1141",
+        "assessment": "这是唯一单器件引脚网络告警。当前原理图端口/连接表显示该端为Q_PRE2的2脚漏极；设计文件把后续8.2Ω R_PRE标为板外，故日志只看见板上单针不能单独证明断路，但板外线束/电阻/保险路径仍未被本次日志验证。"
+      },
+      {
+        "id": "multiple-net-name-duplicates",
+        "count": 97,
+        "uniqueWireCount": 97,
+        "distinctListedNetNameCountAcrossWarnings": 71,
+        "mixedNameWarningCount": 0,
+        "everyWarningRepeatsOnlyOneDistinctName": true,
+        "listedNameOccurrenceRangePerWarning": [
+          2.0,
+          19.0
+        ],
+        "entries": [
+          {
+            "line": 219,
+            "wireId": "$1N778",
+            "listedNetName": "BATT+_FUSED",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 220,
+            "wireId": "$1N785",
+            "listedNetName": "BATT+_FUSED",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 221,
+            "wireId": "$1N792",
+            "listedNetName": "BATT+_FUSED",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 222,
+            "wireId": "$1N799",
+            "listedNetName": "PACK+",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 223,
+            "wireId": "$1N806",
+            "listedNetName": "PACK+",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 224,
+            "wireId": "$1N813",
+            "listedNetName": "PACK+",
+            "listedOccurrences": 11,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 225,
+            "wireId": "$1N820",
+            "listedNetName": "FET_MID",
+            "listedOccurrences": 9,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 226,
+            "wireId": "$1N826",
+            "listedNetName": "CHG_G1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 227,
+            "wireId": "$1N827",
+            "listedNetName": "CHG_G2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 228,
+            "wireId": "$1N828",
+            "listedNetName": "CHG_G3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 229,
+            "wireId": "$1N829",
+            "listedNetName": "DSG_G1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 230,
+            "wireId": "$1N830",
+            "listedNetName": "DSG_G2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 231,
+            "wireId": "$1N831",
+            "listedNetName": "DSG_G3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 232,
+            "wireId": "$1N832",
+            "listedNetName": "QPRE_G",
+            "listedOccurrences": 6,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 233,
+            "wireId": "$1N837",
+            "listedNetName": "QPRE_SRC",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 234,
+            "wireId": "$1N840",
+            "listedNetName": "QPRE_DRV_B",
+            "listedOccurrences": 4,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 235,
+            "wireId": "$1N845",
+            "listedNetName": "VOUT_5V",
+            "listedOccurrences": 12,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 236,
+            "wireId": "$1N846",
+            "listedNetName": "B0",
+            "listedOccurrences": 19,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 237,
+            "wireId": "$1N876",
+            "listedNetName": "DFETOFF_G",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 238,
+            "wireId": "$1N877",
+            "listedNetName": "NTC_BOARD_NODE",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 239,
+            "wireId": "$1N878",
+            "listedNetName": "TAP_B1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 240,
+            "wireId": "$1N879",
+            "listedNetName": "TAP_B2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 241,
+            "wireId": "$1N880",
+            "listedNetName": "TAP_B3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 242,
+            "wireId": "$1N881",
+            "listedNetName": "TAP_B4",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 243,
+            "wireId": "$1N882",
+            "listedNetName": "TAP_B5",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 244,
+            "wireId": "$1N883",
+            "listedNetName": "TAP_B6",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 245,
+            "wireId": "$1N884",
+            "listedNetName": "TAP_B7",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 246,
+            "wireId": "$1N885",
+            "listedNetName": "BAL_ENABLE_BASE",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 247,
+            "wireId": "$1N886",
+            "listedNetName": "BAL_SWITCH_MID",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 248,
+            "wireId": "$1N887",
+            "listedNetName": "TAP_B4",
+            "listedOccurrences": 9,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 249,
+            "wireId": "$1N888",
+            "listedNetName": "TAP_B6",
+            "listedOccurrences": 9,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 250,
+            "wireId": "$1N889",
+            "listedNetName": "CANH",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 251,
+            "wireId": "$1N890",
+            "listedNetName": "LOAD_VALID_GATE",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 252,
+            "wireId": "$1N891",
+            "listedNetName": "TMR_ACTIVE",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 253,
+            "wireId": "$1N892",
+            "listedNetName": "TAP_B8",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 254,
+            "wireId": "$1N898",
+            "listedNetName": "BREG",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 255,
+            "wireId": "$1N899",
+            "listedNetName": "BAL_EN_CLAMP_GATE_1",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 256,
+            "wireId": "$1N900",
+            "listedNetName": "BAL_ETA_BIAS_1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 257,
+            "wireId": "$1N901",
+            "listedNetName": "BAL_ETA_SW_1",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 258,
+            "wireId": "$1N903",
+            "listedNetName": "BAL_ETA_ISET_1",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 259,
+            "wireId": "$1N904",
+            "listedNetName": "TAP_B2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 260,
+            "wireId": "$1N905",
+            "listedNetName": "BAL_ETA_EN_1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 261,
+            "wireId": "$1N907",
+            "listedNetName": "TAP_B1",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 262,
+            "wireId": "$1N908",
+            "listedNetName": "B0",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 263,
+            "wireId": "$1N909",
+            "listedNetName": "BAL_EN_CLAMP_GATE_2",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 264,
+            "wireId": "$1N910",
+            "listedNetName": "BAL_ETA_BIAS_2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 265,
+            "wireId": "$1N911",
+            "listedNetName": "BAL_ETA_SW_2",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 266,
+            "wireId": "$1N913",
+            "listedNetName": "BAL_ETA_ISET_2",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 267,
+            "wireId": "$1N914",
+            "listedNetName": "TAP_B3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 268,
+            "wireId": "$1N915",
+            "listedNetName": "BAL_ETA_EN_2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 269,
+            "wireId": "$1N917",
+            "listedNetName": "TAP_B2",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 270,
+            "wireId": "$1N918",
+            "listedNetName": "TAP_B1",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 271,
+            "wireId": "$1N919",
+            "listedNetName": "BAL_EN_CLAMP_GATE_3",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 272,
+            "wireId": "$1N920",
+            "listedNetName": "BAL_ETA_BIAS_3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 273,
+            "wireId": "$1N921",
+            "listedNetName": "BAL_ETA_SW_3",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 274,
+            "wireId": "$1N923",
+            "listedNetName": "BAL_ETA_ISET_3",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 275,
+            "wireId": "$1N925",
+            "listedNetName": "BAL_ETA_EN_3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 276,
+            "wireId": "$1N927",
+            "listedNetName": "TAP_B3",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 277,
+            "wireId": "$1N928",
+            "listedNetName": "TAP_B2",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 278,
+            "wireId": "$1N929",
+            "listedNetName": "BAL_EN_CLAMP_GATE_4",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 279,
+            "wireId": "$1N930",
+            "listedNetName": "BAL_ETA_BIAS_4",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 280,
+            "wireId": "$1N931",
+            "listedNetName": "BAL_ETA_SW_4",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 281,
+            "wireId": "$1N933",
+            "listedNetName": "BAL_ETA_ISET_4",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 282,
+            "wireId": "$1N934",
+            "listedNetName": "TAP_B5",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 283,
+            "wireId": "$1N935",
+            "listedNetName": "BAL_ETA_EN_4",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 284,
+            "wireId": "$1N937",
+            "listedNetName": "TAP_B4",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 285,
+            "wireId": "$1N938",
+            "listedNetName": "TAP_B3",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 286,
+            "wireId": "$1N939",
+            "listedNetName": "BAL_EN_CLAMP_GATE_5",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 287,
+            "wireId": "$1N940",
+            "listedNetName": "BAL_ETA_BIAS_5",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 288,
+            "wireId": "$1N941",
+            "listedNetName": "BAL_ETA_SW_5",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 289,
+            "wireId": "$1N943",
+            "listedNetName": "BAL_ETA_ISET_5",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 290,
+            "wireId": "$1N945",
+            "listedNetName": "BAL_ETA_EN_5",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 291,
+            "wireId": "$1N947",
+            "listedNetName": "TAP_B5",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 292,
+            "wireId": "$1N949",
+            "listedNetName": "BAL_EN_CLAMP_GATE_6",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 293,
+            "wireId": "$1N950",
+            "listedNetName": "BAL_ETA_BIAS_6",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 294,
+            "wireId": "$1N951",
+            "listedNetName": "BAL_ETA_SW_6",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 295,
+            "wireId": "$1N953",
+            "listedNetName": "BAL_ETA_ISET_6",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 296,
+            "wireId": "$1N954",
+            "listedNetName": "TAP_B7",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 297,
+            "wireId": "$1N955",
+            "listedNetName": "BAL_ETA_EN_6",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 298,
+            "wireId": "$1N957",
+            "listedNetName": "TAP_B6",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 299,
+            "wireId": "$1N958",
+            "listedNetName": "TAP_B5",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 300,
+            "wireId": "$1N959",
+            "listedNetName": "BAL_EN_CLAMP_GATE_7",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 301,
+            "wireId": "$1N960",
+            "listedNetName": "BAL_ETA_BIAS_7",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 302,
+            "wireId": "$1N961",
+            "listedNetName": "BAL_ETA_SW_7",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 303,
+            "wireId": "$1N963",
+            "listedNetName": "BAL_ETA_ISET_7",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 304,
+            "wireId": "$1N964",
+            "listedNetName": "TAP_B8",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 305,
+            "wireId": "$1N965",
+            "listedNetName": "BAL_ETA_EN_7",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 306,
+            "wireId": "$1N967",
+            "listedNetName": "TAP_B7",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 307,
+            "wireId": "$1N969",
+            "listedNetName": "BAL_EN_CLAMP_GATE_8",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 308,
+            "wireId": "$1N970",
+            "listedNetName": "BAL_ETA_BIAS_8",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 309,
+            "wireId": "$1N971",
+            "listedNetName": "BAL_ETA_SW_8",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 310,
+            "wireId": "$1N973",
+            "listedNetName": "BAL_ETA_ISET_8",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 311,
+            "wireId": "$1N974",
+            "listedNetName": "TAP_B9",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 312,
+            "wireId": "$1N975",
+            "listedNetName": "BAL_ETA_EN_8",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 313,
+            "wireId": "$1N977",
+            "listedNetName": "TAP_B8",
+            "listedOccurrences": 2,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 314,
+            "wireId": "$1N978",
+            "listedNetName": "TAP_B7",
+            "listedOccurrences": 5,
+            "distinctNamesInThisWarning": 1
+          },
+          {
+            "line": 315,
+            "wireId": "$1N1244",
+            "listedNetName": "TAP_B9",
+            "listedOccurrences": 3,
+            "distinctNamesInThisWarning": 1
+          }
+        ],
+        "assessment": "97条内容不是逐字相同：wire ID、网名和重复次数各异；但每条内部列出的所有网名均为同一个名字的重复项，97/97均无两个不同网名混列。这个文字结果不能替代对对应原生图元连接的核查。"
+      },
+      {
+        "id": "network-graphic-off-grid",
+        "count": 7,
+        "entries": [
+          {
+            "line": 316,
+            "graphicOrNet": "R_PSU_MINLOAD2"
+          },
+          {
+            "line": 317,
+            "graphicOrNet": "R_PSU_MINLOAD3"
+          },
+          {
+            "line": 318,
+            "graphicOrNet": "R_PSU_MINLOAD4"
+          },
+          {
+            "line": 319,
+            "graphicOrNet": "R_PSU_MINLOAD5"
+          },
+          {
+            "line": 320,
+            "graphicOrNet": "R_PSU_MINLOAD7"
+          },
+          {
+            "line": 321,
+            "graphicOrNet": "VOUT_5V"
+          },
+          {
+            "line": 322,
+            "graphicOrNet": "B0"
+          }
+        ],
+        "assessment": "图元未落格点的几何告警；移动或吸附时仍须保护相连端点并保存重开复核针网。"
+      },
+      {
+        "id": "component-property-supplier-number-mismatch",
+        "count": 7,
+        "affectedRefOccurrences": 188,
+        "affectedUniqueRefs": 188,
+        "groups": [
+          {
+            "line": 323,
+            "count": 30,
+            "refs": [
+              "C_BAL_CELL1",
+              "C_BAL_CELL2",
+              "C_BAL_CELL3",
+              "C_BAL_CELL4",
+              "C_BAL_CELL5",
+              "C_BAL_CELL6",
+              "C_BAL_CELL7",
+              "C_BAL_CELL8",
+              "C_BAL_CELL9",
+              "C_BAT1",
+              "C_BAT2",
+              "C_BQ_DCHG_FILT",
+              "C_BQ_TS1_FILT",
+              "C_BQ_TS3_FILT",
+              "C_BREG_COL",
+              "C_CAN_PWR_IN1",
+              "C_CAN_PWR_OUT1",
+              "C_CAN_VCC2_2",
+              "C_CP1",
+              "C_NTC_BOARD_FILT",
+              "C_NTC_CELL5_FILT",
+              "C_PSU_IN1",
+              "C_PSU_IN3",
+              "C_PSU_OUT1",
+              "C_PSU_OUT2",
+              "C_REG1",
+              "C_REG18",
+              "C_REGIN",
+              "C_VC0",
+              "C_VC1"
+            ]
+          },
+          {
+            "line": 324,
+            "count": 30,
+            "refs": [
+              "C_VC2",
+              "C_VC3",
+              "C_VC4",
+              "C_VC5",
+              "C_VC6",
+              "C_VC7",
+              "C_VC8",
+              "C_VC16",
+              "D_BAT",
+              "D_BREG",
+              "D_TVS",
+              "DZ_QPRE",
+              "NTC_BOARD",
+              "NTC_MOS",
+              "Q_BAL_ENABLE",
+              "Q_BAL_MAINCLR",
+              "Q_DFETOFF",
+              "Q_LOAD_POWER_VALID_DRV",
+              "Q_QPRE_DRV",
+              "R_ALERT_PU",
+              "R_ALERT_SER",
+              "R_BAL_ENABLE_BASE",
+              "R_BAL_ENABLE_BE",
+              "R_BAL_MAINCLR_BASE",
+              "R_BAL_MAINCLR_BE",
+              "R_BAL_OPTO_BOTTOM",
+              "R_BAL_OPTO_TOP",
+              "R_BAT",
+              "R_BREG_FEED",
+              "R_BREG_PD"
+            ]
+          },
+          {
+            "line": 325,
+            "count": 30,
+            "refs": [
+              "R_CAN_TXD_PU",
+              "R_DFETOFF_GATE",
+              "R_DFETOFF_GS",
+              "R_DFETOFF_PU",
+              "R_G_CHG1",
+              "R_G_CHG2",
+              "R_G_CHG3",
+              "R_G_DSG1",
+              "R_G_DSG2",
+              "R_G_DSG3",
+              "R_GS_CHG1",
+              "R_GS_CHG2",
+              "R_GS_CHG3",
+              "R_GS_DSG1",
+              "R_GS_DSG2",
+              "R_GS_DSG3",
+              "R_IF_LOCAL_OK_PD",
+              "R_IF_MAIN_REQ_PD",
+              "R_IF_PRE_REQ_PD",
+              "R_LD",
+              "R_LOAD_POWER_VALID_GATE",
+              "R_LOAD_POWER_VALID_GS",
+              "R_LOAD_POWER_VALID_LED",
+              "R_PACK",
+              "R_PRE_CTRL_PD",
+              "R_PSU_MINLOAD1",
+              "R_PSU_MINLOAD2",
+              "R_PSU_MINLOAD3",
+              "R_PSU_MINLOAD4",
+              "R_PSU_MINLOAD5"
+            ]
+          },
+          {
+            "line": 326,
+            "count": 30,
+            "refs": [
+              "R_PSU_MINLOAD6",
+              "R_PSU_MINLOAD7",
+              "R_QPRE_BASE",
+              "R_QPRE_BE",
+              "R_QPRE_LIMIT",
+              "R_QPRE_PU",
+              "R_RST_SHUT",
+              "R_SCL_PU",
+              "R_SDA_PU",
+              "R_SRN",
+              "R_SRP",
+              "R_TIMER_ACTIVE_PD",
+              "R_TIMER_SET",
+              "R_TIMER_SUPPLY",
+              "R_VC0",
+              "R_VC1",
+              "R_VC2",
+              "R_VC3",
+              "R_VC4",
+              "R_VC5",
+              "R_VC6",
+              "R_VC7",
+              "R_VC8",
+              "R_VC15",
+              "R_VC16",
+              "RSHUNT",
+              "U_BAL_OPTO_Q1",
+              "U_BAL_OPTO_Q2",
+              "U_GATE1",
+              "U_LOAD_POWER_VALID"
+            ]
+          },
+          {
+            "line": 327,
+            "count": 30,
+            "refs": [
+              "U_POR",
+              "U_SEQ",
+              "U_TIMER",
+              "U_ETA_BAL1",
+              "L_ETA_BAL1",
+              "C_BAL_BIAS1",
+              "R_BAL_ISET1",
+              "C_BAL_ISET1",
+              "R_BAL_EN_GATE_PU1",
+              "Q_BAL_EN_CLAMP1",
+              "U_ETA_BAL2",
+              "L_ETA_BAL2",
+              "C_BAL_BIAS2",
+              "R_BAL_ISET2",
+              "C_BAL_ISET2",
+              "R_BAL_EN_GATE_PU2",
+              "Q_BAL_EN_CLAMP2",
+              "U_ETA_BAL3",
+              "L_ETA_BAL3",
+              "C_BAL_BIAS3",
+              "R_BAL_ISET3",
+              "C_BAL_ISET3",
+              "R_BAL_EN_GATE_PU3",
+              "Q_BAL_EN_CLAMP3",
+              "U_ETA_BAL4",
+              "L_ETA_BAL4",
+              "C_BAL_BIAS4",
+              "R_BAL_ISET4",
+              "C_BAL_ISET4",
+              "R_BAL_EN_GATE_PU4"
+            ]
+          },
+          {
+            "line": 328,
+            "count": 30,
+            "refs": [
+              "Q_BAL_EN_CLAMP4",
+              "U_ETA_BAL5",
+              "L_ETA_BAL5",
+              "C_BAL_BIAS5",
+              "R_BAL_ISET5",
+              "C_BAL_ISET5",
+              "R_BAL_EN_GATE_PU5",
+              "Q_BAL_EN_CLAMP5",
+              "U_ETA_BAL6",
+              "L_ETA_BAL6",
+              "C_BAL_BIAS6",
+              "R_BAL_ISET6",
+              "C_BAL_ISET6",
+              "R_BAL_EN_GATE_PU6",
+              "Q_BAL_EN_CLAMP6",
+              "U_ETA_BAL7",
+              "L_ETA_BAL7",
+              "C_BAL_BIAS7",
+              "R_BAL_ISET7",
+              "C_BAL_ISET7",
+              "R_BAL_EN_GATE_PU7",
+              "Q_BAL_EN_CLAMP7",
+              "U_ETA_BAL8",
+              "L_ETA_BAL8",
+              "C_BAL_BIAS8",
+              "R_BAL_ISET8",
+              "C_BAL_ISET8",
+              "R_BAL_EN_GATE_PU8",
+              "Q_BAL_EN_CLAMP8",
+              "C_AND2"
+            ]
+          },
+          {
+            "line": 329,
+            "count": 8,
+            "refs": [
+              "C_CAN_PWR_IN2",
+              "C_CAN_PWR_OUT2",
+              "C_GATE1",
+              "C_POR",
+              "C_PSU_IN2",
+              "C_SEQ",
+              "C_SRP",
+              "C_TIMER"
+            ]
+          }
+        ],
+        "assessment": "这是器件属性与供应商编号提示，不等同短路/开路。自动标准化可能覆盖MPN、Name或封装绑定；应逐项比对采购身份、CAD载体、引脚和封装后再决定是否改属性。"
+      }
+    ]
+  },
+  "information": {
+    "countedResultLines": 216,
+    "classes": [
+      {
+        "id": "empty-value-property",
+        "count": 145,
+        "refs": [
+          "C_BAL_CELL1",
+          "C_BAL_CELL2",
+          "C_BAL_CELL3",
+          "C_BAL_CELL4",
+          "C_BAL_CELL5",
+          "C_BAL_CELL6",
+          "C_BAL_CELL7",
+          "C_BAL_CELL8",
+          "C_BAL_CELL9",
+          "C_BAT1",
+          "C_BREG_COL",
+          "C_BAT2",
+          "C_BQ_DCHG_FILT",
+          "C_BQ_TS1_FILT",
+          "C_BQ_TS3_FILT",
+          "C_NTC_BOARD_FILT",
+          "C_NTC_CELL5_FILT",
+          "C_CAN_PWR_IN1",
+          "C_CAN_PWR_OUT1",
+          "C_PSU_OUT1",
+          "C_PSU_OUT2",
+          "C_CAN_VCC2_2",
+          "C_REG1",
+          "C_CP1",
+          "C_PSU_IN1",
+          "C_PSU_IN3",
+          "C_REG18",
+          "C_REGIN",
+          "C_VC0",
+          "C_VC1",
+          "C_VC2",
+          "C_VC3",
+          "C_VC4",
+          "C_VC5",
+          "C_VC6",
+          "C_VC7",
+          "C_VC8",
+          "C_VC16",
+          "R_ALERT_PU",
+          "R_CAN_TXD_PU",
+          "R_QPRE_PU",
+          "R_SCL_PU",
+          "R_SDA_PU",
+          "R_ALERT_SER",
+          "R_DFETOFF_GATE",
+          "R_LOAD_POWER_VALID_GATE",
+          "R_QPRE_BASE",
+          "R_RST_SHUT",
+          "R_TIMER_SUPPLY",
+          "R_BAL_ENABLE_BASE",
+          "R_BAL_MAINCLR_BASE",
+          "R_BAL_ENABLE_BE",
+          "R_BAL_MAINCLR_BE",
+          "R_DFETOFF_GS",
+          "R_IF_LOCAL_OK_PD",
+          "R_IF_MAIN_REQ_PD",
+          "R_IF_PRE_REQ_PD",
+          "R_LOAD_POWER_VALID_GS",
+          "R_PRE_CTRL_PD",
+          "R_QPRE_BE",
+          "R_BAL_ISET1",
+          "R_BAL_EN_GATE_PU1",
+          "R_BAL_ISET2",
+          "R_BAL_EN_GATE_PU2",
+          "R_BAL_ISET3",
+          "R_BAL_EN_GATE_PU3",
+          "R_BAL_ISET4",
+          "R_BAL_EN_GATE_PU4",
+          "R_BAL_ISET5",
+          "R_BAL_EN_GATE_PU5",
+          "R_BAL_ISET6",
+          "R_BAL_EN_GATE_PU6",
+          "R_BAL_ISET7",
+          "R_BAL_EN_GATE_PU7",
+          "R_BAL_ISET8",
+          "R_BAL_EN_GATE_PU8",
+          "R_BAL_OPTO_BOTTOM",
+          "R_BAL_OPTO_TOP",
+          "R_BREG_FEED",
+          "R_BAT",
+          "R_G_CHG1",
+          "R_G_CHG2",
+          "R_G_CHG3",
+          "R_G_DSG1",
+          "R_G_DSG2",
+          "R_G_DSG3",
+          "R_SRN",
+          "R_SRP",
+          "R_VC0",
+          "R_VC1",
+          "R_VC2",
+          "R_VC3",
+          "R_VC4",
+          "R_VC5",
+          "R_VC6",
+          "R_VC7",
+          "R_VC8",
+          "R_VC15",
+          "R_VC16",
+          "R_BREG_PD",
+          "R_GS_CHG1",
+          "R_GS_CHG2",
+          "R_GS_CHG3",
+          "R_GS_DSG1",
+          "R_GS_DSG2",
+          "R_GS_DSG3",
+          "R_DFETOFF_PU",
+          "R_TIMER_ACTIVE_PD",
+          "R_LD",
+          "R_PACK",
+          "R_LOAD_POWER_VALID_LED",
+          "R_PSU_MINLOAD1",
+          "R_PSU_MINLOAD2",
+          "R_PSU_MINLOAD3",
+          "R_PSU_MINLOAD4",
+          "R_PSU_MINLOAD5",
+          "R_PSU_MINLOAD6",
+          "R_PSU_MINLOAD7",
+          "R_QPRE_LIMIT",
+          "R_TIMER_SET",
+          "RSHUNT",
+          "L_ETA_BAL1",
+          "L_ETA_BAL2",
+          "L_ETA_BAL3",
+          "L_ETA_BAL4",
+          "L_ETA_BAL5",
+          "L_ETA_BAL6",
+          "L_ETA_BAL7",
+          "L_ETA_BAL8",
+          "C_BAL_BIAS1",
+          "C_BAL_BIAS2",
+          "C_BAL_BIAS3",
+          "C_BAL_BIAS4",
+          "C_BAL_BIAS5",
+          "C_BAL_BIAS6",
+          "C_BAL_BIAS7",
+          "C_BAL_BIAS8",
+          "C_BAL_ISET1",
+          "C_BAL_ISET2",
+          "C_BAL_ISET3",
+          "C_BAL_ISET4",
+          "C_BAL_ISET5",
+          "C_BAL_ISET6",
+          "C_BAL_ISET7",
+          "C_BAL_ISET8"
+        ],
+        "assessment": "信息级属性提示；Value为空不单独证明电气错误。只在原生设计/BOM确需显示时据源数据补值，勿批量猜填。"
+      },
+      {
+        "id": "reference-designator-style-advice",
+        "count": 71,
+        "refs": [
+          "C_BREG_COL",
+          "C_BQ_DCHG_FILT",
+          "C_BQ_TS1_FILT",
+          "C_BQ_TS3_FILT",
+          "C_NTC_BOARD_FILT",
+          "C_NTC_CELL5_FILT",
+          "C_CAN_VCC2_2",
+          "C_REGIN",
+          "D_BAT",
+          "D_BREG",
+          "D_CAN_TVS",
+          "D_TVS",
+          "DZ_QPRE",
+          "J_CAN",
+          "J_LOAD_POWER_VALID",
+          "NTC_BOARD",
+          "NTC_MOS",
+          "PSU5_EXT",
+          "Q_BAL_ENABLE",
+          "Q_BAL_MAINCLR",
+          "Q_QPRE_DRV",
+          "Q_BREG",
+          "Q_DFETOFF",
+          "Q_LOAD_POWER_VALID_DRV",
+          "R_ALERT_PU",
+          "R_CAN_TXD_PU",
+          "R_QPRE_PU",
+          "R_SCL_PU",
+          "R_SDA_PU",
+          "R_ALERT_SER",
+          "R_DFETOFF_GATE",
+          "R_LOAD_POWER_VALID_GATE",
+          "R_QPRE_BASE",
+          "R_RST_SHUT",
+          "R_TIMER_SUPPLY",
+          "R_BAL_ENABLE_BASE",
+          "R_BAL_MAINCLR_BASE",
+          "R_BAL_ENABLE_BE",
+          "R_BAL_MAINCLR_BE",
+          "R_DFETOFF_GS",
+          "R_IF_LOCAL_OK_PD",
+          "R_IF_MAIN_REQ_PD",
+          "R_IF_PRE_REQ_PD",
+          "R_LOAD_POWER_VALID_GS",
+          "R_PRE_CTRL_PD",
+          "R_QPRE_BE",
+          "R_BAL_OPTO_BOTTOM",
+          "R_BAL_OPTO_TOP",
+          "R_BREG_FEED",
+          "R_BAT",
+          "R_SRN",
+          "R_SRP",
+          "R_BREG_PD",
+          "R_DFETOFF_PU",
+          "R_TIMER_ACTIVE_PD",
+          "R_LD",
+          "R_PACK",
+          "R_LOAD_POWER_VALID_LED",
+          "R_QPRE_LIMIT",
+          "R_TIMER_SET",
+          "RSHUNT",
+          "SW_RUN_STORE",
+          "U_CAN",
+          "U_LOAD_POWER_VALID",
+          "U_POR",
+          "U_SEQ",
+          "U_TIMER",
+          "C_POR",
+          "C_SEQ",
+          "C_SRP",
+          "C_TIMER"
+        ],
+        "assessment": "建议位号风格提示；不构成电气错误。仅在制造/导出规则要求时评估重编号，并保护BOM与检查记录映射。"
+      }
+    ]
+  },
+  "candidateRepairOrder": [
+    {
+      "priority": 1,
+      "target": "QPRE_SW单针与板外预充路径",
+      "candidate": "优先核对板外Q_PRE2 pin 2→外置R_PRE pin 1（8.2Ω，TE CJP300J8R2J）→PACK+及F1上游路径、线束与端子额定；若需要在CAD里消除此边界提示，候选是明确建模板外器件或外部连接器/跨页接口。不得把该端标NC或绕过R_PRE。",
+      "requiredEvidence": "实物连续性/预充波形与额定核对；若改图，官方保存重开并逐针网络比较。",
+      "status": "候选，未执行"
+    },
+    {
+      "priority": 2,
+      "target": "7条供应商属性组告警（188个位号）",
+      "candidate": "按MPN、采购字段、符号针脚和封装逐项核实后修正真实不一致；不直接批量点标准化。",
+      "requiredEvidence": "源/BOM/库身份逐项对应；保存重开后MPN与逐针连接不变或明确记录受控变更。",
+      "status": "候选，未执行"
+    },
+    {
+      "priority": 3,
+      "target": "97条重复网名告警",
+      "candidate": "先在原生图逐条确认每条线段确有同名标签重复且没有几何错接；确认冗余后再评估删除重复标签或整理网标。",
+      "requiredEvidence": "改前后官方网表逐针对比、DRC复跑及保存重开。",
+      "status": "候选，未执行"
+    },
+    {
+      "priority": 4,
+      "target": "7条未落格点图元",
+      "candidate": "必要时将图元吸附至格点并局部检查导线端点。",
+      "requiredEvidence": "官方保存重开，逐针网络与改前一致；复跑DRC。",
+      "status": "候选，未执行"
+    },
+    {
+      "priority": 5,
+      "target": "216条信息级提示",
+      "candidate": "只对实际需要的空Value按现有BOM/器件资料补值；位号风格仅在正式规则要求时统一。",
+      "requiredEvidence": "核对采购字段和交付映射；避免仅为清日志批量改属性/位号。",
+      "status": "候选，未执行"
+    }
+  ],
+  "electricalCandidates": [
+    {
+      "id": "QPRE_SW-external-path",
+      "issue": "DRC只统计到板上Q_PRE2 pin 2；板外R_PRE及其线束不在当前PCB单针统计范围。",
+      "candidate": "检查并记录Q_PRE2 pin 2→8.2Ω外置R_PRE→PACK+连续性、F1保护关系、接线端子/线径以及电阻脉冲能量和重复启动热条件；若要在CAD里闭合端点，考虑系统级板外器件/连接器表示。",
+      "notEstablished": [
+        "外部线束已经接好",
+        "R_PRE现场额定与散热适配",
+        "实际预充电流/时间合格"
+      ]
+    }
+  ],
+  "boundary": {
+    "auditOnly": true,
+    "cadOrZipModified": false,
+    "strictDrcPass": false,
+    "interpretation": "日志摘要为0致命、0错误，但仍有112警告；分类不等于官方CAD复跑、布线验收或实物验收。97条重复网名只证明记录中的标签文本同名，不能据此判定每条导线几何均正确。QPRE_SW板外连接边界仍待核实。"
+  }
+}

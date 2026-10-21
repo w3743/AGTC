@@ -1,0 +1,92 @@
+{
+  "model_id": "V1.6-BUSFIX-cell-protection-reference",
+  "design_version": "V1.6-BUSFIX",
+  "scope": "Deterministic algorithmic qualification model for per-cell charge inhibition; not firmware, analog hardware, power-stage, PCB, or physical acceptance.",
+  "series_cells": 8,
+  "cell_hard_max_voltage_V": 2.7,
+  "planning_lower_voltage_V": 2.2,
+  "planning_charge_target_voltage_V": 2.45,
+  "total_sc_hardware_ov_voltage_V": 20.8,
+  "cell_capacitance_min_EOL_F": 280.0,
+  "initial_capacitance_retention_at_EOL": 0.8,
+  "charge_current_bound_for_slew_A": 80.0,
+  "response_time_qualification_candidate_ms": 50.0,
+  "qualification_gate": {
+    "end_to_end_E100mV_validated": false,
+    "80A_maximum_charge_current_validated": false,
+    "trip_to_zero_current_T50ms_validated": false,
+    "local_firmware_implementation_verified": false
+  },
+  "sample_period_ms": 10.0,
+  "freshness_timeout_ms": 20.0,
+  "measurement_error_qualification_abs_V": 0.1,
+  "cell_trip_measured_voltage_V": 2.56,
+  "cell_latch_clear_measured_voltage_V": 2.5,
+  "bus_conversion_efficiency_ideal": 0.95,
+  "energy_target_power_W": [800.0, 1000.0],
+  "energy_target_duration_s": 1.0,
+  "normal_test_voltage_V": 0.0,
+  "test_feedback_divider_ratio": 2.0,
+  "resistor_network": {
+    "tap_high_ohm": 68000.0,
+    "tap_low_ohm": 10000.0,
+    "tap_test_ohm": 47000.0,
+    "simple_tap_high_ohm": 68000.0,
+    "simple_tap_low_ohm": 10000.0,
+    "nominal_tolerance_fraction": 0.001,
+    "tap_high_tcr_ppm_per_C": 25.0,
+    "tap_low_tcr_ppm_per_C": 10.0,
+    "tap_test_tcr_ppm_per_C": 10.0,
+    "nominal_temperature_C": 25.0,
+    "corner_temperatures_C": [25.0, 125.0],
+    "temperature_ranges_C": {
+      "tap_high": [-55.0, 155.0],
+      "tap_low_and_test": [-55.0, 125.0]
+    },
+    "bom_mpn": {
+      "tap_high": "Yageo RT0603BRD0768KL",
+      "tap_low": "RESI PTFR0805B10K0N9",
+      "tap_test": "RESI PTFR0805B47K0N9"
+    }
+  },
+  "adc_gpio_stress_inputs": {
+    "adc_resolution_bits": 12,
+    "nominal_vref_V": 3.3,
+    "stm32g431_single_adc_full_temperature_TUE_stress_lsb": 7.5,
+    "gpio_leakage_TT_a_A": 1.5e-7,
+    "gpio_leakage_FT_a_A": 1.0e-7,
+    "pad_types": {
+      "tap_T1_to_T7_and_PB14": "TT_a",
+      "TEST_FB_PB15": "FT_a"
+    },
+    "qualification_status": "Conditional stress arithmetic only: data-sheet ADC accuracy is characterized rather than per-unit guaranteed; mixed ADC mapping, actual VREF, board conditions, RC settling and system calibration are not closed."
+  },
+  "sc_minus_candidate": {
+    "shunt_ohm": 0.0005,
+    "current_A": 80.0,
+    "uncompensated_offset_bound_mV": 40.0,
+    "qualification_status": "Candidate arithmetic only; current/shunt compensation accuracy is not specified or qualified."
+  },
+  "unknown_or_unclosed_measurement_terms": [
+    "Production/end-to-end absolute cell-voltage error across all eight channels and temperature; E<=100mV is a qualification requirement, not a measured fact.",
+    "VREF/VDDA accuracy and variation over temperature, supply and load.",
+    "Mixed ADC1/ADC2 channel-specific residual error and calibration stability.",
+    "Actual RC capacitor, input network settling, sample-and-hold timing, and channel scan schedule.",
+    "PCB contamination/leakage, harness leakage, noise, ground offsets and transient coupling.",
+    "SC- shunt-side voltage/current compensation residual for cell 1 and total SC voltage.",
+    "End-to-end detection-to-zero-current response; 50ms is a model qualification limit, not a measurement.",
+    "IWDG/reset cannot independently cover every MCU stuck GPIO/PWM/peripheral failure."
+  ],
+  "behavior_requirements": {
+    "boot_charge_enabled": false,
+    "explicit_request_required": true,
+    "charge_permitted_only_with_fresh_complete_data": true,
+    "diagnostic_test_frames_refresh_working_samples": false,
+    "test_signal_must_be_low_for_working_samples": true,
+    "any_cell_at_or_above_trip_latches_charge_off": true,
+    "stale_or_invalid_data_cancels_request": true,
+    "clear_requires_request_off_fresh_all_cells_below_clear_and_explicit_action": true,
+    "can_frames_can_override_local_protection": false
+  },
+  "historical_result_boundary": "LICAP350F V1.5 energy/SPICE results are historical only and are not re-labeled or used as current BUSFIX verification."
+}

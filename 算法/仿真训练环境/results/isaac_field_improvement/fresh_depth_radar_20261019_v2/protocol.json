@@ -1,0 +1,409 @@
+{
+  "schema": "isaac-field-fresh-foundation-v1",
+  "status": "prepared",
+  "architecture": {
+    "field_encoder_config": {
+      "schema": "depth64-lidar-circular1d-v1",
+      "branch_dims": {
+        "lidar": 32,
+        "depth": 64,
+        "detections": 32,
+        "state": 32
+      },
+      "depth_pool": [
+        8,
+        6
+      ],
+      "radar_pool": 50,
+      "features_dim": 160
+    },
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "input_contract": "sensor-depth-only-v3",
+    "observation_shapes": {
+      "lidar": [
+        2,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        10
+      ],
+      "state": [
+        43
+      ]
+    },
+    "action_shape": [
+      4
+    ],
+    "goal_gain": 1.0,
+    "lstm_hidden_size": 128,
+    "architecture_is_searched": false
+  },
+  "config": {
+    "size": 100.0,
+    "cell": 0.5,
+    "plants": 0,
+    "dry_fraction": 0.25,
+    "leaves_per_plant": 8,
+    "layout": "rows",
+    "row_spacing": 0.8,
+    "plant_spacing": 0.3,
+    "plant_height": 1.0,
+    "plant_height_spread": 0.05,
+    "stem_radius": 0.012,
+    "robot_length": 0.8,
+    "robot_width": 0.47,
+    "max_speed": 4.166666666666667,
+    "max_turn_rate": 1.5,
+    "acceleration": 1.5,
+    "angular_acceleration": 4.0,
+    "camera_height": 0.4,
+    "pitch_min": -0.4363323129985824,
+    "pitch_max": 1.0471975511965976,
+    "gimbal_yaw_rate": 1.8,
+    "gimbal_pitch_rate": 1.2,
+    "dt": 0.05,
+    "max_time": 20.0,
+    "lidar_model": "X2",
+    "lidar_rays": 400,
+    "lidar_range": 8.0,
+    "lidar_min_range": 0.12,
+    "lidar_relative_error": 0.05,
+    "lidar_period": 0.1,
+    "lidar_latency": 0.03,
+    "depth_height": 160,
+    "depth_width": 88,
+    "depth_min_range": 0.3,
+    "depth_range": 5.0,
+    "depth_period": 0.4,
+    "depth_latency": 0.3,
+    "camera_range": 7.0,
+    "camera_period": 0.2,
+    "camera_latency": 0.12,
+    "max_detections": 16,
+    "position_noise": 0.025,
+    "range_noise": 0.01,
+    "detection_drop": 0.08,
+    "class_error": 0.015,
+    "goal_tolerance": 0.4,
+    "goal_hold": 0.3,
+    "damage_penalty": 20.0,
+    "collision_penalty": 0.1,
+    "time_penalty": 0.01,
+    "progress_weight": 0.15,
+    "stop_on_damage": false,
+    "validate_scene": true,
+    "terrain_enabled": false,
+    "terrain_amplitude": 0.35,
+    "terrain_wavelength_min": 4.0,
+    "terrain_wavelength_max": 10.0,
+    "rock_density": 0.01,
+    "large_rock_fraction": 0.2,
+    "terrain_seed": null,
+    "goal_progress_budget": 5.0,
+    "damage_metric": "stem-contact-v2"
+  },
+  "robot_geometry": {
+    "source": "isaac_field.assets.ROBOT_SPEC",
+    "spec": {
+      "body_length_m": 0.8,
+      "body_width_m": 0.3,
+      "body_height_m": 0.15,
+      "total_mass_kg": 30.0,
+      "chassis_mass_kg": 26.4,
+      "wheel_mass_kg": 0.25,
+      "gimbal_link_mass_kg": 0.05,
+      "wheel_radius_m": 0.045,
+      "wheel_width_m": 0.06,
+      "track_ground_contact_length_m": 0.595,
+      "drive_sprocket_radius_m": 0.03,
+      "drive_reduction_ratio": 4.0,
+      "track_separation_m": 0.41,
+      "wheel_count_per_side": 7,
+      "wheel_z_m": -0.105,
+      "reference_height_m": 0.15,
+      "gimbal_offset_z_m": 0.25,
+      "pitch_limits_deg": [
+        -25.0,
+        60.0
+      ]
+    },
+    "sha256": "b58fc3385035fb40add366320bd57f49d3174698fb8e265b4351bc3d7a52149e"
+  },
+  "training": {
+    "algorithm": "SB3-Contrib RecurrentPPO",
+    "mode": "goto",
+    "num_envs": 4,
+    "training_seed": 69001,
+    "stage_seeds": [
+      69001,
+      69002,
+      69003,
+      69004
+    ],
+    "stages": [
+      {
+        "name": "near",
+        "goal_distance_m": [
+          0.6,
+          1.2
+        ],
+        "goal_angle_deg": 15.0,
+        "timesteps": 32768
+      },
+      {
+        "name": "steer30",
+        "goal_distance_m": [
+          1.0,
+          2.0
+        ],
+        "goal_angle_deg": 30.0,
+        "timesteps": 32768
+      },
+      {
+        "name": "steer60",
+        "goal_distance_m": [
+          1.0,
+          3.0
+        ],
+        "goal_angle_deg": 60.0,
+        "timesteps": 65536
+      },
+      {
+        "name": "turn90",
+        "goal_distance_m": [
+          1.0,
+          3.0
+        ],
+        "goal_angle_deg": 90.0,
+        "timesteps": 65536
+      }
+    ],
+    "timesteps_total": 196608,
+    "goal_gain": 1.0,
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 5,
+    "learning_rate": 0.0003,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "target_kl": 0.03,
+    "log_std_init": -2.0,
+    "use_sde": false,
+    "checkpoint_interval_transitions": 8192,
+    "initialization": "new random RecurrentPPO; no old checkpoint or weight transfer"
+  },
+  "initialization": {
+    "checkpoint": null,
+    "baseline_path": "untrained_baseline.zip",
+    "baseline_num_timesteps": 0,
+    "weight_transfer": false
+  },
+  "evaluation": {
+    "environment_seed": 80003,
+    "mode": "goto",
+    "distance_cost": 0.0,
+    "deterministic": true,
+    "record_trajectories": true,
+    "free_space": {
+      "plants": 0,
+      "seeds": [
+        87001,
+        87002,
+        87003,
+        87004
+      ],
+      "goal_distance_m": [
+        1.0,
+        3.0
+      ],
+      "goal_angle_deg": 90.0
+    },
+    "field": {
+      "plants": 16,
+      "seeds": [
+        82001,
+        82002,
+        82003,
+        82004
+      ],
+      "goal_distance_m": [
+        1.0,
+        3.0
+      ],
+      "goal_angle_deg": 60.0
+    },
+    "dataset_role": "development only; these four seeds do not establish generalization",
+    "blind_seeds": {
+      "range_label": "830xx",
+      "used": false,
+      "observed": false
+    },
+    "claim_limit": "This is not an architecture ablation or blind validation."
+  },
+  "runtime": {
+    "versions": {
+      "python": "3.12.3",
+      "packages": {
+        "torch": "2.11.0+cu130",
+        "stable-baselines3": "2.9.0",
+        "sb3-contrib": "2.9.0",
+        "gymnasium": "1.3.0",
+        "numpy": "2.5.1",
+        "warp-lang": "1.17.0"
+      }
+    },
+    "isaaclab_commit": "5870804e4f6aee57bdef68d59f67d328b990d1e1"
+  },
+  "source_snapshot": {
+    "files": [
+      {
+        "path": "isaac_field/__init__.py",
+        "snapshot_path": "source_snapshot/isaac_field/__init__.py",
+        "sha256": "fa5d679eaafe1d5e4f4be39c62971aa65b7086ed5ce473de5fad3eeec748e08c"
+      },
+      {
+        "path": "isaac_field/__main__.py",
+        "snapshot_path": "source_snapshot/isaac_field/__main__.py",
+        "sha256": "3106ae3a576b7d1d93577a5f598fd880c1737acab788aaed6114bb340aa0be25"
+      },
+      {
+        "path": "isaac_field/adversarial_training.py",
+        "snapshot_path": "source_snapshot/isaac_field/adversarial_training.py",
+        "sha256": "127cd8ebb8b71b6385aaf5a902a0f23106f311fad58edb81d1e80278e168408f"
+      },
+      {
+        "path": "isaac_field/adversary.py",
+        "snapshot_path": "source_snapshot/isaac_field/adversary.py",
+        "sha256": "a37c5d5b29308e1905fe947f7c72051ab5b4bcec133890a93653404816ba135d"
+      },
+      {
+        "path": "isaac_field/assets.py",
+        "snapshot_path": "source_snapshot/isaac_field/assets.py",
+        "sha256": "274bef8b1d0e58036ed3809046045cfd5197d0178e62bd4a3a76451a84f254f0"
+      },
+      {
+        "path": "isaac_field/env.py",
+        "snapshot_path": "source_snapshot/isaac_field/env.py",
+        "sha256": "749d8f5bc6d7d09c3ca7d6c85a2c9d857678d4aa423ed01ed1d44b09ec7fff15"
+      },
+      {
+        "path": "isaac_field/layouts.py",
+        "snapshot_path": "source_snapshot/isaac_field/layouts.py",
+        "sha256": "d1119c485432df397fa7c62d90b12a6ac230db95c8a404ad9dc826ab7bc0b2fc"
+      },
+      {
+        "path": "isaac_field/learning.py",
+        "snapshot_path": "source_snapshot/isaac_field/learning.py",
+        "sha256": "624b100414137817f0bbea75865fd3f02145b5364cd5a30cafeb19a0444dbf76"
+      },
+      {
+        "path": "isaac_field/navigation.py",
+        "snapshot_path": "source_snapshot/isaac_field/navigation.py",
+        "sha256": "946403a2884756dd9408561a82eb84f6aeca977b328e8400f133b0dd511470d8"
+      },
+      {
+        "path": "isaac_field/policy.py",
+        "snapshot_path": "source_snapshot/isaac_field/policy.py",
+        "sha256": "0ac66c05a11b2a42e2b9ec9a02585726ba25eb17d2901d6e72c31cd2cbdf69a8"
+      },
+      {
+        "path": "isaac_field/scene_assets.py",
+        "snapshot_path": "source_snapshot/isaac_field/scene_assets.py",
+        "sha256": "3b06c408fc9fde114e2fba1ab933cbc2ccd8f76a9454d9cd8785ca31117698c7"
+      },
+      {
+        "path": "isaac_field/task.py",
+        "snapshot_path": "source_snapshot/isaac_field/task.py",
+        "sha256": "a80ce845103db5b637ada3c2c6039bb9f9ced57fb6f0749c95ff22ee81a980d8"
+      },
+      {
+        "path": "isaac_field/tasks.py",
+        "snapshot_path": "source_snapshot/isaac_field/tasks.py",
+        "sha256": "f3e2b2373d01281a74b91250c4e66767a6c7a48d43c69501a5e8daa186e167ce"
+      },
+      {
+        "path": "isaac_field/terrain.py",
+        "snapshot_path": "source_snapshot/isaac_field/terrain.py",
+        "sha256": "78dea28ecd281a1730a71673fa1a31edc06e896d925c46a0fde4cab016785e71"
+      },
+      {
+        "path": "isaac_field/training.py",
+        "snapshot_path": "source_snapshot/isaac_field/training.py",
+        "sha256": "bf3d7127c1361932ff45d7abea9c7b06548df2411f047632f31f00cdcb6d479c"
+      },
+      {
+        "path": "isaac_field/viewer.py",
+        "snapshot_path": "source_snapshot/isaac_field/viewer.py",
+        "sha256": "7c27cd0c474f87ed34f5495b7aae3367daaee573e1eec8d3a0d0af3212a920be"
+      },
+      {
+        "path": "isaac_field/visualization/__init__.py",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/__init__.py",
+        "sha256": "dbcf4fea4fbe34c62a6f5fa3767f3f81b9d02db2a80c504defe31c920cc7b54b"
+      },
+      {
+        "path": "isaac_field/visualization/activation_maps.py",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/activation_maps.py",
+        "sha256": "893e3a37a0c4a5997665520e860404edb1308bde3181f00fc8ebd137b0155bdb"
+      },
+      {
+        "path": "isaac_field/visualization/inspection.py",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/inspection.py",
+        "sha256": "7b2255f7f33172c5b663ad1d74e1ee72146cd86993d867c8ebb8e9b0f5eb1ad5"
+      },
+      {
+        "path": "isaac_field/visualization/network_2d.html",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/network_2d.html",
+        "sha256": "ac10fcc4bf5fdf1fe2f19ce0ffe77ea703a1082bc0e7c14ddce72783929a40b1"
+      },
+      {
+        "path": "isaac_field/visualization/network_2d.py",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/network_2d.py",
+        "sha256": "2f99e8cc87a159d929f22cc59cd6a9629962d0bb9ec541242a740c309b566e93"
+      },
+      {
+        "path": "isaac_field/visualization/network_panel.py",
+        "snapshot_path": "source_snapshot/isaac_field/visualization/network_panel.py",
+        "sha256": "26b9599463cbf0c1cfed5fd2f8d9f75896f015957380ed85ab20681545fa73af"
+      },
+      {
+        "path": "scripts/compare_isaac_exploration.py",
+        "snapshot_path": "source_snapshot/scripts/compare_isaac_exploration.py",
+        "sha256": "481dfcc98cfe1c19787d781c633b333575bcfd4dceeaa22768aa7622232dfb33"
+      },
+      {
+        "path": "scripts/improve_isaac_policy.py",
+        "snapshot_path": "source_snapshot/scripts/improve_isaac_policy.py",
+        "sha256": "d05892b00da3583ca12d59076b388f15cec3916a4bc2f144abbc1894299151b8"
+      },
+      {
+        "path": "scripts/isaaclab_python.sh",
+        "snapshot_path": "source_snapshot/scripts/isaaclab_python.sh",
+        "sha256": "1bd069fd07fd5cac2cb4759c24bfdf43fab3741018020261261cb7890000b5fd"
+      },
+      {
+        "path": "scripts/train_isaac_foundation.py",
+        "snapshot_path": "source_snapshot/scripts/train_isaac_foundation.py",
+        "sha256": "7b028d39afd452e10395ce4165d6675f31598002c20b28294e6554fd0acd6410"
+      },
+      {
+        "path": "scripts/train_isaac_foundation_fresh.py",
+        "snapshot_path": "source_snapshot/scripts/train_isaac_foundation_fresh.py",
+        "sha256": "03a7d4e0e883e99f7b9a07bd6680b897503d0916e3d18396e6fab1029fef5143"
+      }
+    ]
+  }
+}

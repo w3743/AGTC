@@ -1,0 +1,440 @@
+{
+  "schema": "rknn-forward-runtime-benchmark-v1",
+  "created_at_utc": "2024-08-26T08:26:32.369252Z",
+  "process_id": 713328,
+  "output_path": "/tmp/rk-npu-monitor-20261021/benchmark-result.json",
+  "inputs": {
+    "model": {
+      "path": "/opt/rk-lightstereo/models/lightstereo_640_352.rknn",
+      "size_bytes": 15757542,
+      "sha256": "fb263736efba8e4475f51b46b6c038c269d62934b32bf2d4270de5771d6dea78"
+    },
+    "reference_file": {
+      "path": "/opt/rk-lightstereo/validation/reference.npz",
+      "size_bytes": 1087106,
+      "sha256": "d04e56e9542287b96d3629547eebf1c6a66a5b8860cb025f2ed8413635982728"
+    },
+    "runtime": {
+      "path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+      "size_bytes": 7726232,
+      "sha256": "d31fc19c85b85f6091b2bd0f6af9d962d5264a4e410bfb536402ec92bac738e8"
+    },
+    "reference_tensors": {
+      "left": {
+        "shape": [
+          1,
+          640,
+          352,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "49c3d884cd6b073371f4b55c55d565d74ecb032cf893ec2a52030061512f16a1"
+      },
+      "right": {
+        "shape": [
+          1,
+          640,
+          352,
+          3
+        ],
+        "dtype": "uint8",
+        "sha256": "1f73794e358eea20ec686a838973fc7cb07d60d4b4b3306553ddb6eca28a7f56"
+      },
+      "expected": {
+        "shape": [
+          640,
+          352
+        ],
+        "dtype": "float32",
+        "sha256": "fbd3232267dd7ef3e70b923397e6467b7fb9bb26b9a14e0e2a9f4953105ff715"
+      }
+    },
+    "content_width": 352,
+    "pad_top": 0
+  },
+  "settings": {
+    "runs_per_session": 12,
+    "warmup_per_session": 1,
+    "profiles": [
+      {
+        "name": "single_session_core1",
+        "core_masks": [
+          1
+        ]
+      },
+      {
+        "name": "single_session_core7",
+        "core_masks": [
+          7
+        ]
+      },
+      {
+        "name": "three_sessions_core1_2_4",
+        "core_masks": [
+          1,
+          2,
+          4
+        ]
+      }
+    ]
+  },
+  "scope": "RKNN forward inference only on the saved NHWC reference tensors; excludes camera capture, rectification, reverse inference, consistency/post-processing, and UI/transport.",
+  "comparison_notes": {
+    "latency_ms": "per-call RKNN forward latency; p50/p95 are pooled across profile sessions",
+    "throughput_fps": "completed forward calls divided by measured wall time",
+    "three_session_profile": "throughput is combined across core masks 1/2/4 and must not be read as single-frame latency or single-session FPS",
+    "initialization_and_warmup": "excluded from measured latency and throughput",
+    "reference_tolerance": {
+      "mean_lt_px": 0.2,
+      "p95_lt_px": 0.6,
+      "max_lt_px": 5.0
+    }
+  },
+  "profiles": [
+    {
+      "name": "single_session_core1",
+      "session_count": 1,
+      "core_masks": [
+        1
+      ],
+      "runs_per_session": [
+        12
+      ],
+      "measured_inference_count": 12,
+      "per_inference_latency_ms": {
+        "p50": 196.51764450100018,
+        "p95": 205.66726390134136
+      },
+      "per_session": [
+        {
+          "core_mask": 1,
+          "runs": 12,
+          "latency_ms": {
+            "p50": 196.51764450100018,
+            "p95": 205.66726390134136
+          }
+        }
+      ],
+      "measured_wall_clock_s": 2.2710864359978586,
+      "aggregate_throughput_fps": 5.28381474601494,
+      "throughput_semantics": "completed forward calls across all profile sessions, including concurrent sessions, divided by measured wall time",
+      "session_initialization_ms": [
+        197.5334369999473
+      ],
+      "warmup_runs_per_session": 1,
+      "warmup_total_ms_excluded": 169.9014760015416,
+      "initialization_excluded_from_measurement": true,
+      "warmup_excluded_from_measurement": true,
+      "runtime_isolation": {
+        "requested_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "resolved_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "requested_runtime_mapped": true,
+        "system_runtime_mapped": false,
+        "mapped_runtime_lines": [
+          "7f87491000-7f87bb5000 r-xp 00000000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bb5000-7f87bc5000 ---p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bc5000-7f87bfc000 r--p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bfc000-7f87bff000 rw-p 0075b000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so"
+        ]
+      },
+      "first_output_reference_checks": [
+        {
+          "core_mask": 1,
+          "prediction_shape": [
+            640,
+            352
+          ],
+          "expected_shape": [
+            640,
+            352
+          ],
+          "shape_match": true,
+          "prediction_dtype": "float32",
+          "expected_dtype": "float32",
+          "prediction_all_finite": true,
+          "expected_all_finite": true,
+          "comparison_region": {
+            "content_width": 352,
+            "pad_top": 0,
+            "finite_pixels": 225280,
+            "total_pixels": 225280,
+            "finite_fraction": 1.0
+          },
+          "absolute_disparity_delta_px": {
+            "mean": 0.07781528826294974,
+            "p50": 0.04686737060546875,
+            "p95": 0.29874534606933567,
+            "max": 1.4041481018066406
+          },
+          "within_reference_tolerance": true,
+          "tolerance": {
+            "mean_lt_px": 0.2,
+            "p95_lt_px": 0.6,
+            "max_lt_px": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "single_session_core7",
+      "session_count": 1,
+      "core_masks": [
+        7
+      ],
+      "runs_per_session": [
+        12
+      ],
+      "measured_inference_count": 12,
+      "per_inference_latency_ms": {
+        "p50": 191.8726024996431,
+        "p95": 214.92618409974966
+      },
+      "per_session": [
+        {
+          "core_mask": 7,
+          "runs": 12,
+          "latency_ms": {
+            "p50": 191.8726024996431,
+            "p95": 214.92618409974966
+          }
+        }
+      ],
+      "measured_wall_clock_s": 2.312450315002934,
+      "aggregate_throughput_fps": 5.189300683411559,
+      "throughput_semantics": "completed forward calls across all profile sessions, including concurrent sessions, divided by measured wall time",
+      "session_initialization_ms": [
+        221.82302200235426
+      ],
+      "warmup_runs_per_session": 1,
+      "warmup_total_ms_excluded": 176.88939299841877,
+      "initialization_excluded_from_measurement": true,
+      "warmup_excluded_from_measurement": true,
+      "runtime_isolation": {
+        "requested_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "resolved_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "requested_runtime_mapped": true,
+        "system_runtime_mapped": false,
+        "mapped_runtime_lines": [
+          "7f87491000-7f87bb5000 r-xp 00000000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bb5000-7f87bc5000 ---p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bc5000-7f87bfc000 r--p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bfc000-7f87bff000 rw-p 0075b000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so"
+        ]
+      },
+      "first_output_reference_checks": [
+        {
+          "core_mask": 7,
+          "prediction_shape": [
+            640,
+            352
+          ],
+          "expected_shape": [
+            640,
+            352
+          ],
+          "shape_match": true,
+          "prediction_dtype": "float32",
+          "expected_dtype": "float32",
+          "prediction_all_finite": true,
+          "expected_all_finite": true,
+          "comparison_region": {
+            "content_width": 352,
+            "pad_top": 0,
+            "finite_pixels": 225280,
+            "total_pixels": 225280,
+            "finite_fraction": 1.0
+          },
+          "absolute_disparity_delta_px": {
+            "mean": 0.07781528826294974,
+            "p50": 0.04686737060546875,
+            "p95": 0.29874534606933567,
+            "max": 1.4041481018066406
+          },
+          "within_reference_tolerance": true,
+          "tolerance": {
+            "mean_lt_px": 0.2,
+            "p95_lt_px": 0.6,
+            "max_lt_px": 5.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "three_sessions_core1_2_4",
+      "session_count": 3,
+      "core_masks": [
+        1,
+        2,
+        4
+      ],
+      "runs_per_session": [
+        12,
+        12,
+        12
+      ],
+      "measured_inference_count": 36,
+      "per_inference_latency_ms": {
+        "p50": 266.4648810023209,
+        "p95": 289.1131957530888
+      },
+      "per_session": [
+        {
+          "core_mask": 1,
+          "runs": 12,
+          "latency_ms": {
+            "p50": 271.33658949969686,
+            "p95": 289.5481291536271
+          }
+        },
+        {
+          "core_mask": 2,
+          "runs": 12,
+          "latency_ms": {
+            "p50": 264.560484996764,
+            "p95": 280.56045955527225
+          }
+        },
+        {
+          "core_mask": 4,
+          "runs": 12,
+          "latency_ms": {
+            "p50": 265.67881850132835,
+            "p95": 287.10321784965345
+          }
+        }
+      ],
+      "measured_wall_clock_s": 3.1737201520008966,
+      "aggregate_throughput_fps": 11.343155122641647,
+      "throughput_semantics": "completed forward calls across all profile sessions, including concurrent sessions, divided by measured wall time",
+      "session_initialization_ms": [
+        175.46314300125232,
+        148.4778899975936,
+        154.23743199789897
+      ],
+      "warmup_runs_per_session": 1,
+      "warmup_total_ms_excluded": 538.6436370026786,
+      "initialization_excluded_from_measurement": true,
+      "warmup_excluded_from_measurement": true,
+      "runtime_isolation": {
+        "requested_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "resolved_path": "/opt/rk-lightstereo/runtime/librknnrt.so",
+        "requested_runtime_mapped": true,
+        "system_runtime_mapped": false,
+        "mapped_runtime_lines": [
+          "7f87491000-7f87bb5000 r-xp 00000000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bb5000-7f87bc5000 ---p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bc5000-7f87bfc000 r--p 00724000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so",
+          "7f87bfc000-7f87bff000 rw-p 0075b000 b3:03 255480                         /opt/rk-lightstereo/runtime/librknnrt.so"
+        ]
+      },
+      "first_output_reference_checks": [
+        {
+          "core_mask": 1,
+          "prediction_shape": [
+            640,
+            352
+          ],
+          "expected_shape": [
+            640,
+            352
+          ],
+          "shape_match": true,
+          "prediction_dtype": "float32",
+          "expected_dtype": "float32",
+          "prediction_all_finite": true,
+          "expected_all_finite": true,
+          "comparison_region": {
+            "content_width": 352,
+            "pad_top": 0,
+            "finite_pixels": 225280,
+            "total_pixels": 225280,
+            "finite_fraction": 1.0
+          },
+          "absolute_disparity_delta_px": {
+            "mean": 0.07781528826294974,
+            "p50": 0.04686737060546875,
+            "p95": 0.29874534606933567,
+            "max": 1.4041481018066406
+          },
+          "within_reference_tolerance": true,
+          "tolerance": {
+            "mean_lt_px": 0.2,
+            "p95_lt_px": 0.6,
+            "max_lt_px": 5.0
+          }
+        },
+        {
+          "core_mask": 2,
+          "prediction_shape": [
+            640,
+            352
+          ],
+          "expected_shape": [
+            640,
+            352
+          ],
+          "shape_match": true,
+          "prediction_dtype": "float32",
+          "expected_dtype": "float32",
+          "prediction_all_finite": true,
+          "expected_all_finite": true,
+          "comparison_region": {
+            "content_width": 352,
+            "pad_top": 0,
+            "finite_pixels": 225280,
+            "total_pixels": 225280,
+            "finite_fraction": 1.0
+          },
+          "absolute_disparity_delta_px": {
+            "mean": 0.07781528826294974,
+            "p50": 0.04686737060546875,
+            "p95": 0.29874534606933567,
+            "max": 1.4041481018066406
+          },
+          "within_reference_tolerance": true,
+          "tolerance": {
+            "mean_lt_px": 0.2,
+            "p95_lt_px": 0.6,
+            "max_lt_px": 5.0
+          }
+        },
+        {
+          "core_mask": 4,
+          "prediction_shape": [
+            640,
+            352
+          ],
+          "expected_shape": [
+            640,
+            352
+          ],
+          "shape_match": true,
+          "prediction_dtype": "float32",
+          "expected_dtype": "float32",
+          "prediction_all_finite": true,
+          "expected_all_finite": true,
+          "comparison_region": {
+            "content_width": 352,
+            "pad_top": 0,
+            "finite_pixels": 225280,
+            "total_pixels": 225280,
+            "finite_fraction": 1.0
+          },
+          "absolute_disparity_delta_px": {
+            "mean": 0.07781528826294974,
+            "p50": 0.04686737060546875,
+            "p95": 0.29874534606933567,
+            "max": 1.4041481018066406
+          },
+          "within_reference_tolerance": true,
+          "tolerance": {
+            "mean_lt_px": 0.2,
+            "p95_lt_px": 0.6,
+            "max_lt_px": 5.0
+          }
+        }
+      ],
+      "concurrency_note": "aggregate throughput combines concurrent sessions; latency percentiles remain per inference and are not single-profile wall-clock latency"
+    }
+  ]
+}

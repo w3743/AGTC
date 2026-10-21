@@ -1,0 +1,60 @@
+{
+  "schema": "isaac-field-gpu-health-probe-v1",
+  "ok": true,
+  "started_at_utc": "2026-10-17T14:45:54.244549+00:00",
+  "finished_at_utc": "2026-10-17T14:46:08.204076+00:00",
+  "host": {
+    "hostname": "C3743",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]"
+  },
+  "torch": {
+    "version": "2.11.0+cu130",
+    "compiled_cuda": "13.0",
+    "cudnn_version": 91900,
+    "cudnn_available": true,
+    "cuda_available": true,
+    "device_count": 1,
+    "device": {
+      "name": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+      "compute_capability": "12.0",
+      "total_memory_bytes": 12792037376
+    }
+  },
+  "warp": {
+    "version": "1.17.0",
+    "runtime_banner": "CUDA Toolkit 12.9, Driver 13.4; cuda:0 NVIDIA GeForce RTX 5070 Ti Laptop GPU, sm_120"
+  },
+  "checks": {
+    "torch_cuda_tensor_and_d2h": {
+      "ok": true,
+      "device": "cuda:0",
+      "shape": [16, 16],
+      "sample": 1240.0,
+      "synchronized": true
+    },
+    "cudnn_conv2d_forward_backward": {
+      "ok": true,
+      "input_shape": [2, 3, 16, 16],
+      "weight_shape": [4, 3, 3, 3],
+      "output_shape": [2, 4, 16, 16],
+      "loss": 25.508724212646484,
+      "synchronized": true
+    },
+    "warp_cuda_kernel_and_array_to_cpu_copy": {
+      "ok": true,
+      "device": "cuda:0",
+      "elements": 64,
+      "first": 1.0,
+      "last": 64.0,
+      "synchronized": true
+    }
+  },
+  "execution": {
+    "wrapper": "scripts/isaaclab_python.sh",
+    "wrapper_exit_code": 0,
+    "python_probe_exit_code": 0,
+    "cpu_fallback_used": false,
+    "training_or_viewer_started": false
+  }
+}

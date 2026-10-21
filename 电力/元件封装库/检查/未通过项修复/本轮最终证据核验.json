@@ -1,0 +1,116 @@
+{
+  "pass": true,
+  "checked_at_utc": "2026-10-15T10:29:44.111461+00:00",
+  "engineering_acceptance_all_pass": false,
+  "model_independent_reproductions": [
+    {
+      "model": "BMS",
+      "proof": {
+        "path": "元件封装库/检查/未通过项修复/BMS独立复跑.json",
+        "sha256": "d6ff80fa31301ee20f9fc21d63b9ee07eb4292fd6e622beb743e5a3ebf00f295",
+        "pass": true
+      },
+      "source_files": 5,
+      "equal_json_results": 2
+    },
+    {
+      "model": "FOC",
+      "proof": {
+        "path": "元件封装库/检查/未通过项修复/FOC独立复跑.json",
+        "sha256": "964c41b4a453ff8f734b8d90de42b255e832e3fa406da919da92cce917fa064b",
+        "pass": true
+      },
+      "source_files": 1,
+      "equal_json_results": 1
+    },
+    {
+      "model": "REG",
+      "proof": {
+        "path": "元件封装库/检查/未通过项修复/REG独立复跑.json",
+        "sha256": "28b33c6d7b82cdd5f68476eab9cce60b41552d04963ee207258ba6ceaef43a50",
+        "pass": true
+      },
+      "source_files": 11,
+      "equal_json_results": 1
+    }
+  ],
+  "bms_checks_passed": 17,
+  "regulator_conditional_state_checks_passed": 19,
+  "candidate_families": 18,
+  "native_instances": 522,
+  "drc_counts": [
+    [
+      "BMS模块",
+      0,
+      8
+    ],
+    [
+      "FOC驱动模块",
+      0,
+      5
+    ],
+    [
+      "稳压模块",
+      0,
+      0
+    ]
+  ],
+  "archives": [
+    {
+      "archive": "归档/工程过程.zip",
+      "receipt": "元件封装库/检查/未通过项修复/中央修复前归档核验.json",
+      "recorded_entries_read_back": 13,
+      "pass": true
+    },
+    {
+      "archive": "归档/工程过程.zip",
+      "receipt": "元件封装库/检查/未通过项修复/入口更新前归档核验.json",
+      "recorded_entries_read_back": 3,
+      "pass": true
+    },
+    {
+      "archive": "BMS模块/归档/历史与调试.zip",
+      "preserved_old_entries_read_back": 1187,
+      "appended_read_back": 14,
+      "pass": true
+    },
+    {
+      "archive": "FOC驱动模块/归档/历史与调试.zip",
+      "old_source_and_readme_read_back": 2,
+      "pass": true,
+      "boundary": "仅此处列明成员的独立读回；旧成员全量比较见模块归档收据。"
+    },
+    {
+      "archive": "FOC驱动模块/归档/历史与调试.zip",
+      "existing_members_independently_compared": 18,
+      "pass": true
+    },
+    {
+      "archive": "稳压模块/归档/历史与调试.zip",
+      "receipt": "稳压模块/检查/未通过项修复/README历史归档读回.json",
+      "entries_read_back": 2,
+      "pass": true
+    },
+    {
+      "archive": "稳压模块/检查/未通过项修复/BUSFIX_逐节保护资格复查.zip",
+      "receipt": "稳压模块/检查/未通过项修复/BUSFIX_逐节保护资格ZIP读回.json",
+      "entries_read_back": 19,
+      "pass": true
+    }
+  ],
+  "central_check": {
+    "command": [
+      "C:\\Users\\wangj\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+      "-B",
+      "-X",
+      "utf8",
+      "元件封装库/工具/同步全部.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "stdout": "PASS 来源=3，BOM实例=522，资产引用=405，资产文件=865；配置、源文件和资产SHA256一致。\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/当前精确器件库.elibz -> 元件封装库/嘉立创EDA库/当前精确器件库.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/低价候选精确器件库.elibz -> 元件封装库/嘉立创EDA库/低价候选精确器件库.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/C915627官方器件库.elibz -> 元件封装库/嘉立创EDA库/C915627官方器件库.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/AO3400A精确器件库补充.elibz -> 元件封装库/嘉立创EDA库/AO3400A精确器件库补充.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/CAN复用47uF官方库.elibz -> 元件封装库/嘉立创EDA库/CAN复用47uF官方库.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/PSU100nF当前精确器件库补充.elibz -> 元件封装库/嘉立创EDA库/PSU100nF当前精确器件库补充.elibz\r\nPASS: SHA256与ZIP CRC：BMS模块/检查/泄放继电器官方库.elibz -> 元件封装库/嘉立创EDA库/泄放继电器官方库.elibz\r\nPASS: SHA256与ZIP CRC：稳压模块/参考资料/超级电容.elibz2 -> 元件封装库/嘉立创EDA库/超级电容.elibz2\r\n{\"pass\": true, \"changed_or_missing_sources\": []}\r\n",
+    "stderr": ""
+  },
+  "broken_report_links": [],
+  "boundary": "本收据仅核对证据可复现、哈希一致、快照覆盖及中央库同步；硬件未通过项仍为FAIL/OPEN，其他对话后续保存不在此快照内。"
+}

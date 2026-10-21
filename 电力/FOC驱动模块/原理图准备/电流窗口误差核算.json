@@ -1,0 +1,251 @@
+{
+  "title": "G431 + DRV8353 bidirectional phase-current window corner estimate",
+  "status": "engineering_estimate_not_hardware_qualification",
+  "assumptions": {
+    "VREF_CORE_nom_V": 3.3,
+    "VREF_CORE_tolerance": "+/-2.5%",
+    "DAC_reference_assumed": "same VREF_CORE rail as CSA VREF+; verify board routing and source impedance",
+    "phase_shunt": "0.5mOhm KOA PSF4, initial +/-1%, TCR +/-50ppm/C",
+    "temperature_corner": "TCR applied from 25C to 125C only (100C span)",
+    "DRV8353_CSA_gain": "GAIN10 range 9.7..10.3; GAIN20 range 19.4..20.6",
+    "DRV8353_CSA_input_offset": "+/-3mV bound; input-referred, then multiplied by gain in SO voltage",
+    "TLV1704A_input_offset": "+/-5.5mV full-temperature bound",
+    "STM32G431_COMP_offset": "+/-9mV conservative symmetric bound from -9..+3mV datasheet range",
+    "STM32G431_DAC3_TUE": "+/-5 LSB, DAC 15MSPS accuracy Table 71, internal comparator-only route with output buffer disabled; no separate DAC gain error added because TUE is total unadjusted error",
+    "STM32G431_DAC3_comparator_routes": "RM0440 Table 73: DAC3_CH1 can be COMP1/COMP3 INM; DAC3_CH2 can be COMP2 INM. Program both DAC3 channels to same code. Internal-only output mode avoids PA4/PA5 DAC1 pins used by SPI1.",
+    "STM32G431_DAC_transfer": "RM0440: VDAC=VREF*DOR/4096; code is bounded to 0..4095",
+    "divider_tolerance": "RNEG top and bottom each +/-1%, independent",
+    "omitted_effects": [
+      "CSA offset drift has only a typical 10uV/C value and no corresponding guaranteed maximum used here",
+      "VREF source noise/transient droop and mismatch between coreboard VREF+ and DAC reference",
+      "comparator propagation delay, PWM/current ripple, analog routing, grounding, and ADC/DAC settling",
+      "temperature-dependent comparator/CSA behavior beyond guaranteed values",
+      "calibration and board-to-board component correlation"
+    ]
+  },
+  "formula": {
+    "positive": "Itrip=(Vdac + VOS_COMP - VREF/2 - G*VOS_CSA)/(G*Rshunt); DAC code chosen at nominal window using VREF/2 + Gnom*I*Rnom",
+    "negative_magnitude": "Itrip=(VREF/2 - VNEG + G*VOS_CSA + VOS_TLV)/(G*Rshunt); VNEG=VREF*Rbottom/(Rtop+Rbottom)",
+    "temperature_sensitivity": {
+      "CSA_offset_drift_typical_per_C_uV": 10.0,
+      "temperature_span_C": 100,
+      "CSA_typical_drift_over_span_mV_input": 1.0,
+      "equivalent_current_shift_A_at_0p5mOhm": 2.0,
+      "shunt_TCR_abs_fraction_over_span": 0.004999999999999999,
+      "shunt_threshold_shift_at_150A_due_TCR_only_A": 0.75,
+      "qualification_note": "CSA 10uV/C is typical rather than a guaranteed maximum; the illustrative current shift is not added as a guaranteed corner. KOA TCR is bounded only within its specified temperature interval; actual pulse self-heating must be measured."
+    }
+  },
+  "cases": {
+    "comparison_previous_gain10_nominal_plus_minus_140A": {
+      "nominal_window_A": 140.0,
+      "nominal_gain": 10.0,
+      "positive_DAC_code_12bit": 2917,
+      "positive_DAC_ideal_voltage_at_3v3_V": 2.3501220703125,
+      "negative_divider_nominal": {
+        "Rtop_ohm": 24900.0,
+        "Rbottom_ohm": 10000.0,
+        "VNEG_at_3v3_V": 0.9455587392550143
+      },
+      "positive_trip": {
+        "min_trip_A": 122.19808508165704,
+        "max_trip_A": 159.04873746858317,
+        "min_margin_over_120A": 2.198085081657041,
+        "min_corner": {
+          "trip_A": 122.19808508165704,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 10.3,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": 0.003,
+          "DAC_error_V": -0.0039276123046875,
+          "COMP_VOS_V": -0.009
+        },
+        "max_corner": {
+          "trip_A": 159.04873746858317,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 9.7,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": -0.003,
+          "DAC_error_V": 0.0041290283203124995,
+          "COMP_VOS_V": 0.009
+        },
+        "enumerated_corner_count": 128
+      },
+      "negative_trip_magnitude": {
+        "min_trip_A": 121.89722097457708,
+        "max_trip_A": 161.26101959331285,
+        "min_margin_over_120A": 1.8972209745770812,
+        "min_corner": {
+          "trip_A": 121.89722097457708,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 10.3,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": -0.003,
+          "TLV1704_VOS_V": -0.0055,
+          "Rtop_ohm": 24651.0,
+          "Rbottom_ohm": 10100.0
+        },
+        "max_corner": {
+          "trip_A": 161.26101959331285,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 9.7,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": 0.003,
+          "TLV1704_VOS_V": 0.0055,
+          "Rtop_ohm": 25149.0,
+          "Rbottom_ohm": 9900.0
+        },
+        "enumerated_corner_count": 256
+      }
+    },
+    "root_selected_gain10_nominal_plus_minus_150A": {
+      "nominal_window_A": 150.0,
+      "nominal_gain": 10.0,
+      "positive_DAC_code_12bit": 2979,
+      "positive_DAC_ideal_voltage_at_3v3_V": 2.4000732421874997,
+      "negative_divider_nominal": {
+        "Rtop_ohm": 26700.0,
+        "Rbottom_ohm": 10000.0,
+        "VNEG_at_3v3_V": 0.8991825613079019
+      },
+      "positive_trip": {
+        "min_trip_A": 131.51464609627533,
+        "max_trip_A": 169.765646217655,
+        "min_margin_over_120A": 11.514646096275328,
+        "min_corner": {
+          "trip_A": 131.51464609627533,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 10.3,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": 0.003,
+          "DAC_error_V": -0.0039276123046875,
+          "COMP_VOS_V": -0.009
+        },
+        "max_corner": {
+          "trip_A": 169.765646217655,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 9.7,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": -0.003,
+          "DAC_error_V": 0.0041290283203124995,
+          "COMP_VOS_V": 0.009
+        },
+        "enumerated_corner_count": 128
+      },
+      "negative_trip_magnitude": {
+        "min_trip_A": 130.62292185533047,
+        "max_trip_A": 171.12275700619477,
+        "min_margin_over_120A": 10.622921855330475,
+        "min_corner": {
+          "trip_A": 130.62292185533047,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 10.3,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": -0.003,
+          "TLV1704_VOS_V": -0.0055,
+          "Rtop_ohm": 26433.0,
+          "Rbottom_ohm": 10100.0
+        },
+        "max_corner": {
+          "trip_A": 171.12275700619477,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 9.7,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": 0.003,
+          "TLV1704_VOS_V": 0.0055,
+          "Rtop_ohm": 26967.0,
+          "Rbottom_ohm": 9900.0
+        },
+        "enumerated_corner_count": 256
+      }
+    },
+    "old_gain20_nominal_plus_minus_130A": {
+      "nominal_window_A": 130.0,
+      "nominal_gain": 20.0,
+      "positive_DAC_code_12bit": 3662,
+      "positive_DAC_ideal_voltage_at_3v3_V": 2.9503417968749996,
+      "negative_divider_nominal": {
+        "Rtop_ohm": 84500.0,
+        "Rbottom_ohm": 10000.0,
+        "VNEG_at_3v3_V": 0.3492063492063492
+      },
+      "positive_trip": {
+        "min_trip_A": 114.11802275256778,
+        "max_trip_A": 146.95777859590441,
+        "min_margin_over_120A": -5.881977247432218,
+        "min_corner": {
+          "trip_A": 114.11802275256778,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 20.6,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": 0.003,
+          "DAC_error_V": -0.0039276123046875,
+          "COMP_VOS_V": -0.009
+        },
+        "max_corner": {
+          "trip_A": 146.95777859590441,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 19.4,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": -0.003,
+          "DAC_error_V": 0.0041290283203124995,
+          "COMP_VOS_V": 0.009
+        },
+        "enumerated_corner_count": 128
+      },
+      "negative_trip_magnitude": {
+        "min_trip_A": 114.28357453854223,
+        "max_trip_A": 146.87250842784337,
+        "min_margin_over_120A": -5.716425461457774,
+        "min_corner": {
+          "trip_A": 114.28357453854223,
+          "VREF_V": 3.2175,
+          "gain_V_per_V": 20.6,
+          "Rshunt_ohm": 0.000507525,
+          "CSA_VOS_V": -0.003,
+          "TLV1704_VOS_V": -0.0055,
+          "Rtop_ohm": 83655.0,
+          "Rbottom_ohm": 10100.0
+        },
+        "max_corner": {
+          "trip_A": 146.87250842784337,
+          "VREF_V": 3.3824999999999994,
+          "gain_V_per_V": 19.4,
+          "Rshunt_ohm": 0.000492525,
+          "CSA_VOS_V": 0.003,
+          "TLV1704_VOS_V": 0.0055,
+          "Rtop_ohm": 85345.0,
+          "Rbottom_ohm": 9900.0
+        },
+        "enumerated_corner_count": 256
+      }
+    }
+  },
+  "recommendation": {
+    "previous_140A_candidate": "The modeled cold electrical minimums are +122.20A/-121.90A, only about 2.20A/1.90A above 120A; this narrow margin does not cover unbounded CSA drift, reference noise, comparator/Break delay, or PWM ripple, so it was replaced by the selected +/-150A nominal window.",
+    "selected_candidate": "Root selected nominal +150A/-150.16A (RNEG top 26.7k/10k and positive DAC code from this script); retain commanded peak candidate <=110A, and validate the computed minimums and transient response on hardware.",
+    "hard_limit_status": "No independent +/-120A hard-limit pass is established. Comparator/DAC routing and timed response require bench validation; software current regulation and DRV VDS fault remain distinct protections."
+  },
+  "sources": [
+    {
+      "title": "TI DRV8353R datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8353r.pdf"
+    },
+    {
+      "title": "TI TLV1704 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/tlv1704.pdf"
+    },
+    {
+      "title": "ST STM32G431CB datasheet",
+      "url": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf"
+    },
+    {
+      "title": "ST RM0440 STM32G4 reference manual",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf"
+    },
+    {
+      "title": "KOA PSF4 official datasheet",
+      "url": "https://www.koaspeer.com/pdfs/PSF4.pdf"
+    }
+  ]
+}

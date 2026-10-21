@@ -1,0 +1,25 @@
+{
+  "name": "regen_sink_600W_300J_quota_then_dump",
+  "vdc_v": 32.4,
+  "safe5_v": 4.9764817276,
+  "core5_v": 5.0,
+  "dump_enabled": true,
+  "c_ov_sense_f": 1e-09,
+  "safe5_loss_s": null,
+  "pac_motor_port_w_injected": 1800.0,
+  "source": "ideal 1800W regenerative injection; full 1s even after OVP/BREAK_N as a conservative dump-energy screen",
+  "external_absorption_limit_w": 600.0,
+  "external_absorption_quota_j": 300.0,
+  "external_absorption_duration_s": 0.5001666666666666,
+  "battery_source_model": "one-way diode, 10mohm + 1uH, cannot absorb regen",
+  "bulk": {
+    "C_F": 0.03,
+    "ESR_ohm": 0.006333,
+    "ESL_H": 1.5e-08,
+    "precharged": true
+  },
+  "chopper": "2x2ohm parallel, 11.25mohm Q7 channel (4.5mOhm max at VGS=4.5V times hot factor 2.5) with separate resistor-bank and Q7 energy integrals, 10ohm/10nF gate, hysteretic comparator behavior model",
+  "regen_ramp": "linear 0-to-1800W over 1ms avoids an unphysical step through bulk ESL; full requested energy still approximately 1.8kJ over 1s",
+  "comparator": "TLV1704 threshold network; VOL=0.9V behavior boundary; no official macromodel or worst-case delay; measured crossing times are from behavior-level comparator, without datasheet propagation delay",
+  "netlist_scope": "independent average 1s DC-link network, not a full inverter/FOC test"
+}

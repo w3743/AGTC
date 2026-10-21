@@ -1,0 +1,10 @@
+const pageUuid='90aa6c46493624cf';
+const opened=await eda.dmt_EditorControl.openDocument(pageUuid);
+if(!opened||!String(opened).startsWith(pageUuid+'@')) throw new Error('Could not open target page');
+const page=await eda.dmt_Schematic.getCurrentSchematicPageInfo();
+if(!page||page.uuid!==pageUuid) throw new Error('Wrong active page');
+const info=await eda.dmt_Project.getCurrentProjectInfo();
+const file=await eda.sch_ManufactureData.getNetlistFile('FOC_G431_P1_final','EasyEDA');
+if(!file) throw new Error('getNetlistFile returned undefined');
+const content=await file.text();
+return {pageUuid:page.uuid,pageName:page.name??null,projectUuid:info?.uuid??null,fileName:file.name??null,content};

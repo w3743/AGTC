@@ -1,0 +1,497 @@
+{
+  "snapshotDate": "2026-10-15",
+  "sourceBOM": "BMS模块/原理图准备/BOM.csv",
+  "bomSha256": "4b0d4698249d82b6b7039c7d447055966da6f644ff6291a6f7e88ee56acea6fd",
+  "counts": {
+    "uniqueRefRows": 257,
+    "uniqueRefs": 257,
+    "perSetTotalQty": 280,
+    "rawNonemptyMpnTextVariants": 75,
+    "normalizedMpnTypesIncludingCoreBoard": 74,
+    "normalizedSelectedMpnTypesExcludingCoreBoard": 73,
+    "mpnEmptyRows": 0,
+    "mpnEmptyRefs": [],
+    "nonComponentAnchorRefsExcluded": [
+      "J_BAL_SERVICE",
+      "J_BAT_HV",
+      "J_BUS_OUTPUT",
+      "J_CELL_SERVICE",
+      "J_PACK_HV"
+    ],
+    "dnpPopulatedRows": 0,
+    "dnpRefs": []
+  },
+  "normalization": {
+    "rules": [
+      "去除已识别的制造商名称前缀（不丢弃器件型号）",
+      "去除LCSC采购渠道括注",
+      "Phoenix MSTBA描述中取括号内的准确订购号",
+      "型号大小写不敏感",
+      "WSF60N06点号/标点变体归一；其他型号标点保留"
+    ],
+    "rawAliasGroupsCollapsed": 1,
+    "aliasGroups": [
+      {
+        "normalizedMpn": "sn74lvc1g11dckr",
+        "rawForms": [
+          "SN74LVC1G11DCKR",
+          "TI SN74LVC1G11DCKR"
+        ]
+      }
+    ]
+  },
+  "categories": {
+    "AFE/主动均衡": {
+      "refs": 116,
+      "qty": 116
+    },
+    "功率/预充": {
+      "refs": 51,
+      "qty": 51
+    },
+    "MCU/接口/测温/CAN": {
+      "refs": 45,
+      "qty": 45
+    },
+    "维护线束": {
+      "refs": 33,
+      "qty": 56
+    },
+    "外部控制板": {
+      "refs": 1,
+      "qty": 1
+    },
+    "风扇/供电/控制": {
+      "refs": 6,
+      "qty": 6
+    },
+    "板外/装配配套": {
+      "refs": 5,
+      "qty": 5
+    }
+  },
+  "separateItems": {
+    "mcuCoreBoard": {
+      "ref": "CORE_BOARD",
+      "qty": 1,
+      "mpn": "WeAct Normal STM32G431CBU6 QFN48 core board",
+      "includedInMpnTypes": true,
+      "installedOnMainBmsPcb": false
+    },
+    "mcuSocketHeaders": {
+      "refs": [
+        "J_CORE_P1",
+        "J_CORE_P2"
+      ],
+      "qty": 2,
+      "mpn": "254PM-2x12P-V",
+      "installedOnMainBmsPcb": true
+    },
+    "maintenanceHarness": {
+      "refs": 33,
+      "qty": 56
+    },
+    "assemblyAccessories": {
+      "refs": [
+        "J_FAN_MATE",
+        "FAN_EXT",
+        "J_LOAD_POWER_VALID_MATE",
+        "J_CAN_MATE",
+        "J_FAN_CTRL_MATE"
+      ],
+      "qty": 5,
+      "notes": "refs、用量和逐项说明由当前BOM“板外/装配配套”类别生成；板上风扇保险座FH_FAN已退出，当前这些项均为外部/装配配套。该类别总数不等于PCB贴装数。",
+      "boardMountedRefs": [],
+      "externalOrAssemblyRefs": [
+        "J_FAN_MATE",
+        "FAN_EXT",
+        "J_LOAD_POWER_VALID_MATE",
+        "J_CAN_MATE",
+        "J_FAN_CTRL_MATE"
+      ],
+      "notesByRef": {
+        "J_FAN_MATE": "One 2P wire-side mating plug for J_FAN. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C581323 is catalog identification only; current RMB price remains 待询价.",
+        "FAN_EXT": "One external Delta KSB0405HBF0D 5 V four-wire fan. Power mates to J_FAN; PWM and tach mate to J_FAN_CTRL. Startup current is not guaranteed by the current evidence; verify on first article against converter and SGM2593 limits.",
+        "J_LOAD_POWER_VALID_MATE": "One 2P wire-side mating plug for J_LOAD_POWER_VALID. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C581323 is catalog identification only; current RMB price remains 待询价. Preserve the two signal wires and VO617A isolation boundary; no ground conductor is added.",
+        "J_CAN_MATE": "One 3P wire-side mating plug for J_CAN. Official DEGSON series data lists 2EDGVC-5.08 as a compatible board connector. LCSC reference C528723 is catalog identification only; current RMB price remains 待询价.",
+        "J_FAN_CTRL_MATE": "One additional 2P wire-side mating plug for fan PWM/tach connector J_FAN_CTRL; same exact MPN as J_FAN_MATE to reuse the existing connector family. Current RMB quote remains 待询价."
+      }
+    },
+    "temperatureSensors": {
+      "refs": [
+        "NTC_BOARD",
+        "NTC_CELL1",
+        "NTC_CELL3",
+        "NTC_CELL5",
+        "NTC_MOS"
+      ],
+      "qty": 5,
+      "cellProbesClearlyExternal": [
+        "NTC_CELL1",
+        "NTC_CELL3",
+        "NTC_CELL5"
+      ],
+      "placementByRef": {
+        "NTC_BOARD": {
+          "location": "板上相邻均衡功率区热点（BQ76952 TS2采样）",
+          "interfaceNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于均衡功率区PCB热点，BQ TS2 pin22。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Vishay仍用其独立模型。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。",
+          "source": "BMS模块/原理图准备/接口元件连接.json"
+        },
+        "NTC_MOS": {
+          "location": "MOS功率区热点",
+          "interfaceNote": "南京时恒MF52A103F3950(A1)，10kΩ±1%，B25/50=3950K±1%；安装于主MOS热点，BQ TS3 pin23。两端无极性，沿用BQ内部偏置与1nF滤波。厂家2018-06-04规格书附表1 P163-6完整R/T曲线；必须用这条曲线生成并写入BQ自定义NTC系数，TS2/TS3分别选该模型，不能沿用Vishay3977K模型或把B值公式当原表。板外热区A/B/C三颗Vishay仍用其独立模型。焊接距离、探头绝缘、热耦合与引线孔距按此厂商图核对，不继承旧Vishay封装。实物验收尚未进行。 时恒A1官方器件库名仅增加空格，符号两端1/2与封装PAD1/2对应；钻孔0.55mm、引线最大0.35mm、间距1.70mm。机械几何对应，非焊接/实物验收。",
+          "source": "BMS模块/原理图准备/接口元件连接.json"
+        }
+      },
+      "representativeCellThermalZones": {
+        "NTC_CELL1": "A",
+        "NTC_CELL3": "B",
+        "NTC_CELL5": "C"
+      },
+      "cellCoverageNote": "每个NTC_CELL探头代表其标注热区，不表示逐电芯组测温。"
+    },
+    "panelSwitch": {
+      "ref": "SW_RUN_STORE",
+      "qty": 1,
+      "installedOnMainBmsPcb": false
+    },
+    "batteryCells": {
+      "included": false,
+      "notes": "本BMS模块BOM不采购/不计数电芯；CELL/BAT相关连接器和采样件仍按各自实际物料计。"
+    },
+    "coreBoardInternalAdcTemperatureSensor": {
+      "ref": "CORE_BOARD内STM32G431内部温度传感器",
+      "qty": 0,
+      "isBOMItem": false,
+      "note": "仅作核心板MCU芯片温度参考，不是独立采购NTC或BOM位号。"
+    }
+  },
+  "boardMountBoundary": {
+    "electricalCircuitQty": 218,
+    "mainPcbMountedQty": 212,
+    "mainPcbUniqueRefs": 212,
+    "mainPcbNormalizedMpnTypes": 51,
+    "mainPcbMpnEmptyRefs": [],
+    "mainPcbRefs": [
+      "C_BAT1",
+      "C_BAT2",
+      "C_BREG_COL",
+      "C_REG1",
+      "C_REG18",
+      "C_REGIN",
+      "C_VC0",
+      "C_VC1",
+      "C_VC16",
+      "C_VC2",
+      "C_VC3",
+      "C_VC4",
+      "C_VC5",
+      "C_VC6",
+      "C_VC7",
+      "C_VC8",
+      "D_BAT",
+      "D_BREG",
+      "Q_BREG",
+      "R_ALERT_PU",
+      "R_ALERT_SER",
+      "R_BAT",
+      "R_BREG_FEED",
+      "R_BREG_PD",
+      "R_LD",
+      "R_PACK",
+      "R_RST_SHUT",
+      "R_SCL_PU",
+      "R_SDA_PU",
+      "R_VC0",
+      "R_VC1",
+      "R_VC15",
+      "R_VC16",
+      "R_VC2",
+      "R_VC3",
+      "R_VC4",
+      "R_VC5",
+      "R_VC6",
+      "R_VC7",
+      "R_VC8",
+      "U1",
+      "C_AND2",
+      "C_CP1",
+      "C_GATE1",
+      "C_POR",
+      "C_SEQ",
+      "C_SRP",
+      "C_TIMER",
+      "DZ_QPRE",
+      "D_TVS",
+      "Q_CHG1",
+      "Q_CHG2",
+      "Q_CHG3",
+      "Q_DFETOFF",
+      "Q_DSG1",
+      "Q_DSG2",
+      "Q_DSG3",
+      "Q_PRE1",
+      "Q_PRE2",
+      "Q_QPRE_DRV",
+      "RSHUNT",
+      "R_DFETOFF_PU",
+      "R_GS_CHG1",
+      "R_GS_CHG2",
+      "R_GS_CHG3",
+      "R_GS_DSG1",
+      "R_GS_DSG2",
+      "R_GS_DSG3",
+      "R_G_CHG1",
+      "R_G_CHG2",
+      "R_G_CHG3",
+      "R_G_DSG1",
+      "R_G_DSG2",
+      "R_G_DSG3",
+      "R_QPRE_BASE",
+      "R_QPRE_BE",
+      "R_QPRE_PU",
+      "R_SRN",
+      "R_SRP",
+      "R_TIMER_SET",
+      "U_AND2",
+      "U_GATE1",
+      "U_POR",
+      "U_SEQ",
+      "U_TIMER",
+      "C_BQ_DCHG_FILT",
+      "C_BQ_TS1_FILT",
+      "C_BQ_TS3_FILT",
+      "C_CAN_PWR_IN1",
+      "C_CAN_PWR_IN2",
+      "C_CAN_PWR_OUT1",
+      "C_CAN_PWR_OUT2",
+      "C_CAN_VCC2_2",
+      "C_NTC_BOARD_FILT",
+      "C_NTC_CELL5_FILT",
+      "C_PSU_IN1",
+      "C_PSU_IN2",
+      "C_PSU_OUT1",
+      "C_PSU_OUT2",
+      "D_CAN_TVS",
+      "J_CAN",
+      "J_CORE_P1",
+      "J_CORE_P2",
+      "J_LOAD_POWER_VALID",
+      "NTC_BOARD",
+      "NTC_MOS",
+      "Q_LOAD_POWER_VALID_DRV",
+      "R_CAN_TXD_PU",
+      "R_LOAD_POWER_VALID_LED",
+      "R_PRE_CTRL_PD",
+      "U_CAN",
+      "U_LOAD_POWER_VALID",
+      "C_BAL_BIAS1",
+      "C_PSU_IN3",
+      "J_FAN",
+      "R_IF_LOCAL_OK_PD",
+      "R_IF_PRE_REQ_PD",
+      "R_IF_MAIN_REQ_PD",
+      "R_QPRE_LIMIT",
+      "R_TIMER_SUPPLY",
+      "R_TIMER_ACTIVE_PD",
+      "U_ETA_BAL1",
+      "L_ETA_BAL1",
+      "C_BAL_CELL1",
+      "R_BAL_ISET1",
+      "C_BAL_ISET1",
+      "Q_BAL_EN_CLAMP1",
+      "R_BAL_EN_GATE_PU1",
+      "U_ETA_BAL2",
+      "L_ETA_BAL2",
+      "C_BAL_CELL2",
+      "C_BAL_BIAS2",
+      "R_BAL_ISET2",
+      "C_BAL_ISET2",
+      "Q_BAL_EN_CLAMP2",
+      "R_BAL_EN_GATE_PU2",
+      "U_ETA_BAL3",
+      "L_ETA_BAL3",
+      "C_BAL_CELL3",
+      "C_BAL_BIAS3",
+      "R_BAL_ISET3",
+      "C_BAL_ISET3",
+      "Q_BAL_EN_CLAMP3",
+      "R_BAL_EN_GATE_PU3",
+      "U_ETA_BAL4",
+      "L_ETA_BAL4",
+      "C_BAL_CELL4",
+      "C_BAL_BIAS4",
+      "R_BAL_ISET4",
+      "C_BAL_ISET4",
+      "Q_BAL_EN_CLAMP4",
+      "R_BAL_EN_GATE_PU4",
+      "U_ETA_BAL5",
+      "L_ETA_BAL5",
+      "C_BAL_CELL5",
+      "C_BAL_BIAS5",
+      "R_BAL_ISET5",
+      "C_BAL_ISET5",
+      "Q_BAL_EN_CLAMP5",
+      "R_BAL_EN_GATE_PU5",
+      "U_ETA_BAL6",
+      "L_ETA_BAL6",
+      "C_BAL_CELL6",
+      "C_BAL_BIAS6",
+      "R_BAL_ISET6",
+      "C_BAL_ISET6",
+      "Q_BAL_EN_CLAMP6",
+      "R_BAL_EN_GATE_PU6",
+      "U_ETA_BAL7",
+      "L_ETA_BAL7",
+      "C_BAL_CELL7",
+      "C_BAL_BIAS7",
+      "R_BAL_ISET7",
+      "C_BAL_ISET7",
+      "Q_BAL_EN_CLAMP7",
+      "R_BAL_EN_GATE_PU7",
+      "U_ETA_BAL8",
+      "L_ETA_BAL8",
+      "C_BAL_CELL8",
+      "C_BAL_BIAS8",
+      "R_BAL_ISET8",
+      "C_BAL_ISET8",
+      "Q_BAL_EN_CLAMP8",
+      "R_BAL_EN_GATE_PU8",
+      "U_BAL_OPTO_Q1",
+      "U_BAL_OPTO_Q2",
+      "R_BAL_OPTO_TOP",
+      "R_BAL_OPTO_BOTTOM",
+      "Q_BAL_MAINCLR",
+      "R_BAL_MAINCLR_BASE",
+      "R_BAL_MAINCLR_BE",
+      "Q_BAL_ENABLE",
+      "R_BAL_ENABLE_BASE",
+      "R_BAL_ENABLE_BE",
+      "C_BAL_CELL9",
+      "R_DFETOFF_GATE",
+      "R_DFETOFF_GS",
+      "R_LOAD_POWER_VALID_GATE",
+      "R_LOAD_POWER_VALID_GS",
+      "PSU5_EXT",
+      "R_PSU_MINLOAD1",
+      "R_PSU_MINLOAD2",
+      "R_PSU_MINLOAD3",
+      "R_PSU_MINLOAD4",
+      "R_PSU_MINLOAD5",
+      "R_PSU_MINLOAD6",
+      "R_PSU_MINLOAD7",
+      "Q_FAN_PWM",
+      "R_FAN_PWM_GATE",
+      "R_FAN_PWM_PD",
+      "R_FAN_TACH_PU",
+      "J_FAN_CTRL"
+    ],
+    "knownBoardMountedAccessoryRefs": [],
+    "knownExternalOrAssemblyAccessoryRefs": [
+      "J_FAN_MATE",
+      "FAN_EXT",
+      "J_LOAD_POWER_VALID_MATE",
+      "J_CAN_MATE",
+      "J_FAN_CTRL_MATE"
+    ],
+    "externalCircuitRefsExcluded": [
+      "F1",
+      "NTC_CELL1",
+      "NTC_CELL3",
+      "NTC_CELL5",
+      "R_PRE",
+      "SW_RUN_STORE"
+    ],
+    "note": "用户要求仅设计BMS主板。主板统计排除全部维护线束、外置核心板、板外配套、外置主保险F1、外置预充电阻R_PRE、面板开关SW_RUN_STORE及三只电芯探头；保留板装NTC_BOARD（板上相邻均衡功率区热点）/NTC_MOS、排母及其他板内器件。纯焊盘/连接边界不计采购器件。统计为现行设计拟装配数量，不是layout或实物验收。"
+  },
+  "top10ByQuantity": [
+    {
+      "mpn": "rmc0603100k1%n",
+      "refs": 26,
+      "qty": 26
+    },
+    {
+      "mpn": "abd03k1000ft",
+      "refs": 20,
+      "qty": 20
+    },
+    {
+      "mpn": "ao3400a",
+      "refs": 11,
+      "qty": 11
+    },
+    {
+      "mpn": "0460-202-16141",
+      "refs": 1,
+      "qty": 10
+    },
+    {
+      "mpn": "0462-201-16141",
+      "refs": 1,
+      "qty": 10
+    },
+    {
+      "mpn": "0603b224k500nt",
+      "refs": 10,
+      "qty": 10
+    },
+    {
+      "mpn": "0603b105k250nt",
+      "refs": 9,
+      "qty": 9
+    },
+    {
+      "mpn": "chpv1u",
+      "refs": 9,
+      "qty": 9
+    },
+    {
+      "mpn": "grm188r72a104ka35j",
+      "refs": 9,
+      "qty": 9
+    },
+    {
+      "mpn": "pv-5a10f",
+      "refs": 9,
+      "qty": 9
+    }
+  ],
+  "countingBasis": {
+    "refGranularity": "按唯一BOM位号计物理器件；多单元/拆分符号不按符号单元重复计数。",
+    "dnp": "未发现实际DNP采购行；R_BAL_COMP1与C_BAL_ILIMCOMP1备注都说明器件已装配，DNP不留空。",
+    "nonComponentLines": "5个唯一无采购MPN/value/libraryKey的抽象接口/连接边界不进入BOM。",
+    "cells": "电芯不属于BMS模块BOM。",
+    "pending": "FAN_EXT一件型号待定、MPN为空。"
+  },
+  "updatedAt": "2026-10-15T16:10:50.376754+08:00",
+  "byCategory": {
+    "AFE/主动均衡": {
+      "refs": 116,
+      "qty": 116
+    },
+    "功率/预充": {
+      "refs": 51,
+      "qty": 51
+    },
+    "MCU/接口/测温/CAN": {
+      "refs": 45,
+      "qty": 45
+    },
+    "维护线束": {
+      "refs": 33,
+      "qty": 56
+    },
+    "外部控制板": {
+      "refs": 1,
+      "qty": 1
+    },
+    "风扇/供电/控制": {
+      "refs": 6,
+      "qty": 6
+    },
+    "板外/装配配套": {
+      "refs": 5,
+      "qty": 5
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "checkpoint": "untrained_baseline.zip",
+  "sha256": "896c7776ee9ee719941cdb8ee85c665e94ffbe2ac2d373e43ccba88066ed5335",
+  "num_timesteps": 0,
+  "protocol_sha256": "85b9b4dd44c9b9292078d77eb1fb3f56d06725007af2679011dd97efecce4ab0",
+  "field_encoder_config": {
+    "schema": "depth64-lidar-circular1d-v1",
+    "branch_dims": {
+      "lidar": 32,
+      "depth": 64,
+      "detections": 32,
+      "state": 32
+    },
+    "depth_pool": [
+      8,
+      6
+    ],
+    "radar_pool": 50,
+    "features_dim": 160
+  },
+  "field_action_config": {
+    "schema": "direct-track-speed-v1",
+    "components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ],
+    "normalized_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "protocol_action_config": {
+    "schema": "direct-track-speed-v1",
+    "components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ],
+    "normalized_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "drive_config": {
+    "interface": "independent_left_right_track_speed_v3",
+    "max_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.5,
+    "wheel_effort_limit_nm": 2.0,
+    "wheel_effort_limit_basis": "per_proxy_wheel_joint_effort; not measured motor torque",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "b58fc3385035fb40add366320bd57f49d3174698fb8e265b4351bc3d7a52149e",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating."
+  },
+  "observation_config": {
+    "schema": "sensor-depth-direct-tracks-v4",
+    "state_dim": 43,
+    "depth_channels": 1,
+    "depth_invalid_value": 0.0,
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "measured_velocity_indices": [
+      8,
+      9
+    ],
+    "previous_command_indices": [
+      13,
+      14,
+      15,
+      16
+    ],
+    "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+    "action_components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ]
+  },
+  "protocol_architecture": {
+    "field_encoder_config": {
+      "schema": "depth64-lidar-circular1d-v1",
+      "branch_dims": {
+        "lidar": 32,
+        "depth": 64,
+        "detections": 32,
+        "state": 32
+      },
+      "depth_pool": [
+        8,
+        6
+      ],
+      "radar_pool": 50,
+      "features_dim": 160
+    },
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "input_contract": "sensor-depth-direct-tracks-v4",
+    "observation_shapes": {
+      "lidar": [
+        2,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        10
+      ],
+      "state": [
+        43
+      ]
+    },
+    "action_shape": [
+      4
+    ],
+    "action_config": {
+      "schema": "direct-track-speed-v1",
+      "components": [
+        "left_track_speed",
+        "right_track_speed",
+        "gimbal_yaw_rate",
+        "gimbal_pitch_rate"
+      ],
+      "normalized_range": [
+        -1.0,
+        1.0
+      ]
+    },
+    "goal_gain": 1.0,
+    "lstm_hidden_size": 128,
+    "architecture_is_searched": false
+  },
+  "source_initialization": "new RecurrentPPO, no old checkpoint loaded"
+}
