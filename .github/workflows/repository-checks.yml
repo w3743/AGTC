@@ -1,0 +1,178 @@
+name: Repository checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Repository checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      GIT_LFS_SKIP_SMUDGE: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout: .github
+          lfs: false
+          submodules: false
+          persist-credentials: true
+
+      - name: Check whitespace
+        run: git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check "$BASE_SHA" "$HEAD_SHA"
+
+      - name: Check changed blobs and submodule metadata
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+          from urllib.parse import urlsplit
+
+          base = os.environ["BASE_SHA"]
+          head = os.environ["HEAD_SHA"]
+
+          def fail(message):
+              print(f"::error::{message}")
+              raise SystemExit(1)
+
+          def git(args, *, input=None, allow=(0,)):
+              result = subprocess.run(
+                  ["git", *args], input=input, stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE, check=False,
+              )
+              if result.returncode not in allow:
+                  fail(f"git {args[0]} failed (exit {result.returncode})")
+              return result.stdout
+
+          raw = git([
+              "diff", "--raw", "--no-abbrev", "--no-renames", "-z", "--diff-filter=ACMT",
+              base, head,
+          ])
+          records = raw.split(b"\0")
+          if records and records[-1] == b"":
+              records.pop()
+          if len(records) % 2:
+              fail("could not parse NUL-delimited Git diff metadata")
+
+          changed_blobs = 0
+          max_blob_size = 10 * 1024 * 1024
+          for i in range(0, len(records), 2):
+              metadata, path_bytes = records[i], records[i + 1]
+              fields = metadata[1:].split() if metadata.startswith(b":") else []
+              if len(fields) != 5:
+                  fail("unexpected raw Git diff record")
+              _, new_mode, _, new_oid, _ = fields
+              if new_mode in (b"000000", b"160000"):
+                  continue
+
+              path = os.fsdecode(path_bytes)
+              attr = git([
+                  "check-attr", f"--source={head}", "-z", "filter", "--", path,
+              ]).rstrip(b"\0").split(b"\0")
+              if len(attr) != 3 or attr[1] != b"filter":
+                  fail(f"could not read LFS attributes for {path}")
+              is_lfs = attr[2] == b"lfs"
+
+              oid = new_oid.decode("ascii")
+              size = int(git(["cat-file", "-s", oid]).strip())
+              changed_blobs += 1
+              if is_lfs:
+                  if size >= 1024:
+                      fail(f"LFS-tracked blob is too large to be a pointer: {path}")
+                  pointer = git(["cat-file", "blob", oid])
+                  check = subprocess.run(
+                      ["git", "lfs", "pointer", "--check", "--strict", "--stdin"],
+                      input=pointer, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                      check=False,
+                  )
+                  if check.returncode:
+                      fail(f"LFS-tracked blob is not a canonical pointer: {path}")
+              elif size > max_blob_size:
+                  fail(f"ordinary Git blob exceeds 10 MiB: {path}")
+
+          gitlinks = set()
+          for entry in git(["ls-tree", "-r", "-z", head]).split(b"\0"):
+              if not entry:
+                  continue
+              metadata, separator, path_bytes = entry.partition(b"\t")
+              if not separator:
+                  fail("could not parse NUL-delimited Git tree metadata")
+              fields = metadata.split()
+              if len(fields) == 3 and fields[0] == b"160000" and fields[1] == b"commit":
+                  gitlinks.add(os.fsdecode(path_bytes))
+
+          config = git([
+              "config", "--null", "--file", ".gitmodules", "--get-regexp",
+              r"^submodule\..*\.(path|url)$",
+          ], allow=(0, 1))
+          modules = {}
+          for record in config.split(b"\0"):
+              if not record:
+                  continue
+              key, separator, value = record.partition(b"\n")
+              match = re.fullmatch(rb"submodule\.(.+)\.(path|url)", key)
+              if not separator or not match:
+                  fail("could not parse .gitmodules metadata")
+              name = os.fsdecode(match.group(1))
+              field = match.group(2).decode("ascii")
+              if field in modules.setdefault(name, {}):
+                  fail(f"duplicate {field} entry in .gitmodules: {name}")
+              modules[name][field] = os.fsdecode(value)
+
+          module_paths = []
+          for name, fields in modules.items():
+              if set(fields) != {"path", "url"}:
+                  fail(f"submodule needs one path and URL: {name}")
+              path, url = fields["path"], fields["url"]
+              parsed = urlsplit(url)
+              if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+                  fail(f"submodule URL must be a credential-free HTTPS URL: {name}")
+              module_paths.append(path)
+
+          if len(module_paths) != len(set(module_paths)):
+              fail("duplicate submodule path in .gitmodules")
+          configured = set(module_paths)
+          if configured != gitlinks:
+              missing = sorted(gitlinks - configured)
+              orphaned = sorted(configured - gitlinks)
+              fail(f".gitmodules/gitlink mismatch (unregistered={missing}, missing_gitlink={orphaned})")
+
+          print(f"Checked {changed_blobs} changed blobs and {len(gitlinks)} submodule gitlinks.")
+          PY
+
+      - name: Scan PR commits for credentials
+        shell: bash
+        run: |
+          archive="$RUNNER_TEMP/gitleaks_8.30.1_linux_x64.tar.gz"
+          bin_dir="$RUNNER_TEMP/gitleaks"
+          mkdir -p "$bin_dir"
+          curl --fail --silent --show-error --location \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$archive"
+          printf '%s  %s\n' \
+            551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb \
+            "$archive" | sha256sum --check --status
+          tar -xzf "$archive" -C "$bin_dir" gitleaks
+
+          # The repository ignore entries are positional fingerprints from old findings.
+          # Remove them only from this temporary runner checkout so a new PR value at the
+          # same path and line cannot be silently exempted; the commit itself is untouched.
+          rm -f -- .gitleaksignore
+          "$bin_dir/gitleaks" git \
+            --log-opts="$BASE_SHA..$HEAD_SHA" \
+            --redact --no-banner --gitleaks-ignore-path /dev/null
