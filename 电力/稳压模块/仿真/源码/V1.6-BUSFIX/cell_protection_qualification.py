@@ -39,6 +39,41 @@ def parallel(*resistances: float) -> float:
     return 1.0 / sum(1.0 / r for r in resistances)
 
 
+def validate_stack_configuration(cfg: dict[str, Any]) -> dict[str, Any]:
+    series = int(cfg["series_cells"])
+    per_group = int(cfg["parallel_cells_per_group"])
+    quantity = int(cfg["cell_count"])
+    if series != 8 or per_group != 1 or quantity != 8 or quantity != series * per_group:
+        raise ValueError(
+            "BUSFIX model is fixed to the current 8S1P / 8-cell design; "
+            f"received series={series}, parallel={per_group}, quantity={quantity}"
+        )
+    nominal = float(cfg["cell_capacitance_nominal_F"])
+    eol = float(cfg["cell_capacitance_min_EOL_F"])
+    retention = float(cfg["initial_capacitance_retention_at_EOL"])
+    if not math.isclose(nominal * retention, eol, rel_tol=0.0, abs_tol=1e-9):
+        raise ValueError("per-cell EOL capacitance must match nominal capacitance times retention")
+    return {
+        "manufacturer_part": cfg["cell_mpn"],
+        "series_cells": series,
+        "parallel_cells_per_group": per_group,
+        "cell_count": quantity,
+        "cell_capacitance_nominal_F": nominal,
+        "cell_capacitance_min_EOL_F": eol,
+    }
+
+
+def verify_cancelled_16_cell_configuration_rejected(cfg: dict[str, Any]) -> bool:
+    expanded = dict(cfg)
+    expanded["parallel_cells_per_group"] = 2
+    expanded["cell_count"] = 16
+    try:
+        validate_stack_configuration(expanded)
+    except ValueError:
+        return True
+    return False
+
+
 def resistor_relative_corner(tol: float, tcr_ppm: float, delta_c: float,
                              tol_sign: int, tcr_sign: int) -> float:
     return 1.0 + tol_sign * tol + tcr_sign * tcr_ppm * abs(delta_c) / 1_000_000.0
@@ -83,6 +118,13 @@ class LocalChargeProtection:
         self.sample_test_low = False
         self.charge_request = False
         self.ov_latched = False
+        # This model exposes normal charge permission only. A valid zero-volt
+        # reading is useful diagnostic data, not proof that a controlled
+        # initial-charge path or its per-cell monitoring is qualified.
+        self.normal_charge_min_cell_V = float(cfg["planning_lower_voltage_V"])
+        if (not math.isfinite(self.normal_charge_min_cell_V)
+                or not 0.0 < self.normal_charge_min_cell_V < cfg["cell_trip_measured_voltage_V"]):
+            raise ValueError("normal charge requires a finite, positive cell-voltage operating floor")
         gate = cfg.get("qualification_gate", {})
         self.qualification_ready = all(gate.get(key) is True for key in QUALIFICATION_KEYS)
 
@@ -121,6 +163,14 @@ class LocalChargeProtection:
         self.sample_ms = now_ms
         self.data_valid = True
         self.sample_test_low = True
+        if not self.normal_charge_voltage_domain_valid():
+            # Revoke immediately, even if no output polling occurs before a
+            # later healthy scan. Recovery must require a new local request.
+            self.charge_request = False
+
+    def normal_charge_voltage_domain_valid(self) -> bool:
+        return (self.sample is not None
+                and all(v >= self.normal_charge_min_cell_V for v in self.sample))
 
     def diagnostic_sample(self, _cells: list[float], _now_ms: float,
                           _test_low: bool) -> None:
@@ -143,7 +193,8 @@ class LocalChargeProtection:
         return 0.0 <= age <= self.cfg["freshness_timeout_ms"]
 
     def request_local_charge(self, now_ms: float, test_low: bool = True) -> bool:
-        if self.qualification_ready and self.fresh_and_safe(now_ms, test_low) and not self.ov_latched:
+        if (self.qualification_ready and self.fresh_and_safe(now_ms, test_low)
+                and self.normal_charge_voltage_domain_valid() and not self.ov_latched):
             self.charge_request = True
         else:
             self.charge_request = False
@@ -160,7 +211,9 @@ class LocalChargeProtection:
         return True
 
     def output_enabled(self, now_ms: float, test_low: bool = True) -> bool:
-        if not self.qualification_ready or not test_low or not self.fresh_and_safe(now_ms, test_low):
+        if (not self.qualification_ready or not test_low
+                or not self.fresh_and_safe(now_ms, test_low)
+                or not self.normal_charge_voltage_domain_valid()):
             self.charge_request = False
             return False
         return self.charge_request and not self.ov_latched
@@ -191,6 +244,38 @@ def run_state_tests(cfg: dict[str, Any]) -> list[dict[str, Any]]:
     p.submit_working_sample(cells_target, 0)
     tests.append(("fresh_sample_does_not_auto_enable", not p.output_enabled(0), "explicit local request required"))
     tests.append(("explicit_local_request_enables_with_fresh_data", p.request_local_charge(0) and p.output_enabled(0), "complete fresh sample + TEST low"))
+
+    floor = cfg["planning_lower_voltage_V"]
+    for name, low_cells in (
+        ("all_zero_cells_cannot_enter_normal_charge", [0.0] * cfg["series_cells"]),
+        ("one_zero_cell_cannot_enter_normal_charge", [0.0] + cells_target[1:]),
+        ("AFE_takeover_voltage_is_not_normal_operating_permission", [2.05] * cfg["series_cells"]),
+        ("one_cell_below_normal_floor_blocks_charge", [floor - 1e-6] + cells_target[1:]),
+    ):
+        p = LocalChargeProtection(cfg)
+        p.submit_working_sample(low_cells, 0)
+        tests.append((name, p.data_valid and not p.request_local_charge(0)
+                      and not p.output_enabled(0),
+                      "complete low-voltage data remains diagnostic; it cannot authorize normal PWM"))
+
+    p = LocalChargeProtection(cfg)
+    p.submit_working_sample([floor] * cfg["series_cells"], 0)
+    tests.append(("normal_floor_boundary_requires_explicit_request",
+                  not p.output_enabled(0) and p.request_local_charge(0) and p.output_enabled(0),
+                  "measured normal-mode floor is inclusive; this does not qualify physical measurement or initial charging"))
+    p.submit_working_sample([floor - 1e-6] + cells_target[1:], 1)
+    tests.append(("low_voltage_scan_immediately_revokes_pending_request",
+                  not p.charge_request and not p.output_enabled(1),
+                  "a low cell revokes normal charge before any subsequent healthy scan"))
+    p.submit_working_sample(cells_target, 2)
+    tests.append(("healthy_scan_after_low_voltage_does_not_rearm",
+                  not p.output_enabled(2) and p.request_local_charge(2) and p.output_enabled(2),
+                  "returning to the operating window requires a new explicit local request"))
+    p.submit_working_sample([0.0] * cfg["series_cells"], 3)
+    p.charge_request = True  # adversarial stale/forced request must not bypass output gating
+    tests.append(("forced_request_cannot_bypass_low_voltage_output_gate",
+                  not p.output_enabled(3) and not p.charge_request,
+                  "the final output gate independently checks the measured operating floor"))
 
     p = LocalChargeProtection(cfg)
     p.submit_working_sample(cells_target, 0)
@@ -400,7 +485,6 @@ def calculate_energy(cfg: dict[str, Any]) -> dict[str, Any]:
     target = cfg["planning_charge_target_voltage_V"]
     retention = cfg["initial_capacitance_retention_at_EOL"]
     eta = cfg["bus_conversion_efficiency_ideal"]
-    duration = cfg["energy_target_duration_s"]
     error = cfg["measurement_error_qualification_abs_V"]
     mid = math.sqrt((target * target + low * low) / 2.0)
     def stored_j(vhi: float, cap: float) -> float:
@@ -413,25 +497,31 @@ def calculate_energy(cfg: dict[str, Any]) -> dict[str, Any]:
     target_nominal_stored = stored_j(target, c_eol)
     target_nominal_bus = target_nominal_stored * eta
     energy_rows = []
-    for power in cfg["energy_target_power_W"]:
-        required_bus = power * duration
-        midpoint_required_eol = required_bus / (eta * 0.5 * n * (mid * mid - low * low))
-        fullwindow_required_eol = required_bus / (eta * 0.5 * n * (target * target - low * low))
-        worst_target_required_eol = required_bus / (eta * 0.5 * n * (actual_worst_at_measured_target ** 2 - low * low))
-        energy_rows.append({
-            "power_W": power,
-            "duration_s": duration,
-            "required_bus_energy_J": required_bus,
-            "required_EOL_cell_capacitance_F_at_energy_midpoint": midpoint_required_eol,
-            "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": midpoint_required_eol / retention,
-            "required_EOL_cell_capacitance_F_from_full_2_45V_start": fullwindow_required_eol,
-            "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": fullwindow_required_eol / retention,
-            "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": worst_target_required_eol,
-            "current_280F_midpoint_pass": midpoint_bus >= required_bus,
-            "current_280F_at_measured_target_worst_actual_pass": target_worst_bus >= required_bus,
-            "ideal_energy_shortfall_J_at_midpoint": max(0.0, required_bus - midpoint_bus),
-            "ideal_energy_shortfall_J_at_measured_target_worst_actual": max(0.0, required_bus - target_worst_bus)
-        })
+    for duration in cfg["energy_sensitivity_duration_s"]:
+        if duration <= 0:
+            raise ValueError("energy sensitivity durations must be positive")
+        for power in cfg["energy_sensitivity_power_W"]:
+            if power <= 0:
+                raise ValueError("energy sensitivity powers must be positive")
+            required_bus = power * duration
+            midpoint_required_eol = required_bus / (eta * 0.5 * n * (mid * mid - low * low))
+            fullwindow_required_eol = required_bus / (eta * 0.5 * n * (target * target - low * low))
+            worst_target_required_eol = required_bus / (eta * 0.5 * n * (actual_worst_at_measured_target ** 2 - low * low))
+            energy_rows.append({
+                "power_W": power,
+                "duration_s": duration,
+                "duration_role": "one_second_reference_only" if math.isclose(duration, 1.0) else "illustrative_sensitivity_only",
+                "required_bus_energy_J": required_bus,
+                "required_EOL_cell_capacitance_F_at_energy_midpoint": midpoint_required_eol,
+                "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": midpoint_required_eol / retention,
+                "required_EOL_cell_capacitance_F_from_full_2_45V_start": fullwindow_required_eol,
+                "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": fullwindow_required_eol / retention,
+                "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": worst_target_required_eol,
+                "ideal_energy_screen_at_midpoint_pass": midpoint_bus >= required_bus,
+                "ideal_energy_screen_at_measured_target_worst_actual_pass": target_worst_bus >= required_bus,
+                "ideal_energy_shortfall_J_at_midpoint": max(0.0, required_bus - midpoint_bus),
+                "ideal_energy_shortfall_J_at_measured_target_worst_actual": max(0.0, required_bus - target_worst_bus)
+            })
     return {
         "lower_voltage_V": low,
         "upper_planning_target_voltage_V": target,
@@ -445,16 +535,22 @@ def calculate_energy(cfg: dict[str, Any]) -> dict[str, Any]:
         "worst_actual_target_ideal_bus_energy_J": target_worst_bus,
         "nominal_actual_2_45V_storage_energy_J": target_nominal_stored,
         "nominal_actual_2_45V_ideal_bus_energy_J": target_nominal_bus,
-        "energy_targets": energy_rows,
+        "requirement_status": "SENSITIVITY_ONLY; actual startup transient power and duration are unspecified; 1s is a reference only",
+        "energy_sensitivity": energy_rows,
         "limitations": ["Ideal capacitor energy only; excludes ESR, converter dynamic loss beyond eta, wiring, temperature/cold derating and control reserve.",
                         "The 280F value is minimum end-of-life cell capacitance (350F initial nameplate x 80% retention), not a measured cell.",
+                        "The sensitivity power and duration pairs are not a user requirement, tested operating profile, or release gate.",
                         "No topology or component selection is made; capacitance/pre-bias options require verified physical parts and cost."],
-        "status": "FAIL_AT_ENERGY_MIDPOINT_AND_AT_E100MV_WORST_CASE_CHARGE_TARGET"
+        "status": "SENSITIVITY_ONLY_NO_STARTUP_ENERGY_REQUIREMENT_OR_PHYSICAL_RELEASE"
     }
 
 
 def main() -> int:
     cfg = json.loads(INPUT.read_text(encoding="utf-8-sig"))
+    stack = validate_stack_configuration(cfg)
+    series = stack["series_cells"]
+    parallel = stack["parallel_cells_per_group"]
+    quantity = stack["cell_count"]
     tests = run_state_tests(cfg)
     error_budget = calculate_error_budget(cfg)
     protection = calculate_protection(cfg)
@@ -472,6 +568,10 @@ def main() -> int:
         "status": "MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL",
         "runtime": {"python": platform.python_version(), "dependencies": "Python standard library only"},
         "inputs": {"path": str(INPUT.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(INPUT)},
+        "supercapacitor_configuration": {
+            **stack,
+            "cancelled_16_cell_configuration_rejected": verify_cancelled_16_cell_configuration_rejected(cfg),
+        },
         "source_code": {"path": str(Path(__file__).resolve().relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(Path(__file__).resolve())},
         "source_snapshot_checks": snapshot_checks,
         "state_machine_tests": {"pass_count": sum(1 for t in tests if t["pass"]), "fail_count": sum(1 for t in tests if not t["pass"]), "tests": tests},
@@ -490,7 +590,14 @@ def main() -> int:
             "2_7V_single_cell_guard": "CONDITIONAL_PASS_ONLY_IF_E100_AND_T50MS_QUALIFIED" if protection["conditional_math_pass"] else "FAIL",
             "end_to_end_E100mV_measurement_qualification": error_budget["E100mV_qualification_candidate_vs_conditional_stress"],
             "80A_and_50ms_physical_response": "NOT_MEASURED",
-            "800W_1000W_1s_energy_target": "FAIL",
+            "normal_charge_low_voltage_inhibit": "PASS_MODEL_ONLY" if all(
+                t["pass"] for t in tests if t["name"] in {
+                    "all_zero_cells_cannot_enter_normal_charge", "one_zero_cell_cannot_enter_normal_charge",
+                    "one_cell_below_normal_floor_blocks_charge", "forced_request_cannot_bypass_low_voltage_output_gate"
+                }) else "FAIL",
+            "normal_charge_measured_cell_floor_V": cfg["planning_lower_voltage_V"],
+            "controlled_initial_charge_from_0V": "NOT_IMPLEMENTED_OR_QUALIFIED; normal charge permission cannot be used as initial-charge permission",
+            "startup_energy_sufficiency": "NOT_EVALUATED_AS_REQUIREMENT; actual transient power and duration are unspecified",
             "20_8V_total_SC_OV_individual_cell_proof": "NO; total-voltage threshold is not per-cell protection",
             "hardware_MCU_failure_independence": "FAIL_OPEN",
             "hardware_or_firmware_acceptance": "NOT_ESTABLISHED"
@@ -499,6 +606,8 @@ def main() -> int:
             "No CAD, BOM or firmware change was made.",
             "The persisted qualification gate remains closed; conditional candidate state tests do not enable the current input or prove firmware/hardware qualification.",
             "The 20.8V total SC_OV value is retained; total voltage cannot prove per-cell <=2.7V.",
+            "The BUSFIX energy arithmetic is illustrative sensitivity only; 1s is a reference duration, not a current requirement.",
+            "This model does not simulate 0V DC/DC startup, gate-driver bootstrap, minimum PWM pulses, reverse-current paths, or core-board power-off backfeed.",
             "V1.5 LICAP energy/SPICE outputs remain historical and are not current BUSFIX simulation results.",
             "CAN cannot refresh local ADC working samples or override the local protection state."
         ]
@@ -515,9 +624,7 @@ def main() -> int:
         f"raw_conditional_error_stress_max={error_budget['maximum_additive_known_stress_mV_not_a_closed_total_error']:.3f}mV "
         f"(E100={'PASS' if error_budget['E100mV_qualification_candidate_vs_conditional_stress'] != 'FAIL' else 'FAIL'}); "
         f"energy_midpoint={energy['midpoint_ideal_bus_energy_J']:.2f}J; "
-        f"C_EOL@midpoint_800W/1000W="
-        f"{energy['energy_targets'][0]['required_EOL_cell_capacitance_F_at_energy_midpoint']:.1f}/"
-        f"{energy['energy_targets'][1]['required_EOL_cell_capacitance_F_at_energy_midpoint']:.1f}F_per_cell; "
+        f"energy_sensitivity_rows={len(energy['energy_sensitivity'])}; "
         f"snapshot_hashes={'PASS' if all_snapshot_ok else 'FAIL'}; "
         f"actual_input_gate={'OPEN' if result['qualification_gate']['all_required_gates_open'] else 'CLOSED_OFF'}; "
         "overall=MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL"
