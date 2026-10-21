@@ -14,7 +14,7 @@ class _BeforePhysics(Exception):
     pass
 
 
-@pytest.mark.parametrize("command", ["viewer", "train", "evaluate"])
+@pytest.mark.parametrize("command", ["viewer", "train-sb3", "evaluate"])
 @pytest.mark.parametrize("schema", [INPUT_SCHEMA, ABSOLUTE_GOAL_INPUT_SCHEMA])
 def test_cli_passes_selected_schema_to_native_environment(monkeypatch, tmp_path, command, schema):
     def make_env(cfg, *_args, **_kwargs):
@@ -37,3 +37,16 @@ def test_cli_rejects_unknown_schema_before_importing_native_environment(monkeypa
     with pytest.raises(SystemExit) as result:
         cli.main()
     assert result.value.code == 2
+
+
+def test_new_train_delegates_to_official_rsl_cli_without_legacy_environment(monkeypatch):
+    observed = []
+    monkeypatch.setitem(sys.modules, "isaaclab_rl.entrypoints", types.SimpleNamespace(
+        run_train_cli=lambda arguments: observed.append(arguments) or 7,
+    ))
+    monkeypatch.setattr(sys, "argv", ["isaac_field", "train", "--num_envs", "4", "--max_iterations", "384"])
+    assert cli.main() == 7
+    assert observed == [[
+        "--rl_library", "rsl_rl", "--task", "Isaac-Field-FastStop-Rsl-Direct",
+        "--num_envs", "4", "--max_iterations", "384",
+    ]]

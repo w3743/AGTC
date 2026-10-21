@@ -1,5 +1,15 @@
 # Isaac Lab 项目状态
 
+2026-10-22 RSL-RL迁移：独立worktree `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`基于main `9c93aafc`，新训练命令`python -m isaac_field train`直接调用固定Isaac Lab官方`run_train_cli`，默认任务`Isaac-Field-FastStop-Rsl-Direct`。复用官方RslRlVecEnvWrapper、OnPolicyRunner、PPO更新/存储、RNN、Gaussian、配置/检查点记录；项目仅增加传感器观测边界、现有SensorEncoder的共享所有权、模型身份与既有evaluate_model预测适配。没有新launcher、运行管理或Tracking服务。
+
+输入为`sensor-absolute-goal-v1`/encoder v4，五路形状为LiDAR[1,400]、depth[1,160,88]、detections[16,8]、state[33]、feedback[37]，内容与轴不变；仅RSL任务边界将policy下五路提升为根级tensor以适配官方存储。复用原192维编码器，actor/critic各512×1 LSTM、64/Tanh头，共享encoder只在actor注册，PPO优化器和裁剪不重复计算该参数。四维动作顺序及单位继续由action_contract定义。fast_stop_v1/0.4m/真实XY<0.05m/s/完整角速度模长<0.1rad/s/连续0.5s保留；全场随机起终点，flat、plants0、rocks0、原联动导向轮及零稳定奖励。60s有限horizon失败不bootstrap，关闭随机episode_length_buf偏移。未把未完成的v2奖励混入迁移。
+
+RSL检查点为带field_policy_contract的原生.pt，记录输入/编码器/动作/观测和模型配置；旧SB3 .zip仍走旧加载路径，不转换或假定可续训。既有learning.evaluate_model识别.pt并通过RslPredictionModel复用同一个episode/轨迹循环。新模型官方play保留Viser入口，JIT/ONNX包含五路传感器和LSTM；旧自定义网络检查面板仍按原SB3模型使用。默认4env×128步×384迭代=196608聚合步，仅为配置预算，本轮未执行该训练。
+
+迁移及本批第5项范围内整理完成：最终WSL CPU全套pytest真实exit0，530 passed、23 skipped、55 warnings、26.40s（CUDA_VISIBLE_DEVICES为空，RUN_ISAAC_PHYSICS=0）。真实官方OnPolicyRunner配置构造、共享参数唯一、actor/critic梯度、padded序列更新/partial done、4env保存到1env回放、元数据不匹配拒绝、既有episode/轨迹循环、JIT脚本化/保存/加载与多步输出/状态、ONNX opset18导出/checker均通过；未装onnxruntime，未做ORT推理。官方入口及新默认train的--help、compileall、安装脚本bash -n、TOML解析、git diff --check均通过。整理移除了无用构造期字段，统一RSL模块命名和官方入口/legacy命令，更新本页与使用说明；没有新launcher或报告体系。开发期曾发现并修正numpy标量不能安全重载、Gaussian默认范围/类名规范化、回放环境数身份以及测试夹具断言问题，最终回归通过。
+
+CPU合成张量/假环境验证不构成原生物理或学习效果验收；没有启动GPU训练或原生仿真，没有改旧runtime/失败ablation现场。RSL的PPO实现、初始化、分支梯度裁剪及KL处理与SB3并非数值等价：当前fixed学习率下desired_kl不是SB3 target_kl早停，不以相同网络宽度宣称对照等价或能力提升。旧两项automation保持PAUSED。
+
 2026-10-22 00:01最新状态：fast_stop512 mastery课程已于2026-10-21 17:15:19北京时间以196608步自然完成，真实exit 0；最终near为6/16，未晋级且未建立能力提升，正式global best仍为untrained_baseline.zip。新的绝对目标输入合同`sensor-absolute-goal-v1`及编码器`depth64-lidar-single1d-absolute-goal-v4`已16文件冻结并审核通过：仅将33维state的`state[1:3]`改为`task.goal/size*2-1`，其余31槽不变；旧`sensor-minimal-v6`相对语义保留，不能混用。最终CPU回归511 passed、23 skipped、43 warnings、23.04s、exit 0；首次502 passed、23 skipped、4 error、exit 1因缺固定6源的llm-viz依赖，补齐后通过且保留失败记录。临时prepare/preflight已验证47源、新schema、512×1与固定Isaac Lab依赖并清理临时目录；未启动正式trial（`training_started=false`）。98304步v6模型CPU加载与forward有限值通过，仅为CPU检查，不是物理/GPU验证；无新训练/GPU启动，两项自动化仍PAUSED。第十八批当前4/5：此前3项加本次绝对目标功能。此worktree为`E:/worktree/absolute-goal-schema/先进通用履带底盘工程`；原目录固定在`runtime/legacy-v6-preview`分支`f24d7c43`，原47 live/snapshot与模型及PID415预览仅属原目录，不代表此worktree状态。
 
 2026-10-21 12:50:55训练历史快照：恢复控制组与rough_a/b配对开发评估已完成；8个paired seed的clean成功与进入0.4 m半径均为0/8→0/8，未见损伤或碰撞，但不构成学习提升。fast_stop512 mastery课程仍在运行；run_status最近记录为`mastery_probe`/49152步（12:50:55北京时间），WSL进程PID458的实际argv已核实。47个训练源码及protocol保持冻结。CPU-only Viser 1.0.30浏览器交互验收已通过；这不包含原生策略物理测试，仍须等待课程自然完成并核实exit 0后才启动实际策略预览。

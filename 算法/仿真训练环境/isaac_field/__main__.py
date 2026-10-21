@@ -1,5 +1,6 @@
 """One Isaac Lab backend, with task-specific train/evaluate/view commands."""
 import argparse
+import sys
 from dataclasses import asdict
 import json
 from pathlib import Path
@@ -57,8 +58,16 @@ def _viewer_initial_state(adapter, cfg, *, env_seed, episode_seed, repeat_reset_
 
 
 def main():
+    # New training delegates to Isaac Lab's maintained CLI/runner. Keep the
+    # original SB3 command explicit for historical checkpoints and protocols.
+    if len(sys.argv) > 1 and sys.argv[1] == 'train':
+        from isaaclab_rl.entrypoints import run_train_cli
+        return run_train_cli([
+            '--rl_library', 'rsl_rl', '--task', 'Isaac-Field-FastStop-Rsl-Direct',
+            *sys.argv[2:],
+        ])
     parser=argparse.ArgumentParser(description='Isaac Lab agricultural robot')
-    parser.add_argument('command',choices=['viewer','smoke','train','evaluate','adversary'])
+    parser.add_argument('command',choices=['viewer','smoke','train','train-sb3','evaluate','adversary'])
     parser.add_argument('--seed',type=int,default=7)
     parser.add_argument('--episode-seed',type=int,default=None,
                         help='Viewer reset seed, independent of --seed; explicit values repeat the same episode on Reset')
@@ -167,7 +176,7 @@ def main():
             result['reset_changes_spawn']=bool(not np.allclose(initial[0][:3],env.tasks[0].robot[:3]))
             (output/'smoke.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
             print(json.dumps(result,indent=2))
-        elif args.command=='train':
+        elif args.command=='train-sb3':
             from .learning import train_stage
             result=train_stage(env,args.checkpoint,args.steps,output/'checkpoint.zip',device=args.policy_device)
             summary={k:v for k,v in vars(result).items() if k!='model'}
@@ -196,4 +205,4 @@ def main():
         env.close()
 
 
-if __name__=='__main__':main()
+if __name__=='__main__':raise SystemExit(main())
