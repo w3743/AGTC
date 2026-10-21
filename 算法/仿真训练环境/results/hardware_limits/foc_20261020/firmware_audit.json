@@ -1,0 +1,357 @@
+{
+  "audit": "real_foc_firmware_limits",
+  "date": "2026-10-20",
+  "scope": {
+    "foc_module": "E:/Pioneer/先进通用履带底盘工程/电力/FOC驱动模块",
+    "read_only": true,
+    "examined": [
+      "软件/ 下全部实际 .c/.h 文件及其主机测试脚本",
+      "软件/速度反馈协议.md",
+      "保护与固件约束.md",
+      "交付说明.md、README.md、TODO.md",
+      "检查/三板共用修复/FOC电流环限幅候选复查.md/.json",
+      "仿真/源码/simulate_current_loop_and_5v.py（只读查看候选实现位置）"
+    ],
+    "not_examined": [
+      "厂商runtime",
+      "EDA运行时",
+      "训练/GPU运行"
+    ]
+  },
+  "primary_finding": {
+    "complete_g431_foc_firmware_present": false,
+    "current_limit_implemented_in_target_firmware": false,
+    "status": "software/ only contains a pure C11 host-side CAN codec/session/TTL and a host test; no buildable G431/HAL, FOC loop, ADC/angle conversion, CAN driver, PWM actuation, current limiting, fault-to-break logic, or telemetry transmitter was found.",
+    "source_basis": [
+      {
+        "path": "软件/速度反馈协议.md",
+        "lines": [
+          13,
+          15,
+          77,
+          78,
+          82
+        ]
+      },
+      {
+        "path": "README.md",
+        "lines": [
+          16,
+          46
+        ]
+      },
+      {
+        "path": "TODO.md",
+        "lines": [
+          18
+        ]
+      },
+      {
+        "path": "软件/速度反馈接口.h",
+        "lines": [
+          63,
+          74,
+          113,
+          169
+        ]
+      },
+      {
+        "path": "软件/速度反馈接口.c",
+        "lines": [
+          229,
+          275,
+          278,
+          310,
+          351,
+          376,
+          453,
+          505
+        ]
+      },
+      {
+        "path": "软件/运行主机测试.ps1",
+        "lines": [
+          13,
+          21
+        ]
+      }
+    ]
+  },
+  "limits": {
+    "motor_phase_and_iq_current": {
+      "seller_current_label_A": 80,
+      "seller_current_semantics": "unknown: bus or phase, measurement point, RMS or peak, continuous or peak, duration and thermal conditions are unspecified; it is not a validated phase-current or Iq limit.",
+      "continuous_phase_current_A": null,
+      "peak_phase_current_A_and_duration": null,
+      "qualified_iq_limit_A": null,
+      "reason": "No motor R/L or calibrated current transform is available; protocol defines Iq as signed q-axis current, not battery current or torque. The host codec only serializes a signed cA field.",
+      "candidate_model_only": {
+        "q_axis_command_clamp_A": [
+          -100,
+          100
+        ],
+        "q_axis_reference_slew_A_per_s": 5000,
+        "pwm_rate_hz": 20000,
+        "modeled_peak_envelope_A": 112.88,
+        "screening_line_A": 120,
+        "classification": "reference-model candidate only; no MCU implementation or hardware guarantee; 120 A is not a motor rating or absolute hardware maximum"
+      },
+      "analog_protection_candidate": {
+        "positive_static_min_threshold_A": 131.513,
+        "negative_static_min_magnitude_A": 130.588,
+        "window_protection_candidate_A": [
+          -150,
+          150
+        ],
+        "classification": "schematic/threshold corner estimates only; no guaranteed fast clamp below 120 A; drift, ripple, propagation, break-to-gate delay, overshoot, and parasitics remain open"
+      }
+    },
+    "bus_current_and_power": {
+      "qualified_bus_current_limit_A": null,
+      "board_input_power_selection_W": 1800,
+      "screening_duration_s": 1,
+      "classification": "selection/screening condition, not a continuous or peak board capability and not implemented firmware power limiting",
+      "shared_regen_sink_qualified": false,
+      "600_W_value": "sensitivity only; not a capability or approved limit",
+      "bms_current_and_power_budget": "provided independently by BMS; no qualified value established by this FOC software audit"
+    },
+    "bus_voltage": {
+      "motor_seller_recommended_V": [
+        24,
+        36
+      ],
+      "vehicle_9s_full_charge_V": 37.8,
+      "board_max_input_voltage_V": null,
+      "qualified_bus_overvoltage_limit_V": null,
+      "dump_threshold_candidate_V": {
+        "turn_on_approx": 43.4,
+        "release_approx": 41.4
+      },
+      "classification": "candidate analog circuit values, not verified runtime protection; SAFE_5V loss can disable the dump path; 100 V component ratings are not a bus voltage limit"
+    },
+    "regeneration": {
+      "model_policy": "In this one-direction reference path, the model treats requested Iq < 0 as regen for the purpose of checking fresh, qualified per-board allocated sink power; unknown, zero, stale, or unqualified budget blocks that modeled request.",
+      "real_firmware_policy_present": false,
+      "sink_power_and_energy_qualified": false,
+      "model_ttl_expiry_tail_energy_J": 18.179,
+      "model_post_expiry_peak_power_W": 1774.087,
+      "classification": "single-direction sensitivity/reference result only; command expiry zeros the reference but not physical current or returned energy; do not infer real regen solely from negative Iq",
+      "four_quadrant_caveat": "This sign shortcut is not a universal four-quadrant mapping: real regeneration depends on signed mechanical/electrical power. Negative Iq during reverse rotation can be motoring, so a real controller must qualify regen from torque/current and speed/power direction."
+    },
+    "temperature_and_faults": {
+      "user_environment_C": [
+        0,
+        60
+      ],
+      "qualified_motor_or_board_thermal_limit": null,
+      "implemented_temperature_derating_or_fault_action": false,
+      "candidate_fault_architecture": "positive phase-current comparator to G431 COMP/TIM1 Break; negative phase-current external comparator to BKIN; SAFE undervoltage COMP4-to-Break; bus overvoltage comparator/dump; fault latch and explicit re-ARM requirements",
+      "candidate_safe_5v_undervoltage_static_threshold_V": [
+        4.2824,
+        4.7294
+      ],
+      "status": "not target-firmware implemented or bench verified; fault routing/register configuration, timing, thermal behavior, dump energy path, and shutdown/re-isolation remain open"
+    },
+    "speed": {
+      "protocol_signal": "signed target motor shaft mechanical RPM request",
+      "qualified_operating_speed_limit_rpm": null,
+      "protocol_field": "int16 except 0x8000 sentinel; field range is serialization range, not a safety speed limit",
+      "seller_no_load_speed_note_rpm": [
+        6480,
+        9600
+      ],
+      "seller_speed_note_scope": "series range with unspecified conditions; not verified for this 270 KV unit",
+      "classification": "no validated maximum RPM or speed clamp found"
+    }
+  },
+  "evidence": [
+    {
+      "path": "参考资料/电机资料/N5065参数证据.md",
+      "lines": [
+        3,
+        7,
+        21,
+        22,
+        23,
+        24,
+        25,
+        27
+      ]
+    },
+    {
+      "path": "交付说明.md",
+      "lines": [
+        3,
+        15
+      ]
+    },
+    {
+      "path": "TODO.md",
+      "lines": [
+        3,
+        9,
+        10,
+        11,
+        18,
+        20
+      ]
+    },
+    {
+      "path": "README.md",
+      "lines": [
+        25,
+        27,
+        29,
+        46
+      ]
+    },
+    {
+      "path": "保护与固件约束.md",
+      "lines": [
+        3,
+        5,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        42,
+        46,
+        48,
+        50,
+        56,
+        58,
+        62,
+        70,
+        72,
+        74,
+        76,
+        78,
+        80
+      ]
+    },
+    {
+      "path": "检查/三板共用修复/FOC电流环限幅候选复查.md",
+      "lines": [
+        3,
+        9,
+        10,
+        12,
+        14,
+        15,
+        20,
+        22,
+        24,
+        28,
+        32,
+        33,
+        34,
+        50
+      ]
+    },
+    {
+      "path": "软件/速度反馈协议.md",
+      "lines": [
+        13,
+        15,
+        30,
+        31,
+        32,
+        36,
+        42,
+        44,
+        50,
+        51,
+        63,
+        64,
+        77,
+        78,
+        80,
+        82
+      ]
+    },
+    {
+      "path": "软件/速度反馈接口.h",
+      "lines": [
+        63,
+        74,
+        76,
+        85,
+        113,
+        169
+      ]
+    },
+    {
+      "path": "软件/速度反馈接口.c",
+      "lines": [
+        1,
+        5,
+        229,
+        275,
+        278,
+        310,
+        351,
+        376,
+        378,
+        505
+      ]
+    },
+    {
+      "path": "软件/运行主机测试.ps1",
+      "lines": [
+        13,
+        21
+      ]
+    },
+    {
+      "path": "仿真/源码/simulate_current_loop_and_5v.py",
+      "lines": [
+        175,
+        200,
+        212,
+        234
+      ]
+    },
+    {
+      "path": "仿真/源码/simulate_current_loop_and_5v.py",
+      "lines": [
+        193,
+        200
+      ]
+    }
+  ],
+  "sha256": {
+    "软件/速度反馈接口.h": "EBB9BDE6CE110FF593EB18C63362DDD5D440EC8237F65BCD141840439428B995",
+    "软件/速度反馈接口.c": "82650CD00474505A6EB04B49A73AEBFF54C90E3C79881765691CC5AEBE297296",
+    "软件/速度反馈接口测试.c": "6496E3165139BE67E2696861DF00CBAC847CF762B7915766959D41C10D3C971D",
+    "软件/速度反馈协议.md": "61AE04FAB2A12D4D067DB42DEDA0191F77FEE91ED00863F762F550291D702590",
+    "README.md": "8F018659C2E82891771486B069B9C14E3F8599208B5482F840736A5D27996D98",
+    "TODO.md": "119BDAA840991DE4A4296138C185D673A3FB4B571DA04F461397C2426ED733CB",
+    "保护与固件约束.md": "9AF58A6167024D1B4074CF464607F4CA55FB813570BE7B2AC7CCB3C63E8F8A04",
+    "交付说明.md": "800E3C7B98329312601061724A02C9D9C28653041DB77147F6BA402FA0437231",
+    "检查/三板共用修复/FOC电流环限幅候选复查.md": "1AFD98FD93A66D0ADB2B67A6C43085C4B2C6E4A9FA556732E0F14212D454A35B",
+    "检查/三板共用修复/FOC电流环限幅候选复查.json": "1387ACCD91C7BF1D8990A7BCF9078DDD03E6E1BA98FE1008EAE8F9E45A592079",
+    "参考资料/电机资料/N5065参数证据.md": "B39466641E45C81BC37331D21E3A52AE902C2D77B93124EF0F5EB171C1D840D8",
+    "仿真/源码/simulate_current_loop_and_5v.py": "A79190EDA060F505327601143B6B9C6BF860B4C38B1F3A54231FC84A3D3576C7"
+  },
+  "changes": "Only this audit JSON was created in the simulation project results directory. No FOC hardware, firmware, model, protocol, tests, or training files were modified; no GPU, EDA write operation, or training process was run."
+}

@@ -1,0 +1,597 @@
+.......ssssssssss....................................................... [ 35%]
+....................................FFFFFFFFFFF......................... [ 71%]
+..........................................................               [100%]
+=================================== FAILURES ===================================
+____________ test_fresh_prepare_keeps_the_existing_protocol_schema _____________
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_fresh_prepare_keeps_the_e0/workspace')
+
+    def test_fresh_prepare_keeps_the_existing_protocol_schema(trial_root: Path) -> None:
+        output = trial_root / "results" / "fresh"
+>       prepared = runner.prepare(output)
+                   ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_fresh_prepare_keeps_the_e0/workspace/results/fresh')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+_______________ test_resume_child_records_hashes_and_preflights ________________
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_child_records_hash0/workspace')
+
+    def test_resume_child_records_hashes_and_preflights(trial_root: Path) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_child_records_hash0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+______ test_resume_preflight_rejects_changed_parent_evidence[checkpoint] _______
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_0/workspace')
+tampered_file = 'checkpoint'
+
+    @pytest.mark.parametrize("tampered_file", ["checkpoint", "parent_protocol", "parent_status"])
+    def test_resume_preflight_rejects_changed_parent_evidence(
+        trial_root: Path, tampered_file: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+____ test_resume_preflight_rejects_changed_parent_evidence[parent_protocol] ____
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_1/workspace')
+tampered_file = 'parent_protocol'
+
+    @pytest.mark.parametrize("tampered_file", ["checkpoint", "parent_protocol", "parent_status"])
+    def test_resume_preflight_rejects_changed_parent_evidence(
+        trial_root: Path, tampered_file: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_1/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+_____ test_resume_preflight_rejects_changed_parent_evidence[parent_status] _____
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_2/workspace')
+tampered_file = 'parent_status'
+
+    @pytest.mark.parametrize("tampered_file", ["checkpoint", "parent_protocol", "parent_status"])
+    def test_resume_preflight_rejects_changed_parent_evidence(
+        trial_root: Path, tampered_file: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_preflight_rejects_2/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+______ test_prepare_rejects_running_parent_and_unpaired_resume_arguments _______
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_running_p0/workspace')
+
+    def test_prepare_rejects_running_parent_and_unpaired_resume_arguments(
+        trial_root: Path,
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_running_p0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+________ test_prepare_rejects_a_parent_that_already_has_final_artifacts ________
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_a_parent_0/workspace')
+
+    def test_prepare_rejects_a_parent_that_already_has_final_artifacts(trial_root: Path) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_a_parent_0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+________________ test_prepare_rejects_non_viewer_runtime_drift _________________
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_non_viewe0/workspace')
+
+    def test_prepare_rejects_non_viewer_runtime_drift(trial_root: Path) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_prepare_rejects_non_viewe0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+_ test_resume_requires_the_designated_checkpoint_and_adam_payload[wrong_filename] _
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig0/workspace')
+checkpoint_case = 'wrong_filename'
+
+    @pytest.mark.parametrize("checkpoint_case", ["wrong_filename", "missing_optimizer", "empty_optimizer"])
+    def test_resume_requires_the_designated_checkpoint_and_adam_payload(
+        trial_root: Path, checkpoint_case: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig0/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+_ test_resume_requires_the_designated_checkpoint_and_adam_payload[missing_optimizer] _
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig1/workspace')
+checkpoint_case = 'missing_optimizer'
+
+    @pytest.mark.parametrize("checkpoint_case", ["wrong_filename", "missing_optimizer", "empty_optimizer"])
+    def test_resume_requires_the_designated_checkpoint_and_adam_payload(
+        trial_root: Path, checkpoint_case: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig1/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+_ test_resume_requires_the_designated_checkpoint_and_adam_payload[empty_optimizer] _
+
+trial_root = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig2/workspace')
+checkpoint_case = 'empty_optimizer'
+
+    @pytest.mark.parametrize("checkpoint_case", ["wrong_filename", "missing_optimizer", "empty_optimizer"])
+    def test_resume_requires_the_designated_checkpoint_and_adam_payload(
+        trial_root: Path, checkpoint_case: str
+    ) -> None:
+>       parent, checkpoint = _prepared_parent(trial_root)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_isaac_foundation_resume.py:172: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_isaac_foundation_resume.py:42: in _prepared_parent
+    runner.prepare(parent)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+output = PosixPath('/tmp/pytest-of-wangj/pytest-0/test_resume_requires_the_desig2/workspace/results/failed_parent')
+resume_parent = None, resume_checkpoint = None
+
+    def prepare(
+        output: Path,
+        *,
+        resume_parent: Path | None = None,
+        resume_checkpoint: Path | None = None,
+    ) -> dict:
+        from isaac_field.task import Config
+        from scripts.compare_isaac_exploration import _checkpoint_steps
+    
+        output = output.resolve()
+        if (resume_parent is None) != (resume_checkpoint is None):
+            raise ValueError("--resume-parent and --resume-checkpoint must be provided together")
+        if output.exists():
+            raise FileExistsError(f"refusing to reuse prepared output: {output}")
+        if not BASELINE.is_file() or _checkpoint_steps(BASELINE) != 53_248:
+            raise ValueError(f"expected the recorded 53,248-step development baseline: {BASELINE}")
+        resume_info = None
+        if resume_parent is not None:
+            resume_parent = resume_parent.resolve()
+            if output.parent != resume_parent:
+                raise ValueError("resume output must be a new direct child of the parent trial")
+            resume_info = _validate_resume_parent(resume_parent, resume_checkpoint)
+    
+        cfg = Config(**_field_config_dict())
+        output.mkdir(parents=True)
+        snapshot = _snapshot(output)
+        if len(RUNTIME_FILES) != 19 or len(snapshot["files"]) != 20:
+>           raise RuntimeError(
+                f"expected 19 frozen runtime files plus this runner, got {len(snapshot['files'])} files"
+            )
+E           RuntimeError: expected 19 frozen runtime files plus this runner, got 21 files
+
+scripts/train_isaac_foundation.py:298: RuntimeError
+=============================== warnings summary ===============================
+tests/test_network_2d.py::test_extreme_finite_values_and_all_nonfinite_frames_have_safe_ranges
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_isaac_foundation_resume.py::test_fresh_prepare_keeps_the_existing_protocol_schema
+FAILED tests/test_isaac_foundation_resume.py::test_resume_child_records_hashes_and_preflights
+FAILED tests/test_isaac_foundation_resume.py::test_resume_preflight_rejects_changed_parent_evidence[checkpoint]
+FAILED tests/test_isaac_foundation_resume.py::test_resume_preflight_rejects_changed_parent_evidence[parent_protocol]
+FAILED tests/test_isaac_foundation_resume.py::test_resume_preflight_rejects_changed_parent_evidence[parent_status]
+FAILED tests/test_isaac_foundation_resume.py::test_prepare_rejects_running_parent_and_unpaired_resume_arguments
+FAILED tests/test_isaac_foundation_resume.py::test_prepare_rejects_a_parent_that_already_has_final_artifacts
+FAILED tests/test_isaac_foundation_resume.py::test_prepare_rejects_non_viewer_runtime_drift
+FAILED tests/test_isaac_foundation_resume.py::test_resume_requires_the_designated_checkpoint_and_adam_payload[wrong_filename]
+FAILED tests/test_isaac_foundation_resume.py::test_resume_requires_the_designated_checkpoint_and_adam_payload[missing_optimizer]
+FAILED tests/test_isaac_foundation_resume.py::test_resume_requires_the_designated_checkpoint_and_adam_payload[empty_optimizer]
+11 failed, 181 passed, 10 skipped, 1 warning in 12.84s

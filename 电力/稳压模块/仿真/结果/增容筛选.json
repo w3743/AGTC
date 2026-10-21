@@ -1,0 +1,1067 @@
+{
+  "date": "2026-10-21",
+  "status": "CANDIDATE_MODEL_ONLY_NO_HARDWARE_RELEASE",
+  "sources": {
+    "SC0350-270-RSS": "https://www.licaptech.com/pdfs/datasheets/ultracapacitors/60862a8f5979e5f969df83ba_LICAP_SC0350_270_RSS_Datasheet_061120.pdf"
+  },
+  "source_sha256": "2fed6d64b8c1cb45811832f0161ea60ba035a950349a1aac65e3d421146b3d96",
+  "latest_requirement": "500元成本上限已取消；电容选型固定LICAP SC0350-270-RSS，最多16颗；800–1000W/1s作为设计目标，按状态核算可用额度；全电路最少选型、最小总成本与性价比优先。",
+  "conditions": [
+    "8 series groups are identical; no cell imbalance or individual fault is simulated.",
+    "EOL C=80% and ESR=200% are data-sheet endurance sensitivities; temperature corners remain unqualified.",
+    "Power is a total BUS allocation, not an independent allowance to each of the two FOC boards.",
+    "80A screens average SC current plus an ideal Vbus/(8Lf) half-ripple estimate at Lmin=12uH/f=50kHz. Hot biased inductance, actual PWM, trip tolerance, response and SOA remain unqualified.",
+    "An idle-voltage target is no-load internal voltage; ADC under current sees terminal voltage plus the shunt reference offset.",
+    "A wider voltage window requires a new per-cell UV/control/inductor qualification; it does not modify the current 8S1P design.",
+    "Measurements, end-to-end shutdown, firmware, balancing/leakage and mechanical/thermal design remain mandatory.",
+    "Only the user's fixed SC0350-270-RSS selection is evaluated. Other cell types are excluded.",
+    "Parallel groups reuse the current corrected footprint; mechanical fit, placement and fault-energy coordination need new checks."
+  ],
+  "numerical_verification": {
+    "completed_runs": 39,
+    "completed_runs_energy_balance_and_step_convergence_pass": true,
+    "infeasible_runs": [
+      {
+        "candidate": "current_8S1P_350F",
+        "scenario": "unqualified_extra_loss_sensitivity",
+        "power_W": 1000.0,
+        "direction": "support",
+        "failure_time_s": 0.6341
+      }
+    ],
+    "all_runs_complete_one_second": false,
+    "meaning": "Numerical checks apply only to completed trajectories. Infeasible constant-power runs fail the candidate screen and are never counted as numerical passes."
+  },
+  "rows": [
+    {
+      "candidate": "current_8S1P_350F",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 8,
+      "parallel_count": 1,
+      "total_EOL_capacitance_F": 35.0,
+      "total_model_series_resistance_ohm": 0.0448,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.626862323000083,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.626862323000083,
+          "end_internal_V": 17.063617306197266,
+          "minimum_terminal_V": 14.453416804911367,
+          "maximum_terminal_V": 16.31440853687602,
+          "maximum_average_port_current_A": 58.26340404656025,
+          "resistive_loss_J": 134.27589608273453,
+          "stored_energy_change_J": -976.3768774837908,
+          "energy_balance_residual_J": 0.004281756838508954,
+          "terminal_voltage_timestep_difference_V": 6.151356569006339e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 66.13840404656025,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.626862323000083,
+          "end_internal_V": 19.671454970003154,
+          "minimum_terminal_V": 20.303790573275435,
+          "maximum_terminal_V": 21.272052732178462,
+          "maximum_average_port_current_A": 37.431434157932,
+          "resistive_loss_J": 59.89444875440573,
+          "stored_energy_change_J": 700.1074611450805,
+          "energy_balance_residual_J": 0.0019098994862360996,
+          "terminal_voltage_timestep_difference_V": 1.1056848592261304e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 45.306434157932,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "current_8S1P_350F",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 8,
+      "parallel_count": 1,
+      "total_EOL_capacitance_F": 35.0,
+      "total_model_series_resistance_ohm": 0.0448,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.626862323000083,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.626862323000083,
+          "end_internal_V": 16.51674829946408,
+          "minimum_terminal_V": 12.845622656203027,
+          "maximum_terminal_V": 15.604862259680955,
+          "maximum_average_port_current_A": 81.94476882279139,
+          "resistive_loss_J": 245.1241857252866,
+          "stored_energy_change_J": -1297.7479482126328,
+          "energy_balance_residual_J": 0.007816460022468164,
+          "terminal_voltage_timestep_difference_V": 1.59460423674318e-05,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 89.81976882279139,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.626862323000083,
+          "end_internal_V": 19.903169943448198,
+          "minimum_terminal_V": 20.684446947259904,
+          "maximum_terminal_V": 21.85091450953609,
+          "maximum_average_port_current_A": 45.928228220085316,
+          "resistive_loss_J": 89.41980993595371,
+          "stored_energy_change_J": 860.583041461145,
+          "energy_balance_residual_J": 0.002851397098652342,
+          "terminal_voltage_timestep_difference_V": 1.5642523010228615e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 53.803228220085316,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "current_8S1P_350F",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 8,
+      "parallel_count": 1,
+      "total_EOL_capacitance_F": 35.0,
+      "total_model_series_resistance_ohm": 0.06324,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.626862323000083,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.52686232300008,
+          "end_internal_V": 16.62436436396175,
+          "minimum_terminal_V": 11.900920023215171,
+          "maximum_terminal_V": 14.703819341631736,
+          "maximum_average_port_current_A": 74.69077072654298,
+          "resistive_loss_J": 281.4323665971667,
+          "stored_energy_change_J": -1170.3148980186756,
+          "energy_balance_residual_J": 0.006357467379984882,
+          "terminal_voltage_timestep_difference_V": 1.8708064004613334e-05,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 82.56577072654298,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.726862323000084,
+          "end_internal_V": 19.690734559790947,
+          "minimum_terminal_V": 20.904949394217525,
+          "maximum_terminal_V": 21.781198079468513,
+          "maximum_average_port_current_A": 34.441604541705225,
+          "resistive_loss_J": 71.98266287334765,
+          "stored_energy_change_J": 648.0189631920463,
+          "energy_balance_residual_J": 0.0016260653939070835,
+          "terminal_voltage_timestep_difference_V": 8.846165187037514e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 42.316604541705225,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "current_8S1P_350F",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 8,
+      "parallel_count": 1,
+      "total_EOL_capacitance_F": 35.0,
+      "total_model_series_resistance_ohm": 0.06324,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.626862323000083,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": false,
+          "failure_time_s": 0.6341,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.726862323000084,
+          "end_internal_V": 19.900408939849036,
+          "minimum_terminal_V": 21.38798284196406,
+          "maximum_terminal_V": 22.437100360949874,
+          "maximum_average_port_current_A": 42.079704600948375,
+          "resistive_loss_J": 106.71159918009475,
+          "stored_energy_change_J": 793.2908114009086,
+          "energy_balance_residual_J": 0.002410581003346124,
+          "terminal_voltage_timestep_difference_V": 1.2326686693597821e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 49.954704600948375,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_same_window",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.7,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.7,
+          "end_internal_V": 18.00294170904905,
+          "minimum_terminal_V": 16.885842716005797,
+          "maximum_terminal_V": 17.630056890219002,
+          "maximum_average_port_current_A": 49.87049076085956,
+          "resistive_loss_J": 53.339581441910696,
+          "stored_energy_change_J": -895.4431437203718,
+          "energy_balance_residual_J": 0.001700879433656155,
+          "terminal_voltage_timestep_difference_V": 8.225934990946371e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 57.74549076085956,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.7,
+          "end_internal_V": 19.24745156063235,
+          "minimum_terminal_V": 19.569907044587048,
+          "maximum_terminal_V": 20.094642545085254,
+          "maximum_average_port_current_A": 38.83513591906471,
+          "resistive_loss_J": 32.89734376138884,
+          "stored_energy_change_J": 727.1037052611024,
+          "energy_balance_residual_J": 0.0010490224912018675,
+          "terminal_voltage_timestep_difference_V": 3.4295342388190875e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 46.71013591906471,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_same_window",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.7,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.7,
+          "end_internal_V": 17.807804523726926,
+          "minimum_terminal_V": 16.367180906024902,
+          "maximum_terminal_V": 17.34021605662694,
+          "maximum_average_port_current_A": 64.3135543616974,
+          "resistive_loss_J": 87.39463943722761,
+          "stored_energy_change_J": -1140.0234315655782,
+          "energy_balance_residual_J": 0.002786819017956077,
+          "terminal_voltage_timestep_difference_V": 1.454488003815868e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 72.1885543616974,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.7,
+          "end_internal_V": 19.375309790207304,
+          "minimum_terminal_V": 19.77604910788358,
+          "maximum_terminal_V": 20.41755039164162,
+          "maximum_average_port_current_A": 48.03790660194555,
+          "resistive_loss_J": 50.059564959634336,
+          "stored_energy_change_J": 899.9420313276056,
+          "energy_balance_residual_J": 0.0015962872399768457,
+          "terminal_voltage_timestep_difference_V": 5.047181268480472e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 55.91290660194555,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_same_window",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.7,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.599999999999998,
+          "end_internal_V": 17.823684647286,
+          "minimum_terminal_V": 15.918413861320026,
+          "maximum_terminal_V": 16.79407173111594,
+          "maximum_average_port_current_A": 55.840292671921915,
+          "resistive_loss_J": 100.78251673817317,
+          "stored_energy_change_J": -989.6692957935431,
+          "energy_balance_residual_J": 0.00210983351894356,
+          "terminal_voltage_timestep_difference_V": 1.2131267297377235e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 63.715292671921915,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.8,
+          "end_internal_V": 19.3075355728485,
+          "minimum_terminal_V": 20.02668339605542,
+          "maximum_terminal_V": 20.505570976410816,
+          "maximum_average_port_current_A": 35.952033882046365,
+          "resistive_loss_J": 43.068355226506064,
+          "stored_energy_change_J": 676.9325463883579,
+          "energy_balance_residual_J": 0.000901614863892064,
+          "terminal_voltage_timestep_difference_V": 2.7997943519153523e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 43.827033882046365,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_same_window",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        17.6,
+        19.6
+      ],
+      "idle_internal_target_V": 18.7,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.599999999999998,
+          "end_internal_V": 17.587286736914365,
+          "minimum_terminal_V": 15.071943503087564,
+          "maximum_terminal_V": 16.269855729417134,
+          "maximum_average_port_current_A": 73.7204933712427,
+          "resistive_loss_J": 171.54956337085736,
+          "stored_energy_change_J": -1282.6570831744598,
+          "energy_balance_residual_J": 0.003591307508713726,
+          "terminal_voltage_timestep_difference_V": 2.4169433388010475e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 81.5954933712427,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 18.8,
+          "end_internal_V": 19.42405475777001,
+          "minimum_terminal_V": 20.311828444399225,
+          "maximum_terminal_V": 20.893774818718008,
+          "maximum_average_port_current_A": 44.3091572215482,
+          "resistive_loss_J": 65.11474999611184,
+          "stored_energy_change_J": 834.8866131496675,
+          "energy_balance_residual_J": 0.0013631457793508162,
+          "terminal_voltage_timestep_difference_V": 4.060051672638565e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 52.1841572215482,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_balanced_800W_candidate",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.2,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.2,
+          "end_internal_V": 16.42911617619104,
+          "minimum_terminal_V": 15.187061705015248,
+          "maximum_terminal_V": 16.022724708977368,
+          "maximum_average_port_current_A": 55.448860320347876,
+          "resistive_loss_J": 65.241775678425,
+          "stored_energy_change_J": -907.3449584226237,
+          "energy_balance_residual_J": 0.002080413696148753,
+          "terminal_voltage_timestep_difference_V": 1.1552112635371259e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 63.323860320347876,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.2,
+          "end_internal_V": 17.78945248358976,
+          "minimum_terminal_V": 18.138553349434073,
+          "maximum_terminal_V": 18.699834854985987,
+          "maximum_average_port_current_A": 41.89970309973546,
+          "resistive_loss_J": 38.13952787750285,
+          "stored_energy_change_J": 721.8616883064249,
+          "energy_balance_residual_J": 0.0012161839276814135,
+          "terminal_voltage_timestep_difference_V": 4.218112579223998e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 49.77470309973546,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": true
+    },
+    {
+      "candidate": "8S2P_350F_balanced_800W_candidate",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.2,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.2,
+          "end_internal_V": 16.207169379151374,
+          "minimum_terminal_V": 14.591198846775884,
+          "maximum_terminal_V": 15.697961160190927,
+          "maximum_average_port_current_A": 72.1415416239058,
+          "resistive_loss_J": 108.23999762559757,
+          "stored_energy_change_J": -1160.8681250424324,
+          "energy_balance_residual_J": 0.003451530533766345,
+          "terminal_voltage_timestep_difference_V": 2.1183144571779167e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 80.0165416239058,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.2,
+          "end_internal_V": 17.925711398800015,
+          "minimum_terminal_V": 18.35909831900468,
+          "maximum_terminal_V": 19.04317227618802,
+          "maximum_average_port_current_A": 51.74546066985186,
+          "resistive_loss_J": 57.81232314780041,
+          "stored_energy_change_J": 892.1895203574084,
+          "energy_balance_residual_J": 0.0018435052087397708,
+          "terminal_voltage_timestep_difference_V": 6.156679468460879e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 59.62046066985186,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_balanced_800W_candidate",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.2,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.099999999999998,
+          "end_internal_V": 16.22930939423381,
+          "minimum_terminal_V": 14.074414085259395,
+          "maximum_terminal_V": 15.090153752864765,
+          "maximum_average_port_current_A": 63.15636896173547,
+          "resistive_loss_J": 126.79684606013684,
+          "stored_energy_change_J": -1015.6830805181951,
+          "energy_balance_residual_J": 0.002654430830716592,
+          "terminal_voltage_timestep_difference_V": 1.8559232088932731e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 71.03136896173547,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.3,
+          "end_internal_V": 17.84496376199228,
+          "minimum_terminal_V": 18.61939817641968,
+          "maximum_terminal_V": 19.129199419789128,
+          "maximum_average_port_current_A": 38.66934866411717,
+          "resistive_loss_J": 49.655431174015646,
+          "stored_energy_change_J": 670.3456083386161,
+          "energy_balance_residual_J": 0.0010395126317916947,
+          "terminal_voltage_timestep_difference_V": 3.402640302851978e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 46.54434866411717,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": true
+    },
+    {
+      "candidate": "8S2P_350F_balanced_800W_candidate",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.2,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.099999999999998,
+          "end_internal_V": 15.947055266701518,
+          "minimum_terminal_V": 13.039693028271957,
+          "maximum_terminal_V": 14.482233044047483,
+          "maximum_average_port_current_A": 85.20991320133534,
+          "resistive_loss_J": 222.4435368637894,
+          "stored_energy_change_J": -1333.5499912268544,
+          "energy_balance_residual_J": 0.0046567480460453226,
+          "terminal_voltage_timestep_difference_V": 4.109245645977921e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 93.08491320133534,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.3,
+          "end_internal_V": 17.968557648723685,
+          "minimum_terminal_V": 18.92280390156456,
+          "maximum_terminal_V": 19.54009551440893,
+          "maximum_average_port_current_A": 47.56166182780064,
+          "resistive_loss_J": 74.7343253844158,
+          "stored_energy_change_J": 825.2672391427245,
+          "energy_balance_residual_J": 0.0015645271403172956,
+          "terminal_voltage_timestep_difference_V": 4.887421276578152e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 55.43666182780064,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_support_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 19.2,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.2,
+          "end_internal_V": 18.52424530062516,
+          "minimum_terminal_V": 17.442816880920184,
+          "maximum_terminal_V": 18.161357491967212,
+          "maximum_average_port_current_A": 48.27805445111513,
+          "resistive_loss_J": 50.12809679391727,
+          "stored_energy_change_J": -892.231761479332,
+          "energy_balance_residual_J": 0.0015984724800546246,
+          "terminal_voltage_timestep_difference_V": 7.420371979094398e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 56.15305445111513,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.2,
+          "end_internal_V": 19.73468335493635,
+          "minimum_terminal_V": 20.049114795043643,
+          "maximum_terminal_V": 20.562594445865024,
+          "maximum_average_port_current_A": 37.90691049301988,
+          "resistive_loss_J": 31.380551469303587,
+          "stored_energy_change_J": 728.6204491860665,
+          "energy_balance_residual_J": 0.0010006553700350196,
+          "terminal_voltage_timestep_difference_V": 3.2089333501517103e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 45.78191049301988,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_support_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 19.2,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.2,
+          "end_internal_V": 18.33646122117853,
+          "minimum_terminal_V": 16.944959046154246,
+          "maximum_terminal_V": 17.881367799559378,
+          "maximum_average_port_current_A": 62.12063281358412,
+          "resistive_loss_J": 81.86767757661778,
+          "stored_energy_change_J": -1134.496645947556,
+          "energy_balance_residual_J": 0.0026105764302428724,
+          "terminal_voltage_timestep_difference_V": 1.3001139329560374e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 69.99563281358412,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.2,
+          "end_internal_V": 19.859935084153264,
+          "minimum_terminal_V": 20.250821564555476,
+          "maximum_terminal_V": 20.87913442301764,
+          "maximum_average_port_current_A": 46.91167698908384,
+          "resistive_loss_J": 47.80577028127649,
+          "stored_energy_change_J": 902.1957541373604,
+          "energy_balance_residual_J": 0.0015244186369045565,
+          "terminal_voltage_timestep_difference_V": 4.7340955688923714e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 54.78667698908384,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_support_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 19.2,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.099999999999998,
+          "end_internal_V": 18.35010941431572,
+          "minimum_terminal_V": 16.513497320577326,
+          "maximum_terminal_V": 17.35215426091481,
+          "maximum_average_port_current_A": 53.828021504642265,
+          "resistive_loss_J": 94.03503658158505,
+          "stored_energy_change_J": -982.9219568924523,
+          "energy_balance_residual_J": 0.0019685780216605053,
+          "terminal_voltage_timestep_difference_V": 1.0715116900428256e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 61.703021504642265,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.3,
+          "end_internal_V": 19.796104165007108,
+          "minimum_terminal_V": 20.498451502403466,
+          "maximum_terminal_V": 20.96773297347566,
+          "maximum_average_port_current_A": 35.124604408073424,
+          "resistive_loss_J": 41.14995754110778,
+          "stored_energy_change_J": 678.8509039134126,
+          "energy_balance_residual_J": 0.0008614545204181923,
+          "terminal_voltage_timestep_difference_V": 2.629044750790399e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 42.999604408073424,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_support_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 19.2,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.099999999999998,
+          "end_internal_V": 18.12520957136721,
+          "minimum_terminal_V": 15.712393834246296,
+          "maximum_terminal_V": 16.850095128756124,
+          "maximum_average_port_current_A": 70.71558432359073,
+          "resistive_loss_J": 158.929445790711,
+          "stored_energy_change_J": -1270.0372297906438,
+          "energy_balance_residual_J": 0.0033271111783506058,
+          "terminal_voltage_timestep_difference_V": 2.085814559293908e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 78.59058432359073,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 19.3,
+          "end_internal_V": 19.91040890918449,
+          "minimum_terminal_V": 20.777915348348046,
+          "maximum_terminal_V": 21.348803347511605,
+          "maximum_average_port_current_A": 43.31522122942689,
+          "resistive_loss_J": 62.29790159375513,
+          "stored_energy_change_J": 837.7034025826589,
+          "energy_balance_residual_J": 0.0013041764140098167,
+          "terminal_voltage_timestep_difference_V": 3.823354859378014e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 51.19022122942689,
+          "conditional_screen_pass": false
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_absorb_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.1,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.1,
+          "end_internal_V": 16.32356959644712,
+          "minimum_terminal_V": 15.072036110424609,
+          "maximum_terminal_V": 15.914736390751754,
+          "maximum_average_port_current_A": 55.87203062600485,
+          "resistive_loss_J": 66.18449436502395,
+          "stored_energy_change_J": -908.2876470481553,
+          "energy_balance_residual_J": 0.0021104747634126397,
+          "terminal_voltage_timestep_difference_V": 1.183902313073304e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 63.74703062600485,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.1,
+          "end_internal_V": 17.692468422872494,
+          "minimum_terminal_V": 18.04349777479302,
+          "maximum_terminal_V": 18.607374499516585,
+          "maximum_average_port_current_A": 42.120436374688346,
+          "resistive_loss_J": 38.53086736077466,
+          "stored_energy_change_J": 721.4703613019096,
+          "energy_balance_residual_J": 0.0012286626842978876,
+          "terminal_voltage_timestep_difference_V": 4.278486862574482e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 49.995436374688346,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": true
+    },
+    {
+      "candidate": "8S2P_350F_absorb_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.0224,
+      "efficiency_assumption": 0.95,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.1,
+      "unmeasured_bias_error_assumption_V": 0.0,
+      "additional_terminal_reserve_V": 0.0,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "EOL_25C_parameter_screen",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.1,
+          "end_internal_V": 16.099516530305777,
+          "minimum_terminal_V": 14.47001221332162,
+          "maximum_terminal_V": 15.587297253319555,
+          "maximum_average_port_current_A": 72.74572843679272,
+          "resistive_loss_J": 109.9167882165735,
+          "stored_energy_change_J": -1162.5448621643866,
+          "energy_balance_residual_J": 0.0035049995553890767,
+          "terminal_voltage_timestep_difference_V": 2.1775929628375934e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 80.62072843679272,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.1,
+          "end_internal_V": 17.82932016648032,
+          "minimum_terminal_V": 18.265065619953372,
+          "maximum_terminal_V": 18.952148035896215,
+          "maximum_average_port_current_A": 52.01185803363268,
+          "resistive_loss_J": 58.38884592896362,
+          "stored_energy_change_J": 891.6130159601619,
+          "energy_balance_residual_J": 0.0018618891255073322,
+          "terminal_voltage_timestep_difference_V": 6.241028991382791e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 59.88685803363268,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": false
+    },
+    {
+      "candidate": "8S2P_350F_absorb_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.1,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 800.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.0,
+          "end_internal_V": 16.122019298194168,
+          "minimum_terminal_V": 13.947518603812723,
+          "maximum_terminal_V": 14.974651427768997,
+          "maximum_average_port_current_A": 63.73096994083953,
+          "resistive_loss_J": 128.93109142401332,
+          "stored_energy_change_J": -1017.8172812029186,
+          "energy_balance_residual_J": 0.00269910998360956,
+          "terminal_voltage_timestep_difference_V": 1.9160492055192435e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 71.60596994083953,
+          "conditional_screen_pass": true
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.200000000000003,
+          "end_internal_V": 17.747640889867732,
+          "minimum_terminal_V": 18.526046544319648,
+          "maximum_terminal_V": 19.038026724271486,
+          "maximum_average_port_current_A": 38.86420118170125,
+          "resistive_loss_J": 50.14454930232037,
+          "stored_energy_change_J": 669.8565004496763,
+          "energy_balance_residual_J": 0.001049751996674786,
+          "terminal_voltage_timestep_difference_V": 3.448336656219908e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 46.73920118170125,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": true
+    },
+    {
+      "candidate": "8S2P_350F_absorb_1kW_prepared",
+      "mpn": "SC0350-270-RSS",
+      "cell_quantity": 16,
+      "parallel_count": 2,
+      "total_EOL_capacitance_F": 70.0,
+      "total_model_series_resistance_ohm": 0.03412,
+      "efficiency_assumption": 0.9,
+      "terminal_window_V": [
+        13.6,
+        19.6
+      ],
+      "idle_internal_target_V": 17.1,
+      "unmeasured_bias_error_assumption_V": 0.1,
+      "additional_terminal_reserve_V": 0.1,
+      "bus_power_W": 1000.0,
+      "duration_s": 1.0,
+      "scenario": "unqualified_extra_loss_sensitivity",
+      "results": {
+        "support": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.0,
+          "end_internal_V": 15.835849818615355,
+          "minimum_terminal_V": 12.896119738593077,
+          "maximum_terminal_V": 14.3599393246764,
+          "maximum_average_port_current_A": 86.15856037579948,
+          "resistive_loss_J": 226.79875509031095,
+          "stored_energy_change_J": -1337.9051182791013,
+          "energy_balance_residual_J": 0.0047479223208029,
+          "terminal_voltage_timestep_difference_V": 4.285137602977329e-06,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 94.03356037579948,
+          "conditional_screen_pass": false
+        },
+        "absorb": {
+          "quadratic_solution_exists": true,
+          "initial_internal_V": 17.200000000000003,
+          "end_internal_V": 17.87173037711004,
+          "minimum_terminal_V": 18.83073799879559,
+          "maximum_terminal_V": 19.450506726336013,
+          "maximum_average_port_current_A": 47.794196916635116,
+          "resistive_loss_J": 75.44544588967544,
+          "stored_energy_change_J": 824.5561335241198,
+          "energy_balance_residual_J": 0.0015794137951843368,
+          "terminal_voltage_timestep_difference_V": 4.949631424722156e-07,
+          "ideal_ripple_half_peak_A": 7.875,
+          "estimated_inductor_peak_A": 55.669196916635116,
+          "conditional_screen_pass": true
+        }
+      },
+      "both_directions_pass": false
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "scope": "read-only installed Newton source inspection; no Isaac app, simulator, GPU, or contact sample created",
+  "contacts_source": {
+    "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/sim/contacts.py",
+    "sha256": "84d3ccff76e8c2c10706dff557459aab57474e73aad1a1ef8a429c36fe51fea1",
+    "force_fields": [
+      {
+        "start_line": 290,
+        "text": "290:             self.rigid_contact_margin1 = wp.zeros(rigid_contact_max, dtype=wp.float32)\n291:             \"\"\"Surface thickness for shape 1: effective radius + margin [m], shape (rigid_contact_max,), dtype float.\"\"\"\n292:             self.rigid_contact_tids = wp.full(rigid_contact_max, -1, dtype=wp.int32)\n293:             # to be filled by the solver (currently unused)\n294:             self.rigid_contact_force = wp.zeros(rigid_contact_max, dtype=wp.vec3)\n295:             \"\"\"Contact force [N], shape (rigid_contact_max,), dtype :class:`vec3`.\"\"\"\n296: "
+      },
+      {
+        "start_line": 419,
+        "text": "419:             self._enable_rigid_soft_full_surface_contact = False\n420: \n421:             # Extended contact attributes (optional, allocated on demand)\n422:             self.force: wp.array | None = None\n423:             \"\"\"Contact forces (spatial) [N, N·m], shape (rigid_contact_max + soft_contact_max,), dtype :class:`spatial_vector`.\n424:             Force and torque exerted on body0 by body1, referenced to the center of mass (COM) of body0, and in world frame, where body0 and body1 are the bodies of shape0 and shape1.\n425:             First three entries: linear force [N]; last three entries: torque (moment) [N·m]."
+      },
+      {
+        "start_line": 429,
+        "text": "429:             \"\"\"\n430:             if requested_attributes and \"force\" in requested_attributes:\n431:                 total_contacts = rigid_contact_max + soft_contact_max\n432:                 self.force = wp.zeros(total_contacts, dtype=wp.spatial_vector, requires_grad=requires_grad)\n433: \n434:         self.soft_self_contact_data: TriMeshCollisionInfo | None = None\n435:         \"\"\"Tri-mesh self-contact results owned by this container, written by the"
+      }
+    ]
+  },
+  "sensor_source": {
+    "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/sensors/sensor_contact.py",
+    "sha256": "6ec9b973ed43cf96c6d6882b610f849a4627616dd2e60a586ace537d201fb803",
+    "force_decomposition": [
+      {
+        "start_line": 93,
+        "text": "93:         return\n94: \n95:     shape0 = contact_shape0[contact_index]\n96:     shape1 = contact_shape1[contact_index]\n97:     assert shape0 >= 0 and shape1 >= 0\n98:     force = wp.spatial_top(contact_force[contact_index])\n99: \n100:     # Decompose into normal and friction (tangential) components\n101:     n = contact_normal[contact_index]\n102:     len_sq = wp.dot(n, n)\n103:     if wp.abs(len_sq - 1.0) > 1.0e-4:\n104:         n = wp.normalize(n)\n105:     friction = force - wp.dot(force, n) * n\n106: \n107:     row0 = sensing_shape_to_row[shape0]\n108:     row1 = sensing_shape_to_row[shape1]\n109: \n110:     # total force and friction\n111:     if total_force:\n112:         assert total_force_friction\n113:         if row0 >= 0:\n114:             wp.atomic_add(total_force, row0, force)\n115:             wp.atomic_add(total_force_friction, row0, friction)\n116:         if row1 >= 0:\n117:             wp.atomic_add(total_force, row1, -force)\n118:             wp.atomic_add(total_force_friction, row1, -friction)\n119: \n120:     # per-counterpart forces and friction"
+      }
+    ]
+  },
+  "solver_mujoco_source_hits": [
+    {
+      "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/kernels.py",
+      "sha256": "bd770d39d20c208e980477e0186799f531364b03f16d76968ee69bacdc490a3d",
+      "excerpts": [
+        {
+          "start_line": 24,
+          "text": "24: from .enums import EqType\n25: \n26: \n27: def _import_contact_force_fn():\n28:     from mujoco_warp._src.support import contact_force_fn\n29: \n30:     return contact_force_fn\n31: \n32: \n33: # Custom vector types"
+        },
+        {
+          "start_line": 88,
+          "text": "88:     # Data out:\n89:     contact_dist_out: wp.array[float],\n90:     contact_pos_out: wp.array[wp.vec3],\n91:     contact_frame_out: wp.array[wp.mat33],\n92:     contact_includemargin_out: wp.array[float],\n93:     contact_friction_out: wp.array[vec5],\n94:     contact_solref_out: wp.array[wp.vec2],"
+        },
+        {
+          "start_line": 104,
+          "text": "104:     cid = contact_id_in\n105:     contact_dist_out[cid] = dist_in\n106:     contact_pos_out[cid] = pos_in\n107:     contact_frame_out[cid] = frame_in\n108:     contact_geom_out[cid] = geoms_in\n109:     contact_worldid_out[cid] = worldid_in\n110:     contact_includemargin_out[cid] = margin_in"
+        },
+        {
+          "start_line": 427,
+          "text": "427:     nacon_out: wp.array[int],\n428:     contact_dist_out: wp.array[float],\n429:     contact_pos_out: wp.array[wp.vec3],\n430:     contact_frame_out: wp.array[wp.mat33],\n431:     contact_includemargin_out: wp.array[float],\n432:     contact_friction_out: wp.array[vec5],\n433:     contact_solref_out: wp.array[wp.vec2],"
+        },
+        {
+          "start_line": 669,
+          "text": "669:             contact_id_in=cid,\n670:             contact_dist_out=contact_dist_out,\n671:             contact_pos_out=contact_pos_out,\n672:             contact_frame_out=contact_frame_out,\n673:             contact_includemargin_out=contact_includemargin_out,\n674:             contact_friction_out=contact_friction_out,\n675:             contact_solref_out=contact_solref_out,"
+        },
+        {
+          "start_line": 1451,
+          "text": "1451:         mj_opt_cone: int,\n1452:         mj_nacon: wp.array[wp.int32],\n1453:         mj_contact_pos: wp.array[wp.vec3],\n1454:         mj_contact_frame: wp.array[wp.mat33f],\n1455:         mj_contact_friction: wp.array[vec5],\n1456:         mj_contact_dist: wp.array[float],\n1457:         mj_contact_dim: wp.array[int],"
+        },
+        {
+          "start_line": 1470,
+          "text": "1470:         rigid_contact_point0: wp.array[wp.vec3],\n1471:         rigid_contact_point1: wp.array[wp.vec3],\n1472:         rigid_contact_normal: wp.array[wp.vec3],\n1473:         contact_force: wp.array[wp.spatial_vector],\n1474:     ):\n1475:         \"\"\"Convert MuJoCo contacts to Newton contact format.\n1476: \n1477:         Uses mjc_geom_to_newton_shape to convert MuJoCo geom indices to Newton shape indices.\n1478:         Contact positions are converted from MuJoCo world frame to Newton body-local frame.\n1479:         Contact forces are computed via ``mujoco_warp`` ``contact_force_fn``.\n1480:         \"\"\"\n1481:         contact_idx = wp.tid()\n1482:         n_contacts = mj_nacon[0]"
+        },
+        {
+          "start_line": 1490,
+          "text": "1490:         world = mj_contact_worldid[contact_idx]\n1491:         geoms_mjw = mj_contact_geom[contact_idx]\n1492: \n1493:         normal = mj_contact_frame[contact_idx][0]\n1494:         pos_world = mj_contact_pos[contact_idx]\n1495: \n1496:         rigid_contact_shape0[contact_idx] = mjc_geom_to_newton_shape[world, geoms_mjw[0]]"
+        },
+        {
+          "start_line": 1517,
+          "text": "1517:         rigid_contact_point0[contact_idx] = wp.transform_point(wp.transform_inverse(X_wb_a), point0_world)\n1518:         rigid_contact_point1[contact_idx] = wp.transform_point(wp.transform_inverse(X_wb_b), point1_world)\n1519: \n1520:         if contact_force:\n1521:             # Negate: contact_force_fn returns force on geom2; Newton stores force on shape0 (geom1).\n1522:             contact_force[contact_idx] = -wp.static(_import_contact_force_fn())(\n1523:                 mj_opt_cone,\n1524:                 mj_contact_frame,\n1525:                 mj_contact_friction,\n1526:                 mj_contact_dim,\n1527:                 mj_contact_efc_address,"
+        },
+        {
+          "start_line": 1696,
+          "text": "1696: def apply_mjc_body_f_kernel(\n1697:     mjc_body_to_newton: wp.array2d[wp.int32],\n1698:     body_flags: wp.array[wp.int32],\n1699:     body_f: wp.array[wp.spatial_vector],\n1700:     body_mass: wp.array[float],\n1701:     body_world: wp.array[wp.int32],\n1702:     gravity: wp.array[wp.vec3],\n1703:     body_gravcomp: wp.array2d[float],\n1704:     # outputs\n1705:     xfrc_applied: wp.array2d[wp.spatial_vector],\n1706: ):\n1707:     \"\"\"Apply Newton body forces to MuJoCo xfrc_applied array.\n1708: "
+        },
+        {
+          "start_line": 1713,
+          "text": "1713:     world, mjc_body = wp.tid()\n1714:     newton_body = mjc_body_to_newton[world, mjc_body]\n1715:     if newton_body < 0 or (body_flags[newton_body] & BodyFlags.KINEMATIC) != 0:\n1716:         xfrc_applied[world, mjc_body] = wp.spatial_vector(wp.vec3(0.0, 0.0, 0.0), wp.vec3(0.0, 0.0, 0.0))\n1717:         return\n1718: \n1719:     f = body_f[newton_body]"
+        },
+        {
+          "start_line": 1725,
+          "text": "1725:         gravcomp = body_gravcomp[world, mjc_body]\n1726:         v += body_mass[newton_body] * (1.0 - gravcomp) * (gravity[gravity_world] - gravity[world])\n1727: \n1728:     xfrc_applied[world, mjc_body] = wp.spatial_vector(v, w)\n1729: \n1730: \n1731: @wp.kernel"
+        },
+        {
+          "start_line": 1788,
+          "text": "1788:     body_free_qd_start: wp.array[wp.int32],\n1789:     joint_f: wp.array[wp.float32],\n1790:     # outputs\n1791:     xfrc_applied: wp.array2d[wp.spatial_vector],\n1792: ):\n1793:     worldid, mjc_body = wp.tid()\n1794:     newton_body = mjc_body_to_newton[worldid, mjc_body]"
+        },
+        {
+          "start_line": 1802,
+          "text": "1802:     v = wp.vec3(joint_f[qd_start + 0], joint_f[qd_start + 1], joint_f[qd_start + 2])\n1803:     w = wp.vec3(joint_f[qd_start + 3], joint_f[qd_start + 4], joint_f[qd_start + 5])\n1804:     xfrc = xfrc_applied[worldid, mjc_body]\n1805:     xfrc_applied[worldid, mjc_body] = wp.spatial_vector(\n1806:         wp.spatial_top(xfrc) + v,\n1807:         wp.spatial_bottom(xfrc) + w,\n1808:     )"
+        },
+        {
+          "start_line": 2120,
+          "text": "2120:     newton_actuator_ctrlrange: wp.array[wp.vec2],\n2121:     newton_actuator_forcerange: wp.array[wp.vec2],\n2122:     newton_actuator_actrange: wp.array[wp.vec2],\n2123:     newton_actuator_gear: wp.array[wp.spatial_vector],\n2124:     newton_actuator_cranklength: wp.array[float],\n2125:     actuators_per_world: wp.int32,\n2126:     # outputs"
+        },
+        {
+          "start_line": 2130,
+          "text": "2130:     actuator_ctrlrange: wp.array2d[wp.vec2],\n2131:     actuator_forcerange: wp.array2d[wp.vec2],\n2132:     actuator_actrange: wp.array2d[wp.vec2],\n2133:     actuator_gear: wp.array2d[wp.spatial_vector],\n2134:     actuator_cranklength: wp.array2d[float],\n2135: ):\n2136:     \"\"\"Update MuJoCo actuator properties for CTRL_DIRECT actuators from Newton custom attributes."
+        },
+        {
+          "start_line": 2956,
+          "text": "2956:     body_rootid: wp.array[int],\n2957:     xipos_in: wp.array2d[wp.vec3],\n2958:     subtree_com_in: wp.array2d[wp.vec3],\n2959:     cvel_in: wp.array2d[wp.spatial_vector],\n2960:     cacc_in: wp.array2d[wp.spatial_vector],\n2961:     worldid: int,\n2962:     bodyid: int,\n2963: ) -> wp.vec3:"
+        },
+        {
+          "start_line": 2981,
+          "text": "2981:     mjw_gravity: wp.array[wp.vec3],\n2982:     mjw_xipos: wp.array2d[wp.vec3],\n2983:     mjw_subtree_com: wp.array2d[wp.vec3],\n2984:     mjw_cacc: wp.array2d[wp.spatial_vector],\n2985:     mjw_cvel: wp.array2d[wp.spatial_vector],\n2986:     mjw_cint: wp.array2d[wp.spatial_vector],\n2987:     # outputs\n2988:     body_qdd: wp.array[wp.spatial_vector],\n2989:     body_parent_f: wp.array[wp.spatial_vector],\n2990: ):\n2991:     \"\"\"Update RNE-computed rigid forces from mj_warp com-based forces.\"\"\"\n2992:     world, mjc_body = wp.tid()"
+        },
+        {
+          "start_line": 3006,
+          "text": "3006:             world,\n3007:             mjc_body,\n3008:         )\n3009:         body_qdd[newton_body] = wp.spatial_vector(qdd_lin + mjw_gravity[world], wp.spatial_top(cacc))\n3010: \n3011:     if body_parent_f:\n3012:         cint = mjw_cint[world, mjc_body]"
+        },
+        {
+          "start_line": 3015,
+          "text": "3015: \n3016:         offset = mjw_xipos[world, mjc_body] - mjw_subtree_com[world, mjw_body_rootid[mjc_body]]\n3017: \n3018:         body_parent_f[newton_body] = wp.spatial_vector(parent_f_lin, parent_f_ang - wp.cross(offset, parent_f_lin))\n3019: \n3020: \n3021: @wp.kernel"
+        },
+        {
+          "start_line": 3171,
+          "text": "3171:     qfrc_applied: wp.array2d[wp.float32],\n3172:     ctrl: wp.array2d[wp.float32],\n3173:     act: wp.array2d[wp.float32],\n3174:     xfrc_applied: wp.array2d[wp.spatial_vector],\n3175: ):\n3176:     \"\"\"Zero the persistent MuJoCo buffers for the worlds selected by ``world_mask``.\n3177: "
+        },
+        {
+          "start_line": 3192,
+          "text": "3192:     if i < act.shape[1]:\n3193:         act[worldid, i] = 0.0\n3194:     if i < xfrc_applied.shape[1]:\n3195:         xfrc_applied[worldid, i] = wp.spatial_vector(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)\n3196: \n3197: \n3198: @wp.kernel(enable_backward=False)"
+        }
+      ]
+    },
+    {
+      "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py",
+      "sha256": "a2f2466ad9d35e32f6e87f12bbaa0e08d18295f4e95b1c059c805d2ff4091178",
+      "excerpts": [
+        {
+          "start_line": 5008,
+          "text": "5008:             single_world_template = len(mj_data.qfrc_applied) < effective_dof_count\n5009:             ctrl = wp.zeros((1, len(mj_data.ctrl)), dtype=wp.float32, device=model.device)\n5010:             qfrc = wp.zeros((1, len(mj_data.qfrc_applied)), dtype=wp.float32, device=model.device)\n5011:             xfrc = wp.zeros((1, len(mj_data.xfrc_applied)), dtype=wp.spatial_vector, device=model.device)\n5012:             nworld = 1\n5013:         joints_per_world = (\n5014:             model.joint_count // model.world_count if single_world_template else model.joint_count // nworld"
+        },
+        {
+          "start_line": 5540,
+          "text": "5540:                 contacts.rigid_contact_point0,\n5541:                 contacts.rigid_contact_point1,\n5542:                 contacts.rigid_contact_normal,\n5543:                 contacts.force,\n5544:             ],\n5545:             device=self.model.device,\n5546:         )"
+        },
+        {
+          "start_line": 8534,
+          "text": "8534:         \"\"\"\n8535:         ref_qd = wp.zeros(model.joint_dof_count, dtype=wp.float32, device=model.device)\n8536:         ref_body_q = wp.zeros(model.body_count, dtype=wp.transform, device=model.device)\n8537:         ref_body_qd = wp.zeros(model.body_count, dtype=wp.spatial_vector, device=model.device)\n8538: \n8539:         ref_state = State()\n8540:         ref_state.body_q = ref_body_q"
+        },
+        {
+          "start_line": 9610,
+          "text": "9610:         show_left_ui: bool = True,\n9611:         show_right_ui: bool = True,\n9612:         show_contact_points: bool = True,\n9613:         show_contact_forces: bool = False,\n9614:         show_transparent_geoms: bool = True,\n9615:     ):\n9616:         \"\"\"Create and synchronize the MuJoCo viewer."
+        },
+        {
+          "start_line": 9628,
+          "text": "9628:             show_left_ui: Whether to show the left UI.\n9629:             show_right_ui: Whether to show the right UI.\n9630:             show_contact_points: Whether to show contact points.\n9631:             show_contact_forces: Whether to show contact forces.\n9632:             show_transparent_geoms: Whether to show transparent geoms.\n9633:         \"\"\"\n9634:         if self._viewer is None:"
+        },
+        {
+          "start_line": 9649,
+          "text": "9649:             self._viewer.__enter__()\n9650: \n9651:             self._viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTPOINT] = show_contact_points\n9652:             self._viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_CONTACTFORCE] = show_contact_forces\n9653:             self._viewer.opt.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = show_transparent_geoms\n9654: \n9655:         if self._viewer.is_running():"
+        }
+      ]
+    }
+  ]
+}

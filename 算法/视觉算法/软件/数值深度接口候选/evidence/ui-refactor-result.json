@@ -1,0 +1,4022 @@
+{
+  "recorded_at_host_utc": "2026-10-21T02:39:07.937337+00:00",
+  "timezone": "Asia/Shanghai",
+  "board_wall_clock_trusted": false,
+  "scope": "UI refactor, removal of extra visualizations, and ISP-direct 640x360 normal capture",
+  "routes": [
+    [
+      "/measure",
+      302,
+      "/?view=depth"
+    ],
+    [
+      "/pointcloud",
+      302,
+      "/?view=depth"
+    ],
+    [
+      "/far",
+      302,
+      "/?view=depth"
+    ],
+    [
+      "/stereo4k",
+      302,
+      "/?view=raw"
+    ],
+    [
+      "/measure4k",
+      302,
+      "/?view=raw"
+    ],
+    [
+      "/measure.jpg",
+      410
+    ],
+    [
+      "/pointcloud.bin",
+      410
+    ],
+    [
+      "/range4k",
+      410
+    ],
+    [
+      "/far.jpg",
+      410
+    ],
+    [
+      "/far/status",
+      410
+    ],
+    [
+      "/far/point",
+      410
+    ],
+    [
+      "/npu.jpg",
+      410
+    ],
+    [
+      "/video/0.mp4",
+      410
+    ],
+    [
+      "/video/1.mp4",
+      410
+    ],
+    [
+      "POST /measure-point",
+      410
+    ],
+    [
+      "POST /measure-point4k",
+      410
+    ],
+    [
+      "POST /far/point",
+      410
+    ],
+    [
+      "/",
+      200,
+      "text/html; charset=utf-8"
+    ],
+    [
+      "/?view=raw",
+      200,
+      "text/html; charset=utf-8"
+    ],
+    [
+      "/hardware",
+      200,
+      "text/html; charset=utf-8"
+    ],
+    [
+      "/calibration",
+      200,
+      "text/html; charset=utf-8"
+    ],
+    [
+      "/ui.css",
+      200,
+      "text/css; charset=utf-8"
+    ],
+    [
+      "/ui.js",
+      200,
+      "application/javascript; charset=utf-8"
+    ]
+  ],
+  "deployed_sha256": {
+    "server.py": "5fe6d12e2f747676fec30af84977c8ac5d793caeb7168ee4f200f4240df4d91a",
+    "index.html": "f8abb17ebf6f986788cd82ed8ebefab98db46cc1e4d0c4ff07fa5f4d8005a0b3",
+    "hardware.html": "f9ad18d594092c17d07c9ed0e0a953ae505b0525a98c045af86316d235bac765",
+    "calibration.html": "f15533ecb34a1493ec6554ec763d1724c8af35027a568c4dcc51e8f76e800810",
+    "ui.css": "552c8ffe1d5993ba501aec3d7a1c725ec3e8351b03683386779f6447c688a000",
+    "ui.js": "4309e04b2517765c4c8506392b4cd380a1bb92a7207d76843780d75d099bef0c",
+    "fast_depth.py": "df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4",
+    "depth_wire.py": "c99a2fec72160ac4cfe9a2cc18752064df2309b832f6c9a4ba02d9e20a0d4dfa",
+    "calibration.npz": "fc0ee7b44fe56c397d0abab6cf94140d85c5017793c13656cbeb09a2ed9c2a1e"
+  },
+  "removed_files": [
+    "measure.html",
+    "pointcloud_stream.html",
+    "pointcloud_viewer.html",
+    "far.html",
+    "stereo4k.html"
+  ],
+  "rollback": {
+    "board": "/opt/rk-lightstereo/backups/direct-single-20261021-1034",
+    "local": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\视觉算法\\备份\\直出与单深度前_20261021_1034\\direct-single-20261021-1034.tar.gz",
+    "sha256": "a5823532546e4c47a427f90e1859dd5bf47619f2b71c9cfa6aaa14ea7448973f",
+    "exercised": false
+  },
+  "tests": {
+    "local_suite": {
+      "passed": 71,
+      "seconds": 5.484
+    },
+    "static_pages": [
+      {
+        "file": "index.html",
+        "unique_ids": 43,
+        "scripts_parsed": 1
+      },
+      {
+        "file": "hardware.html",
+        "unique_ids": 24,
+        "scripts_parsed": 1
+      },
+      {
+        "file": "calibration.html",
+        "unique_ids": 41,
+        "scripts_parsed": 1
+      }
+    ],
+    "test_source_sha256": {
+      "test_depth_adapter.py": "7b8ec6cc9f4342093d1a72c007746caa0a373c52cf9bc2c30652b09c7f3f2f52",
+      "test_depth_benchmark.py": "e3fb3b828edd6640151e6007f6323b455b3fddb8b9aa604f3e5daeb9f7b1e163",
+      "test_depth_contract_acceptance.py": "66c57940db35c7e249db26ca142691fe3df9588696f42fe4da696cd1758fb248",
+      "test_depth_http_transport.py": "59592647d5cc1842f08ae611a19661b3382354591c41aca44fd29fe4578d9f21",
+      "test_depth_npu_benchmark.py": "d159ed3be1ff264101c16b020617c5c3d90308d42c2d27438b4160641cf7d6dd",
+      "test_depth_producer_http.py": "eef71040a83db33fe9a412906160d8bcc790b98a983825ab08017cdc48baa0e6",
+      "test_far_routes.py": "40605663a60171517aef16d960be884067e1a8a30d9a9983f5432a186a77552c",
+      "test_native_roi.py": "717e996abcaeabb74847791e43c63712c3ebcd89426e42b70da107b8b5e58436",
+      "test_pointcloud_geometry.py": "574574417cb285c817f642d672d1ebf77a7f67758fec4de8e9cada9501dcbade",
+      "test_roi_depth.py": "8d0d4948bb574f97efd1e909af9fe77cc06320b525ca649078036ad8cb55a5fc"
+    }
+  },
+  "pipeline": {
+    "service": "MainPID=631014\u001b[m\n\nNRestarts=0\u001b[m\n\nActiveState=active\u001b[m\n\n\n\u001b[K",
+    "left_format": "Format Video Capture Multiplanar:\n\n\tWidth/Height      : 640/360\n\n\tPixel Format      : 'NM12' (Y/CbCr 4:2:0 (N-C))\n\n\tField             : None\n\n\tNumber of planes  : 2\n\n\tFlags             : \n\n\tColorspace        : SMPTE 170M\n\n\tTransfer Function : Rec. 709\n\n\tYCbCr/HSV Encoding: ITU-R 601\n\n\tQuantization      : Full Range\n\n\tPlane 0           :\n\n\t   Bytes per Line : 640\n\n\t   Size Image     : 230400\n\n\tPlane 1           :\n\n\t   Bytes per Line : 640\n\n\t   Size Image     : 115200",
+    "right_format": "Format Video Capture Multiplanar:\n\n\tWidth/Height      : 640/360\n\n\tPixel Format      : 'NM12' (Y/CbCr 4:2:0 (N-C))\n\n\tField             : None\n\n\tNumber of planes  : 2\n\n\tFlags             : \n\n\tColorspace        : SMPTE 170M\n\n\tTransfer Function : Rec. 709\n\n\tYCbCr/HSV Encoding: ITU-R 601\n\n\tQuantization      : Full Range\n\n\tPlane 0           :\n\n\t   Bytes per Line : 640\n\n\t   Size Image     : 230400\n\n\tPlane 1           :\n\n\t   Bytes per Line : 640\n\n\t   Size Image     : 115200",
+    "sensor_format": "ioctl: VIDIOC_SUBDEV_G_FMT (pad=0)\n\n\tWidth/Height      : 3864/2192\n\n\tMediabus Code     : 0x300e (MEDIA_BUS_FMT_SGBRG10_1X10)\n\n\tField             : None\n\n\tColorspace        : Default\n\n\tTransfer Function : Default (maps to Rec. 709)\n\n\tYCbCr/HSV Encoding: Default (maps to ITU-R 601)\n\n\tQuantization      : Default (maps to Full Range)",
+    "sensor_note": "Sensor stays at native 3864x2192 Bayer; ISP mainpaths deliver 640x360 NV12. No claim of native low-resolution sensor mode.",
+    "continuous_4k_encoder": false,
+    "primary_depth_producer_fps": 27.295964944317802,
+    "elapsed_s": 10.953999999997905,
+    "snapshots": [
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.4,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4614503816793893,
+        "frames": 6667,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.498
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.562,
+        "depth_p95_m": 4.131,
+        "depth_median_m": 2.029,
+        "process_ms": 32.4,
+        "stage_ms": {
+          "rectify": 11.3,
+          "resize": 8.8,
+          "remap_rotate_crop": 2.4,
+          "match": 16.0,
+          "inference_forward": 15.94,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 2.2,
+          "colorize": 1.8,
+          "depth_filter_color": 5.1,
+          "jpeg_encode": 3.72
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5352735368956743,
+          "consistent_fraction": 0.4614503816793893,
+          "textured_fraction": 0.4614503816793893,
+          "range_fraction": 0.4614503816793893,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 240035645603,
+        "depth_source_age_ms": 63,
+        "jpeg_encode_ms": 3.72,
+        "jpeg_bytes": 28897,
+        "depth_publish_ms": 5.23,
+        "depth_seq": 6667,
+        "age_ms": 58,
+        "capture_ready": false,
+        "preview_age_ms": 177861,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.01
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.32
+        ],
+        "camera_age_ms": [
+          15,
+          27
+        ],
+        "camera_pts_ns": [
+          [
+            239968980477,
+            240002313186,
+            240035645603,
+            240068988769,
+            240102313185,
+            240135647769
+          ],
+          [
+            239968945185,
+            240002228477,
+            240035560603,
+            240068896477,
+            240102226602,
+            240135561186
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.25,
+          0.28
+        ],
+        "camera_copy_ms_p50": [
+          0.23,
+          0.3
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10367961.0,
+          10371153.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.0,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4658078880407125,
+        "frames": 6684,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.294
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.511,
+        "depth_p95_m": 4.057,
+        "depth_median_m": 2.011,
+        "process_ms": 45.1,
+        "stage_ms": {
+          "rectify": 13.6,
+          "resize": 9.7,
+          "remap_rotate_crop": 3.8,
+          "match": 21.6,
+          "inference_forward": 21.59,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.5,
+          "colorize": 6.7,
+          "depth_filter_color": 9.9,
+          "jpeg_encode": 1.4
+        },
+        "filter_stats": {
+          "matched_fraction": 0.539026717557252,
+          "consistent_fraction": 0.4658078880407125,
+          "textured_fraction": 0.4658078880407125,
+          "range_fraction": 0.4658078880407125,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 240635647185,
+        "depth_source_age_ms": 81,
+        "jpeg_encode_ms": 1.4,
+        "jpeg_bytes": 29467,
+        "depth_publish_ms": 2.45,
+        "depth_seq": 6684,
+        "age_ms": 1,
+        "capture_ready": false,
+        "preview_age_ms": 178418,
+        "capture_skew_ms": 0.04,
+        "camera_capture_fps": [
+          30.01,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          5,
+          17
+        ],
+        "camera_pts_ns": [
+          [
+            240535686352,
+            240569018185,
+            240602321352,
+            240635647185,
+            240668980060,
+            240702316769
+          ],
+          [
+            240535601935,
+            240568933186,
+            240602227478,
+            240635561186,
+            240668933602,
+            240702274894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.18,
+          0.76
+        ],
+        "camera_copy_ms_p50": [
+          0.18,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10370256.0,
+          10367609.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.5,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4488549618320611,
+        "frames": 6699,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.359
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.546,
+        "depth_p95_m": 4.131,
+        "depth_median_m": 2.029,
+        "process_ms": 29.9,
+        "stage_ms": {
+          "rectify": 3.2,
+          "resize": 2.1,
+          "remap_rotate_crop": 1.0,
+          "match": 16.0,
+          "inference_forward": 15.99,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 7.9,
+          "colorize": 1.3,
+          "depth_filter_color": 10.7,
+          "jpeg_encode": 4.06
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5218193384223918,
+          "consistent_fraction": 0.4488549618320611,
+          "textured_fraction": 0.4488549618320611,
+          "range_fraction": 0.4488549618320611,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 241168979894,
+        "depth_source_age_ms": 65,
+        "jpeg_encode_ms": 4.06,
+        "jpeg_bytes": 28461,
+        "depth_publish_ms": 5.62,
+        "depth_seq": 6699,
+        "age_ms": 22,
+        "capture_ready": false,
+        "preview_age_ms": 178960,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          14,
+          27
+        ],
+        "camera_pts_ns": [
+          [
+            241068980186,
+            241102312310,
+            241135647352,
+            241168979894,
+            241202314060,
+            241235649769
+          ],
+          [
+            241068894185,
+            241102231185,
+            241135559603,
+            241168894769,
+            241202226894,
+            241235563311
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.18,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.21,
+          0.25
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10367819.0,
+          10367847.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 30.5,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4742684478371501,
+        "frames": 6717,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.256
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.512,
+        "depth_p95_m": 3.918,
+        "depth_median_m": 2.011,
+        "process_ms": 25.1,
+        "stage_ms": {
+          "rectify": 3.1,
+          "resize": 2.1,
+          "remap_rotate_crop": 0.9,
+          "match": 13.4,
+          "inference_forward": 13.4,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 5.9,
+          "colorize": 1.6,
+          "depth_filter_color": 8.6,
+          "jpeg_encode": 0.91
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5483142493638676,
+          "consistent_fraction": 0.4742684478371501,
+          "textured_fraction": 0.4742684478371501,
+          "range_fraction": 0.4742684478371501,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 241768980769,
+        "depth_source_age_ms": 50,
+        "jpeg_encode_ms": 0.91,
+        "jpeg_bytes": 30165,
+        "depth_publish_ms": 1.71,
+        "depth_seq": 6717,
+        "age_ms": 2,
+        "capture_ready": false,
+        "preview_age_ms": 179521,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          3,
+          21
+        ],
+        "camera_pts_ns": [
+          [
+            241635648061,
+            241668978894,
+            241702318769,
+            241735646477,
+            241768980769,
+            241802313477
+          ],
+          [
+            241635561186,
+            241668894186,
+            241702230061,
+            241735559310,
+            241768893894,
+            241802227936
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.31,
+          0.26
+        ],
+        "camera_copy_ms_p50": [
+          0.2,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368078.0,
+          10367995.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 29.9,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.46269083969465646,
+        "frames": 6733,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.448
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.3,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.539,
+        "depth_p95_m": 4.131,
+        "depth_median_m": 2.029,
+        "process_ms": 18.7,
+        "stage_ms": {
+          "rectify": 2.9,
+          "resize": 1.9,
+          "remap_rotate_crop": 0.9,
+          "match": 11.4,
+          "inference_forward": 11.37,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 2.2,
+          "colorize": 1.5,
+          "depth_filter_color": 4.4,
+          "jpeg_encode": 0.74
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5321564885496183,
+          "consistent_fraction": 0.46269083969465646,
+          "textured_fraction": 0.46269083969465646,
+          "range_fraction": 0.46269083969465646,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 242302315519,
+        "depth_source_age_ms": 50,
+        "jpeg_encode_ms": 0.74,
+        "jpeg_bytes": 29840,
+        "depth_publish_ms": 1.06,
+        "depth_seq": 6733,
+        "age_ms": 28,
+        "capture_ready": false,
+        "preview_age_ms": 180079,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          10,
+          46
+        ],
+        "camera_pts_ns": [
+          [
+            242202313185,
+            242235650894,
+            242268979477,
+            242302315519,
+            242335647477,
+            242368986478
+          ],
+          [
+            242168899478,
+            242202227894,
+            242235561186,
+            242268932602,
+            242302228478,
+            242335560769
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.28,
+          0.26
+        ],
+        "camera_copy_ms_p50": [
+          0.19,
+          0.25
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10367588.0,
+          10368334.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.8,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4498409669211196,
+        "frames": 6749,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.376
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.527,
+        "depth_p95_m": 4.057,
+        "depth_median_m": 2.029,
+        "process_ms": 17.0,
+        "stage_ms": {
+          "rectify": 3.0,
+          "resize": 1.9,
+          "remap_rotate_crop": 1.0,
+          "match": 9.3,
+          "inference_forward": 9.26,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.9,
+          "colorize": 1.8,
+          "depth_filter_color": 4.7,
+          "jpeg_encode": 0.78
+        },
+        "filter_stats": {
+          "matched_fraction": 0.528912213740458,
+          "consistent_fraction": 0.4498409669211196,
+          "textured_fraction": 0.4498409669211196,
+          "range_fraction": 0.4498409669211196,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 242868980477,
+        "depth_source_age_ms": 48,
+        "jpeg_encode_ms": 0.78,
+        "jpeg_bytes": 28204,
+        "depth_publish_ms": 1.12,
+        "depth_seq": 6749,
+        "age_ms": 12,
+        "capture_ready": false,
+        "preview_age_ms": 180628,
+        "capture_skew_ms": 0.1,
+        "camera_capture_fps": [
+          30.0,
+          29.99
+        ],
+        "camera_pts_interval_ms": [
+          33.34,
+          33.34
+        ],
+        "camera_age_ms": [
+          15,
+          28
+        ],
+        "camera_pts_ns": [
+          [
+            242735687769,
+            242768979894,
+            242802353478,
+            242835646478,
+            242868980477,
+            242902365477
+          ],
+          [
+            242735569894,
+            242768894769,
+            242802266186,
+            242835560478,
+            242868895477,
+            242902269477
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.31,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.28,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10367313.0,
+          10365953.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 29.2,
+        "pair_skew_ms": 0.08,
+        "valid_fraction": 0.4577608142493639,
+        "frames": 6766,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.36
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.506,
+        "depth_p95_m": 4.057,
+        "depth_median_m": 2.029,
+        "process_ms": 18.8,
+        "stage_ms": {
+          "rectify": 2.8,
+          "resize": 1.9,
+          "remap_rotate_crop": 0.9,
+          "match": 11.9,
+          "inference_forward": 11.9,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.6,
+          "colorize": 1.4,
+          "depth_filter_color": 4.1,
+          "jpeg_encode": 0.9
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5428435114503817,
+          "consistent_fraction": 0.4577608142493639,
+          "textured_fraction": 0.4577608142493639,
+          "range_fraction": 0.4577608142493639,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 243435646894,
+        "depth_source_age_ms": 34,
+        "jpeg_encode_ms": 0.9,
+        "jpeg_bytes": 29464,
+        "depth_publish_ms": 1.9,
+        "depth_seq": 6766,
+        "age_ms": 1,
+        "capture_ready": false,
+        "preview_age_ms": 181171,
+        "capture_skew_ms": 0.08,
+        "camera_capture_fps": [
+          30.0,
+          30.01
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.32
+        ],
+        "camera_age_ms": [
+          37,
+          4
+        ],
+        "camera_pts_ns": [
+          [
+            243268982769,
+            243302318186,
+            243335646477,
+            243368980769,
+            243402313769,
+            243435646894
+          ],
+          [
+            243302272894,
+            243335560477,
+            243368900185,
+            243402229477,
+            243435563769,
+            243468895894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.31,
+          0.22
+        ],
+        "camera_copy_ms_p50": [
+          0.22,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368158.0,
+          10370717.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 26.4,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.45712468193384226,
+        "frames": 6778,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.527
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.557,
+        "depth_p95_m": 4.208,
+        "depth_median_m": 2.029,
+        "process_ms": 20.3,
+        "stage_ms": {
+          "rectify": 2.9,
+          "resize": 2.0,
+          "remap_rotate_crop": 0.9,
+          "match": 12.8,
+          "inference_forward": 12.81,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.9,
+          "colorize": 1.6,
+          "depth_filter_color": 4.6,
+          "jpeg_encode": 0.89
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5326335877862596,
+          "consistent_fraction": 0.45712468193384226,
+          "textured_fraction": 0.45712468193384226,
+          "range_fraction": 0.45712468193384226,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 243968980769,
+        "depth_source_age_ms": 47,
+        "jpeg_encode_ms": 0.89,
+        "jpeg_bytes": 28943,
+        "depth_publish_ms": 1.3,
+        "depth_seq": 6778,
+        "age_ms": 12,
+        "capture_ready": false,
+        "preview_age_ms": 181728,
+        "capture_skew_ms": 0.08,
+        "camera_capture_fps": [
+          30.01,
+          30.01
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          15,
+          28
+        ],
+        "camera_pts_ns": [
+          [
+            243835688935,
+            243868980186,
+            243902313769,
+            243935647185,
+            243968980769,
+            244002314186
+          ],
+          [
+            243835603269,
+            243868896186,
+            243902228478,
+            243935561769,
+            243968894186,
+            244002230769
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.21,
+          0.23
+        ],
+        "camera_copy_ms_p50": [
+          0.23,
+          0.26
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10370577.0,
+          10370437.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 26.2,
+        "pair_skew_ms": 0.08,
+        "valid_fraction": 0.4542620865139949,
+        "frames": 6795,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.402
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.3,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.49,
+        "depth_p95_m": 3.918,
+        "depth_median_m": 2.029,
+        "process_ms": 18.7,
+        "stage_ms": {
+          "rectify": 3.0,
+          "resize": 2.0,
+          "remap_rotate_crop": 0.9,
+          "match": 11.8,
+          "inference_forward": 11.74,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.7,
+          "colorize": 1.3,
+          "depth_filter_color": 4.0,
+          "jpeg_encode": 0.78
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5340648854961833,
+          "consistent_fraction": 0.4542620865139949,
+          "textured_fraction": 0.4542620865139949,
+          "range_fraction": 0.4542620865139949,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 244535646477,
+        "depth_source_age_ms": 43,
+        "jpeg_encode_ms": 0.78,
+        "jpeg_bytes": 29317,
+        "depth_publish_ms": 1.11,
+        "depth_seq": 6795,
+        "age_ms": 10,
+        "capture_ready": false,
+        "preview_age_ms": 182288,
+        "capture_skew_ms": 0.13,
+        "camera_capture_fps": [
+          29.99,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.34,
+          33.33
+        ],
+        "camera_age_ms": [
+          9,
+          21
+        ],
+        "camera_pts_ns": [
+          [
+            244402313186,
+            244435647186,
+            244468981060,
+            244502313186,
+            244535646477,
+            244569022477
+          ],
+          [
+            244402228894,
+            244435563477,
+            244468894311,
+            244502227477,
+            244535561478,
+            244568897186
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.1,
+          0.25
+        ],
+        "camera_copy_ms_p50": [
+          0.15,
+          0.26
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10365349.0,
+          10367899.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 29.5,
+        "pair_skew_ms": 0.08,
+        "valid_fraction": 0.45524809160305346,
+        "frames": 6811,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.277
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.538,
+        "depth_p95_m": 3.918,
+        "depth_median_m": 2.029,
+        "process_ms": 23.0,
+        "stage_ms": {
+          "rectify": 3.3,
+          "resize": 2.1,
+          "remap_rotate_crop": 1.2,
+          "match": 15.9,
+          "inference_forward": 15.86,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.6,
+          "colorize": 1.3,
+          "depth_filter_color": 3.8,
+          "jpeg_encode": 0.73
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5310750636132315,
+          "consistent_fraction": 0.45524809160305346,
+          "textured_fraction": 0.45524809160305346,
+          "range_fraction": 0.45524809160305346,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 245068981061,
+        "depth_source_age_ms": 55,
+        "jpeg_encode_ms": 0.73,
+        "jpeg_bytes": 29128,
+        "depth_publish_ms": 1.06,
+        "depth_seq": 6811,
+        "age_ms": 3,
+        "capture_ready": false,
+        "preview_age_ms": 182827,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          29.99,
+          29.99
+        ],
+        "camera_pts_interval_ms": [
+          33.34,
+          33.34
+        ],
+        "camera_age_ms": [
+          14,
+          27
+        ],
+        "camera_pts_ns": [
+          [
+            244935648477,
+            244968980769,
+            245002322186,
+            245035648061,
+            245068981061,
+            245102352769
+          ],
+          [
+            244935563478,
+            244968894769,
+            245002235311,
+            245035560186,
+            245068902477,
+            245102267769
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.2,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.2,
+          0.25
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10365660.0,
+          10365660.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 30.2,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.45655216284987277,
+        "frames": 6827,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.308
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.3,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.54,
+        "depth_p95_m": 3.918,
+        "depth_median_m": 2.029,
+        "process_ms": 20.9,
+        "stage_ms": {
+          "rectify": 2.7,
+          "resize": 1.9,
+          "remap_rotate_crop": 0.8,
+          "match": 12.6,
+          "inference_forward": 12.58,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 3.1,
+          "colorize": 1.5,
+          "depth_filter_color": 5.6,
+          "jpeg_encode": 1.21
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5367684478371502,
+          "consistent_fraction": 0.45655216284987277,
+          "textured_fraction": 0.45655216284987277,
+          "range_fraction": 0.45655216284987277,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 245602316478,
+        "depth_source_age_ms": 52,
+        "jpeg_encode_ms": 1.21,
+        "jpeg_bytes": 29083,
+        "depth_publish_ms": 1.59,
+        "depth_seq": 6827,
+        "age_ms": 21,
+        "capture_ready": false,
+        "preview_age_ms": 183375,
+        "capture_skew_ms": 0.08,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          9,
+          42
+        ],
+        "camera_pts_ns": [
+          [
+            245502314061,
+            245535679894,
+            245569019477,
+            245602316478,
+            245635646477,
+            245668980186
+          ],
+          [
+            245468894185,
+            245502228185,
+            245535601769,
+            245568933769,
+            245602229477,
+            245635561769
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.23,
+          0.23
+        ],
+        "camera_copy_ms_p50": [
+          0.22,
+          0.26
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368034.0,
+          10367943.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 30.5,
+        "pair_skew_ms": 0.08,
+        "valid_fraction": 0.4590330788804071,
+        "frames": 6844,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.443
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.533,
+        "depth_p95_m": 4.131,
+        "depth_median_m": 2.047,
+        "process_ms": 17.8,
+        "stage_ms": {
+          "rectify": 2.4,
+          "resize": 1.6,
+          "remap_rotate_crop": 0.7,
+          "match": 11.5,
+          "inference_forward": 11.46,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.6,
+          "colorize": 1.4,
+          "depth_filter_color": 4.0,
+          "jpeg_encode": 0.88
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5363549618320611,
+          "consistent_fraction": 0.4590330788804071,
+          "textured_fraction": 0.4590330788804071,
+          "range_fraction": 0.4590330788804071,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 246168980186,
+        "depth_source_age_ms": 34,
+        "jpeg_encode_ms": 0.88,
+        "jpeg_bytes": 29069,
+        "depth_publish_ms": 1.26,
+        "depth_seq": 6844,
+        "age_ms": 31,
+        "capture_ready": false,
+        "preview_age_ms": 183934,
+        "capture_skew_ms": 0.08,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          21,
+          0
+        ],
+        "camera_pts_ns": [
+          [
+            246035648769,
+            246069024602,
+            246102314060,
+            246135650186,
+            246168980186,
+            246202315352
+          ],
+          [
+            246068912310,
+            246102227477,
+            246135561186,
+            246168895478,
+            246202231061,
+            246235561644
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.18,
+          0.43
+        ],
+        "camera_copy_ms_p50": [
+          0.22,
+          0.27
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368005.0,
+          10369078.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.5,
+        "pair_skew_ms": 0.12,
+        "valid_fraction": 0.46186386768447835,
+        "frames": 6859,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.363
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.544,
+        "depth_p95_m": 3.986,
+        "depth_median_m": 2.029,
+        "process_ms": 24.5,
+        "stage_ms": {
+          "rectify": 5.4,
+          "resize": 3.0,
+          "remap_rotate_crop": 2.3,
+          "match": 13.2,
+          "inference_forward": 13.22,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 2.1,
+          "colorize": 2.5,
+          "depth_filter_color": 5.9,
+          "jpeg_encode": 0.77
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5400127226463104,
+          "consistent_fraction": 0.46186386768447835,
+          "textured_fraction": 0.46186386768447835,
+          "range_fraction": 0.46186386768447835,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 246735686894,
+        "depth_source_age_ms": 48,
+        "jpeg_encode_ms": 0.77,
+        "jpeg_bytes": 29557,
+        "depth_publish_ms": 1.12,
+        "depth_seq": 6859,
+        "age_ms": 8,
+        "capture_ready": false,
+        "preview_age_ms": 184492,
+        "capture_skew_ms": 0.1,
+        "camera_capture_fps": [
+          29.99,
+          29.99
+        ],
+        "camera_pts_interval_ms": [
+          33.34,
+          33.34
+        ],
+        "camera_age_ms": [
+          12,
+          25
+        ],
+        "camera_pts_ns": [
+          [
+            246602313186,
+            246635646186,
+            246668981185,
+            246702314769,
+            246735686894,
+            246769036186
+          ],
+          [
+            246602224227,
+            246635561477,
+            246668901186,
+            246702228477,
+            246735569185,
+            246768939185
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.25,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.25,
+          0.28
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10364497.0,
+          10364997.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.2,
+        "pair_skew_ms": 0.08,
+        "valid_fraction": 0.4568702290076336,
+        "frames": 6875,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.238
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.52,
+        "depth_p95_m": 3.851,
+        "depth_median_m": 2.029,
+        "process_ms": 19.8,
+        "stage_ms": {
+          "rectify": 2.9,
+          "resize": 1.9,
+          "remap_rotate_crop": 0.9,
+          "match": 12.6,
+          "inference_forward": 12.61,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 2.1,
+          "colorize": 1.3,
+          "depth_filter_color": 4.3,
+          "jpeg_encode": 0.99
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5371819338422392,
+          "consistent_fraction": 0.4568702290076336,
+          "textured_fraction": 0.4568702290076336,
+          "range_fraction": 0.4568702290076336,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 247269020060,
+        "depth_source_age_ms": 44,
+        "jpeg_encode_ms": 0.99,
+        "jpeg_bytes": 28466,
+        "depth_publish_ms": 2.86,
+        "depth_seq": 6875,
+        "age_ms": 3,
+        "capture_ready": false,
+        "preview_age_ms": 185019,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.34
+        ],
+        "camera_age_ms": [
+          6,
+          19
+        ],
+        "camera_pts_ns": [
+          [
+            247135690769,
+            247168982227,
+            247202355894,
+            247235686186,
+            247269020060,
+            247302359186
+          ],
+          [
+            247135595602,
+            247168896936,
+            247202268477,
+            247235600894,
+            247268936061,
+            247302271894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.39,
+          0.23
+        ],
+        "camera_copy_ms_p50": [
+          0.25,
+          0.23
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10367891.0,
+          10367401.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.0,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4629134860050891,
+        "frames": 6888,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.251
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.507,
+        "depth_p95_m": 3.851,
+        "depth_median_m": 2.047,
+        "process_ms": 50.9,
+        "stage_ms": {
+          "rectify": 12.6,
+          "resize": 8.8,
+          "remap_rotate_crop": 3.8,
+          "match": 26.5,
+          "inference_forward": 26.52,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 8.7,
+          "colorize": 2.0,
+          "depth_filter_color": 11.7,
+          "jpeg_encode": 0.97
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5411895674300254,
+          "consistent_fraction": 0.4629134860050891,
+          "textured_fraction": 0.4629134860050891,
+          "range_fraction": 0.4629134860050891,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 247735657186,
+        "depth_source_age_ms": 83,
+        "jpeg_encode_ms": 0.97,
+        "jpeg_bytes": 29416,
+        "depth_publish_ms": 1.37,
+        "depth_seq": 6888,
+        "age_ms": 30,
+        "capture_ready": false,
+        "preview_age_ms": 185549,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          3,
+          15
+        ],
+        "camera_pts_ns": [
+          [
+            247668982644,
+            247702313894,
+            247735657186,
+            247768984186,
+            247802314936,
+            247835648061
+          ],
+          [
+            247668898227,
+            247702230185,
+            247735563186,
+            247768946602,
+            247802226894,
+            247835560894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.26,
+          0.31
+        ],
+        "camera_copy_ms_p50": [
+          0.27,
+          0.27
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368078.0,
+          10368249.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 27.7,
+        "pair_skew_ms": 0.12,
+        "valid_fraction": 0.45970101781170486,
+        "frames": 6904,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.296
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.488,
+        "depth_p95_m": 3.986,
+        "depth_median_m": 2.029,
+        "process_ms": 30.3,
+        "stage_ms": {
+          "rectify": 2.5,
+          "resize": 1.6,
+          "remap_rotate_crop": 0.8,
+          "match": 14.9,
+          "inference_forward": 14.93,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 3.7,
+          "colorize": 5.4,
+          "depth_filter_color": 12.9,
+          "jpeg_encode": 0.74
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5375,
+          "consistent_fraction": 0.45970101781170486,
+          "textured_fraction": 0.45970101781170486,
+          "range_fraction": 0.45970101781170486,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 248302364769,
+        "depth_source_age_ms": 59,
+        "jpeg_encode_ms": 0.74,
+        "jpeg_bytes": 29174,
+        "depth_publish_ms": 1.09,
+        "depth_seq": 6904,
+        "age_ms": 17,
+        "capture_ready": false,
+        "preview_age_ms": 186077,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.01
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          31,
+          9
+        ],
+        "camera_pts_ns": [
+          [
+            248168980477,
+            248202353186,
+            248235647186,
+            248268980477,
+            248302364769,
+            248335646894
+          ],
+          [
+            248202268477,
+            248235561311,
+            248268895060,
+            248302245769,
+            248335559310,
+            248368895602
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.28,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.2,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368016.0,
+          10370460.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 29.0,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4611005089058524,
+        "frames": 6918,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.275
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.502,
+        "depth_p95_m": 3.986,
+        "depth_median_m": 2.029,
+        "process_ms": 44.3,
+        "stage_ms": {
+          "rectify": 13.2,
+          "resize": 8.8,
+          "remap_rotate_crop": 4.3,
+          "match": 13.4,
+          "inference_forward": 13.35,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 7.5,
+          "colorize": 6.5,
+          "depth_filter_color": 17.8,
+          "jpeg_encode": 4.16
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5299936386768448,
+          "consistent_fraction": 0.4611005089058524,
+          "textured_fraction": 0.4611005089058524,
+          "range_fraction": 0.4611005089058524,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 248802354894,
+        "depth_source_age_ms": 63,
+        "jpeg_encode_ms": 4.16,
+        "jpeg_bytes": 29594,
+        "depth_publish_ms": 5.68,
+        "depth_seq": 6918,
+        "age_ms": 25,
+        "capture_ready": false,
+        "preview_age_ms": 186596,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          29,
+          17
+        ],
+        "camera_pts_ns": [
+          [
+            248702314478,
+            248735649061,
+            248768980186,
+            248802354894,
+            248835696186,
+            248868980769
+          ],
+          [
+            248702234228,
+            248735563186,
+            248768901186,
+            248802262894,
+            248835606186,
+            248868893894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.28,
+          0.3
+        ],
+        "camera_copy_ms_p50": [
+          0.21,
+          0.28
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368023.0,
+          10368436.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 30.1,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4607824427480916,
+        "frames": 6934,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.361
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.3,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.492,
+        "depth_p95_m": 4.057,
+        "depth_median_m": 2.029,
+        "process_ms": 18.8,
+        "stage_ms": {
+          "rectify": 2.6,
+          "resize": 1.8,
+          "remap_rotate_crop": 0.8,
+          "match": 11.9,
+          "inference_forward": 11.88,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 1.5,
+          "colorize": 1.6,
+          "depth_filter_color": 4.3,
+          "jpeg_encode": 0.95
+        },
+        "filter_stats": {
+          "matched_fraction": 0.532410941475827,
+          "consistent_fraction": 0.4607824427480916,
+          "textured_fraction": 0.4607824427480916,
+          "range_fraction": 0.4607824427480916,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 249335647477,
+        "depth_source_age_ms": 36,
+        "jpeg_encode_ms": 0.95,
+        "jpeg_bytes": 28605,
+        "depth_publish_ms": 2.84,
+        "depth_seq": 6934,
+        "age_ms": 64,
+        "capture_ready": false,
+        "preview_age_ms": 187137,
+        "capture_skew_ms": 0.08,
+        "camera_capture_fps": [
+          30.0,
+          30.0
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          24,
+          4
+        ],
+        "camera_pts_ns": [
+          [
+            249235647769,
+            249268981352,
+            249302314477,
+            249335647477,
+            249368980477,
+            249402312894
+          ],
+          [
+            249268896061,
+            249302230186,
+            249335559602,
+            249368899602,
+            249402234477,
+            249435561478
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.23,
+          0.36
+        ],
+        "camera_copy_ms_p50": [
+          0.21,
+          0.28
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10368096.0,
+          10368078.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.7,
+        "pair_skew_ms": 0.09,
+        "valid_fraction": 0.4686386768447837,
+        "frames": 6950,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.395
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.3,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.488,
+        "depth_p95_m": 4.083,
+        "depth_median_m": 2.029,
+        "process_ms": 30.0,
+        "stage_ms": {
+          "rectify": 9.2,
+          "resize": 6.8,
+          "remap_rotate_crop": 2.4,
+          "match": 15.1,
+          "inference_forward": 14.99,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 3.5,
+          "colorize": 1.3,
+          "depth_filter_color": 5.7,
+          "jpeg_encode": 0.74
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5368002544529262,
+          "consistent_fraction": 0.4686386768447837,
+          "textured_fraction": 0.4686386768447837,
+          "range_fraction": 0.4686386768447837,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 249902314477,
+        "depth_source_age_ms": 60,
+        "jpeg_encode_ms": 0.74,
+        "jpeg_bytes": 30125,
+        "depth_publish_ms": 1.07,
+        "depth_seq": 6950,
+        "age_ms": 36,
+        "capture_ready": false,
+        "preview_age_ms": 187697,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          29.99,
+          29.99
+        ],
+        "camera_pts_interval_ms": [
+          33.34,
+          33.34
+        ],
+        "camera_age_ms": [
+          17,
+          30
+        ],
+        "camera_pts_ns": [
+          [
+            249802314185,
+            249835647477,
+            249868979602,
+            249902314477,
+            249935649186,
+            249969026769
+          ],
+          [
+            249802229477,
+            249835560019,
+            249868929603,
+            249902228769,
+            249935563769,
+            249968934894
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.27,
+          0.24
+        ],
+        "camera_copy_ms_p50": [
+          0.25,
+          0.27
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10365144.0,
+          10365590.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      },
+      {
+        "algorithm": "Calibrated SGBM CPU (240x131)",
+        "depth_mode": "fast",
+        "mode": "calibrated",
+        "message": "已标定米制深度；黑色为无有效深度，实际距离精度待实测",
+        "fps": 28.5,
+        "pair_skew_ms": 0.1,
+        "valid_fraction": 0.46908396946564884,
+        "frames": 6966,
+        "auto_alignment": false,
+        "alignment_state": "calibrated",
+        "alignment_message": "固定标定校正；请勿改变两镜头相对位置",
+        "alignment_checks": 0,
+        "alignment_p90_px": null,
+        "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+        "sync": "软件时间戳配对；未经硬件曝光同步验证",
+        "calibration_id": "fc0ee7b44fe5",
+        "baseline_mm": 96.287,
+        "depth_unit": "m",
+        "depth_range_m": [
+          0.3,
+          5.0
+        ],
+        "pointcloud_calibration_id": "fc0ee7b44fe5",
+        "pointcloud_error": null,
+        "depth_color_range_m": [
+          0.3,
+          4.25
+        ],
+        "depth_color_mode": "auto",
+        "depth_min_m": 0.301,
+        "depth_max_m": 4.939,
+        "depth_p05_m": 0.462,
+        "depth_p95_m": 3.918,
+        "depth_median_m": 2.029,
+        "process_ms": 20.1,
+        "stage_ms": {
+          "rectify": 2.7,
+          "resize": 1.9,
+          "remap_rotate_crop": 0.9,
+          "match": 13.0,
+          "inference_forward": 13.03,
+          "inference_reverse": 0.0,
+          "consistency": 0.0,
+          "depth_filter": 2.0,
+          "colorize": 1.4,
+          "depth_filter_color": 4.3,
+          "jpeg_encode": 0.75
+        },
+        "filter_stats": {
+          "matched_fraction": 0.5480279898218829,
+          "consistent_fraction": 0.46908396946564884,
+          "textured_fraction": 0.46908396946564884,
+          "range_fraction": 0.46908396946564884,
+          "consistency_method": "SGBM disp12MaxDiff=1 plus 3x3 support and real 5x5 stereo windows"
+        },
+        "depth_resolution": [
+          131,
+          240
+        ],
+        "npu_execution": {
+          "mode": "idle; fast CPU SGBM path"
+        },
+        "preprocess_backend": "cpu",
+        "opencl_error": null,
+        "source_pts_ns": 250469031061,
+        "depth_source_age_ms": 40,
+        "jpeg_encode_ms": 0.75,
+        "jpeg_bytes": 29621,
+        "depth_publish_ms": 1.15,
+        "depth_seq": 6966,
+        "age_ms": 47,
+        "capture_ready": false,
+        "preview_age_ms": 188256,
+        "capture_skew_ms": 0.09,
+        "camera_capture_fps": [
+          30.01,
+          30.01
+        ],
+        "camera_pts_interval_ms": [
+          33.33,
+          33.33
+        ],
+        "camera_age_ms": [
+          10,
+          23
+        ],
+        "camera_pts_ns": [
+          [
+            250369026185,
+            250402314769,
+            250435647478,
+            250469031061,
+            250502315061,
+            250535658227
+          ],
+          [
+            250368934686,
+            250402228769,
+            250435561186,
+            250468935894,
+            250502227478,
+            250535565185
+          ]
+        ],
+        "capture_count": 4,
+        "capture_busy": false,
+        "preview_stats": {
+          "fps": 29.83,
+          "resize_ms": 0.3,
+          "jpeg_ms": 4.93,
+          "jpeg_bytes": 34567,
+          "resolution": [
+            1280,
+            360
+          ]
+        },
+        "camera_copy_ms": [
+          0.22,
+          0.23
+        ],
+        "camera_copy_ms_p50": [
+          0.21,
+          0.24
+        ],
+        "camera_format": "NV12",
+        "hardware_video": {
+          "enabled": false,
+          "error": null
+        },
+        "camera_stream_resolution": [
+          640,
+          360
+        ],
+        "capture_resolution": [
+          3840,
+          2160
+        ],
+        "uncompressed_input_bytes_per_second": [
+          10370154.0,
+          10370250.0
+        ],
+        "capture_error": null,
+        "capture_width": 3840,
+        "capture_height": 2160,
+        "capture_directory": "/opt/rk-lightstereo/captures",
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "last_capture": {
+          "id": "20240825T202554668352Z-fa1e27e0",
+          "captured_at": "2024-08-25T20:25:54.668352+00:00",
+          "width": 3840,
+          "height": 2160,
+          "skew_ms": 3.51,
+          "left_pts_ns": 275502005,
+          "right_pts_ns": 279011879,
+          "left_device": "/dev/video33",
+          "right_device": "/dev/video42",
+          "pixel_format": "GRAY8",
+          "rectified": false,
+          "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+          "square_size_reference_mm": 24.2,
+          "baseline_reference_mm": 95,
+          "calibration_target": {
+            "id": "screen-checkerboard-10x7",
+            "inner_corners": [
+              9,
+              6
+            ],
+            "square_size_mm": 24.2,
+            "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+            "source": "User-selected target; not automatically detected"
+          },
+          "calibrated": false
+        }
+      }
+    ],
+    "last_hardware": {
+      "sampled_at": 1724655551.4323747,
+      "cpu_cores": {
+        "cpu": 28.2,
+        "cpu0": 25.2,
+        "cpu1": 17.0,
+        "cpu2": 21.7,
+        "cpu3": 39.9,
+        "cpu4": 23.9,
+        "cpu5": 43.6,
+        "cpu6": 19.7,
+        "cpu7": 34.0
+      },
+      "cpu_average_percent": 28.1,
+      "memory": {
+        "total_kb": 8107880,
+        "available_kb": 7104736,
+        "used_percent": 12.4,
+        "swap_total_kb": 0,
+        "swap_free_kb": 0
+      },
+      "service_process": {
+        "VmSize": 1600900,
+        "VmHWM": 96468,
+        "VmRSS": 96352,
+        "Pss": 85556,
+        "dma_buf": {
+          "bytes": 1425408,
+          "objects": 8,
+          "exporters": {
+            "videobuf2_cma_sg": 1425408
+          }
+        }
+      },
+      "gpu": [
+        {
+          "name": "fb000000.gpu",
+          "frequency_hz": 300000000,
+          "load_percent": 0
+        }
+      ],
+      "npu": {
+        "load_percent": [
+          0,
+          0,
+          0
+        ],
+        "frequency": [
+          {
+            "name": "fdab0000.npu",
+            "frequency_hz": 1000000000,
+            "load_percent": 100
+          }
+        ],
+        "source": "/sys/kernel/debug/rknpu/load"
+      },
+      "temperatures": [
+        {
+          "name": "bigcore1-thermal",
+          "celsius": 50.8
+        },
+        {
+          "name": "soc-thermal",
+          "celsius": 49.9
+        },
+        {
+          "name": "iwlwifi_1",
+          "celsius": 46.0
+        },
+        {
+          "name": "gpu-thermal",
+          "celsius": 48.1
+        },
+        {
+          "name": "littlecore-thermal",
+          "celsius": 50.8
+        },
+        {
+          "name": "bigcore0-thermal",
+          "celsius": 49.9
+        },
+        {
+          "name": "npu-thermal",
+          "celsius": 49.0
+        },
+        {
+          "name": "center-thermal",
+          "celsius": 49.0
+        }
+      ],
+      "notes": {
+        "gpu_memory": "Mali GPU dedicated memory is not exposed by this BSP; DMA-BUF buffers are shared RAM",
+        "npu_memory": "NPU private memory counter is not exposed; process RSS/PSS is shown as a proxy",
+        "npu_zero_load": "A zero reading may mean idle or a driver counter limitation"
+      }
+    }
+  },
+  "fixture": {
+    "payload_path": "current-sample.depth.bin",
+    "metadata_path": "current-sample.metadata.json",
+    "raw_headers_path": "current-sample.headers.txt",
+    "payload_sha256": "e995be0040da04608279a71232307a6d9c628c1d091e41caf7e79f8126a0e43d",
+    "metadata_sha256": "a09668b741e30667490fb73c4c0e08a7d36711fb836af7611ce86cdbef0d9e30",
+    "header_sha256": "9ef269be42cae4974ddebe648778e3387e6955716bb06dc5c2f775683e5fca86",
+    "bytes": 62880,
+    "width": 131,
+    "height": 240,
+    "same_sequence_payload_header_identical": true,
+    "values_in_profile": true,
+    "metadata": {
+      "session_id": "d853d94811da4f469c10c38cf9f89787",
+      "pipeline_epoch": 1,
+      "width": 131,
+      "height": 240,
+      "K": [
+        147.48719383114582,
+        0.0,
+        65.7668809890747,
+        0.0,
+        147.48719383114582,
+        121.08679103851318,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "calibration_id": "fc0ee7b44fe5",
+      "extrinsics_id": null,
+      "preprocessing_id": "fast-preprocess-b3acaf226887820e",
+      "frame_id": "left_rectified_optical",
+      "monotonic_clock_id": "linux-boot:417a655a-c534-4829-afb4-e0f22244101e:CLOCK_MONOTONIC",
+      "left_pts_ns": 240002313186,
+      "right_pts_ns": 240002228477,
+      "left_arrival_mono_ns": 42827127747851,
+      "right_arrival_mono_ns": 42827115424934,
+      "schema": "depth-z-u16le-v1",
+      "seq": 6666,
+      "encoding": "16UC1",
+      "byte_order": "little",
+      "unit": "mm",
+      "convention": "camera_z",
+      "min_mm": 300,
+      "max_mm": 5000,
+      "publish_mono_ns": 42827155565271,
+      "source_mono_ns": null,
+      "clock_mapping_id": null,
+      "clock_quality": null,
+      "source_time_reference": "left_pts"
+    },
+    "hardware_legacy_ready": false,
+    "reason": "Real hardware clock mapping and camera/body/gimbal extrinsics remain unverified/null"
+  },
+  "interface_sources": {
+    "local_adapter_sha256": "1561ae01bf63420afc19296cadfbda75a628226e2cccec0d99d39133a3deeee5",
+    "wire_sha256": "c99a2fec72160ac4cfe9a2cc18752064df2309b832f6c9a4ba02d9e20a0d4dfa",
+    "adapter_note": "Local shared consumer adapter state rollback/optional target_k updated; default TARGET_K retained. Adapter is not part of this board UI rollout."
+  },
+  "physical_accuracy_verified": false,
+  "ui_screenshot": {
+    "path": "ui-depth-final.png",
+    "sha256": "12d0db236886ed8007640899e2cbbcb0b4fced2a908c27efcbd80acc7fb92b45"
+  }
+}

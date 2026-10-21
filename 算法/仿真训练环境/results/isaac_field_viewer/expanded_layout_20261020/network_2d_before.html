@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>策略网络 · 二维展开</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10141b;
+      --panel: #171d27;
+      --panel-soft: #1d2531;
+      --border: #2a3544;
+      --text: #e7edf5;
+      --muted: #a4b0c0;
+      --cyan: #65d6df;
+      --yellow: #ffd76a;
+      --green: #66d69a;
+      --red: #ff8585;
+      --card: #1a222e;
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--text); }
+    body { min-width: 320px; }
+    button, select, input { font: inherit; color: inherit; }
+    button, select, input[type="number"] {
+      border: 1px solid var(--border); border-radius: 7px; background: #202a37; min-height: 32px;
+    }
+    button { padding: 5px 10px; cursor: pointer; white-space: nowrap; }
+    button:hover, select:hover { border-color: #4a7180; background: #263545; }
+    button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 2px solid var(--cyan); outline-offset: 2px;
+    }
+    button:disabled { opacity: .55; cursor: wait; }
+    a { color: #8bdce5; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .app { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
+    .topbar {
+      z-index: 2; flex: none; padding: 10px 14px 9px; background: rgba(20, 26, 35, .98);
+      border-bottom: 1px solid var(--border); box-shadow: 0 5px 18px #0004;
+    }
+    .heading-row, .toolbar, .status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .heading-row { justify-content: space-between; margin-bottom: 5px; }
+    h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: .02em; }
+    .subtitle { margin-left: 8px; color: var(--muted); font-size: 12px; font-weight: 400; }
+    .toolbar { gap: 6px; }
+    .flow-note { margin: 0 0 7px; color: #b2c1cf; font-size: 12px; letter-spacing: .025em; }
+    .toolbar .separator { width: 1px; height: 22px; background: var(--border); margin: 0 3px; }
+    .toolbar label { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; }
+    .toolbar select { padding: 4px 8px; }
+    .scale-readout { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .scale-readout b { color: var(--text); font-weight: 600; }
+    .primary { border-color: #347c88; background: #1d5660; }
+    .primary:hover { background: #236b77; }
+    .status-row { margin-top: 8px; gap: 8px 15px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .status-item { display: inline-flex; align-items: baseline; gap: 5px; min-width: 0; }
+    .status-item b { color: var(--text); font-weight: 550; font-variant-numeric: tabular-nums; }
+    .status-item.status-text { flex: 1 1 260px; }
+    .connection { display: inline-flex; align-items: center; gap: 6px; color: var(--red); font-weight: 600; }
+    .connection::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .connection.online { color: var(--green); }
+    .connection.busy { color: var(--yellow); }
+    .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
+    .canvas-panel { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; background:
+      radial-gradient(ellipse at 50% 42%, #18212c 0, #111720 63%, #10141b 100%); }
+    #network-svg { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; }
+    .empty-state {
+      position: absolute; inset: 0; display: grid; place-content: center; padding: 20px; text-align: center;
+      color: var(--muted); pointer-events: none; line-height: 1.7;
+    }
+    .empty-state strong { color: #d8e3ee; font-size: 16px; font-weight: 600; }
+    .empty-state[hidden] { display: none; }
+    .details {
+      position: relative; flex: 0 0 320px; min-width: 0; overflow: auto; padding: 12px;
+      background: var(--panel); border-left: 1px solid var(--border); scrollbar-color: #394858 transparent;
+    }
+    .details.collapsed { display: none; }
+    .detail-heading { display: flex; align-items: start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .detail-heading h2 { margin: 0; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+    .detail-heading button { min-height: 28px; padding: 3px 8px; color: var(--muted); }
+    #layer-select { width: 100%; min-width: 0; margin-bottom: 8px; padding: 6px; }
+    .detail-placeholder { color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .detail-image-wrap { min-height: 100px; max-height: 370px; overflow: auto; margin: 8px 0 10px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 8px; background: #111720; }
+    .detail-image-wrap.zoomed { max-height: min(70vh, 620px); display: block; cursor: zoom-out; }
+    #detail-image { display: block; width: 100%; max-width: 100%; max-height: 340px; object-fit: contain; image-rendering: pixelated; cursor: zoom-in; }
+    .detail-image-wrap.zoomed #detail-image { width: auto; max-width: none; max-height: none; object-fit: initial; }
+    #detail-image[hidden] { display: none; }
+    #detail-image-empty { color: var(--muted); font-size: 12px; }
+    #detail-image-empty[hidden] { display: none; }
+    .detail-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 9px 0; }
+    .detail-controls label { display: grid; gap: 4px; color: var(--muted); font-size: 14px; }
+    .detail-controls select, .detail-controls input { width: 100%; min-width: 0; padding: 4px 7px; }
+    .info-grid { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 6px 8px; margin: 8px 0 10px; font-size: 14px; line-height: 1.5; }
+    .info-grid dt { color: var(--muted); }
+    .info-grid dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .section-title { margin: 12px 0 5px; padding-top: 9px; border-top: 1px solid var(--border); color: #c9d5e1; font-size: 14px; font-weight: 650; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+    .stat { min-width: 0; padding: 6px; border: 1px solid #293544; border-radius: 6px; background: #131923; }
+    .stat span { display: block; color: var(--muted); font-size: 14px; }
+    .stat b { display: block; margin-top: 2px; overflow: hidden; color: var(--text); font-size: 14px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; }
+    .field-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+    .field-list li { padding: 5px 7px; border-radius: 5px; background: #121821; color: #d5deea; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+    .node-card { cursor: pointer; }
+    .spectrum-key { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: 6px 0 3px; font-size: 12px; color: #b9c9d9; }
+    .spectrum-core { position: relative; display: inline-block; width: 200px; height: 22px; }
+    #spectrum-bar { display: block; width: 100%; height: 10px; border: 1px solid #607184; border-radius: 3px; }
+    .zero-tick { position: absolute; left: 50%; top: 8px; padding-top: 4px; border-top: 3px solid white; transform: translateX(-50%); line-height: 10px; color: white; }
+    .node-card image { image-rendering: pixelated; }
+    .node-card rect.card-bg { fill: var(--card); stroke: #536273; stroke-width: 1.35; }
+    .node-card:hover rect.card-bg { stroke: var(--cyan); stroke-width: 2; }
+    .node-card.selected rect.card-bg { fill: #292a24; stroke: var(--yellow); stroke-width: 2.4; }
+    .svg-title { fill: #edf3f8; font-size: 12px; font-weight: 650; }
+    .node-card.overview-card .svg-title { font-size: 18px; }
+    .svg-shape { fill: #a9b7c6; font-size: 10px; }
+    .node-card.overview-card .svg-shape { font-size: 12px; }
+    .svg-missing { fill: #8492a2; font-size: 10px; pointer-events: none; }
+    .column-label { fill: #8094a5; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+    .row-label { fill: #718295; font-size: 10px; }
+    .flow-edge { fill: none; stroke: #57acb8; stroke-width: 1.7; opacity: .46; marker-end: url(#arrow); pointer-events: none; }
+    .flow-edge.overview-edge { stroke-width: 2.1; opacity: .57; }
+    .empty-graph-label { fill: #92a0af; font-size: 15px; text-anchor: middle; }
+    @media (max-width: 920px) {
+      .heading-row { align-items: flex-start; }
+      .toolbar { max-width: 100%; }
+      .workspace { flex-direction: column; overflow: auto; }
+      .canvas-panel { flex: 0 0 58vh; min-height: 270px; }
+      .details { flex: 0 0 auto; max-height: 44vh; border-left: 0; border-top: 1px solid var(--border); }
+      .details.collapsed { display: none; }
+    }
+    @media (max-width: 560px) {
+      .topbar { padding: 8px; }
+      .heading-row { margin-bottom: 6px; }
+      h1 { font-size: 15px; }
+      .subtitle { display: block; margin: 2px 0 0; }
+      .toolbar { gap: 5px; }
+      .toolbar button { padding: 4px 7px; font-size: 11px; }
+      .toolbar .separator { display: none; }
+      .status-row { gap: 5px 10px; }
+      .canvas-panel { flex-basis: 53vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="heading-row">
+        <div>
+          <h1>策略网络二维展开 <span class="subtitle">实时张量与数据流</span></h1>
+        </div>
+        <a href="__VIEWER_URL__" target="_blank" rel="noopener">打开三维查看器 ↗</a>
+      </div>
+      <div class="toolbar" aria-label="页面操作">
+        <button class="primary" type="button" data-command="run">运行</button>
+        <button type="button" data-command="pause">暂停</button>
+        <button type="button" data-command="reset">重置回合</button>
+        <button type="button" data-command="preview">读取当前帧</button>
+        <span class="separator" aria-hidden="true"></span>
+        <label><input id="mode-overview" type="radio" name="layout-mode" value="overview" checked>整体</label>
+        <label><input id="mode-detail" type="radio" name="layout-mode" value="detail">全部层</label>
+        <span id="scale-readout" class="scale-readout" title="整帧激活与全部参数共同定标；覆盖完整值域，不用百分位。范围增大立即生效，缩小平滑回落。">全局自适应 <b id="scale-value">±—</b></span>
+        <label title="只暂停此页刷新，不影响后端仿真"><input id="freeze-control" type="checkbox">冻结本页</label>
+        <span class="separator" aria-hidden="true"></span>
+        <button id="fit-button" type="button" title="显示全部网络">适配全部</button>
+        <button id="one-to-one-button" type="button" title="恢复 100% 视图">100%</button>
+        <button id="zoom-out-button" type="button" title="缩小">−</button>
+        <button id="zoom-in-button" type="button" title="放大">＋</button>
+        <button id="detail-toggle" type="button" aria-expanded="true">收起详情</button>
+      </div>
+      <div class="flow-note">输入 → 编码 → 融合 → 记忆 → 动作[左履带，右履带，云台偏航，云台俯仰]　·　连线仅表示数据流，不表示重要性</div>
+      <div class="spectrum-key" aria-label="全光谱伪彩色标">
+        <span>全光谱 · 低值</span><b id="legend-min">—</b>
+        <span class="spectrum-core"><i id="spectrum-bar"></i><b class="zero-tick">0</b></span>
+        <b id="legend-max">—</b><span>高值 · 未采集为灰，NaN/Inf为洋红</span>
+      </div>
+      <div class="status-row" aria-live="polite">
+        <span id="connection-status" class="connection">连接中</span>
+        <span class="status-item">帧 <b id="frame-value">—</b></span>
+        <span class="status-item">输入时刻 <b id="input-time-value">—</b></span>
+        <span class="status-item">步后时刻 <b id="output-time-value">—</b></span>
+        <span class="status-item">运行状态 <b id="runtime-value">等待首帧</b></span>
+        <span class="status-item">模型 <b id="training-value">—</b></span>
+        <span class="status-item">模式 <b id="mode-value">—</b></span>
+        <span class="status-item">价值诊断 <b id="critic-value">—</b></span>
+        <span class="status-item status-text">消息 <b id="message-value">正在连接本地查看器…</b></span>
+      </div>
+    </header>
+    <main class="workspace">
+      <section class="canvas-panel" aria-label="网络结构图">
+        <svg id="network-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="策略网络数据流图" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L8,4 L0,8 z" fill="#57acb8"></path>
+            </marker>
+            <clipPath id="card-image-clip"><rect x="11" y="43" width="148" height="55" rx="3"></rect></clipPath>
+          </defs>
+          <g id="column-label-layer"></g>
+          <g id="edge-layer"></g>
+          <g id="node-layer"></g>
+        </svg>
+        <div id="empty-state" class="empty-state">
+          <div><strong>等待真实策略帧</strong><br>页面连接后会显示实际采集的网络张量。尚无数据时不会绘制虚构激活。</div>
+        </div>
+      </section>
+      <aside id="details-panel" class="details" aria-label="选中层详情">
+        <div class="detail-heading">
+          <h2 id="detail-title">尚未选中网络层</h2>
+          <button id="focus-layer-button" type="button" title="将选中层居中并以100%大小显示">聚焦此层</button>
+          <button id="detail-collapse-button" type="button" aria-label="收起详情面板">收起</button>
+        </div>
+        <select id="layer-select" aria-label="选择网络层"></select>
+        <div id="detail-placeholder" class="detail-placeholder">点击网络卡片查看完整张量、来源、字段与统计数据。首次采集之前，详情保持为空。</div>
+        <div id="detail-content" hidden>
+          <div class="detail-image-wrap">
+            <img id="detail-image" alt="选中层张量完整图像" hidden>
+            <span id="detail-image-empty">该层尚未采集或没有图像</span>
+          </div>
+          <dl class="info-grid">
+            <dt>形状</dt><dd id="detail-shape">—</dd>
+            <dt>元素数</dt><dd id="detail-size">—</dd>
+            <dt>来源</dt><dd id="detail-source">—</dd>
+            <dt>说明</dt><dd id="detail-description">—</dd>
+          </dl>
+          <div class="detail-controls">
+            <label>张量<select id="tensor-select" aria-label="选择激活值或参数"></select></label>
+            <label>元素索引<input id="index-input" type="number" min="0" step="1" value="0" inputmode="numeric"></label>
+          </div>
+          <div class="info-grid">
+            <dt>坐标</dt><dd id="detail-coordinate">—</dd>
+            <dt>数值</dt><dd id="detail-value">—</dd>
+          </div>
+          <div class="section-title">统计</div>
+          <div class="stats">
+            <div class="stat"><span>最小值</span><b id="stat-min">—</b></div>
+            <div class="stat"><span>最大值</span><b id="stat-max">—</b></div>
+            <div class="stat"><span>均值</span><b id="stat-mean">—</b></div>
+            <div class="stat"><span>标准差</span><b id="stat-std">—</b></div>
+            <div class="stat"><span>非有限值</span><b id="stat-nonfinite">—</b></div>
+          </div>
+          <div class="section-title">字段</div>
+          <ul id="field-list" class="field-list"></ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+  <script>
+  (() => {
+    "use strict";
+
+    const POLL_MS = 250;
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const BRANCHES = ["lidar", "depth", "detections", "state"];
+    const BRANCH_LABELS = {
+      lidar: "雷达", depth: "深度", detections: "检测", state: "状态", fusion: "融合",
+      actor: "动作支路", actor_memory: "动作记忆", critic: "价值支路", critic_memory: "价值记忆",
+      output: "输出", value: "价值"
+    };
+    const BRANCH_ORDER = ["lidar", "depth", "detections", "state", "fusion", "actor", "actor_memory", "critic", "critic_memory", "output", "value"];
+    const CARD_W = 170;
+    const CARD_H = 110;
+    const COL_GAP = 260;
+    const ROW_GAP = 155;
+    const els = {
+      svg: document.getElementById("network-svg"),
+      labels: document.getElementById("column-label-layer"),
+      edgeLayer: document.getElementById("edge-layer"),
+      nodeLayer: document.getElementById("node-layer"),
+      empty: document.getElementById("empty-state"),
+      connection: document.getElementById("connection-status"),
+      frame: document.getElementById("frame-value"),
+      inputTime: document.getElementById("input-time-value"),
+      outputTime: document.getElementById("output-time-value"),
+      runtime: document.getElementById("runtime-value"),
+      training: document.getElementById("training-value"),
+      mode: document.getElementById("mode-value"),
+      critic: document.getElementById("critic-value"),
+      message: document.getElementById("message-value"),
+      overviewMode: document.getElementById("mode-overview"),
+      detailMode: document.getElementById("mode-detail"),
+      scaleReadout: document.getElementById("scale-readout"),
+      scaleValue: document.getElementById("scale-value"),
+      freeze: document.getElementById("freeze-control"),
+      detailPanel: document.getElementById("details-panel"),
+      detailToggle: document.getElementById("detail-toggle"),
+      detailCollapse: document.getElementById("detail-collapse-button"),
+      detailTitle: document.getElementById("detail-title"),
+      detailPlaceholder: document.getElementById("detail-placeholder"),
+      detailContent: document.getElementById("detail-content"),
+      detailImage: document.getElementById("detail-image"),
+      detailImageEmpty: document.getElementById("detail-image-empty"),
+      tensor: document.getElementById("tensor-select"),
+      index: document.getElementById("index-input"),
+      fieldList: document.getElementById("field-list")
+    };
+    const scaleReadoutBaseTitle = els.scaleReadout.title;
+
+    let selectedKey = "features_extractor";
+    let tensorName = "激活值";
+    let elementIndex = 0;
+    let detailMode = false;
+    let frozen = false;
+    let fetching = false;
+    let controlBusy = false;
+    let requestTimer = 0;
+    let lastFrame = null;
+    let renderedKeys = new Map();
+    let topologySignature = "";
+    let currentBounds = null;
+    let hasInitialFit = false;
+    let viewBox = { x: 0, y: 0, width: 1000, height: 700 };
+    let pan = null;
+    let suppressClickUntil = 0;
+    let detailVisible = true;
+    let parameterOptions = [];
+    let layerOptionsSignature = "";
+    let legendSignature = "";
+
+    const fmt = (value, digits = 3) => {
+      if (value === null || value === undefined || value === "") return "—";
+      if (typeof value === "number") return Number.isFinite(value) ? value.toFixed(digits) : String(value);
+      if (Array.isArray(value)) return "[" + value.map(item => fmt(item, digits)).join(", ") + "]";
+      if (typeof value === "object") {
+        try { return JSON.stringify(value); } catch (_) { return String(value); }
+      }
+      return String(value);
+    };
+    const legendNumber = value => typeof value === "number" && Number.isFinite(value) ? Number(Math.abs(value).toPrecision(6)).toString() : "—";
+    const signedLegendNumber = value => {
+      if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+      return value < 0 ? "−" + legendNumber(value) : (value > 0 ? "+" + legendNumber(value) : "0");
+    };
+    const asText = value => value === null || value === undefined ? "" : String(value);
+    const shapeText = value => Array.isArray(value) ? "(" + value.join(" × ") + ")" : asText(value || "形状待定");
+    const safeImageUri = value => typeof value === "string" && /^data:image\/png;base64,[A-Za-z0-9+/=\s]+$/.test(value) ? value : "";
+    const clearChildren = element => { while (element.firstChild) element.removeChild(element.firstChild); };
+    const svgElement = (name, attrs = {}) => {
+      const node = document.createElementNS(SVG_NS, name);
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, String(value));
+      return node;
+    };
+    const setText = (id, value) => { document.getElementById(id).textContent = fmt(value); };
+    const numericColumn = node => {
+      const n = Number(node.column);
+      return Number.isFinite(n) ? n : 0;
+    };
+
+    function setViewBox(next) {
+      viewBox = { x: next.x, y: next.y, width: Math.max(1, next.width), height: Math.max(1, next.height) };
+      els.svg.setAttribute("viewBox", [viewBox.x, viewBox.y, viewBox.width, viewBox.height].map(v => Number(v.toFixed(3))).join(" "));
+    }
+
+    function viewportSize() {
+      const rect = els.svg.getBoundingClientRect();
+      return { width: Math.max(1, rect.width), height: Math.max(1, rect.height), rect };
+    }
+
+    function fitBounds(bounds, padding = 55) {
+      if (!bounds) return;
+      const { width: pxW, height: pxH } = viewportSize();
+      let w = Math.max(1, bounds.maxX - bounds.minX + padding * 2);
+      let h = Math.max(1, bounds.maxY - bounds.minY + padding * 2);
+      const aspect = pxW / pxH;
+      if (w / h < aspect) w = h * aspect;
+      else h = w / aspect;
+      const cx = (bounds.minX + bounds.maxX) / 2;
+      const cy = (bounds.minY + bounds.maxY) / 2;
+      setViewBox({ x: cx - w / 2, y: cy - h / 2, width: w, height: h });
+    }
+
+    function fitAll() {
+      if (currentBounds) {
+        fitBounds(currentBounds);
+        hasInitialFit = true;
+      }
+    }
+
+    function setZoom(factor, centerX = null, centerY = null) {
+      const { width: pxW, height: pxH } = viewportSize();
+      const cx = centerX === null ? pxW / 2 : centerX;
+      const cy = centerY === null ? pxH / 2 : centerY;
+      const worldX = viewBox.x + (cx / pxW) * viewBox.width;
+      const worldY = viewBox.y + (cy / pxH) * viewBox.height;
+      const nextW = Math.max(80, Math.min(100000, viewBox.width * factor));
+      const nextH = Math.max(60, Math.min(100000, viewBox.height * factor));
+      setViewBox({
+        x: worldX - (cx / pxW) * nextW,
+        y: worldY - (cy / pxH) * nextH,
+        width: nextW,
+        height: nextH
+      });
+    }
+
+    function set100Percent() {
+      const { width, height } = viewportSize();
+      const cx = currentBounds ? (currentBounds.minX + currentBounds.maxX) / 2 : 0;
+      const cy = currentBounds ? (currentBounds.minY + currentBounds.maxY) / 2 : 0;
+      setViewBox({ x: cx - width / 2, y: cy - height / 2, width, height });
+    }
+
+    function normalizeNodes(nodes) {
+      if (!Array.isArray(nodes)) return [];
+      return nodes.filter(item => item && typeof item === "object" && item.key !== null && item.key !== undefined)
+        .map(item => ({ ...item, key: String(item.key), branch: String(item.branch || ""), parents: Array.isArray(item.parents) ? item.parents.map(String) : [] }));
+    }
+
+    function findNode(nodes, key) { return nodes.find(node => node.key === key) || null; }
+
+    function fusionLabel(node) {
+      if (!node) return "融合";
+      const shape = Array.isArray(node.shape) ? node.shape : null;
+      if (shape && shape.length && shape.every(value => Number.isInteger(value) && value > 0)) {
+        const width = shape.reduce((product, value) => product * value, 1);
+        if (Number.isSafeInteger(width) && width > 0) return "融合 · " + width + "维";
+      }
+      const match = asText(node.title).match(/(\d+)维/);
+      return match ? "融合 · " + match[1] + "维" : "融合";
+    }
+
+    function branchTerminal(nodes, branch) {
+      const candidates = nodes.filter(node => node.branch === branch && !node.key.startsWith("input."));
+      if (!candidates.length) return null;
+      const summaries = candidates.filter(node => node.summary === true);
+      const pool = summaries.length ? summaries : candidates;
+      pool.sort((a, b) => numericColumn(a) - numericColumn(b));
+      return pool[pool.length - 1];
+    }
+
+    function overviewGraph(nodes) {
+      const shown = [];
+      const positions = new Map();
+      const edgePairs = [];
+      const rowY = index => 65 + index * 142;
+      for (let row = 0; row < BRANCHES.length; row += 1) {
+        const branch = BRANCHES[row];
+        const input = findNode(nodes, "input." + branch);
+        const encoded = branchTerminal(nodes, branch);
+        if (input) { shown.push(input); positions.set(input.key, { x: 30, y: rowY(row) }); }
+        if (encoded && encoded.key !== input?.key) { shown.push(encoded); positions.set(encoded.key, { x: 218, y: rowY(row) }); }
+        if (input && encoded && input.key !== encoded.key) edgePairs.push([input.key, encoded.key]);
+      }
+      const fusion = findNode(nodes, "features_extractor");
+      const actorMemory = findNode(nodes, "lstm_actor");
+      const action = findNode(nodes, "action.applied") || findNode(nodes, "action_net");
+      const centerY = rowY(1.5);
+      const terminalSlots = [
+        [fusion, { x: 406, y: centerY }],
+        [actorMemory, { x: 594, y: centerY }],
+        [action, { x: 782, y: centerY }]
+      ];
+      for (const [node, pos] of terminalSlots) {
+        if (node && !positions.has(node.key)) { shown.push(node); positions.set(node.key, pos); }
+      }
+      const encodedNodes = BRANCHES.map(branch => branchTerminal(nodes, branch)).filter(Boolean);
+      if (fusion) for (const node of encodedNodes) edgePairs.push([node.key, fusion.key]);
+      if (fusion && actorMemory) edgePairs.push([fusion.key, actorMemory.key]);
+      if (actorMemory && action) edgePairs.push([actorMemory.key, action.key]);
+      return { nodes: shown, positions, edgePairs, columns: [
+        [30, "四路输入"], [218, "特征编码"], [406, fusionLabel(fusion)], [594, "actor LSTM"], [782, "四维动作"]
+      ], rowLabels: BRANCHES.map((branch, index) => [10, rowY(index) + 15, BRANCH_LABELS[branch]]) };
+    }
+
+    function detailedGraph(nodes) {
+      const branches = Array.from(new Set(nodes.map(node => node.branch)));
+      branches.sort((a, b) => {
+        const ai = BRANCH_ORDER.indexOf(a), bi = BRANCH_ORDER.indexOf(b);
+        if (ai < 0 && bi < 0) return a.localeCompare(b);
+        return (ai < 0 ? BRANCH_ORDER.length : ai) - (bi < 0 ? BRANCH_ORDER.length : bi);
+      });
+      const lane = new Map(branches.map((branch, index) => [branch, index]));
+      const sorted = [...nodes].sort((a, b) => numericColumn(a) - numericColumn(b) || a.key.localeCompare(b.key));
+      const positions = new Map();
+      const occupancy = new Map();
+      const laneStarts = new Map();
+      let nextLaneY = 52;
+      for (const branch of branches) {
+        laneStarts.set(branch, nextLaneY);
+        const columnCounts = new Map();
+        for (const node of sorted) {
+          if (node.branch !== branch) continue;
+          const col = numericColumn(node);
+          columnCounts.set(col, (columnCounts.get(col) || 0) + 1);
+        }
+        const maxSameColumn = Math.max(1, ...columnCounts.values());
+        nextLaneY += ROW_GAP + Math.max(0, maxSameColumn - 1) * 116;
+      }
+      for (const node of sorted) {
+        const row = lane.get(node.branch) ?? 0;
+        const col = numericColumn(node);
+        const token = row + ":" + col;
+        const count = occupancy.get(token) || 0;
+        occupancy.set(token, count + 1);
+        positions.set(node.key, { x: 52 + col * COL_GAP, y: (laneStarts.get(node.branch) ?? 52) + count * 116 });
+      }
+      const edgePairs = [];
+      for (const node of sorted) for (const parent of node.parents) if (positions.has(parent)) edgePairs.push([parent, node.key]);
+      const rowLabels = branches.map(branch => [9, (laneStarts.get(branch) ?? 52) + 15, BRANCH_LABELS[branch] || branch]);
+      return { nodes: sorted, positions, edgePairs, columns: [], rowLabels };
+    }
+
+    function textNode(x, y, className, text) {
+      const node = svgElement("text", { x, y, class: className });
+      node.textContent = text;
+      return node;
+    }
+
+    function shortTitle(node) {
+      const key = asText(node.key);
+      const branch = asText(node.branch);
+      const inputLabels = { lidar: "雷达输入", depth: "深度输入", detections: "检测输入", state: "状态输入" };
+      const encodedLabels = { lidar: "雷达编码", depth: "深度编码", detections: "检测编码", state: "状态编码" };
+      if (key.startsWith("input.")) return inputLabels[branch] || "输入";
+      if (key === "features_extractor") return fusionLabel(node);
+      if (key === "lstm_actor") return "驾驶记忆 LSTM";
+      if (key === "action.applied" || key === "action_net") return "左右履带＋云台";
+      if (!detailMode && encodedLabels[branch] && node.summary === true) return encodedLabels[branch];
+      const text = asText(node.title || key || "未命名层");
+      const max = detailMode ? 18 : 10;
+      return text.length > max ? text.slice(0, max - 1) + "…" : text;
+    }
+
+    function createCard(node, position) {
+      const group = svgElement("g", {
+        class: "node-card" + (detailMode ? "" : " overview-card"),
+        transform: "translate(" + position.x + " " + position.y + ")",
+        tabindex: "0",
+        role: "button"
+      });
+      group.dataset.nodeKey = node.key;
+      group.setAttribute("aria-label", nodeDescription(node) + "，" + shapeText(node.shape));
+      group.setAttribute("title", nodeDescription(node));
+      const background = svgElement("rect", { class: "card-bg", x: 0, y: 0, width: CARD_W, height: CARD_H, rx: 9 });
+      const title = textNode(10, 18, "svg-title", "");
+      const shape = textNode(10, 35, "svg-shape", "");
+      const image = svgElement("image", { x: 11, y: 43, width: 148, height: 55, preserveAspectRatio: "xMidYMid meet", "clip-path": "url(#card-image-clip)" });
+      const missing = textNode(CARD_W / 2, 75, "svg-missing", "尚未采集");
+      missing.setAttribute("text-anchor", "middle");
+      group.append(background, title, shape, image, missing);
+      group.addEventListener("click", event => {
+        event.stopPropagation();
+        if (performance.now() < suppressClickUntil) return;
+        chooseNode(node.key);
+      });
+      group.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); chooseNode(node.key); }
+      });
+      els.nodeLayer.appendChild(group);
+      return { group, title, shape, image, missing, node };
+    }
+
+    function nodeDescription(node) {
+      const title = asText(node.title || node.key);
+      const description = asText(node.description);
+      return description ? title + "；" + description : title;
+    }
+
+    function updateCard(record, node, position) {
+      record.node = node;
+      record.position = position;
+      record.group.setAttribute("transform", "translate(" + position.x + " " + position.y + ")");
+      record.group.setAttribute("aria-label", nodeDescription(node) + "，" + shapeText(node.shape));
+      record.group.setAttribute("title", nodeDescription(node));
+      record.title.textContent = shortTitle(node);
+      record.shape.textContent = shapeText(node.shape);
+      const uri = safeImageUri(node.image);
+      if (uri) {
+        if (record.image.getAttribute("href") !== uri) record.image.setAttribute("href", uri);
+        record.image.style.display = "";
+        record.missing.style.display = "none";
+      } else {
+        record.image.removeAttribute("href");
+        record.image.style.display = "none";
+        record.missing.style.display = "";
+        record.missing.textContent = "未采集 / 暂无图像";
+      }
+      record.group.classList.toggle("selected", node.key === selectedKey);
+    }
+
+    function renderLabels(graph, detailed) {
+      clearChildren(els.labels);
+      for (const [x, label] of graph.columns) {
+        const text = textNode(x, 30, "column-label", label);
+        els.labels.appendChild(text);
+      }
+      for (const [x, y, label] of graph.rowLabels) {
+        const text = textNode(x, y, "row-label", label);
+        els.labels.appendChild(text);
+      }
+      if (detailed && graph.nodes.length) {
+        const maxColumn = Math.max(...graph.nodes.map(numericColumn));
+        for (let col = 0; col <= maxColumn; col += 1) {
+          const x = 52 + col * COL_GAP;
+          const label = textNode(x, 28, "column-label", "列 " + col);
+          els.labels.appendChild(label);
+        }
+      }
+    }
+
+    function edgePath(from, to) {
+      const sx = from.x + CARD_W, sy = from.y + CARD_H / 2;
+      const ex = to.x, ey = to.y + CARD_H / 2;
+      const bend = Math.max(35, Math.abs(ex - sx) * 0.42);
+      return "M" + sx + "," + sy + " C" + (sx + bend) + "," + sy + " " + (ex - bend) + "," + ey + " " + ex + "," + ey;
+    }
+
+    function renderEdges(graph, detailed) {
+      clearChildren(els.edgeLayer);
+      const known = new Set(graph.nodes.map(node => node.key));
+      for (const [sourceKey, targetKey] of graph.edgePairs) {
+        if (!known.has(sourceKey) || !known.has(targetKey)) continue;
+        const from = graph.positions.get(sourceKey), to = graph.positions.get(targetKey);
+        if (!from || !to) continue;
+        const path = svgElement("path", { class: detailed ? "flow-edge" : "flow-edge overview-edge", d: edgePath(from, to) });
+        els.edgeLayer.appendChild(path);
+      }
+    }
+
+    function graphBounds(graph) {
+      if (!graph.nodes.length) return null;
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      for (const node of graph.nodes) {
+        const p = graph.positions.get(node.key);
+        if (!p) continue;
+        minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+        maxX = Math.max(maxX, p.x + CARD_W); maxY = Math.max(maxY, p.y + CARD_H);
+      }
+      for (const [x, y] of graph.rowLabels) { minX = Math.min(minX, x); minY = Math.min(minY, y - 12); }
+      for (const [x] of graph.columns) { minX = Math.min(minX, x); maxX = Math.max(maxX, x + 130); }
+      return Number.isFinite(minX) ? { minX, minY, maxX, maxY } : null;
+    }
+
+    function drawGraph(rawNodes) {
+      const nodes = normalizeNodes(rawNodes);
+      const layerSelect = document.getElementById("layer-select");
+      const choices = nodes.map(node => [node.key, node.title || node.key]);
+      if (!choices.some(([key]) => key === selectedKey)) choices.push([selectedKey, selectedKey]);
+      const choicesSignature = JSON.stringify(choices);
+      if (choicesSignature !== layerOptionsSignature) {
+        clearChildren(layerSelect);
+        for (const [key, title] of choices) addOption(layerSelect, key, title + " · " + key);
+        layerOptionsSignature = choicesSignature;
+      }
+      layerSelect.value = selectedKey;
+      const graph = detailMode ? detailedGraph(nodes) : overviewGraph(nodes);
+      const signature = JSON.stringify({
+        mode: detailMode,
+        nodes: graph.nodes.map(node => [node.key, graph.positions.get(node.key)?.x, graph.positions.get(node.key)?.y]),
+        edges: graph.edgePairs,
+        columns: graph.columns,
+        rows: graph.rowLabels
+      });
+      const topologyChanged = signature !== topologySignature;
+      currentBounds = graphBounds(graph);
+      els.empty.hidden = graph.nodes.length > 0;
+
+      if (topologyChanged) {
+        clearChildren(els.nodeLayer);
+        renderedKeys = new Map();
+        renderLabels(graph, detailMode);
+        renderEdges(graph, detailMode);
+        for (const node of graph.nodes) {
+          const position = graph.positions.get(node.key);
+          if (!position) continue;
+          const record = createCard(node, position);
+          renderedKeys.set(node.key, record);
+          updateCard(record, node, position);
+        }
+        topologySignature = signature;
+      } else {
+        const current = new Map(graph.nodes.map(node => [node.key, node]));
+        for (const [key, record] of renderedKeys) {
+          const node = current.get(key);
+          if (node) updateCard(record, node, graph.positions.get(key));
+        }
+      }
+
+      if (!hasInitialFit && currentBounds) fitAll();
+      lastFrame = lastFrame || {};
+      lastFrame.nodes = nodes;
+    }
+
+    function updateSelectionStyle() {
+      for (const [key, record] of renderedKeys) record.group.classList.toggle("selected", key === selectedKey);
+    }
+
+    function addOption(select, value, label) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+
+    function updateParameterOptions(parameters) {
+      const names = Array.isArray(parameters) ? parameters.map(asText).filter(Boolean) : [];
+      const next = ["激活值", ...names];
+      if (JSON.stringify(next) === JSON.stringify(parameterOptions)) return;
+      parameterOptions = next;
+      clearChildren(els.tensor);
+      for (const item of next) addOption(els.tensor, item, item === "激活值" ? "激活值" : "参数：" + item);
+      if (!next.includes(tensorName)) tensorName = "激活值";
+      els.tensor.value = tensorName;
+    }
+
+    function renderFields(fields) {
+      clearChildren(els.fieldList);
+      const items = Array.isArray(fields) ? fields : [];
+      if (!items.length) {
+        const li = document.createElement("li");
+        li.textContent = "该层没有单独字段说明。";
+        els.fieldList.appendChild(li);
+        return;
+      }
+      for (const field of items) {
+        const li = document.createElement("li");
+        li.textContent = asText(field);
+        els.fieldList.appendChild(li);
+      }
+    }
+
+    function renderDetail(detail) {
+      if (!detail || typeof detail !== "object") {
+        els.detailTitle.textContent = "尚未选中网络层";
+        els.detailPlaceholder.hidden = false;
+        els.detailContent.hidden = true;
+        return;
+      }
+      if (detail.key !== undefined && String(detail.key) !== selectedKey) return;
+      els.detailTitle.textContent = asText(detail.title || detail.key || selectedKey);
+      els.detailPlaceholder.hidden = true;
+      els.detailContent.hidden = false;
+      const uri = safeImageUri(detail.image);
+      if (uri) {
+        if (els.detailImage.getAttribute("src") !== uri) els.detailImage.src = uri;
+        els.detailImage.hidden = false;
+        els.detailImageEmpty.hidden = true;
+        if (!els.detailImage.parentElement.classList.contains("zoomed")) els.detailImage.title = "点击查看原图";
+      } else {
+        els.detailImage.removeAttribute("src");
+        els.detailImage.hidden = true;
+        els.detailImageEmpty.textContent = "未采集激活或当前没有可显示图像";
+        els.detailImageEmpty.hidden = false;
+      }
+      setText("detail-shape", shapeText(detail.shape));
+      document.getElementById("detail-size").textContent = detail.size === null ? "—" : String(detail.size);
+      setText("detail-source", tensorName === "激活值" ? detail.source : "检查点参数（只读）");
+      setText("detail-description", detail.description);
+      document.getElementById("detail-coordinate").textContent = Array.isArray(detail.coordinate) ? "[" + detail.coordinate.join(", ") + "]" : "—";
+      document.getElementById("detail-value").textContent = typeof detail.value === "number" ? detail.value.toPrecision(9) : fmt(detail.value);
+      setText("stat-min", detail.min);
+      setText("stat-max", detail.max);
+      setText("stat-mean", detail.mean);
+      setText("stat-std", detail.std);
+      document.getElementById("stat-nonfinite").textContent = detail.nonfinite === null ? "—" : String(detail.nonfinite);
+      renderFields(detail.fields);
+      updateParameterOptions(detail.parameters);
+      if (detail.index !== undefined && document.activeElement !== els.index) {
+        const index = Number(detail.index);
+        if (Number.isFinite(index) && index >= 0) { elementIndex = Math.floor(index); els.index.value = String(elementIndex); }
+      }
+    }
+
+    function displayTime(value) {
+      return value === null || value === undefined ? "—" : fmt(value, 3) + " s";
+    }
+
+    function updateHeader(frame) {
+      const legend = frame.legend || {};
+      const minimum = legend.minimum;
+      const maximum = legend.maximum;
+      if (typeof minimum === "number" && Number.isFinite(minimum) && typeof maximum === "number" && Number.isFinite(maximum)) {
+        const sharedMagnitude = Math.max(Math.abs(minimum), Math.abs(maximum));
+        els.scaleValue.textContent = "±" + legendNumber(sharedMagnitude);
+        els.scaleReadout.title = scaleReadoutBaseTitle + " 后端完整精度范围：±" + String(sharedMagnitude) + "。";
+        document.getElementById("legend-min").textContent = signedLegendNumber(minimum);
+        document.getElementById("legend-max").textContent = signedLegendNumber(maximum);
+      } else {
+        els.scaleValue.textContent = "±—";
+        els.scaleReadout.title = scaleReadoutBaseTitle;
+        document.getElementById("legend-min").textContent = "—";
+        document.getElementById("legend-max").textContent = "—";
+      }
+      if (Array.isArray(legend.colors) && legend.colors.length >= 2) {
+        const colors = legend.colors.filter(rgb => Array.isArray(rgb) && rgb.length === 3 && rgb.every(n => Number.isFinite(n) && n >= 0 && n <= 255));
+        const signature = JSON.stringify(colors);
+        if (signature !== legendSignature && colors.length >= 2) {
+          document.getElementById("spectrum-bar").style.background = "linear-gradient(90deg," + colors.map(rgb => "rgb(" + rgb.join(",") + ")").join(",") + ")";
+          document.getElementById("spectrum-bar").title = asText(legend.name);
+          legendSignature = signature;
+        }
+      }
+      els.frame.textContent = frame.sequence === null || frame.sequence === undefined ? "—" : String(frame.sequence);
+      els.inputTime.textContent = displayTime(frame.sim_time);
+      els.outputTime.textContent = displayTime(frame.output_time);
+      els.mode.textContent = asText(frame.mode || "—");
+      const criticDescription = asText(frame.critic);
+      els.critic.textContent = criticDescription ? "独立只读" : "—";
+      els.critic.title = criticDescription;
+      const state = frame.state && typeof frame.state === "object" ? frame.state : {};
+      const running = state.running === true;
+      let runtime = state.done ? "回合结束" : (running ? "运行中" : "已暂停");
+      if (state.time !== undefined) runtime += " · " + fmt(state.time, 2) + " s";
+      els.runtime.textContent = runtime;
+      els.runtime.title = asText(state.status);
+      els.training.textContent = Number.isInteger(state.training_steps)
+        ? (state.training_steps === 0 ? "未训练 · 随机初始化" : state.training_steps.toLocaleString() + " 步")
+        : "训练步数未记录";
+      const errors = Array.isArray(frame.errors) ? frame.errors.filter(Boolean).map(asText) : (frame.errors ? [asText(frame.errors)] : []);
+      const robot = state.robot && typeof state.robot === "object" ? state.robot : null;
+      const robotText = robot ? Object.entries(robot).slice(0, 4).map(([key, value]) => key + " " + fmt(value, 2)).join(" · ") : "";
+      const commandError = asText(state.status).startsWith("请求失败") ? asText(state.status) : "";
+      els.message.textContent = [...errors, commandError, robotText].filter(Boolean).join(" · ") || "实时帧已更新";
+      els.connection.textContent = "已连接";
+      els.connection.classList.remove("busy");
+      els.connection.classList.add("online");
+    }
+
+    function setConnection(connected, message = "") {
+      els.connection.classList.toggle("online", connected);
+      els.connection.classList.toggle("busy", !connected && fetching);
+      els.connection.textContent = connected ? "已连接" : (fetching ? "连接中" : "已断开");
+      if (message) els.message.textContent = message;
+    }
+
+    function queryUrl() {
+      const query = new URLSearchParams({
+        detail: detailMode ? "1" : "0",
+        selected: selectedKey,
+        tensor: tensorName,
+        index: String(Math.max(0, elementIndex)),
+        scale: "auto"
+      });
+      return "/api/frame?" + query.toString();
+    }
+
+    async function pollOnce() {
+      if (fetching || frozen || document.visibilityState === "hidden") return;
+      fetching = true;
+      if (!els.connection.classList.contains("online")) setConnection(false);
+      const requestedKey = selectedKey;
+      const requestedMode = detailMode;
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 4000);
+      try {
+        const response = await fetch(queryUrl(), { method: "GET", cache: "no-store", headers: { "Accept": "application/json" }, signal: controller.signal });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const frame = await response.json();
+        if (!frame || typeof frame !== "object") throw new Error("帧数据格式无效");
+        lastFrame = frame;
+        updateHeader(frame);
+        if (requestedMode === detailMode) {
+          drawGraph(frame.nodes);
+          if (requestedKey === selectedKey) renderDetail(frame.detail);
+        }
+      } catch (error) {
+        setConnection(false, "等待本地服务恢复：" + asText(error && error.message || error));
+      } finally {
+        window.clearTimeout(timeout);
+        fetching = false;
+        if (!els.connection.classList.contains("online")) {
+          els.connection.textContent = "已断开";
+          els.connection.classList.remove("busy");
+        }
+      }
+    }
+
+    function schedulePoll(delay = POLL_MS) {
+      window.clearTimeout(requestTimer);
+      requestTimer = window.setTimeout(async () => {
+        await pollOnce();
+        schedulePoll(POLL_MS);
+      }, delay);
+    }
+
+    function requestRefresh() {
+      if (frozen) return;
+      if (!fetching) {
+        window.clearTimeout(requestTimer);
+        schedulePoll(0);
+      }
+    }
+
+    async function sendCommand(command) {
+      if (controlBusy) return;
+      controlBusy = true;
+      const buttons = document.querySelectorAll("[data-command]");
+      buttons.forEach(button => { button.disabled = true; });
+      els.message.textContent = "已发送命令：" + command;
+      try {
+        const response = await fetch("/api/control", {
+          method: "POST",
+          cache: "no-store",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({ command })
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        let result = null;
+        try { result = await response.json(); } catch (_) { /* empty response is valid */ }
+        if (result && result.message) els.message.textContent = asText(result.message);
+        else els.message.textContent = "命令已接受：" + command;
+      } catch (error) {
+        els.message.textContent = "命令发送失败：" + asText(error && error.message || error);
+        setConnection(false);
+      } finally {
+        buttons.forEach(button => { button.disabled = false; });
+        controlBusy = false;
+        requestRefresh();
+      }
+    }
+
+    function chooseNode(key) {
+      if (key === selectedKey) return;
+      selectedKey = key;
+      document.getElementById("layer-select").value = key;
+      tensorName = "激活值";
+      elementIndex = 0;
+      els.detailImage.parentElement.classList.remove("zoomed");
+      els.detailImage.title = "点击查看原图";
+      els.tensor.value = tensorName;
+      els.index.value = "0";
+      updateSelectionStyle();
+      requestRefresh();
+    }
+
+    function setMode(detailed) {
+      if (detailMode === detailed) return;
+      detailMode = detailed;
+      els.overviewMode.checked = !detailed;
+      els.detailMode.checked = detailed;
+      hasInitialFit = false;
+      requestRefresh();
+    }
+
+    function setDetailsVisible(visible) {
+      detailVisible = visible;
+      els.detailPanel.classList.toggle("collapsed", !visible);
+      els.detailToggle.textContent = visible ? "收起详情" : "展开详情";
+      els.detailToggle.setAttribute("aria-expanded", String(visible));
+      els.detailCollapse.textContent = "收起";
+      window.requestAnimationFrame(() => {
+        if (!currentBounds) return;
+        // Preserve the current world-space center and scale when the side panel changes width.
+        const center = { x: viewBox.x + viewBox.width / 2, y: viewBox.y + viewBox.height / 2 };
+        const { width, height } = viewportSize();
+        const aspect = width / height;
+        let w = viewBox.width, h = viewBox.height;
+        if (w / h < aspect) w = h * aspect; else h = w / aspect;
+        setViewBox({ x: center.x - w / 2, y: center.y - h / 2, width: w, height: h });
+      });
+    }
+
+    document.querySelectorAll("[data-command]").forEach(button => {
+      button.addEventListener("click", () => sendCommand(button.dataset.command));
+    });
+    els.overviewMode.addEventListener("change", () => { if (els.overviewMode.checked) setMode(false); });
+    els.detailMode.addEventListener("change", () => { if (els.detailMode.checked) setMode(true); });
+    els.freeze.addEventListener("change", () => {
+      frozen = els.freeze.checked;
+      if (frozen) {
+        els.message.textContent = "本页刷新已冻结；仿真和后端命令仍可继续。";
+        els.connection.textContent = "画面冻结";
+        els.connection.classList.remove("busy");
+      } else {
+        els.message.textContent = "恢复本页实时刷新。";
+        requestRefresh();
+      }
+    });
+    els.tensor.addEventListener("change", () => {
+      tensorName = els.tensor.value || "激活值";
+      els.detailImage.parentElement.classList.remove("zoomed");
+      els.detailImage.title = "点击查看原图";
+      requestRefresh();
+    });
+    els.detailImage.addEventListener("click", () => {
+      if (els.detailImage.hidden) return;
+      const zoomed = els.detailImage.parentElement.classList.toggle("zoomed");
+      els.detailImage.title = zoomed ? "点击缩回适配视图" : "点击查看原图";
+    });
+    els.index.addEventListener("change", () => {
+      const value = Number(els.index.value);
+      elementIndex = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+      els.index.value = String(elementIndex);
+      requestRefresh();
+    });
+    document.getElementById("fit-button").addEventListener("click", fitAll);
+    document.getElementById("layer-select").addEventListener("change", event => chooseNode(event.target.value));
+    document.getElementById("focus-layer-button").addEventListener("click", () => {
+      const record = renderedKeys.get(selectedKey);
+      if (!record || !record.position) return;
+      const { width, height } = viewportSize();
+      setViewBox({ x: record.position.x + CARD_W / 2 - width / 2,
+                   y: record.position.y + CARD_H / 2 - height / 2, width, height });
+    });
+    document.getElementById("one-to-one-button").addEventListener("click", set100Percent);
+    document.getElementById("zoom-in-button").addEventListener("click", () => setZoom(0.82));
+    document.getElementById("zoom-out-button").addEventListener("click", () => setZoom(1.22));
+    els.detailToggle.addEventListener("click", () => setDetailsVisible(!detailVisible));
+    els.detailCollapse.addEventListener("click", () => setDetailsVisible(false));
+
+    els.svg.addEventListener("wheel", event => {
+      event.preventDefault();
+      const rect = els.svg.getBoundingClientRect();
+      setZoom(event.deltaY < 0 ? 0.88 : 1.14, event.clientX - rect.left, event.clientY - rect.top);
+    }, { passive: false });
+    els.svg.addEventListener("pointerdown", event => {
+      if (event.button !== 0 || event.target.closest?.(".node-card")) return;
+      const rect = els.svg.getBoundingClientRect();
+      pan = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, rect, moved: false };
+      els.svg.setPointerCapture(event.pointerId);
+      els.svg.style.cursor = "grabbing";
+    });
+    els.svg.addEventListener("pointermove", event => {
+      if (!pan || event.pointerId !== pan.pointerId) return;
+      const dx = event.clientX - pan.x, dy = event.clientY - pan.y;
+      if (Math.abs(dx) + Math.abs(dy) > 2) pan.moved = true;
+      const rect = els.svg.getBoundingClientRect();
+      setViewBox({
+        x: viewBox.x - dx * viewBox.width / Math.max(1, rect.width),
+        y: viewBox.y - dy * viewBox.height / Math.max(1, rect.height),
+        width: viewBox.width, height: viewBox.height
+      });
+      pan.x = event.clientX; pan.y = event.clientY;
+    });
+    const endPan = event => {
+      if (!pan || event.pointerId !== pan.pointerId) return;
+      if (pan.moved) suppressClickUntil = performance.now() + 80;
+      pan = null;
+      els.svg.style.cursor = "";
+      if (els.svg.hasPointerCapture(event.pointerId)) els.svg.releasePointerCapture(event.pointerId);
+    };
+    els.svg.addEventListener("pointerup", endPan);
+    els.svg.addEventListener("pointercancel", endPan);
+    window.addEventListener("resize", () => {
+      if (!currentBounds) return;
+      const center = { x: viewBox.x + viewBox.width / 2, y: viewBox.y + viewBox.height / 2 };
+      const { width, height } = viewportSize();
+      const aspect = width / height;
+      let w = viewBox.width, h = viewBox.height;
+      if (w / h < aspect) w = h * aspect; else h = w / aspect;
+      setViewBox({ x: center.x - w / 2, y: center.y - h / 2, width: w, height: h });
+    });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && !frozen) requestRefresh(); });
+
+    updateParameterOptions([]);
+    setViewBox(viewBox);
+    schedulePoll(0);
+  })();
+  </script>
+</body>
+</html>

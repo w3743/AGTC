@@ -1,0 +1,66 @@
+{
+  "purpose": "untrained UI preview, separate from training baseline",
+  "seed": 69001,
+  "training_steps": 0,
+  "encoder_config": {
+    "schema": "depth64-lidar-circular1d-v1",
+    "branch_dims": {
+      "lidar": 32,
+      "depth": 64,
+      "detections": 32,
+      "state": 32
+    },
+    "depth_pool": [
+      8,
+      6
+    ],
+    "radar_pool": 50,
+    "features_dim": 160
+  },
+  "observation_shapes": {
+    "lidar": [
+      2,
+      400
+    ],
+    "depth": [
+      1,
+      160,
+      88
+    ],
+    "detections": [
+      16,
+      10
+    ],
+    "state": [
+      43
+    ]
+  },
+  "actor_lstm_input_size": 160,
+  "actor_lstm_hidden_size": 128,
+  "checkpoint": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_viewer/encoder_topology_20261019/untrained_encoder_preview.zip",
+  "sha256": "398a3e6fe64c7894321923049ebfb0932593c4d97a52f8030c4bc0a142904db1",
+  "encoder_modules": {
+    "laser.0": "Conv1d(2, 16, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)",
+    "laser.1": "ReLU()",
+    "laser.2": "Conv1d(16, 32, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)",
+    "laser.3": "ReLU()",
+    "laser.4": "AdaptiveAvgPool1d(output_size=50)",
+    "laser.5": "Flatten(start_dim=1, end_dim=-1)",
+    "laser.6": "Linear(in_features=1600, out_features=32, bias=True)",
+    "laser.7": "ReLU()",
+    "depth.0": "Conv2d(1, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+    "depth.1": "ReLU()",
+    "depth.2": "Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+    "depth.3": "ReLU()",
+    "depth.4": "AdaptiveAvgPool2d(output_size=(8, 6))",
+    "depth.5": "Flatten(start_dim=1, end_dim=-1)",
+    "depth.6": "Linear(in_features=768, out_features=64, bias=True)",
+    "depth.7": "ReLU()",
+    "boxes.0": "Linear(in_features=10, out_features=32, bias=True)",
+    "boxes.1": "ReLU()",
+    "boxes.2": "Linear(in_features=32, out_features=32, bias=True)",
+    "boxes.3": "ReLU()",
+    "proprioception.0": "Linear(in_features=43, out_features=32, bias=True)",
+    "proprioception.1": "ReLU()"
+  }
+}

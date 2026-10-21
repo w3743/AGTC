@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-15",
+  "status": "候选审查；未修改正式EDA、BOM或共用库，不是电气验收",
+  "basis": {
+    "formal_components": 213,
+    "formal_normalized_mpn_types": 60,
+    "latest_requirement": "由代理平衡器件总数、精确料号种类、成本和电气性能；重新审查重复保护",
+    "resistor_chains": "四组六段串联增加20件、减少2种，不再作为默认方案；未落实正式工程"
+  },
+  "preferred_candidate": {
+    "name": "复用SW_RUN_STORE的DPDT控制URB4805模块",
+    "existing_switch": "MN22SS1G01，DPDT保持型ON-ON",
+    "documented_contacts": {
+      "common_pins": [2, 5],
+      "RUN_closed_pairs": [[2, 3], [5, 6]],
+      "STORE_closed_pairs": [[2, 1], [5, 4]]
+    },
+    "proposed_nets": {
+      "pin1": "NC",
+      "pin2": "合并后的SW_RUN与PRE_CTRL_3V3，开关后的3.3V节点",
+      "pin3": "REG1",
+      "pin4": "B0",
+      "pin5": "CTRL_MODULE",
+      "pin6": "NC"
+    },
+    "operation": "RUN时第一极接通3.3V逻辑，第二极使CTRL悬空；STORE时逻辑由原有下拉释放，第二极将CTRL接B0。PRE_CTRL不能接在REG1侧的pin3上。",
+    "module_reference": "采用本项目缓存的海凌科官方V1.7手册，CTRL开路或3.5–12V为开、相对输入负端0–1.2V为关；不借用同名其他厂家资料作为保证。",
+    "simplification": "避免增加先前候选的AO3400A、MMBT5551及5只电阻组成的7件电子CTRL网络，同时删除原buck的R_PSU_EN。保留已有SW_RUN及PRE_CTRL下拉、POR和主FET本地控制。",
+    "counts": [
+      {
+        "condition": "7只现有510Ω料号并联作最小负载；不叠加六段电阻链",
+        "delta": "删除7件原buck专属/关联件和R_PSU_EN，增加1件模块及7件负载电阻",
+        "components": 213,
+        "normalized_mpn_types": 55
+      },
+      {
+        "condition": "单只75Ω功率电阻代替7只510Ω；新增一个精确MPN，尚未选定",
+        "components": 207,
+        "normalized_mpn_types": 56
+      },
+      {
+        "condition": "证明实际负载满足精确版本的最低负载条件后，能够完全取消附加负载；当前不能采用",
+        "components": 206,
+        "normalized_mpn_types": 55
+      }
+    ],
+    "open_electrical_checks": [
+      "核对原生开关针号、实际面板ON/OFF方向及精确模块版本。",
+      "核对SW_RUN与PRE_CTRL合并后的默认态、开关弹跳、POR复位以及外部MCU/I/O回灌；原生逐针验证尚未实施。",
+      "CTRL断线将使模块浮空上电；须验证5V意外上电而逻辑失电时不会回灌，主FET仍按原本地路径保持关断。不能把控制电源上电等同主回路接通。",
+      "REG1失电不再通过电子CTRL自动关闭5V；核对这一状态的能耗及本地保护实际动作。",
+      "核对CTRL对地开关电流与接点适用条件；模块关断输入电流不等同CTRL引脚电流。"
+    ]
+  },
+  "minimum_load": {
+    "basis": "本项目海凌科V1.7资料对容性负载提出3%最低负载条件，额定2A对应60mA；当前不能用其他厂家的零负载规格撤销。",
+    "seven_510": "复用现有精确料号，分担耗散；已有独立候选计算，须随最终电源容差/温度重新绑定。",
+    "single_75": "共用库未发现已核实的75Ω功率料号；在仅作示例的5.25V、74.25Ω条件下耗散约0.371W，必须再核对实际最高输出与60°C降额，不直接宣称0.5W型号足够。",
+    "decision": "优先查明核心板及其他始终连接负载的保证最小耗流，再决定使用单只功率电阻、复用510Ω或不增加负载。"
+  },
+  "other_candidates_not_in_counts": [
+    "SN74LVC1G08功能用现有SN74LVC1G11第三输入固定高实现；涉及5脚到6脚封装/库绑定变化，尚未落图。",
+    "低压100nF与现有100V 100nF精确料号归并：需逐位置核对电容量、封装、成本和供应。",
+    "VO617A-2与AT3H74-CuH-S合并：需核对CTR温度范围、光耦引脚、未用通道和隔离边界，不能仅按25°C典型值替换。",
+    "BQ原生预放电不能直接替代独立启动窗：非零PDSG超时可使DSG接通；不得把PTO当作PDSG失败保护。",
+    "SGM2593风扇支路保护与模块总OCP的动作范围不同，现阶段保留；温控调速另用独立PWM接口。"
+  ],
+  "formal_change": false
+}

@@ -1,0 +1,1846 @@
+{
+  "document": "2026-10-21 user-authorized FOC-A source; static precharge-permission Buck shutdown candidate implemented through official API; FOC-B is same schematic with R_LOAD_VALID_BIAS DNP.",
+  "pageUuid": "90aa6c46493624cf",
+  "scope": "Official saved native schematic candidate for both-board LOAD_POWER_VALID control. Each FOC board has 2x MMBT3904LT1G, 3x resistors and 1x 2-pin interface; R_LOAD_VALID_BIAS is a position on both but installed on FOC-A only and DNP on FOC-B. The shared single 10k bias is not tied to two SAFE_5V rails. Static pin/logic closure does not constitute full-temperature transistor/opto qualification, fault-tolerance, DRC warning closure, PCB, firmware, precharge hardware, or bench acceptance.",
+  "components": [
+    {
+      "ref": "U1",
+      "pins": {
+        "1": "GND_SYS",
+        "2": "VGLS",
+        "3": "CP_FLYING_LO",
+        "4": "CP_FLYING_HI",
+        "5": "BUS",
+        "6": "BUS",
+        "7": "VCP_PUMP",
+        "8": "DRV_GUH",
+        "9": "PH_U",
+        "10": "DRV_GUL",
+        "11": "SH_U",
+        "12": "GND_SYS",
+        "13": "GND_SYS",
+        "14": "SH_V",
+        "15": "DRV_GVL",
+        "16": "PH_V",
+        "17": "DRV_GVH",
+        "18": "DRV_GWH",
+        "19": "PH_W",
+        "20": "DRV_GWL",
+        "21": "SH_W",
+        "22": "GND_SYS",
+        "23": "CSA_SO_W_RAW",
+        "24": "CSA_SO_V_RAW",
+        "25": "CSA_SO_U_RAW",
+        "26": "VREF_CORE",
+        "27": "GND_SYS",
+        "28": "BREAK_N",
+        "29": "DRV_SPI_MISO",
+        "30": "DRV_SPI_MOSI",
+        "31": "DRV_SPI_SCK",
+        "32": "DRV_SPI_CS_N",
+        "33": "DRV_ENABLE",
+        "34": "PWM_UH",
+        "35": "PWM_UL",
+        "36": "PWM_VH",
+        "37": "PWM_VL",
+        "38": "PWM_WH",
+        "39": "PWM_WL",
+        "40": "DVDD_5V",
+        "41": "GND_SYS",
+        "42": "BUCK_SW",
+        "43": "BUS",
+        "44": "BUCK_VCC",
+        "45": "BUCK_BST",
+        "46": "BUCK_RCL",
+        "47": "BUCK_RT_SD",
+        "48": "BUCK_FB",
+        "49": "GND_SYS"
+      },
+      "manufacturerId": "DRV8353RSRGZR",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U2",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB",
+        "4": "GND_SYS",
+        "5": "BUS",
+        "8": "BUS",
+        "9": "GND_SYS"
+      },
+      "manufacturerId": "TPS7A4001DGNR",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U3",
+      "pins": {
+        "1": "BREAK_N",
+        "2": "BREAK_N",
+        "3": "SAFE_5V",
+        "4": "VNEG_REF",
+        "5": "NEG_U",
+        "6": "VNEG_REF",
+        "7": "NEG_V",
+        "8": "VNEG_REF",
+        "9": "NEG_W",
+        "10": "VBUS_OV_SENSE",
+        "11": "V_OV_REF",
+        "12": "GND_SYS",
+        "13": "BUSOV_N",
+        "14": "BREAK_N"
+      },
+      "manufacturerId": "TLV1704AIPWR",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U4",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "DUMP_DRV_OUT",
+        "3": "DUMP_DRV_OUT",
+        "4": "GND_SYS",
+        "5": "BUSOV_N",
+        "6": "DUMP_THERM_OK"
+      },
+      "manufacturerId": "UCC27511ADBVR",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U5",
+      "pins": {
+        "1": "FDCAN1_TX",
+        "2": "GND_SYS",
+        "3": "5V_BUCK",
+        "4": "FDCAN1_RX",
+        "5": "MCU_3V3",
+        "6": "CANL_CONN",
+        "7": "CANH_CONN",
+        "8": "CAN_STB"
+      },
+      "manufacturerId": "TCAN1042HGVDRQ1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q1",
+      "pins": {
+        "1": "GATE_UH",
+        "2": "PH_U",
+        "3": "BUS"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q2",
+      "pins": {
+        "1": "GATE_UL",
+        "2": "SH_U",
+        "3": "PH_U"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q3",
+      "pins": {
+        "1": "GATE_VH",
+        "2": "PH_V",
+        "3": "BUS"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q4",
+      "pins": {
+        "1": "GATE_VL",
+        "2": "SH_V",
+        "3": "PH_V"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q5",
+      "pins": {
+        "1": "GATE_WH",
+        "2": "PH_W",
+        "3": "BUS"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q6",
+      "pins": {
+        "1": "GATE_WL",
+        "2": "SH_W",
+        "3": "PH_W"
+      },
+      "manufacturerId": "IPT015N10N5ATMA1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q7",
+      "pins": {
+        "1": "DUMP_GATE",
+        "2": "DUMP_SW",
+        "3": "GND_SYS"
+      },
+      "manufacturerId": "IRLB4030PBF",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSU",
+      "pins": {
+        "1": "SH_U",
+        "2": "SH_U",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "manufacturerId": "PSF4NTEBL500F",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSV",
+      "pins": {
+        "1": "SH_V",
+        "2": "SH_V",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "manufacturerId": "PSF4NTEBL500F",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSW",
+      "pins": {
+        "1": "SH_W",
+        "2": "SH_W",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "manufacturerId": "PSF4NTEBL500F",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBUS1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "PEH200PJ5100MB2",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "DTVS1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "SMCJ40A",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_DVDD_C",
+      "pins": {
+        "1": "DVDD_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C105K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VGLS_C",
+      "pins": {
+        "1": "VGLS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C105K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VCP_C",
+      "pins": {
+        "1": "VCP_PUMP",
+        "2": "BUS"
+      },
+      "manufacturerId": "C1608X7R1C105K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_CP_C",
+      "pins": {
+        "1": "CP_FLYING_HI",
+        "2": "CP_FLYING_LO"
+      },
+      "manufacturerId": "C1608X7S2A473K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VCC_C",
+      "pins": {
+        "1": "BUCK_VCC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C474K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_L",
+      "pins": {
+        "1": "BUCK_SW",
+        "2": "5V_BUCK"
+      },
+      "manufacturerId": "CDRH127/LDNP-221MC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_D",
+      "pins": {
+        "1": "BUCK_SW",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "DFLS1100-7",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_RFB1",
+      "pins": {
+        "1": "BUCK_FB",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-073K01L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_RFB2",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "BUCK_FB"
+      },
+      "manufacturerId": "RC0603FR-073K01L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_RRIP",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "BUCK_RIPPLE_CAP"
+      },
+      "manufacturerId": "PT0603FR-070R82L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_RT",
+      "pins": {
+        "1": "BUCK_RT_SD",
+        "2": "BUS"
+      },
+      "manufacturerId": "RC0603FR-07280KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_RCL",
+      "pins": {
+        "1": "BUCK_RCL",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-071ML",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_CBST",
+      "pins": {
+        "1": "BUCK_BST",
+        "2": "BUCK_SW"
+      },
+      "manufacturerId": "C1608C0G1H103J080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U2_CIN",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A225K230AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U2_COUT",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R1A106K160AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U2_RTOP",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB"
+      },
+      "manufacturerId": "RC0603FR-0797K6L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U2_RBOT",
+      "pins": {
+        "1": "SAFE_FB",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0730K1L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U5_C",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RNEG_TOP",
+      "pins": {
+        "1": "VREF_CORE",
+        "2": "VNEG_REF"
+      },
+      "manufacturerId": "RC0603FR-0726K7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RNEG_BOT",
+      "pins": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OVTOP",
+      "pins": {
+        "1": "BUS",
+        "2": "VBUS_OV_SENSE"
+      },
+      "manufacturerId": "RT0603BRD07162KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OVBOT",
+      "pins": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OVREF_TOP",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "V_OV_REF"
+      },
+      "manufacturerId": "RT0603BRD0710K2L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OVREF_BOT",
+      "pins": {
+        "1": "V_OV_REF",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OV_HYS",
+      "pins": {
+        "1": "BUSOV_N",
+        "2": "V_OV_REF"
+      },
+      "manufacturerId": "RC0603FR-07200KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_OV_PU",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "BUSOV_N"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BREAK_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "BREAK_N"
+      },
+      "manufacturerId": "RC0603FR-072K2L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_DRV_EN_PD",
+      "pins": {
+        "1": "DRV_ENABLE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_DUMP_GATE_PD",
+      "pins": {
+        "1": "DUMP_GATE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_DUMP_GATE",
+      "pins": {
+        "1": "DUMP_DRV_OUT",
+        "2": "DUMP_GATE"
+      },
+      "manufacturerId": "RC0603FR-0710RL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_SAFEADC_TOP",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_ADC"
+      },
+      "manufacturerId": "RC0603FR-0727K4L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_SAFEADC_BOT",
+      "pins": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_SAFEADC",
+      "pins": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BUSADC_TOP",
+      "pins": {
+        "1": "BUS",
+        "2": "VBUS_ADC_SENSE"
+      },
+      "manufacturerId": "RC0603FR-07180KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BUSADC_BOT",
+      "pins": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_BUSADC",
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBUS2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "PEH200PJ5100MB2",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "CBUS3",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "PEH200PJ5100MB2",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "J_BRAKE_R",
+      "pins": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      },
+      "manufacturerId": "",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "F_BRAKE",
+      "pins": {
+        "1": "BUS",
+        "2": "DUMP_RES_UP"
+      },
+      "manufacturerId": "Eaton CBBF-60",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "J_TEMP",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "DUMP_THERM_OK"
+      },
+      "manufacturerId": "HC-XH2.54-2AW-M",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_DUMP_A",
+      "pins": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      },
+      "manufacturerId": "LPS0300H2R00FB",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "R_DUMP_B",
+      "pins": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      },
+      "manufacturerId": "LPS0300H2R00FB",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "J_CAN",
+      "pins": {
+        "1": "GND_SYS",
+        "2": "CANH_CONN",
+        "3": "CANL_CONN"
+      },
+      "manufacturerId": "B3B-XH-A(LF)(SN)",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "D_CAN_ESD",
+      "pins": {
+        "1": "CANH_CONN",
+        "2": "CANL_CONN",
+        "3": "GND_SYS"
+      },
+      "manufacturerId": "PESD2CANFD24V-TR",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_CAN_TERM",
+      "pins": {
+        "1": "CANH_CONN",
+        "2": "CANL_CONN"
+      },
+      "manufacturerId": "RC0603FR-07120RL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_HALL",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "HALL_A_RAW",
+        "3": "HALL_B_RAW",
+        "4": "HALL_C_RAW",
+        "5": "GND_SYS"
+      },
+      "manufacturerId": "B5B-PH-K-S(LF)(SN)",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HA",
+      "pins": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HB",
+      "pins": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HC",
+      "pins": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_HA",
+      "pins": {
+        "1": "HALL_A",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_HB",
+      "pins": {
+        "1": "HALL_B",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_HC",
+      "pins": {
+        "1": "HALL_C",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HALL_PU_A",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_A_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HALL_PU_B",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_B_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HALL_PU_C",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_C_DIRECT"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CNEG_REF",
+      "pins": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSO_U",
+      "pins": {
+        "1": "CSA_SO_U_RAW",
+        "2": "SO_U_ADC"
+      },
+      "manufacturerId": "RC0603FR-0747RL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CSO_U",
+      "pins": {
+        "1": "SO_U_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H221J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSO_V",
+      "pins": {
+        "1": "CSA_SO_V_RAW",
+        "2": "SO_V_ADC"
+      },
+      "manufacturerId": "RC0603FR-0747RL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CSO_V",
+      "pins": {
+        "1": "SO_V_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H221J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "RSO_W",
+      "pins": {
+        "1": "CSA_SO_W_RAW",
+        "2": "SO_W_ADC"
+      },
+      "manufacturerId": "RC0603FR-0747RL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CSO_W",
+      "pins": {
+        "1": "SO_W_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H221J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GUH",
+      "pins": {
+        "1": "DRV_GUH",
+        "2": "GATE_UH"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_UH",
+      "pins": {
+        "1": "GATE_UH",
+        "2": "PH_U"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GUL",
+      "pins": {
+        "1": "DRV_GUL",
+        "2": "GATE_UL"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_UL",
+      "pins": {
+        "1": "GATE_UL",
+        "2": "SH_U"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_U_HF1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C4532X7S2A475K230KB",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_U_HF2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A104K200AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GVH",
+      "pins": {
+        "1": "DRV_GVH",
+        "2": "GATE_VH"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_VH",
+      "pins": {
+        "1": "GATE_VH",
+        "2": "PH_V"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GVL",
+      "pins": {
+        "1": "DRV_GVL",
+        "2": "GATE_VL"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_VL",
+      "pins": {
+        "1": "GATE_VL",
+        "2": "SH_V"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_V_HF1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C4532X7S2A475K230KB",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_V_HF2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A104K200AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GWH",
+      "pins": {
+        "1": "DRV_GWH",
+        "2": "GATE_WH"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_WH",
+      "pins": {
+        "1": "GATE_WH",
+        "2": "PH_W"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GWL",
+      "pins": {
+        "1": "DRV_GWL",
+        "2": "GATE_WL"
+      },
+      "manufacturerId": "RC0603FR-074R7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_GS_WL",
+      "pins": {
+        "1": "GATE_WL",
+        "2": "SH_W"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_W_HF1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C4532X7S2A475K230KB",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "CBYP_W_HF2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A104K200AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "F_MAIN",
+      "pins": {
+        "1": "PACK+",
+        "2": "BUS"
+      },
+      "manufacturerId": "Eaton CBBF-100",
+      "addIntoBom": true,
+      "addIntoPcb": false
+    },
+    {
+      "ref": "J_BUS_P",
+      "pins": {
+        "1": "BUS",
+        "2": "BUS",
+        "3": "BUS",
+        "4": "BUS"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_BUS_N",
+      "pins": {
+        "1": "GND_SYS",
+        "2": "GND_SYS",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_MOTOR_U",
+      "pins": {
+        "1": "PH_U",
+        "2": "PH_U",
+        "3": "PH_U",
+        "4": "PH_U"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_MOTOR_V",
+      "pins": {
+        "1": "PH_V",
+        "2": "PH_V",
+        "3": "PH_V",
+        "4": "PH_V"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_MOTOR_W",
+      "pins": {
+        "1": "PH_W",
+        "2": "PH_W",
+        "3": "PH_W",
+        "4": "PH_W"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_DUMP_SW",
+      "pins": {
+        "1": "DUMP_SW",
+        "2": "DUMP_SW",
+        "3": "DUMP_SW",
+        "4": "DUMP_SW"
+      },
+      "manufacturerId": "MFE04542-T1",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BUSADC_SER",
+      "pins": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "BUS_ADC"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "D_BUSADC_CLAMP",
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "BZT52H-C3V6,115",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_TEMP_MOS_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "TEMP_MOS_NODE"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_TEMP_MOS_SER",
+      "pins": {
+        "1": "TEMP_MOS_NODE",
+        "2": "TEMP_MOS_ADC"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_TEMP_MOS",
+      "pins": {
+        "1": "TEMP_MOS_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H103J080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_TEMP_MOS",
+      "pins": {
+        "1": "TEMP_MOS_NODE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "HC-XH2.54-2AW-M",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_TEMP_MOTOR_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "TEMP_MOTOR_NODE"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_TEMP_MOTOR_SER",
+      "pins": {
+        "1": "TEMP_MOTOR_NODE",
+        "2": "TEMP_MOTOR_ADC"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_TEMP_MOTOR",
+      "pins": {
+        "1": "TEMP_MOTOR_ADC",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H103J080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_TEMP_MOTOR",
+      "pins": {
+        "1": "TEMP_MOTOR_NODE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "HC-XH2.54-2AW-M",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_PWR_SENSE",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "MCU_3V3",
+        "3": "GND_SYS",
+        "4": "SAFE_ADC",
+        "5": "BUS_ADC",
+        "6": "BREAK_N",
+        "7": "DRV_ENABLE",
+        "8": "BREAK_N"
+      },
+      "manufacturerId": "XY-XH2.54-8A11",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_DUMP_INP_PD",
+      "pins": {
+        "1": "DUMP_THERM_OK",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_HALL_VCC1",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R1A106K160AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_HALL_VCC2",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_THERM_TOP",
+      "pins": {
+        "1": "DUMP_THERM_OK",
+        "2": "THERM_SENSE"
+      },
+      "manufacturerId": "RC0603FR-0712KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_THERM_BOT",
+      "pins": {
+        "1": "THERM_SENSE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0720KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_THERM_SER",
+      "pins": {
+        "1": "THERM_SENSE",
+        "2": "DUMP_THERM_OK_GPIO"
+      },
+      "manufacturerId": "RC0603FR-07100KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VM_C1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A104K200AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VM_C2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C4532X7S2A475K230KB",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_CIN1",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A225K230AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_CIN2",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R2A104K200AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_COUT1",
+      "pins": {
+        "1": "BUCK_RIPPLE_CAP",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C3225X7R1C226K250AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_BUCK_COUT2",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C474K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U3_C1",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U3_C2",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C105K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U4_C1",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U4_C2",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1C105K080AC",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VREF_C",
+      "pins": {
+        "1": "VREF_CORE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_CAN_TX_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "FDCAN1_TX"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_CAN_STB_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "CAN_STB"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_MCU_L",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "5V_BUCK",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "BREAK_N",
+        "6": "PWM_UL",
+        "7": "PWM_VL",
+        "8": "PWM_WL",
+        "9": null,
+        "10": "PWM_UH",
+        "11": "PWM_VH",
+        "12": "PWM_WH",
+        "13": "FDCAN1_RX",
+        "14": "FDCAN1_TX",
+        "15": "HALL_A",
+        "16": null,
+        "17": null,
+        "18": "HALL_B",
+        "19": null,
+        "20": "CAN_STB",
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": "DUMP_THERM_OK_GPIO"
+      },
+      "manufacturerId": "JXT-PM2.54-2X12P-A9",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "J_MCU_R",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "MCU_3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "HALL_C",
+        "6": "DRV_ENABLE",
+        "7": null,
+        "8": "VREF_CORE",
+        "9": "SAFE_ADC",
+        "10": "TEMP_MOTOR_ADC",
+        "11": "DRV_SPI_MOSI",
+        "12": "BUS_ADC",
+        "13": "DRV_SPI_SCK",
+        "14": "DRV_SPI_MISO",
+        "15": "SO_V_ADC",
+        "16": "DRV_SPI_CS_N",
+        "17": "SO_U_ADC",
+        "18": "TEMP_MOS_ADC",
+        "19": null,
+        "20": "SO_W_ADC",
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
+      "manufacturerId": "JXT-PM2.54-2X12P-A9",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HA_5V_SER",
+      "pins": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_5V_DIV"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HA_5V_PD",
+      "pins": {
+        "1": "HALL_A_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0718KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "JP_HA",
+      "pins": {
+        "1": "HALL_A_DIRECT",
+        "2": "HALL_A",
+        "3": "HALL_A_5V_DIV"
+      },
+      "manufacturerId": "Jumper3",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HB_5V_SER",
+      "pins": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_5V_DIV"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HB_5V_PD",
+      "pins": {
+        "1": "HALL_B_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0718KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "JP_HB",
+      "pins": {
+        "1": "HALL_B_DIRECT",
+        "2": "HALL_B",
+        "3": "HALL_B_5V_DIV"
+      },
+      "manufacturerId": "Jumper3",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HC_5V_SER",
+      "pins": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_5V_DIV"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_HC_5V_PD",
+      "pins": {
+        "1": "HALL_C_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0718KL",
+      "addIntoBom": false,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "JP_HC",
+      "pins": {
+        "1": "HALL_C_DIRECT",
+        "2": "HALL_C",
+        "3": "HALL_C_5V_DIV"
+      },
+      "manufacturerId": "Jumper3",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U5_VIO_C",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608X7R1A104K080AE",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "C_OV_SENSE",
+      "pins": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "C1608C0G1H102J080AA",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q_BOV_PNP",
+      "pins": {
+        "1": "BOV_PNP_BASE",
+        "2": "SAFE_5V",
+        "3": "BOV_BK_SRC"
+      },
+      "manufacturerId": "BC857C",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BOV_DRIVE",
+      "pins": {
+        "1": "BOV_BK_SRC",
+        "2": "BOV_BK_DRIVE"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BOV_PNP_B",
+      "pins": {
+        "1": "BUSOV_N",
+        "2": "BOV_PNP_BASE"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q_BOV_NPN",
+      "pins": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS",
+        "3": "BREAK_N"
+      },
+      "manufacturerId": "BC847C",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_BOV_NPN_PD",
+      "pins": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_SPI_SDO_PU",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "DRV_SPI_MISO"
+      },
+      "manufacturerId": "RC0603FR-074K7L",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "U1_VM_C3",
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "EEEFK2A330P",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_NEG_U_IN",
+      "pins": {
+        "1": "CSA_SO_U_RAW",
+        "2": "NEG_U"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_NEG_V_IN",
+      "pins": {
+        "1": "CSA_SO_V_RAW",
+        "2": "NEG_V"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "R_NEG_W_IN",
+      "pins": {
+        "1": "CSA_SO_W_RAW",
+        "2": "NEG_W"
+      },
+      "manufacturerId": "RC0603FR-071KL",
+      "addIntoBom": true,
+      "addIntoPcb": true
+    },
+    {
+      "ref": "Q_BUCK_CLAMP",
+      "pins": {
+        "1": "BUCK_CLAMP_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_RT_SD"
+      },
+      "manufacturerId": "MMBT3904LT1G",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "SOT-23 NPN; pin1=B, pin2=E, pin3=C. Q_CLAMP base is pulled from BUS through R_BUCK_CLAMP_BUS; collector clamps U1 DRV8353RS pin47 BUCK_RT_SD low when permission is absent.",
+      "supplierId": "C81464",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "R_BUCK_CLAMP_BUS",
+      "pins": {
+        "1": "BUS",
+        "2": "BUCK_CLAMP_BASE"
+      },
+      "manufacturerId": "RC0603FR-07100KL",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "100kΩ, 0603, 1%; supplies Q_BUCK_CLAMP base bias from BUS.",
+      "supplierId": "C14675",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "Q_BUCK_RELEASE",
+      "pins": {
+        "1": "BUCK_RELEASE_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_CLAMP_BASE"
+      },
+      "manufacturerId": "MMBT3904LT1G",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "SOT-23 NPN; pin1=B, pin2=E, pin3=C. LOAD_POWER_VALID drives the base through R_BUCK_VALID_BASE; collector pulls BUCK_CLAMP_BASE low to release the clamp.",
+      "supplierId": "C81464",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "R_BUCK_VALID_BASE",
+      "pins": {
+        "1": "LOAD_POWER_VALID",
+        "2": "BUCK_RELEASE_BASE"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "10kΩ, 0603, 1%; limits Q_BUCK_RELEASE base current.",
+      "supplierId": "C98220",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "R_BUCK_VALID_PD",
+      "pins": {
+        "1": "BUCK_RELEASE_BASE",
+        "2": "GND_SYS"
+      },
+      "manufacturerId": "RC0603FR-07100KL",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "100kΩ, 0603, 1%; holds Q_BUCK_RELEASE off when LOAD_POWER_VALID is low, open, or unpowered.",
+      "supplierId": "C14675",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "R_LOAD_VALID_BIAS",
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "LOAD_EN_BIAS_EXT"
+      },
+      "manufacturerId": "RC0603FR-0710KL",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "10kΩ, 0603, 1%; shared optocoupler receiver bias from FOC-A SAFE_5V to LOAD_EN_BIAS_EXT. Install on FOC-A only; DNP on FOC-B. Never populate both or connect the two SAFE_5V rails.",
+      "supplierId": "C98220",
+      "population": {
+        "FOC-A": "INSTALL",
+        "FOC-B": "DNP",
+        "systemInstalledQuantity": 1,
+        "systemPositionQuantity": 2
+      },
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    },
+    {
+      "ref": "J_LOAD_POWER_VALID",
+      "pins": {
+        "1": "LOAD_EN_BIAS_EXT",
+        "2": "LOAD_POWER_VALID"
+      },
+      "manufacturerId": "2EDGVC-5.08-02P-14-100A(H)",
+      "addIntoBom": true,
+      "addIntoPcb": true,
+      "note": "DEGSON 2-position 5.08mm exact shared-library part C581328; pin1=LOAD_EN_BIAS_EXT, pin2=LOAD_POWER_VALID; same pinout as BMS. Matching cable-side plug C581323, one per FOC. No B0 connection; receiver reference is the existing BUS−/GND_SYS.",
+      "supplierId": "C581328",
+      "manufacturer": "DEGSON(高正/高松)",
+      "supplier": "LCSC",
+      "candidateStatus": "STATIC_CANDIDATE_IMPLEMENTED_OPEN_FULL_TEMPERATURE_AND_BENCH"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "bodyText": "策略网络二维展开 实时张量与数据流\n打开三维查看器 ↗\n运行\n暂停\n重置回合\n读取当前帧\n60 层完整展开 · Graphviz 曲线 · 16 处交叉\n全局自适应\n±2.44281\n冻结本页\n适配全部\n100%\n−\n＋\n收起详情\n输入 → 编码 → 融合 → 记忆 → 动作[左履带，右履带，云台偏航，云台俯仰]　·　连线只表示真实数据依赖；跨线小弧不是神经元\n全光谱 · 低值\n−2.44281\n0\n+2.44281\n高值 · 未采集为灰，NaN/Inf为洋红\n已连接\n帧\n201\n输入时刻\n9.950 s\n步后时刻\n10.000 s\n运行状态\n已暂停 · 10.00 s\n模型\n未训练 · 随机初始化\n模式\n实际驾驶推理（动作前观测）\n价值诊断\n独立只读\n消息\nx 48.28 · y 21.31 · yaw -2.32 · z 0.15\n网络结构\n导航只聚焦画布位置；全部真实层与连接始终保留在同一张图中。\n策略流程\n01\n传感输入\n雷达、深度、状态与反馈\n02\n特征编码\n各传感器编码支路\n03\n融合表示\n策略共享特征\n04\n循环记忆\n驾驶与价值诊断状态\n05\n动作输出\n履带与云台控制\n辅助诊断\nV\n价值分支\n独立只读价值估计\n\n点击分区会缩放到对应节点，不会隐藏其它层或改变网络拓扑。使用“适配全部”恢复完整展开视图。\n\n雷达\n深度\n检测\n状态\n反馈\n策略\n价值\n动作\n策略与动作\n深度输入支路\n雷达输入支路\n检测输入支路\n传感融合\n状态输入支路\n惯性与驱动反馈支路\n独立价值诊断\n雷达输入\n(1 × 400)\n一维卷积 1→16 · 环形填充\n(16 × 200)\nReLU\n(16 × 200)\n一维卷积 16→32 · 环形填充\n(32 × 100)\nReLU\n(32 × 100)\n一维自适应平均池化 · 50\n(32 × 50)\n展平 Flatten\n(1600)\n全连接 1600→32\n(32)\n激光雷达编码输出 · 32维\n(32)\n深度输入\n(1 × 160 × 88)\n二维卷积 1→8\n(8 × 80 × 44)\nReLU\n(8 × 80 × 44)\n二维卷积 8→16\n(16 × 40 × 22)\nReLU\n(16 × 40 × 22)\n二维自适应平均池化 · 8×6\n(16 × 8 × 6)\n展平 Flatten\n(768)\n全连接 768→64\n(64)\n深度图编码输出 · 64维\n(64)\n检测输入\n(16 × 8)\n全连接 8→32\n(16 × 32)\nReLU\n(16 × 32)\n全连接 32→32\n(16 × 32)\n检测框编码输出 · 32维\n(16 × 32)\n逐框有效性掩码\n(16 × 32)\n检测编码输出 · 32维\n(32)\n池化来源索引\n(32)\n状态输入\n(33)\n全连接 33→32\n(32)\n任务与定位状态编码输出 · 32维\n(32)\n惯性与驱动反馈\n(37)\n全连接 37→32\n(32)\n惯性与驱动反馈编码输出 · 32维\n(32)\n融合 · 192维\n(192)\n驾驶记忆 LSTM\n(128)\n输入隐状态 h₀\n(1 × 128)\n输入记忆 c₀\n(1 × 128)\n输出隐状态 h₁\n(1 × 128)\n输出记忆 c₁\n(1 × 128)\n输入门 i\n(1 × 128)\n遗忘门 f\n(1 × 128)\n候选记忆 g\n(1 × 128)\n输出门 o\n(1 × 128)\n动作头 全连接 128→64\n(64)\n动作头 Tanh\n(64)\n左右履带＋云台\n(4)\n价值记忆 LSTM\n(128)\n输入隐状态 h₀\n(1 × 128)\n输入记忆 c₀\n(1 × 128)\n输出隐状态 h₁\n(1 × 128)\n输出记忆 c₁\n(1 × 128)\n输入门 i\n(1 × 128)\n遗忘门 f\n(1 × 128)\n候选记忆 g\n(1 × 128)\n输出门 o\n(1 × 128)\n价值头 全连接 128→64\n(64)\n价值头 Tanh\n(64)\n状态价值 V(s)\n(1)\nGaussian log_std …\n(4)\n动作分布标准差 σ\n(4)\n左右履带＋云台\n(4)\n惯性与驱动反馈输入\n聚焦此层\n收起\n激光雷达输入 · input.lidar\n一维卷积 1→16 · 环形填充 · features_extractor.laser.0\nReLU · features_extractor.laser.1\n一维卷积 16→32 · 环形填充 · features_extractor.laser.2\nReLU · features_extractor.laser.3\n一维自适应平均池化 · 50 · features_extractor.laser.4\n展平 Flatten · features_extractor.laser.5\n全连接 1600→32 · features_extractor.laser.6\n激光雷达编码输出 · 32维 · features_extractor.laser.7\n深度图输入 · input.depth\n二维卷积 1→8 · features_extractor.depth.0\nReLU · features_extractor.depth.1\n二维卷积 8→16 · features_extractor.depth.2\nReLU · features_extractor.depth.3\n二维自适应平均池化 · 8×6 · features_extractor.depth.4\n展平 Flatten · features_extractor.depth.5\n全连接 768→64 · features_extractor.depth.6\n深度图编码输出 · 64维 · features_extractor.depth.7\n检测框输入 · input.detections\n全连接 8→32 · features_extractor.boxes.0\nReLU · features_extractor.boxes.1\n全连接 32→32 · features_extractor.boxes.2\n检测框编码输出 · 32维 · features_extractor.boxes.3\n逐框有效性掩码 · detections.masked\n检测编码输出 · 32维 · detections.pooled\n池化来源索引 · detections.winner\n任务与定位状态输入 · input.state\n全连接 33→32 · features_extractor.proprioception.0\n任务与定位状态编码输出 · 32维 · features_extractor.proprioception.1\n惯性与驱动反馈输入 · input.feedback\n全连接 37→32 · features_extractor.feedback.0\n惯性与驱动反馈编码输出 · 32维 · features_extractor.feedback.1\n五路特征拼接 · 192维 · features_extractor\n驾驶记忆 LSTM · lstm_actor\n输入隐状态 h₀ · lstm_actor.h0\n输入记忆 c₀ · lstm_actor.c0\n输出隐状态 h₁ · lstm_actor.h\n输出记忆 c₁ · lstm_actor.c\n输入门 i · lstm_actor.i\n遗忘门 f · lstm_actor.f\n候选记忆 g · lstm_actor.g\n输出门 o · lstm_actor.o\n动作头 全连接 128→64 · mlp_extractor.policy_net.0\n动作头 Tanh · mlp_extractor.policy_net.1\n动作分布均值 μ · action_net\n价值记忆 LSTM · lstm_critic\n输入隐状态 h₀ · lstm_critic.h0\n输入记忆 c₀ · lstm_critic.c0\n输出隐状态 h₁ · lstm_critic.h\n输出记忆 c₁ · lstm_critic.c\n输入门 i · lstm_critic.i\n遗忘门 f · lstm_critic.f\n候选记忆 g · lstm_critic.g\n输出门 o · lstm_critic.o\n价值头 全连接 128→64 · mlp_extractor.value_net.0\n价值头 Tanh · mlp_extractor.value_net.1\n状态价值 V(s) · value_net\nGaussian log_std 参数 · action.log_std\n动作分布标准差 σ · action.std\n四维输出动作 · action.applied\n形状\n(37)\n元素数\n37\n来源\n实际前向\n说明\n37维：加速度、角速度、磁场、四元数、云台实测关节、左右Iq/RPM及有效性/帧龄；仿真电流为模型等效值\n张量\n激活值\n元素索引\n坐标\n[0]\n数值\n0.0172021426\n统计\n最小值\n-0.923\n最大值\n1.001\n均值\n0.222\n标准差\n0.472\n非有限值\n0\n字段\n云台IMU加速度X / 9.80665（g）\n云台IMU加速度Y / 9.80665（g）\n云台IMU加速度Z / 9.80665（g）\n云台IMU角速度X / π（rad/s）\n云台IMU角速度Y / π（rad/s）\n云台IMU角速度Z / π（rad/s）\n磁场X计数 / 32768\n磁场Y计数 / 32768\n磁场Z计数 / 32768\n云台IMU姿态四元数X\n云台IMU姿态四元数Y\n云台IMU姿态四元数Z\n云台IMU姿态四元数W\n云台偏航关节角 / π（rad）\n云台偏航关节速率 / π（rad/s）\n云台俯仰关节角 / π（rad）\n云台俯仰关节速率 / π（rad/s）\n左侧等效Iq / 100（A）\n左侧机械转速 / 10000（rpm）\n右侧等效Iq / 100（A）\n右侧机械转速 / 10000（rpm）\n有效标记：accel\n有效标记：gyro\n有效标记：mag\n有效标记：attitude\n有效标记：gimbal_yaw\n有效标记：gimbal_pitch\n有效标记：motor_left\n有效标记：motor_right\n数据年龄 / 2秒：accel\n数据年龄 / 2秒：gyro\n数据年龄 / 2秒：mag\n数据年龄 / 2秒：attitude\n数据年龄 / 2秒：gimbal_yaw\n数据年龄 / 2秒：gimbal_pitch\n数据年龄 / 2秒：motor_left\n数据年龄 / 2秒：motor_right",
+  "cardOverlaps": [],
+  "cardRectangleCount": 60,
+  "inputs": [
+    {
+      "key": "input.lidar",
+      "label": "激光雷达输入；400束距离/8米，1×400；无效返回为0，保留裁到量程的有效回波，(1 × 400)"
+    },
+    {
+      "key": "input.depth",
+      "label": "深度图输入；轴向Z深度/量程，1×160×88；无效值为0且无单独掩码；不是RGB图，(1 × 160 × 88)"
+    },
+    {
+      "key": "input.detections",
+      "label": "检测框输入；16个候选×8字段；由框宽高恢复存在掩码，距离有效位保留，(16 × 8)"
+    },
+    {
+      "key": "input.state",
+      "label": "任务与定位状态输入；33维：任务、定位、命令历史与逐传感器时序；云台角由反馈输入，(33)"
+    },
+    {
+      "key": "input.feedback",
+      "label": "惯性与驱动反馈输入；37维：加速度、角速度、磁场、四元数、云台实测关节、左右Iq/RPM及有效性/帧龄；仿真电流为模型等效值，(37)"
+    }
+  ],
+  "nodeCount": 60,
+  "selectedFields": [
+    "云台IMU加速度X / 9.80665（g）",
+    "云台IMU加速度Y / 9.80665（g）",
+    "云台IMU加速度Z / 9.80665（g）",
+    "云台IMU角速度X / π（rad/s）",
+    "云台IMU角速度Y / π（rad/s）",
+    "云台IMU角速度Z / π（rad/s）",
+    "磁场X计数 / 32768",
+    "磁场Y计数 / 32768",
+    "磁场Z计数 / 32768",
+    "云台IMU姿态四元数X",
+    "云台IMU姿态四元数Y",
+    "云台IMU姿态四元数Z",
+    "云台IMU姿态四元数W",
+    "云台偏航关节角 / π（rad）",
+    "云台偏航关节速率 / π（rad/s）",
+    "云台俯仰关节角 / π（rad）",
+    "云台俯仰关节速率 / π（rad/s）",
+    "左侧等效Iq / 100（A）",
+    "左侧机械转速 / 10000（rpm）",
+    "右侧等效Iq / 100（A）",
+    "右侧机械转速 / 10000（rpm）",
+    "有效标记：accel",
+    "有效标记：gyro",
+    "有效标记：mag",
+    "有效标记：attitude",
+    "有效标记：gimbal_yaw",
+    "有效标记：gimbal_pitch",
+    "有效标记：motor_left",
+    "有效标记：motor_right",
+    "数据年龄 / 2秒：accel",
+    "数据年龄 / 2秒：gyro",
+    "数据年龄 / 2秒：mag",
+    "数据年龄 / 2秒：attitude",
+    "数据年龄 / 2秒：gimbal_yaw",
+    "数据年龄 / 2秒：gimbal_pitch",
+    "数据年龄 / 2秒：motor_left",
+    "数据年龄 / 2秒：motor_right"
+  ],
+  "selectedTitle": "惯性与驱动反馈输入",
+  "title": "策略网络 · 二维展开",
+  "url": "http://127.0.0.1:8770/",
+  "viewBoxAfterFocus": "-655.522 556 1589.043 889",
+  "runtimeViewBoxBefore": "-55 -370.655 4723 2642.311",
+  "runtimeViewBoxAfter": "-55 -370.655 4723 2642.311",
+  "consoleWarningsAndErrors": []
+}

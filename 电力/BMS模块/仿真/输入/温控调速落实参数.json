@@ -1,0 +1,202 @@
+﻿{
+  "title": "BMS四线5V风扇温控调速参数化模型输入",
+  "date": "2026-10-15",
+  "model_boundary": "本文件用于策略逻辑和接口假设敏感性模型；不等于厂家保证或原型验收。",
+  "fan": {
+    "mpn": "Delta KSB0405HBF0D",
+    "supply_v": 5.0,
+    "typical_average_current_a": 0.16,
+    "maximum_label_current_a": 0.3,
+    "pwm_frequency_hz": 25000,
+    "stopped_command_percent": 0,
+    "full_speed_command_percent": 100,
+    "minimum_start_duty_percent_exclusive": 40,
+    "disconnected_pwm_is_full_speed": true,
+    "startup_peak_current_a_sensitivity_default": 0.45,
+    "startup_peak_current_is_manufacturer_guaranteed": false
+  },
+  "temperature": {
+    "cell_start_c": 35.0,
+    "cell_stop_c": 30.0,
+    "board_mos_start_c": 45.0,
+    "board_mos_stop_c": 40.0,
+    "kick_duty_percent": 60.0,
+    "kick_duration_s": 1.0,
+    "invalid_sensor_duty_percent": 100.0,
+    "stall_detection_timeout_s_after_kick": 1.0,
+    "cell_curve_c_percent": [
+      [
+        35.0,
+        60.0
+      ],
+      [
+        50.0,
+        80.0
+      ],
+      [
+        60.0,
+        100.0
+      ]
+    ],
+    "board_mos_curve_c_percent": [
+      [
+        45.0,
+        60.0
+      ],
+      [
+        52.5,
+        80.0
+      ],
+      [
+        60.0,
+        100.0
+      ]
+    ]
+  },
+  "power": {
+    "five_volt_module_mpn": "URB4805YMD-10WR3",
+    "five_volt_nominal_v": 5.0,
+    "five_volt_max_current_a": 2.0,
+    "design_input_min_v": 18.0,
+    "design_input_max_v": 75.0,
+    "base_load_planning_a": 0.3,
+    "sgm_mpn": "SGM2593XN6G/TR",
+    "ilim_resistor_ohm": 6800.0,
+    "ilim_resistor_tolerance_fraction": 0.01,
+    "sgm_ilim_manufacturer_min_at_nominal_resistor_a": 0.915,
+    "sgm_ilim_manufacturer_max_at_nominal_resistor_a": 1.088,
+    "sgm_foldback_fraction_approx": 0.6,
+    "branch_output_capacitance_f": 4.7e-05,
+    "output_ramp_sensitivity_s": [
+      0.0013,
+      0.005,
+      0.01
+    ],
+    "minimum_load_resistor_count": 7,
+    "minimum_load_resistor_ohm": 510.0,
+    "minimum_load_current_budget_a": 0.073
+  },
+  "pwm_open_drain_rc_assumptions": {
+    "gpio_v_high": 3.3,
+    "gate_series_ohm": 1000.0,
+    "gate_pulldown_ohm": 100000.0,
+    "gate_capacitance_f": 5e-10,
+    "fet_gate_on_threshold_v": 2.5,
+    "fet_rds_on_ohm_model": 0.048,
+    "fan_pwm_pullup_v": 5.0,
+    "fan_pwm_equivalent_pullup_ohm": 10000.0,
+    "fan_pwm_input_and_cable_capacitance_f": 1e-10,
+    "fan_pwm_logic_low_max_v_model": 0.4,
+    "fan_pwm_logic_high_min_v_model": 2.8,
+    "max_mid_level_fraction_percent_model": 2.5,
+    "simulation_step_s": 1e-07,
+    "periods_to_simulate": 12,
+    "periods_to_measure": 4,
+    "assumptions_are_not_ksb_model_guarantees": true
+  },
+  "verification_cases": {
+    "temperature_sequence": [
+      {
+        "time_s": 0.0,
+        "cell_temps_c": [
+          25.0,
+          25.0
+        ],
+        "board_c": 25.0,
+        "mos_c": 25.0,
+        "expected_state": "OFF",
+        "expected_duty_percent": 0.0
+      },
+      {
+        "time_s": 1.0,
+        "cell_temps_c": [
+          35.0,
+          29.0
+        ],
+        "board_c": 30.0,
+        "mos_c": 30.0,
+        "expected_state": "RUN",
+        "expected_duty_percent": 60.0
+      },
+      {
+        "time_s": 1.5,
+        "cell_temps_c": [
+          50.0,
+          30.0
+        ],
+        "board_c": 35.0,
+        "mos_c": 36.0,
+        "expected_state": "RUN",
+        "expected_duty_percent": 80.0
+      },
+      {
+        "time_s": 2.1,
+        "cell_temps_c": [
+          50.0,
+          30.0
+        ],
+        "board_c": 35.0,
+        "mos_c": 36.0,
+        "expected_state": "RUN",
+        "expected_duty_percent": 80.0
+      },
+      {
+        "time_s": 3.0,
+        "cell_temps_c": [
+          31.0,
+          30.0
+        ],
+        "board_c": 40.5,
+        "mos_c": 39.0,
+        "expected_state": "RUN",
+        "expected_duty_percent": 60.0
+      },
+      {
+        "time_s": 4.0,
+        "cell_temps_c": [
+          30.0,
+          30.0
+        ],
+        "board_c": 40.0,
+        "mos_c": 40.0,
+        "expected_state": "OFF",
+        "expected_duty_percent": 0.0
+      },
+      {
+        "time_s": 5.0,
+        "cell_temps_c": [
+          29.0,
+          28.0
+        ],
+        "board_c": null,
+        "mos_c": 30.0,
+        "expected_state": "RUN",
+        "expected_duty_percent": 100.0,
+        "sensor_valid": false
+      }
+    ],
+    "temperature_ramp_cell_c": [
+      35.0,
+      40.0,
+      45.0,
+      50.0,
+      55.0,
+      60.0
+    ],
+    "fan_start_peak_sweep_a": [
+      0.3,
+      0.45,
+      0.6,
+      0.8
+    ]
+  },
+  "source_evidence": {
+    "fan_datasheet": "https://www.delta-fan.com/Download/Spec/KSB0405HBF0D.pdf",
+    "sgm_datasheet": "https://www.sg-micro.com/rect/assets/4c0699d6-d8dc-4bdd-bbb6-45bdec34c0f8/SGM2593_SGM2593D.pdf",
+    "five_volt_module_manufacturer_product": "https://h.hlktech.com/download/DCDC%E7%94%B5%E6%BA%90%E6%A8%A1%E5%9D%9710W%E7%B3%BB%E5%88%97/1/UR%28A%29B_YMD-10WR3%E7%B3%BB%E5%88%97%E6%8A%80%E6%9C%AF%E6%89%8B%E5%86%8CV1.7.pdf",
+    "five_volt_module_hilink_download_index": "https://www.hlktech.net/index.php?cate=cate-713&id=download-center&pageid=1",
+    "mcu_datasheet": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+    "mcu_board_schematic": "https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/QFN48/WeAct-STM32G431CxUxCoreBoard_Long_V10%20SchDoc.pdf",
+    "ao3400a_datasheet": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf"
+  }
+}

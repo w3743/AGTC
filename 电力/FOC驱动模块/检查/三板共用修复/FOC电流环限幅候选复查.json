@@ -1,0 +1,211 @@
+{
+  "report": "FOC电流环限幅候选复查",
+  "date": "2026-10-15",
+  "overall_status": "MODEL_CONTROL_CANDIDATE_PASS_WITH_HARDWARE_AND_ENERGY_PATH_FAILS",
+  "scope": "FOC-only reference control-model repair and rerun. No CAD, schematic, BOM, PCB, firmware image, or central report was modified.",
+  "confirmed_motor_input": {
+    "model": "BDUAV N5065",
+    "kv_rpm_per_v": 270,
+    "pole_pairs": 7,
+    "evidence": "FOC驱动模块/参考资料/电机资料/N5065参数证据.md"
+  },
+  "run": {
+    "compile_command": "python -m py_compile 'FOC驱动模块/仿真/源码/simulate_current_loop_and_5v.py'",
+    "compile_return_code": 0,
+    "simulation_command": "python 'FOC驱动模块/仿真/源码/simulate_current_loop_and_5v.py'",
+    "simulation_return_code": 0,
+    "model_cases": 201,
+    "source": "FOC驱动模块/仿真/源码/simulate_current_loop_and_5v.py",
+    "source_sha256": "a79190eda060f505327601143b6b9c6bf860b4c38b1f3a54231fc84a3d3576c7",
+    "result": "FOC驱动模块/仿真/结果/current_loop_5v_screen.json",
+    "result_sha256": "9bbfcf73128094f7cb193ed2fc75777216945d61d6f53df89fcba721694733f4"
+  },
+  "reference_control_configuration": {
+    "q_current_command_limit_a": 100.0,
+    "slew_limit_a_per_s": 5000.0,
+    "pwm_sample_hz": 20000.0,
+    "reference_step_limit_a_per_pwm_sample": 0.25,
+    "current_controller": "dq average-plant PI with vector voltage saturation and back-calculation anti-windup",
+    "regen_policy": "Negative q-current request is allowed only with fresh positive power allocated to this board. Missing, zero, invalid-generation, expired or unqualified shared budget denies new regenerative request.",
+    "power_limit_source": "per_board_power_w, preallocated from shared battery/DC-DC absorption capability; no board may reuse the full shared budget",
+    "shared_sink_budget_qualified": false,
+    "600w_value": "sensitivity-only; not a default, capability, or approved limit",
+    "screening_limit_a": 120.0,
+    "screening_limit_boundary": "120 A is a model screening line, not a confirmed motor rating or absolute hardware maximum"
+  },
+  "model_results": {
+    "limited_drive_110a_request": {
+      "effective_command_a": 100.0,
+      "measured_peak_abs_a": 100.7651275875842,
+      "pwm_ripple_bound_pp_a": 23.625,
+      "screen_peak_envelope_a": 112.5776275875842,
+      "passes_120a_model_screen": true
+    },
+    "limited_regen_110a_request_synthetic_fresh_1800w_per_board": {
+      "effective_command_a": -100.0,
+      "measured_peak_abs_a": 100.76512943219717,
+      "pwm_ripple_bound_pp_a": 23.625,
+      "screen_peak_envelope_a": 112.57762943219717,
+      "passes_120a_model_screen": true,
+      "hardware_sink_qualification": false
+    },
+    "limited_100a_20uh_sensitivity_grid": {
+      "points": 30,
+      "worst_peak_envelope_a": 112.87957528784445,
+      "worst_corner": {
+        "phase_resistance_mohm": 10,
+        "phase_inductance_uh": 20,
+        "bus_voltage_v": 37.8
+      },
+      "margin_to_120a_screen_a": 7.120424712155554,
+      "classification": "assumption sweep only; the swept R/L values are not measured motor bounds"
+    },
+    "preserved_unlimited_stress_failures": {
+      "110a_hard_step": {
+        "fundamental_peak_a": 121.25192736533202,
+        "ripple_envelope_a": 131.37692736533202,
+        "passes_120a_screen": false
+      },
+      "110a_at_5000a_per_s": {
+        "fundamental_peak_a": 110.77746055513269,
+        "ripple_envelope_a": 120.90246055513269,
+        "passes_120a_screen": false
+      }
+    },
+    "bidirectional_transition": {
+      "command_schedule_a": [
+        110.0,
+        -110.0
+      ],
+      "max_reference_step_a": 0.25,
+      "step_bound_a": 0.25,
+      "test_pass": true
+    },
+    "anti_windup_saturation_recovery": {
+      "low_bus_v": 22.5,
+      "voltage_saturation_fraction": 0.6404166666666666,
+      "max_abs_integrator_v_with_back_calculation": 11.381446042524447,
+      "max_abs_integrator_v_without_back_calculation": 566.6152669008674,
+      "recovery_tail_mean_current_a": 0.0009480748104740917,
+      "test_pass": true
+    },
+    "capability_policy_tests": {
+      "passed": 7,
+      "cases": [
+        "missing capability",
+        "zero allocation",
+        "expired allocation",
+        "missing generation",
+        "replayed generation rejected at receive",
+        "accepted generation reusable within TTL",
+        "fresh per-board allocation"
+      ],
+      "test_pass": true
+    },
+    "two_board_budget_tests": {
+      "passed": 5,
+      "cases": [
+        "unknown budget blocks both boards",
+        "zero budget blocks both boards",
+        "unqualified budget blocks both boards",
+        "synthetic qualified 1800 W budget allocates 900 W + 900 W",
+        "over-allocation rejected"
+      ],
+      "qualification_boundary": "Logic tests only. The synthetic 1800 W qualification flag is not actual battery/DC-DC sink evidence.",
+      "test_pass": true
+    },
+    "cached_generation_pwm_reuse_test": {
+      "test_pass": true,
+      "accepted_generation": 5,
+      "ttl_s": 0.25,
+      "trace_duration_s": 0.12,
+      "per_board_power_w_sensitivity_only": 600.0,
+      "effective_regen_command_a": -32.583698856586416,
+      "max_reference_step_a": 0.25,
+      "same_generation_pwm_interface_has_no_replay_check_argument": true,
+      "requirement": "Generation anti-replay is checked once by the receive/update API; the accepted generation and allocation are cached and reused on PWM calls until TTL expiry. Each PWM checks age/TTL, not generation replay."
+    }
+  },
+  "ttl_expiry_loaded_regen_case": {
+    "test_case": "single-board -100 A regen request, 100 ms capability TTL, simulated to 500 ms",
+    "phase_r_ohm_sensitivity": 0.01,
+    "phase_l_h_sensitivity": 2E-05,
+    "per_board_power_w_sensitivity_input": 1800.0,
+    "shared_sink_budget_qualified": false,
+    "first_pwm_sample_after_expiry_s": 0.10005,
+    "current_at_last_sample_within_ttl_a": -99.97695589631569,
+    "peak_abs_current_after_expiry_a": 99.97456186234724,
+    "max_regen_power_after_expiry_w": 1774.0867477473482,
+    "requested_regen_command_after_expiry_a": 0.0,
+    "regen_energy_before_expiry_j": 160.43232821462976,
+    "regen_energy_after_expiry_to_500ms_j": 18.17936256612232,
+    "total_regen_energy_to_500ms_j": 178.61169078075676,
+    "reference_ramp_down_upper_bound_s": 0.02,
+    "local_per_board_absorber_sensitivity_requirement": {
+      "minimum_energy_j_for_modeled_post_expiry_tail": 18.17936256612232,
+      "peak_power_w_for_modeled_post_expiry_tail": 1774.0867477473482,
+      "qualification": "18.179 J is only the modeled post-TTL tail in this single-board sensitivity case, not a full hardware absorber rating. Actual sink qualification must also cover possible sustained mechanical/bus energy, stored magnetic energy, source backfeed, temperature, tolerance, and fault duration."
+    },
+    "status": "FAIL: TTL expiry zeros the request, not the physical current or regen energy; no qualified local sink/isolating path is established"
+  },
+  "analog_current_limit_boundary": {
+    "evidence": "FOC驱动模块/原理图准备/电流窗口误差核算.md",
+    "shunt_nominal_mohm": 0.5,
+    "csa_gain_candidate_v_per_v": 10,
+    "positive_comparator_cold_corner_min_a": 131.51464609627533,
+    "negative_comparator_cold_corner_abs_min_a": 130.62292185533047,
+    "static_min_margin_above_120a_screen_a": {
+      "positive": 11.514646096275328,
+      "negative": 10.622921855330475
+    },
+    "limitations": "Static tolerance corners are not a guaranteed sub-120 A fast clamp. CSA drift maximum, reference transients, PWM ripple, propagation max, break-to-gate delay, and board parasitics are not closed; do not count the comparator threshold as a 120 A runtime limiter."
+  },
+  "system_failures_unchanged": {
+    "safe_5v_loss": {
+      "classification": "FAIL / energy path unresolved",
+      "condition": "Existing ngspice behavior model assumes 1.8 kW regen persists after SAFE_5V loss at 100 ms.",
+      "vbus_cross_75v_s": 0.131714,
+      "vbus_cross_100v_s": 0.168228,
+      "interpretation": "Conditional model trend only. SAFE_5V supplies comparator/reference and dump-control circuitry; loss of the rail does not prove a guaranteed dump or galvanic/current isolation. The 1 s post-threshold voltage is not treated as valid prediction.",
+      "minimum_open_design": "A dump path that stays effective when SAFE_5V fails, with independently qualified drive/sense and a bounded energy source; proposed dual-rail isolation/OR remains unrated and is not implemented."
+    },
+    "official_drc": {
+      "errors": 0,
+      "warnings": 5,
+      "warning_detail": "Current official API record contains only the aggregate count; revised per-warning GUI detail is unavailable. DRC warning-free acceptance remains FAIL/open.",
+      "evidence": "FOC驱动模块/检查/未通过项修复/官方DRC与逐项日志.json"
+    }
+  },
+  "minimal_evidence_needed_for_hardware_closure": [
+    "Motor phase resistance and effective inductance over rotor angle, current, and temperature; back-EMF/speed range; definition and duty/thermal condition of the seller's 80 A and 1.8 kW specifications.",
+    "Actual shunt/CSA/reference/ADC gain, offset, filtering and synchronous sampling phase; deployed PWM/ISR/driver shutdown latency; measured switching ripple and maximum current slew; compare measured peaks against MOSFET, shunt, connector and motor limits.",
+    "Qualified per-board DC/DC/battery absorption power and energy allocation for both FOC boards, including a generation/TTL update source; measured behavior and independently powered local energy path during SAFE_5V loss; thermal and bus-voltage limits.",
+    "Official revised DRC warning-by-warning report or GUI evidence to classify the remaining five warnings."
+  ],
+  "archive_and_readback": {
+    "archive": "FOC驱动模块/归档/历史与调试.zip",
+    "archive_sha256": "edd9ca8c38c6979b2e6137fddb7a51040f8b6fa2e79c98a80bd27e7e483fcb19",
+    "zip_testzip": null,
+    "old_readme_member": "FOC驱动模块/README_20261015_before_current_review.md",
+    "old_readme_sha256_read_back": "c3c7bbd4aa5d1624f0f1de69cd2d879edc232d34be46e59c2a09325137f58f50",
+    "old_readme_backup_sha256": "c3c7bbd4aa5d1624f0f1de69cd2d879edc232d34be46e59c2a09325137f58f50",
+    "old_source_member": "FOC驱动模块/修改前快照_20261015/simulate_current_loop_and_5v.py",
+    "old_source_sha256_read_back": "cd11e0fa84533c78d6ab7d430b7f976efedc1f00cec2f627f92f5651b68b79f2",
+    "old_source_sha256_matches_pre_edit_baseline": true,
+    "current_readme": "FOC驱动模块/README.md",
+    "current_readme_sha256": "f4b5583e2343eb057c818bef1d3f483aa0910253764d352f26fd553f9eeeacc2",
+    "archive_note": "All members in the preserved baseline ZIP were individually compared by path, length and SHA-256 against the current archive; appended old README and pre-edit source were matched to their saved preimage digests. The detailed receipt lists every member. Entry counts are observations, not a fixed invariant.",
+    "baseline_archive_sha256": "e25ce4f233eed8b95ede85271b2cd3edc9afde33d84eeb8e5e9888b161840b38",
+    "archive_member_receipt": "FOC驱动模块/检查/三板共用修复/FOC历史归档追加读回核验.json",
+    "archive_member_receipt_sha256": "881b2e24b634a611371d3a9b1a887c3d68f1a1aebde17ed3a932e3bfbb8eda37",
+    "preserved_baseline_members_individually_matched": true,
+    "baseline_member_count_observed": 18
+  },
+  "acceptance_boundary": "All PASS results in this report are software/model logic or sensitivity-sweep results. No MCU firmware execution, measured motor data, qualified shared absorption budget, hardware fast-limit timing, SAFE_5V fault test, PCB or bench acceptance is claimed.",
+  "archive_readback_receipt": {
+    "path": "FOC驱动模块/检查/三板共用修复/FOC历史归档追加读回核验.json",
+    "sha256": "881b2e24b634a611371d3a9b1a887c3d68f1a1aebde17ed3a932e3bfbb8eda37",
+    "all_baseline_member_sha256_matches": true,
+    "archive_crc_scan": "passed"
+  }
+}

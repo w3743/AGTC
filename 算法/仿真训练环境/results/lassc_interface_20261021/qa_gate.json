@@ -1,0 +1,100 @@
+{
+  "schema": "lassc-independent-interface-gate-v1",
+  "status": "passed",
+  "qa_reference": "01a15a61-349e-7e60-ab32-3860bf95458a:independent-interface-qa-20261021",
+  "verified_at": "2026-10-21T10:34:39.987715+08:00",
+  "source_hashes": {
+    "isaac_field/action_contract.py": "5e3e2207301d5d7407e640d8f16e1847ccfee3dbdf4df401a77af7697dab9b91",
+    "isaac_field/feedback.py": "25216fb7dcb3e7cee2a66c8e6e8cba08c656cde0cccb02712242684f4dbdd88f",
+    "isaac_field/policy.py": "a758cacaf8ef80dd9b263797870c12630b9448948ecf720c59bf9657fe357858",
+    "isaac_field/task.py": "01f53d03599843ed9b0cc20c93788a1237d806509867b985c1edb1931739294f",
+    "isaac_field/telemetry.py": "7e613d172649d282640f70a092a423919b189f0829bdb76bd5c114f866b7402c",
+    "scripts/lassc_consumer.py": "43ee69f1b183d1507c660fa5df36befd58fcb0f47bd19f35aa0bff455582c126",
+    "scripts/lassc_replay.py": "e257648fe83e4a9c3e2715f8a3f5abfaa4932bcb67c9d5208199f1fd74da8202",
+    "tests/fixtures/foc_drive_feedback_v1_golden_vectors.json": "2d91167ded3101e664e9abe99d986214ae8b179ac30caa046db6d4dd769fc737",
+    "tests/fixtures/foc_drive_feedback_v1_golden_vectors.provenance.json": "c38557751e9e0c48726a424596c06f3d5b9d6e7108dc31fe44f6773e83044daf"
+  },
+  "external_dependency_hashes": {
+    "../视觉算法/深度接口契约.md": "b761458ae394ce3dcfbbcb35ef4987de1a214534167fa4c0c0b80996a8bcb491",
+    "../视觉算法/软件/数值深度接口候选/app/depth_adapter.py": "1561ae01bf63420afc19296cadfbda75a628226e2cccec0d99d39133a3deeee5",
+    "../视觉算法/软件/数值深度接口候选/app/depth_wire.py": "c99a2fec72160ac4cfe9a2cc18752064df2309b832f6c9a4ba02d9e20a0d4dfa"
+  },
+  "evidence": [
+    {
+      "path": "results/lassc_interface_20261021/qa_replay.json",
+      "sha256": "4382b3861e56e5fddc1ccde1156b4328bb9fa61d400fd7e16a39173d2c9f9a98"
+    },
+    {
+      "path": "results/lassc_interface_20261021/live_negative.json",
+      "sha256": "9ee3046cbcf280017bc271fb7fb75074304a14b4533c808112d20cd0414b5862"
+    },
+    {
+      "path": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/stage_1_global_random/checkpoints/field_policy_global_random_57344_steps.zip",
+      "sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a"
+    },
+    {
+      "path": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/protocol.json",
+      "sha256": "3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c"
+    }
+  ],
+  "contract_verification": {
+    "full_suite_final_result.json": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\视觉算法\\软件\\数值深度接口候选\\evidence\\contract_acceptance_20261021\\full_suite_final_result.json",
+      "sha256": "53ec1ecbade8d4122de0caa7a2e824088db10d94a5a84711ed2335452db17ce4",
+      "exitcode": 0,
+      "tests_count": 69,
+      "sources_stable": true
+    },
+    "consumer_only_final_result.json": {
+      "path": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\视觉算法\\软件\\数值深度接口候选\\evidence\\contract_acceptance_20261021\\consumer_only_final_result.json",
+      "sha256": "cea54f66bc61e03363de83f29d637e6df560eb8a2ea85b108685dfd254076d9c",
+      "exitcode": 0,
+      "tests_count": 4,
+      "sources_stable": true
+    }
+  },
+  "checks": {
+    "real_cpu_checkpoint_replay_17_checks": true,
+    "original_live_frame_7_checks": true,
+    "runtime_and_fixture_sources_unchanged": true,
+    "contract_full_suite_69_passed": true,
+    "contract_consumer_4_passed": true,
+    "no_fabricated_live_source_clock_or_extrinsics": true
+  },
+  "execution": {
+    "checkpoint_replay": {
+      "interpreter": "/home/wangj/robotics-lab/venv/isaaclab-field/bin/python",
+      "CUDA_VISIBLE_DEVICES": "",
+      "device": "cpu",
+      "exitcode": 0,
+      "argv": [
+        "scripts/lassc_replay.py",
+        "--checkpoint",
+        "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/stage_1_global_random/checkpoints/field_policy_global_random_57344_steps.zip",
+        "--output",
+        "results/lassc_interface_20261021/qa_replay.json"
+      ]
+    },
+    "live_negative": {
+      "interpreter": "Windows Python 3.11.9",
+      "exitcode": 0,
+      "url": "http://127.0.0.1:8877/depth.bin",
+      "seq": 10911,
+      "payload_bytes": 62880,
+      "scope": "Unmodified HTTP record through production fetch_depth/LASSCConsumer/DepthAdapter; sentinel only asserts inference/reset are not called. Real checkpoint predict is separately verified."
+    }
+  },
+  "training_release": {
+    "simulation_continuation_interface_gate_passed": true,
+    "checkpoint_steps": 57344,
+    "preserve_parent_trial": true,
+    "training_launch_owner": "01a15836-cb4e-7682-b370-7e10e965a13d",
+    "requires_resume_prepare_and_preflight": true
+  },
+  "deployment_ready": false,
+  "limits": [
+    "Positive replay uses explicit synthetic calibration/clock/telemetry fixtures with the real 57344 checkpoint.",
+    "Live producer lacks verified source clock mapping and extrinsics; its unchanged frame is correctly rejected.",
+    "No physical CAN/serial transmission, vehicle/field precision, exposure synchronization or sensor-to-action latency acceptance."
+  ]
+}

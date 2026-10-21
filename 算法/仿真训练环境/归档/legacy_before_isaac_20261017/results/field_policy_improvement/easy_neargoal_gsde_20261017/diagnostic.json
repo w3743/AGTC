@@ -1,0 +1,86 @@
+{
+  "purpose": "Deterministic target-sensitivity counterfactual only; not a task-performance evaluation.",
+  "checkpoint": "E:\\Pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\field_policy_improvement\\easy_neargoal_gsde_20261017\\best_checkpoint.zip",
+  "seed": 30007,
+  "robot_pose_xyz_yaw_proxy": [
+    50.0,
+    50.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "goal_distance_m": 0.6,
+  "goal_pairs": {
+    "forward_0.6m": {
+      "state_goal_xy": [
+        0.006125418934971094,
+        -0.0002907513699028641
+      ],
+      "normalized_action_mean_4d": [
+        0.020981669425964355,
+        0.14624464511871338,
+        0.1281108856201172,
+        0.25985264778137207
+      ],
+      "normalized_action_std_4d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "physical_control_mean_4d": [
+        0.08742362260818481,
+        0.21936696767807007,
+        0.23059959411621095,
+        0.3118231773376465
+      ],
+      "physical_control_units": [
+        "m/s",
+        "rad/s",
+        "rad/s",
+        "rad/s"
+      ],
+      "repeat_count": 10
+    },
+    "backward_0.6m": {
+      "state_goal_xy": [
+        -0.005874581169337034,
+        -0.0002907513699028641
+      ],
+      "normalized_action_mean_4d": [
+        0.02076864242553711,
+        0.14622879028320312,
+        0.12778055667877197,
+        0.2593955993652344
+      ],
+      "normalized_action_std_4d": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "physical_control_mean_4d": [
+        0.08653601010640463,
+        0.2193431854248047,
+        0.23000500202178956,
+        0.31127471923828126
+      ],
+      "physical_control_units": [
+        "m/s",
+        "rad/s",
+        "rad/s",
+        "rad/s"
+      ],
+      "repeat_count": 10
+    }
+  },
+  "same_reset_sensor_arrays": {
+    "lidar": true,
+    "depth": true,
+    "detections": true
+  },
+  "non_goal_state_equal": true,
+  "body_pose_unchanged": true,
+  "policy_input_contract": "Identical lidar/depth/detections and identical non-goal state entries; only goal-relative state[2:4] changed.",
+  "note": "The goal vector is relative to the same noisy estimated position in the observation, so its x component is not exactly +/-0.006 despite goals being +/-0.6m from the true robot position."
+}

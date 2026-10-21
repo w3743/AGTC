@@ -1,0 +1,1085 @@
+{
+  "sequence": 153,
+  "sim_time": 7.549999999999981,
+  "output_time": 7.599999999999981,
+  "mode": "实际驾驶推理（动作前观测）",
+  "critic": "价值支路为独立记忆的额外诊断计算；记忆自本段连续采集起累计，不控制车辆",
+  "errors": [],
+  "state": {
+    "running": true,
+    "time": 7.599999999999981,
+    "robot": {
+      "x": 48.30602264404297,
+      "y": 21.334623336791992,
+      "yaw": -2.3361868858337402,
+      "z": 0.15396249294281006,
+      "roll": -2.9110121886333218e-06,
+      "pitch": -1.4702959560963791e-05,
+      "v": -0.009907546453177929,
+      "w": -0.0019124490208923817
+    },
+    "done": false,
+    "status": "控制模式：策略控制。",
+    "training_steps": 0
+  },
+  "legend": {
+    "name": "turbo",
+    "colors": [
+      [
+        48,
+        18,
+        59
+      ],
+      [
+        70,
+        107,
+        227
+      ],
+      [
+        40,
+        188,
+        235
+      ],
+      [
+        50,
+        242,
+        152
+      ],
+      [
+        164,
+        252,
+        60
+      ],
+      [
+        238,
+        207,
+        58
+      ],
+      [
+        251,
+        126,
+        33
+      ],
+      [
+        208,
+        47,
+        5
+      ],
+      [
+        122,
+        4,
+        3
+      ]
+    ],
+    "minimum": -1.0,
+    "zero": 0.0,
+    "maximum": 1.0
+  },
+  "nodes": [
+    {
+      "key": "input.lidar",
+      "title": "激光雷达输入",
+      "description": "距离/8米与有效掩码，2×400",
+      "branch": "lidar",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        2,
+        400
+      ],
+      "image_sha256": "ead6b3105c1709262c73a71e10650999ffe0f6792fcbd1de855fe58c94d75785"
+    },
+    {
+      "key": "features_extractor.laser.0",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "lidar",
+      "column": 1.0,
+      "parents": [
+        "input.lidar"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        800
+      ],
+      "image_sha256": "4ce1a2b9a5e061c6b93f85fec293cb019564c368084f1e0ca99beb65913bdfd2"
+    },
+    {
+      "key": "features_extractor.laser.1",
+      "title": "全连接 800→64",
+      "description": "Linear(in_features=800, out_features=64, bias=True)",
+      "branch": "lidar",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.laser.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        64
+      ],
+      "image_sha256": "9525e8734b9a06f0d4ddf0264f0ed0ce4548c44c4b30a9137012e50c4f6bbc4a"
+    },
+    {
+      "key": "features_extractor.laser.2",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.laser.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        64
+      ],
+      "image_sha256": "715be64b4eb32c62745856eb482811fe87d5a49c970eb4a945f54bae9d420aeb"
+    },
+    {
+      "key": "features_extractor.laser.3",
+      "title": "全连接 64→32",
+      "description": "Linear(in_features=64, out_features=32, bias=True)",
+      "branch": "lidar",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.laser.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "d140b7b15403a10b912d915fd7ca6a21b863fceea9b3665c93067549cfd3907a"
+    },
+    {
+      "key": "features_extractor.laser.4",
+      "title": "激光雷达编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.laser.3"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "c7202e61cb76767ec325c2457614a0e16c9c79a20254db44d28d990815b9a97a"
+    },
+    {
+      "key": "input.depth",
+      "title": "深度图输入",
+      "description": "轴向Z深度/量程，1×160×88；无效值为0且无单独掩码；不是RGB图",
+      "branch": "depth",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        1,
+        160,
+        88
+      ],
+      "image_sha256": "48da34f8d61a0e31539e2f42ba1604e813e04b3e25e4cef79bd242b20869f4b2"
+    },
+    {
+      "key": "features_extractor.depth.0",
+      "title": "卷积 1→8",
+      "description": "Conv2d(1, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 1.0,
+      "parents": [
+        "input.depth"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ],
+      "image_sha256": "b862bd496bfba033225ecc4a500c40d7fa84d607d439f7b84171723c741d0a0b"
+    },
+    {
+      "key": "features_extractor.depth.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.depth.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ],
+      "image_sha256": "adf66e2b4f6d2df0f80baa3e5eb2f65c522cdcacabdca6284d27effbdb2850c6"
+    },
+    {
+      "key": "features_extractor.depth.2",
+      "title": "卷积 8→16",
+      "description": "Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.depth.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ],
+      "image_sha256": "2a4d7d2e7814b0ce3d8d0237e39181f9ffd20a96de506b4822e23bd65966133f"
+    },
+    {
+      "key": "features_extractor.depth.3",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.depth.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ],
+      "image_sha256": "2178d9236a583a915b50307c78f7f30d1ae7cb8bcce7829c5072bd0f767edc7c"
+    },
+    {
+      "key": "features_extractor.depth.4",
+      "title": "自适应平均池化 2×3",
+      "description": "AdaptiveAvgPool2d(output_size=(2, 3))",
+      "branch": "depth",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.depth.3"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        2,
+        3
+      ],
+      "image_sha256": "a79dac1eae5a7fd0898fe5fa791d5150905bdc5aeff4e9a2f69f10999eea580a"
+    },
+    {
+      "key": "features_extractor.depth.5",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "depth",
+      "column": 6.0,
+      "parents": [
+        "features_extractor.depth.4"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        96
+      ],
+      "image_sha256": "ee90adcabb34fbfc0113b62965f1bbdf430a3b2beb9bc20b7fe25bccc3587e0d"
+    },
+    {
+      "key": "features_extractor.depth.6",
+      "title": "全连接 96→32",
+      "description": "Linear(in_features=96, out_features=32, bias=True)",
+      "branch": "depth",
+      "column": 7.0,
+      "parents": [
+        "features_extractor.depth.5"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "d4925bfd6a5e6fcf60b7ab2d822bf31fd6d5bab6df115893ffe69ba1c7452a44"
+    },
+    {
+      "key": "features_extractor.depth.7",
+      "title": "深度图编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 8.0,
+      "parents": [
+        "features_extractor.depth.6"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "32ef8ef756f4ed9c22c07f4897df714b2de1930ab3bb8ba4f25771e7619a4920"
+    },
+    {
+      "key": "input.detections",
+      "title": "检测框输入",
+      "description": "16个候选×10字段；无效行由presence掩码排除",
+      "branch": "detections",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        10
+      ],
+      "image_sha256": "fee22a4e3e79ce188e94d662b2840d0b6e1bc4b26acb7aabf0256c55b1e6113d"
+    },
+    {
+      "key": "features_extractor.boxes.0",
+      "title": "全连接 10→32",
+      "description": "Linear(in_features=10, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 1.0,
+      "parents": [
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image_sha256": "0045abc5b96eff2956923490cc3745bb166f52a1bf628a397b6946a43172d1ea"
+    },
+    {
+      "key": "features_extractor.boxes.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.boxes.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image_sha256": "0045abc5b96eff2956923490cc3745bb166f52a1bf628a397b6946a43172d1ea"
+    },
+    {
+      "key": "features_extractor.boxes.2",
+      "title": "全连接 32→32",
+      "description": "Linear(in_features=32, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.boxes.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image_sha256": "0045abc5b96eff2956923490cc3745bb166f52a1bf628a397b6946a43172d1ea"
+    },
+    {
+      "key": "features_extractor.boxes.3",
+      "title": "检测框编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.boxes.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image_sha256": "0045abc5b96eff2956923490cc3745bb166f52a1bf628a397b6946a43172d1ea"
+    },
+    {
+      "key": "detections.masked",
+      "title": "逐框有效性掩码",
+      "description": "逐框32维特征 × 输入第8列presence；按真实算式重建",
+      "branch": "detections",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.boxes.3",
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        16,
+        32
+      ],
+      "image_sha256": "0045abc5b96eff2956923490cc3745bb166f52a1bf628a397b6946a43172d1ea"
+    },
+    {
+      "key": "detections.pooled",
+      "title": "检测编码输出 · 32维",
+      "description": "沿16个候选逐特征amax；不是求平均",
+      "branch": "detections",
+      "column": 6.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": true,
+      "source": "算式重建",
+      "shape": [
+        32
+      ],
+      "image_sha256": "7b82e0e9cd59d1331dd5cbee14e47e8bcf7090631629ae404314ea73a9bf0769"
+    },
+    {
+      "key": "detections.winner",
+      "title": "池化来源索引",
+      "description": "每个输出特征来自哪个候选行；并列最大值取首行，空槽可能在零值并列中出现",
+      "branch": "detections",
+      "column": 7.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        32
+      ],
+      "image_sha256": "7b82e0e9cd59d1331dd5cbee14e47e8bcf7090631629ae404314ea73a9bf0769"
+    },
+    {
+      "key": "input.state",
+      "title": "车辆与目标状态输入",
+      "description": "43维归一化状态；点击查看字段与精确数值",
+      "branch": "state",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        43
+      ],
+      "image_sha256": "3dc47a1ca266efb8c92f014a22e748d2ec631cce935fcd2953d339beaceb62f6"
+    },
+    {
+      "key": "features_extractor.proprioception.0",
+      "title": "全连接 43→32",
+      "description": "Linear(in_features=43, out_features=32, bias=True)",
+      "branch": "state",
+      "column": 1.0,
+      "parents": [
+        "input.state"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "f6f1f5df8877581be64d89f84bd876710b7c8ddb1574451a02b8140e0d048fa9"
+    },
+    {
+      "key": "features_extractor.proprioception.1",
+      "title": "车辆与目标状态编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "state",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.proprioception.0"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image_sha256": "98e13771716bacf119d6d9425fb43f1457a837a444558c3c329fa2daa2087f8c"
+    },
+    {
+      "key": "features_extractor",
+      "title": "四路特征拼接",
+      "description": "按雷达32、深度32、检测32、状态32拼成128维；没有注意力权重",
+      "branch": "fusion",
+      "column": 9.0,
+      "parents": [
+        "features_extractor.laser.4",
+        "features_extractor.depth.7",
+        "detections.pooled",
+        "features_extractor.proprioception.1"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        128
+      ],
+      "image_sha256": "7146ec77b433048bdb5904dc667bf8feab2b9648f80e757cd8bfc863bb9993dd"
+    },
+    {
+      "key": "lstm_actor",
+      "title": "驾驶记忆 LSTM",
+      "description": "LSTM(128, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "actor",
+      "column": 10.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0",
+        "lstm_actor.c0"
+      ],
+      "summary": true,
+      "source": "实际驾驶前向",
+      "shape": [
+        128
+      ],
+      "image_sha256": "230acaf196c4238d439c10c640965cd0e09a7909216787f555545759f1637df6"
+    },
+    {
+      "key": "lstm_actor.h0",
+      "title": "输入隐状态 h₀",
+      "description": "直接读取本次LSTM模块输入；来自上一次决策，回合开始时清零",
+      "branch": "actor_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "22531d390582a05ddd8dd97a3284206e16d73be1fa10f58d313ee97783696d96"
+    },
+    {
+      "key": "lstm_actor.c0",
+      "title": "输入记忆 c₀",
+      "description": "直接读取本次LSTM模块输入；来自上一次决策，回合开始时清零",
+      "branch": "actor_memory",
+      "column": 9.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "178b26dbc64d488a507df8168e1198894b62885a428be1d190de2858ac352b89"
+    },
+    {
+      "key": "lstm_actor.h",
+      "title": "输出隐状态 h₁",
+      "description": "直接读取本次LSTM模块输出，供下一次决策使用",
+      "branch": "actor_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "230acaf196c4238d439c10c640965cd0e09a7909216787f555545759f1637df6"
+    },
+    {
+      "key": "lstm_actor.c",
+      "title": "输出记忆 c₁",
+      "description": "直接读取本次LSTM模块输出，供下一次决策使用",
+      "branch": "actor_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "a23b9fe057bdba11d5368f1b256f33fe524cf89694e2da8f8fa4fee50ecde7a4"
+    },
+    {
+      "key": "lstm_actor.i",
+      "title": "输入门 i",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "actor_memory",
+      "column": 14.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "83cb3416e70390588281944025a3ed86dc674dea1c590651652ea1d4d4970e1f"
+    },
+    {
+      "key": "lstm_actor.f",
+      "title": "遗忘门 f",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "actor_memory",
+      "column": 15.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "49bdea389bcd971404927e003b903bb488247996785ef0db3e5cf9e6eba5bd1f"
+    },
+    {
+      "key": "lstm_actor.g",
+      "title": "候选记忆 g",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "actor_memory",
+      "column": 16.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "b04993880158c97378da6c8d1dde198a89882572fb1588faafb87608f3dd1a25"
+    },
+    {
+      "key": "lstm_actor.o",
+      "title": "输出门 o",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "actor_memory",
+      "column": 17.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "ae22901f7efb06539ce815f076e183e1e2e396b7dbe5ba9404c077ad836a0335"
+    },
+    {
+      "key": "mlp_extractor.policy_net.0",
+      "title": "动作头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "actor",
+      "column": 11.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ],
+      "image_sha256": "cec95d73603b966bca3fd494058110196afcba60757483d6b0ec29fc69b46ba7"
+    },
+    {
+      "key": "mlp_extractor.policy_net.1",
+      "title": "动作头 Tanh",
+      "description": "Tanh()",
+      "branch": "actor",
+      "column": 12.0,
+      "parents": [
+        "mlp_extractor.policy_net.0"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ],
+      "image_sha256": "e150fbc8287f1fe9adb714b2f510c24e5601b5d1e78adcf24efb67fadde96c54"
+    },
+    {
+      "key": "action_net",
+      "title": "动作分布均值 μ",
+      "description": "Linear(in_features=64, out_features=4, bias=True)；均值尚未经过动作范围裁剪",
+      "branch": "actor",
+      "column": 13.0,
+      "parents": [
+        "mlp_extractor.policy_net.1"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        4
+      ],
+      "image_sha256": "f7c23320490154d9446b5c22bd7084ee51985f1084d56bc03f64da30c2c3abc5"
+    },
+    {
+      "key": "lstm_critic",
+      "title": "价值记忆 LSTM",
+      "description": "LSTM(128, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "critic",
+      "column": 10.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0",
+        "lstm_critic.c0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        128
+      ],
+      "image_sha256": "b4abfa8974bbe7ea47d3ac68990834fda25c689d56fcea537de55cb317e7a233"
+    },
+    {
+      "key": "lstm_critic.h0",
+      "title": "输入隐状态 h₀",
+      "description": "直接读取本次LSTM模块输入；来自上一次决策，回合开始时清零",
+      "branch": "critic_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "c60fa01bd85ec5633d6b63b9d6cfd94fc321b799606c97515be249a5ba210373"
+    },
+    {
+      "key": "lstm_critic.c0",
+      "title": "输入记忆 c₀",
+      "description": "直接读取本次LSTM模块输入；来自上一次决策，回合开始时清零",
+      "branch": "critic_memory",
+      "column": 9.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "9bf550b9024a62a120c43366d7f3184b628def949789ace2be3fe1b47e67214e"
+    },
+    {
+      "key": "lstm_critic.h",
+      "title": "输出隐状态 h₁",
+      "description": "直接读取本次LSTM模块输出，供下一次决策使用",
+      "branch": "critic_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "b4abfa8974bbe7ea47d3ac68990834fda25c689d56fcea537de55cb317e7a233"
+    },
+    {
+      "key": "lstm_critic.c",
+      "title": "输出记忆 c₁",
+      "description": "直接读取本次LSTM模块输出，供下一次决策使用",
+      "branch": "critic_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "b299b035a593a2e5315ff86c4f480abb11611ba00d01fde0ae78cc859ba281a4"
+    },
+    {
+      "key": "lstm_critic.i",
+      "title": "输入门 i",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "critic_memory",
+      "column": 14.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "2a4a594e82b416a7b4d1d56558c7b329acdff03120f1224d1ec9f7e0445be84e"
+    },
+    {
+      "key": "lstm_critic.f",
+      "title": "遗忘门 f",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "critic_memory",
+      "column": 15.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "aad1c916d1f1da93119bdf86cb4cb18e462cf9bf1107fff372b585cc9982d080"
+    },
+    {
+      "key": "lstm_critic.g",
+      "title": "候选记忆 g",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "critic_memory",
+      "column": 16.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "da864773293fe5ec10f53e335830d751f5e9bde24b658af7135040b174e9c438"
+    },
+    {
+      "key": "lstm_critic.o",
+      "title": "输出门 o",
+      "description": "基于本次LSTM输入、h₀/c₀与权重重建门值，并核对实测h₁/c₁；不是融合算子的内部探针",
+      "branch": "critic_memory",
+      "column": 17.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image_sha256": "471c1c71b29c996607bf435701cadae54e394799e22977482f7d4caa45692b1b"
+    },
+    {
+      "key": "mlp_extractor.value_net.0",
+      "title": "价值头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "critic",
+      "column": 11.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ],
+      "image_sha256": "ef1f4993c1e6a1cb8ef3b87d83b48cf216182c6cc84ad8b76409561bf427210e"
+    },
+    {
+      "key": "mlp_extractor.value_net.1",
+      "title": "价值头 Tanh",
+      "description": "Tanh()",
+      "branch": "critic",
+      "column": 12.0,
+      "parents": [
+        "mlp_extractor.value_net.0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ],
+      "image_sha256": "6e2a27b09e759e8f9144700746ee749efd822298983f18076f857a2561b1e1e5"
+    },
+    {
+      "key": "value_net",
+      "title": "状态价值 V(s)",
+      "description": "Linear(in_features=64, out_features=1, bias=True)；额外只读计算，不参与驾驶",
+      "branch": "critic",
+      "column": 13.0,
+      "parents": [
+        "mlp_extractor.value_net.1"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1
+      ],
+      "image_sha256": "5340e4f6107d294b58225b0f738124056aa74a2b9eceee8af3bbd03c2a4d6ed5"
+    },
+    {
+      "key": "action.std",
+      "title": "动作分布标准差 σ",
+      "description": "默认Gaussian的exp(log_std)为全局可训练参数，不是置信度；确定性驾驶不采样噪声",
+      "branch": "actor",
+      "column": 14.0,
+      "parents": [
+        "action_net"
+      ],
+      "summary": false,
+      "source": "分布参数",
+      "shape": [
+        4
+      ],
+      "image_sha256": "a518d2ec9ad39958a2fa0baf49027434da88dd182a33329428db1edcbe7124e9"
+    },
+    {
+      "key": "action.applied",
+      "title": "四维输出动作",
+      "description": "前进、差速、云台偏航速率、云台俯仰速率；确定性均值经SB3裁剪/反归一化后，范围[-1,1]",
+      "branch": "output",
+      "column": 15.0,
+      "parents": [
+        "action_net"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        4
+      ],
+      "image_sha256": "f7c23320490154d9446b5c22bd7084ee51985f1084d56bc03f64da30c2c3abc5"
+    },
+    {
+      "key": "actuator.tracks",
+      "title": "左右履带限速指令",
+      "description": "实际引擎回读，单位米/秒；动作前进±差速后同比分配，再经加速度限制；不是实测履带速度",
+      "branch": "output",
+      "column": 16.0,
+      "parents": [
+        "action.applied"
+      ],
+      "summary": false,
+      "source": "实际仿真步后回读",
+      "shape": [
+        2
+      ],
+      "image_sha256": "e6d636f5b38f9d52f85488441c2a30a074d2353848c2a1e2709e8cb4a29feba7"
+    },
+    {
+      "key": "actuator.wheels",
+      "title": "14滚轮目标角速度",
+      "description": "实际执行器目标回读，单位弧度/秒；履带指令除以代理滚轮半径45mm；不是实测关节转速",
+      "branch": "output",
+      "column": 17.0,
+      "parents": [
+        "action.applied"
+      ],
+      "summary": false,
+      "source": "实际仿真步后回读",
+      "shape": [
+        14
+      ],
+      "image_sha256": "79cfcad803d0571827f0ab169df7163bd5c6d5f3a82af6d038ca86849496ccdd"
+    },
+    {
+      "key": "actuator.gimbal",
+      "title": "云台目标角",
+      "description": "实际执行器目标回读，偏航/俯仰单位弧度；速率积分后执行角度范围约束",
+      "branch": "output",
+      "column": 18.0,
+      "parents": [
+        "action.applied"
+      ],
+      "summary": false,
+      "source": "实际仿真步后回读",
+      "shape": [
+        2
+      ],
+      "image_sha256": "df682c5052b175ba8925888cafbd8d18e8034ba969c0f3d16626d0675daaa83a"
+    },
+    {
+      "key": "motion.actual",
+      "title": "车辆实际运动反馈",
+      "description": "物理引擎测得的车体前向速度（米/秒）和偏航角速度（弧度/秒）；指令不等于实际运动",
+      "branch": "output",
+      "column": 19.0,
+      "parents": [
+        "action.applied"
+      ],
+      "summary": true,
+      "source": "实际仿真步后回读",
+      "shape": [
+        2
+      ],
+      "image_sha256": "8d443011353814290b04f08e1c577f282f06a2f7c71f11a33f195a84067371a7"
+    }
+  ],
+  "detail": {
+    "key": "input.state",
+    "title": "车辆与目标状态输入",
+    "shape": [
+      43
+    ],
+    "size": 43,
+    "min": -0.7211780548095703,
+    "max": 1.0,
+    "mean": 0.06267711520195007,
+    "std": 0.3524954617023468,
+    "nonfinite": 0,
+    "index": 0,
+    "coordinate": [
+      0
+    ],
+    "value": 0.0,
+    "parameters": [],
+    "description": "43维归一化状态；点击查看字段与精确数值",
+    "source": "实际前向",
+    "fields": [
+      "任务模式：搜索标记",
+      "任务模式：到点标记",
+      "目标相对车体前向分量（按场地尺寸缩放；仅到点模式）",
+      "目标相对车体侧向分量（按场地尺寸缩放；仅到点模式）",
+      "估计车体 X 位置（按场地尺寸映射）",
+      "估计车体 Y 位置（按场地尺寸映射）",
+      "车体航向正弦",
+      "车体航向余弦",
+      "测得车体前向速度 / 最大速度",
+      "测得车体偏航角速度 / 最大转向率",
+      "云台偏航正弦",
+      "云台偏航余弦",
+      "云台俯仰角 / π",
+      "上一动作：前进指令",
+      "上一动作：差速转向指令",
+      "上一动作：云台偏航角速度指令",
+      "上一动作：云台俯仰角速度指令",
+      "已用时间 / 时限（上限 1）",
+      "任务步长 dt（秒）",
+      "目标容差 / 场地尺寸",
+      "LiDAR 帧龄 / 2 秒（上限 1）",
+      "LiDAR 新帧标记",
+      "LiDAR 帧位置差 X / LiDAR 量程",
+      "LiDAR 帧位置差 Y / LiDAR 量程",
+      "LiDAR 帧时车体航向差 / π",
+      "LiDAR 帧时云台偏航差 / π",
+      "LiDAR 帧时云台俯仰差 / π",
+      "深度图帧龄 / 2 秒（上限 1）",
+      "深度图新帧标记",
+      "深度图帧位置差 X / LiDAR 量程",
+      "深度图帧位置差 Y / LiDAR 量程",
+      "深度图帧时车体航向差 / π",
+      "深度图帧时云台偏航差 / π",
+      "深度图帧时云台俯仰差 / π",
+      "相机帧龄 / 2 秒（上限 1）",
+      "相机新帧标记",
+      "相机帧位置差 X / LiDAR 量程",
+      "相机帧位置差 Y / LiDAR 量程",
+      "相机帧时车体航向差 / π",
+      "相机帧时云台偏航差 / π",
+      "相机帧时云台俯仰差 / π",
+      "车体横滚角 / π",
+      "车体俯仰角 / π"
+    ]
+  }
+}

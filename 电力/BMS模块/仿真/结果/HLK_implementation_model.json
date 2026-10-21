@@ -1,0 +1,667 @@
+{
+  "schema": "hlk-urb4805-bms-power-reduced-model-v1",
+  "generated_by": "BMS模块/仿真/源码/verify_hlk_implementation.py",
+  "input": {
+    "path": "BMS模块/仿真/输入/HLK_implementation_cases.json",
+    "sha256": "5c355d2b853d6ce7ace268a5b1431e0d2bb9086955ddd8745ff4791b64eb4396"
+  },
+  "model_scope": {
+    "method": "stdlib Python reduced-order analytical/time-domain RC and static power/current model",
+    "ngspice_expected": false,
+    "converter_macromodel_available": false,
+    "startup_sensitivity_ramp_ms": [
+      1.0,
+      10.0,
+      50.0
+    ],
+    "startup_capacitance_scenarios_uf": [
+      40.0,
+      188.0
+    ],
+    "startup_model_warning": "I=C*dV/dt linear-ramp sensitivity only; not converter control-loop/current-limit/SPICE/macromodel simulation",
+    "no_hardware_sample": true
+  },
+  "paper_calculations": {
+    "minimum_load_bank": {
+      "mpn": "RC0603FR-07510RL",
+      "refs": [
+        "R_PSU_MINLOAD1",
+        "R_PSU_MINLOAD2",
+        "R_PSU_MINLOAD3",
+        "R_PSU_MINLOAD4",
+        "R_PSU_MINLOAD5",
+        "R_PSU_MINLOAD6",
+        "R_PSU_MINLOAD7"
+      ],
+      "quantity": 7,
+      "each_nominal_ohm": 510.0,
+      "parallel_nominal_ohm": 72.857143,
+      "min_resistance_each_corner_ohm": 503.63775,
+      "max_resistance_each_corner_ohm": 516.90285,
+      "vendor_minimum_load_current_ma": 60.0,
+      "minimum_current_at_datasheet_5v_minus_2pct_ma": 66.3568,
+      "minimum_margin_at_datasheet_5v_minus_2pct_ma": 6.3568,
+      "minimum_current_at_extended_4p75v_stress_ma": 64.3254,
+      "ideal_nominal_current_at_5v_ma": 68.6275,
+      "worst_resistance_nominal_current_at_5v_ma": 67.711,
+      "maximum_current_at_5p25v_stress_ma": 72.9691,
+      "ideal_bank_power_at_5v_w": 0.343137,
+      "maximum_bank_power_at_5p25v_stress_w": 0.383088,
+      "maximum_each_resistor_power_at_5p25v_stress_mw": 54.7268,
+      "each_resistor_power_rating_mw": 100.0,
+      "maximum_each_resistor_fraction_of_rated_power": 0.54727,
+      "assumptions": "电阻±1%、±100ppm/°C，温度按0–60°C；未建模自热/铜箔/风道；5.25V为扩展应力边界，不是手册输出精度值。",
+      "single_75_ohm_comparison_only": {
+        "quantity": 1,
+        "selected": false,
+        "mpn": null,
+        "new_mpn_type_needed": true,
+        "min_current_at_4p9v_ma": 64.4609,
+        "min_margin_at_4p9v_ma": 4.4609,
+        "min_current_at_4p75v_stress_ma": 62.4876,
+        "min_margin_at_4p75v_stress_ma": 2.4876,
+        "max_current_at_5p25v_stress_ma": 70.8843,
+        "max_power_at_5p25v_stress_w": 0.372142,
+        "tradeoff": "少6个焊点，但需新增一种75Ω功率电阻MPN；较7×510方案在4.75V角落最低负载电流裕量更小，实际选型还要核额定功率/温度降额。"
+      },
+      "no_additional_bleeder": {
+        "selected": false,
+        "reason": "外置MCU/风扇等负载最小耗流没有厂家保证值，不能证明所有稳态/待机/掉线条件下由其它负载满足60mA最低负载。"
+      }
+    },
+    "static_power_and_thermal_envelopes": {
+      "base_load_planning_current_a": 0.3,
+      "load_envelopes": [
+        {
+          "label": "Delta候选典型电流；候选未冻结",
+          "base_planning_current_a": 0.3,
+          "fan_current_assumption_a": 0.16,
+          "minimum_load_worst_corner_current_a": 0.072969,
+          "total_current_a": 0.532969,
+          "current_margin_to_2a_rated_a": 1.467031,
+          "output_power_at_5p25v_stress_w": 2.798088,
+          "output_power_fraction_of_10w_rated": 0.279809,
+          "input_power_at_81pct_48v_rated_test_efficiency_extrapolated_w": 3.454429,
+          "conversion_loss_at_81pct_extrapolated_w": 0.656342,
+          "input_current_at_22p5v_extrapolated_a": 0.15353,
+          "input_current_at_37p8v_extrapolated_a": 0.091387,
+          "effective_case_to_ambient_theta_limit_at_60c_for_100c_case_c_per_w": 60.9439,
+          "efficiency_status": "81%为官方表格在48V标称输入、额定阻性负载、25°C条件下的下限；对本负载及22.5–37.8V计算仅为保守算术外推，非保证。"
+        },
+        {
+          "label": "Delta候选铭牌最大电流；启动电流未知",
+          "base_planning_current_a": 0.3,
+          "fan_current_assumption_a": 0.3,
+          "minimum_load_worst_corner_current_a": 0.072969,
+          "total_current_a": 0.672969,
+          "current_margin_to_2a_rated_a": 1.327031,
+          "output_power_at_5p25v_stress_w": 3.533088,
+          "output_power_fraction_of_10w_rated": 0.353309,
+          "input_power_at_81pct_48v_rated_test_efficiency_extrapolated_w": 4.361837,
+          "conversion_loss_at_81pct_extrapolated_w": 0.828749,
+          "input_current_at_22p5v_extrapolated_a": 0.193859,
+          "input_current_at_37p8v_extrapolated_a": 0.115393,
+          "effective_case_to_ambient_theta_limit_at_60c_for_100c_case_c_per_w": 48.2655,
+          "efficiency_status": "81%为官方表格在48V标称输入、额定阻性负载、25°C条件下的下限；对本负载及22.5–37.8V计算仅为保守算术外推，非保证。"
+        },
+        {
+          "label": "旧预算legacy_continuous压力值；不是所选风扇实测",
+          "base_planning_current_a": 0.3,
+          "fan_current_assumption_a": 0.5,
+          "minimum_load_worst_corner_current_a": 0.072969,
+          "total_current_a": 0.872969,
+          "current_margin_to_2a_rated_a": 1.127031,
+          "output_power_at_5p25v_stress_w": 4.583088,
+          "output_power_fraction_of_10w_rated": 0.458309,
+          "input_power_at_81pct_48v_rated_test_efficiency_extrapolated_w": 5.658133,
+          "conversion_loss_at_81pct_extrapolated_w": 1.075045,
+          "input_current_at_22p5v_extrapolated_a": 0.251473,
+          "input_current_at_37p8v_extrapolated_a": 0.149686,
+          "effective_case_to_ambient_theta_limit_at_60c_for_100c_case_c_per_w": 37.2077,
+          "efficiency_status": "81%为官方表格在48V标称输入、额定阻性负载、25°C条件下的下限；对本负载及22.5–37.8V计算仅为保守算术外推，非保证。"
+        },
+        {
+          "label": "旧预算legacy_startup压力值；不是所选风扇实测",
+          "base_planning_current_a": 0.3,
+          "fan_current_assumption_a": 0.8,
+          "minimum_load_worst_corner_current_a": 0.072969,
+          "total_current_a": 1.172969,
+          "current_margin_to_2a_rated_a": 0.827031,
+          "output_power_at_5p25v_stress_w": 6.158088,
+          "output_power_fraction_of_10w_rated": 0.615809,
+          "input_power_at_81pct_48v_rated_test_efficiency_extrapolated_w": 7.602578,
+          "conversion_loss_at_81pct_extrapolated_w": 1.44449,
+          "input_current_at_22p5v_extrapolated_a": 0.337892,
+          "input_current_at_37p8v_extrapolated_a": 0.201126,
+          "effective_case_to_ambient_theta_limit_at_60c_for_100c_case_c_per_w": 27.6914,
+          "efficiency_status": "81%为官方表格在48V标称输入、额定阻性负载、25°C条件下的下限；对本负载及22.5–37.8V计算仅为保守算术外推，非保证。"
+        },
+        {
+          "label": "旧预算legacy_current_limit压力值；不是所选风扇实测",
+          "base_planning_current_a": 0.3,
+          "fan_current_assumption_a": 1.1,
+          "minimum_load_worst_corner_current_a": 0.072969,
+          "total_current_a": 1.472969,
+          "current_margin_to_2a_rated_a": 0.527031,
+          "output_power_at_5p25v_stress_w": 7.733088,
+          "output_power_fraction_of_10w_rated": 0.773309,
+          "input_power_at_81pct_48v_rated_test_efficiency_extrapolated_w": 9.547022,
+          "conversion_loss_at_81pct_extrapolated_w": 1.813934,
+          "input_current_at_22p5v_extrapolated_a": 0.424312,
+          "input_current_at_37p8v_extrapolated_a": 0.252567,
+          "effective_case_to_ambient_theta_limit_at_60c_for_100c_case_c_per_w": 22.0515,
+          "efficiency_status": "81%为官方表格在48V标称输入、额定阻性负载、25°C条件下的下限；对本负载及22.5–37.8V计算仅为保守算术外推，非保证。"
+        }
+      ],
+      "separate_fan_interpretation": {
+        "selected_fan_actual_rating": "尚未冻结",
+        "Delta_candidate_max_current_a": 0.3,
+        "Delta_candidate_startup_current": "未见型号资料保证值，不以0.30A铭牌最大值等同启动峰值",
+        "legacy_pressure_1p1a_fan_plus_base_and_bleed_total_a": 1.472969,
+        "warning": "1.1A仅为旧预算风扇支路电流限流压力，不是候选风扇电流；总量显式另加0.30A基础规划与约0.073A最低负载。"
+      },
+      "input_power_loss_heat": {
+        "minimum_load_current_is_added_separately": true,
+        "min_efficiency_used": 0.81,
+        "test_condition": "48V标称输入、额定阻性负载、25°C",
+        "22p5v_high_pressure_input_current_extrapolated_a": 0.424312,
+        "22p5v_high_pressure_conversion_loss_extrapolated_w": 1.813934,
+        "required_effective_theta_at_60c_ambient_for_case_below_100c_c_per_w": 22.0515,
+        "temperature_derating_curve_reading": {
+          "source_page": 4,
+          "full_power_through_ambient_c": 71.0,
+          "power_fraction_at_85c": 0.6,
+          "curve_end_ambient_c": 90.0,
+          "curve_reading": "对手册曲线图的读图值；非具体板上热模型"
+        },
+        "conclusion": "10W及曲线容量的纸面比较未越界，但效率外推、有效热阻、壳温、封闭舱气流和风扇失效没有测量，因此热验收仍OPEN。"
+      },
+      "capacitors": {
+        "input_nominal_uf": 9.5,
+        "input_test_circuit_reference_uf": [
+          47.0,
+          100.0
+        ],
+        "input_nominal_fraction_of_47uf_reference": 0.20213,
+        "input_capacitance_status": "OPEN: 9.5uF标称陶瓷小于47–100uF典型测试电路范围；该范围不是手册保证最小值。输入偏压有效容量、纹波/动态阻抗/PI滤波器稳定性未闭合。",
+        "output_nominal_uf": 188.0,
+        "output_cap_limit_uf": 2200.0,
+        "output_cap_fraction_of_limit": 0.085455,
+        "output_effective_capacitance_status": "名义4×47uF，低于上限；X5R在5V偏压与温度后的有效容量和模块兼容性仍待确认。"
+      }
+    },
+    "startup_capacitor_current_sensitivity": [
+      {
+        "effective_capacitance_scenario_uf": 40.0,
+        "assumed_linear_voltage_ramp_ms": 1.0,
+        "capacitor_charge_current_a": 0.2,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 1.372969,
+        "comparison_to_2a_rating": "BELOW",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      },
+      {
+        "effective_capacitance_scenario_uf": 40.0,
+        "assumed_linear_voltage_ramp_ms": 10.0,
+        "capacitor_charge_current_a": 0.02,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 1.192969,
+        "comparison_to_2a_rating": "BELOW",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      },
+      {
+        "effective_capacitance_scenario_uf": 40.0,
+        "assumed_linear_voltage_ramp_ms": 50.0,
+        "capacitor_charge_current_a": 0.004,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 1.176969,
+        "comparison_to_2a_rating": "BELOW",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      },
+      {
+        "effective_capacitance_scenario_uf": 188.0,
+        "assumed_linear_voltage_ramp_ms": 1.0,
+        "capacitor_charge_current_a": 0.94,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 2.112969,
+        "comparison_to_2a_rating": "ABOVE",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      },
+      {
+        "effective_capacitance_scenario_uf": 188.0,
+        "assumed_linear_voltage_ramp_ms": 10.0,
+        "capacitor_charge_current_a": 0.094,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 1.266969,
+        "comparison_to_2a_rating": "BELOW",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      },
+      {
+        "effective_capacitance_scenario_uf": 188.0,
+        "assumed_linear_voltage_ramp_ms": 50.0,
+        "capacitor_charge_current_a": 0.0188,
+        "static_load_base_plus_legacy_startup_fan_plus_bleed_a": 1.172969,
+        "sum_sensitivity_current_a": 1.191769,
+        "comparison_to_2a_rating": "BELOW",
+        "model_scope": "I=C*dV/dt sensitivity only; converter ramp/current limit/foldback/startup response is unknown"
+      }
+    ],
+    "output_bleeder_rc_discharge": {
+      "nominal_capacitance_uf": 188.0,
+      "nominal_parallel_resistance_ohm": 72.857143,
+      "minimum_resistance_corner_ohm": 71.94825,
+      "maximum_resistance_corner_ohm": 73.843264,
+      "nominal_time_constant_ms": 13.697143,
+      "nominal_time_to_10pct_ms": 31.538837,
+      "nominal_time_to_1pct_ms": 63.077674,
+      "nominal_energy_at_5v_mj": 2.35,
+      "voltage_samples": [
+        {
+          "time_ms": 0,
+          "voltage_from_5v_initial_v": 5.0
+        },
+        {
+          "time_ms": 1,
+          "voltage_from_5v_initial_v": 4.647967
+        },
+        {
+          "time_ms": 5,
+          "voltage_from_5v_initial_v": 3.470846
+        },
+        {
+          "time_ms": 10,
+          "voltage_from_5v_initial_v": 2.409354
+        },
+        {
+          "time_ms": 20,
+          "voltage_from_5v_initial_v": 1.160997
+        },
+        {
+          "time_ms": 50,
+          "voltage_from_5v_initial_v": 0.129904
+        },
+        {
+          "time_ms": 100,
+          "voltage_from_5v_initial_v": 0.003375
+        }
+      ],
+      "interpretation": "仅按7×510Ω与188uF标称值的无其他负载RC衰减；实际电容量、其他负载、模块停机输出行为会改变结果；CTRL OFF不等于瞬时零电压。"
+    },
+    "control_rail_rc_discharge": {
+      "control_rail": "PRE_CTRL_3V3 after switch pole 1 disconnects REG1 in STORE",
+      "initial_voltage_v": 3.3,
+      "nominal_decoupling_uf": 0.4,
+      "decoupling_tolerance_range_uf": [
+        0.36,
+        0.44
+      ],
+      "before_merge_two_100k_in_parallel": {
+        "nominal_tau_ms": 20.0,
+        "tau_corner_range_ms": [
+          17.77545,
+          22.29777
+        ],
+        "time_to_10pct_corner_range_ms": [
+          40.929486,
+          51.342513
+        ],
+        "time_to_1pct_corner_range_ms": [
+          81.858972,
+          102.685026
+        ]
+      },
+      "after_merge_one_100k_retained": {
+        "nominal_tau_ms": 40.0,
+        "tau_corner_range_ms": [
+          35.5509,
+          44.59554
+        ],
+        "time_to_10pct_corner_range_ms": [
+          81.858972,
+          102.685026
+        ],
+        "time_to_1pct_corner_range_ms": [
+          163.717945,
+          205.370051
+        ]
+      },
+      "nominal_discharge_samples_after_merge": [
+        {
+          "time_ms": 0,
+          "voltage_v": 3.3
+        },
+        {
+          "time_ms": 1,
+          "voltage_v": 3.218523
+        },
+        {
+          "time_ms": 10,
+          "voltage_v": 2.570043
+        },
+        {
+          "time_ms": 40,
+          "voltage_v": 1.214002
+        },
+        {
+          "time_ms": 80,
+          "voltage_v": 0.446606
+        },
+        {
+          "time_ms": 100,
+          "voltage_v": 0.27088
+        },
+        {
+          "time_ms": 160,
+          "voltage_v": 0.060442
+        },
+        {
+          "time_ms": 200,
+          "voltage_v": 0.022235
+        }
+      ],
+      "scope_warning": "被动RC、不含芯片负载/输入漏电/REG1软启动/开关弹跳/阈值；实际POR保持U_POR，不能由RC时间替代POR或故障关断证明。"
+    },
+    "part_count_plan": {
+      "procurement_bom_scope": {
+        "rows_observed_in_current_bom": 261,
+        "per_set_quantity_observed_in_current_bom": 284,
+        "raw_mpn_text_variants_observed_in_current_bom": 77,
+        "normalized_mpn_types_including_core_board_from_bound_count_evidence": 76,
+        "normalized_selected_mpn_types_excluding_core_board_from_bound_count_evidence": 75,
+        "count_evidence_sha256": "413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc",
+        "bom_sha256": "2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2",
+        "scope": "当前全采购BOM含板外风扇、配套、插头和线束；与PCB实装统计分开。规范化料号数来自与此BOM SHA绑定的当前计数证据；不从电源局部变化推导全板数量。"
+      }
+    },
+    "switch_state_and_supply_domain_analysis": {
+      "U_GATE1_logic_after_SW_RUN_net_merge": {
+        "device": "TI SN74LVC1G11DCKR; pin1=A, pin5=VCC, pin4=Y",
+        "planned_merged_net": "SW_RUN renamed/merged into PRE_CTRL_3V3; U_GATE1 pin1 A and pin5 VCC share the switched rail",
+        "RUN_equivalence": "both original SW_RUN and PRE_CTRL_3V3 were connected to REG1 in RUN; A is high whenever VCC is powered, so the original A&B&C function reduces to B&C during RUN",
+        "STORE_limit": "gate VCC is off; B/C input injection, Y output state and any off-domain backfeed are not guaranteed by this reduced model and require exact TI limits plus board measurement"
+      },
+      "RUN": {
+        "pole1": "2-3闭合，REG1接PRE_CTRL_3V3",
+        "pole2": "5-6闭合，pin6 NC，因此CTRL_MODULE开路并开启5V模块",
+        "if_REG1_or_BREG_lost_while_CELL_B9_present": "PRE_CTRL_3V3及本地控制逻辑失电/下拉；CTRL仍开路，5V模块仍可能开启。不能据此声称全板失电；主功率硬关断须由独立本地路径维持。"
+      },
+      "STORE": {
+        "pole1": "2-1闭合，两端pin1 NC，REG1断开；保留R_PRE_CTRL_PD下拉PRE_CTRL_3V3",
+        "pole2": "5-4闭合，CTRL_MODULE接B0并关断模块",
+        "output_after_disable": "7x510负载提供约14ms标称RC时间常数的输出衰减；不等于瞬时无电压。"
+      },
+      "single_fault_and_backfeed": {
+        "CTRL_wire_or_contact_open_in_STORE": "CTRL开路默认开启，模式开关不是安全隔离；需以主功率硬关断及本地保护独立保证风险状态。",
+        "module_pin5_to_B0": "有意将模块输出回路负端接B0，模块内部1500V输入/输出隔离不再构成整板地隔离边界。",
+        "5v_to_reg1_backfeed": "无计划的直接网线；GPIO/外置MCU/外部5V和芯片钳位路径仍需分析/实测，不能声称无回灌。",
+        "ctrl_sink_current": "V1.7没有给出CTRL引脚灌电流上限；需确认模块CTRL内部电路与MN22接点电流。"
+      },
+      "startup_order": "URB输入直接接CELL_B9；BREG经原有D_BREG/R_BREG_FEED/Q_BREG形成REGIN后由BQ76952生成REG1=3.3V。两路径独立，没有文档保证5V与REG1/BREG先后顺序、PGOOD或交叉复位；REG1失电不自动关断RUN档的5V。"
+    }
+  },
+  "checks": [
+    {
+      "item": "海凌科官方V1.7资料哈希",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf SHA256=1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d; compared with the cached official-PDF digest"
+    },
+    {
+      "item": "实现前连接源归档哈希",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "BMS模块/归档/历史与调试.zip!20261015_141128_电源调速精简过程/检查/tmp/source_before_implementation.zip SHA256=2995779953965e11a21cfa504db869e76dd66b49f271da9d053086dbce88c9a1"
+    },
+    {
+      "item": "归档基线DPDT针图与原始记录一致",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline SW_RUN_STORE pins={'1': None, '2': 'SW_RUN', '3': 'REG1', '4': None, '5': 'PRE_CTRL_3V3', '6': 'REG1'}"
+    },
+    {
+      "item": "当前DPDT正式连接源符合冻结针图",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "SW_RUN_STORE current pins={'1': None, '2': 'PRE_CTRL_3V3', '3': 'REG1', '4': 'B0', '5': 'CTRL_MODULE', '6': None}"
+    },
+    {
+      "item": "归档基线含原SCT2A26STER且正式源已更换为海凌科模块",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline U_PSU=SCT2A26STER; current PSU5_EXT=URB4805YMD-10WR3, libUuid=bd9ce49027fc4c83a722f82268af98d2, pins={'1': 'B0', '2': 'CELL_B9', '3': 'VOUT_5V', '5': 'B0', '6': 'CTRL_MODULE'}"
+    },
+    {
+      "item": "归档基线两只控制下拉合并后同值同地且正式源保留一只",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline R_IF_RUN_PD={'1': 'SW_RUN', '2': 'B0'}; baseline R_PRE_CTRL_PD={'1': 'PRE_CTRL_3V3', '2': 'B0'}; current R_PRE_CTRL_PD={'1': 'PRE_CTRL_3V3', '2': 'B0'}; duplicate absent=True"
+    },
+    {
+      "item": "U_GATE1合并后pin1与VCC同接PRE_CTRL_3V3",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "U_GATE1 A(pin1)=PRE_CTRL_3V3, VCC(pin5)=PRE_CTRL_3V3; RUN时为高，STORE掉电输入注入与Y状态仍待验证"
+    },
+    {
+      "item": "正式源已移除舊位号：C_PSU_BOOT",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：C_PSU_FF",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_FB_TOP",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_FB_BOT",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：L_PSU",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：D_PSU",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_PSU_EN",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源已移除舊位号：R_IF_RUN_PD",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "baseline_present=True; current_present=False"
+    },
+    {
+      "item": "正式源含7只准确MPN和并联网络的最低负载",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "refs=['R_PSU_MINLOAD1', 'R_PSU_MINLOAD2', 'R_PSU_MINLOAD3', 'R_PSU_MINLOAD4', 'R_PSU_MINLOAD5', 'R_PSU_MINLOAD6', 'R_PSU_MINLOAD7']; all_match=True; source quantities=7"
+    },
+    {
+      "item": "保留输入电容仍跨CELL_B9/B0",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "C_PSU_IN1,C_PSU_IN2,C_PSU_IN3"
+    },
+    {
+      "item": "保留输出电容仍跨VOUT_5V/B0",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "C_PSU_OUT1,C_PSU_OUT2,C_CAN_PWR_IN1,C_FAN_IN1"
+    },
+    {
+      "item": "BREG/REGIN/REG1链与5V模块输入分开",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "U1 BREG/REGIN/REG1 pins=[(37, 'BREG'), (36, 'REGIN'), (35, 'REG1')]; Q_BREG={'1': 'BREG', '2': 'BREG_COLLECTOR', '3': 'REGIN'}"
+    },
+    {
+      "item": "510Ω精确MPN可在项目共用库索引命中",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "current DEVICE assets=3; current common-library-backed asset=True"
+    },
+    {
+      "item": "510Ω复用MPN已出现在现行采购BOM",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "R_LOAD_POWER_VALID_LED MPN=RC0603FR-07510RL"
+    },
+    {
+      "item": "7×510Ω并联在官方输出精度下限仍超过3%最低负载",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "Imin=66.357mA, requirement=60.000mA"
+    },
+    {
+      "item": "纸面输出功率及温度曲线读图边界",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "候选风扇铭牌最大支路3.533088W；旧风扇限流压力7.733088W；V1.7曲线60°C读图100%功率；仅算术/读图，不代表板级热验收"
+    },
+    {
+      "item": "188uF输出标称容量低于2200uF上限",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "nominal=188.0uF; datasheet max=2200.0uF"
+    },
+    {
+      "item": "采购BOM同步到正式模块/删除/最低负载位号",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "current BOM SHA256=2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2; target module rows=1; removed refs still present=[]; missing added refs=[]; all added row MPN/qty correct=True"
+    },
+    {
+      "item": "当前全采购BOM计数证据与BOM哈希一致",
+      "status": "PASS",
+      "passed": true,
+      "evidence": "BOM SHA256=2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2; evidence SHA256=413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc; rows=261; qty=284; raw MPN variants=77; normalized MPN types incl. core board=76; selected excluding core board=75; evidence bound and local module implementation=True"
+    },
+    {
+      "item": "9.5uF输入旁路可满足模块动态条件",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "手册page 6 C1=47–100uF为测试电路参考；现有输入仅9.5uF标称且高压陶瓷有效值未核，动态阻抗/PI稳定性未仿真。"
+    },
+    {
+      "item": "模块启动时间足以保证并发负载",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "V1.7第1页典型10ms与第2页典型1ms矛盾，均无最大值；低线、实际电容、风扇启动场景未建模。"
+    },
+    {
+      "item": "CTRL关断与失电安全已通过硬件验证",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "CTRL开路即开；STORE触点/引线故障可使模块开启；REG1丢失时RUN档CTRL仍开路；U_GATE1掉电时B/C输入注入及Y输出状态未验证；尚无硬件样板。"
+    },
+    {
+      "item": "模块温升和效率边界已验收",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "效率81%仅在48V额定阻性负载/25°C条件；22.5V外推损耗约1.8W，实际效率、外壳热阻、舱体气流与风扇失效未测。"
+    },
+    {
+      "item": "5V/REG1跨域回灌已经排除",
+      "status": "OPEN",
+      "passed": false,
+      "evidence": "无规划直接连接，但跨域GPIO/外部供电与IC保护结构没有闭合；本轮未声称无回灌。"
+    }
+  ],
+  "summary": {
+    "pass_count": 26,
+    "fail_count": 0,
+    "open_count": 5,
+    "model_or_hardware_acceptance": false,
+    "ngspice_available": false,
+    "ngspice_binary_path": null,
+    "formal_native_source_current_implementation_verified": true,
+    "procurement_bom_current_implementation_verified": true
+  },
+  "source_hashes": [
+    {
+      "path": "BMS模块/项目要求.md",
+      "sha256": "c6198cd62d7710fdd6cd9f280c82ea8668b527c2b23a96eb50182bc04a3f6b22",
+      "bytes": 13925
+    },
+    {
+      "path": "BMS模块/检查/最大料号归并候选.json",
+      "sha256": "7326b21ed30b2084f3be636a4e2716135133e2dc635b51be2ea4dd42884e9b21",
+      "bytes": 4365
+    },
+    {
+      "path": "BMS模块/检查/URB4805替换候选.json",
+      "sha256": "b2b9b39e5df9d9daf514518bef1109c8024e8ba8866f0a757b5cdbf5d8cbe8ee",
+      "bytes": 8557
+    },
+    {
+      "path": "BMS模块/检查/5V电源预算.md",
+      "sha256": "5758d6f43e4bd74dfc0dc8ba6de6c31d4b491bb421e2bed4cc4e10cb392f0250",
+      "bytes": 6264
+    },
+    {
+      "path": "BMS模块/检查/风扇调速支持审查.json",
+      "sha256": "b7a651e82665500f8362a61cd852d402b5a4b1c58cee33680b9ce601bca799bc",
+      "bytes": 15379
+    },
+    {
+      "path": "BMS模块/原理图准备/接口元件连接.json",
+      "sha256": "ca5caf9237f966db1de3d7c219a4046bc9870286ab9ad08c13b02fd67f7d96d3",
+      "bytes": 33585
+    },
+    {
+      "path": "BMS模块/原理图准备/功率元件连接.json",
+      "sha256": "fa04dd717fe733251c5b1d919089118fe745b6eab28aacf17163ff5c871f81be",
+      "bytes": 31832
+    },
+    {
+      "path": "BMS模块/原理图准备/风扇元件连接.json",
+      "sha256": "b30b7b38323455d81a960c432477d1fe8e59704e1db963bca84033e81aa5472a",
+      "bytes": 9240
+    },
+    {
+      "path": "BMS模块/原理图准备/AFE元件连接.json",
+      "sha256": "874fba89731a5312d594a114a13cc2f2e8a2b48fb9926860502aaed00271a991",
+      "bytes": 94119
+    },
+    {
+      "path": "BMS模块/原理图准备/BOM.csv",
+      "sha256": "2f63f6605e6bfe76fac0ed256e9165e7ec6ac562a2e80fe7eb03ff701cfba3a2",
+      "bytes": 161112
+    },
+    {
+      "path": "BMS模块/检查/当前BOM计数证据.json",
+      "sha256": "413398efb95d2e7c7b9f03c1db788000416ac9f60b7689355d41610b9852aecc",
+      "bytes": 14715
+    },
+    {
+      "path": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+      "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d",
+      "bytes": 1490874
+    },
+    {
+      "path": "元件封装库/资产索引.json",
+      "sha256": "516db47a2d0a0f91fa6a7b50b6b4d44ca6d7b3c3f0b67e9a76012a7e54fd672a",
+      "bytes": 837094
+    }
+  ]
+}

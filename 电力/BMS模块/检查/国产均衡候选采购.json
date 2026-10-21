@@ -1,0 +1,201 @@
+{
+  "title": "国产均衡候选采购核对",
+  "retrieved_date": "2026-10-12",
+  "status": "采购与规格纸面核对；非已批准BOM、库存承诺或实物验证",
+  "requirements": {
+    "series_cells": 9,
+    "adjacent_pair_stages_for_9s": 8,
+    "target_net_average_transfer_current_A": [0.5, 1.0],
+    "comparison_peak_current_A": 2.0,
+    "independent_enable": true,
+    "default_off": true,
+    "custom_transformer_allowed": false,
+    "currency_policy": "不将USD报价折算成大陆人民币报价"
+  },
+  "summary": {
+    "domestic_candidate_closed": false,
+    "closest_domestic_inductor_candidate": "ETA3006S8A",
+    "best_documented_non_domestic_comparator": "MP2643",
+    "recommendation": "国产约束下暂不锁定ETA方案；若允许非国产，可将MP2643作为9S八级相邻均衡架构及BOM比较基准。"
+  },
+  "candidates": [
+    {
+      "manufacturer": "ETA",
+      "part_number": "ETA3006S8A",
+      "domestic_brand_candidate": true,
+      "package": "SOP8",
+      "topology": "两相邻电芯之间的电感式双向均衡，标准1uH电感，无定制变压器",
+      "series_9s": "不闭合；数据表说明堆叠用于偶数串，未确认9S",
+      "current": {
+        "headline_A": 2.0,
+        "specification": "IAVERAGE为平均电感电流；Rs=50mΩ时典型1A，Rs=25mΩ曲线约2A。25mΩ条件下驱动限流值4.5A。",
+        "net_transfer_0_5_to_1A_guaranteed": false,
+        "voltage_delta": "VKICK=50mV；最终精度±10mV；预充和电压差影响实际净转移，但未找到0.5–1A净电流全范围保证曲线。"
+      },
+      "control": {
+        "independent_enable": false,
+        "default_off_proven": false,
+        "reason": "SOP8引脚没有外部EN；器件自动检测并均衡。"
+      },
+      "typical_external_parts": {
+        "inductor": "1uH standard inductor per device",
+        "capacitors": ["BATPS-BATN 10uF", "BATC-BATN 22uF", "BATP-BATC 22uF", "BST-SW 100nF"],
+        "current_set": "ISET via resistor"
+      },
+      "procurement": {
+        "channel": "JLCPCB C20068933",
+        "channel_url": "https://jlcpcb.com/partdetail/ETA-ETA3006S8A/C20068933",
+        "quantity_9s": 8,
+        "stock_quantity": null,
+        "unit_price_cny": null,
+        "unit_price_other": null,
+        "moq": null,
+        "availability_note": "JLCPCB页面准确列ETA厂家型号和SOP8；只用于SMT装配，零件储存在JLC零件库且不能单独发货。公开库存数量和单价未知。"
+      },
+      "decision": "暂不批准9S采购/设计冻结"
+    },
+    {
+      "manufacturer": "ETA",
+      "part_number": "ETA3000D2I",
+      "domestic_brand_candidate": true,
+      "package": "DFN2x2-8",
+      "topology": "相邻电芯间电感式均衡，标准电感，无定制变压器",
+      "series_9s": "不闭合；产品资料表示偶数串堆叠，未确认9S",
+      "current": {
+        "headline_A": 2.0,
+        "specification": "数据表给平均电感电流调节值；RISET=50kΩ时典型1A。",
+        "net_transfer_0_5_to_1A_guaranteed": false,
+        "voltage_delta": "检测阈值约100mV，预充时限流，接近平衡时电流调节/停止；没有查到压差与LFP电压全范围下的净转移保证曲线。"
+      },
+      "control": {
+        "independent_enable": true,
+        "default_off": false,
+        "reason": "D2I带EN/STAT，EN低禁能，但EN内部上拉；需外加可靠下拉。各串组电位不同，需逐级本地或隔离控制。"
+      },
+      "procurement": {
+        "channel": "LCSC C7465544",
+        "channel_url": "https://www.lcsc.com/product-detail/battery-management_etasolution-eta3000d2i_C7465544.html",
+        "snapshot_date": "2026-10-12",
+        "quantity_9s_theoretical": 8,
+        "minimum_order_quantity": 5,
+        "order_multiple": 5,
+        "order_quantity_for_8_stages": 10,
+        "stock_snapshot_quantity": 3220,
+        "unit_price_currency": "USD",
+        "unit_price_usd_at_5_plus": 0.3807,
+        "estimated_10_piece_total_usd": 3.807,
+        "unit_price_cny": null,
+        "availability_note": "頁面顯示USD，不是可核驗的大陆人民币报价；价格与库存会变。"
+      },
+      "decision": "可向ETA索取9S、净电流和默认OFF书面确认；当前不批准用于9S"
+    },
+    {
+      "manufacturer": "ETA",
+      "part_number": "ETA3002 / ETA3005",
+      "domestic_brand_candidate": true,
+      "series_9s": null,
+      "current": {
+        "manual_headline_A": 10.0,
+        "net_or_peak_definition": null,
+        "decision_note": "ETA产品手册列示10A Balance Current，但未找到完整数据表来核实口径、压差影响及限流条件。不得视为10A净平均或峰值保证。"
+      },
+      "control": {
+        "independent_enable": null,
+        "default_off": null
+      },
+      "procurement": {
+        "stock_quantity": null,
+        "unit_price_cny": null,
+        "unit_price_other": null,
+        "availability_note": "本轮未找到准确厂家型号对应的大陆小批库存价格。手册型号封装分别列ETA3002 MSOP10、ETA3005 MSOP10。"
+      },
+      "decision": "规格与采购证据不足，不推荐"
+    },
+    {
+      "manufacturer": "MPS",
+      "part_number": "MP2643GR-Z / MP2643GR-P",
+      "domestic_brand_candidate": false,
+      "package": "QFN-26 4x4mm",
+      "topology": "集成双向Buck-Boost主动均衡；每个相邻电芯对一颗，标准电感，无定制变压器",
+      "series_9s": "厂家明确可级联到任意串数；9S需要8颗覆盖8个相邻电芯边",
+      "current": {
+        "headline_net_balance_A": 2.0,
+        "programmable_net_current_range_A": [0.5, 2.0],
+        "buck_boost_voltage_dependence": "Buck净转移受效率影响；Boost受效率及上下电芯电压比影响，须使用数据表公式逐级核算。单级最大净电流不等于远距离多级搬运电流。",
+        "switch_peak_current_limit_A": {
+          "buck_high_side_min": 6.7,
+          "buck_high_side_typ": 8.0,
+          "boost_low_side_min": 7.6,
+          "boost_low_side_typ": 9.2
+        },
+        "comparison_note": "2A为厂家所述净均衡电流能力，不是开关峰值。开关峰值限流高于约2A对照值，需按电感/铜箔/热设计。"
+      },
+      "control": {
+        "independent_enable": true,
+        "default_off": true,
+        "reason": "每颗有独立EN和MODE；EN默认低，低电平为休眠。9S每级位于不同电位，须逐级隔离或本地驱动。"
+      },
+      "reference_inductor": {
+        "part_number": "MPL-AL4020-1R0",
+        "inductance_uH": 1.0,
+        "dcr_typ_mohm": 10.1,
+        "irms_A": 7.9,
+        "isat_A": 8.6,
+        "note": "MPS产品页列为参考板优化电感；最终L值须按数据表电流、压差及电感选型指南复核。"
+      },
+      "procurement": {
+        "channel": "MPS official direct store (English product page)",
+        "channel_url": "https://www.monolithicpower.com/en/mp2643.html",
+        "snapshot_date": "2026-10-12",
+        "stock_snapshot_quantity": 3639,
+        "unit_price_currency": "USD",
+        "unit_price_usd_qty_1": 2.84,
+        "unit_price_usd_qty_10": 2.54,
+        "eight_piece_total_at_single_piece_tier_usd": 22.72,
+        "ten_piece_order_total_usd": 25.4,
+        "shipment_estimate": "官方页显示库存预计2026-10-15发出；动态估算，非承诺",
+        "unit_price_cny_current": null,
+        "china_page_note": "MPS中文页显示的人民币价格伴随已过期的2026-09预计发货日期，未作为当前报价。运税未计。"
+      },
+      "decision": "可进入9S比较和BOM细化的非国产对照方案；不是现有均衡电路直接替换"
+    }
+  ],
+  "capacitive_modules": {
+    "qualified_candidate_found": false,
+    "reason": "未核验到同时具备9S明确支持、独立EN默认OFF、0.5–1A净均衡平均电流规格以及大陆小批库存价格的成熟电容式模块。"
+  },
+  "sources": [
+    {
+      "name": "ETA3006 Rev 1.0 datasheet (ETA-branded document mirrored by third party)",
+      "url": "https://offer-product.oss-cn-beijing.aliyuncs.com/product/offer/attachment/2519080892/file/subPdf_697272_315466_20231031-105057835.pdf"
+    },
+    {
+      "name": "ETA Product Manual (ETA-branded, third-party hosted)",
+      "url": "https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf"
+    },
+    {
+      "name": "ETA3000D2I datasheet PDF",
+      "url": "https://atta.szlcsc.com/upload/public/pdf/source/20230717/2FD4E108EC3C68D06D894D4D17347BBC.pdf"
+    },
+    {
+      "name": "LCSC ETA3000D2I C7465544 listing",
+      "url": "https://www.lcsc.com/product-detail/battery-management_etasolution-eta3000d2i_C7465544.html"
+    },
+    {
+      "name": "JLCPCB ETA3006S8A C20068933 listing",
+      "url": "https://jlcpcb.com/partdetail/ETA-ETA3006S8A/C20068933"
+    },
+    {
+      "name": "MPS MP2643 official product and direct-purchase page",
+      "url": "https://www.monolithicpower.com/en/mp2643.html"
+    },
+    {
+      "name": "MPS MP2643 Rev 1.1 datasheet",
+      "url": "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2643GR/document_id/12324/"
+    },
+    {
+      "name": "MPS Chinese MP2643 page (stale CNY snapshot excluded)",
+      "url": "https://www.monolithicpower.cn/cn/products/mp2643.html"
+    }
+  ]
+}

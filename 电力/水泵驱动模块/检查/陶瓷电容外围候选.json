@@ -1,0 +1,154 @@
+[
+  {
+    "reference": "C_DRV_VM1,C_DRV_VM2",
+    "mpn": "C2012X7R2E103K125AA",
+    "manufacturer": "TDK",
+    "package": "0805 (EIA 2012 metric; 2.00 x 1.25 mm, thickness 1.25 mm)",
+    "quantity": 2,
+    "original_spec": "10nF 100V X7R 0805",
+    "candidate_spec": "10nF ±10%, 250VDC, X7R, 0805",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C2012X7R2E103K125AA",
+    "notes": [
+      "TDK Product Center列为Production；参数满足容量、X7R、0805，额定电压由100V提高为250V。",
+      "同系列原100V型号C2012X7R2A103K085AA已标NRND，TDK建议本型号为替代料，但说明互换性不保证；本候选不据此声称替代已完成验证。",
+      "候选厚度1.25mm，高于原100V型号的0.85mm；PCB器件高度/邻件间隙仍需复核。",
+      "价格与MOQ待询价；额定及封装核验来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_DRV_CP",
+    "mpn": "C2012X7R2A104K125AA",
+    "manufacturer": "TDK",
+    "package": "0805 (EIA 2012 metric; 2.00 x 1.25 mm, thickness 1.25 mm)",
+    "quantity": 1,
+    "original_spec": "100nF 100V X7R；CPL-CPH飞跨电容",
+    "candidate_spec": "100nF ±10%, 100VDC, X7R, 0805",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C2012X7R2A104K125AA",
+    "notes": [
+      "TDK Product Center列为Production；电气额定值与原规格相同，原BOM未定封装，候选补为0805。",
+      "该电容跨接CPL/CPH，需按TI参考连接放置；没有把厂商名义容量当成已验证的偏压有效容量。",
+      "价格与MOQ待询价；额定及封装核验来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_DRV_VCP",
+    "mpn": "C1608X7R1C105K080AC",
+    "manufacturer": "TDK",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 1,
+    "original_spec": "1uF 16V X7R；VCP至VM，不接地",
+    "candidate_spec": "1uF ±10%, 16VDC, X7R, 0603",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+    "notes": [
+      "TDK Product Center列为Production；并与元件封装库中已有精确MPN一致，优先复用。",
+      "需维持VCP-VM差分电压连接且不得接地；偏压下有效容量尚未核实，不宣称已满足有效容量裕量，须结合DRV8262要求核对原厂DC-bias曲线/最低有效容量。",
+      "价格与MOQ待询价；参数来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价",
+    "selection_basis": {
+      "ti_source": "https://www.ti.com/lit/ds/symlink/drv8262.pdf",
+      "ti_recommendation": "Rev.C Table 6-1推荐VCP–VM间1uF/16V X7R，未规定最小有效容量；正常差分偏压约5V。",
+      "conclusion": "所选TDK名义值/耐压/介质满足TI推荐，保留主选；TDK特性曲线未给出5V偏压保证最小Ceff，不将资料核对当实物验证。",
+      "evm_boundary": "未找到官方EVM该电容MPN明细，不声称EVM使用此型号。"
+    }
+  },
+  {
+    "reference": "C_DRV_DVDD",
+    "mpn": "C1608X7R1C105K080AC",
+    "manufacturer": "TDK",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 1,
+    "original_spec": "1uF 10V X7R；DVDD去耦",
+    "candidate_spec": "1uF ±10%, 16VDC, X7R, 0603",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+    "notes": [
+      "TDK Product Center列为Production；与元件封装库已有精确MPN一致；额定电压从10V提高到16V。",
+      "仅作DVDD去耦，按数据手册接至规定的DVDD/GND节点，不将其与外部电源并联。",
+      "价格与MOQ待询价；参数来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_DRV_VCC,C_CAN_VCC,C_CAN_VIO,C_VREF,C_ADC_BUS",
+    "mpn": "C1608X7R1H104K080AA",
+    "manufacturer": "TDK",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 5,
+    "original_spec": "100nF 16V X7R 0603",
+    "candidate_spec": "100nF ±10%, 50VDC, X7R, 0603",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1H104K080AA",
+    "notes": [
+      "TDK Product Center列为Production；满足容量、介质、封装，额定电压从16V提高至50V。",
+      "对应节点分别就近去耦；100nF是名义值，不代表所有板级布局下阻抗/瞬态要求已验收。",
+      "价格与MOQ待询价；参数来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_ADC_I,C_ADC_NTC",
+    "mpn": "C1608X7R1H103K080AA",
+    "manufacturer": "TDK",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 2,
+    "original_spec": "10nF 16V X7R 0603",
+    "candidate_spec": "10nF ±10%, 50VDC, X7R, 0603",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1H103K080AA",
+    "notes": [
+      "TDK Product Center列为Production；满足容量、介质、封装，额定电压从16V提高至50V。",
+      "用于ADC输入滤波，滤波响应仍应结合实际源阻抗、ADC采样时间和固件采样要求核对。",
+      "价格与MOQ待询价；参数来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_5V_IN_HF",
+    "mpn": "C2012X7R2A104K125AA",
+    "manufacturer": "TDK",
+    "package": "0805 (EIA 2012 metric; 2.00 x 1.25 mm, thickness 1.25 mm)",
+    "quantity": 1,
+    "original_spec": "100nF 100V X7R；XL7015 VIN-GND",
+    "candidate_spec": "100nF ±10%, 100VDC, X7R, 0805",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C2012X7R2A104K125AA",
+    "notes": [
+      "TDK Product Center列为Production；容量、介质、额定电压满足原规格，原BOM未定封装，候选补为0805。",
+      "放置于XL7015 VIN与GND近端；PCB回路面积和接地回流需在布局中落实。",
+      "价格与MOQ待询价；额定及封装核验来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_5V_OUT_HF",
+    "mpn": "C1608X7R1H104K080AA",
+    "manufacturer": "TDK",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 1,
+    "original_spec": "100nF 16V X7R 0603",
+    "candidate_spec": "100nF ±10%, 50VDC, X7R, 0603",
+    "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1H104K080AA",
+    "notes": [
+      "TDK Product Center列为Production；满足容量、介质、封装，额定电压从16V提高至50V。",
+      "5V输出高频去耦；与电解输出电容配合，具体环路/纹波效果仍需按XL7015原厂应用核对。",
+      "价格与MOQ待询价；参数来自原厂产品页，非实物测试。"
+    ],
+    "procurement": "待询价"
+  },
+  {
+    "reference": "C_FB_FF",
+    "mpn": "GCJ188R71H333KA12D",
+    "manufacturer": "Murata",
+    "package": "0603 (EIA 1608 metric; 1.60 x 0.80 mm)",
+    "quantity": 1,
+    "original_spec": "33nF 16V X7R；XL7015反馈前馈电容",
+    "candidate_spec": "33nF ±10%, 50VDC, X7R, 0603",
+    "source": "https://ds.murata.com/simsurfing/mlcc.html?oripartnumbers=%5B%22GCJ188R71H333KA12D%22%5D&partnumbers=%5B%22GCJ188R71H333KA12%22%5D&rgear=inovutkyzuv&rgearinfo=com",
+    "notes": [
+      "Murata SimSurfing按该料号解析到GCJ188R71H333KA12系列数据，状态In Production；显示33nF、50V、X7R、0603、±10%。",
+      "额定电压高于16V原要求；Murata产品清单/SimSurfing的基础型号不含包装后缀D，正式采购前需确认D对应卷带订货形式及完整料号。",
+      "跨接XL7015反馈上臂的前馈电容；连接位置与反馈网络需按芯龙原厂Fig.10复核。",
+      "价格与MOQ待询价；参数来自原厂工具，非实物测试。"
+    ],
+    "procurement": "待询价"
+  }
+]

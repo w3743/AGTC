@@ -1,0 +1,186 @@
+{
+  "review_id": "V1.6-BUSFIX-cell-protection-qualification-20261015",
+  "status": "MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL",
+  "scope": "Current BUSFIX per-cell software/reference state model and ideal capacitor energy arithmetic; no CAD, BOM, or firmware change.",
+  "source_snapshot": {
+    "path": "稳压模块/仿真/输入/V1.6-BUSFIX/source_snapshot_manifest.json",
+    "checked_staged_file_count": 8,
+    "all_staged_files_match_registered_input_baseline": true,
+    "meaning": "Hashes certify staged inputs against the registered capture baseline; they do not claim all staged context files still equal later current files.",
+    "historical_context_files": {
+      "module_README.md": "pre-edit README (historical context; this current README was subsequently updated)",
+      "prior_shared_simulation_review.json": "previous shared review retained as prior-turn context"
+    },
+    "current_source_comparison": {
+      "matched_count": 7,
+      "total_count": 8,
+      "official_netlist_matches_current_formal_file": true,
+      "candidate_bom_matches_current_formal_file": true,
+      "mismatched_current_source_files": [
+        "module_README.md"
+      ],
+      "per_file": [
+        {
+          "staged": "current_official_netlist.enet",
+          "registered_baseline_sha256": "E7589F1D6E02B8A9C2AE45E8EA693F8105A95DCBEDE1333683779B002BFBD3CE",
+          "current_source_sha256": "E7589F1D6E02B8A9C2AE45E8EA693F8105A95DCBEDE1333683779B002BFBD3CE",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "BUSFIX_candidate_BOM.csv",
+          "registered_baseline_sha256": "17C5C06655BA29BEE01D75FF68E4130C063967CCD13E328275E9A79B17DCD874",
+          "current_source_sha256": "17C5C06655BA29BEE01D75FF68E4130C063967CCD13E328275E9A79B17DCD874",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "design-plan.json",
+          "registered_baseline_sha256": "B48823CB3AB75FF818BAA1E8AFCC93DA596B167370DF3D5506A5C62E3F10FDA7",
+          "current_source_sha256": "B48823CB3AB75FF818BAA1E8AFCC93DA596B167370DF3D5506A5C62E3F10FDA7",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "interface_sampling_review.md",
+          "registered_baseline_sha256": "9F8017456EDCE3ACB957105DA45394B1929232CDEED7194A1B2EE0BCEFE72A6F",
+          "current_source_sha256": "9F8017456EDCE3ACB957105DA45394B1929232CDEED7194A1B2EE0BCEFE72A6F",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "compute_protection_boundaries.md",
+          "registered_baseline_sha256": "4C222137F02F5189E3B3944812FA2FE84E4AE80BF1DF89C25099A25111B95683",
+          "current_source_sha256": "4C222137F02F5189E3B3944812FA2FE84E4AE80BF1DF89C25099A25111B95683",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "programmable_control.md",
+          "registered_baseline_sha256": "61F3689AB64C0D0D7DF41CDCF9C4CA9DE9E5267404B65FFF318760692FEE99A3",
+          "current_source_sha256": "61F3689AB64C0D0D7DF41CDCF9C4CA9DE9E5267404B65FFF318760692FEE99A3",
+          "current_source_matches_registered_baseline": true
+        },
+        {
+          "staged": "module_README.md",
+          "registered_baseline_sha256": "02692A85379DD1159EBAA7503348B132EB69B8DD7E12C205A3335ABE9FB95EFB",
+          "current_source_sha256": "C436B08108F74437FE78B567D11BC940E806E826577082E1FB1A96CB70D417FC",
+          "current_source_matches_registered_baseline": false
+        },
+        {
+          "staged": "prior_shared_simulation_review.json",
+          "registered_baseline_sha256": "9B432B1599407D2922F2B7DD1282D2265F6A38A03FF21C8C82610C6C581B2D4B",
+          "current_source_sha256": "9B432B1599407D2922F2B7DD1282D2265F6A38A03FF21C8C82610C6C581B2D4B",
+          "current_source_matches_registered_baseline": true
+        }
+      ]
+    }
+  },
+  "reproduction": {
+    "working_directory": "E:/Pioneer/先进通用履带底盘工程/电力",
+    "command": "python -u \"稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py\"",
+    "actual_output": "BUSFIX-CELL-PROTECTION: state_tests=19/19 PASS; T2.56_E100_T50ms_margin=25.714mV; raw_conditional_error_stress_max=339.174mV (E100=FAIL); energy_midpoint=618.45J; C_EOL@midpoint_800W/1000W=362.2/452.7F_per_cell; snapshot_hashes=PASS; actual_input_gate=CLOSED_OFF; overall=MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL"
+  },
+  "pass_fail": {
+    "algorithmic_state_tests": "PASS_19_OF_19_CONDITIONAL_MODEL_TESTS",
+    "19_6V_single_cell_imbalance_cutoff_test": "PASS; 2.66V actual cell with -100mV modeled error measures 2.56V and latches off at 19.60V pack total, below 20.8V total SC_OV",
+    "persisted_input_charge_gate": "CLOSED_OFF_UNTIL_E100_80A_T50_AND_FIRMWARE_VERIFICATION",
+    "2_7V_hard_max_guard": "CONDITIONAL_ONLY; 25.714mV model margin if abs error <=100mV, charge <=80A, and response <=50ms",
+    "end_to_end_measurement_error_E100mV": "FAIL_OPEN; max additive known conditional stress 339.174mV at T8/125C, not a complete hard bound",
+    "80A_and_T50ms_physical_response": "NOT_MEASURED",
+    "800W_and_1000W_for_1s": "FAIL_AT_280F_EOL_PER_CELL",
+    "20_8V_total_sc_ov_as_per_cell_proof": "FAIL_TOTAL_VOLTAGE_IS_NOT_PER_CELL_PROTECTION",
+    "independent_mcu_failure_shutdown": "OPEN",
+    "physical_board_vehicle_acceptance": "NOT_ESTABLISHED",
+    "central_total_cost_le_500_CNY": "NOT_VERIFIED"
+  },
+  "protection_candidate": {
+    "series_cells": 8,
+    "cell_hard_max_V": 2.7,
+    "planning_target_V_per_cell": 2.45,
+    "measured_trip_V_per_cell": 2.56,
+    "measured_reset_V_per_cell": 2.5,
+    "abs_measurement_error_candidate_V": 0.1,
+    "charge_current_A": 80,
+    "cell_EOL_capacitance_F": 280,
+    "dV_dt_V_per_s": 0.285714285714,
+    "response_time_ms": 50,
+    "dynamic_rise_mV": 14.285714286,
+    "worst_true_after_trip_V": 2.674285714286,
+    "hard_max_margin_mV": 25.714285714,
+    "normal_target_no_false_trip_margin_mV": 10.0
+  },
+  "energy": {
+    "window_V_per_cell": [
+      2.2,
+      2.45
+    ],
+    "energy_midpoint_V_per_cell": 2.328357790375,
+    "efficiency": 0.95,
+    "current_EOL_capacitance_F_per_cell": 280,
+    "midpoint_ideal_bus_energy_J": 618.45,
+    "E100_worst_actual_start_V_per_cell": 2.35,
+    "E100_worst_ideal_bus_energy_J": 726.18,
+    "targets": [
+      {
+        "power_W": 800,
+        "duration_s": 1,
+        "required_EOL_F_per_cell_at_midpoint": 362.195812111,
+        "initial_nameplate_F_per_cell_at_80pct_EOL_retention": 452.744765139,
+        "required_EOL_F_per_cell_from_E100_worst_start": 308.463466358,
+        "required_EOL_F_per_cell_from_full_2_45V_start": 181.097906055,
+        "current_280F_pass": false,
+        "midpoint_shortfall_J": 181.55
+      },
+      {
+        "power_W": 1000,
+        "duration_s": 1,
+        "required_EOL_F_per_cell_at_midpoint": 452.744765139,
+        "initial_nameplate_F_per_cell_at_80pct_EOL_retention": 565.930956423,
+        "required_EOL_F_per_cell_from_E100_worst_start": 385.579332948,
+        "required_EOL_F_per_cell_from_full_2_45V_start": 226.372382569,
+        "current_280F_pass": false,
+        "midpoint_shortfall_J": 381.55
+      }
+    ],
+    "esr": "Excluded; require E_ESR=integral(I^2 R_stack dt) with verified ESR and temperature."
+  },
+  "open_inputs": [
+    "End-to-end calibrated voltage error across all cells, supply/reference, operating temperature, input slew, scan order and wiring.",
+    "Measured detection-to-zero-current response at up to 80A, including software scan wait, PWM/driver turnoff and current tail.",
+    "Actual RC/sample-and-hold settling, mixed ADC residuals, noise, board/harness leakage and SC- shunt compensation residual.",
+    "Independent shutdown behavior for arbitrary MCU/PWM/peripheral fault.",
+    "Cell stack ESR and cold-temperature data; verified component quotation and total system cost."
+  ],
+  "artifacts": {
+    "source": "稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py",
+    "input": "稳压模块/仿真/输入/V1.6-BUSFIX/model_input.json",
+    "result": "稳压模块/仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
+    "report_markdown": "稳压模块/检查/未通过项修复/BUSFIX_逐节保护资格复查.md",
+    "verification_archive": "稳压模块/检查/未通过项修复/BUSFIX_逐节保护资格复查.zip",
+    "archive_readback_receipt": "稳压模块/检查/未通过项修复/BUSFIX_逐节保护资格ZIP读回.json",
+    "historical_archive": "稳压模块/归档/历史与调试.zip",
+    "historical_archive_readback_receipt": "稳压模块/检查/未通过项修复/README历史归档读回.json"
+  },
+  "power_energy_target_source": {
+    "dc_dc_supercapacitor_support": {
+      "source_documents": [
+        "稳压模块/稳压模块设计构想.md",
+        "稳压模块/最简元器件方案.md"
+      ],
+      "source_wording": "约0.8–1 kW、约1 s功率差额目标，仍为未验证目标候选",
+      "screening_endpoints": [
+        {
+          "power_W": 800,
+          "duration_s": 1,
+          "meaning": "下端点计算工况，不是独立用户验收指标"
+        },
+        {
+          "power_W": 1000,
+          "duration_s": 1,
+          "meaning": "上端点计算工况，不是独立用户验收指标"
+        }
+      ]
+    },
+    "separate_bus_dump_absorption": {
+      "source_document": "稳压模块/计算与保护边界.md",
+      "target": "1 kW、至少1 kJ/1 s短时吸收目标",
+      "meaning": "BUS dump电阻吸收路径，不能与SC经DC/DC向BUS支撑能量混同"
+    }
+  }
+}

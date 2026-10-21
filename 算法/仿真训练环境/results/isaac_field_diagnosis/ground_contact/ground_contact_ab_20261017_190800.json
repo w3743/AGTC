@@ -1,0 +1,66 @@
+{
+  "schema": "isaac-field-newton-ground-contact-ab-v1",
+  "setup": {
+    "physics": "Isaac Lab Newton MJWarp, use_mujoco_contacts=False",
+    "plants": 0,
+    "seed": 80017,
+    "control_dt_s": 0.05,
+    "settle_zero_steps": 20,
+    "phase_steps": 40,
+    "phases": [
+      {
+        "name": "forward",
+        "command": [
+          0.12,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "forward_zero",
+        "command": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "mix",
+        "command": [
+          0.12,
+          0.05,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "name": "mix_zero",
+        "command": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "wheel_body_spin": "body_link_ang_vel_w minus root angular velocity, projected on wheel local-Y transformed to world",
+    "wheel_samples": [
+      "left_wheel_3_wheel_joint",
+      "right_wheel_3_wheel_joint"
+    ],
+    "finite_difference": "wrapped joint_pos delta / 0.05 s",
+    "case_definitions": {
+      "A": "flat triangle mesh, drive gain 20",
+      "B": "visual-only mesh plus GroundPlaneCfg, gain 20",
+      "C": "flat triangle mesh, drive gain 0.5"
+    }
+  },
+  "cases": {
+    "A": {
+      "status": "failed:ValueError:operands could not be broadcast together with shapes (2,) (14,) "
+    }
+  },
+  "status": "failed:A"
+}

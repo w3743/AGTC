@@ -1,0 +1,82 @@
+{
+  "status": "candidate_not_manufacturer_recommended",
+  "component": "Vishay IHXL2000VZEB100M3A",
+  "source": {
+    "format_schema": "https://github.com/easyeda/easyeda-format-skill",
+    "manufacturer_datasheet": "https://www.vishay.com/docs/34681/ihxl2000vz-3a.pdf",
+    "document": "Vishay document 34681, Figure B, page 2; IHXL2000VZ-3A; value 10 uH uses Figure B",
+    "published_revision": "2026-01-09"
+  },
+  "native_format": {
+    "document_uuid": "f9766f11540a4cae",
+    "description": "EasyEDA line-format FOOTPRINT document source",
+    "units": "All pad, hole and mechanical coordinates are mil; canvas unit only controls display.",
+    "groupIdNote": "Un-grouped primitives use groupId string \"0\" here to satisfy the published validator schema and matching example; the format primitive prose elsewhere describes a numeric 0. Importer normalization remains to be confirmed."
+  },
+  "geometry": {
+    "manufacturer_dimensions": {
+      "terminal_length_mm": 12.827,
+      "terminal_width_mm": {
+        "nominal": 7.11,
+        "tolerance": 0.254
+      },
+      "left_body_edge_to_terminal_edge_mm": 5.461,
+      "body_envelope_mm": {
+        "tolerance": 0.254,
+        "x": 50.8,
+        "y": 50.8
+      },
+      "tinned_length_mm": 11.557,
+      "terminal_center_pitch_mm": {
+        "nominal": 25.4,
+        "tolerance": 0.508
+      },
+      "terminal_thickness_mm": {
+        "nominal": 2.01,
+        "tolerance": 0.254
+      }
+    },
+    "candidate_land_pattern": {
+      "pad_centers_mm": [
+        {
+          "x": -12.7,
+          "y": 0.0
+        },
+        {
+          "x": 12.7,
+          "y": 0.0
+        }
+      ],
+      "plated": true,
+      "plated_slot_mm": {
+        "length": 8.0,
+        "diameter": 2.7
+      },
+      "copper_pad_mm": {
+        "width": 12.0,
+        "height": 9.0
+      },
+      "slot_long_axis": "X, parallel to terminal width"
+    },
+    "body_outline_mm": {
+      "placement": "X offset derived from Figure B left-edge-to-terminal callout and lead width. Y offset is provisional, using the center of the tinned area estimated from the terminal-length and tinned-length callouts; verify against the physical part.",
+      "y_min": 7.049,
+      "x_max": 29.083,
+      "y_max": 57.849,
+      "shape": "50.8 x 50.8 mm rectangular envelope on mechanical layer; corner radii omitted because no radius dimension was supplied.",
+      "x_min": -21.717
+    }
+  },
+  "validation": {
+    "must_confirm_before_pcb_release": [
+      "Confirm selected component is Figure B / 10 uH package.",
+      "Confirm physical lead pitch, body-to-terminal offsets and body envelope using the received part.",
+      "Confirm board-fabricator capability and tolerance for plated 8.0 x 2.7 mm slots and 12 x 9 mm annular copper lands.",
+      "Perform physical test fit before releasing PCB fabrication."
+    ],
+    "not_claimed": [
+      "Not a Vishay-recommended land pattern; the datasheet provides package dimensions, not this PCB slot/copper pattern.",
+      "Not checked by EasyEDA import, DRC, PCB fabrication review, or physical test fit."
+    ]
+  }
+}

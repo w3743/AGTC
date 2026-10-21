@@ -1,0 +1,909 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-10-21",
+  "document": "温度保护配置闭合.md",
+  "status": "selected_sensor_and_threshold_candidates; TI_configuration_readback_and_physical_qualification_open",
+  "scope": {
+    "firmware_modified": false,
+    "formal_bom_modified": true,
+    "eprj3_modified": true,
+    "configuration_written_or_read_back": false,
+    "bench_or_vehicle_acceptance_performed": false
+  },
+  "current_electrical_evidence": {
+    "connected_thermistors": [
+      "TS1",
+      "TS2",
+      "TS3",
+      "DCHG",
+      "CFETOFF"
+    ],
+    "unconnected_channels_with_filter_cap_only": [],
+    "evidence_source": "P1 SHA256 56f8f62e754d1e4af8f068bdc7b19c37dfa4788101cdb2852dc2f2254db41e8f; saved schematic and updated BOM/connection contracts.",
+    "schematic_sensor_mapping": {
+      "TS1": "NTC_CELL1.1→BQ_TS1; pin2→B0; Semitec 103AT-2, zone A",
+      "DCHG": "NTC_CELL2.1→BQ_DCHG; pin2→B0; Semitec 103AT-2, zone B",
+      "CFETOFF": "NTC_CELL3.1→BQ_CFETOFF; pin2→B0; Semitec 103AT-2, zone C",
+      "TS2": "NTC_BOARD, MF52A103F3950(A1), report-only",
+      "TS3": "NTC_MOS, MF52A103F3950(A1), FET protection"
+    },
+    "external_probes_physical_status": "All schematic nets are connected. External sensors/cables/insulation/strain relief/thermal placement are not physically installed or tested.",
+    "cell_coverage_note": "三路 cell-zone 只代表区域，不覆盖每一并联组。"
+  },
+  "pin_config_decode": {
+    "register_byte_fields": {
+      "pullup_logical_opt_bits": "OPT[5:4]",
+      "model_logical_opt_bits": "OPT[3:2]",
+      "temperature_category_logical_opt_bits": "OPT[1:0]",
+      "thermistor_function_pin_fxn": "PIN_FXN[1:0]"
+    },
+    "codes": {
+      "pullup_18k": "00",
+      "model_18k": "00",
+      "model_custom": "10",
+      "category_cell_temperature": "01",
+      "category_report_only": "10",
+      "category_fet_temperature": "11",
+      "function_thermistor": "11"
+    },
+    "candidate_bytes": {
+      "cell_18k": "0x07",
+      "report_18k": "0x0B",
+      "fet_18k": "0x0F",
+      "cell_custom": "0x27",
+      "report_custom": "0x2B",
+      "fet_custom": "0x2F"
+    },
+    "status": "TRM_field_decode_verified; selected bytes are candidates only; actual write/readback not performed"
+  },
+  "channels": [
+    {
+      "channel": "TS1",
+      "physical_pin": 21,
+      "data_memory_address": "0x92FD",
+      "live_temperature_command": "0x70",
+      "planned_role": "cell_zone_A_cell_temperature_protection",
+      "net": "BQ_TS1",
+      "raw_count_source": {
+        "subcommand": "DASTATUS6 0x0076",
+        "byte_offsets": "24-27"
+      },
+      "current_sensor_part": "Semitec 103AT-2",
+      "current_wiring_status": "connected_in_saved_schematic; physical sensor/cable/insulation/thermal coupling not verified",
+      "candidate_byte_18k": "0x07",
+      "candidate_byte_custom": "0x27",
+      "model_slot_final": null,
+      "temperature_limits_c": null,
+      "raw_count_valid_window": null,
+      "notes": [
+        "External Semitec 103AT-2; TI 18K default model is based on Semitec 103-AT; exact 103AT-2 error still requires temperature sweep.",
+        "Zone A representative only; not every cell group."
+      ],
+      "selected_sensor_part": "Semitec 103AT-2",
+      "candidate_model_slot": "18K",
+      "candidate_configuration_byte": "0x07",
+      "recommended_candidate_byte": "0x07",
+      "raw_count_window_candidate": {
+        "lower_exclusive_signed_I4_counts": 250000,
+        "upper_exclusive_signed_I4_counts": 4700000,
+        "valid_expression": "250000 < signed I4 counts < 4700000",
+        "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+        "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json",
+        "temperature_scope": "Semitec tolerance envelope; cell surface -20..75°C"
+      }
+    },
+    {
+      "channel": "TS2",
+      "physical_pin": 22,
+      "data_memory_address": "0x92FE",
+      "live_temperature_command": "0x72",
+      "planned_role": "bms_balancing_area_board_temperature_report_only",
+      "net": "NTC_BOARD_NODE",
+      "raw_count_source": {
+        "subcommand": "DASTATUS6 0x0076",
+        "byte_offsets": "28-31"
+      },
+      "current_sensor_part": "MF52A103F3950(A1)",
+      "current_wiring_status": "connected_in_saved_schematic; physical sensor/cable/insulation/thermal coupling not verified",
+      "candidate_byte_18k": "0x0B",
+      "candidate_byte_custom": "0x2B",
+      "recommended_candidate_byte": "0x2B",
+      "model_slot_final": null,
+      "temperature_limits_c": null,
+      "raw_count_valid_window": null,
+      "notes": [
+        "Onboard MF52A103F3950(A1) retained for board/MOS response and the existing 1.70mm-pitch carrier.",
+        "Custom coefficient fit/report, model write/readback, and temperature sweep remain pending."
+      ],
+      "selected_sensor_part": "MF52A103F3950(A1)",
+      "candidate_model_slot": "Custom",
+      "candidate_configuration_byte": "0x2B",
+      "raw_count_window_candidate": {
+        "lower_exclusive_signed_I4_counts": 250000,
+        "upper_exclusive_signed_I4_counts": 4700000,
+        "valid_expression": "250000 < signed I4 counts < 4700000",
+        "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+        "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json",
+        "temperature_scope": "A1 table envelope; board ambient design range 0..60°C"
+      }
+    },
+    {
+      "channel": "TS3",
+      "physical_pin": 23,
+      "data_memory_address": "0x92FF",
+      "live_temperature_command": "0x74",
+      "planned_role": "main_mos_temperature_fet_temperature_protection",
+      "net": "BQ_TS3",
+      "raw_count_source": {
+        "subcommand": "DASTATUS7 0x0077",
+        "byte_offsets": "0-3"
+      },
+      "current_sensor_part": "MF52A103F3950(A1)",
+      "current_wiring_status": "connected_in_saved_schematic; physical sensor/cable/insulation/thermal coupling not verified",
+      "candidate_byte_18k": "0x0F",
+      "candidate_byte_custom": "0x2F",
+      "recommended_candidate_byte": "0x2F",
+      "model_slot_final": null,
+      "temperature_limits_c": null,
+      "raw_count_valid_window": null,
+      "notes": [
+        "Onboard MF52A103F3950(A1) retained for board/MOS response and the existing 1.70mm-pitch carrier.",
+        "Custom coefficient fit/report, model write/readback, and temperature sweep remain pending."
+      ],
+      "selected_sensor_part": "MF52A103F3950(A1)",
+      "candidate_model_slot": "Custom",
+      "candidate_configuration_byte": "0x2F",
+      "raw_count_window_candidate": {
+        "lower_exclusive_signed_I4_counts": 250000,
+        "upper_exclusive_signed_I4_counts": 4700000,
+        "valid_expression": "250000 < signed I4 counts < 4700000",
+        "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+        "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json",
+        "temperature_scope": "A1 table envelope; OTF candidate 80°C; -20..80°C stress envelope"
+      }
+    },
+    {
+      "channel": "DCHG",
+      "physical_pin": 31,
+      "data_memory_address": "0x9301",
+      "live_temperature_command": "0x78",
+      "planned_role": "cell_zone_B_cell_temperature_protection",
+      "net": "BQ_DCHG",
+      "raw_count_source": {
+        "subcommand": "DASTATUS7 0x0077",
+        "byte_offsets": "8-11"
+      },
+      "current_sensor_part": "Semitec 103AT-2",
+      "current_wiring_status": "connected_in_saved_schematic; physical sensor/cable/insulation/thermal coupling not verified",
+      "candidate_byte_18k": "0x07",
+      "candidate_byte_custom": "0x27",
+      "model_slot_final": null,
+      "temperature_limits_c": null,
+      "raw_count_valid_window": null,
+      "mux_loss": "DCHG logic charge-fault output unavailable while configured as thermistor input",
+      "selected_sensor_part": "Semitec 103AT-2",
+      "candidate_model_slot": "18K",
+      "candidate_configuration_byte": "0x07",
+      "recommended_candidate_byte": "0x07",
+      "raw_count_window_candidate": {
+        "lower_exclusive_signed_I4_counts": 250000,
+        "upper_exclusive_signed_I4_counts": 4700000,
+        "valid_expression": "250000 < signed I4 counts < 4700000",
+        "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+        "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json",
+        "temperature_scope": "Semitec tolerance envelope; cell surface -20..75°C"
+      },
+      "notes": [
+        "External Semitec 103AT-2; TI 18K default model candidate; physical probe/configuration readback pending.",
+        "DCHG charge-fault output is unavailable while this pin is configured as thermistor input."
+      ]
+    },
+    {
+      "channel": "CFETOFF",
+      "physical_pin": 29,
+      "data_memory_address": "0x92FA",
+      "live_temperature_command": "0x6A",
+      "planned_role": "cell_zone_C_cell_temperature_protection",
+      "net": "BQ_CFETOFF",
+      "raw_count_source": {
+        "subcommand": "DASTATUS6 0x0076",
+        "byte_offsets": "12-15"
+      },
+      "current_sensor_part": "Semitec 103AT-2",
+      "current_wiring_status": "connected_in_saved_schematic; physical sensor/cable/insulation/thermal coupling not verified",
+      "candidate_byte_18k": "0x07",
+      "candidate_byte_custom": "0x27",
+      "existing_human_handoff_byte": "0x07",
+      "model_slot_final": null,
+      "temperature_limits_c": null,
+      "raw_count_valid_window": null,
+      "mux_loss": "CFETOFF external CHG/PCHG-off input unavailable while configured as thermistor input",
+      "selected_sensor_part": "Semitec 103AT-2",
+      "candidate_model_slot": "18K",
+      "candidate_configuration_byte": "0x07",
+      "recommended_candidate_byte": "0x07",
+      "raw_count_window_candidate": {
+        "lower_exclusive_signed_I4_counts": 250000,
+        "upper_exclusive_signed_I4_counts": 4700000,
+        "valid_expression": "250000 < signed I4 counts < 4700000",
+        "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+        "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json",
+        "temperature_scope": "Semitec tolerance envelope; cell surface -20..75°C"
+      },
+      "notes": [
+        "External Semitec 103AT-2; TI 18K default model candidate; physical probe/configuration readback pending.",
+        "External CHG/PCHG-off input is unavailable while this pin is configured as thermistor input."
+      ]
+    }
+  ],
+  "sensor_profiles": [
+    {
+      "id": "selected_external_Semitec_internal_A1",
+      "status": "selected_design_candidate; no physical acceptance",
+      "external_cell_sensor": "SEMITEC 103AT-2",
+      "onboard_board_and_mos_sensor": "MF52A103F3950(A1)",
+      "intended_curve_families": 2,
+      "slot_assignment": "TS1/DCHG/CFETOFF use TI 18K default candidate based on Semitec 103-AT; TS2/TS3 share Custom fitted from the A1 manufacturer R/T table. Both use 18k pull-up. Exact 103AT-2 error needs sweep; A1 coefficients require TI GPC output.",
+      "pin_model_bytes": "0x07 on TS1/DCHG/CFETOFF; 0x2B on TS2; 0x2F on TS3; candidate only; none written/read back."
+    },
+    {
+      "id": "unified_Semitec_on_all_five",
+      "status": "rejected_for_current_no_PCB_edit_scope",
+      "all_sensor_parts": "SEMITEC 103AT-2",
+      "reason": "A1 lead pitch/hole geometry does not accept Semitec Fig.2 square 0.5mm leads; A1 is retained for its board/MOS thermal response. Switching board sensors requires footprint/PCB change and thermal requalification; no measured benefit/cost evidence supports it."
+    }
+  ],
+  "model_allocation": {
+    "global_shared_slots": [
+      "18K",
+      "180K",
+      "Custom"
+    ],
+    "pullup_resistor_ohm": 18000,
+    "tool_input": {
+      "ProcessingType": 7,
+      "Rpullup": "18k"
+    },
+    "slot_mapping_status": "Semitec 103AT-2→TI default 18K candidate; A1→Custom pending GPC/report/readback/sweep; pin bytes not written/read back.",
+    "source_difference": {
+      "guide_2022": "The guide directs an 18-kΩ pull-up calculator result to the 18K Temperature Model, and a 180-kΩ pull-up result to the 180K Temperature Model.",
+      "faq_2024_section_5_9": "For thermistors other than the FAQ named Semitec defaults, use the calculator and add the generated coefficients to the Custom Temperature Model.",
+      "trm_rev_b": "OPT[5:4] selects pull-up independently from OPT[3:2] polynomial/model selection. 18K and 180K each expose a1-a5, b1-b4, and Adc0; Custom exposes the same nine polynomial fields plus Rc0 and Adc0. The shared a/b fields have matching polynomial element definitions.",
+      "candidate_resolution": "Semitec product data gives 10kΩ±1% and B25/85=3435K±1%; TI FAQ names Semitec 103-AT as basis of 18K default. This supports 18K as model candidate for 103AT-2, not an exact-variant accuracy guarantee. Keep onboard A1 in Custom using its full manufacturer R/T table; obtain TI GPC output, write/readback, then sweep."
+    },
+    "required_artifacts": [
+      "A1 manufacturer R/T table and prepared GPC ZIP",
+      "TI GPC coefficient report/fit log for A1 Custom slot",
+      "Semitec 103AT-2 supplier/lot identity and TI 18K configuration readback plus temperature sweep; use GPC only if sweep misses approved accuracy",
+      "five-channel config/model readback",
+      "per-channel raw I4 open/short/range tests and actual FET-output timing"
+    ],
+    "prepared_input_artifacts": [
+      {
+        "thermistor": "MF52A103F3950(A1)",
+        "path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input.zip",
+        "sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
+        "archive_entries": [
+          "config.txt",
+          "thermistor.txt"
+        ],
+        "configuration": {
+          "ProcessingType": 7,
+          "Rpullup": "18k"
+        },
+        "data_source": "../厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+        "points": 181,
+        "temperature_range_c": [
+          -55,
+          125
+        ],
+        "temperature_step_c": 1,
+        "resistance_column": "电阻中心_kΩ converted to Ω by multiplying by 1000",
+        "format_basis": "TI SLUUCP2 required resistance list followed by temperature list in matching order; TI FAQ SLUAAQ5 §5.10 blank line between tables and UTF-8",
+        "zip_validation": "exactly two required files; UTF-8, no BOM; lists have matching count and are strictly monotonic",
+        "uploaded_to_ti": false,
+        "coefficient_fit_or_slot_verified": false,
+        "project_candidate_model_slot": "Custom",
+        "project_candidate_slot_basis": "TI FAQ §5.9 for non-default thermistors; model mapping remains a project candidate pending fit/report/readback/sweep.",
+        "selection_status": "selected_for_Custom_GPC_submission; output not generated"
+      },
+      {
+        "thermistor": "Vishay NTCLE100E3103GB0",
+        "path": "../仿真/输入/TI_GPC_Vishay_NTCLE100E3103GB0_input.zip",
+        "sha256": "9ca93e19b356ea4c733b7af6a005b0164b819ec5beeefd488f89d0e1bfed5c74",
+        "archive_entries": [
+          "config.txt",
+          "thermistor.txt"
+        ],
+        "configuration": {
+          "ProcessingType": 7,
+          "Rpullup": "18k"
+        },
+        "data_source": "https://www.vishay.com/docs/29049/ntcle100.pdf",
+        "data_source_pages": {
+          "part_identification": 2,
+          "full_center_R_T_table": 10
+        },
+        "data_source_table": "NTCLE100E3103***, R25=10 kOhm column, manufacturer table at 5 C increments",
+        "part_identification": "Datasheet page 2 lists the 103*B0 series entry at 10 kOhm, B25/85=3977 K, +/-0.75% beta tolerance; the SAP * is replaced with G, identifying exact order code NTCLE100E3103GB0, with +/-2% R25 tolerance.",
+        "points": 39,
+        "temperature_range_c": [
+          -40,
+          150
+        ],
+        "temperature_step_c": 5,
+        "continuous_sensor_rating_c": [
+          -40,
+          125
+        ],
+        "short_period_curve_points_above_continuous_rating_c": [
+          130,
+          150
+        ],
+        "extraction_method": "Directly transcribed the exact 10 kOhm resistance column from the official datasheet table; removed thousands-group spaces and retained decimal values. No Beta-only generated/interpolated curve.",
+        "max_deviation_ohm_vs_manufacturer_table": 0.0,
+        "anchor_points_ohm": {
+          "minus_40C": 332094,
+          "25C": 10000,
+          "150C": 182.6
+        },
+        "format_basis": "TI SLUUCP2 required resistance list followed by temperature list in matching order; TI FAQ SLUAAQ5 section 5.10 blank line between tables and UTF-8.",
+        "zip_validation": "exactly two required files; UTF-8, no BOM; both lists have 39 matching points; temperatures ascend by 5 C; resistances descend; archive readback matches every extracted table point exactly.",
+        "uploaded_to_ti": false,
+        "coefficient_fit_or_slot_verified": false,
+        "project_candidate_model_slot": "18K",
+        "project_candidate_slot_basis": "TI calculator guide directs the 18 kOhm pull-up result to the 18K model; project candidate mapping pending GPC report, block/pin readback and temperature sweep."
+      }
+    ],
+    "candidate_assignments": {
+      "dual_curve_current_bom_candidate": {
+        "status": "candidate_not_frozen",
+        "pullup_ohm": 18000,
+        "global_model_slots_are_shared": true,
+        "curve_to_slot": {
+          "Vishay_NTCLE100E3103GB0": "18K",
+          "MF52A103F3950_A1": "Custom"
+        },
+        "channels": {
+          "TS1": {
+            "curve": "Vishay_NTCLE100E3103GB0",
+            "model": "18K",
+            "pin_config_cell_byte": "0x07"
+          },
+          "DCHG": {
+            "curve": "Vishay_NTCLE100E3103GB0",
+            "model": "18K",
+            "pin_config_cell_byte": "0x07"
+          },
+          "CFETOFF": {
+            "curve": "Vishay_NTCLE100E3103GB0",
+            "model": "18K",
+            "pin_config_cell_byte": "0x07"
+          },
+          "TS2": {
+            "curve": "MF52A103F3950_A1",
+            "model": "Custom",
+            "pin_config_report_only_byte": "0x2B"
+          },
+          "TS3": {
+            "curve": "MF52A103F3950_A1",
+            "model": "Custom",
+            "pin_config_fet_byte": "0x2F"
+          }
+        },
+        "verification": "Generate each exact-curve GPC report; validate every model-block parameter and signed-I2 range; read back the shared blocks and five pin bytes; sweep against a reference thermometer."
+      },
+      "unified_A1_candidate": {
+        "status": "candidate_only_requires_mechanical_and_insulation_review",
+        "pullup_ohm": 18000,
+        "curve_to_slot": {
+          "MF52A103F3950_A1": "Custom"
+        },
+        "pin_config_bytes_by_use": {
+          "cell": "0x27",
+          "report_only": "0x2B",
+          "fet": "0x2F"
+        },
+        "verification": "Generate and validate the exact A1 GPC fit, write/read back Custom block, and temperature-sweep before freeze."
+      }
+    },
+    "model_parameter_layout": {
+      "18K": {
+        "parameter_count": 10,
+        "fields": [
+          "Coeff a1",
+          "Coeff a2",
+          "Coeff a3",
+          "Coeff a4",
+          "Coeff a5",
+          "Coeff b1",
+          "Coeff b2",
+          "Coeff b3",
+          "Coeff b4",
+          "Adc0"
+        ],
+        "polynomial_field_definitions_match_other_slots": true
+      },
+      "180K": {
+        "parameter_count": 10,
+        "fields": [
+          "Coeff a1",
+          "Coeff a2",
+          "Coeff a3",
+          "Coeff a4",
+          "Coeff a5",
+          "Coeff b1",
+          "Coeff b2",
+          "Coeff b3",
+          "Coeff b4",
+          "Adc0"
+        ],
+        "polynomial_field_definitions_match_other_slots": true
+      },
+      "Custom": {
+        "parameter_count": 11,
+        "fields": [
+          "Coeff a1",
+          "Coeff a2",
+          "Coeff a3",
+          "Coeff a4",
+          "Coeff a5",
+          "Coeff b1",
+          "Coeff b2",
+          "Coeff b3",
+          "Coeff b4",
+          "Rc0",
+          "Adc0"
+        ],
+        "polynomial_field_definitions_match_other_slots": true,
+        "extra_field": "Rc0"
+      }
+    },
+    "pin_opt_independence": "TRM OPT[5:4] selects pull-up independently from OPT[3:2] model; choose 18-k pull-up and the assigned candidate model per pin."
+  },
+  "coefficients": {
+    "exact_values_found": false,
+    "custom_block": {
+      "type": "signed_I2_little_endian",
+      "start_address": "0x9216",
+      "end_address": "0x922B",
+      "fields": [
+        {
+          "name": "a1",
+          "address": "0x9216",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "a2",
+          "address": "0x9218",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "a3",
+          "address": "0x921A",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "a4",
+          "address": "0x921C",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "a5",
+          "address": "0x921E",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "b1",
+          "address": "0x9220",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "b2",
+          "address": "0x9222",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "b3",
+          "address": "0x9224",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "b4",
+          "address": "0x9226",
+          "value": null,
+          "source_required": "TI GPC coefficient report"
+        },
+        {
+          "name": "Rc0",
+          "address": "0x9228",
+          "value": null,
+          "source_required": "nominal formula candidate; optionally replace Adc0 with target-device raw-count calibration if accuracy budget requires",
+          "candidate_value": 11703,
+          "candidate_status": "nominal_25C_10k_18k_zero_offset_not_measured_or_frozen"
+        },
+        {
+          "name": "Adc0",
+          "address": "0x922A",
+          "value": null,
+          "source_required": "nominal formula candidate; optionally replace Adc0 with target-device raw-count calibration if accuracy budget requires",
+          "candidate_value": 11703,
+          "candidate_status": "nominal_25C_10k_18k_zero_offset_not_measured_or_frozen"
+        }
+      ],
+      "status": "fit_coefficients_missing; Rc0_and_Adc0_have_nominal_candidates; not_final_or_frozen"
+    },
+    "manufacturer_curve_sources": {
+      "MF52A103F3950_A1": "../厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+      "SEMITEC_103AT-2": "https://www.semitec.co.jp/products/thermistor_at/"
+    },
+    "nominal_calibration_candidate": {
+      "calibration_temperature_c": 25,
+      "thermistor_r25_ohm_nominal": 10000,
+      "pullup_ohm": 18000,
+      "rc0_formula_result": 11702.5,
+      "rc0_candidate": 11703,
+      "adc0_candidate": 11703,
+      "adc0_assumption": "zero board/device offset; Adc0=Rc0 as a nominal uncalibrated candidate",
+      "target_chip_measurement_required_to_form_candidate": false,
+      "target_chip_measurement_role": "optional board/device-specific accuracy calibration after error-budget review",
+      "basis": "BQ76952 TRM Custom Rc0/Adc0 definitions and 18K Adc0 default; TI FAQ §5.1 says factory calibration meets datasheet limits and customer calibration can compensate board parasitics."
+    },
+    "semitec_103at2_default_model": {
+      "candidate_slot": "18K",
+      "basis": "TI FAQ §5.9 bases the default on Semitec 103-AT; Semitec product table lists 103AT-2,3 as 10kΩ and B=3435K±1%.",
+      "exact_variant_error_validated": false,
+      "temperature_sweep_required": true
+    },
+    "status": "A1 GPC coefficients missing; Semitec 103AT-2 uses TI default 18K candidate, exact-variant error not swept; no fitted coefficients/readback claimed."
+  },
+  "protection": {
+    "category_by_channel": {
+      "TS1": "cell_temperature_protection",
+      "DCHG": "cell_temperature_protection",
+      "CFETOFF": "cell_temperature_protection",
+      "TS3": "fet_temperature_protection",
+      "TS2": "report_only"
+    },
+    "external_sensor_only_candidate_masks": [
+      {
+        "data_memory": "Enabled Protections B",
+        "address": "0x9262",
+        "candidate_value": "0xB3",
+        "bits": [
+          "OTF",
+          "OTD",
+          "OTC",
+          "UTD",
+          "UTC"
+        ],
+        "status": "proposed_not_written_or_read_back"
+      },
+      {
+        "data_memory": "CHG FET Protections B",
+        "address": "0x9266",
+        "candidate_value": "0x91",
+        "bits": [
+          "OTF",
+          "OTC",
+          "UTC"
+        ],
+        "status": "proposed_not_written_or_read_back"
+      },
+      {
+        "data_memory": "DSG FET Protections B",
+        "address": "0x926A",
+        "candidate_value": "0xA2",
+        "bits": [
+          "OTF",
+          "OTD",
+          "UTD"
+        ],
+        "status": "proposed_not_written_or_read_back"
+      }
+    ],
+    "trip_thresholds_c": {
+      "OTC": 55,
+      "OTD": 70,
+      "UTC": 5,
+      "UTD": -15,
+      "OTF": 80,
+      "candidate_status": "review_candidate_not_frozen",
+      "cell_surface_guard_band_c_candidate": 5,
+      "cell_guard_band_is_validated_total_error_budget": false,
+      "OTF_basis": "TRM default threshold 80 °C; current BOM HYG022N10NS1TA datasheet Tj upper limit 175 °C; sensor-to-hotspot/junction difference not measured.",
+      "reason": "EVE model/ranges are known; final values depend on approved total measurement/thermal/response margin, charge derating and first-board data."
+    },
+    "delays_hysteresis_recovery": {
+      "candidate_trip_delay_s": {
+        "OTC": 0,
+        "OTD": 0,
+        "UTC": 0,
+        "UTD": 0,
+        "OTF": 0
+      },
+      "candidate_recovery_thresholds_c": {
+        "OTC": 44,
+        "OTD": 59,
+        "UTC": 8,
+        "UTD": -12,
+        "OTF": 65
+      },
+      "candidate_recovery_time_s": null,
+      "status": "trip delays and recovery temperatures are review candidates; recovery-time and total shutdown latency remain for system validation",
+      "basis": "Cell high-temperature recovery values are strictly below EVE recommendations (<45 °C charge, <60 °C discharge); low-temperature recovery uses provisional 3 °C hysteresis. Zero delay avoids added AFE timer delay but not sensor response, ADC update, MCU and FET turn-off latency.",
+      "required_error_budget": "For each trip direction, guard margin must cover NTC tolerance, curve-fit error, pull-up/AFE/ADC error, mounting gradient, thermal lag, sampling/filtering and charger/load/FET turn-off latency."
+    },
+    "internal_die_temperature_protection": "excluded_from_candidate; DA Configuration TINT_EN/TINT_FETT and thresholds require separate decision if enabled",
+    "fan_values_are_safety_thresholds": false,
+    "cell_temperature_basis": {
+      "model": "EVE INR18650-30P",
+      "model_status": "known_project_design_input_not_missing",
+      "source": "../../参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+      "spec_pages": {
+        "temperature_ranges": "1/12 (PDF page 6)",
+        "temperature_measurement_method": "9/12 (PDF page 14)"
+      },
+      "ambient_charge_range_c": [
+        0,
+        45
+      ],
+      "ambient_discharge_range_c": [
+        -20,
+        60
+      ],
+      "cell_surface_charge_operation_range_c": [
+        0,
+        60
+      ],
+      "cell_surface_discharge_operation_range_c": [
+        -20,
+        75
+      ],
+      "recommended_recharge_release_below_c": 45,
+      "recommended_redischarge_release_below_c": 60,
+      "recommended_reference_measurement": "K-type thermocouple near cell middle, 30 mm above bottom; measurement-system accuracy within ±2 °C",
+      "measurement_boundary": "±2 °C is the EVE reference measurement recommendation, not proven total error for this BQ+NTC+mounting chain."
+    },
+    "current_derating_boundary": "EVE INR18650-30P specifies 1.5 A standard and 4.0 A maximum charge current per cell; project TODO notes maximum is defined at 25 °C. 4P x 4.0 A = 16 A with no sharing margin. Temperature thresholds do not authorize 16 A over the full temperature range; charger/current derating strategy must be separately approved."
+  },
+  "fault_handling": {
+    "afe_has_dedicated_ntc_open_short_flag": false,
+    "raw_count_window": "Per-channel qualified thresholds not established. Candidate 250000 < signed DASTATUS I4 counts < 4700000 only applies within scoped envelopes and stated sensitivity brackets; see raw window artifact.",
+    "fail_closed_events": [
+      "open circuit",
+      "short circuit",
+      "raw-count out of qualified window",
+      "stale sample",
+      "invalid temperature conversion",
+      "AFE/I2C read failure",
+      "configuration readback mismatch"
+    ],
+    "required_safe_response": [
+      "inhibit charge",
+      "inhibit discharge/precharge",
+      "disable balancing",
+      "revoke outputs",
+      "latch fault cause",
+      "require configuration and sensor revalidation before rearm"
+    ],
+    "automatic_reclose_allowed": false,
+    "caveat": "DFETOFF/BOTHOFF is controlled through FET_RELEASE; project evidence does not prove an MCU-independent hard-off path.",
+    "unwired_thermistor_channels": [],
+    "unwired_channel_detail": "All five NTC paths are wired in saved schematic; three cell probes are external. Physical installation, config/model readback and output shutdown unverified.",
+    "raw_count_candidate_window": {
+      "lower_exclusive_signed_I4_counts": 250000,
+      "upper_exclusive_signed_I4_counts": 4700000,
+      "valid_expression": "250000 < signed I4 counts < 4700000",
+      "status": "candidate_only_not_TI_threshold_not_enabled_until_per_channel_raw_count_test",
+      "artifact": "../../检查/统一审查/BMS/temperature_raw_window_candidate.json"
+    }
+  },
+  "acceptance_matrix": [
+    {
+      "id": "CFG-1",
+      "test": "read back five pin configurations and verify pullup/model/category/function",
+      "status": "five channel values are candidates only; data-memory write/readback not performed"
+    },
+    {
+      "id": "MOD-1",
+      "test": "archive manufacturer curves and exact-curve TI GPC reports; write candidate model blocks; verify signed-I2 parameters and five pin bytes by readback; pass temperature sweep",
+      "status": "A1 GPC ZIP ready but full report/fit missing; Semitec 103AT-2 mapped to TI 18K default candidate; exact variant needs temperature sweep"
+    },
+    {
+      "id": "MOD-2",
+      "test": "verify Rc0 nominal formula candidate and validate optional target-chip Adc0 calibration against approved accuracy budget",
+      "status": "nominal_candidate_available; board_specific_calibration_optional"
+    },
+    {
+      "id": "CAL-1",
+      "test": "temperature accuracy and thermal-response comparison against project-approved reference limits",
+      "status": "blocked_missing_accuracy_limits_and_measurements"
+    },
+    {
+      "id": "FLT-1",
+      "test": "inject open/short individually at all five pins and verify raw counts, latch, and actual safe outputs",
+      "status": "all five paths schematic-connected; per-channel physical open/short/raw-count injection pending",
+      "unwired_channels": [
+        "TS1",
+        "DCHG",
+        "CFETOFF"
+      ]
+    },
+    {
+      "id": "PROT-1",
+      "test": "cell OTC/OTD/UTC/UTD threshold, delay, FET action, and no auto-reclose",
+      "status": "cell_threshold_review_candidates_available; error_budget_derating_and_test_unverified"
+    },
+    {
+      "id": "PROT-2",
+      "test": "FET OTF threshold and action with controlled MOS hotspot",
+      "status": "OTF_80C_65C_review_candidate_available; sensor_hotspot_delta_and_test_unverified"
+    },
+    {
+      "id": "RPT-1",
+      "test": "TS2 report-only and MCU board/fan policy including invalid sensor response",
+      "status": "pending_policy_and_bench_test"
+    },
+    {
+      "id": "MUX-1",
+      "test": "confirm DCHG/CFETOFF mux loss and verify DFETOFF default/real turnoff",
+      "status": "pending_system_and_board_evidence"
+    },
+    {
+      "id": "CFG-2",
+      "test": "configuration mismatch/startup fault remains outputs-off; recovery requires project OFF/ON sequence",
+      "status": "pending_firmware_and_board_test"
+    },
+    {
+      "id": "RAW-TS1",
+      "test": "TS1: capture signed I4 little-endian DASTATUS counts and separate Temperature() I2 0.1K; read config/model; test hard short/open and scoped temperature endpoints; measure latch, CCL/DCL/output action and total response time.",
+      "candidate_pass_criterion": "raw strictly between 250000 and 4700000 only within its sensor temperature envelope; open/short/out-of-window/stale/read/config fault latches fail-closed and forbids auto-reclose",
+      "status": "candidate criteria only; no device/bench/firmware test performed"
+    },
+    {
+      "id": "RAW-TS2",
+      "test": "TS2: capture signed I4 little-endian DASTATUS counts and separate Temperature() I2 0.1K; read config/model; test hard short/open and scoped temperature endpoints; measure latch, CCL/DCL/output action and total response time.",
+      "candidate_pass_criterion": "raw strictly between 250000 and 4700000 only within its sensor temperature envelope; open/short/out-of-window/stale/read/config fault latches fail-closed and forbids auto-reclose",
+      "status": "candidate criteria only; no device/bench/firmware test performed"
+    },
+    {
+      "id": "RAW-TS3",
+      "test": "TS3: capture signed I4 little-endian DASTATUS counts and separate Temperature() I2 0.1K; read config/model; test hard short/open and scoped temperature endpoints; measure latch, CCL/DCL/output action and total response time.",
+      "candidate_pass_criterion": "raw strictly between 250000 and 4700000 only within its sensor temperature envelope; open/short/out-of-window/stale/read/config fault latches fail-closed and forbids auto-reclose",
+      "status": "candidate criteria only; no device/bench/firmware test performed"
+    },
+    {
+      "id": "RAW-DCHG",
+      "test": "DCHG: capture signed I4 little-endian DASTATUS counts and separate Temperature() I2 0.1K; read config/model; test hard short/open and scoped temperature endpoints; measure latch, CCL/DCL/output action and total response time.",
+      "candidate_pass_criterion": "raw strictly between 250000 and 4700000 only within its sensor temperature envelope; open/short/out-of-window/stale/read/config fault latches fail-closed and forbids auto-reclose",
+      "status": "candidate criteria only; no device/bench/firmware test performed"
+    },
+    {
+      "id": "RAW-CFETOFF",
+      "test": "CFETOFF: capture signed I4 little-endian DASTATUS counts and separate Temperature() I2 0.1K; read config/model; test hard short/open and scoped temperature endpoints; measure latch, CCL/DCL/output action and total response time.",
+      "candidate_pass_criterion": "raw strictly between 250000 and 4700000 only within its sensor temperature envelope; open/short/out-of-window/stale/read/config fault latches fail-closed and forbids auto-reclose",
+      "status": "candidate criteria only; no device/bench/firmware test performed"
+    }
+  ],
+  "minimum_inputs_to_close": [
+    "Procure three Semitec 103AT-2 external sensors after quote; confirm supplier/lot, wire gauge, insulation, strain relief and thermal zones A/B/C. Qty remains three off-board parts; installation unverified.",
+    "Submit the prepared A1 manufacturer-table ZIP to TI GPC and archive output coefficients/report/fit plot; configure TS2/TS3 Custom and read back. Semitec 103AT-2 uses TI default 18K as candidate; require readback and sweep, not Vishay coefficients.",
+    "Review/approve EVE 30P cell-surface trip/recovery candidates, 5°C guard band, total sensor/thermal/response budget and charger derating; verify all three installed zones.",
+    "Measure A1 TS3-to-MOS hotspot delta and validate candidate 80/65°C; Tj rating does not establish sensor margin.",
+    "optional target-chip raw-count calibration at a known temperature only if the approved accuracy budget requires board/device-specific Adc0 correction; nominal 11703 candidate does not depend on this measurement",
+    "confirm TS2 report/fan-only versus direct safety trip, DCHG/CFETOFF mux-loss acceptance, MCU latch/off-on recovery behavior, and first-board fault/temperature/actual-shutdown evidence"
+  ],
+  "coefficient_generation_survey": {
+    "as_of": "2026-10-15",
+    "matching_bq76952_fitter_identified": false,
+    "search_scope": [
+      "BMS module Python/PowerShell/C/C++/JS/notebook source keyword scan for thermistor, Steinhart, ProcessingType, Rpullup, GPC, coeff",
+      "BMS module simulation inputs and vendor-material inventory",
+      "common TI install roots C:\\ti, C:\\Program Files\\Texas Instruments, C:\\Program Files (x86)\\Texas Instruments (not present)",
+      "GitHub-origin searches for BQ76952/BQ769x2 thermistor coefficient fitting"
+    ],
+    "generic_open_source_tools_reviewed": [
+      {
+        "url": "https://github.com/RICCIARDI-Adrien/Thermistor_Calculator",
+        "scope": "Beta-based ADC temperature lookup table; not BQ76952 coefficient fit"
+      },
+      {
+        "url": "https://gist.github.com/fbaeuerlein/8292eeb7d6a7339dcda9e41a47a93ef8",
+        "scope": "generic four-coefficient Steinhart-Hart fit; not BQ76952 model format"
+      }
+    ],
+    "trm_boundary": "TRM specifies I2 coefficient fields and polynomial term orders, but no complete locally reproducible fitting/segmentation/quantization procedure was found in the reviewed public sources; generic Steinhart-Hart coefficients are not interchangeable.",
+    "official_ti_path": {
+      "tool_url": "https://www.ti.com/tool/BQ769X2-THERMISTOR-COEFF-CALCULATOR",
+      "guide_url": "https://www.ti.com/lit/ug/sluucp2/sluucp2.pdf",
+      "login_required": true,
+      "zip_upload_to_gpc_required": true,
+      "report_delivery": "email; includes calculated coefficients, log, and performance graph",
+      "no_login_local_path_documented": false,
+      "used_this_turn": false,
+      "login_or_upload_performed": false
+    },
+    "result": {
+      "local_coefficients_generated": false,
+      "quantized_fit_error_available": false,
+      "existing_a1_and_vishay_zips_remain_inputs_only": true,
+      "next_artifact_if_ti_gpc_is_later_authorized": "TI report for the selected exact source curve, followed by parameter-range check, Data Memory readback, and temperature sweep"
+    }
+  },
+  "sources": [
+    {
+      "title": "BQ76952 TRM Rev. B",
+      "url": "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf"
+    },
+    {
+      "title": "TI Thermistor Coefficient Calculator Guide, June 2022",
+      "url": "https://www.ti.com/lit/ug/sluucp2/sluucp2.pdf"
+    },
+    {
+      "title": "TI BQ769X2 Thermistor Coefficient Calculator",
+      "url": "https://www.ti.com/tool/BQ769X2-THERMISTOR-COEFF-CALCULATOR"
+    },
+    {
+      "title": "BQ769x2 FAQ, May 2024, section 5.9",
+      "url": "https://www.ti.com/lit/an/sluaaq5/sluaaq5.pdf"
+    },
+    {
+      "title": "Vishay NTCLE100E3 datasheet",
+      "url": "https://www.vishay.com/docs/29049/ntcle100.pdf"
+    },
+    {
+      "title": "Project interface audit",
+      "path": "BQ76952三路电芯测温接口审查_20261015.md"
+    },
+    {
+      "title": "Project dual-NTC model handoff",
+      "path": "BQ76952_时恒MF52双NTC模型交接.md"
+    },
+    {
+      "title": "Project unified sensor candidate review",
+      "path": "NTC统一型号精简审查_20261015.md"
+    },
+    {
+      "title": "Project programming handoff",
+      "path": "../原理图准备/编程交接.md"
+    },
+    {
+      "title": "EVE INR18650-30P Version B specification",
+      "path": "../../参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+      "pages": "1/12 and 9/12",
+      "use": "ambient and cell-surface operating temperature ranges; recommended temperature recovery points; reference thermocouple location and accuracy"
+    },
+    {
+      "title": "HYG022N10NS1TA manufacturer datasheet",
+      "path": "../厂商资料/HYG022N10NS1TA.pdf",
+      "pages": "2",
+      "use": "Tj upper limit 175 °C"
+    },
+    {
+      "title": "Prepared TI GPC A1 input ZIP",
+      "path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input.zip",
+      "sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
+      "use": "prepared from the project A1 full R/T center table; exact required config.txt and thermistor.txt only; not uploaded or coefficient-validated; candidate model slot is Custom"
+    },
+    {
+      "title": "Prepared TI GPC Vishay NTCLE100E3103GB0 input ZIP",
+      "path": "../仿真/输入/TI_GPC_Vishay_NTCLE100E3103GB0_input.zip",
+      "sha256": "9ca93e19b356ea4c733b7af6a005b0164b819ec5beeefd488f89d0e1bfed5c74",
+      "use": "39 exact manufacturer R/T points from Vishay datasheet pages 2 and 10; 18k GPC input format; 0 ohm pointwise deviation to the official table; not uploaded or coefficient-validated; candidate model slot 18K."
+    },
+    {
+      "title": "SEMITEC AT thermistor official product data",
+      "url": "https://www.semitec.co.jp/products/thermistor_at/",
+      "use": "103AT-2,3 R25=10kΩ±1%, B25/85=3435K±1%, rated -50…+110°C, still-air time constant approx.15s; BMS accuracy/thermal coupling unqualified"
+    }
+  ]
+}

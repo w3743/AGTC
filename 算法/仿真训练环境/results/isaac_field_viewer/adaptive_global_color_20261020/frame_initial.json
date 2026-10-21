@@ -1,0 +1,1060 @@
+{
+  "sequence": 1,
+  "sim_time": 0.0,
+  "output_time": null,
+  "mode": "暂停预览（未施加车辆）",
+  "critic": "价值支路为独立记忆的额外诊断计算；记忆自本段连续采集起累计，不控制车辆",
+  "errors": [],
+  "state": {
+    "running": false,
+    "time": 0.0,
+    "robot": {
+      "x": 48.2548828125,
+      "y": 21.28045654296875,
+      "yaw": -2.321727752685547,
+      "z": 0.1599999964237213,
+      "roll": 0.0,
+      "pitch": -0.0,
+      "v": 0.0,
+      "w": 0.0
+    },
+    "done": false,
+    "status": "已加载检查点：results/isaac_field_improvement/fresh_depth_radar_20261019_v2/stage_04_turn90.zip（加载成功不代表策略已具备任务能力）。 当前为手动控制；选择“策略控制”并点击“运行任务”后才会执行策略。",
+    "training_steps": 196608
+  },
+  "legend": {
+    "name": "turbo",
+    "colors": [
+      [
+        48,
+        18,
+        59
+      ],
+      [
+        70,
+        107,
+        227
+      ],
+      [
+        40,
+        188,
+        235
+      ],
+      [
+        50,
+        242,
+        152
+      ],
+      [
+        164,
+        252,
+        60
+      ],
+      [
+        238,
+        207,
+        58
+      ],
+      [
+        251,
+        126,
+        33
+      ],
+      [
+        208,
+        47,
+        5
+      ],
+      [
+        122,
+        4,
+        3
+      ]
+    ],
+    "minimum": -2.146289825439453,
+    "zero": 0.0,
+    "maximum": 2.146289825439453,
+    "mode": "adaptive-global",
+    "scale": 2.146289825439453,
+    "observed_max_abs": 2.146289825439453
+  },
+  "nodes": [
+    {
+      "key": "input.lidar",
+      "title": "激光雷达输入",
+      "description": "距离/8米与有效掩码，2×400",
+      "branch": "lidar",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        2,
+        400
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAACCAIAAAD5BB1nAAAAJUlEQVR4nGP826vOMApGwSgYBUMBMC75YzPQbhgFo2AUjAKiAACq3wOQ+Gm5hAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.laser.0",
+      "title": "一维卷积 2→16 · 环形填充",
+      "description": "Conv1d(2, 16, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+      "branch": "lidar",
+      "column": 1.0,
+      "parents": [
+        "input.lidar"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        200
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAQCAIAAADcV6eLAAAAk0lEQVR4nO3YMQ5BURCFYROT0GmpdVqFICqdddkIqrsTWxC9Wod3H7GJ93KSk/9bwV/Omdhc2gHQtTh9d+oGGMrp561ugKH4laW6AYbyvh2qG2Aor7ORugGGstS9ugGGWIXoRS6eL3UDDOVtMlY3wFC0x7m6AYa4sdCLPDcHdQMMRalrdQMMZQ0+7+herh6NugGG/iPdGt7rfkTWAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "features_extractor.laser.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.laser.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        200
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAAAQCAIAAADcV6eLAAAAjUlEQVR4nO3ZsQ3CUAxFUQwGpaNCSp+CASgoYLyMQsMsTIDo09OFEEiWyNeTnu6Z4BYuLDtu43UFLG2tDoCnPAwfdQMMxf9+UjfAUL4uG3UDDOWj3qkbYIjlHUUwWCgij+9e3QBD+dxX6gYYirFt1A0wFLx0UALLO4rI7fRTN8BQfoPLO5aX525QN8DQDIrEE4MEFr+WAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "features_extractor.laser.2",
+      "title": "一维卷积 16→32 · 环形填充",
+      "description": "Conv1d(16, 32, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+      "branch": "lidar",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.laser.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        100
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAgCAIAAABrSUp5AAAA8ElEQVR4nO3ZOwrCUBSE4eQ6YsAHPkALO9HGRrC2sgm4Q3vBHbiBdBaCpbXYBBHxhai51y0k1TBwvxX81cDhhKvfLPDywfD+ZjfIQNLssRtkIE5TdoMMPCqO3SADh3qV3SADZ1NjN8gw7AAlSF2L3SADY3dkN8iACSy7QQZS02A3yPADXwC69sZukBGOzmt2g4xwaefsBhmI3JfdIAPWb3xuGLye7AYZ2Nc67AYZSL4TdoMMxNiyG2Sg7DJ2gww0sg+7QQY2pSm7QQYW2Y7dIAPXUsRukIGTabMbZKBvL+wGGf4wLMD/DQtAJfixG2T8AdHJLN12v4/AAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "features_extractor.laser.3",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.laser.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        100
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAgCAIAAABrSUp5AAAAoElEQVR4nO3YsQkCQRBGYT1GVE5LMDO2Asu9ssTE+CLvUFHUFvZFw8D7Kvh57G6wy+FzXqhNHO/P7A1lxGW/yd5QRpzGV/aGMmJa/7I3lBHXndewVZc9oBJjAcYCjAUYCzAWYCzAWICxAGMBxgKMBcTh4edfq7ht/XVo5TUEjAUYC4j++87eUEbM3Sp7QxmeLMCTBfjAA8YCjAUYCzAW8AcwgBMyfggSzAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.laser.4",
+      "title": "一维自适应平均池化 · 50",
+      "description": "AdaptiveAvgPool1d(output_size=50)",
+      "branch": "lidar",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.laser.3"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32,
+        50
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAgCAIAAADfQ7x2AAAAfklEQVR4nO3WMQ5AYAyGYf5UEBzBZnYCx3UssZhNCEJwgQ6+qR2+5wRv2g6N+7uL/JFmOawbFDJUmXWDQtr5tG5QyJq+1g0KGUuPSwzWATpmIZiFYBaCWQhmIZxmSb27fAOnnB/Eb8xCSPFc1g0K2UJi3aDgtBBOT55ZCGYhPkZcEzIIOyzIAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "features_extractor.laser.5",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "lidar",
+      "column": 6.0,
+      "parents": [
+        "features_extractor.laser.4"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        1600
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAIAAAADnC86AAAAl0lEQVR4nO2WQQ5AQAxFkQqCI9hZO4HjOpbYWFshCMENvkTTNEzf9mf6kk4nHb85ak8DwnE5rlJiTuk2j9+LOYcx1bAhMY7loCm6dMQ47jKpiyC50phAxWpiE5vYxCY2MeJhH2OK5f1/jTiHMX2CNj3hWA73huubU41Jzx2JcSwHzUGoI8axXD9YreZ0S63V7r1jE/9ffAMk1iFWYrRC5QAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.laser.6",
+      "title": "全连接 1600→32",
+      "description": "Linear(in_features=1600, out_features=32, bias=True)",
+      "branch": "lidar",
+      "column": 7.0,
+      "parents": [
+        "features_extractor.laser.5"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAfUlEQVR4nAFyAI3/AXH+X1/s1Y0SOzkC1U3d9FkaVgLL9y9J+IcrA9/D/S9C5a8dBuUAKu+h1DMFRn30L/Gbcf5f/qcyAY//SQ3/903X+ZcqGq+zoUJMawTW/iDe+h4AKbm49T7zObbo/RQEGwLqEAfzZALAAADAAAAA3gAAl+U1cTNYEw8AAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.laser.7",
+      "title": "激光雷达编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "lidar",
+      "column": 8.0,
+      "parents": [
+        "features_extractor.laser.6"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAASElEQVR4nGNc8sdG592PK0IcDAwM9vf/HFRkYVzyx4YBFTAxMDAYmJ+E86NWf4Oqcr35d7c6M0IVAwMDnM/AwMACoWJYjsCFANUaE9TfJH8iAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "input.depth",
+      "title": "深度图输入",
+      "description": "轴向Z深度/量程，1×160×88；无效值为0且无单独掩码；不是RGB图",
+      "branch": "depth",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        1,
+        160,
+        88
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFgAAACgCAIAAAAHNjwXAAAEsklEQVR4nO2bXY7bNhSFDynGQYECQbfS566kC8ii8ly0y2uCvASFRfaBxzTNP1Mz8UjwnA+GIJGXl5efpLHGnjF/nf+AAOzeBRwFiSASQSSCSASRCCIRRCKIRBCJIBJBJIJIBJEIIhFEIohEEIkgEkEkgkgEkQgiEUQiiEQQiSASQSSCSASRCCIRRCKIRBCJIBJBJIJIBJEIIhFEIohEEIkgEkEkgkgEkQgiEUQiiEQQiSASQSSCSASRCCIRRCKIRBCJIBJBJIJIBJEIIhFEIohEEIkgEkEkgkgEkQgiEUQiiEQQiSASQSSCSASRCCIRRCKIRBCJIBJBJIJIBJEIIhHEzQT9+eXfR9fxUP7+/NvdGOP/+f0NSjk+zv86dVE8PW79Zdm7hkPg1o9m7xoOgTuf9i7hGLjzCcYjWBgPgDv1tiZYAN2uYuA4SczTmy6196YbZOtVVawXgFtdyKONNyFrMd4EG9IWQDrMg1NLM0meKj+M2XrxM8NvMtg7GbppXTDeuPPlTcN6APCXgqyHt7A+xG3qsh7ehRgMGwCkgLgPcFQipbopIa/bhsvAGIlL2muIz0xZfx3OMNuc8SZJmiIfeEkbnLc3a7hObMtt3V40jg/9xENsEdkbMp4O/eLRWkvEnVvXpPXG2xC3qeUyONSR7XpveweRMfkgz0z+u3lSb7MS17Tuec2HoqUX2WMmw90kk/nni2mGOa/HCACAe/HZeDLat8Y7xHmjKwIA3KorAsDWWyM+ouQ7M8HNw6NhAXgTmjdIakw754WR5VPK7fCY0Fu2F4cpvjdvnTnfDtrznZR8MEve7uoszdC6iEHSutZx0c0qm3nmXUzOkto3/IxYPOrgZuOb8ZrZi7HX3frJqmhpTrnvz9rXzF6MvXmyvOviiflpJ3R8cjadugddZavtZl7txueI8T15fBeDzNsmfER9B7n7nDewgdXEnXQ4oBczHltMlDOpox44mLHoir9d9oJd3hd3ZmrqxYzHFhNNjhpHDsZummXztb6a6zZvGcfUveP882Ezwc2wokg3maJO9wgXS7jpfUsXx/o16AVn5Wdhe5/q1i3j3nFj0dtMe/fD65nemYHNDK5XVrMlfVnQ7M2/TRgXNEiSm+qlmnfRm6jOsFnvoIit31/cbX/95xcblO14Wx4KtwSsBvkWwLfTM//RxKf/1rTS5fIxhc3fQt6DBQDfTkv+Dh1f5T309BYi9TLtuPuJKRZrex3vgbhkn54svXkjC6s53FtUcmEHv5O9pu58bNpfwrG+VcuLtAC+f1hWY+plLyHE9mJV8bCIT5Hxla855ulVUKQt9gelN+vJk9SNRXws8uvJAXDfP5Q3RYyL1ac15Ge1XlW97JQkNRbBeZK6t7nmoquoMF92mqJZf74T27+enE0nsK4vT1rUmrIPNNU3QvNSSusp1l/MW0w9MIiO7tSVv1K7K6bH7SmtK25mL5Za79dJirB6kb0bcJxnUP+Yxh9i9wrdlLfHpMQX56kFTbLnBzOPeBN58QnbU8ShHivcD6N/UwCO9pnljkgEkQgiEUQiiEQQiSASQSSCSASRCCIRRCKIRBCJIBJBJIJIBJEIIhFEIohEkP8BJt3iATFNXtsAAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.depth.0",
+      "title": "二维卷积 1→8",
+      "description": "Conv2d(1, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 1.0,
+      "parents": [
+        "input.depth"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ],
+      "image": "data:image/png;base64,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"
+    },
+    {
+      "key": "features_extractor.depth.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.depth.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        8,
+        80,
+        44
+      ],
+      "image": "data:image/png;base64,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"
+    },
+    {
+      "key": "features_extractor.depth.2",
+      "title": "二维卷积 8→16",
+      "description": "Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+      "branch": "depth",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.depth.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAACjCAIAAABqlfW6AAAMfUlEQVR4nO2dT6wkRR3Hv7+q6pl5896+/QcsC7tuIFEjrP+WgOyGBCGKiSZ6ISEYEhLjRe8e5WriwZMXD+qFgJuY4AmjB5SwAoKgSBSD7CIH3IUV9u2+N+/NdHdVeaienppf9/T0TE3QQ30Os9VVNdXV366qnu3+9u/R2ey0hEUADyYvPp7fo4lCGnlUPvdzfa+ACWzkyfyMsEGHo4ZCybAmAATKUZKRXEk7IYj/dQf+74iKcKIinKgIJyrCiYpwoiKcqAgnKsKJinCiIpyoCCcqwomKcKIinKgIJyrCiYpwoiKcqAhHPfRsbhICcOUGIwwBMMICcOkqRlhXdOhd6G5R5+t/0S99KgPwq+7nH9Cvtd/9vX+TL38yKzdv3d0BcPQqnT+8wK3sC92DJwcfuPSxQXrrJQXg39flQ9W2BWlx/LISBgDU707npy4oACovOjFLC1a6dRQYP9b4w+35kYEF8K29V9sfCYDzH9OH9or0ly6MHrvlbgDoTSrkkAq6oYUcUmn9597HAQB/enHzyM/Wb1moDwUbxb9KE+32p56SGIKwNekGNIGdECMgDMx4UpZpl6h+Ari6oQ+I7WrjCtrpkkOWOQBqN7vIrxNb83s8GwVg2Al6bgTAEI2qQ1TUpcWMT2CvYzdoD2Eoq9fDGlGakLWeb7PQROEPsYYKXWTz681Dwfijhk06P9OfkuUwVAAyGfpMD0Dj4tOuBcF7vwQSpot0nK5pzc+spiW0MkThB6OxgjGSifpjWBQV9vDYjZGa5dOtqS1XVgA6XFaiwIMBIGEkDAAN4Tb9tIZwn2Vll+O3UCwhbl3UBDaBXE41vyzt5ZNNs+ww8Z/mD9Bbx3DRFvp2tEvdclNZrUlgrEXRW8zJySG6yBWAoUKisdMhYOq66/UYIyoS5agxhIGSh1BIkgmhQf7Dff9sYPqElOfKbR7IMtdgDnHIbq/bUdEHiNI/4aerSGtHMinlWLejTbOwrBnJLdFXwlpDhRyYsUCWmS5Rbva02U6KY9YgAInV45okrBXQZdoQJVa7cVRUo+IIt5IEQCqoi7yDfEiJf7CYiDvlpSgVlzAZoW9HTpoO5QbCEDRRgxGktvR6vS0yITJRI0OblVJa688md7SGiCX8onKzOsX8HDd2yhnOxpo/81kd/zibfTG1pRlJNRCJVsE/Jca2nOr6Ws2pnU0ABiIBkELlJOHWAoicpLIaQJkYUeJKy0TuTdXE6ukhtjAKK3L2tL/66unBX25mJN3I79jJcl2m2yQAdKzuGW+1X5x4N4ATFeFERThRkcg8aCXm3LPZ6cB+PJS8cDY7HXjVe0Sd+4m5X4b/Ty/c4WuI9ComYODBrKSFuI5woiKcqAgnKsKJinCiIpyoCCcqwomKcKIinKgIJyrCiYpwoiKcqAgnKsKJinCiIpyoCCcqwlG/wR2vbJ8CMEg31zvX2n9zXW0P8n0AgHOnLuXH31YA/noyvdpd4M7+Hf9M+uN9ntjJ3t7XAXDTXtodP7ptY3K6uC6HoriJ/4r9xHO//SGArc+eO9B/v31Pdt64b/ODwwDUnfIfvc20LKiaR1Hxj5bVXPrvwNM3Hz5wdBeAgGy2vjhcHQNx6aRxmwBOXEruemrQ/hg8Cofjw8Bjb77+1FceZMWlr6CJLzxR1FRWH6AaX+1C9O2oVKFNVBVXh31ld83kx/oArACZyadj7L4p8st0icu8tq/myOfL4dVUEqZH6fy6jYQ/JQGQJma4X1YlWIidXv3XmOeroQUFrMZXG06mMOqHPkvL5JTrqNaNhMZTqOTYIRxC+FNBAIZs2glWxDv9sw67eUQrzPAGf/RkEitQRHJXF2OW56tESWvVclN21WiBPNiP7nyU/ihg9t4yn/lIyzoKQNdmh/X8y15pwsTYk7sl15w9zl0sOlYvEXkrI6kLJyNyaXd6VljI6XOkBQBIAy14kWMtHZtIiQBIa0vDQ6lCNYFpU2RiNQgKwJrNhkK1cSr4e4KzwdmsLEpJhoRW04Tdrt3tYCgXdm8kxlw3KGTVEA2W9IY5tW7TdZOpns2GlBiIiTm3+SeWnfIhd6wG0LE6JYnWjkWmrFuYM4mRdYdna83oDTma8P7G2MYKM8fJOmPdHIhOYrVKSS4UqY5VdkIMKWnZiNOCCeeG50iStNad3ja+WJbj2txKkqUvfNLaAXXVcpO/ivGGovuFXrvZ8OZKKkh4E9eMnfjzd+3930dY27fL/+DsI1XNs64lPZuxyclGZpsL/FDI3cVXEMa27M6v1Ei8G8CJinCiIpyoSGQeK3P4Lv2SnuNh9fzZ7HTPBP2f8xvdl8IDAQe//AxgRW/o1L6YtUw7YUtBXEc4URFOVIQTFeFERThREU5UhBMV4URFOFERTlSEExXhREU4URFOVIQTFeFERThREU5UhBMV4agP5fp3fr3lNraOLyBQ2rE3nLcAHgW+9prZ2TQALtyYb4wW2P2x95LSafWquPUe/SaAkxfprRsWuJ/+8tqxT6fvuvT33/ve4fWLAB7Y9+xC/rqnt+93CXUivZLuL+7IO/ux7yJtoA9K9xcey3eOp0cvJwBu+1diKt/1Q9dW6aTF/feT9p03OjcCeOMEUGcobgha+3rnZpc4dfiPtydvFXVI57btQ4Kv7ntm3DKwuxnqlhgmcIGA/RiDPi78YO1mmZbW+j5SP116xvoYwTOP9TFiwSOPqP+s0yR+YJcWNqYqU4lqvASZWEEgYABd23QA5SxwieongA3aLeOzOjQk82roIjKhrq2jAKRJ0xjxAzI31Bk1NiIsGZo/EsO90xu0x0Kaus0cosyvxjz1cxQw52BcTyefdWiCFpOQrsDU3BEWGhaVmK9VF9Eqova4ULwVl+rYk+gHZy06z2pqonAXKYBMutYx3s2EanpWaa2FzAWPLENIVmNm+jlqHIeyveG5JmKtDv5RYmgFcZ5n4Y62IaKmn1O94paBKv20i0/JilxOEdV4N6mP0juX8tUgTfWX2Fnxf0sSXe86rMYbbmCiF7Q7tnIuuGC+LF1E+J0ucrtTADKBTNBo8ZMsLIayOIaRspqoNtRrM1mXjuwWJ1bASGv7nmfCGa2r3yoN2K5Uwm7J4k8RdJD70ThnwTy1Dg2hpLUjteSY92P7mrFLtXZP1X6UicTY9/pFoF5poSGY92KWldJ3vmbAAT0EMEIHaPUiV20nNYQYCpmJ+tjmfmYxksc5LDGUolrU3A+/WmIspqN3l5/MzN6QMyQF4EZ7pbrT2gW7NnPNZgrjMMshDIVMZ//cmDXyWVFpQ3fRoQWmNlsmpLW1HqNap3BtpnP4hl4n5tqEG0r1ZOpRoOuqaCd6jFZLVIQTFeFERSLzoCfzM4HBZh9R536Z3Z1RUCMPq+cfz+8JacH15Mn8TODrQqr6G3EJpLXZKv5aS+CFE4CGSBf/n4RPXEc4URFOVIQTFeFERThREU5UhBMV4URFOFERTlSEExXhREU4URFOVIQTFeFERThREU5UhBMV4agf7T7y3Y1fALjr8mCkJnexZ0WnK/n9oSMHbeFLENbetJcChXuvwb3KyASS8V42dXrykgWQS3tx/6QnzWF8DaGf4fprxS6/+eMP9u48COCFz6Ut/8K548xLie4SAPUD9dMvPuMcvkV8xTb2XgCfwYcu8W3g7rekMKE39FMSlzcL92ZvwT9Ie3mz0PXylw88cdv+Jfb+2n1FQhnC7sHQJws762ahE1KLIRoqHgmvhOWXm5qmSq/t082m2LkoAMPgOLF7XdM8xVrS4PBj+bM2Bz0TaAFVmigNtivn0prxcyNDVtglB124kyULDpYz3/Pcsh/+s0W9VARODRFuAfWjGjfva1Y1BawgTqwWExupi6Lq4+eUMVZrTbQf2RhpivOMFTl8J2mvT87z7XL8dPB1aSbhMSKLMaIFdhMAkLam0VljSFj0skk/RqpVqMxq4+U7CJrQ03aJuaOJXB/K7y4Rk1TAZCSVM/lfWVtmxCam6L0R0ISBEkvMv8RYORZSWgwlZWLsTAYtGhRYE7k1wncsNlts/Qo9kytDdGWtyPUrsXeEaosMYbvjfK642pE9vcw1yxAAAiBhqs5aXxRdVLO1RS5dmuh948XcQWcKszAZWCWsdUfI3klgrfil1R0YGrt0x35m/yvlyw/wdPcbdIGdNUStKdYJUbtZTQ9UEWh5Fiyaro/rpMqEuNoJXY4GSpRDfWk0UdM7PO3Ylp05put5u1BDUpkI7YchCnRdOVYSjTBp/Xc3aol3AzhREU5UhBMV4fwXVuPSxPXqj+8AAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.depth.3",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.depth.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        40,
+        22
+      ],
+      "image": "data:image/png;base64,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"
+    },
+    {
+      "key": "features_extractor.depth.4",
+      "title": "二维自适应平均池化 · 8×6",
+      "description": "AdaptiveAvgPool2d(output_size=(8, 6))",
+      "branch": "depth",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.depth.3"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        8,
+        6
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAjCAIAAADqn+bCAAABx0lEQVR4nO1WwU4bMRScZ7/dkG5oD0gVl14qLpXonSJ+osdKfB5SVamfUVXiL7gUVGhRBIXu5q1tDm5ix3ZQEAEpUueUN347+7yZnTUd9QeYxyF/W578Ih8SUmHVWAdFfjdu47oyBGBLOkMUSOsANFZapZPrN6wRpaJOy6JRmdAh2gEwRNq5GWkJACakTLana13HZavBv4YqvtjjRuupFqnpqo2mvgc85jpnhcLuzFQnHxBA5UxOrhi0vJk/9/sJ+Ym/553r4McncHiR3TSTWx2WXpgewPsLGUgwUK8dgMqZ2BgLFRPf+nLzVtWTdE8aTpaZsYiT1wZI3SeU3uMBiqfDwrtQtP2K8QCHf5W9JAE+1sf/He7Bu5ftQMhMlX2G71wnwR5+z7LdoByX7LW0/Vdbcr5UaQqjJV4gMq94NlIYhdr/mz+bwtPQsDlZUCxmeJGsnM2/H8+BssOXjOviu1B2j3rE7tbC4W//tKMu2KxjB+DNjeStW9IhOm54w2537e+6mvU0xvDLvzTswqQNAGDQF24+UVRbp8MRAwDGNcdfhTFr/vEKQGq084bik5RfFaUke0iFDL+oB/k4V8z5KaelQuDnGX4HQh281HuT8nEAAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.depth.5",
+      "title": "展平 Flatten",
+      "description": "Flatten(start_dim=1, end_dim=-1)",
+      "branch": "depth",
+      "column": 6.0,
+      "parents": [
+        "features_extractor.depth.4"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        768
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAIAAAD9b0jDAAACC0lEQVR4nLVVzWrcMBCekUb2buyF0CUlh0Kh9FJobz32Ufp4eZRcCzkEAiEUeumWpimh2SyyZWly8K4syV7HocmwsPoZf/P7jfCk+QLPIR9utV/jtz+flcVNxspGSqtSSObw5EblEw3QxeHsSR4tTWUR/VY5NgIT86R466FDFMwAYFCOgE7xl0II23kAhTNaROiCObEnwVkQA6DhxnsNADUKEQeVKGwtQXoCALSwtRGdNeXcncz6eo+ih0FQAqHH8jkM0ZeBjPy/TAJd2FqC87+Frcf1ad+FBOfXGxmpbSSFtwOg4fWna5Obrq0ayQdaZHUUzeUbk0D8nKeFpbDRzo6mEHG4RIqtr94WccZN79OxAPsStVT7pzFN7iBVAODjX50btLtLZXE9cwcVhjp02ESllMzj7D5/9fgAolsa5s/7Ox1ulQWHIGLerso0mhYtinrGjR9iq0ICgMV0rI2fFM4AALVAfkTWKFIKYlo0g6DYeaB2cS+UVyCNBFGWB6RfNIti5KsX4f5emobybq3LoGkq4nmN8ypy6Oq1g10q6LjSAPArTxslzOOPMoMSBLPDKOb4RPoTus4zD/F2nY6fPCUa/C4wfPgk8z8iD90uIu5/L5/2soayNBXs2ouWphIMWmLmou67p3Rw9KkcSshD6jbTHpLjSt9kXUsW1mopEnu075kN5SudTjK4kwcHcNcNAYb87QAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.depth.6",
+      "title": "全连接 768→64",
+      "description": "Linear(in_features=768, out_features=64, bias=True)",
+      "branch": "depth",
+      "column": 7.0,
+      "parents": [
+        "features_extractor.depth.5"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA00lEQVR4nAHIADf/AcvtNDOm9ndrMir/41+s9AAAAJhVEcv+KAF1/lwaAe0v9et0/mSx6aDeGPwT9AGZFy0C2fsh9QAIzQsXw9OigiIx2wsMId4FZ+nTAfXFOog6HHu/46k/BBj5+JECSysG3PwAAwGf/T/aARr8AAOJlc5vazgbAew78ubpCgQCXq/16P4TEwHyo2oTFwHvt/c8VvKF7QMKAW3+YikA4tsAG3bZ2hWw7IR4Lg8A9u4ADQITAfH5AQVo5tfII/4eXZEk/emK43Ic/+xwM10P+XFn+AAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.depth.7",
+      "title": "深度图编码输出 · 64维",
+      "description": "ReLU()",
+      "branch": "depth",
+      "column": 8.0,
+      "parents": [
+        "features_extractor.depth.6"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAApUlEQVR4nGM8/dbEeNm3ZZlCDAwMUWu/MzAwLAvmZGBgYFzyx4aBgUHqx49nHBz29//ck/gj/IXxgig7CwMDAwMDwzMOjsCT/9abszAwsJhc+sfA8JPx61Gr9eZMIYf+rrFjFv318zUbO0Qp03pzJgYGhjV2zFHT30FE5b/+4Pj/h/HvGpPlARwMGIAJLup8+29E90u4BNRVpi9+XRNj/MrECpcAAFptOPTIzNbBAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "input.detections",
+      "title": "检测框输入",
+      "description": "16个候选×10字段；无效行由presence掩码排除",
+      "branch": "detections",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        10
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAQCAIAAACgHXkXAAAAFklEQVR4nGNc8seGATdgwiM3Kj0EpQG4DQH8FkEo+AAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.boxes.0",
+      "title": "全连接 10→32",
+      "description": "Linear(in_features=10, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 1.0,
+      "parents": [
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAIAAAD4YuoOAAAAIElEQVR4nGNc8seGgZaAiaamj1owasGoBaMWjFpAJQAAqiUB/HWBVV0AAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.boxes.1",
+      "title": "ReLU",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.boxes.0"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAIAAAD4YuoOAAAAIElEQVR4nGNc8seGgZaAiaamj1owasGoBaMWjFpAJQAAqiUB/HWBVV0AAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.boxes.2",
+      "title": "全连接 32→32",
+      "description": "Linear(in_features=32, out_features=32, bias=True)",
+      "branch": "detections",
+      "column": 3.0,
+      "parents": [
+        "features_extractor.boxes.1"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAIAAAD4YuoOAAAAIElEQVR4nGNc8seGgZaAiaamj1owasGoBaMWjFpAJQAAqiUB/HWBVV0AAAAASUVORK5CYII="
+    },
+    {
+      "key": "features_extractor.boxes.3",
+      "title": "检测框编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "detections",
+      "column": 4.0,
+      "parents": [
+        "features_extractor.boxes.2"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        16,
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAIAAAD4YuoOAAAAIElEQVR4nGNc8seGgZaAiaamj1owasGoBaMWjFpAJQAAqiUB/HWBVV0AAAAASUVORK5CYII="
+    },
+    {
+      "key": "detections.masked",
+      "title": "逐框有效性掩码",
+      "description": "逐框32维特征 × 输入第8列presence；按真实算式重建",
+      "branch": "detections",
+      "column": 5.0,
+      "parents": [
+        "features_extractor.boxes.3",
+        "input.detections"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        16,
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAIAAAD4YuoOAAAAIElEQVR4nGNc8seGgZaAiaamj1owasGoBaMWjFpAJQAAqiUB/HWBVV0AAAAASUVORK5CYII="
+    },
+    {
+      "key": "detections.pooled",
+      "title": "检测编码输出 · 32维",
+      "description": "沿16个候选逐特征amax；不是求平均",
+      "branch": "detections",
+      "column": 6.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": true,
+      "source": "算式重建",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAHElEQVR4nGNc8seGARUwMWAAsoVYIFQMyxG4EADgEAMOunk9uAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "detections.winner",
+      "title": "池化来源索引",
+      "description": "每个输出特征来自哪个候选行；并列最大值取首行，空槽可能在零值并列中出现",
+      "branch": "detections",
+      "column": 7.0,
+      "parents": [
+        "detections.masked"
+      ],
+      "summary": false,
+      "source": "算式重建",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAHElEQVR4nGNc8seGARUwMWAAsoVYIFQMyxG4EADgEAMOunk9uAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "input.state",
+      "title": "车辆与目标状态输入",
+      "description": "43维归一化状态；点击查看字段与精确数值",
+      "branch": "state",
+      "column": 0.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        43
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAIAAABLMMCEAAAAV0lEQVR4nGNc8scmcuLr5fmifxkZfzMy931MfP9FglH2+aZ20S4GBgYGBgaINAMDA+OSPzYMMMD6/+9vRmYGBgamyImv4aIQIQYGBiYGbAC7KAOyuXAAAMOnGierKTawAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "features_extractor.proprioception.0",
+      "title": "全连接 43→32",
+      "description": "Linear(in_features=43, out_features=32, bias=True)",
+      "branch": "state",
+      "column": 1.0,
+      "parents": [
+        "input.state"
+      ],
+      "summary": false,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAdklEQVR4nGOUOXtjrmbsbybGrawG6W/P7RYVZ2L6x8T1+/8HFraenE2f2RmsP75kenAn4gsbo97bn5/yFO/xcMb/KWba7c/8lYVZ8hWL+PFv75h49r2fyMT673/g5r8u93ffdWEPufO+S1mLQfb5pjW/LRiQAABqBy+vxYa6xAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor.proprioception.1",
+      "title": "车辆与目标状态编码输出 · 32维",
+      "description": "ReLU()",
+      "branch": "state",
+      "column": 2.0,
+      "parents": [
+        "features_extractor.proprioception.0"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        32
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAIAAABvrngfAAAAdklEQVR4nGNc8sdG9NfP30yMH1jYdN79uCLEwcTAwMD1+/8HFrbA3Duf2RmUvvxg/LfcaGcAs/QnBtF3LHtVmRkYGJh2+zN/ZWGWfMUifvwbAwOD/f0/TKz//gdu/rtTk/muC7v9/T8HFVkYlvyxWfPbggEJAABLmioqOmI4jwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "features_extractor",
+      "title": "四路特征拼接 · 160维",
+      "description": "按雷达32、深度64、检测32、状态32拼成160维；没有注意力权重",
+      "branch": "fusion",
+      "column": 9.0,
+      "parents": [
+        "features_extractor.laser.7",
+        "features_extractor.depth.7",
+        "detections.pooled",
+        "features_extractor.proprioception.1"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        160
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAIAAAD9iXMrAAABLklEQVR4nI2QP0vDUBTFT14SkzpJy/PvECuCDh0EkSyVDuIHCOhgRndHP4nfQIoIUtLBWehmUCRDF1EMOIj4p1jS2Jfna+PwSrSlQ+907uF37+FepSrKpRZr5k0AlVA0ihrGFdmwfQkBWLrlUuze90a5wLez5mx/GsBam9GrtnTcWtetdQEoVVGW1iJjL6ZZCcXTvCh0lIAa2bzj90mmZiPF8fuNombf6AE1KE8yzrPJgMvdfQXU8GxixexyOz2os/epv31DubJ2Hnq0/nF+PPff3HrlisftmOhjfzF07yQQADIJRHlCZgQHUGoxaVkxA+AcPVoxW+kw9+K78JMsRCCboQqgmTcpT8xUrD/r7mnknawuv2lMQ2qon7qRSxRNaKncFOnqnn49SDocjf4F4AFu8hXDTLwAAAAASUVORK5CYII="
+    },
+    {
+      "key": "lstm_actor",
+      "title": "驾驶记忆 LSTM",
+      "description": "LSTM(160, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "actor",
+      "column": 14.0,
+      "parents": [
+        "lstm_actor.h"
+      ],
+      "summary": true,
+      "source": "实际驾驶前向",
+      "shape": [
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABO0lEQVR4nDXKzW7TQBAA4PnZdaZ2N6mKDAgRlRfgDZA48Ko8DieuFUIVUlVoUxxbwZvdnRkOiO/84ef2QRENqLfyPYx39vqTfT1wz2BirSIX5DBYnVgAAABe2fHGnyrSu7xMMTA4g123lUSNwApyRf5XM8ZvsjPEieWBdwBAvzqpyIOV6DpRn1rb59PW8iOn6DrqsnBHYu03DjMJACRflxAeNpIpjLqccJMpKGJg8Jc2s3umsM+n5y4+ckq+KtD7ZTpuKJrTVWkGpIhH6n/I8GYtG69ijcHu+1gJn7tIhy4uJJ3rqEt0vR0ut5ZnktTatrWZu5mEMoXezwU5um21AEBFfqGnaH4r12JNvNJ+Xa80szsAHMJFdP1Juz/UiXqyPPEFAIR7kbGc357b3WVMes4UbvSpIH9MX+C/v3xMrgnXDIubAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.h0",
+      "title": "输入隐状态 h₀",
+      "description": "上一决策步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；回合开始时清零",
+      "branch": "actor_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAAAHklEQVR4nGNc8seGgRBgIqhiVBHRilhwScSwHIGzAREjAxjXGYa4AAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.c0",
+      "title": "输入记忆 c₀",
+      "description": "上一决策步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；回合开始时清零",
+      "branch": "actor_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAAAHklEQVR4nGNc8seGgRBgIqhiVBHRilhwScSwHIGzAREjAxjXGYa4AAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.h",
+      "title": "输出隐状态 h₁",
+      "description": "h₁ = o·tanh(c₁)；本次隐状态输出，供下一决策步使用",
+      "branch": "actor_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_actor.o",
+        "lstm_actor.c"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABO0lEQVR4nDXKzW7TQBAA4PnZdaZ2N6mKDAgRlRfgDZA48Ko8DieuFUIVUlVoUxxbwZvdnRkOiO/84ef2QRENqLfyPYx39vqTfT1wz2BirSIX5DBYnVgAAABe2fHGnyrSu7xMMTA4g123lUSNwApyRf5XM8ZvsjPEieWBdwBAvzqpyIOV6DpRn1rb59PW8iOn6DrqsnBHYu03DjMJACRflxAeNpIpjLqccJMpKGJg8Jc2s3umsM+n5y4+ckq+KtD7ZTpuKJrTVWkGpIhH6n/I8GYtG69ijcHu+1gJn7tIhy4uJJ3rqEt0vR0ut5ZnktTatrWZu5mEMoXezwU5um21AEBFfqGnaH4r12JNvNJ+Xa80szsAHMJFdP1Juz/UiXqyPPEFAIR7kbGc357b3WVMes4UbvSpIH9MX+C/v3xMrgnXDIubAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.c",
+      "title": "输出记忆 c₁",
+      "description": "c₁ = f·c₀ + i·g；由本次门值及上一时刻记忆状态计算",
+      "branch": "actor_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_actor.f",
+        "lstm_actor.i",
+        "lstm_actor.g",
+        "lstm_actor.c0"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABe0lEQVR4nDXB3U7UQBQA4HPOTLvdKUWY7W5ZgqAQwRgNIaiJ6Av4FD6D72TitVckXhgJ3poIKiFhQzasCOwPhS7dnbbz45Xfhx/1Tk6+AVouxl9qGwfl4/fu0/dgqQblkklTEgV6vFmUWT0wQADwEC536EQBvR31+iECgKAsqiyJCnxnNLKMc43MIF7waLdxP+P8JJDfvHXPAB3NzgxpRpp8rtIXTiYT/SK9WTNXP9gD4YpN2/0T+rRQTvpuvsMSAJCYXQd0OusNWPRSn17i/IBFOfm4N37eFfXAakV8u6+OY7bHnjzCc2ny173qLDaNO6TlIVPoTcjvUby70Fq/Ngmm0uShrQ4XnWJ4HDP63XZdSOaMelaex/bua0uumasOS9q5aU7t35ro8BaNvJrEbMTrvnUr0xwAUhKvpmcA8PneymIxaduUtobqqeoHVnvWHYTNyKqfbrUXhKLElrs9qscWCD/oNxu3So7Zr7YDgIEnGnqaMf8d24f//gFPc6+OYW8RGAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_actor.i",
+      "title": "输入门 i",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABSklEQVR4nDXMwVLaUBQG4P+eey4EklgwaIFRRqfTmWq31fdfddG1G7VTOlYFgyCTgRCSe89x0fF7gM/8XP84n7kiDdHeDKdkBNPLMJzx5kCWvdAvbKckPp+5Zc939iSEPxe+1VBjtehJvKEMmGf+W94i9ogr6u5olQZSA6Bf2KgyiyPvWU9eXD4OXKSya0vt1AqSLbE3nY15OmkGK34YNUlbAXB3R6QA0FgjhJeBj2PiYLg2wyXXLa2dchUJCd7SQGqSgqq2DBb2edysD8PxsyUPYXCW279nDQdztOIykcmdfT0VANtI8jEAdEuifVe//HZWsP4U/h37++9+E8tw7uKKstwCEIK5mV1ZAYCktABqp9uOADh9dGUiVVtXaeDx3O0jXR/42ikAzzrKWQhKWPT95KlFCnP7eJ0tOSoRGPln//8nwdfJL3x4Bw7LpWI5blzuAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.f",
+      "title": "遗忘门 f",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABQUlEQVR4nDXBTXMSQRAG4Ld7emc/WASExATUKu8evOSS/39Ur560Si2wSkICCbvs7Mx0e/J56Nv27uqh+LkZX7+49XdONX39ON6cGEBXaRmp7R09fbnfrmMZSRmSiA2D17Z3dc+s6Fpd7Zgfl7kOXAVWMsmYPjsA5yZHb1lMEh2vTQAoGyuFwl6daXcT60DKOE8ygORMMrGyzU+ur/V2XySx3huAUNj85JYHqUZWBvtIfaOX0vpGq4EXHa/2MrnwcZafFnn67C5eJTm8NLmM5EfqG938lu27FJ3VgS+l6sKWJxEA77eeFA9XKRSmt2g79iON3pTpUpqPJmOhvzZ5MnDbOZ1mZdsv8mRgVqoCs9pQmqwehZT2q3iYJ6cIJd7+8X7Ajw/jrHNtxwDkOMsA1rvi75skmXxEqPSw1E/Xn/HfPzZjsFiU+KMtAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_actor.g",
+      "title": "候选记忆 g",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABoklEQVR4nAGXAWj+Aa/6N+cEDe4BDUzr440SO8ryNbD3kZIYMQAAAEP+0tgEGfX/CAQj7/7VFg38AAIE/QEYAu2XBpDsAwCMyNTTKvoD/gAm/OT+Af8CEfIDFf/x/QAD4xAA+AAG+QMBxQ4abDcy8QcBrhElbQ1VG+kFAq8kD7z8NCf95jDgBNL4KCrmAlvc6kv/zJECSw8B9WoFr8Ym/QIx8u3V9Sui/Ej4CP4mB9/sD/3RHf7FAydv/rXN+yjAAi3aBhUB49s4viIFG/j35QgJUM79yCv7igFSLgfYOP3aTMoB2yX6G+kFAhXjAd8CFtoJELz/MngyLCrlAxYE7Dj92hr2+9Mq+gn6Askl/QLJNfvZ/CAr9fBr88UpAuF+ITRTAMW0ATYv2AYT8wK9Gg61BTAC4AoJ+f8HygwXA/4AS+HwFALwyQMkhOHI8RL+dxhEQefxNgDZAk7Q/Xnzuh787hTyA5AeKyQA5rrzP7EiEAzyAhsE6KYaIfoBAwGn/DpC2f8N7gHIMfoN+QDHEhMx8u3eDAlfA8MAAAAAAAAAAABH27UWG26BHwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_actor.o",
+      "title": "输出门 o",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "actor_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_actor.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABQ0lEQVR4nDXNwW7TQBAG4H9n1vZ2a2ziuE0lBEK9cyy8/4lH4ICo2iKkNo0dO3HSdbI7wwHxvcBnfvy584HGUgDc3md8wnCtxws5ZQLgWOjtY27b3vaLdPlG0erD53OWDIBlZ7cLLQ9M71LwSsXRVHtuOu5KiaxuNnOm51wj6/FCygNFq+bXwzchBSCE9yOTwO/M5iaRmFCIEM6slhTVyKdct1V6aWMWsf2oq4HB6t9oupTIavdeQi6T0yxhOdpyR65JYrD3qelyP1HwSvVEiVAG8+Elm3zKA1ygoUyLPa9XMXgtgjE/n766mf71bjZC2FTpprcA6p7GRkhANplQyM7LsrORAaAMZr2I1UAnh66Ov6+jbTY8NMnPZqwTgIOTq962Ao54/HRedVlwYteruOxs+8xDKyRGSF+bWE989eU7/vsLw9iyNEhpZScAAAAASUVORK5CYII="
+    },
+    {
+      "key": "mlp_extractor.policy_net.0",
+      "title": "动作头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "actor",
+      "column": 15.0,
+      "parents": [
+        "lstm_actor"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA00lEQVR4nAHIADf/AZn+QjTu8oENSWn+uAL/APgDAbgEMBAB8wT2AQezEx9BAMwg5gCGFzoUAvAiAeU78ekCTOPtPvXhEP72yhgI4vobBAD99QAI0w4OAtwV/+EJCyzw9dQBH3IDrM75K0Py4Qv++gTfBw/qAQ8VC/c0/d0S+P5FDsfmBAUN/foC8gEKL/vkDfv+zAMj3gwJ9QAIE/r7A/8AAgMA/ecEDeYJBjL+3twCGTf54J0GP/gDAgHG8DQK+gDhDwIa9P4F/QCdFC40/9sb+Pdgm1jXjzMLQQAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "mlp_extractor.policy_net.1",
+      "title": "动作头 Tanh",
+      "description": "Tanh()",
+      "branch": "actor",
+      "column": 16.0,
+      "parents": [
+        "mlp_extractor.policy_net.0"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA00lEQVR4nAHIADf/AZn+QjTu8oUORmX9uwL/APgDAbwFLAwA9wT2AQezEx89AM8d7QCNFTcUAvAeAek48ukCSuXtPvXhEP72zRYI5fwYAAAA9QAI1g0OAt4T/+EJCyny9dQBH2sBstX6JEPy4Qv++gTfBw/uAQ0VCfc0/d0Q+v5BDMvmAwUN/foC8gEKK/vmDfv+zAMj4AoJ8gALE/r7A/8AAgMA/ecEDeYJBjL+3twCGTf54KEHO/gDAgHG8DQK+gDhDwIa9P4C/wCgEi40/9sb+Pfd31fXDGpdLwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "action_net",
+      "title": "动作分布均值 μ",
+      "description": "Linear(in_features=64, out_features=4, bias=True)；均值尚未经过动作范围裁剪",
+      "branch": "actor",
+      "column": 17.0,
+      "parents": [
+        "mlp_extractor.policy_net.1"
+      ],
+      "summary": false,
+      "source": "实际驾驶前向",
+      "shape": [
+        4
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGM8/NHkITcH00d2JvmvPwAqFgXm1TSU6wAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_critic",
+      "title": "价值记忆 LSTM",
+      "description": "LSTM(160, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+      "branch": "critic",
+      "column": 14.0,
+      "parents": [
+        "lstm_critic.h"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABU0lEQVR4nCXOz05TURAH4N/MnNOeelu1/GkoapoguCAxMW4hce0z+Dg+iBsfwvgKsmABUSO6MRFNS4HbUs+9pzPjwu8JPnq/Pp5L9cBWHdePeHnEZy3C8fT2+5BvJEXXqQzonb6KrpmDuCcvX2W8r38KCcMyxcraQsLRVYkW1EteWpKJzQrJ3urujCbP6xpA8sI7TRb3w78zBV/ykGG7zepDdfBm9uXboCcwAOGqE5UomgPY8hrA7256isuTrX50bUkMzJnDKe3Nu2F/kVuEysrDdfOouUu23iyNuAMIBn7hP6KZESpvLsJo6MvkBcDn7vbc7z/zX2HG/cd6PQ+9Vb8AGNt1IRH3qQwqb8b2M7ryyGoFR9dMsbJyy/cAKNGGLQWmRAC443rOT5Kvk5dCvK0LBQMYtbmy9oLHk2UJmeIG1ZlCIflf2SlLI3rd+wQAwFvgHymosbKYoTsxAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_critic.h0",
+      "title": "输入隐状态 h₀",
+      "description": "上一价值诊断步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；诊断开始或回合开始时清零",
+      "branch": "critic_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAAAHklEQVR4nGNc8seGgRBgIqhiVBHRilhwScSwHIGzAREjAxjXGYa4AAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_critic.c0",
+      "title": "输入记忆 c₀",
+      "description": "上一价值诊断步输出的循环状态，作为本次LSTM输入；跨步反馈折叠在此节点，不画跨帧回边；诊断开始或回合开始时清零",
+      "branch": "critic_memory",
+      "column": 8.0,
+      "parents": [],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAAAHklEQVR4nGNc8seGgRBgIqhiVBHRilhwScSwHIGzAREjAxjXGYa4AAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_critic.h",
+      "title": "输出隐状态 h₁",
+      "description": "h₁ = o·tanh(c₁)；本次隐状态输出，供下一决策步使用",
+      "branch": "critic_memory",
+      "column": 13.0,
+      "parents": [
+        "lstm_critic.o",
+        "lstm_critic.c"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABU0lEQVR4nCXOz05TURAH4N/MnNOeelu1/GkoapoguCAxMW4hce0z+Dg+iBsfwvgKsmABUSO6MRFNS4HbUs+9pzPjwu8JPnq/Pp5L9cBWHdePeHnEZy3C8fT2+5BvJEXXqQzonb6KrpmDuCcvX2W8r38KCcMyxcraQsLRVYkW1EteWpKJzQrJ3urujCbP6xpA8sI7TRb3w78zBV/ykGG7zepDdfBm9uXboCcwAOGqE5UomgPY8hrA7256isuTrX50bUkMzJnDKe3Nu2F/kVuEysrDdfOouUu23iyNuAMIBn7hP6KZESpvLsJo6MvkBcDn7vbc7z/zX2HG/cd6PQ+9Vb8AGNt1IRH3qQwqb8b2M7ryyGoFR9dMsbJyy/cAKNGGLQWmRAC443rOT5Kvk5dCvK0LBQMYtbmy9oLHk2UJmeIG1ZlCIflf2SlLI3rd+wQAwFvgHymosbKYoTsxAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "lstm_critic.c",
+      "title": "输出记忆 c₁",
+      "description": "c₁ = f·c₀ + i·g；由本次门值及上一时刻记忆状态计算",
+      "branch": "critic_memory",
+      "column": 12.0,
+      "parents": [
+        "lstm_critic.f",
+        "lstm_critic.i",
+        "lstm_critic.g",
+        "lstm_critic.c0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABjUlEQVR4nCXLS2sTURQA4HPOncmk95qoSaOoGV+gUCq0JVotQhe+IrhT0PoLXPtLBPeuFIpQXHTVYnEhIlXqxlSMCGINlCRNJw87r9y597jw23/4Wi+sYW0RG9KOn6VLj9RaCPkn2+3GOf1TFo9l4TtnGp9zvWL+7okCAPh68BJu3qf3gVCS0x4WqyYIhKKSCRN0W1w5mQ1HInfL+ZyQc29nsJzWH7Ta/yfN7qUum4f9ZoLOFl5QnF7rhE9P3Hn1e/XDqQllNTHjenRl15O1XvS17I0on4PMZdOlogfZYRtZoDEK2vXksr7dl1zrpAEW/CQ8G8X1bvd4NprZj102AqwTo/vYfXvoAGRCvu2teJcv0p+iigHgxeTUgZXXYZsafL5g00+lI5unyQJdxe8GhLLjJvhlHN7lL34S0jz80EhHbTQQExUdf4MzAoxBnOVfCpJ9oTQhVXS8ygulsS6bSDAvZs0UchrFpX5cNf2NbH5uh5x2TlahE6A7orzg0CDeGLYSB2qTWwAA8PENwD8NE7vdszuu8QAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_critic.i",
+      "title": "输入门 i",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABWElEQVR4nDXBS1MTQRQG0K9v355MHuTVJihBRyrFwlS5gvIn+Nd1ZbmxVAoqagTDJDET8mCYflxXnqM+ri+zuWns1HIQXl7RdBLsio8WkmeS93x/q6MCj5ZctL2pTNEKaab6az09rWgEANltsrK+8Uic97wJCkB3p38eexNwsuT+nADsuxgs+O65o7NZEpXUd+CA85mpeTW8EZdCCPtWeGxEAPRrVAE4tKWsifaKIr5exE0/7ruy7AQAkUCdvZ58Ng9H8dUNLwa+WVLNKTunohOGa74+8eNrw9tGvHobbcEqSFRicw6M2Zl/qMdnQb37lNxlgW2hPcvvoTNV4hg/Xrv6k2pvNUUklfr+prIbZgCHNJ7mRkhsoatE0pLurSsNuhtNog71yADGX3g6CatWJIEJaBmpOfViwX974fybUUF414zIyGkZ35o/A9csKX2i46lK3n/Af/8AQH6pzajafnkAAAAASUVORK5CYII="
+    },
+    {
+      "key": "lstm_critic.f",
+      "title": "遗忘门 f",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABV0lEQVR4nDXBzU8TQRgH4N+8887sdtluSqqLUkKJIUaN8etg4sn/3pMeTCAKh9IIpRRToNvu0t2ZeceTz6POrj5nj5RXNNt3R1MzH/k6lcOZvX7mtMAxWo4sKnqOm0IAXB66QACwHHoAaUeBxARwk8TWhNHCbBNVZZJvKXFqsNL5ndJtVB4/vgQez+xN6QDktS7WuuqHvTmvBwKoy5dS9yTrFJ2POwDFAsuB11497MiyDFUepsfOc9x5pJYjDTd0NDWT1/7pHd+UjiLyDY0nxjqyTgnF8kGTqLgsg3W0TeU+i/t/zZ/nbvUkrrMA4OCC7/uB9m5N1tD1bvAa/RaLoSsa8hwDQRS+f+gCgVeDMN8N73/bdBUv3kT2qjPS9KRleI6ZgxZwuqV3v/TkhQMgKoYURUNVJh9/2pO33fHUJg34qnSfTtEbEQdVp5I41Km8OrO9r9/w3z902LMpfNXErgAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_critic.g",
+      "title": "候选记忆 g",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABoklEQVR4nAGXAWj+ALn2NSLrqp/9P7f3NRzmtGX9aWH8bPu2N9/fN3X+XL70NCDqrAF5/lkz/d/YBBnV/CJj+sFd7oWQGICwADovBNvh/hg7/9bVAh0CM/3f6gMMwvkzY/rB5QgJTBqw7QMLmNDHlehkkL/TAAAAT/HbAkbOAhP99Znns+sHBpf3VDcB103d9C4edd7PhaBCCRj5+Aj7AAHn1zmrKA5iyPO1NP/bBBgEAP0X/vHKACcUAvAk/uf7AQPdABkCrycLle9d9Q7/Q9YBu/c5UeXoUND7ftrTNPrgVsT9C/76HQDrAW3+YikA4lnP9gb4AKw4A5f3VDkKzhcB7+3/Dq3tThoK5E8KvQK98T8j+PF2MC+8NPz1AQdTC7rk/Bcc/e6r7FAsDtN7AqdH6uoBlv5EG/vy+wIC4wQRPO7rXAFwRhC+NP/b+AEF2AAdBAD9XevZAjDy8Iv8WDHl/zzu6xzqBab+kN36HuoCDljN+D782LXxRSbVBATCDxoA9gDSGgDcBRdC/+nxCACd37nhGPsPNcwAAAAAAMkIAAD638q7FD/vRwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "lstm_critic.o",
+      "title": "输出门 o",
+      "description": "使用LSTM输入权重、循环权重及偏置，根据features_extractor与h₀重建；并以真实h₁/c₁核验",
+      "branch": "critic_memory",
+      "column": 11.0,
+      "parents": [
+        "features_extractor",
+        "lstm_critic.h0"
+      ],
+      "summary": false,
+      "source": "权重重建并核验",
+      "shape": [
+        1,
+        128
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAALCAIAAADEEvsIAAABUElEQVR4nDXBS2/TQBQG0O/emfErxk2aNjQOqlohFogVEkL8/w1bxAKpUheQtNQ4Cc3DqR8zc4cV59C3+hOA21/R79Le3Jvq2gO4WqpNKdsz9xJhsVV09/C5OCoA27EznvITV1MHwHhKe0p63udea0cPM/umNkqwzUUolGsTdySMtEGbY3XpdHFkp0PcURbx61otF8MQSdyp7IB16YWRDdBPM7dPwvwR0cD7sbcK9dgPJiQ5AxhMGHXMxuHjj+jnjZ2ukL1w0XK50SzkdHAKTSIXa82e8WfujUM7oeWVPX9WXRxOqTxNfNbyh++mKYQe774Iozp3RctWBWEYh8uNaTMB8Fz42JIeojCYcF2ZtKE+C7szL4xqZgGMOm7iYBz0MZO39+bvTHYLf0hlfGKhAGC604dX/t3KKEd61PKQoJ64i72yinoT0p6Tnubvv+K/f9fNqiBIrbL5AAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "mlp_extractor.value_net.0",
+      "title": "价值头 全连接 128→64",
+      "description": "Linear(in_features=128, out_features=64, bias=True)",
+      "branch": "critic",
+      "column": 15.0,
+      "parents": [
+        "lstm_critic"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA00lEQVR4nAHIADf/AYT/URL/8+oBD/X/CTr82wr8/vYEAvIDBgL5AAWw+kDt/w8IAfqqATzZCRIX9v3qAg4C9P8JOgfPVPXS/P8DRgLMB//74QwG8gALAlLz1Rz/7RbyASAA6eUCEkTi9dICH1rm3wLsCQMY+vb2B//I/ioo/OffFf02/N6xGhkE5wQNE/31gQ1Hafu4AAAA/QEBHvL9BQzoBM//JWH1y0QPyuj+CvcBBd8AGOQFFzYE1gLX+CXbDQk28O3pAg8Z/PMIAfpGAszuAA3fPF44nmeSKwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "mlp_extractor.value_net.1",
+      "title": "价值头 Tanh",
+      "description": "Tanh()",
+      "branch": "critic",
+      "column": 16.0,
+      "parents": [
+        "mlp_extractor.value_net.0"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        64
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAA00lEQVR4nAHIADf/AYT/URL/8+oBD/n/Bjb83gr8/vYEAvIDBgL5AAW4+znt/w8HAfquAjjZCRIX9v3qAg4C9P8JMgbWVPXS+f8GQgHQB//74QwG8gALAlLz1Rz/7RP0ASAA6ekCD0Lk9NICH1fo3wLsCQMY+vb3Bv/M/yck/OrhE/42/N60GBkE5wQNE/31hw1EZfq7AAAA/QEBHvL9BQzoBM//JWH1y0APzegDCvcBBd8AGOgGEzID2gLe+h7bDQk28O3sAgwZ/PMIAfpCAdDuAA25HV0+tS061QAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "value_net",
+      "title": "状态价值 V(s)",
+      "description": "Linear(in_features=64, out_features=1, bias=True)；额外只读计算，不参与驾驶",
+      "branch": "critic",
+      "column": 17.0,
+      "parents": [
+        "mlp_extractor.value_net.1"
+      ],
+      "summary": false,
+      "source": "价值旁路诊断",
+      "shape": [
+        1
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGPQ+TAPAAMGAbt/oRwjAAAAAElFTkSuQmCC"
+    },
+    {
+      "key": "action.log_std",
+      "title": "Gaussian log_std 参数",
+      "description": "实际策略的全局可训练参数；独立于动作均值 μ，σ = exp(log_std)",
+      "branch": "actor",
+      "column": 18.0,
+      "parents": [],
+      "summary": false,
+      "source": "实际分布参数",
+      "shape": [
+        4
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGM0EnVmYuNjYuYU/fP9FQANqgOi0XWihAAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "action.std",
+      "title": "动作分布标准差 σ",
+      "description": "实际对角Gaussian分布的stddev，等于exp(log_std)；它独立于μ，确定性驾驶不采样噪声",
+      "branch": "actor",
+      "column": 19.0,
+      "parents": [
+        "action.log_std"
+      ],
+      "summary": false,
+      "source": "实际分布",
+      "shape": [
+        4
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGPc/t2UgYGBiYGB4S8jIwAaSgLm7dObMwAAAABJRU5ErkJggg=="
+    },
+    {
+      "key": "action.applied",
+      "title": "四维输出动作",
+      "description": "前进、差速、云台偏航速率、云台俯仰速率；确定性均值经SB3裁剪/反归一化后，范围[-1,1]",
+      "branch": "output",
+      "column": 19.0,
+      "parents": [
+        "action_net"
+      ],
+      "summary": true,
+      "source": "实际前向",
+      "shape": [
+        4
+      ],
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGM8/NHkITcH00d2JvmvPwAqFgXm1TSU6wAAAABJRU5ErkJggg=="
+    }
+  ],
+  "detail": {
+    "key": "features_extractor",
+    "title": "四路特征拼接 · 160维",
+    "shape": [
+      160
+    ],
+    "size": 160,
+    "min": 0.0,
+    "max": 1.5848286151885986,
+    "mean": 0.14311659336090088,
+    "std": 0.28769776225090027,
+    "nonfinite": 0,
+    "index": 0,
+    "coordinate": [
+      0
+    ],
+    "value": 0.0,
+    "parameters": [],
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAIAAAD9iXMrAAABLklEQVR4nI2QP0vDUBTFT14SkzpJy/PvECuCDh0EkSyVDuIHCOhgRndHP4nfQIoIUtLBWehmUCRDF1EMOIj4p1jS2Jfna+PwSrSlQ+907uF37+FepSrKpRZr5k0AlVA0ihrGFdmwfQkBWLrlUuze90a5wLez5mx/GsBam9GrtnTcWtetdQEoVVGW1iJjL6ZZCcXTvCh0lIAa2bzj90mmZiPF8fuNombf6AE1KE8yzrPJgMvdfQXU8GxixexyOz2os/epv31DubJ2Hnq0/nF+PPff3HrlisftmOhjfzF07yQQADIJRHlCZgQHUGoxaVkxA+AcPVoxW+kw9+K78JMsRCCboQqgmTcpT8xUrD/r7mnknawuv2lMQ2qon7qRSxRNaKncFOnqnn49SDocjf4F4AFu8hXDTLwAAAAASUVORK5CYII=",
+    "description": "按雷达32、深度64、检测32、状态32拼成160维；没有注意力权重",
+    "source": "实际前向",
+    "fields": []
+  }
+}

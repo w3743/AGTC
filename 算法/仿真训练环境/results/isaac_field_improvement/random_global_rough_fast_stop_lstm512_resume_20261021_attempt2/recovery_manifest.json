@@ -1,0 +1,51 @@
+{
+  "schema": "isaac-field-fast-stop-recovery-v1",
+  "parent": {
+    "path": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020",
+    "protocol_sha256": "3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c",
+    "status_path": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/run_status.json",
+    "status_sha256": "52456d09552efec69b25a85ef861bc7b2e4d64ad7efaada9f32505f105cdd583",
+    "status_snapshot": {
+      "status": "running",
+      "protocol_sha256": "3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c",
+      "num_timesteps": 57344,
+      "updated_at": "2026-10-20T10:14:02.771289+00:00",
+      "phase": "training_global_random",
+      "stage": "global_random"
+    },
+    "checkpoint": {
+      "path": "results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020/stage_1_global_random/checkpoints/field_policy_global_random_57344_steps.zip",
+      "sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a",
+      "num_timesteps": 57344,
+      "size_bytes": 37400451,
+      "zip_integrity": true,
+      "policy_weights_present": true,
+      "adam_optimizer_state_present": true
+    }
+  },
+  "checkpoint_copy": {
+    "path": "parent_checkpoint_baseline.zip",
+    "sha256": "db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a",
+    "num_timesteps": 57344,
+    "adam_optimizer_state_present": true
+  },
+  "training_plan": {
+    "starting_num_timesteps": 57344,
+    "additional_timesteps": 139264,
+    "expected_final_num_timesteps": 196608,
+    "checkpoint_interval_transitions": 8192,
+    "training_seed": 69009,
+    "num_envs": 4,
+    "n_steps": 128
+  },
+  "continuation_semantics": {
+    "policy_weights_and_adam_optimizer": "load and continue from the copied verified checkpoint",
+    "global_timestep": "retained by train_stage.learn(reset_num_timesteps=False)",
+    "environment_rng_lstm_state_and_partial_rollout": "reinitialized in the child environment",
+    "observation_contract": "original Isaac simulation policy contract; RK interface is not connected",
+    "consumer_interface_gate": "QA evidence only; it does not alter training observations",
+    "bitwise_resume": false,
+    "development_evaluation": "not run by this continuation",
+    "blind_830xx": "not evaluated or observed"
+  }
+}

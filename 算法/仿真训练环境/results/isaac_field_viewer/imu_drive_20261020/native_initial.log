@@ -1,0 +1,54 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_native_gimbal_imu_and_drive_feedback_use_physical_signals ________
+tests/test_env_integration.py:76: in test_native_gimbal_imu_and_drive_feedback_use_physical_signals
+    assert feedback[iq_index] * 100. == pytest.approx(effort[sides == side].sum() * torque_factor, abs=.12)
+E   assert np.float32(1.5565226e+06) == nan ± 0.12
+E     
+E     comparison failed
+E     Obtained: 1556522.625
+E     Expected: nan ± 0.12
+----------------------------- Captured stdout call -----------------------------
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 2301
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.05
+	Environment step-size : 0.05
+[INFO]: Time taken for scene creation Last: 0.717738 s, Mean: 1.898872 s, Std: 1.670376 s, N: 2
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 110.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+Finalize builder took: Last: 0.537612 s, Mean: 0.560259 s, Std: 0.032028 s, N: 2
+[INFO]: Time taken for NewtonSegmentationMapper.build_mapping (instance_segmentation, colorize=False) Last: 0.000684 s, Mean: 0.000649 s, Std: 0.000050 s, N: 2
+Initialize solver took: Last: 0.547757 s, Mean: 1.091794 s, Std: 0.769384 s, N: 2
+[INFO]: Time taken for simulation start Last: 1.128134 s, Mean: 2.288572 s, Std: 1.641107 s, N: 2
+[INFO]: Completed setting up the environment...
+CUDA graph took: Last: 0.354912 s, Mean: 0.354912 s, Std: 0.000000 s, N: 1
+------------------------------ Captured log call -------------------------------
+WARNING  isaaclab.utils.sensors:sensors.py:40 Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+WARNING  isaaclab.utils.sensors:sensors.py:40 Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+INFO     isaaclab.sensors.camera.camera:camera.py:288 Using renderer: NewtonWarpRenderer
+INFO     isaaclab.sensors.camera.camera:camera.py:288 Using renderer: NewtonWarpRenderer
+=============================== warnings summary ===============================
+tests/test_env_integration.py: 35 warnings
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_script.py:1488: DeprecationWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_env_integration.py::test_single_channel_depth_passes_official_sb3_wrapper_without_rescaling
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab/isaaclab/actuators/newton/adapter.py:30: DeprecationWarning: newton.actuators.Clamping is deprecated in Newton 1.6; use newton.actuators.ClampingBase instead.
+    from newton.actuators import Actuator, Clamping, Delay
+
+tests/test_env_integration.py::test_single_channel_depth_passes_official_sb3_wrapper_without_rescaling
+tests/test_env_integration.py::test_native_gimbal_imu_and_drive_feedback_use_physical_signals
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:165: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+    replace_newton_builder_shape_colors(builder, stage)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_env_integration.py::test_native_gimbal_imu_and_drive_feedback_use_physical_signals
+1 failed, 1 passed, 38 warnings in 25.64s

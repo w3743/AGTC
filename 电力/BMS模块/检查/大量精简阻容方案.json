@@ -1,0 +1,183 @@
+{
+  "title": "BMS阻容跨料号合并与精简记录",
+  "date": "2026-10-13",
+  "status": "六份源JSON已完成第一批可证明的同值替换；BOM和原生工程同步由主代理处理，尚未完成",
+  "scope": {
+    "modified_files": [
+      "BMS模块/原理图准备/AFE元件连接.json",
+      "BMS模块/原理图准备/接口元件连接.json",
+      "BMS模块/原理图准备/共享电感功率级连接.json",
+      "BMS模块/原理图准备/共享电感控制保护连接.json",
+      "BMS模块/原理图准备/共享电感矩阵连接.json",
+      "BMS模块/原理图准备/风扇元件连接.json"
+    ],
+    "not_modified": [
+      "BMS模块/原理图准备/功率元件连接.json：由其他代理负责",
+      "BMS/BOM、映射文件、原生工程：本记录不操作"
+    ],
+    "backup": {
+      "archive": "BMS模块/归档/历史与调试.zip",
+      "folder": "大规模精简前备份_20261013_01/原理图准备/",
+      "readback": "修改前六份JSON已先归档；归档内SHA256清单已读回核对。",
+      "original_sha256": {
+        "AFE元件连接.json": "d0608be008953dbbd6adbaa38a3994502e21c4976f4b01739e1ce2a9e8ad9b1c",
+        "接口元件连接.json": "a9143c92f6ff2c9f2a88bd6f69e1f4154ff6fb7167146cdf5ee67c2b4b5197e5",
+        "共享电感功率级连接.json": "a599a5f4563accce63ffa0df4ba05f274f485a50098568ee30cd3d0c5f6bb28f",
+        "共享电感控制保护连接.json": "51b7dc52eba96c6d6626134a4bb9d7f9c274dc1c468bb2eeaf056e96a8d33767",
+        "共享电感矩阵连接.json": "a833cdbb93606b16d5c664d445c07a572167466a101178e1e4d63ae740da49fc",
+        "风扇元件连接.json": "e1408b0a198437e09d193b98ab6f1bafca4689e5b1dca3998ba9e534bd27e3df"
+      }
+    },
+    "comparison_basis": "以归档源为修改前基线，仅统计六份JSON的四个同值替换族。接口JSON随后由主代理并行实施CA-IS2062A集成CAN等架构变更；报告中的接口被动件计数仅按当前仍存在且匹配目标料号的位号计算，不把CAN架构改动计为本轮精简。"
+  },
+  "summary": {
+    "currently_present_replacement_refs": 49,
+    "target_mpn_types_already_present_in_baseline": true,
+    "unique_mpn_types_removed_from_six_file_baseline": 5,
+    "nominal_resistance_or_capacitance_changed": false,
+    "pin_net_ref_mapping_changed_by_passive_substitution": false,
+    "precision_or_voltage_rating_effect": "替换的电阻精度/TCR提高；1uF耐压从16V升为25V；1nF保持50V并由X7R改为C0G，额定容量未变。",
+    "test_status": "未运行测试；未操作EDA/BOM/映射。"
+  },
+  "completed_substitutions": [
+    {
+      "family": "100kΩ 0603",
+      "old_mpn": "Yageo RC0603FR-07100KL",
+      "new_mpn": "Yageo RT0603BRD07100KL",
+      "refs": [
+        "R_RUN_PD", "R_PRE_CTRL_PD", "R_BMS_LOCAL_OK_PD", "R_PRE_REQ_PD", "R_LOAD_POWER_VALID_BE",
+        "R_BAL_M01_P_GS", "R_BAL_M01_N_GS", "R_BAL_M02_P_GS", "R_BAL_M02_N_GS",
+        "R_BAL_M03_P_GS", "R_BAL_M03_N_GS", "R_BAL_M04_P_GS", "R_BAL_M04_N_GS",
+        "R_BAL_M05_P_GS", "R_BAL_M05_N_GS", "R_BAL_M06_P_GS", "R_BAL_M06_N_GS",
+        "R_BAL_M07_P_GS", "R_BAL_M07_N_GS", "R_BAL_M08_P_GS", "R_BAL_M08_N_GS",
+        "R_BAL_M09_P_GS", "R_BAL_M09_N_GS", "R_FAN_OPTO_COL", "R_FAN_STOP_PD"
+      ],
+      "ref_count": 25,
+      "baseline_target_ref_count": 35,
+      "unique_old_mpn_types_removed": 1,
+      "spec_comparison": {
+        "old": "100kΩ ±1%, 0603, 0.1W, 75V, TCR ±100ppm/°C",
+        "new": "100kΩ ±0.1%, 0603, 0.1W, 75V, TCR ±25ppm/°C",
+        "circuit_effect": "阻值、封装、额定功率與工作电压相同；容差和温漂更小。"
+      },
+      "official_sources": [
+        "https://yageogroup.com/component-documentation/download/specsheet/RC0603FR-07100KL",
+        "https://www.yageogroup.com/component-documentation/download/specsheet/RT0603BRD07100KL"
+      ]
+    },
+    {
+      "family": "10kΩ 0603",
+      "old_mpn": "Yageo RC0603FR-0710KL",
+      "new_mpn": "Yageo RT0603BRD0710KL",
+      "refs": [
+        "R_SCL_PU", "R_SDA_PU", "R_ALERT_PU",
+        "R_PGOOD_PU", "R_CAN_TXD_PU", "R_NTC_CELL5_PU", "R_NTC_CELL6_PU",
+        "R_NTC_CELL7_PU", "R_NTC_CELL8_PU", "R_NTC_CELL9_PU", "R_NTC_BOARD_PU",
+        "R_NTC_CORE_PU", "R_LOAD_POWER_VALID_BASE", "R_FAN_EN_PD", "R_FAN_BLEED"
+      ],
+      "ref_count": 15,
+      "baseline_target_ref_count": 12,
+      "unique_old_mpn_types_removed": 1,
+      "spec_comparison": {
+        "old": "10kΩ ±1%, 0603, 0.1W, 75V, TCR ±100ppm/°C",
+        "new": "10kΩ ±0.1%, 0603, 0.1W, 75V, TCR ±25ppm/°C",
+        "circuit_effect": "阻值、封装、额定功率和工作电压相同；包括NTC分压及逻辑上拉在内，名义电路值不变，误差收紧。"
+      },
+      "official_sources": [
+        "https://yageogroup.com/component-documentation/download/specsheet/RC0603FR-0710KL",
+        "https://yageogroup.com/component-documentation/download/specsheet/RT0603BRD0710KL"
+      ]
+    },
+    {
+      "family": "1µF 0603 X7R",
+      "old_mpns_by_ref": {
+        "C_REG1": "Murata GRM188R71C105KA12D",
+        "C_CAN_VCC2_2": "Murata GRM188R71C105KA12D",
+        "C_PSU_VCC": "TDK C1608X7R1C105K080AC",
+        "C_FAN_VCC": "TDK C1608X7R1C105K080AC"
+      },
+      "new_mpn": "Murata GRM188R71E105KA12D",
+      "refs": ["C_REG1", "C_PSU_VCC", "C_CAN_VCC2_2", "C_FAN_VCC"],
+      "ref_count": 4,
+      "baseline_target_ref_count": 4,
+      "unique_old_mpn_types_removed": 2,
+      "spec_comparison": {
+        "old": "1µF ±10%, X7R, 0603, 16V（Murata和TDK两种料号）",
+        "new": "1µF ±10%, X7R, 0603, 25V",
+        "circuit_effect": "容量、容差、介质和封装不变；耐压提高。C_DELAY位于未修改的功率元件连接.json，由其他代理处理，不计入本组四个引用。"
+      },
+      "official_sources": [
+        "https://www.murata.com/products/productdetail?partno=GRM188R71E105KA12%23",
+        "https://ds.murata.com/simsurfing/mlcc.html?oripartnumbers=%5B%22GRM188R71C105KA12D%22%5D&partnumbers=%5B%22GRM188R71C105KA12%22%5D&rgear=zzo&rgearinfo=eu-en",
+        "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC"
+      ]
+    },
+    {
+      "family": "1nF 0603 50V",
+      "old_mpn": "Murata GRM188R71H102KA01D",
+      "new_mpn": "Murata GRM1885C1H102JA01D",
+      "refs": ["C_BQ_TS1_FILT", "C_BQ_HDQ_FILT", "C_BQ_DCHG_FILT", "C_BQ_DDSG_FILT", "C_BQ_TS3_FILT"],
+      "ref_count": 5,
+      "baseline_target_ref_count": 3,
+      "unique_old_mpn_types_removed": 1,
+      "spec_comparison": {
+        "old": "1nF ±10%, X7R, 0603, 50V",
+        "new": "1nF ±5%, C0G/NP0, 0603, 50V",
+        "circuit_effect": "电容量、封装和耐压相同；容差收紧，介质稳定性提高，不改变名义滤波容量。"
+      },
+      "official_sources": [
+        "https://www.murata.com/products/productdetail?partno=GRM188R71H102KA01%23",
+        "https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/static-model/component-list-s-mlcc-2506.ashx?cvid=20250805040438000000&la=ko-kr",
+        "https://search.murata.co.jp/Ceramy/image/img/A01X/G101/ENG/GRM1885C1H102JA01-01.pdf"
+      ]
+    }
+  ],
+  "metadata_repairs_without_type_savings": [
+    {
+      "ref": "R_BAL_AUX_GATE_LOAD",
+      "old_mpn": null,
+      "new_mpn": "RC2512FK-071K1L",
+      "reason": "原JSON的libraryKey指向该精确料号但mpn为空；补齐料号元数据。"
+    },
+    {
+      "ref": "R_BAL_AUX_FLOAT_LOAD",
+      "old_mpn": null,
+      "new_mpn": "RC2512FK-07620RL",
+      "reason": "原JSON的libraryKey指向该精确料号但mpn为空；补齐料号元数据。"
+    }
+  ],
+  "deferred_candidates": [
+    {
+      "family": "4.7µF 0805 25V",
+      "current_ref": "C_BAL_BIAS1",
+      "current_mpn": "Murata GRM21BR61E475KA12L",
+      "candidate_mpn_already_in_design": "Samsung CL21B475KAB6PNE",
+      "verified_specs": "Murata现用件为4.7µF ±10%, X5R, 25V, 0805；Samsung候选为4.7µF ±10%, X7R, 25V, 0805。",
+      "decision": "暂不替换。C_BAL_BIAS1工作在12V浮地BIAS；尚未取得两料号可比较的官方12V直流偏压有效电容量数据，也未核对隔离模块允许容性负载和启动行为。",
+      "source_metadata_correction": "C_BAL_BIAS1的MPN未改；其value/note已更正为X5R，以符合Murata官方料表。",
+      "official_sources": [
+        "https://www.murata.com/-/media/webrenewal/tool/library/common-pdf/dynamic-model/component-list-d-mlcc-2504.ashx?cvid=20250523010405000000&la=en",
+        "https://product.samsungsem.com/mlcc/CL21B475KAB6PN.do"
+      ]
+    },
+    {
+      "family": "4.7µF高压输入电容",
+      "refs": ["C_PSU_IN1", "C_PSU_IN3", "C_FAN_IN1", "C_FAN_IN2"],
+      "decision": "不并入4.7µF/0805/25V料号；这些位号使用100V/1210等级，不能降额替代。"
+    }
+  ],
+  "unchanged_decisions": [
+    {
+      "ref": "R_FAN_PERMIT",
+      "mpn": "RC0603FR-07160RL",
+      "value": "160Ω ±1%, 0603",
+      "decision": "按主代理最新指令保留，不换成750Ω。"
+    }
+  ],
+  "verification_notes": [
+    "归档基线与当前六份源JSON按位号对照；上述49个仍存在的替换位号，其pin/net/ref映射保留。接口文件并行改为集成隔离CAN后，不把随架构变更发生的位号/引脚差异算作被动件替换。",
+    "100kΩ目标料号在基线已有35个用例，10kΩ目标料号已有12个用例，1µF/25V目标已有4个用例，1nF C0G目标已有3个用例，因此四组均是向现有料号归并，而非新引入目标料号。",
+    "R_PRE_READY_PD出现在接口归档基线但不在当前接口快照中；未计入当前49个存留位号或本轮归并数量。",
+    "尚未同步BOM、器件映射或原生工程；未运行测试，也不代表电气/实物验收。"
+  ]
+}

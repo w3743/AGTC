@@ -1,0 +1,522 @@
+{
+  "env_seed": 80003,
+  "episode_seed": 82001,
+  "repeat_reset_seed": 82001,
+  "reward_profile": "protect_plants",
+  "task_config": {
+    "size": 100.0,
+    "cell": 0.5,
+    "plants": 16,
+    "dry_fraction": 0.25,
+    "leaves_per_plant": 8,
+    "layout": "rows",
+    "row_spacing": 0.8,
+    "plant_spacing": 0.3,
+    "plant_height": 1.0,
+    "plant_height_spread": 0.05,
+    "stem_radius": 0.012,
+    "robot_length": 0.8,
+    "robot_width": 0.47,
+    "max_speed": 4.166666666666667,
+    "max_turn_rate": 1.5,
+    "acceleration": 1.5,
+    "angular_acceleration": 4.0,
+    "camera_height": 0.4,
+    "pitch_min": -0.4363323129985824,
+    "pitch_max": 1.0471975511965976,
+    "gimbal_yaw_rate": 1.8,
+    "gimbal_pitch_rate": 1.2,
+    "dt": 0.05,
+    "max_time": 20.0,
+    "lidar_model": "X2",
+    "lidar_rays": 400,
+    "lidar_range": 8.0,
+    "lidar_min_range": 0.12,
+    "lidar_relative_error": 0.05,
+    "lidar_period": 0.1,
+    "lidar_latency": 0.03,
+    "depth_height": 160,
+    "depth_width": 88,
+    "depth_min_range": 0.3,
+    "depth_range": 5.0,
+    "depth_period": 0.4,
+    "depth_latency": 0.3,
+    "camera_range": 7.0,
+    "camera_period": 0.2,
+    "camera_latency": 0.12,
+    "max_detections": 16,
+    "position_noise": 0.025,
+    "range_noise": 0.01,
+    "detection_drop": 0.08,
+    "class_error": 0.015,
+    "goal_tolerance": 0.4,
+    "goal_hold": 0.3,
+    "damage_penalty": 20.0,
+    "collision_penalty": 0.1,
+    "time_penalty": 0.01,
+    "progress_weight": 0.15,
+    "stop_on_damage": false,
+    "validate_scene": true,
+    "terrain_enabled": false,
+    "terrain_amplitude": 0.35,
+    "terrain_wavelength_min": 4.0,
+    "terrain_wavelength_max": 10.0,
+    "rock_density": 0.01,
+    "large_rock_fraction": 0.2,
+    "terrain_seed": null,
+    "goal_progress_budget": 5.0,
+    "damage_metric": "stem-contact-v2"
+  },
+  "environment": {
+    "mode": "goto",
+    "initial_task_mode": "goto",
+    "goal_distance": [
+      1.0,
+      3.0
+    ],
+    "goal_angle_rad": 1.0471975511965976,
+    "distance_cost": 0.0,
+    "auto_reset": false
+  },
+  "robot": {
+    "x": 48.2548828125,
+    "y": 21.28045654296875,
+    "z": 0.1599999964237213,
+    "yaw": -2.321727752685547,
+    "v": 0.0,
+    "w": 0.0
+  },
+  "goal": [
+    47.00636820665898,
+    21.44963490081655
+  ],
+  "gimbal": {
+    "yaw": 0.0,
+    "pitch": 0.0
+  },
+  "plant_xy": [
+    [
+      47.19219207763672,
+      31.94500732421875
+    ],
+    [
+      47.19219207763672,
+      32.2450065612793
+    ],
+    [
+      47.19219207763672,
+      32.545005798339844
+    ],
+    [
+      47.19219207763672,
+      32.845008850097656
+    ],
+    [
+      46.392189025878906,
+      31.94500732421875
+    ],
+    [
+      46.392189025878906,
+      32.2450065612793
+    ],
+    [
+      46.392189025878906,
+      32.545005798339844
+    ],
+    [
+      46.392189025878906,
+      32.845008850097656
+    ],
+    [
+      45.59218978881836,
+      31.94500732421875
+    ],
+    [
+      45.59218978881836,
+      32.2450065612793
+    ],
+    [
+      45.59218978881836,
+      32.545005798339844
+    ],
+    [
+      45.59218978881836,
+      32.845008850097656
+    ],
+    [
+      44.79219055175781,
+      31.94500732421875
+    ],
+    [
+      44.79219055175781,
+      32.2450065612793
+    ],
+    [
+      44.79219055175781,
+      32.545005798339844
+    ],
+    [
+      44.79219055175781,
+      32.845008850097656
+    ]
+  ],
+  "drive_config": {
+    "interface": "independent_left_right_track_speed_explicit_v4",
+    "actuator_model": "explicit_IdealPD_velocity_servo",
+    "motor_torque_constant_nm_per_a": 0.035,
+    "current_feedback_source": "equivalent_from_post_limit_explicit_applied_effort; model_not_measured",
+    "max_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.04,
+    "wheel_effort_limit_nm": 2.0,
+    "wheel_effort_limit_basis": "per_proxy_wheel_joint_effort; not measured motor torque",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "b58fc3385035fb40add366320bd57f49d3174698fb8e265b4351bc3d7a52149e",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating."
+  },
+  "observation_config": {
+    "schema": "sensor-minimal-v6",
+    "state_dim": 33,
+    "state_fields": [
+      "mode_0_search_1_goto",
+      "goal_local_x_over_field_size",
+      "goal_local_y_over_field_size",
+      "estimated_x_normalized",
+      "estimated_y_normalized",
+      "heading_sin",
+      "heading_cos",
+      "previous_left_track_speed",
+      "previous_right_track_speed",
+      "previous_gimbal_yaw_rate",
+      "previous_gimbal_pitch_rate",
+      "episode_time_ratio",
+      "lidar_age_ratio",
+      "lidar_new_frame",
+      "lidar_motion_dx_over_lidar_range",
+      "lidar_motion_dy_over_lidar_range",
+      "lidar_heading_delta_over_pi",
+      "lidar_gimbal_yaw_delta_over_pi",
+      "lidar_gimbal_pitch_delta_over_pi",
+      "depth_age_ratio",
+      "depth_new_frame",
+      "depth_motion_dx_over_lidar_range",
+      "depth_motion_dy_over_lidar_range",
+      "depth_heading_delta_over_pi",
+      "depth_gimbal_yaw_delta_over_pi",
+      "depth_gimbal_pitch_delta_over_pi",
+      "camera_age_ratio",
+      "camera_new_frame",
+      "camera_motion_dx_over_lidar_range",
+      "camera_motion_dy_over_lidar_range",
+      "camera_heading_delta_over_pi",
+      "camera_gimbal_yaw_delta_over_pi",
+      "camera_gimbal_pitch_delta_over_pi"
+    ],
+    "observation_shapes": {
+      "lidar": [
+        1,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        8
+      ],
+      "state": [
+        33
+      ],
+      "feedback": [
+        37
+      ]
+    },
+    "lidar_fields": [
+      "normalized_range"
+    ],
+    "lidar_invalid_value": 0.0,
+    "detection_fields": [
+      "cx",
+      "cy",
+      "width",
+      "height",
+      "class_id",
+      "confidence",
+      "range",
+      "range_valid"
+    ],
+    "detection_presence": "positive width and height",
+    "feedback": {
+      "input_schema": "sensor-minimal-v6",
+      "state_dim": 33,
+      "schema": "gimbal-imu-drive-feedback-v2",
+      "dimension": 37,
+      "value_dimension": 21,
+      "value_order": [
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6X / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6Y / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6Z / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6X / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6Y / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6Z / \u03c0\uff08rad/s\uff09",
+        "\u78c1\u573aX\u8ba1\u6570 / 32768",
+        "\u78c1\u573aY\u8ba1\u6570 / 32768",
+        "\u78c1\u573aZ\u8ba1\u6570 / 32768",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570X",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570Y",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570Z",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570W",
+        "\u4e91\u53f0\u504f\u822a\u5173\u8282\u89d2 / \u03c0\uff08rad\uff09",
+        "\u4e91\u53f0\u504f\u822a\u5173\u8282\u901f\u7387 / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0\u4fef\u4ef0\u5173\u8282\u89d2 / \u03c0\uff08rad\uff09",
+        "\u4e91\u53f0\u4fef\u4ef0\u5173\u8282\u901f\u7387 / \u03c0\uff08rad/s\uff09",
+        "\u5de6\u4fa7\u7b49\u6548Iq / 100\uff08A\uff09",
+        "\u5de6\u4fa7\u673a\u68b0\u8f6c\u901f / 10000\uff08rpm\uff09",
+        "\u53f3\u4fa7\u7b49\u6548Iq / 100\uff08A\uff09",
+        "\u53f3\u4fa7\u673a\u68b0\u8f6c\u901f / 10000\uff08rpm\uff09"
+      ],
+      "valid_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "age_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "group_slices": {
+        "accel": {
+          "start": 0,
+          "stop": 3
+        },
+        "gyro": {
+          "start": 3,
+          "stop": 6
+        },
+        "mag": {
+          "start": 6,
+          "stop": 9
+        },
+        "attitude": {
+          "start": 9,
+          "stop": 13
+        },
+        "gimbal_yaw": {
+          "start": 13,
+          "stop": 15
+        },
+        "gimbal_pitch": {
+          "start": 15,
+          "stop": 17
+        },
+        "motor_left": {
+          "start": 17,
+          "stop": 19
+        },
+        "motor_right": {
+          "start": 19,
+          "stop": 21
+        }
+      },
+      "valid_slice": {
+        "start": 21,
+        "stop": 29
+      },
+      "age_slice": {
+        "start": 29,
+        "stop": 37
+      },
+      "labels": [
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6X / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6Y / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u52a0\u901f\u5ea6Z / 9.80665\uff08g\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6X / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6Y / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0IMU\u89d2\u901f\u5ea6Z / \u03c0\uff08rad/s\uff09",
+        "\u78c1\u573aX\u8ba1\u6570 / 32768",
+        "\u78c1\u573aY\u8ba1\u6570 / 32768",
+        "\u78c1\u573aZ\u8ba1\u6570 / 32768",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570X",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570Y",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570Z",
+        "\u4e91\u53f0IMU\u59ff\u6001\u56db\u5143\u6570W",
+        "\u4e91\u53f0\u504f\u822a\u5173\u8282\u89d2 / \u03c0\uff08rad\uff09",
+        "\u4e91\u53f0\u504f\u822a\u5173\u8282\u901f\u7387 / \u03c0\uff08rad/s\uff09",
+        "\u4e91\u53f0\u4fef\u4ef0\u5173\u8282\u89d2 / \u03c0\uff08rad\uff09",
+        "\u4e91\u53f0\u4fef\u4ef0\u5173\u8282\u901f\u7387 / \u03c0\uff08rad/s\uff09",
+        "\u5de6\u4fa7\u7b49\u6548Iq / 100\uff08A\uff09",
+        "\u5de6\u4fa7\u673a\u68b0\u8f6c\u901f / 10000\uff08rpm\uff09",
+        "\u53f3\u4fa7\u7b49\u6548Iq / 100\uff08A\uff09",
+        "\u53f3\u4fa7\u673a\u68b0\u8f6c\u901f / 10000\uff08rpm\uff09",
+        "\u6709\u6548\u6807\u8bb0\uff1aaccel",
+        "\u6709\u6548\u6807\u8bb0\uff1agyro",
+        "\u6709\u6548\u6807\u8bb0\uff1amag",
+        "\u6709\u6548\u6807\u8bb0\uff1aattitude",
+        "\u6709\u6548\u6807\u8bb0\uff1agimbal_yaw",
+        "\u6709\u6548\u6807\u8bb0\uff1agimbal_pitch",
+        "\u6709\u6548\u6807\u8bb0\uff1amotor_left",
+        "\u6709\u6548\u6807\u8bb0\uff1amotor_right",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1aaccel",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1agyro",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1amag",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1aattitude",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1agimbal_yaw",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1agimbal_pitch",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1amotor_left",
+        "\u6570\u636e\u5e74\u9f84 / 2\u79d2\uff1amotor_right"
+      ],
+      "simulation_assumptions": {
+        "name": "simulated-gimbal-imu-drive-feedback-v1",
+        "dt_s": 0.05,
+        "filter_rate_hz": 20.0,
+        "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+        "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+        "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+        "magnetic_reference": "ENU with magnetic north along +Y",
+        "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+        "sensor_mount_rot_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+        "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+        "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+        "accel_white_noise_std_mps2": 0.025,
+        "accel_episode_bias_std_mps2": 0.05,
+        "gyro_white_noise_std_rad_s": 0.0015,
+        "gyro_episode_bias_std_rad_s": 0.003,
+        "mag_white_noise_std_counts": 12.0,
+        "mag_episode_bias_std_counts": 24.0,
+        "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+        "gimbal_position_white_noise_std_rad": 0.0005,
+        "gimbal_rate_white_noise_std_rad_s": 0.003,
+        "motor_iq_white_noise_std_A": 0.02,
+        "motor_rpm_white_noise_std_rpm": 1.0,
+        "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+        "timeout_s": 0.25,
+        "age_max_s": 2.0,
+        "value_scaling": {
+          "accel": {
+            "factor": 0.10197162129779283,
+            "unit": "g (m/s^2 divided by 9.80665)"
+          },
+          "gyro": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s divided by pi"
+          },
+          "mag_counts": {
+            "factor": 3.0517578125e-05,
+            "unit": "raw signed counts / 32768"
+          },
+          "attitude_quaternion": {
+            "factor": 1.0,
+            "unit": "unitless xyzw"
+          },
+          "gimbal_position": {
+            "factor": 0.3183098861837907,
+            "unit": "rad / pi"
+          },
+          "gimbal_rate": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s / pi"
+          },
+          "motor_iq": {
+            "factor": 0.01,
+            "unit": "A / 100; simulation value is model-equivalent"
+          },
+          "motor_rpm": {
+            "factor": 0.0001,
+            "unit": "mechanical rpm / 10000"
+          },
+          "age": {
+            "factor": 0.5,
+            "unit": "s / age_max_s; bounded, not signal-clipped"
+          }
+        }
+      },
+      "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+    },
+    "feedback_dim": 37,
+    "estimated_pose": {
+      "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+      "position_noise_std_m": 0.025,
+      "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+      "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+      "gimbal_source": "feedback measured joint positions; zero when invalid"
+    },
+    "imu_mount_body": "gimbal_pitch_link",
+    "imu_offset_pos_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "imu_offset_rot_xyzw": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "depth_channels": 1,
+    "depth_invalid_value": 0.0,
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "measured_velocity_indices": [],
+    "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+    "previous_command_indices": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+    "action_components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ]
+  },
+  "action_config": {
+    "schema": "direct-track-speed-v1",
+    "components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ],
+    "normalized_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "checkpoint": "/mnt/e/Pioneer/\u5148\u8fdb\u901a\u7528\u5c65\u5e26\u5e95\u76d8\u5de5\u7a0b/\u7b97\u6cd5/\u4eff\u771f\u8bad\u7ec3\u73af\u5883/results/isaac_field_viewer/minimal_inputs_20261020/untrained_minimal_preview.zip"
+}

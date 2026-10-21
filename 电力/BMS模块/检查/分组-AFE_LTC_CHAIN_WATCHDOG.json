@@ -1,0 +1,261 @@
+[
+  {
+    "ref": "D_CASCADE_CS",
+    "mpn": "Diodes Inc. RS07J-M",
+    "pins": {
+      "1": "LTC1_CSBO",
+      "2": "LTC_TOP_CSBI"
+    },
+    "note": "ADI LTC3300-1 Fig.13 serial cascade protection: HV diode cathode at lower high-side output, anode at upper low-side input; confirm footprint pin-1 cathode in selected library.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "a4a5071e96464e3cb64a8e44e5c0c90e",
+    "libType": "3",
+    "libraryNote": "Pin-compatible diode-symbol proxy from BAT46W; source MPN retained; verify cathode/anode; PCB footprint not assigned.",
+    "value": "RS07J-M",
+    "x": 300,
+    "y": 150
+  },
+  {
+    "ref": "D_CASCADE_SCK",
+    "mpn": "Diodes Inc. RS07J-M",
+    "pins": {
+      "1": "LTC1_SCKO",
+      "2": "LTC_TOP_SCKI"
+    },
+    "note": "ADI LTC3300-1 Fig.13 serial cascade protection: HV diode cathode at lower high-side output, anode at upper low-side input; confirm footprint pin-1 cathode in selected library.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "a4a5071e96464e3cb64a8e44e5c0c90e",
+    "libType": "3",
+    "libraryNote": "Pin-compatible diode-symbol proxy from BAT46W; source MPN retained; verify cathode/anode; PCB footprint not assigned.",
+    "value": "RS07J-M",
+    "x": 950,
+    "y": 150
+  },
+  {
+    "ref": "D_CASCADE_SDI",
+    "mpn": "Diodes Inc. RS07J-M",
+    "pins": {
+      "1": "LTC1_SDOI",
+      "2": "LTC_TOP_SDI"
+    },
+    "note": "ADI LTC3300-1 Fig.13 serial cascade protection: HV diode cathode at lower high-side output, anode at upper low-side input; confirm footprint pin-1 cathode in selected library.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "a4a5071e96464e3cb64a8e44e5c0c90e",
+    "libType": "3",
+    "libraryNote": "Pin-compatible diode-symbol proxy from BAT46W; source MPN retained; verify cathode/anode; PCB footprint not assigned.",
+    "value": "RS07J-M",
+    "x": 1600,
+    "y": 150
+  },
+  {
+    "ref": "Q_WDT1",
+    "mpn": "onsemi BSS84LT1G",
+    "pins": {
+      "1": "WDT_GATE1",
+      "2": "LTC_VREG",
+      "3": "LTC1_WDT"
+    },
+    "note": "SOT-23 physical pins 1=G,2=S,3=D; P-MOS source=local VREG, drain=WDT. Gate low turns on and forces WDT high for immediate pause; opto raises gate to release. Verify POR/falling-VREG default behavior on both stacks.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "99def8e1dfff4ca78566d30eacbcd0ad",
+    "libType": "3",
+    "libraryNote": "BSS84 P-MOS symbol; source pin map retained; PCB footprint not assigned.",
+    "value": "BSS84",
+    "x": 2250,
+    "y": 150
+  },
+  {
+    "ref": "R_WDT_PD1",
+    "mpn": "Yageo RC0603FR-07100KL",
+    "pins": {
+      "1": "WDT_GATE1",
+      "2": "B0"
+    },
+    "note": "100kΩ gate-to-local-V− default-on pull-down; WDT remains clamped when MCU/LED power is absent.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "100kΩ 1% 0.1W",
+    "x": 300,
+    "y": 450
+  },
+  {
+    "ref": "U_WDT_OPTO1",
+    "mpn": "Vishay VO617A-2X007T",
+    "pins": {
+      "1": "WDT_LED_A1",
+      "2": "WDT_LED_SINK",
+      "3": "WDT_GATE1",
+      "4": "LTC_VREG"
+    },
+    "note": "LED pins1=A,2=K; transistor pin4=C to local VREG and pin3=E to PMOS gate. Min CTR 63% guaranteed at IF=5mA,VCE=5V at 25°C; temperature/low-VCE confirmation gate.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "0e814d0d76d34c00ba4d456a325520a1",
+    "libType": "3",
+    "libraryNote": "Pin-compatible VO617A optocoupler symbol; library variant differs by suffix; source MPN retained; verify CTR grade; PCB footprint not assigned.",
+    "value": "VO617A-2X007",
+    "x": 950,
+    "y": 450
+  },
+  {
+    "ref": "R_WDT_LED1",
+    "mpn": "Yageo RC0603FR-07510RL",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "WDT_LED_A1"
+    },
+    "note": "510Ω; with 4.75V rail, VF≤1.65V, NPN VCE≤0.4V gives ≥5mA LED drive for CTR bin guarantee.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "510Ω 1% 0.1W",
+    "x": 1600,
+    "y": 450
+  },
+  {
+    "ref": "Q_WDT2",
+    "mpn": "onsemi BSS84LT1G",
+    "pins": {
+      "1": "WDT_GATE2",
+      "2": "LTC_TOP_VREG",
+      "3": "LTC2_WDT"
+    },
+    "note": "SOT-23 physical pins 1=G,2=S,3=D; P-MOS source=local VREG, drain=WDT. Gate low turns on and forces WDT high for immediate pause; opto raises gate to release. Verify POR/falling-VREG default behavior on both stacks.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "99def8e1dfff4ca78566d30eacbcd0ad",
+    "libType": "3",
+    "libraryNote": "BSS84 P-MOS symbol; source pin map retained; PCB footprint not assigned.",
+    "value": "BSS84",
+    "x": 2250,
+    "y": 450
+  },
+  {
+    "ref": "R_WDT_PD2",
+    "mpn": "Yageo RC0603FR-07100KL",
+    "pins": {
+      "1": "WDT_GATE2",
+      "2": "B6"
+    },
+    "note": "100kΩ gate-to-local-V− default-on pull-down; WDT remains clamped when MCU/LED power is absent.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "100kΩ 1% 0.1W",
+    "x": 300,
+    "y": 750
+  },
+  {
+    "ref": "U_WDT_OPTO2",
+    "mpn": "Vishay VO617A-2X007T",
+    "pins": {
+      "1": "WDT_LED_A2",
+      "2": "WDT_LED_SINK",
+      "3": "WDT_GATE2",
+      "4": "LTC_TOP_VREG"
+    },
+    "note": "LED pins1=A,2=K; transistor pin4=C to local VREG and pin3=E to PMOS gate. Min CTR 63% guaranteed at IF=5mA,VCE=5V at 25°C; temperature/low-VCE confirmation gate.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "0e814d0d76d34c00ba4d456a325520a1",
+    "libType": "3",
+    "libraryNote": "Pin-compatible VO617A optocoupler symbol; library variant differs by suffix; source MPN retained; verify CTR grade; PCB footprint not assigned.",
+    "value": "VO617A-2X007",
+    "x": 950,
+    "y": 750
+  },
+  {
+    "ref": "R_WDT_LED2",
+    "mpn": "Yageo RC0603FR-07510RL",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "WDT_LED_A2"
+    },
+    "note": "510Ω; with 4.75V rail, VF≤1.65V, NPN VCE≤0.4V gives ≥5mA LED drive for CTR bin guarantee.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "510Ω 1% 0.1W",
+    "x": 1600,
+    "y": 750
+  },
+  {
+    "ref": "Q_BAL_RUN",
+    "mpn": "onsemi MMBT3904LT1G",
+    "pins": {
+      "1": "BAL_RUN_BASE",
+      "2": "B0",
+      "3": "WDT_LED_SINK"
+    },
+    "note": "SOT-23 pin1=B,2=E,3=C. Common low-side sink for two WDT opto LEDs. BAL_RUN high releases both clamps; low/reset immediately pauses both.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "564cadce804e4fdcb009ae93bf75eeb3",
+    "libType": "3",
+    "libraryNote": "MMBT3904 NPN symbol; source pin map retained; PCB footprint not assigned.",
+    "value": "MMBT3904",
+    "x": 2250,
+    "y": 750
+  },
+  {
+    "ref": "R_BAL_RUN_BASE",
+    "mpn": "Yageo RC0603FR-0710KL",
+    "pins": {
+      "1": "BAL_RUN",
+      "2": "BAL_RUN_BASE"
+    },
+    "note": "10kΩ base resistor from interface PA8/BAL_RUN; interface manifest owns the sole 100kΩ external BAL_RUN-to-B0 pull-down.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "10kΩ 1% 0.1W",
+    "x": 300,
+    "y": 1050
+  },
+  {
+    "ref": "R_BAL_RUN_BPD",
+    "mpn": "Yageo RC0603FR-07100KL",
+    "pins": {
+      "1": "BAL_RUN_BASE",
+      "2": "B0"
+    },
+    "note": "100kΩ NPN base-emitter pull-down for unpowered/high-impedance default.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_LTC_CHAIN_WATCHDOG",
+    "addIntoPcb": false,
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol; source MPN and electrical pins retained; PCB footprint intentionally not assigned.",
+    "value": "100kΩ 1% 0.1W",
+    "x": 950,
+    "y": 1050
+  }
+]

@@ -1,0 +1,218 @@
+{
+  "title": "BMS风扇调速支持审查",
+  "date": "2026-10-15",
+  "status": "现行设计仅温控启停；温控调速的最小四线PWM改动已给出纸面候选，尚未落图或实测验收",
+  "scope": [
+    "只读核对现行风扇连接JSON、设计说明、候选资料与官方网表",
+    "以SG Micro和风扇原厂资料评估当前EN开关、两线供电PWM及独立PWM输入风扇方案；项目已明确要求温度自动调速",
+    "未修改正式EDA、BOM、固件或共用器件库；未做实物或半导体仿真"
+  ],
+  "current_design": {
+    "connection_source": "原理图准备/风扇元件连接.json",
+    "netlist_source": "检查/当前BMS9S4P官方网表.enet",
+    "switch": {
+      "ref": "U_FAN_SW",
+      "mpn": "SGM2593XN6G/TR",
+      "type": "5V高侧限流电源开关",
+      "input_net": "VOUT_5V",
+      "output_net": "FAN_5V",
+      "enable_pin_net": "FAN_RUN",
+      "enable_control": "PA15高有效；100kΩ下拉提供默认关闭",
+      "fault_pin": "nFAULT未接",
+      "set_limit_resistor": "6.8kΩ",
+      "output_capacitors": "47uF X5R与100nF旁路；COUT总量高于数据手册10uF最低要求"
+    },
+    "fan_connector": {
+      "ref": "J_FAN",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "positions": 2,
+      "pin_map": {
+        "1": "FAN_5V",
+        "2": "B0"
+      },
+      "tach_or_pwm_contact": false
+    },
+    "fan_candidate": {
+      "mpn": "SUNON MF40100V2-10000-A99",
+      "supply_wires": 2,
+      "rated_voltage": "5VDC",
+      "operating_voltage": "3.5–6V",
+      "rated_current": "94mA; maximum 109mA",
+      "operating_temperature": "−10 to +70°C",
+      "speed_control": "原厂明确禁止用电源或地PWM控制转速；需要调速时应联系SUNON定制"
+    },
+    "temperature_logic_candidate": {
+      "source": "原理图准备/AFE与主动均衡设计.md",
+      "fan_on": "任一电芯代表温区≥35°C，或板温/MOS温度≥45°C",
+      "fan_off": "所有电芯代表温区≤30°C，且板温/MOS温度≤40°C",
+      "interpretation": "这是温控开关迟滞候选，只决定FAN_RUN开/关，不代表多个转速档或连续调速；阈值与温控闭环仍需配置、固件与实物验收"
+    },
+    "capability_conclusion": "当前接口和器件只支持风扇电源全开/全关。温度分段可以选择开/关状态，不能据此称为转速分档；满足温控调速需求至少要换四线PWM风扇、增加PWM线与独立PWM控制。",
+    "mcu_pin_assessment": {
+      "core_board": "WeAct Normal STM32G431CBU6（外置核心板）",
+      "current_assignment": "PA15/J_CORE_P1-15=FAN_RUN",
+      "free_header_positions": ["J_CORE_P1-5..14", "J_CORE_P1-16..18"],
+      "result": "当前接口连接表把上述位置列为NC，可作为后续候选引脚；本轮未找到把这些核心板排针位置映射到具体MCU GPIO/TIMx_CHy的原理图/管脚表，故没有确认可用定时器引脚或分配PWM脚。"
+    }
+  },
+  "manufacturer_evidence": [
+    {
+      "manufacturer": "SG Micro",
+      "document": "SGM2593/SGM2593D datasheet, Jan 2026",
+      "url": "https://www.sg-micro.com/rect/assets/4c0699d6-d8dc-4bdd-bbb6-45bdec34c0f8/SGM2593_SGM2593D.pdf",
+      "facts": [
+        "器件描述为Power Distribution Switch；EN为高有效，内部1.2MΩ下拉。",
+        "具有软启动，用于应对大电容负载上电浪涌。",
+        "推荐COUT≥10uF，典型应用图采用10uF；现行设计在开关输出侧使用47uF。",
+        "tON典型1.1ms、tR典型1.3ms仅在RL=100Ω、COUT=0.1uF条件给出；不是最大/最小保证，且与实际47uF输出条件不同。",
+        "数据手册未给出用EN调速的PWM频率、占空比到转速关系或连续调制保证。"
+      ],
+      "design_implication": "不能从开关EN、软启动或小电容典型时序推出现有板可按频率/占空比稳定调速；47uF还会改变开关输出波形。SGM2593仍可保留为风扇电源支路的固定使能、限流/短路降额和关断器件，不用作速度PWM。"
+    },
+    {
+      "manufacturer": "SUNON",
+      "document": "MF40100V2-10000-A99 approval specification",
+      "url": "https://www.sunon.com/en/PROSEARCH_FILES/D04113370G-01.pdf",
+      "facts": [
+        "第11页明确禁止使用电源PWM或地PWM调速；需要调速应联系SUNON定制。",
+        "第3页列5V额定、3.5–6V工作、94mA额定/109mA最大电流、−10至+70°C。"
+      ],
+      "design_implication": "不得通过周期性切换SGM2593的EN来对该两线风扇做转速控制。"
+    },
+    {
+      "manufacturer": "Delta Electronics",
+      "document": "KSB0405HBF0D specification and product page",
+      "url": "https://www.delta-fan.com/Download/Spec/KSB0405HBF0D.pdf",
+      "product_url": "https://www.delta-fan.com/products/ksb0405hbf0d.html",
+      "facts": [
+        "官方资料列出5V、3.0–5.5V工作、0.16A典型/0.30A安全标签电流、4根线，定义pin1黑色地、pin2红色正电源、pin3黄色FG、pin4蓝色PWM。",
+        "规格书建议PWM控制频率25kHz；100%占空比最大转速、0%停止；控制线断开时最大转速；从停转启动要求占空比大于40%。",
+        "官方页面标1.19CFM、31dBA；本审查不以外形尺寸作为筛选条件，风量仅用于后续热性能选型验证。"
+      ],
+      "design_implication": "确认市场上存在原厂定义独立PWM输入的5V四线风扇，但该型号仅作为接口可行性示例，不是现有风扇的机械/散热等效替换。"
+    },
+    {
+      "manufacturer": "Delta Electronics",
+      "document": "ASB0305HP-00 specification and product page",
+      "url": "https://www.delta-fan.com/Download/Spec/ASB0305HP-00.pdf",
+      "product_url": "https://www.delta-fan.com/technology/pulse-width-modulation-pwm/asb0305hp-00.html",
+      "facts": [
+        "原厂产品页列5V、四线、PWM控制与转速传感器、5.10CFM；规格书列0.20A平均电流、标签最大0.50A，并特别说明最大耗流不代表峰值，峰值要用示波器测量。",
+        "该型号规格书可核实FG为开漏输出、外部需加上拉；公开文本未给出该型号PWM输入门限、控制频率和最小起转占空比，不能把Delta通用PWM范围冒充成该型号的保证。"
+      ],
+      "design_implication": "作为更高风量的四线候选可继续评估，但需在选型冻结前用型号专属PWM参数或首板/风扇台架验证输入兼容性和启动电流；0.50A最大平均电流已接近现有SGM2593低压折返下沿，峰值仍未知。"
+    },
+    {
+      "manufacturer": "Delta Electronics",
+      "document": "PWM fan application notes",
+      "url": "https://www.delta-fan.com/resources/application-notes.html",
+      "facts": [
+        "Delta通用PWM资料给出高电平2.8–20V、低电平0–0.4V、输入电流40µA–20mA、控制输入可接受30Hz–30kHz。",
+        "该资料是系列通用应用说明，不替代具体风扇型号的数据表；建议的25kHz须由最终型号确认或实测。"
+      ],
+      "design_implication": "为AO3400A开漏下拉提供了合理的接口设计窗口；具体PWM线上拉电压、占空比极性和开路默认仍按所选型号核实。"
+    },
+    {
+      "manufacturer": "UMW / UTD Semiconductor",
+      "document": "AO3400A datasheet",
+      "url": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+      "facts": [
+        "AO3400A原厂资料支持低至2.5V栅压驱动；VDS额定30V，VGS绝对最大±12V，VGS=2.5V时RDS(on)最大48mΩ。"
+      ],
+      "design_implication": "单颗N沟道MOS可作为PWM信号开漏下拉，MCU GPIO经串联电阻驱动栅极；需确认选定风扇的PWM线不会超30V以及输入电流不超驱动能力。"
+    },
+    {
+      "manufacturer": "Delta Electronics",
+      "document": "BSB03505HP-00 specification and product page",
+      "url": "https://www.delta-fan.com/Download/Spec/BSB03505HP-00.pdf",
+      "product_url": "https://www.delta-fan.com/products/bsb03505hp-00.html",
+      "facts": [
+        "5V四线PWM/测速鼓风机；规格书给出25kHz、20–100%控制占空比，0.27A典型/0.50A标签最大电流和2.10CFM。"
+      ],
+      "design_implication": "可作为具备型号级PWM频率/工作占空比说明的中间风量候选；该最大耗流也不代表峰值，仍需检查启动电流与具体热需求。"
+    }
+  ],
+  "minimum_change_recommendation": {
+    "recommended_architecture": [
+      "项目要求温度自动调速；现有接口不满足。改用5V四线风扇：FAN_5V与B0继续作电源，增加PWM与FG两个触点。MCU温度控制输出一路定时器PWM；FG可接输入捕获用于转速监测。",
+      "沿用现有AO3400A料号新增一颗作为PWM信号开漏下拉：D接风扇PWM线、S接B0、G接MCU定时器GPIO；栅极串现有1kΩ料号、栅源间用现有100kΩ下拉料号。GPIO高时AO导通并将PWM线拉低，GPIO低时AO关断、PWM线释放，因此固件比较值相对风扇高电平占空比反相。",
+      "最终风扇线需要原厂内部上拉，或根据该型号输入电路另加上拉；不得因通用Delta资料推定所有型号的开路状态、占空比极性或25kHz均相同。KSB0405HBF0D型号明确控制线断开时全速，ASB0305HP-00公开型号资料未明示该项。",
+      "SGM2593留作风扇电源固定使能、支路限流/短路降额与关断；正常调速时FAN_RUN保持有效，不用EN脉冲调速。现有输出47µF和数据手册仅给出受限负载/小C条件的典型切换时间，不构成电机PWM供电保证。",
+      "温控策略沿用现有候选迟滞（电芯代表温区35/30°C、板温/MOS 45/40°C）作风扇启停边界；运行区内设单调递增占空比，最低运行/起转占空比和温度到占空比曲线由所选型号与首板温升、转速响应校准。未凭空给出固定速度档阈值。"
+    ],
+    "sgm2593_branch_decision": {
+      "recommendation": "保留SGM2593，不增加独立熔丝作为第一版方案。",
+      "reason": "风扇支路没有独立熔丝；2A熔丝在SGM2593约1.10A最大设定限流以下没有合适动作窗口。按6.8kΩ限流设定（含电阻公差约0.906–1.10A），短路态约60%折返对应约0.54–0.66A支路限流范围。已选URB4805YMD-10WR3的原厂模块级OCP为2.2–4A，高于该风扇支路限流；它是共用5V源保护，不等同于风扇支路隔离，不能证明短路期间主5V不下陷。保留现有SGM2593可继续提供较低的支路限流与关断；不增加无法在其限流以下动作的2A熔丝。以上为规格/设定值推断，未作短路实测。",
+      "boundary": "不宣称主5V在SGM击穿、风扇堵转或长时间过载时已通过实物证明不下陷；nFAULT当前未接，过流/过温没有MCU故障遥测。"
+    },
+    "fan_candidates": [
+      {
+        "mpn": "Delta KSB0405HBF0D",
+        "use": "电气协议/低电流样机候选",
+        "strength": "型号级资料完整：25kHz建议、0%停止、100%全速、断开控制线全速、从停转起步需>40%；典型0.16A、标签最大0.30A。",
+        "limitation": "原厂风量1.19CFM；仅证明5V四线接口方案可行，未证明足以满足系统热负荷。"
+      },
+      {
+        "mpn": "Delta ASB0305HP-00",
+        "use": "较高风量的样机候选",
+        "strength": "原厂列5V四线PWM/FG与5.10CFM，0.20A平均、0.50A最大耗流。",
+        "limitation": "该数据手册未给出可读的型号级PWM输入细节；最大平均耗流不是峰值，且0.50A接近现有SGM低压折返最小限流约0.544A，启动余量未闭合。"
+      }
+    ],
+    "candidate_reference_only": {
+      "mpn": "Delta KSB0405HBF0D",
+      "reason": "原厂明确给出5V供电、四线接口、专用PWM与FG脚及PWM频率/启动占空比；用于定义接口基线。",
+      "not_a_frozen_fan": "风量1.19CFM，空气负载点和系统温升尚未验收。ASB0305HP-00的5.10CFM是另一个电气参数仍需补验的备选。"
+    }
+  },
+  "acceptance_matrix": [
+    {
+      "item": "当前开关和接头拓扑",
+      "result": "PASS（文档/官方网表核对）",
+      "evidence": "U_FAN_SW的EN为FAN_RUN；J_FAN只有FAN_5V与B0两个触点；无现有PWM或测速线。"
+    },
+    {
+      "item": "当前硬件是否实现温度调速",
+      "result": "FAIL",
+      "evidence": "现有温度逻辑只驱动PA15/FAN_RUN高有效电源开关，没有PWM控制线或调速输入。"
+    },
+    {
+      "item": "对SUNON两线电源做PWM调速",
+      "result": "FAIL（原厂禁止）",
+      "evidence": "SUNON原厂规格第11页禁止电源或地PWM调速。"
+    },
+    {
+      "item": "SGM2593 EN PWM调速支持",
+      "result": "未获规格支持",
+      "evidence": "数据手册没有调速频率/转速传递规格；提供软启动与受限测试条件下的典型切换时序。"
+    },
+    {
+      "item": "四线独立PWM 5V风扇方案存在性",
+      "result": "PASS（候选方案存在；未作整机热验收）",
+      "evidence": "Delta KSB0405HBF0D原厂规格给出PWM/FG独立引线、25kHz建议频率和>40%起转占空比；ASB0305HP-00产品页列5V、四线PWM/FG与5.10CFM。"
+    },
+    {
+      "item": "AO3400A开漏驱动纸面兼容性",
+      "result": "PASS（基于Delta系列通用PWM窗口；不是指定型号验收）",
+      "evidence": "Delta通用PWM资料为低电平0–0.4V、高电平2.8–20V、40µA–20mA、30Hz–30kHz；UMW AO3400A在2.5V栅压RDS(on)最大48mΩ，适合将控制线开漏拉低。最终风扇仍需型号级确认PWM线上拉、电压、占空比和开路默认。"
+    },
+    {
+      "item": "风扇型号、MCU定时器复用和启动/热性能",
+      "result": "OPEN（工程闭合项；无需再向用户确认是否要调速）",
+      "evidence": "J_CORE_P1-5..14、16..18在接口表中为NC，但本轮未确认对应核心板GPIO/TIM通道；ASB型号PWM细节及风扇峰值/低压折返启动未知；气路与热负荷尚未实测。"
+    }
+  ],
+  "minimum_remaining_inputs": [],
+  "open_design_tasks": [
+    "在外置核心板NC排针中核对具体GPIO/TIM通道并分配PWM；当前只确认P1-5..14、16..18在接口表为空闲位置，P1-15已作PA15/FAN_RUN；这是工程实现动作，不是用户是否要调速的待确认项。",
+    "从Delta KSB0405HBF0D（接口参数齐全但1.19CFM）和ASB0305HP-00（5.10CFM但型号级PWM/峰值电流细节不足）候选中，结合台架热需求选定风扇；不以尺寸作为阻断条件，也不预设某个风量已足够。",
+    "首次原型使用型号级推荐PWM频率/电平；验证转速随温度单调、最低起动/稳定占空比、PWM开路默认、FG读数、低压折返期间能否启动、堵转恢复和主5V瞬态。",
+    "未选具体风扇前温度到占空比曲线保持候选：沿用35/30°C电芯与45/40°C板温/MOS迟滞启停，运行区按最低可稳定转速至全速单调增加并以温升/转速实测整定。"
+  ],
+  "out_of_scope": {
+    "URB4805YMD-10WR3_REG1_BREG_supply_margin": "本文件未计算；不影响现有硬件仅启停、必须增加独立PWM输入才能调速的结论。URB模块级2.2–4A OCP也不替代风扇支路SGM限流。",
+    "firmware": "未实现",
+    "formal_eda_bom_or_component_library": "未修改",
+    "hardware_validation": "未做"
+  }
+}

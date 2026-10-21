@@ -1,0 +1,327 @@
+{
+  "status": "passed",
+  "probe": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/front_guide_step_probe_20261020/probe.py",
+  "sampling_contract": {
+    "policy_steps": 200,
+    "physics_dt_s": 0.001,
+    "decimation": 50,
+    "policy_dt_s": 0.05,
+    "fixed_normalized_action_left_right_gimbal_yaw_pitch": [
+      0.05,
+      0.05,
+      0.0,
+      0.0
+    ],
+    "baseline_comparison": false,
+    "checkpoint_loaded": false,
+    "claim_scope": "single fixed-action Newton contact diagnostic, not navigation competence or a continuous-track model"
+  },
+  "task_contract": {
+    "mode": "goto",
+    "plants": 0,
+    "terrain_enabled": false,
+    "terrain_amplitude_m": 0.0,
+    "rock_density_per_m2": 0.0,
+    "start_xy_yaw": [
+      2.0,
+      2.0,
+      0.0
+    ],
+    "goal_xy": [
+      6.0,
+      2.0
+    ],
+    "goal_distance_config": null,
+    "max_time_s": 12.0,
+    "auto_reset": false
+  },
+  "obstacle_contract": {
+    "primitive": "Isaac Lab USD Cuboid via AssetBaseCfg + sim_utils.CuboidCfg",
+    "prim_path": "{ENV_REGEX_NS}/DiagnosticStep",
+    "size_xyz_m": [
+      0.8,
+      2.0,
+      0.06
+    ],
+    "center_xyz_m": [
+      3.0,
+      2.0,
+      0.03
+    ],
+    "front_edge_x_m": 2.6,
+    "collision_material_override": null,
+    "collision_note": "Uses the actual configured Newton default shape material; value is recorded from the imported model."
+  },
+  "source_sha256": {
+    "results/isaac_field_diagnosis/front_guide_step_probe_20261020/probe.py": "cde9ccc6f8299779ee967f6b7c371cfc0e7ab98729d3405ff6c22045628a5576",
+    "isaac_field/env.py": "d651b5a5e3cece973f920252a0885639a103e95be48f34c3ff944e67284d4804",
+    "isaac_field/assets.py": "54430fa7c24f42aceed5eb084a399e9b323de5bc77b0d18f08ce323a1ea8a3ef",
+    "isaac_field/newton_drive.py": "d47082a7727fda7a88f9009ddb9c678b5a7b024eb9d090a359950d6f5bf0a449",
+    "isaac_field/task.py": "ba63a0a75fcb854e2c6292c679fdf113ea4655e9c1184d6767d2af6069dea2a9"
+  },
+  "error": null,
+  "reset_observation_keys": [
+    "policy"
+  ],
+  "reset_info": {},
+  "runtime": {
+    "device": "cuda:0",
+    "physics_dt_s": 0.001,
+    "decimation": 50,
+    "policy_dt_s": 0.05,
+    "max_episode_steps": 240,
+    "body_stability_config": null,
+    "front_guide_spec": {
+      "x_m": 0.42,
+      "z_offset_from_support_m": 0.05,
+      "radius_m": 0.045,
+      "width_m": 0.06,
+      "mass_per_wheel_kg": 0.25
+    },
+    "guide_joint_names": [
+      "left_front_guide_joint",
+      "right_front_guide_joint"
+    ],
+    "guide_body_names": [
+      "left_front_guide_link",
+      "right_front_guide_link"
+    ],
+    "drive_joint_count": 14,
+    "drive_interface": "independent_left_right_track_speed_coupled_pi_v7",
+    "drive_velocity_gain": 0.04,
+    "drive_integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+    "drive_effort_limit_nm": 2.0,
+    "newton_contact_backend": "newton_collision_pipeline",
+    "configured_default_shape_material": {
+      "mu": 0.8,
+      "margin_m": 0.002,
+      "gap_m": 0.005
+    },
+    "physics_contact_metadata": {
+      "backend": "NewtonCfg",
+      "physics_manager": "ResolvableString",
+      "solver_cfg": "MJWarpSolverCfg",
+      "solver_type": "mujoco_warp",
+      "solver": "newton",
+      "physics_dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "newton_num_substeps": 1,
+      "collision_decimation": 0,
+      "cone": "elliptic",
+      "impratio": 1.0,
+      "njmax": 256,
+      "nconmax": 128,
+      "iterations": 40,
+      "ls_iterations": 30,
+      "tolerance": 1e-06,
+      "integrator": "implicitfast",
+      "use_mujoco_contacts": false,
+      "disable_contacts": false,
+      "contact_generation": "newton_collision_pipeline",
+      "shape_cfg_defaults": {
+        "mu": 0.8,
+        "kf": null,
+        "ke": 2500.0,
+        "kd": 100.0,
+        "margin": 0.002,
+        "gap": 0.005,
+        "kf_source": "not_exposed_by_NewtonShapeCfg"
+      },
+      "actual_wheel_ground_shape_materials": {
+        "ground": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "wheel": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "passive_front_guide": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        }
+      },
+      "front_guide_contact_body_names": [
+        "left_front_guide_link",
+        "right_front_guide_link"
+      ]
+    }
+  },
+  "scene_assets": {
+    "diagnostic_step": {
+      "prim_path": "/World/envs/env_[^/]+/DiagnosticStep",
+      "size_xyz_m": [
+        0.8,
+        2.0,
+        0.06
+      ],
+      "initial_center_xyz_m": [
+        3.0,
+        2.0,
+        0.03
+      ],
+      "collidable_schema_configured": true,
+      "static_asset_class_type": "isaaclab.assets.asset:Asset"
+    },
+    "robot_usd_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field/assets/front_guides_e68babf79b8fef15ea0d66b462032ed84b3e135c854f7116b2b73f117bb9e95f/field_robot.usda",
+    "field_usd_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field/assets/8a0d46ed583487be/terrain.usda"
+  },
+  "robot_asset_sha256": "855096a37ecfa5b7e1e92fc8142a7c2363b1e8b9aaead8c675b4d691567eab28",
+  "field_asset_sha256": "a57af01de1c47d3ce71458713e782ac219ae2e6b005cff35752c861c7023e57a",
+  "newton_shape_inventory": {
+    "shape_count": 20,
+    "body_count": 19,
+    "diagnostic_step_shape_ids": [
+      0
+    ],
+    "front_guide_shape_ids": [
+      17,
+      18
+    ],
+    "front_guide_shape_body_names_seen": [
+      "left_front_guide_link",
+      "right_front_guide_link"
+    ],
+    "diagnostic_step_shapes": [
+      {
+        "shape_id": 0,
+        "shape_label": "/World/envs/env_0/DiagnosticStep/geometry/mesh",
+        "shape_type": "BOX",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": -1,
+        "shape_body_label": null,
+        "shape_material_mu": 0.800000011920929
+      }
+    ],
+    "front_guide_shapes": [
+      {
+        "shape_id": 17,
+        "shape_label": "/World/envs/env_0/Robot/base_link/left_front_guide_link/front_guide_collision_visual",
+        "shape_type": "CYLINDER",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": 3,
+        "shape_body_label": "/World/envs/env_0/Robot/base_link/left_front_guide_link",
+        "shape_material_mu": 0.800000011920929
+      },
+      {
+        "shape_id": 18,
+        "shape_label": "/World/envs/env_0/Robot/base_link/right_front_guide_link/front_guide_collision_visual",
+        "shape_type": "CYLINDER",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": 11,
+        "shape_body_label": "/World/envs/env_0/Robot/base_link/right_front_guide_link",
+        "shape_material_mu": 0.800000011920929
+      }
+    ],
+    "step_mu_by_shape_id": {
+      "0": 0.800000011920929
+    },
+    "guide_mu_by_shape_id": {
+      "17": 0.800000011920929,
+      "18": 0.800000011920929
+    },
+    "relevant_shape_inventory": [
+      {
+        "shape_id": 0,
+        "shape_label": "/World/envs/env_0/DiagnosticStep/geometry/mesh",
+        "shape_type": "BOX",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": -1,
+        "shape_body_label": null,
+        "shape_material_mu": 0.800000011920929
+      },
+      {
+        "shape_id": 17,
+        "shape_label": "/World/envs/env_0/Robot/base_link/left_front_guide_link/front_guide_collision_visual",
+        "shape_type": "CYLINDER",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": 3,
+        "shape_body_label": "/World/envs/env_0/Robot/base_link/left_front_guide_link",
+        "shape_material_mu": 0.800000011920929
+      },
+      {
+        "shape_id": 18,
+        "shape_label": "/World/envs/env_0/Robot/base_link/right_front_guide_link/front_guide_collision_visual",
+        "shape_type": "CYLINDER",
+        "shape_flags": 7,
+        "collide_shapes": true,
+        "shape_body_id": 11,
+        "shape_body_label": "/World/envs/env_0/Robot/base_link/right_front_guide_link",
+        "shape_material_mu": 0.800000011920929
+      }
+    ]
+  },
+  "sampling_timing_note": "Per-step pose and velocity are read after env.step at policy time; Newton contact identity is the public contact buffer snapshot after the final physics substep. Their different sampling points are retained and are not combined to infer force direction, sustained support, or cause.",
+  "sampling_result": {
+    "sample_count": 200,
+    "finite_row_count": 200,
+    "terminated_policy_steps": [],
+    "truncated_policy_steps": [],
+    "guide_step_contact_policy_step_snapshots": 187,
+    "guide_any_contact_policy_step_snapshots": 187,
+    "step_any_contact_policy_step_snapshots": 187,
+    "contact_snapshot_semantics": "policy-step snapshots with a pair identity; not continuous contact duration",
+    "checks": {
+      "step_shape_imported_by_newton": true,
+      "step_shape_has_collision_flag": true,
+      "both_front_guide_shapes_imported_by_newton": true,
+      "all_200_rows_finite": true,
+      "guide_step_contact_observed": true
+    }
+  },
+  "finished_utc": "2026-10-20T08:18:08.682819+00:00"
+}

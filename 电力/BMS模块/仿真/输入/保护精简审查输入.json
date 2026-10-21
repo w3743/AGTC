@@ -1,0 +1,80 @@
+{
+  "schema": "bms-protection-reduction-input-v1",
+  "date": "2026-10-15",
+  "scope": "按当前连接源、当前施工输入、检查/BMS-9S4P.enet、当前BOM与共享DEVICE片段检查保护功能差异、两项料号归并和已发布的四线5V风扇直供边界；不使用历史计划或旧网表，不改原理图，不替代实物验收。",
+  "precharge": {
+    "resistor_mpn": "TE Connectivity CJP300J8R2J",
+    "resistor_nominal_ohm": 8.2,
+    "resistor_tolerance_fraction": 0.05,
+    "pack_voltage_v": 37.8,
+    "timer_hard_upper_s": 2.970,
+    "bus_capacitance_f": 0.060,
+    "bus_energy_basis": "E=0.5*C*V^2；与R_PRE硬短路期间耗散能量分开列示。",
+    "upper_bound_method": "忽略Q_PRE两只MOS压降，以R_PRE下限7.79Ω和37.8V计算最大初始电流/功率，功率乘2.970s形成保守上界；不是实际波形/脉冲能力验收。"
+  },
+  "tpl5111": {
+    "mpn": "TI TPL5111DDCR",
+    "rext_mpn": "RS-03K7321FT",
+    "rext_ohm": 7320,
+    "rext_tolerance_fraction": 0.01,
+    "rext_temperature_coefficient_ppm_per_c": 100,
+    "reference_temperature_c": 25,
+    "operating_temperature_min_c": -40,
+    "operating_temperature_max_c": 85,
+    "a": 0.2253,
+    "b": -20.7654,
+    "c": 570.5679,
+    "one_shot_duration_subtract_s": 0.050,
+    "method": "TI式：tIP=(a*(REXT/100)^2+b*(REXT/100)+c)/100；DRVn在one-shot且未收到DONE时约为tIP−50ms。先报标称多项式结果与外部电阻容差/温漂敏感性，不冒充量产最坏时间。"
+  },
+  "logic": {
+    "u_and2_replacement_mpn": "SN74LVC1G11DCKR",
+    "u_and2_library_uuid": "27376aeb8ef24d0493ee69f282c2787f",
+    "u_and2_library_device_uuid": "15fca2ac6d055b14",
+    "u_and2_library_footprint_uuid": "4fd014b71516d4de",
+    "c_tied_high_net": "PRE_CTRL_3V3",
+    "existing_u_gate1_mpn": "TI SN74LVC1G11DCKR",
+    "cap_mpn": "GRM188R72A104KA35J",
+    "cap_library_uuid": "7a51f266b7fa4392acd0ac134ddaeceb",
+    "cap_library_device_uuid": "7cb60a0fa1ea5a16",
+    "cap_library_footprint_uuid": "6cdef4c8a707e09a",
+    "cap_value": "100 nF ±10%, 100 V, X7R, 0603",
+    "cap_refs": ["C_SRP", "C_TIMER", "C_AND2", "C_GATE1", "C_SEQ", "C_POR", "C_CAN_PWR_IN2", "C_CAN_PWR_OUT2"]
+  },
+  "protection_decisions": {
+    "approved_protection_removals": [],
+    "approved_protection_removals_meaning": "本次审计不额外批准删除保护功能；已发布的风扇独立支路限流变化需单独按当前ENET/BOM绑定模型核验，不得记成仍保留。",
+    "and3_replacement_removes_physical_gates": 0,
+    "cap_merge_removes_physical_capacitors": 0,
+    "isets_are_eight_local_filters_and_existing_mpn": true,
+    "main_req_still_depends_on_mcu_precharge_checks": true,
+    "hardware_preok_comparator_present_in_current_sources": false,
+    "pdsG_timeout_nonzero_transitions_to_dsg": true,
+    "pto_is_not_pdsG_timeout": true
+  },
+  "fan": {
+    "mpn": "Delta KSB0405HBF0D",
+    "wire_count": 4,
+    "supply_v": 5.0,
+    "released_topology_delta": [
+      "Remove U_FAN_SW SGM2593XN6G/TR",
+      "Remove R_FAN_ILIM RC0603FR-076K8L",
+      "Remove C_FAN_IN1 GRM32ER61C476KE15L",
+      "Remove C_FAN_OUT1 GRM32ER61C476KE15L",
+      "Connect J_FAN pin 1 directly to VOUT_5V and pin 2 to B0; retain fan PWM and FG control"
+    ],
+    "removed_references": ["U_FAN_SW", "R_FAN_ILIM", "C_FAN_IN1", "C_FAN_OUT1"],
+    "power_net": "VOUT_5V",
+    "return_net": "B0",
+    "branch_current_limit_removed": true,
+    "startup_peak_is_manufacturer_guaranteed": false,
+    "continuous_fault_layout_current_a_min": 4.0,
+    "module_ocp_or_scp_is_peak_current_ceiling": false,
+    "required_before_operation": [
+      "首件实测风扇启动与共享5V短路/恢复行为；模块OCP/SCP不可视为峰值电流钳位、I²t上界或支路隔离。",
+      "布局按风扇正负线、连接器、焊盘、过孔至少4A连续热负荷核算；该值不是峰值或短路上限。",
+      "保留相关通道BQ独立温度保护配置和读回，并按缺FG锁存及人工OFF/ON重新使能策略运行。",
+      "风扇断电时FG输入注入耐受仍未验证；0.33mA只代表3.3V/10kΩ上拉的源侧电流界限。"
+    ]
+  }
+}

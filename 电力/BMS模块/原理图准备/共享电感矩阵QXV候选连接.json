@@ -1,0 +1,725 @@
+{
+  "schema": "pioneer-bms-shared-inductor-qxv-candidate/v1",
+  "status": "candidate_only_not_approved",
+  "created": "2026-10-14",
+  "sourceFiles": [
+    "共享电感矩阵连接.json",
+    "共享电感控制保护连接.json"
+  ],
+  "purpose": "Replace the 144-reference MOSFET/optocoupler selector with a 9-pair QXV255 Form-A PhotoMOS selector. This file is isolated; it does not modify current sources, BOM or native EasyEDA project.",
+  "accounting": {
+    "oldMatrixRefs": 144,
+    "newRefs": 33,
+    "decoderSameRefReplacement": 1,
+    "reusedExistingRefs": [
+      "C_BAL_DECODER",
+      "U_BAL_AND1",
+      "U_BAL_SCHMITT",
+      "U_BAL_SHIFT"
+    ],
+    "removedControlRefs": [
+      "U_BAL_AUX_GATE",
+      "R_BAL_AUX_GATE_LOAD",
+      "C_BAL_AUX_GATE_IN",
+      "C_BAL_AUX_GATE_OUT"
+    ],
+    "newSelectorRefsTotal": 34,
+    "note": "计数口径：原矩阵144个器件位，替换后选择器组件共33件；U_BAL_DECODER为同ref替换、不增件，C_BAL_DECODER复用。删除旧偏置支路4件仅为候选：U_BAL_AUX_GATE、R_BAL_AUX_GATE_LOAD、C_BAL_AUX_GATE_IN、C_BAL_AUX_GATE_OUT。预计总数变化=−144+33−4=−115；以当前源650件估计为535件。其余控制、Hall/OCP、blank/watchdog、四bank OVP及tap保险不删。",
+    "expectedProjectItemDelta": "-115",
+    "expectedProjectItemCountAfter": 535
+  },
+  "removedMatrixRefs": [
+    "Q_BAL_M01_P1",
+    "Q_BAL_M01_P2",
+    "Q_BAL_M01_N1",
+    "Q_BAL_M01_N2",
+    "U_BAL_M01_P",
+    "R_BAL_M01_P_BIAS",
+    "R_BAL_M01_P_GS",
+    "D_BAL_M01_P_GS",
+    "U_BAL_M01_N",
+    "R_BAL_M01_N_BIAS",
+    "R_BAL_M01_N_GS",
+    "D_BAL_M01_N_GS",
+    "Q_BAL_M01_LED",
+    "R_BAL_M01_LED_BASE",
+    "R_BAL_M01_LED_PU",
+    "R_BAL_M01_LED_SER",
+    "Q_BAL_M02_P1",
+    "Q_BAL_M02_P2",
+    "Q_BAL_M02_N1",
+    "Q_BAL_M02_N2",
+    "U_BAL_M02_P",
+    "R_BAL_M02_P_BIAS",
+    "R_BAL_M02_P_GS",
+    "D_BAL_M02_P_GS",
+    "U_BAL_M02_N",
+    "R_BAL_M02_N_BIAS",
+    "R_BAL_M02_N_GS",
+    "D_BAL_M02_N_GS",
+    "Q_BAL_M02_LED",
+    "R_BAL_M02_LED_BASE",
+    "R_BAL_M02_LED_PU",
+    "R_BAL_M02_LED_SER",
+    "Q_BAL_M03_P1",
+    "Q_BAL_M03_P2",
+    "Q_BAL_M03_N1",
+    "Q_BAL_M03_N2",
+    "U_BAL_M03_P",
+    "R_BAL_M03_P_BIAS",
+    "R_BAL_M03_P_GS",
+    "D_BAL_M03_P_GS",
+    "U_BAL_M03_N",
+    "R_BAL_M03_N_BIAS",
+    "R_BAL_M03_N_GS",
+    "D_BAL_M03_N_GS",
+    "Q_BAL_M03_LED",
+    "R_BAL_M03_LED_BASE",
+    "R_BAL_M03_LED_PU",
+    "R_BAL_M03_LED_SER",
+    "Q_BAL_M04_P1",
+    "Q_BAL_M04_P2",
+    "Q_BAL_M04_N1",
+    "Q_BAL_M04_N2",
+    "U_BAL_M04_P",
+    "R_BAL_M04_P_BIAS",
+    "R_BAL_M04_P_GS",
+    "D_BAL_M04_P_GS",
+    "U_BAL_M04_N",
+    "R_BAL_M04_N_BIAS",
+    "R_BAL_M04_N_GS",
+    "D_BAL_M04_N_GS",
+    "Q_BAL_M04_LED",
+    "R_BAL_M04_LED_BASE",
+    "R_BAL_M04_LED_PU",
+    "R_BAL_M04_LED_SER",
+    "Q_BAL_M05_P1",
+    "Q_BAL_M05_P2",
+    "Q_BAL_M05_N1",
+    "Q_BAL_M05_N2",
+    "U_BAL_M05_P",
+    "R_BAL_M05_P_BIAS",
+    "R_BAL_M05_P_GS",
+    "D_BAL_M05_P_GS",
+    "U_BAL_M05_N",
+    "R_BAL_M05_N_BIAS",
+    "R_BAL_M05_N_GS",
+    "D_BAL_M05_N_GS",
+    "Q_BAL_M05_LED",
+    "R_BAL_M05_LED_BASE",
+    "R_BAL_M05_LED_PU",
+    "R_BAL_M05_LED_SER",
+    "Q_BAL_M06_P1",
+    "Q_BAL_M06_P2",
+    "Q_BAL_M06_N1",
+    "Q_BAL_M06_N2",
+    "U_BAL_M06_P",
+    "R_BAL_M06_P_BIAS",
+    "R_BAL_M06_P_GS",
+    "D_BAL_M06_P_GS",
+    "U_BAL_M06_N",
+    "R_BAL_M06_N_BIAS",
+    "R_BAL_M06_N_GS",
+    "D_BAL_M06_N_GS",
+    "Q_BAL_M06_LED",
+    "R_BAL_M06_LED_BASE",
+    "R_BAL_M06_LED_PU",
+    "R_BAL_M06_LED_SER",
+    "Q_BAL_M07_P1",
+    "Q_BAL_M07_P2",
+    "Q_BAL_M07_N1",
+    "Q_BAL_M07_N2",
+    "U_BAL_M07_P",
+    "R_BAL_M07_P_BIAS",
+    "R_BAL_M07_P_GS",
+    "D_BAL_M07_P_GS",
+    "U_BAL_M07_N",
+    "R_BAL_M07_N_BIAS",
+    "R_BAL_M07_N_GS",
+    "D_BAL_M07_N_GS",
+    "Q_BAL_M07_LED",
+    "R_BAL_M07_LED_BASE",
+    "R_BAL_M07_LED_PU",
+    "R_BAL_M07_LED_SER",
+    "Q_BAL_M08_P1",
+    "Q_BAL_M08_P2",
+    "Q_BAL_M08_N1",
+    "Q_BAL_M08_N2",
+    "U_BAL_M08_P",
+    "R_BAL_M08_P_BIAS",
+    "R_BAL_M08_P_GS",
+    "D_BAL_M08_P_GS",
+    "U_BAL_M08_N",
+    "R_BAL_M08_N_BIAS",
+    "R_BAL_M08_N_GS",
+    "D_BAL_M08_N_GS",
+    "Q_BAL_M08_LED",
+    "R_BAL_M08_LED_BASE",
+    "R_BAL_M08_LED_PU",
+    "R_BAL_M08_LED_SER",
+    "Q_BAL_M09_P1",
+    "Q_BAL_M09_P2",
+    "Q_BAL_M09_N1",
+    "Q_BAL_M09_N2",
+    "U_BAL_M09_P",
+    "R_BAL_M09_P_BIAS",
+    "R_BAL_M09_P_GS",
+    "D_BAL_M09_P_GS",
+    "U_BAL_M09_N",
+    "R_BAL_M09_N_BIAS",
+    "R_BAL_M09_N_GS",
+    "D_BAL_M09_N_GS",
+    "Q_BAL_M09_LED",
+    "R_BAL_M09_LED_BASE",
+    "R_BAL_M09_LED_PU",
+    "R_BAL_M09_LED_SER"
+  ],
+  "addedComponents": [
+    {
+      "ref": "U_BAL_M01_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M01_LED_A",
+        "2": "BAL_M01_LED_MID",
+        "3": null,
+        "4": "BAL_B1",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_01",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M01_LED_A到BAL_M01_LED_MID；P侧功率端接BAL_B1与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M01_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M01_LED_MID",
+        "2": "BAL_M01_LED_K",
+        "3": null,
+        "4": "BAL_B0",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_01",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M01_LED_MID到BAL_M01_LED_K；N侧功率端接BAL_B0与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M01_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M01_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_01",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M02_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M02_LED_A",
+        "2": "BAL_M02_LED_MID",
+        "3": null,
+        "4": "BAL_B2",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_02",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M02_LED_A到BAL_M02_LED_MID；P侧功率端接BAL_B2与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M02_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M02_LED_MID",
+        "2": "BAL_M02_LED_K",
+        "3": null,
+        "4": "BAL_B1",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_02",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M02_LED_MID到BAL_M02_LED_K；N侧功率端接BAL_B1与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M02_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M02_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_02",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M03_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M03_LED_A",
+        "2": "BAL_M03_LED_MID",
+        "3": null,
+        "4": "BAL_B3",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_03",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M03_LED_A到BAL_M03_LED_MID；P侧功率端接BAL_B3与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M03_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M03_LED_MID",
+        "2": "BAL_M03_LED_K",
+        "3": null,
+        "4": "BAL_B2",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_03",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M03_LED_MID到BAL_M03_LED_K；N侧功率端接BAL_B2与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M03_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M03_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_03",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M04_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M04_LED_A",
+        "2": "BAL_M04_LED_MID",
+        "3": null,
+        "4": "BAL_B4",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_04",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M04_LED_A到BAL_M04_LED_MID；P侧功率端接BAL_B4与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M04_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M04_LED_MID",
+        "2": "BAL_M04_LED_K",
+        "3": null,
+        "4": "BAL_B3",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_04",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M04_LED_MID到BAL_M04_LED_K；N侧功率端接BAL_B3与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M04_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M04_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_04",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M05_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M05_LED_A",
+        "2": "BAL_M05_LED_MID",
+        "3": null,
+        "4": "BAL_B5",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_05",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M05_LED_A到BAL_M05_LED_MID；P侧功率端接BAL_B5与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M05_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M05_LED_MID",
+        "2": "BAL_M05_LED_K",
+        "3": null,
+        "4": "BAL_B4",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_05",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M05_LED_MID到BAL_M05_LED_K；N侧功率端接BAL_B4与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M05_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M05_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_05",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M06_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M06_LED_A",
+        "2": "BAL_M06_LED_MID",
+        "3": null,
+        "4": "BAL_B6",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_06",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M06_LED_A到BAL_M06_LED_MID；P侧功率端接BAL_B6与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M06_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M06_LED_MID",
+        "2": "BAL_M06_LED_K",
+        "3": null,
+        "4": "BAL_B5",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_06",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M06_LED_MID到BAL_M06_LED_K；N侧功率端接BAL_B5与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M06_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M06_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_06",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M07_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M07_LED_A",
+        "2": "BAL_M07_LED_MID",
+        "3": null,
+        "4": "BAL_B7",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_07",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M07_LED_A到BAL_M07_LED_MID；P侧功率端接BAL_B7与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M07_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M07_LED_MID",
+        "2": "BAL_M07_LED_K",
+        "3": null,
+        "4": "BAL_B6",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_07",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M07_LED_MID到BAL_M07_LED_K；N侧功率端接BAL_B6与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M07_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M07_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_07",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M08_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M08_LED_A",
+        "2": "BAL_M08_LED_MID",
+        "3": null,
+        "4": "BAL_B8",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_08",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M08_LED_A到BAL_M08_LED_MID；P侧功率端接BAL_B8与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M08_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M08_LED_MID",
+        "2": "BAL_M08_LED_K",
+        "3": null,
+        "4": "BAL_B7",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_08",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M08_LED_MID到BAL_M08_LED_K；N侧功率端接BAL_B7与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M08_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M08_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_08",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_M09_P",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M09_LED_A",
+        "2": "BAL_M09_LED_MID",
+        "3": null,
+        "4": "BAL_B9",
+        "5": null,
+        "6": "BAL_P"
+      },
+      "pageGroup": "BAL_MATRIX_09",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本P器件LED从BAL_M09_LED_A到BAL_M09_LED_MID；P侧功率端接BAL_B9与BAL_P。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "U_BAL_M09_N",
+      "mpn": "QXV255-CuH-S",
+      "pins": {
+        "1": "BAL_M09_LED_MID",
+        "2": "BAL_M09_LED_K",
+        "3": null,
+        "4": "BAL_B8",
+        "5": null,
+        "6": "BAL_N"
+      },
+      "pageGroup": "BAL_MATRIX_09",
+      "value": "QXV255-CuH-S, Form-A AC/DC bidirectional, pin4/pin6 power terminals",
+      "note": "原厂QXV255 V1.1：输入LED脚1=AN、脚2=CA；功率端脚4/6为双向A接法，脚3/5 NC。每个通道两颗LED串联：本N器件LED从BAL_M09_LED_MID到BAL_M09_LED_K；N侧功率端接BAL_B8与BAL_N。IF=5mA条件VFmax=1.5V/颗；25°C Ron max=30mΩ，高温最大Ron缺资料。https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_M09_LED",
+      "mpn": "RC1206FR-07220RL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_M09_LED_A"
+      },
+      "pageGroup": "BAL_MATRIX_09",
+      "value": "220Ω ±1%, 1206, 0.25W",
+      "note": "9路限流电阻，每路两颗QXV255 LED串联后由ULN2003LV低侧下拉。保守计算：V5,min=4.75V；2×VF,max=3.0V；按ULN2003LV在VIN=3.3V、IOUT=100mA的VOL,max=0.49V作更保守压降预算；Rmax=222.2Ω，Imin=(4.75−3.0−0.49)/222.2=5.67mA。0.49V数据点为100mA而非5.67mA；把它用作低电流压降上界属于基于低侧MOS输出I-V单调性和大电流裕度的工程保守推断，非数据表直接5mA保证点。最高角落按5.25V、两LED Vf=0、输出压降=0、Rmin=217.8Ω，Imax=24.1mA< QXV LED 50mA绝对最大；P_R,max=5.25²/217.8=0.127W，选0.25W。MPN已在项目布局库检索记录中：检查/Layout库检索.json。"
+    },
+    {
+      "ref": "U_BAL_QXV_DRV1",
+      "mpn": "ULN2003LVDR",
+      "pins": {
+        "1": "BAL_SEL0",
+        "2": "BAL_SEL1",
+        "3": "BAL_SEL2",
+        "4": "BAL_SEL3",
+        "5": "BAL_SEL4",
+        "6": "BAL_SEL5",
+        "7": "BAL_SEL6",
+        "8": "B0",
+        "9": "VOUT_5V",
+        "10": "BAL_M07_LED_K",
+        "11": "BAL_M06_LED_K",
+        "12": "BAL_M05_LED_K",
+        "13": "BAL_M04_LED_K",
+        "14": "BAL_M03_LED_K",
+        "15": "BAL_M02_LED_K",
+        "16": "BAL_M01_LED_K"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "TI ULN2003LV, 7-channel low-side driver, SOIC-16",
+      "note": "TI ULN2003LV Rev.B：SOIC16；输入1..7脚，GND脚8=B0，COM脚9接VOUT_5V，OUT1..7脚16..10分别低侧吸收串联LED对电流，未用输入固定B0。电气特性表在TJ=−40…125°C：VIN=3.3V、IOUT=50mA时VOL typ/max=0.17/0.24V；100mA时0.36/0.49V。候选用100mA的VOL,max=0.49V作5.67mA估算中的保守工程压降上界，不误称为5mA直测规格。COM去耦按每颗100nF计；无电感负载。https://www.ti.com/lit/ds/symlink/uln2003lv.pdf"
+    },
+    {
+      "ref": "U_BAL_QXV_DRV2",
+      "mpn": "ULN2003LVDR",
+      "pins": {
+        "1": "BAL_SEL7",
+        "2": "BAL_SEL8",
+        "3": null,
+        "4": null,
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": "B0",
+        "9": "VOUT_5V",
+        "10": null,
+        "11": null,
+        "12": null,
+        "13": null,
+        "14": null,
+        "15": "BAL_M09_LED_K",
+        "16": "BAL_M08_LED_K"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "TI ULN2003LV, 7-channel low-side driver, SOIC-16",
+      "note": "TI ULN2003LV Rev.B：SOIC16；输入1..7脚，GND脚8=B0，COM脚9接VOUT_5V，OUT1..7脚16..10分别低侧吸收串联LED对电流，未用输入固定B0。电气特性表在TJ=−40…125°C：VIN=3.3V、IOUT=50mA时VOL typ/max=0.17/0.24V；100mA时0.36/0.49V。候选用100mA的VOL,max=0.49V作5.67mA估算中的保守工程压降上界，不误称为5mA直测规格。COM去耦按每颗100nF计；无电感负载。https://www.ti.com/lit/ds/symlink/uln2003lv.pdf"
+    },
+    {
+      "ref": "R_BAL_QXV_E_PU",
+      "mpn": "RC0603FR-0710KL",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "BAL_MATRIX_INHIBIT"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "10kΩ ±1%, 0603",
+      "note": "XL74HC4514D pin23 E/INH为高有效禁止；10k上拉到VOUT_5V，使有5V而互斥逻辑未允许时默认全关。现有U_BAL_SCHMITT pin5/6将BAL_MATRIX_ALLOWED反相为BAL_MATRIX_INHIBIT；E高禁能。"
+    },
+    {
+      "ref": "C_BAL_QXV_DRV1_COM",
+      "mpn": "GRM188R71C104KA01D",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "100nF ±10% 16V X7R, 0603",
+      "note": "ULN2003LV COM/LED rail本地去耦，靠近U_BAL_QXV_DRV1。"
+    },
+    {
+      "ref": "C_BAL_QXV_DRV2_COM",
+      "mpn": "GRM188R71C104KA01D",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "100nF ±10% 16V X7R, 0603",
+      "note": "ULN2003LV COM/LED rail本地去耦，靠近U_BAL_QXV_DRV2。"
+    },
+    {
+      "ref": "C_BAL_QXV_LED_RAIL",
+      "mpn": "CL21B475KAB6PNE",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "pageGroup": "BAL_QXV_LED_DRIVER",
+      "value": "4.7µF ±10% 25V X7R, 0805",
+      "note": "LED公共5V支路本地储能/旁路，靠近限流电阻供电分配点。"
+    }
+  ],
+  "sameRefReplacement": {
+    "ref": "U_BAL_DECODER",
+    "oldMpn": "74HCT154",
+    "newMpn": "XL74HC4514D",
+    "libraryProduct": "LCSC C50202050",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "BAL_A0",
+      "3": "BAL_A1",
+      "4": "BAL_SEL7",
+      "5": "BAL_SEL6",
+      "6": "BAL_SEL5",
+      "7": "BAL_SEL4",
+      "8": "BAL_SEL3",
+      "9": "BAL_SEL1",
+      "10": "BAL_SEL2",
+      "11": "BAL_SEL0",
+      "12": "B0",
+      "13": null,
+      "14": null,
+      "15": null,
+      "16": null,
+      "17": null,
+      "18": "BAL_SEL8",
+      "19": null,
+      "20": null,
+      "21": "BAL_A2",
+      "22": "BAL_A3",
+      "23": "BAL_MATRIX_INHIBIT",
+      "24": "VOUT_5V"
+    },
+    "value": "XL74HC4514D 4-to-16 latched decoder, active-high Q outputs",
+    "pageGroup": "BAL_LOGIC",
+    "note": "XL74HC4514D：VCC pin24=VOUT_5V，GND pin12=B0；LE pin1固定VOUT_5V（透明），E/INH pin23接BAL_MATRIX_INHIBIT（高有效禁止）；A0..A3 pins2,3,21,22来自BAL_A0..3。Q0..Q8驱动BAL_SEL0..8，Q9..Q15 NC。pin mapping按XL74HC4514D数据手册；复用现有C_BAL_DECODER。https://datasheet.lcsc.com/datasheet/pdf/7536a9b5f345f3ac39b2a76a3c62d67b.pdf?productCode=C50202050"
+  },
+  "controlPinChanges": [
+    {
+      "ref": "U_BAL_SCHMITT",
+      "pin": "5",
+      "from": "BAL_PERMIT",
+      "to": "BAL_MATRIX_ALLOWED",
+      "note": "复用现有SN74HCT14D空余门输入；由现有U_BAL_AND1 pin11输出BAL_MATRIX_ALLOWED，包含BAL_PERMIT与BAL_NOT_BLANK。"
+    },
+    {
+      "ref": "U_BAL_SCHMITT",
+      "pin": "6",
+      "from": "BAL_PERMIT_N",
+      "to": "BAL_MATRIX_INHIBIT",
+      "note": "反相BAL_MATRIX_ALLOWED；4514 E/INH高有效禁止。配合R_BAL_QXV_E_PU默认上拉，失许可/blank时所有译码输出保持低。"
+    }
+  ],
+  "candidateSafetyNotes": [
+    "保留所有四组独立bank OVP、独立OCP、watchdog、blanking、电源失效和安全恢复；选择矩阵变化不授权删除保护。",
+    "每个平衡通道两颗QXV255功率输出器件分别串在该电芯上端/下端tap路径；有效选择时BAL_Bk↔BAL_P且BAL_B(k−1)↔BAL_N。tap保险、保险座、连接器与线束保持原设计。",
+    "QXV255 A接法功率端为pins4/6，pins3/5 NC；LED pins1/2，两器件LED同向串联，先关E、换译码地址、等待settle后再允许E。",
+    "XL74HC4514D E/INH高有效禁止；U_BAL_AND1 pin11经现有U_BAL_SCHMITT pin5/6产生互斥blank门控，10k上拉提供逻辑默认off。",
+    "ULN2003LV在3.3V输入、50mA输出点VOL typ/max=0.17/0.24V；100mA点为0.36/0.49V（全推荐温度范围）。220Ω±1%和0.49V预算算得低角5.67mA；此处将100mA最大压降作为小电流上界是基于低侧MOS输出I-V单调性的工程推断，并非5mA数据表测试点。",
+    "QXV255只核到25°C Ron max=30mΩ；未找到更高温度Ron最大保证及经核对的大陆实际供货承诺。该候选需进行采购可得性、SSR高温通路电阻、每只功耗和最坏关断时间审查，未批准替换。"
+  ],
+  "ledCurrentCheck": {
+    "v5Min": 4.75,
+    "v5Max": 5.25,
+    "twoLedVfMax": 3.0,
+    "rLed": 220,
+    "rTolerance": 0.01,
+    "conservativeVolBudget": 0.49,
+    "volTestPoint": "ULN2003LV, VIN=3.3V, IOUT=100mA, VOL max=0.49V, TJ=−40…125°C",
+    "rMax": 222.2,
+    "iMin_mA": 5.67,
+    "currentBoundMethod": "Imin=(4.75−3.0−0.49)/222.2=5.67mA；0.49V点为100mA最大值，向5.67mA使用为保守工程推断（低侧MOS输出I-V单调），不是5mA直接表征规格。",
+    "rMin": 217.8,
+    "iMax_mA": 24.1,
+    "qxvLedAbsoluteMaximum_mA": 50,
+    "resistorPowerMax_W": 0.127,
+    "resistorMpn": "RC1206FR-07220RL",
+    "resistorRating_W": 0.25,
+    "result": "候选电阻满足按保守VOL预算的5mA下限估算，并低于LED绝对最大电流及电阻额定功率；须以实际5V轨上/下限和同选一路条件核实。",
+    "sources": [
+      "https://www.ti.com/lit/ds/symlink/uln2003lv.pdf",
+      "https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf",
+      "../检查/Layout库检索.json"
+    ]
+  }
+}

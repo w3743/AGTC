@@ -1,0 +1,109 @@
+.....................................F.................................. [ 39%]
+........................................................................ [ 79%]
+...........................sssssssssss                                   [100%]
+=================================== FAILURES ===================================
+______ test_engine_frames_drive_observation_and_finish_without_scene_cast ______
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7cf68c72ecf0>
+
+    def test_engine_frames_drive_observation_and_finish_without_scene_cast(monkeypatch):
+        cfg = _small_config(size=12.0, plants=0, terrain_enabled=False, validate_scene=False)
+        task = FieldTask(cfg, mode="goto")
+        task.prepare(seed=5, options={"start": [2.0, 2.0, 0.4], "goal": [10.0, 10.0]})
+        monkeypatch.setattr(task.scene, "cast", lambda *_args: pytest.fail("runtime sensing must not cast scene rays"))
+        task.robot = np.array([2.0, 2.0, 0.4, 0.0, 0.0], dtype=np.float64)
+        task.gimbal = np.array([0.1, -0.05], dtype=np.float64)
+        task.body_pose = (0.17, -0.04, 0.03)
+        task.view_origin = np.array([2.1, 2.0, 0.55], dtype=np.float32)
+        task.view_basis = (
+            np.array([0.99, 0.0, 0.1], dtype=np.float32),
+            np.array([0.0, -1.0, 0.0], dtype=np.float32),
+            np.array([0.1, 0.0, -0.99], dtype=np.float32),
+        )
+        captured = []
+    
+        def capture(kind):
+            captured.append(kind)
+            if kind == "lidar":
+                ranges = np.full(cfg.lidar_rays, 2.0, dtype=np.float32)
+                valid = np.ones(cfg.lidar_rays, dtype=bool)
+                # A valid over-range hit saturates at 1; an explicitly invalid
+                # finite-distance override remains the reserved policy value 0.
+                ranges[0] = cfg.lidar_range * 2.0
+                ranges[1] = 3.0
+                valid[1] = False
+                return {"ranges": ranges, "valid": valid}
+            if kind == "depth":
+                values = np.full((cfg.depth_height, cfg.depth_width), 2.5, dtype=np.float32)
+                valid = np.ones((cfg.depth_height, cfg.depth_width), dtype=bool)
+                values[0, 0] = cfg.depth_range
+                valid[0, 0] = False
+                values[0, 1] = cfg.depth_range
+                return {"values": values, "valid": valid}
+            return {"detections": [{
+                "box": [0.5, 0.4, 0.2, 0.3],
+                "class_id": 1,
+                "confidence": 0.8,
+                # A noisy negative range is still a candidate with a real box;
+                # range validity is carried separately from candidate presence.
+                "range": -0.1,
+            }]}
+    
+        task.attach_sensors(capture)
+        observation, info = task.initialize_sensors()
+    
+        assert captured == ["lidar", "depth", "camera"]
+        assert observation["lidar"].shape == (1, cfg.lidar_rays)
+        assert observation["depth"].shape == (1, cfg.depth_height, cfg.depth_width)
+        assert observation["depth"].dtype == np.float32
+        assert observation["detections"].shape == (cfg.max_detections, 8)
+        assert observation["state"].shape == (33,)
+        assert observation["state"].dtype == np.float32
+        assert observation["feedback"].shape == (37,)
+        assert observation["feedback"].dtype == np.float32
+        np.testing.assert_array_equal(observation["feedback"][:21], np.zeros(21, dtype=np.float32))
+        np.testing.assert_array_equal(observation["feedback"][21:29], np.zeros(8, dtype=np.float32))
+        np.testing.assert_array_equal(observation["feedback"][29:37], np.ones(8, dtype=np.float32))
+>       assert observation["lidar"][0] == 1.0
+E       ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+
+tests/test_task.py:358: ValueError
+=============================== warnings summary ===============================
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_trace.py:1006: DeprecationWarning: `torch.jit.trace` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/jit/_trace.py:1145: DeprecationWarning: `torch.jit.trace_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:126: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if caching:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:131: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if caching:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/policy.py:58: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if value.ndim < 2 or value.shape[-1] != 8:
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/nn/modules/rnn.py:328: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if self.input_size != input.size(-1):
+
+tests/test_policy_inspection.py::test_netron_wrapper_runtime_matches_policy_with_all_five_sensor_inputs
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/torch/nn/modules/rnn.py:361: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+    if hx.size() != expected_hidden_size:
+
+tests/test_network_2d.py::test_extreme_finite_values_and_all_nonfinite_frames_have_safe_ranges
+  /home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/numpy/_core/_methods.py:190: RuntimeWarning: overflow encountered in square
+    x = um.square(x, out=x)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_task.py::test_engine_frames_drive_observation_and_finish_without_scene_cast
+1 failed, 170 passed, 11 skipped, 8 warnings in 12.11s
+
+pytest_exit_code=1

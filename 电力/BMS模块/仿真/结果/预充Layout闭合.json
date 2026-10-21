@@ -1,0 +1,127 @@
+{
+  "scope": "paper/Layout closure; physical board validation is not claimed; 2.970 s is a legacy comparison scenario, not a confirmed product cutoff requirement",
+  "input_corner": {
+    "pack_voltage_v": 37.8,
+    "ambient_c": [
+      0,
+      60
+    ],
+    "bus_capacitance_f": 0.06,
+    "timer_supply_v": [
+      3.0,
+      3.6
+    ]
+  },
+  "timer": {
+    "r_set_nominal_ohm": 7320.0,
+    "r_set_min_0c_ohm": 7228.683000000001,
+    "r_set_max_60c_ohm": 7419.0762,
+    "tip_nominal_s": 2.5775209200000018,
+    "tip_min_conservative_s": 2.3959738837108113,
+    "tip_max_conservative_s": 2.787740527137862,
+    "drv_pulse_min_s": 2.3459738837108115,
+    "drv_pulse_max_s": 2.7377405271378623,
+    "first_start_delay_min_s": 0.1,
+    "first_start_delay_max_s": 0.12,
+    "ff_b_power_to_drv_low_min_s": 2.4459738837108116,
+    "ff_b_power_to_drv_low_max_s": 2.8577405271378624,
+    "margin_to_2p970_s": 0.11225947286213778,
+    "reference_deadline_s": 2.97,
+    "reference_deadline_status": "legacy comparison scenario; not a confirmed physical cutoff requirement",
+    "max_factor": 1.0321948845822253,
+    "min_factor": 0.97088531691102,
+    "polynomial_coefficients": {
+      "a": 0.2253,
+      "b": -20.7654,
+      "c": 570.5679
+    },
+    "status": "PASS for TMR_ACTIVE/logic-window deassertion only; excludes BJT and MOSFET physical release"
+  },
+  "precharge_resistor": {
+    "mpn": "TE CJP300J8R2J",
+    "nominal_ohm": 8.2,
+    "tolerance_fraction": 0.05,
+    "tcr_ppm_per_c_max": 200,
+    "r_min_25c_ohm": 7.789999999999999,
+    "r_min_60c_ambient_only_ohm": 7.735469999999999,
+    "r_min_at_max_surface_350c_ohm": 7.28365,
+    "initial_current_upper_ignore_mos_drops_25c_a": 4.85237483953787,
+    "initial_current_upper_ignore_mos_drops_60c_ambient_only_a": 4.886580905879022,
+    "initial_current_upper_ignore_mos_drops_worst_tcr_350c_a": 5.189705710735689,
+    "initial_power_upper_ignore_mos_drops_25c_w": 183.41976893453142,
+    "initial_power_upper_ignore_mos_drops_60c_ambient_only_w": 184.712758242227,
+    "initial_power_upper_ignore_mos_drops_worst_tcr_350c_w": 196.170875865809,
+    "bus_capacitor_energy_j": 42.86519999999999,
+    "60c_derated_power_linear_envelope_w": 253.33333333333334,
+    "continuous_power_fraction_at_60c": 0.7743587205229302,
+    "constant_worst_tcr_power_fault_scenario_2p970s_j": 582.6275013214528,
+    "status": "PASS when external, unobstructed/free-air mounted per TE rating; no added heatsink indicated"
+  },
+  "qpre_mosfets": {
+    "mpn": "NCE01P30K x2, P-channel common-source, common-gate",
+    "topology": "fully-enhanced series path during precharge; external resistor dominates voltage drop",
+    "rds_on_max_25c_ohm_per_fet_at_vgs_minus10v": 0.058,
+    "rds_on_max_25c_ohm_per_fet_at_vgs_minus4p5v": 0.065,
+    "on_state_current_upper_at_rpre_min_25c_and_minus10v_a": 4.781178851505186,
+    "on_state_current_upper_at_rpre_min_25c_and_minus4p5v_a": 4.772727272727273,
+    "on_state_vds_per_fet_at_rpre_min_25c_and_minus10v_v": 0.2773083733873008,
+    "on_state_power_per_fet_at_rpre_min_25c_and_minus10v_w": 1.3258609301846662,
+    "on_state_vds_per_fet_at_rpre_min_25c_and_minus4p5v_v": 0.3102272727272728,
+    "on_state_power_per_fet_at_rpre_min_25c_and_minus4p5v_w": 1.4806301652892566,
+    "on_state_vds_per_fet_upper_at_minus10v_25c_v": 0.30100293122266997,
+    "on_state_power_per_fet_upper_at_minus10v_25c_w": 1.5621166311144723,
+    "gate_pullup_mpn": "Yageo RC0603FR-074K7L; LCSC C99782; shared project MPN",
+    "gate_pullup_ohm_nominal": 4700.0,
+    "gate_charge_typ_nc_per_fet": 136.0,
+    "gate_charge_typ_pair_nc": 272.0,
+    "input_capacitance_typ_pf_per_fet": 3810.0,
+    "simple_rc_tau_typ_s_pair": 3.5814e-05,
+    "simple_rc_3tau_typ_s_pair": 0.00010744199999999999,
+    "physical_turnoff_max_guaranteed": false,
+    "status": "no multi-second linear-SOA premise; transient SOA and actual turn-off still require controlled device limits or board qualification"
+  },
+  "gate_clamp": {
+    "network": "4.7 kOhm ±1% QPRE_G-QPRE_SRC pullup; 4.7 kOhm ±1% QPRE_G to NPN collector; MMSZ5242BT1G reverse clamp",
+    "r_pullup_min_ohm": 4653.0,
+    "r_pullup_max_ohm": 4747.0,
+    "r_limit_min_ohm": 4653.0,
+    "r_limit_max_ohm": 4747.0,
+    "npn_vce_sat_assumption_v": 0.2,
+    "zener_vz_min_at_20ma_v": 11.4,
+    "zener_vz_max_at_20ma_v": 12.6,
+    "zener_iz_test_ma": 20.0,
+    "zener_izk_ma": 0.25,
+    "unclamped_abs_vgs_at_37p8v_worst_resistor_ratio_v": 19.089,
+    "unclamped_abs_vgs_at_22p5v_min_v": 11.0385,
+    "unclamped_abs_vgs_at_22p5v_max_v": 11.2615,
+    "max_npn_collector_sink_at_37p8_vz_min_a": 0.005630775843541801,
+    "r_limit_max_dissipation_at_37p8_vz_min_w": 0.14752632710079516,
+    "r_pullup_dissipation_at_vz_min_w": 0.02793036750483559,
+    "zener_current_at_vz_min_a": 0.003180743606275521,
+    "zener_dissipation_at_vz_min_w": 0.03626047711154094,
+    "steady_abs_vgs_upper_if_zener_regulates_v": 12.6,
+    "npn_base_drive_check": {
+      "base_driver_voh_min_assumption_v": 2.4,
+      "npn_vbe_max_assumption_v": 1.0,
+      "base_available_min_after_100k_be_pull_a": 0.001376037603760376,
+      "npn_forced_beta_at_max_sink": 4.092021779168142,
+      "precharge_window_load_typ_at_3p3v_a": 0.0025999999999999994,
+      "status": "paper check only; confirm exact U_GATE1 VOH at this load and MMBT5551 VCEsat/current/temperature on first board"
+    },
+    "off_state_static_current": "4.7k pullup has zero ideal DC current when QPRE_G=QPRE_SRC; MMBT5551 datasheet gives ICBO only at a different test condition, not a guaranteed circuit ICEO bound. No off-state leakage maximum is claimed.",
+    "status": "unclamped DC divider is approximately 11.04–11.26 V at 22.5 V and 19.09 V worst at 37.8 V; static bias/load powers are bounded by stated assumptions, but Zener low-current knee, logic VOH, switching transients and physical cutoff remain measurement items"
+  },
+  "evidence_and_limits": {
+    "official_vendor_sources": [
+      "https://www.ti.com/lit/ds/symlink/tpl5111.pdf",
+      "https://www.te.com/en/product-1-2176508-5.html",
+      "https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocFormat=pdf&DocLang=English&DocNm=1773309-8&DocType=Data+Sheet&PartCntxt=1-2176508-5",
+      "https://www.onsemi.com/pdf/datasheet/mmsz5221et1-d.pdf"
+    ],
+    "nce_local_pdf": "BMS模块/厂商资料/NCE01P30K_V2_Elecfans镜像.pdf (mirror copy; controlled manufacturer version not obtained)",
+    "mmbt_local_pdf": "BMS模块/厂商资料/MDD_MMBT5551_C408396.pdf (no guaranteed storage/turn-off time found)",
+    "pre_ok_used_as_cutoff": false,
+    "full_chain_physical_max_time_s": null,
+    "layout_verdict": "FAIL to guarantee physical current extinction within the legacy 2.970 s scenario; candidate Layout may proceed under the constraints in the companion Markdown"
+  }
+}

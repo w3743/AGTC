@@ -1,0 +1,115 @@
+{
+  "id": "P09",
+  "title": "FOC P09 precision resistor check",
+  "date": "2026-10-15",
+  "refs": [
+    "FOC R_OVBOT",
+    "FOC R_OVREF_BOT"
+  ],
+  "quantity": 2,
+  "recommendation": "HoAR0603-1/10W-10KR-0.1%-TCR25; Milliohm; LCSC C5123581",
+  "status": {
+    "selection": "Technically suitable at component-selection stage for both actual divider-bottom positions",
+    "qualification": "OPEN",
+    "e100": "Not a P09/FOC OVP error metric. FOC complete threshold-error and bench qualification remain OPEN; the separate steady-state per-cell protection E100 gate is unchanged and remains open under its original-module qualification record."
+  },
+  "carrier": {
+    "eda_device": "RT0603BRD0710KL",
+    "footprint": "R0603",
+    "note": "Procurement MPN and retained CAD carrier are distinct; no land geometry was measured or changed."
+  },
+  "manufacturer_datasheet": {
+    "url": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/0BFAEB87CEA46D4D4A0AA08C46D82900.pdf",
+    "exact_series": "HoAR high-power exact 0603 / 10 kΩ row",
+    "size": "0603",
+    "resistance": "10 kΩ",
+    "initial_tolerance": "±0.1%",
+    "tcr": "±25 ppm/°C",
+    "power": "0.1 W at 70°C",
+    "temperature": "-55°C to +155°C",
+    "table_max_working_voltage": "75 V",
+    "table_max_overload_voltage": "150 V",
+    "endurance_drift": "±0.5%",
+    "continuous_voltage_rule": "min(sqrt(P × R), table maximum voltage)",
+    "continuous_voltage_10k_at_70C": "min(sqrt(0.1 W × 10000 Ω), 75 V) = 31.6228 V",
+    "body_mm": "1.55±0.1 × 0.8±0.1 × 0.45±0.1",
+    "recommended_land_mm": "A=0.8, B=1.0, C=0.9±0.2",
+    "endurance_test": "70±2°C, rated continuous working voltage, 1000 h cycling 1.5 h on / 0.5 h off; ±0.5% maximum resistance change"
+  },
+  "supplier": {
+    "url": "https://www.lcsc.com/pt/product-detail/Chip-Resistor-Surface-Mount_Milliohm-HoAR0603-1-10W-10KR-0-1-TCR25_C5123581.html",
+    "part_id": "C5123581",
+    "price_stock_moq": "Not verified; request current quote, stock/MOQ and lot traceability."
+  },
+  "baseline": {
+    "mpn": "Yageo RT0603BRD0710KL",
+    "datasheet": "https://www.yageogroup.com/content/datasheet/asset/file/PYU-RT_1-TO-0-01_ROHS_L",
+    "comparison": "Same 0603, 10 kΩ, ±0.1%, ±25 ppm/°C, 0.1 W at 70°C, 75 V table limit and -55°C to +155°C range.",
+    "endurance": "Yageo ±(0.5%+0.05 Ω) = ±0.5005% at 10 kΩ; HoAR ±0.5%, so quoted endurance drift does not worsen."
+  },
+  "actual_circuit_stress": {
+    "R_OVBOT": {
+      "network": "162 kΩ top / 10 kΩ bottom; 50 V BUS input",
+      "nominal": {
+        "bottom_voltage_V": 2.906976744,
+        "bottom_power_mW": 0.845051
+      },
+      "bottom_only_drift_plus_0.5_percent": {
+        "bottom_R_ohm": 10050,
+        "voltage_V": 2.920662598,
+        "power_mW": 0.848783
+      },
+      "bottom_only_drift_minus_0.5_percent": {
+        "bottom_R_ohm": 9950,
+        "voltage_V": 2.893282931,
+        "power_mW": 0.841315
+      }
+    },
+    "R_OVREF_BOT": {
+      "network": "10.2 kΩ top / 10 kΩ bottom; SAFE_5V=4.97648 V",
+      "nominal": {
+        "bottom_voltage_V": 2.46360396,
+        "bottom_power_mW": 0.606934
+      },
+      "bottom_only_drift_plus_0.5_percent": {
+        "bottom_R_ohm": 10050,
+        "voltage_V": 2.469808593,
+        "power_mW": 0.606961
+      },
+      "bottom_only_drift_minus_0.5_percent": {
+        "bottom_R_ohm": 9950,
+        "voltage_V": 2.457368536,
+        "power_mW": 0.606901
+      }
+    },
+    "note": "50 V is the BUS input, not the voltage across either bottom resistor. Nominal power is about 0.85% / 0.61% of rating. The ±0.5% corners vary only the bottom resistor, holding source and top resistor nominal; they omit other loop tolerances and are not a qualification result."
+  },
+  "release_checks": [
+    "Measure current R0603 copper land against HoAR recommended land dimensions A=0.8 mm, B=1.0 mm, C=0.9±0.2 mm.",
+    "Confirm derated power and board self-heating at actual operating temperature.",
+    "Verify current quote, stock/MOQ and lot traceability."
+  ],
+  "qualification_actions": [
+    "Complete the FOC OVP threshold-error analysis with the exact new part, upper/lower resistor initial tolerance/TCR/endurance, reference/source/comparator, temperature and transient bounds.",
+    "Require no worse error than the old-part baseline and compliance with the applicable documented FOC OVP acceptance window; maintain OPEN until demonstrated. Do not apply the separate cell-protection E100 limit to this OVP screen.",
+    "Do not substitute a 10 ppm part; exact recommended MPN is ±25 ppm/°C."
+  ],
+  "api_evidence": {
+    "save": "元件封装库/检查/非BMS共用实施/FOC官方修改保存.json",
+    "readback": "元件封装库/检查/非BMS共用实施/FOC修改后API.json",
+    "spec_correction": "元件封装库/检查/非BMS共用实施/P09规格字段修正.json",
+    "note": "Isolated official-API copy evidence only; this report changes no CAD, BOM, or central index."
+  },
+  "model_recheck": {
+    "report_json": "元件封装库/检查/非BMS共用实施/P09模型复查.json",
+    "report_markdown": "元件封装库/检查/非BMS共用实施/P09模型复查.md",
+    "result": "HoAR lower-arm threshold corners are contained within the Yageo baseline corners for the stated modeled scenarios; this is a part-swap non-regression screen only.",
+    "qualification": "FOC complete OVP error and hardware bench qualification remain OPEN. This is not the separate per-cell E100 qualification."
+  },
+  "sources": {
+    "HoAR_datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/0BFAEB87CEA46D4D4A0AA08C46D82900.pdf",
+    "HoAR_supplier": "https://www.lcsc.com/pt/product-detail/Chip-Resistor-Surface-Mount_Milliohm-HoAR0603-1-10W-10KR-0-1-TCR25_C5123581.html",
+    "Yageo_family": "https://www.yageogroup.com/content/datasheet/asset/file/PYU-RT_1-TO-0-01_ROHS_L",
+    "Yageo_exact": "https://www.yageogroup.com/component-documentation/download/specsheet/RT0603BRD0710KL"
+  }
+}

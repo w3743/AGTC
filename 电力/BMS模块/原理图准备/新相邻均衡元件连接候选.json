@@ -1,0 +1,1014 @@
+{
+  "title": "9S ETA3000D2I 八级相邻均衡连接候选",
+  "status": "已并入当前正式连接源；工程选型，待原型/实物验收",
+  "date": "2026-10-14",
+  "applicability": "9S串联电芯组B0/TAP_B1..TAP_B9；8个相邻两节均衡级",
+  "sourceDatasheet": "厂商资料/ETA3000D2I.pdf（本地12页镜像；重点p2-p4,p8-p9）；厂商目录 https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf",
+  "topology": "8颗ETA3000D2I分别跨相邻两节；每级100k ISET、1uH电感、9颗单节1uF及本地外围。每级BSS138LT1G以BATP上拉栅极、BATN为源并默认钳低ETA EN；AT3H74四路光耦输出将栅极拉回BATN后释放ETA内部上拉。两颗四路光耦覆盖8路串联LED输入；两只MMBT5551仍将BAL_ENABLE_CMD与MAIN_CLR_N串联作为全局许可。",
+  "control": {
+    "BAL_ENABLE_CMD": "唯一均衡MCU静态许可，PA5/P2-13；上电、复位、失效默认0。",
+    "MAIN_CLR_N": "现有独立硬件许可，来自BQ_ALERT_IC_N与BMS_LOCAL_OK；任一低时切断串联LED回路，MCU软件不能覆盖。",
+    "defaultState": "每级光耦LED熄灭时，100k栅极上拉令BSS138LT1G导通并把ETA EN钳到本级BATN；BAL_ENABLE_CMD为0或MAIN_CLR_N为低时全局LED串断开，均衡默认停。LED点亮后光耦把本级MOS栅极拉至BATN，BSS关断，由ETA内部典型约1µA上拉释放EN。EN内部上拉无最大值，首板人工确认默认低/释放高，观察窗口15–40°C。",
+    "balancePolicy": "ETA相邻级粗均衡与BQ76952单槽内均衡用于小压差修整，固件控制两者互斥；阈值和时序由人类固件参数设定。",
+    "wakePolicy": "完成电芯采样、配置和均衡判定后才令BAL_ENABLE_CMD=1；故障告警、复位和本地许可丢失均停止LED串。"
+  },
+  "designParameters": [
+    "ETA手册p8：Ibal=Iind/2；100k ISET约500mA平均电感电流，估算均衡电流约250mA。项目已取消均衡电流下限；此值不作为电芯净流保证。",
+    "ETA约100mV相邻压差启动行为作为粗均衡的工作边界。项目采用ETA相邻级粗均衡与BQ76952单槽内均衡细修整两种互斥模式；固件阈值和时序由人类设定。",
+    "ETA手册p9级联示例为每颗跨相邻两节、n−1级串接；本设计用于9S电池组并设置8级。",
+    "Sunlord SWPA8040S1R0NT为1.0uH±30%；原厂表列Isat 9.85A min/14.0A typ、Irms 6.30A min/6.90A typ、DCR 10mΩ max/8mΩ typ。",
+    "ETA手册p9多级示例未列逐级跨两节22uF；本设计据此删除8只跨两节22uF，保留9只单节1uF、8只BIAS 10nF和8只ISET 1nF。",
+    "BSS138LT1G以本级BATP−BATN（两节电压和，预计5.0–8.4V）驱动栅极，低于±20V额定；D接EN、S接BATN。厂家RDS(on)保证点为VGS=2.75V，EN钳位仅承受芯片内部弱上拉电流，首板按工程设计确认实际开关态。",
+    "AT3H74-CuH-S为两颗四路光耦；输入LED串联，输出C/E分别驱动对应BSS138栅极/BATN。厂家CTR条件不构成全温保证；不能成功拉低栅极时均衡保持关闭。",
+    "8路输入LED串由两只1kΩ/1W/2512限流；按8×1.0–1.4V LED压降和22.5–37.8V包压估算约5.2–14.9mA，需按实际器件压降复核。",
+    "ETA EN内部上拉仅有约1µA典型值、无最大值；不宣称全温默认态保证。首板人工检查范围15–40°C。候选现已进入正式连接源，但未做原型、热、电气或实物验收。",
+    "当前可追溯人民币价格仅覆盖ETA控制器8只与电感8只，共¥15.97416；其余器件未闭合价格，不能据此宣称整板≤200元。"
+  ],
+  "costSnapshot": [
+    {
+      "part": "ETA3000D2I",
+      "qty": 8,
+      "source": "https://www.hqchip.com/gongsi/33895.html",
+      "price": "华秋网页5+显示约¥1.3385/只；8只¥10.708，采购时复核"
+    },
+    {
+      "part": "Sunlord SWPA8040S1R0NT",
+      "qty": 8,
+      "source": "https://www.hqchip.com/search/8040.html; manufacturer datasheet: https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "price": "华秋页面5+价¥0.65827/只；8只¥5.26616；MOQ/步进5只，采购时复核"
+    },
+    {
+      "part": "其余候选器件",
+      "qty": 59,
+      "source": "候选JSON各器件行列出的制造商/采购来源",
+      "price": "部分器件缺少可核验人民币小批价；其中AT3H74-CuH-S与BSS138LT1G本轮未补报价，待询价"
+    }
+  ],
+  "counts": {
+    "powerStage": 49,
+    "controlAndGlobalEnable": 26,
+    "total": 75,
+    "normalizedMpnTypes": 11,
+    "includesExistingAFEorLegacySharedInductorParts": false
+  },
+  "components": [
+    {
+      "ref": "U_ETA_BAL1",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B1",
+        "2": "TAP_B2",
+        "3": "BAL_ETA_SW_1",
+        "4": "B0",
+        "5": "BAL_ETA_BIAS_1",
+        "6": null,
+        "7": "BAL_ETA_ISET_1",
+        "8": "BAL_ETA_EN_1",
+        "EP": "B0"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B1；2 BATP=TAP_B2；3 SW；4 BATN=B0；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP1默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL1",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_1",
+        "2": "TAP_B1"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL1",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "B0",
+        "2": "TAP_B1"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS1",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_1",
+        "2": "BAL_ETA_SW_1"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET1",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_1",
+        "2": "B0"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET1",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_1",
+        "2": "B0"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP1",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_1",
+        "2": "B0",
+        "3": "BAL_ETA_EN_1"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN B0，D=ETA EN，G=BAL_EN_CLAMP_GATE_1。对应栅极由R_BAL_EN_GATE_PU1拉到本级BATP TAP_B2，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU1",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B2",
+        "2": "BAL_EN_CLAMP_GATE_1"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B2上拉至BATN=B0；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL2",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B2",
+        "2": "TAP_B3",
+        "3": "BAL_ETA_SW_2",
+        "4": "TAP_B1",
+        "5": "BAL_ETA_BIAS_2",
+        "6": null,
+        "7": "BAL_ETA_ISET_2",
+        "8": "BAL_ETA_EN_2",
+        "EP": "TAP_B1"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B2；2 BATP=TAP_B3；3 SW；4 BATN=TAP_B1；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP2默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL2",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_2",
+        "2": "TAP_B2"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL2",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B1",
+        "2": "TAP_B2"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS2",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_2",
+        "2": "BAL_ETA_SW_2"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET2",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_2",
+        "2": "TAP_B1"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET2",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_2",
+        "2": "TAP_B1"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP2",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_2",
+        "2": "TAP_B1",
+        "3": "BAL_ETA_EN_2"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B1，D=ETA EN，G=BAL_EN_CLAMP_GATE_2。对应栅极由R_BAL_EN_GATE_PU2拉到本级BATP TAP_B3，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU2",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B3",
+        "2": "BAL_EN_CLAMP_GATE_2"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B3上拉至BATN=TAP_B1；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL3",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B3",
+        "2": "TAP_B4",
+        "3": "BAL_ETA_SW_3",
+        "4": "TAP_B2",
+        "5": "BAL_ETA_BIAS_3",
+        "6": null,
+        "7": "BAL_ETA_ISET_3",
+        "8": "BAL_ETA_EN_3",
+        "EP": "TAP_B2"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B3；2 BATP=TAP_B4；3 SW；4 BATN=TAP_B2；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP3默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL3",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_3",
+        "2": "TAP_B3"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL3",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B2",
+        "2": "TAP_B3"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS3",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_3",
+        "2": "BAL_ETA_SW_3"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET3",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_3",
+        "2": "TAP_B2"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET3",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_3",
+        "2": "TAP_B2"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP3",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_3",
+        "2": "TAP_B2",
+        "3": "BAL_ETA_EN_3"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B2，D=ETA EN，G=BAL_EN_CLAMP_GATE_3。对应栅极由R_BAL_EN_GATE_PU3拉到本级BATP TAP_B4，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU3",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B4",
+        "2": "BAL_EN_CLAMP_GATE_3"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B4上拉至BATN=TAP_B2；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL4",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B4",
+        "2": "TAP_B5",
+        "3": "BAL_ETA_SW_4",
+        "4": "TAP_B3",
+        "5": "BAL_ETA_BIAS_4",
+        "6": null,
+        "7": "BAL_ETA_ISET_4",
+        "8": "BAL_ETA_EN_4",
+        "EP": "TAP_B3"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B4；2 BATP=TAP_B5；3 SW；4 BATN=TAP_B3；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP4默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL4",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_4",
+        "2": "TAP_B4"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL4",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B3",
+        "2": "TAP_B4"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS4",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_4",
+        "2": "BAL_ETA_SW_4"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET4",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_4",
+        "2": "TAP_B3"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET4",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_4",
+        "2": "TAP_B3"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP4",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_4",
+        "2": "TAP_B3",
+        "3": "BAL_ETA_EN_4"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B3，D=ETA EN，G=BAL_EN_CLAMP_GATE_4。对应栅极由R_BAL_EN_GATE_PU4拉到本级BATP TAP_B5，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU4",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B5",
+        "2": "BAL_EN_CLAMP_GATE_4"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B5上拉至BATN=TAP_B3；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL5",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B5",
+        "2": "TAP_B6",
+        "3": "BAL_ETA_SW_5",
+        "4": "TAP_B4",
+        "5": "BAL_ETA_BIAS_5",
+        "6": null,
+        "7": "BAL_ETA_ISET_5",
+        "8": "BAL_ETA_EN_5",
+        "EP": "TAP_B4"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B5；2 BATP=TAP_B6；3 SW；4 BATN=TAP_B4；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP5默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL5",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_5",
+        "2": "TAP_B5"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL5",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B4",
+        "2": "TAP_B5"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS5",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_5",
+        "2": "BAL_ETA_SW_5"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET5",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_5",
+        "2": "TAP_B4"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET5",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_5",
+        "2": "TAP_B4"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP5",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_5",
+        "2": "TAP_B4",
+        "3": "BAL_ETA_EN_5"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B4，D=ETA EN，G=BAL_EN_CLAMP_GATE_5。对应栅极由R_BAL_EN_GATE_PU5拉到本级BATP TAP_B6，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU5",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B6",
+        "2": "BAL_EN_CLAMP_GATE_5"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B6上拉至BATN=TAP_B4；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL6",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B6",
+        "2": "TAP_B7",
+        "3": "BAL_ETA_SW_6",
+        "4": "TAP_B5",
+        "5": "BAL_ETA_BIAS_6",
+        "6": null,
+        "7": "BAL_ETA_ISET_6",
+        "8": "BAL_ETA_EN_6",
+        "EP": "TAP_B5"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B6；2 BATP=TAP_B7；3 SW；4 BATN=TAP_B5；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP6默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL6",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_6",
+        "2": "TAP_B6"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL6",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B5",
+        "2": "TAP_B6"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS6",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_6",
+        "2": "BAL_ETA_SW_6"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET6",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_6",
+        "2": "TAP_B5"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET6",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_6",
+        "2": "TAP_B5"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP6",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_6",
+        "2": "TAP_B5",
+        "3": "BAL_ETA_EN_6"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B5，D=ETA EN，G=BAL_EN_CLAMP_GATE_6。对应栅极由R_BAL_EN_GATE_PU6拉到本级BATP TAP_B7，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU6",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B7",
+        "2": "BAL_EN_CLAMP_GATE_6"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B7上拉至BATN=TAP_B5；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL7",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B7",
+        "2": "TAP_B8",
+        "3": "BAL_ETA_SW_7",
+        "4": "TAP_B6",
+        "5": "BAL_ETA_BIAS_7",
+        "6": null,
+        "7": "BAL_ETA_ISET_7",
+        "8": "BAL_ETA_EN_7",
+        "EP": "TAP_B6"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B7；2 BATP=TAP_B8；3 SW；4 BATN=TAP_B6；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP7默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL7",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_7",
+        "2": "TAP_B7"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL7",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B6",
+        "2": "TAP_B7"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS7",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_7",
+        "2": "BAL_ETA_SW_7"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET7",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_7",
+        "2": "TAP_B6"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET7",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_7",
+        "2": "TAP_B6"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP7",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_7",
+        "2": "TAP_B6",
+        "3": "BAL_ETA_EN_7"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B6，D=ETA EN，G=BAL_EN_CLAMP_GATE_7。对应栅极由R_BAL_EN_GATE_PU7拉到本级BATP TAP_B8，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU7",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B8",
+        "2": "BAL_EN_CLAMP_GATE_7"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B8上拉至BATN=TAP_B6；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_ETA_BAL8",
+      "mpn": "ETA3000D2I",
+      "value": "相邻两节自动均衡控制器；DFN2×2-8",
+      "pins": {
+        "1": "TAP_B8",
+        "2": "TAP_B9",
+        "3": "BAL_ETA_SW_8",
+        "4": "TAP_B7",
+        "5": "BAL_ETA_BIAS_8",
+        "6": null,
+        "7": "BAL_ETA_ISET_8",
+        "8": "BAL_ETA_EN_8",
+        "EP": "TAP_B7"
+      },
+      "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+      "note": "ETA3000D2I 8腳：1 BATC=TAP_B8；2 BATP=TAP_B9；3 SW；4 BATN=TAP_B7；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP8默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。"
+    },
+    {
+      "ref": "L_ETA_BAL8",
+      "mpn": "SWPA8040S1R0NT",
+      "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+      "pins": {
+        "1": "BAL_ETA_SW_8",
+        "2": "TAP_B8"
+      },
+      "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+      "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+    },
+    {
+      "ref": "C_BAL_CELL8",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B7",
+        "2": "TAP_B8"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+    },
+    {
+      "ref": "C_BAL_BIAS8",
+      "mpn": "0603B103K500NT",
+      "value": "10nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_BIAS_8",
+        "2": "BAL_ETA_SW_8"
+      },
+      "source": "https://www.lcsc.com/product-detail/C57112.html",
+      "note": "BIAS对SW本地去耦，贴近芯片。"
+    },
+    {
+      "ref": "R_BAL_ISET8",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_8",
+        "2": "TAP_B7"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。"
+    },
+    {
+      "ref": "C_BAL_ISET8",
+      "mpn": "0603B102K500NT",
+      "value": "1nF 50V X7R ±10% 0603",
+      "pins": {
+        "1": "BAL_ETA_ISET_8",
+        "2": "TAP_B7"
+      },
+      "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+      "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+    },
+    {
+      "ref": "Q_BAL_EN_CLAMP8",
+      "mpn": "BSS138LT1G",
+      "value": "N沟道MOSFET；SOT-23；pin1=G,pin2=S,pin3=D；VDS 50V；VGS ±20V",
+      "pins": {
+        "1": "BAL_EN_CLAMP_GATE_8",
+        "2": "TAP_B7",
+        "3": "BAL_ETA_EN_8"
+      },
+      "source": "https://www.onsemi.com/download/data-sheet/pdf/bss138lt1-d.pdf（Rev.15）",
+      "note": "本地默认EN钳位：S=本级BATN TAP_B7，D=ETA EN，G=BAL_EN_CLAMP_GATE_8。对应栅极由R_BAL_EN_GATE_PU8拉到本级BATP TAP_B9，VGS为两节电压和（典型5.0–8.4V），低于±20V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家RDS(on)保证点为VGS=2.75V；本应用以EN小电流钳位，首板确认开/关态。"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU8",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "BAL_EN_CLAMP_GATE_8"
+      },
+      "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+      "note": "本级MOS栅极从BATP=TAP_B9上拉至BATN=TAP_B7；与光耦输出构成默认钳位控制。"
+    },
+    {
+      "ref": "U_BAL_OPTO_Q1",
+      "mpn": "AT3H74-CuH-S",
+      "value": "4路光耦；SSOP-16；每路输入A/K、输出C/E",
+      "pins": {
+        "1": "BAL_OPTO_LED_0",
+        "2": "BAL_OPTO_LED_1",
+        "16": "BAL_EN_CLAMP_GATE_1",
+        "15": "B0",
+        "3": "BAL_OPTO_LED_1",
+        "4": "BAL_OPTO_LED_2",
+        "14": "BAL_EN_CLAMP_GATE_2",
+        "13": "TAP_B1",
+        "5": "BAL_OPTO_LED_2",
+        "6": "BAL_OPTO_LED_3",
+        "12": "BAL_EN_CLAMP_GATE_3",
+        "11": "TAP_B2",
+        "7": "BAL_OPTO_LED_3",
+        "8": "BAL_OPTO_LED_4",
+        "10": "BAL_EN_CLAMP_GATE_4",
+        "9": "TAP_B3"
+      },
+      "source": "AOTE manufacturer datasheet: https://www.aotesemi.com/uploadfile/202405/ffb1a2e2ebecfaf.pdf",
+      "note": "四路输入LED分别串入BAL_OPTO_LED_0..BAL_OPTO_LED_4链。输出按原厂脚图：16C/15E→stage1, 14C/13E→stage2, 12C/11E→stage3, 10C/9E→stage4；各E接对应级BATN，各C接BSS138LT1G栅极。输入LED有效时拉低栅极并释放ETA EN；CTR表列为IF=5mA、VCE=5V条件，未宣称全温最低CTR；失效时默认EN关闭。"
+    },
+    {
+      "ref": "U_BAL_OPTO_Q2",
+      "mpn": "AT3H74-CuH-S",
+      "value": "4路光耦；SSOP-16；每路输入A/K、输出C/E",
+      "pins": {
+        "1": "BAL_OPTO_LED_4",
+        "2": "BAL_OPTO_LED_5",
+        "16": "BAL_EN_CLAMP_GATE_5",
+        "15": "TAP_B4",
+        "3": "BAL_OPTO_LED_5",
+        "4": "BAL_OPTO_LED_6",
+        "14": "BAL_EN_CLAMP_GATE_6",
+        "13": "TAP_B5",
+        "5": "BAL_OPTO_LED_6",
+        "6": "BAL_OPTO_LED_7",
+        "12": "BAL_EN_CLAMP_GATE_7",
+        "11": "TAP_B6",
+        "7": "BAL_OPTO_LED_7",
+        "8": "BAL_OPTO_LED_8",
+        "10": "BAL_EN_CLAMP_GATE_8",
+        "9": "TAP_B7"
+      },
+      "source": "AOTE manufacturer datasheet: https://www.aotesemi.com/uploadfile/202405/ffb1a2e2ebecfaf.pdf",
+      "note": "四路输入LED分别串入BAL_OPTO_LED_4..BAL_OPTO_LED_8链。输出按原厂脚图：16C/15E→stage5, 14C/13E→stage6, 12C/11E→stage7, 10C/9E→stage8；各E接对应级BATN，各C接BSS138LT1G栅极。输入LED有效时拉低栅极并释放ETA EN；CTR表列为IF=5mA、VCE=5V条件，未宣称全温最低CTR；失效时默认EN关闭。"
+    },
+    {
+      "ref": "R_BAL_OPTO_TOP",
+      "mpn": "RC2512FK-071KL",
+      "value": "1kΩ ±1% 1W 2512",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "BAL_OPTO_LED_0"
+      },
+      "source": "https://www.lcsc.com/product-detail/C189504.html",
+      "note": "8路AT3H74输入LED串的高端限流电阻；TAP_B9接LED0。按8×1.0–1.4V LED压降估算，整链约5.2–14.9mA；与低端同值1k串联，按最大约0.23W/只估算，2512 1W。"
+    },
+    {
+      "ref": "R_BAL_OPTO_BOTTOM",
+      "mpn": "RC2512FK-071KL",
+      "value": "1kΩ ±1% 1W 2512",
+      "pins": {
+        "1": "BAL_OPTO_LED_8",
+        "2": "BAL_OPTO_SINK"
+      },
+      "source": "https://www.lcsc.com/product-detail/C189504.html",
+      "note": "8路AT3H74输入LED串的低端限流电阻；LED8接BAL_OPTO_SINK。与高端1k总阻值2kΩ。"
+    },
+    {
+      "ref": "Q_BAL_MAINCLR",
+      "mpn": "MMBT5551",
+      "value": "NPN; VCEO 160V; SOT-23 pin1=B,pin2=E,pin3=C",
+      "pins": {
+        "1": "BAL_MAINCLR_BASE",
+        "2": "BAL_SWITCH_MID",
+        "3": "BAL_OPTO_SINK"
+      },
+      "source": "https://www.lcsc.com/product-detail/bipolar-bjt_goodwork-mmbt5551_C909756.html",
+      "note": "串联LED回路的上侧低端开关，由MAIN_CLR_N驱动；需确认具体厂家的SOT-23封装引脚图。"
+    },
+    {
+      "ref": "R_BAL_MAINCLR_BASE",
+      "mpn": "RC0603FR-073K3L",
+      "value": "3.3kΩ ±1% 0603",
+      "pins": {
+        "1": "MAIN_CLR_N",
+        "2": "BAL_MAINCLR_BASE"
+      },
+      "source": "https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_3-3KR-3301-1_C108078.html",
+      "note": "Q_BAL_MAINCLR基极限流。"
+    },
+    {
+      "ref": "R_BAL_MAINCLR_BE",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_MAINCLR_BASE",
+        "2": "BAL_SWITCH_MID"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "Q_BAL_MAINCLR基极-发射极下拉，失电默认关断。"
+    },
+    {
+      "ref": "Q_BAL_ENABLE",
+      "mpn": "MMBT5551",
+      "value": "NPN; VCEO 160V; SOT-23 pin1=B,pin2=E,pin3=C",
+      "pins": {
+        "1": "BAL_ENABLE_BASE",
+        "2": "B0",
+        "3": "BAL_SWITCH_MID"
+      },
+      "source": "https://www.lcsc.com/product-detail/bipolar-bjt_goodwork-mmbt5551_C909756.html",
+      "note": "串联LED回路的下侧低端开关；静态MCU许可控制。"
+    },
+    {
+      "ref": "R_BAL_ENABLE_BASE",
+      "mpn": "RC0603FR-073K3L",
+      "value": "3.3kΩ ±1% 0603",
+      "pins": {
+        "1": "BAL_ENABLE_CMD",
+        "2": "BAL_ENABLE_BASE"
+      },
+      "source": "https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_3-3KR-3301-1_C108078.html",
+      "note": "PA5/P2-13静态命令到Q_BAL_ENABLE基极；MCU复位先保持低。"
+    },
+    {
+      "ref": "R_BAL_ENABLE_BE",
+      "mpn": "RS-03K1003FT",
+      "value": "100kΩ ±1% 100mW 50V 0603",
+      "pins": {
+        "1": "BAL_ENABLE_BASE",
+        "2": "B0"
+      },
+      "source": "https://item.szlcsc.com/116568.html",
+      "note": "Q_BAL_ENABLE基极-发射极下拉，MCU复位/断线默认关断。"
+    },
+    {
+      "ref": "C_BAL_CELL9",
+      "mpn": "0603B105K250NT",
+      "value": "1uF 25V X7R ±10% 0603",
+      "pins": {
+        "1": "TAP_B8",
+        "2": "TAP_B9"
+      },
+      "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+      "note": "跨第9节电芯抽头TAP_B8-TAP_B9；须核对偏压后的有效容量。"
+    }
+  ],
+  "sourceDatasheetSha256": "E00B8EB322D500A3AECE85FDF357241454802CC8992B1A329FB7BD1374EA6DB6",
+  "comparisonToCurrentBoard": {
+    "currentBoardQty": 333,
+    "currentBoardNormalizedTypes": 117,
+    "legacyBalanceQty": 193,
+    "retiredLegacyBalanceQty": 193,
+    "legacyRefReusedByNewDesign": [
+      "C_BAL_BIAS1"
+    ],
+    "nonBalanceQty": 138,
+    "candidateBalanceQty": 75,
+    "candidateTotalBoardQty": 213,
+    "candidateTotalBoardNormalizedTypes": 67,
+    "status": "合并计数完成：修改前正式主板333件/117种；旧共享电感均衡193件退出，TS2板温改线删除2只电阻，75件新ETA均衡进入正式源；当前主板213件/67种，其中新均衡75件/11种、非均衡138件/57种，1个归一化型号重叠。",
+    "nonBalanceNormalizedMpnTypes": 57,
+    "candidateBalanceNormalizedMpnTypes": 11,
+    "normalizedTypeOverlapWithNonBalance": 1
+  },
+  "comparison": {
+    "candidateBoardMountedQty": 213,
+    "candidateBoardNormalizedMpnTypes": 67,
+    "currentBoardMountedQty": 333,
+    "currentBoardNormalizedMpnTypes": 117
+  },
+  "costBoundary": {
+    "boardComponentCapCNY": 200,
+    "knownCnyPriceCoveredQty": 16,
+    "knownCnyUsageSubtotal": 15.97416,
+    "missingCnyPriceQty": 197,
+    "includesMcuHeaders": true,
+    "excludes": [
+      "external MCU",
+      "PCB fabrication",
+      "assembly",
+      "MOQ surplus",
+      "freight"
+    ],
+    "status": "ETA控制器8只与Sunlord电感8只具有可追溯人民币页面价，合计¥15.97416；其余197件待价，不能据此判定整板满足¥200上限。"
+  }
+}

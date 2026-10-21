@@ -1,0 +1,91 @@
+* Independent 1 s DC-link energy/crowbar cross-check: healthy_32p4_SAFEon_noCOV
+* Average source/injection model; no phase bridge or vendor MOS macro.
+.title healthy_32p4_SAFEon_noCOV
+.options method=gear reltol=0.001 abstol=1u vntol=1u maxord=2
+.param VDC=32.4 VSAFE=4.9764817276 VOL=0.9 PGEN=1800 COV=1e-15 PABS=0 TABS=0 TRAMP=1m DUMPEN=1
+
+* Precharged bus. Battery source has a one-way diode and 10mohm/1uH path;
+* it may source motoring current but cannot absorb regenerative current.
+Vbattery batt 0 {VDC}
+Rsource batt src1 10m
+Lsource src1 src2 1u IC=0
+Dsrc src2 bus D_SOURCE
+.model D_SOURCE D(IS=1e-9 N=1.2 RS=2m CJO=500p TT=200n)
+
+* Local bulk C, ESR and ESL, isolated from the source/bridge by the modeled
+* connection inductance. No remote DC/DC or distant capacitance is included.
+Llink bus cap_esr 15n IC=0
+Resr cap_esr cap_i 6.333m
+Cbulk cap_i 0 30m IC={VDC}
+
+* Motor port is an explicit 1.8kW constant-power injection into the BUS.
+* It intentionally continues for the full second as chopper thermal upper
+* bound; actual BREAK_N current decay and diode regeneration are not modeled.
+Bregen 0 bus I={ ((time<TRAMP) ? PGEN*time/TRAMP : PGEN)/max(v(bus),1) }
+Bregen_power regen_power 0 V={ ((time<TRAMP) ? PGEN*time/TRAMP : PGEN) }
+* Optional external absorption envelope (not present in the no-sink baseline).
+* It is power-limited and expires after the requested finite energy quota.
+Babs bus 0 I={ (time<TABS) ? min(PABS, ((time<TRAMP) ? PGEN*time/TRAMP : PGEN))/max(v(bus),1) : 0 }
+Babs_power abs_power 0 V={ (time<TABS) ? min(PABS, ((time<TRAMP) ? PGEN*time/TRAMP : PGEN)) : 0 }
+
+* Candidate TLV1704 resistor network. The COV option is the proposed 1nF
+* VBUS_OV_SENSE filter; compare with 1fF for the unfiltered sensitivity.
+Rovtop bus ov_sense 162k
+Rovbot ov_sense 0 10k
+Covsense ov_sense 0 {COV} IC=1.88372093023
+Rref_top safe5 ov_ref 10.2k
+Rref_bot ov_ref 0 10k
+Rhyst busov_n ov_ref 200k
+Rov_pullup safe5 busov_n 4.7k
+* Open-collector comparator behavior at the full-temperature VOL=0.9V
+* datasheet boundary; no official TLV1704 macromodel or worst-case delay.
+Boc busov_n 0 I={ (v(ov_sense)>v(ov_ref)) ? (v(busov_n)-VOL)/5 : 0 }
+Ccmp busov_n 0 100p IC=4.92017398333
+
+* SAFE_5V independent from controller 5V; UCC gate RC and IRLB4030 dump
+* switch represented behaviorally. The two 2ohm resistors make 1ohm total.
+Vsafe safe5 0 {4.9764817276}
+Vcore5 core5 0 {5}
+Bdrv drv_cmd 0 V={ ((DUMPEN>0.5) && (v(safe5)>4.5) && (v(busov_n)<1.0)) ? 5 : 0 }
+Rgate drv_cmd brkgate 10
+Cgate brkgate 0 10n IC=0
+Rgate_pd brkgate 0 10k
+RdumpA bus dump_bus 2
+RdumpB bus dump_bus 2
+Ldump dump_bus dump_sw 10n
+Sbrake dump_sw 0 brkgate 0 SW_DUMP
+.model SW_DUMP SW(Ron=11.25m Roff=1G Vt=2.5 Vh=0.1)
+
+.ic V(bus)={VDC} V(cap_i)={VDC} V(ov_sense)=1.88372093023 V(ov_ref)=2.52409975893 V(busov_n)=4.92017398333 V(brkgate)=0
+.save V(bus) V(batt) V(cap_i) V(ov_sense) V(ov_ref) V(busov_n) V(brkgate) V(dump_bus) V(regen_power) V(abs_power) I(Llink) I(Ldump) I(Vbattery)
+
+.control
+set noaskquit
+set numdgt=10
+tran 2u 1s 0 2u uic
+let preg = v(regen_power)
+let idump = i(Ldump)
+let pdump_r = v(bus,dump_bus)*idump
+let pq7 = idump*idump*11.25m
+let pdump = pdump_r+pq7
+let pabs = v(abs_power)
+let isource = -i(Vbattery)
+let psource = v(batt)*isource
+meas tran t_end max time from=0 to=1
+meas tran vbus_min min v(bus) from=0 to=1
+meas tran vbus_max max v(bus) from=0 to=1
+meas tran vbus_end find v(bus) at=1
+meas tran regen_energy integ preg from=0 to=1
+meas tran dump_energy integ pdump from=0 to=1
+meas tran dump_resistor_energy integ pdump_r from=0 to=1
+meas tran q7_channel_energy integ pq7 from=0 to=1
+meas tran absorb_energy integ pabs from=0 to=1
+meas tran battery_energy integ psource from=0 to=1
+meas tran source_current_max max isource from=0 to=1
+meas tran source_current_min min isource from=0 to=1
+meas tran t_busov_1v WHEN v(busov_n)=1 FALL=1
+meas tran t_gate_2p5 WHEN v(brkgate)=2.5 RISE=1
+write healthy_32p4_SAFEon_noCOV.raw V(bus) V(cap_i) V(ov_sense) V(ov_ref) V(busov_n) V(brkgate) V(dump_bus) V(regen_power) V(abs_power) I(Llink) I(Ldump) I(Vbattery)
+quit
+.endc
+.end

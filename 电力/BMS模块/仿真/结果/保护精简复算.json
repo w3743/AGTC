@@ -1,0 +1,324 @@
+{
+  "schema": "bms-protection-reduction-audit-v1",
+  "date": "2026-10-15",
+  "scope": "保护链只读核验、两项MPN归并核验与算术复算；非硬件验收",
+  "status": "PASS_WITH_OPEN_ITEMS",
+  "summary": {
+    "safety_function_components_removed_this_round": 0,
+    "approved_mpn_reductions": [
+      {
+        "change": "U_AND2原SN74LVC1G08DBVR功能由SN74LVC1G11DCKR承载；第三输入绑高",
+        "physical_gate_removed": 0,
+        "part_number_type_reduction": 1
+      },
+      {
+        "change": "8只100nF 16V X7R电容并为GRM188R72A104KA35J 100V X7R",
+        "physical_capacitors_removed": 0,
+        "part_number_type_reduction": 1
+      }
+    ],
+    "protection_device_deletion_candidates_approved": []
+  },
+  "source_provenance": {
+    "功率元件连接.json": {
+      "path": "BMS模块\\原理图准备\\功率元件连接.json",
+      "sha256": "d6c63c8ac2ca1920cc6b6fdc150502a5ce985affd281289bfca4dc75eb52f7df"
+    },
+    "接口元件连接.json": {
+      "path": "BMS模块\\原理图准备\\接口元件连接.json",
+      "sha256": "ca5caf9237f966db1de3d7c219a4046bc9870286ab9ad08c13b02fd67f7d96d3"
+    },
+    "AFE元件连接.json": {
+      "path": "BMS模块\\原理图准备\\AFE元件连接.json",
+      "sha256": "874fba89731a5312d594a114a13cc2f2e8a2b48fb9926860502aaed00271a991"
+    },
+    "风扇元件连接.json": {
+      "path": "BMS模块\\原理图准备\\风扇元件连接.json",
+      "sha256": "b30b7b38323455d81a960c432477d1fe8e59704e1db963bca84033e81aa5472a"
+    }
+  },
+  "evidence_files": {
+    "saved_native_netlist": {
+      "path": "BMS模块\\检查\\BMS-9S4P.enet",
+      "sha256": "96f01941ebc12eabead28cf4345d7c5e21138f222c73c77ab7e2271968925037"
+    },
+    "current_construction_input": {
+      "path": "BMS模块\\检查\\当前施工输入.json",
+      "sha256": "31da774e23494ab494c6ad240df7aec90a7964601fbd9f9f212b45fce99147e8"
+    },
+    "fan_inputs": {
+      "path": "BMS模块\\仿真\\输入\\温控调速落实参数.json",
+      "sha256": "d5a3132463b573b20b87314c2e07820ae380655a161e3f9dde75fc13821f3abc"
+    },
+    "shared_device_record": {
+      "path": "元件封装库\\原生片段\\DEVICE\\eba5cdb2817e6fbbf140876a0d45855db75f70802eb8b95db9bba2864ac21bca.jsonl",
+      "sha256": "eba5cdb2817e6fbbf140876a0d45855db75f70802eb8b95db9bba2864ac21bca"
+    }
+  },
+  "primary_references": [
+    {
+      "title": "TI BQ76952 Technical Reference Manual",
+      "url": "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+      "finding": "PDSG非零timeout到时会转DSG，timeout=0则仍由LD电压条件退出；PTO为独立超时机制，不是PDSGtimeout替代。"
+    },
+    {
+      "title": "TI BQ76952 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/bq76952.pdf",
+      "finding": "AFE保护器件/功能边界与PDSG/PCHG功能参照。"
+    },
+    {
+      "title": "TI BQ76952EVM",
+      "url": "https://www.ti.com/tool/BQ76952EVM",
+      "finding": "成熟AFE/FET功能拓扑参考；不将EVM规格移作本BMS主回路保证。"
+    },
+    {
+      "title": "TI SN74LVC1G11 datasheet",
+      "url": "https://www.ti.com/lit/gpn/SN74LVC1G11",
+      "finding": "DCK pin1=A,2=GND,3=B,4=Y,5=VCC,6=C。"
+    },
+    {
+      "title": "TI SN74LVC74A datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74lvc74a.pdf",
+      "finding": "SOIC-14 pin9=2Q、pin12=2D；本图映射正确。"
+    },
+    {
+      "title": "TI TPL5111 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/tpl5111.pdf",
+      "finding": "7.32kΩ标称公式复算one-shot约2.528s输出；实际容差和首板测量仍需确认。"
+    },
+    {
+      "title": "Murata GRM188R72A104KA35J",
+      "url": "https://www.murata.com/products/productdetail?partno=GRM188R72A104KA35%23",
+      "finding": "100nF±10%,100Vdc,0603,X7R。"
+    },
+    {
+      "title": "SG Micro SGM2593 datasheet",
+      "url": "https://www.sg-micro.com/rect/assets/4c0699d6-d8dc-4bdd-bbb6-45bdec34c0f8/SGM2593_SGM2593D.PDF",
+      "finding": "RILIM电阻设定独立扇支路限流。"
+    },
+    {
+      "title": "Delta KSB0405HBF0D datasheet",
+      "url": "https://www.delta-fan.com/Download/Spec/KSB0405HBF0D.pdf",
+      "finding": "5V四线PWM风扇；厂家要求峰值电流实测。"
+    },
+    {
+      "title": "Littelfuse SMCJ TVS datasheet",
+      "url": "https://www.littelfuse.com/assetdocs/littelfuse_tvs_diode_smcj_datasheet.pdf?assetguid=37388813-0d6d-4329-969b-1aa8b7614ac1",
+      "finding": "SMCJ45A瞬态抑制参数；不覆盖48V连续耐压或大母线储能。"
+    }
+  ],
+  "calculations": {
+    "tpl5111": {
+      "rext_ohm": 7320,
+      "equation_coefficients_a_b_c": [
+        0.2253,
+        -20.7654,
+        570.5679
+      ],
+      "nominal_tIP_s": 2.577521,
+      "one_shot_active_high_approx_s": 2.527521
+    },
+    "precharge_fault_bound": {
+      "resistance_min_ohm": 7.79,
+      "initial_current_a": 4.852375,
+      "initial_power_w": 183.419769,
+      "resistor_energy_at_timer_hard_upper_j": 544.7567,
+      "bus_cap_stored_energy_j": 42.8652
+    }
+  },
+  "capacitor_population": [
+    {
+      "ref": "C_SRP",
+      "pins": {
+        "1": "SRP",
+        "2": "SRN"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_TIMER",
+      "pins": {
+        "1": "TMR_VDD",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_AND2",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_GATE1",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_SEQ",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_POR",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_CAN_PWR_IN2",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    },
+    {
+      "ref": "C_CAN_PWR_OUT2",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "PACK-"
+      },
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "netlist_device": "7cb60a0fa1ea5a16",
+      "netlist_footprint": "6cdef4c8a707e09a"
+    }
+  ],
+  "and_truth_table": [
+    {
+      "A": 0,
+      "B": 0,
+      "C": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 0,
+      "B": 1,
+      "C": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 1,
+      "B": 0,
+      "C": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 1,
+      "B": 1,
+      "C": 1,
+      "Y": 1,
+      "expected_AND2": 1
+    }
+  ],
+  "checks": [
+    {
+      "id": "当前施工输入与正式重开网表一致",
+      "status": "PASS",
+      "evidence": "217个当前器件的MPN与每个引脚的网络逐项比对；输入文件与BMS-9S4P.enet器件集合及映射完全一致。旧final_before_reopen.enet/plan.json不参与判定。"
+    },
+    {
+      "id": "AND3替AND2逻辑等价及脚位",
+      "status": "PASS",
+      "evidence": "U_AND2=TI SN74LVC1G11DCKR; DCK pin1=A,3=B,6=C tied PRE_CTRL_3V3,4=Y,5=VCC,2=GND; 对C固定高的4种A/B组合逐一等价于A&B。U_GATE1未改且仍独立存在。"
+    },
+    {
+      "id": "8只100nF物料合并",
+      "status": "PASS",
+      "evidence": "8个物理电容仍全部保留，精确MPN/共用DEVICE/0603封装一致，分别保持原两端网络；官方Murata资料为0.1µF±10%、100V、X7R、0603。不是删除去耦或把八颗折算一颗。"
+    },
+    {
+      "id": "U_SEQ 14-pin pinmap",
+      "status": "PASS",
+      "evidence": "TI SOIC-14脚位表：pin9=2Q、pin12=2D；源与ENET相同，TMR_TRIG和PRE_CTRL_3V3连接正确。不得套用16-pin RGY引脚表误报。"
+    },
+    {
+      "id": "双许可与默认关断结构保留",
+      "status": "PASS",
+      "evidence": "TPL5111 one-shot、FF-B一次尝试锁存、U_GATE1硬件窗口、BQ DFETOFF/BOTHOFF及POR清除链保留；FF-A MAIN_REQ仍是MCU最终许可。MAIN_REQ依赖固件正确完成新鲜电压/电流/计时检查，外部逻辑不构成PRE_OK，故此项是明确残余风险，不能声称独立硬件差压联锁。"
+    },
+    {
+      "id": "差异故障域保护件逐项保留",
+      "status": "PASS",
+      "evidence": "双向QPRE提供反向阻断；SMCJ45A提供端口瞬态钳位（45V VRWM并不保证48V钳位，也不吸收60mF储能）；BAT46W分别供BAT与BREG两支路、FCX495TA承担BREG预稳压；SGM2593+R_ILIM保护风扇支路；VO617A隔离LOAD_VALID；两颗MMBT5551分别作为均衡主清除与MCU许可串联开关；两片四路光耦承担八个隔离均衡输出。器件MPN相同或BQ内置告警不代表故障功能重复。"
+    },
+    {
+      "id": "八路ISET本地电容",
+      "status": "PASS",
+      "evidence": "8个独立ISET/电芯采样本地滤波件保留；同料号已存在，归并不减少采购SKU，不批准移除。"
+    },
+    {
+      "id": "本轮没有批准删除保护功能器件",
+      "status": "PASS",
+      "evidence": "当前保护精简输入的批准删除集合为空，审查保护链的器件仍在当前施工输入与ENET中。AFE原生比较器拓扑文件是历史候选，当前源中没有U_COMP；本轮未实施/未宣称删比较器。"
+    },
+    {
+      "id": "预充硬件应力纸面计算",
+      "status": "PASS",
+      "evidence": "R_PRE=8.2Ω±5%, VPACK=37.8V：Rmin=7.7900Ω, I0=4.8524A, P0=183.420W; 按2.970s故障上界电阻吸收约544.76J。60mF母线储能另为42.8652J，不能与R_PRE耗散混为一谈。安装降额、重复脉冲和过热保护尚未实物验证。"
+    },
+    {
+      "id": "TPL5111公式复算",
+      "status": "PASS",
+      "evidence": "TI公式T=(a*(REXT/100)^2+b*(REXT/100)+c)/100，7.32kΩ标称tIP=2.578s；one-shot DRVn高电平约tIP−50ms=2.528s。电阻容差、振荡器/温度/电源和量化影响需按实际器差并首板测量；不可把标称值称为保证最坏值。"
+    },
+    {
+      "id": "风扇保护边界",
+      "status": "PASS",
+      "evidence": "Delta 5V四线风扇；厂家给定运行电流信息不能代替启动峰值。0.45A仅为当前敏感性假设；25kHz控制、PWM断开全速、首板需量峰值并核对模块/SGM2593限流与压降。不是可凭BQ主电流保护删除的重复器件。"
+    },
+    {
+      "id": "风扇限流阻值維持6.8k",
+      "status": "PASS",
+      "evidence": "当前源保留R_FAN_ILIM=RC0603FR-076K8L（6.8kΩ）。SGM2593资料给6.8kΩ时全温限流阈值915mA(min)/1010mA(typ)/1088mA(max)，并说明阈值与RILIM成反比；5.1kΩ按标称比例约提高1.33倍至1.35A，非该表直接规格值。未测风扇启动峰值和5V模块余量前不提高阈值，5.1kΩ候选未采纳。"
+    },
+    {
+      "id": "BQ成熟参考方案边界",
+      "status": "PASS",
+      "evidence": "参考TI BQ76952EVM成熟AFE/FET保护实现作为功能/接口拓扑资料；EVM型号的电芯范围与其具体电流能力不代表本设计9S、60A路径已经验证。BQ本体保护不能代替外部熔断、瞬态钳位、各采样通路、分支限流或独立硬件窗口。"
+    }
+  ],
+  "open_items": [
+    "FF-A MAIN_REQ为MCU最终许可；当前没有独立硬件PRE_OK差压判据。固件错误许可/过期测量仍是开放故障风险。",
+    "PDSG到期可开DSG，PTO与PDSG timeout不同；禁止以原生BQ功能作窗口器件直接删减依据。",
+    "R_PRE的约545J故障脉冲及安装降额/重复频次/温升/温断需实物验证；BUS电容能量独立评估。",
+    "风扇启动峰值没有厂家保证，需首件实测并核对5V模块和SGM2593限流。",
+    "SMCJ45A的45V VRWM不证明可在48V连续工作，且不吸收大电容能量；车辆浪涌仍需测量。",
+    "保护阈值、CHG/DSG动作和BQ寄存器配置必须实际配置、读回并按系统试验；本脚本未验证。",
+    "不以EVM最大电流推定9S、60A通路，FET、铜箔、热、短路开断仍要验证。"
+  ],
+  "not_tested": [
+    "台架/实物测试",
+    "热与脉冲耐量验收",
+    "EMC/线束瞬态",
+    "固件正确性/端到端关断",
+    "车辆放行"
+  ]
+}

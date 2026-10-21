@@ -1,0 +1,1296 @@
+{
+  "schema": "isaac-field-paired-motion-response-comparison-v1",
+  "status": "complete",
+  "purpose": "CPU-only readout of the frozen 2 ms same-reset baseline and same-side mimic runs; no repair verdict.",
+  "sources": {
+    "protocol_path": "same_side_mimic_v2/protocol.json",
+    "protocol_sha256": "d7af43935bbf382a98c070bd7f0c64f3f64c87eb16d18edd1458cf88373938b6",
+    "protocol_acceptance_thresholds": {
+      "last_1s_native_physics_qd_pair_abs_p95_max_rad_s": 0.0925925925925926,
+      "last_1s_native_physics_qd_pair_abs_max_rad_s": 0.462962962962963,
+      "last_1s_policy_q_pair_abs_max_rad": 0.02,
+      "all_sampled_residuals_finite": true,
+      "all_applied_actuator_efforts_le_2Nm": true,
+      "yaw": "measure only; no target yaw rate"
+    },
+    "baseline": {
+      "name": "baseline_2ms_elliptic_1_mu0_8_kf1000",
+      "summary_path": "runs/baseline_2ms_elliptic_1_mu0_8_kf1000/staged_motion_response_summary.json",
+      "summary_sha256": "21ffa855223a3329e33f94647039f67cc7e24c3aad79752090266714d88fcee9",
+      "exit_record_path": "runs/baseline_2ms_elliptic_1_mu0_8_kf1000.exit.json",
+      "exit_record": {
+        "actual_exit_code": 0,
+        "mode": "baseline",
+        "physics_dt_s": 0.002,
+        "policy_dt_s": 0.05,
+        "decimation": 25,
+        "cone": "elliptic",
+        "impratio": 1,
+        "mu": 0.8,
+        "kf": 1000,
+        "effort_cap_nm": 2,
+        "runner_sha256": "52fc275d99cb92365a1495fd9c12ecf63909ed5f9f6bca58fefa208d426ca5b0",
+        "collector_sha256": "612a32ff99841e19d31b36ef4ce93a45cd890fa00df7d66f41f1cf05f056b000",
+        "output_dir": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/baseline_2ms_elliptic_1_mu0_8_kf1000",
+        "log_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/baseline_2ms_elliptic_1_mu0_8_kf1000.log"
+      }
+    },
+    "mimic": {
+      "name": "mimic_v2_2ms_elliptic_1_mu0_8_kf1000",
+      "summary_path": "runs/mimic_v2_2ms_elliptic_1_mu0_8_kf1000/staged_motion_response_summary.json",
+      "summary_sha256": "379ca6200ca5715335bc0b0ec72b6eb8c9c7e25da60db14d21e9c13a05b11cf5",
+      "exit_record_path": "runs/mimic_v2_2ms_elliptic_1_mu0_8_kf1000.exit.json",
+      "exit_record": {
+        "actual_exit_code": 0,
+        "mode": "mimic",
+        "physics_dt_s": 0.002,
+        "policy_dt_s": 0.05,
+        "decimation": 25,
+        "cone": "elliptic",
+        "impratio": 1,
+        "mu": 0.8,
+        "kf": 1000,
+        "effort_cap_nm": 2,
+        "runner_sha256": "52fc275d99cb92365a1495fd9c12ecf63909ed5f9f6bca58fefa208d426ca5b0",
+        "collector_sha256": "612a32ff99841e19d31b36ef4ce93a45cd890fa00df7d66f41f1cf05f056b000",
+        "output_dir": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/mimic_v2_2ms_elliptic_1_mu0_8_kf1000",
+        "log_path": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/mimic_v2_2ms_elliptic_1_mu0_8_kf1000.log"
+      }
+    },
+    "raw_effort_jsonl": {
+      "baseline": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/baseline_2ms_elliptic_1_mu0_8_kf1000/native_physics_efforts.jsonl",
+      "mimic": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/staged_response/same_side_mimic_motion_v1/runs/mimic_v2_2ms_elliptic_1_mu0_8_kf1000/native_physics_efforts.jsonl"
+    }
+  },
+  "fixed_contract": {
+    "seed": 90231,
+    "case_count": 8,
+    "case_order": [
+      "forward",
+      "reverse",
+      "pivot_left_low",
+      "pivot_right_low",
+      "arc_left",
+      "arc_right",
+      "pivot_right_high",
+      "pivot_left_high"
+    ],
+    "settle_drive_brake_s": [
+      1.0,
+      2.0,
+      5.0
+    ],
+    "physics_dt_s": 0.002,
+    "decimation": 25,
+    "policy_dt_s": 0.05,
+    "solver_treatment": {
+      "cone": "elliptic",
+      "impratio": 1.0
+    },
+    "shape_mu_treatment": {
+      "mode": "cfg_default",
+      "requested_mu": null
+    },
+    "current_drive_interface": "independent_left_right_track_speed_explicit_pi_v6",
+    "drive_config_identical": true,
+    "runtime_physics_identical": true,
+    "source_hash_maps_identical": true,
+    "source_hashes_unchanged_after_both_runs": true,
+    "initial_state_hash_maps_identical": true,
+    "initial_state_hashes_match_across_cases_both_runs": true,
+    "initial_state_hash_per_case": {
+      "forward": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "reverse": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "pivot_left_low": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "pivot_right_low": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "arc_left": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "arc_right": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "pivot_right_high": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "pivot_left_high": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af"
+    },
+    "only_treatment_difference": "same_side_mimic_v2 hook off (baseline) vs on (candidate)",
+    "baseline_hook_enabled": false,
+    "mimic_hook_enabled": true,
+    "runtime_gate": {
+      "baseline": {
+        "ground_and_14_wheel_mu_status": "pass",
+        "observed_ground_and_14_wheel_mu": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929
+        ],
+        "observed_ground_and_14_wheel_kf": [
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0
+        ],
+        "drive_fixed_config_status": "pass",
+        "native_wheel_joint_count": 14,
+        "effort_cap_pass": true,
+        "effort_cap_nm": 2.0,
+        "all_case_reference_checks_pass": true,
+        "all_hashes_unchanged": true
+      },
+      "mimic": {
+        "ground_and_14_wheel_mu_status": "pass",
+        "observed_ground_and_14_wheel_mu": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929
+        ],
+        "observed_ground_and_14_wheel_kf": [
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0,
+          1000.0
+        ],
+        "drive_fixed_config_status": "pass",
+        "native_wheel_joint_count": 14,
+        "effort_cap_pass": true,
+        "effort_cap_nm": 2.0,
+        "all_case_reference_checks_pass": true,
+        "all_hashes_unchanged": true
+      }
+    },
+    "candidate_mimic_equality_counts": {
+      "newton_model_mimic_constraint_count": 12,
+      "newton_model_equality_constraint_count": 12,
+      "solver_host_neq": 12,
+      "solver_mjwarp_neq": 12,
+      "all_12_expected_joint_pairs_match_once": true
+    },
+    "mimic_residual_run_gate": true,
+    "mimic_residual_thresholds": {
+      "last_1s_native_physics_qd_abs_p95_max_rad_s": 0.0925925925925926,
+      "last_1s_native_physics_qd_abs_max_rad_s": 0.462962962962963,
+      "last_1s_policy_q_abs_max_rad": 0.02
+    },
+    "baseline_residual_run_gate": false,
+    "reference_gate_pass_counts_of_8": {
+      "baseline": {
+        "all_physics_step_efforts_at_or_below_2Nm": 8,
+        "arc_translation_direction_last_1s": 2,
+        "arc_yaw_direction": 2,
+        "brake_final_abs_forward_speed_lt_0_02m_s": 8,
+        "brake_final_abs_yaw_rate_lt_0_3rad_s": 8,
+        "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": 8,
+        "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": 8,
+        "commanded_translation_direction_last_1s": 2,
+        "commanded_translation_displacement_0_7_to_1_3m": 2,
+        "finite_policy_and_effort_samples": 8,
+        "native_overturn_limit_abs_roll_pitch_le_1_2_rad": 8,
+        "no_episode_done_or_reason": 8,
+        "no_task_damage_or_collision_counters": 8,
+        "pivot_max_center_drift_lt_0_75m": 4,
+        "signed_pivot_yaw_delta_ge_0_1rad": 2
+      },
+      "mimic": {
+        "all_physics_step_efforts_at_or_below_2Nm": 8,
+        "arc_translation_direction_last_1s": 2,
+        "arc_yaw_direction": 2,
+        "brake_final_abs_forward_speed_lt_0_02m_s": 8,
+        "brake_final_abs_yaw_rate_lt_0_3rad_s": 8,
+        "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": 8,
+        "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": 8,
+        "commanded_translation_direction_last_1s": 2,
+        "commanded_translation_displacement_0_7_to_1_3m": 2,
+        "finite_policy_and_effort_samples": 8,
+        "native_overturn_limit_abs_roll_pitch_le_1_2_rad": 8,
+        "no_episode_done_or_reason": 8,
+        "no_task_damage_or_collision_counters": 8,
+        "pivot_max_center_drift_lt_0_75m": 4,
+        "signed_pivot_yaw_delta_ge_0_1rad": 2
+      }
+    },
+    "informational_gate_failures": {
+      "baseline": {
+        "pivot_right_low": {
+          "signed_pivot_yaw_delta_ge_0_1rad": false
+        }
+      },
+      "mimic": {}
+    }
+  },
+  "paired_cases": {
+    "forward": {
+      "action": [
+        0.12,
+        0.12,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": 9.246397524975691e-06,
+        "yaw_rate_last_1s_rad_s": -5.05847358454048e-06,
+        "distance_m": 0.9831123352206906,
+        "drive_mean_v_last_1s_m_s": 0.5304854601621628,
+        "brake_last_0_3s_mean_v_m_s": -2.5732710658606567e-07,
+        "brake_last_0_3s_mean_w_rad_s": -1.642073338340803e-06,
+        "brake_last_0_3s_max_abs_v_m_s": 2.3869285996624967e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": 1.6609528756816871e-06,
+        "brake_final_v_m_s": 1.704512555988913e-06,
+        "brake_final_w_rad_s": -1.6335720829374623e-06,
+        "opposite_translation_speed_integral_m": 0.05054548880341301,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.018478572388481086,
+          "p95_abs_effort_nm": 0.14666101336479187,
+          "max_abs_effort_nm": 0.22849062085151672,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.006338787078857428,
+          "native_physics_qd_pair_abs_max_rad_s": 0.11717891693115234,
+          "policy_q_pair_abs_max_rad": 0.001888275146484375,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "commanded_translation_direction_last_1s": true,
+          "commanded_translation_displacement_0_7_to_1_3m": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": 1.2524325512686119e-05,
+        "yaw_rate_last_1s_rad_s": -4.3273667756693616e-06,
+        "distance_m": 0.9831428527934464,
+        "drive_mean_v_last_1s_m_s": 0.5304279714822769,
+        "brake_last_0_3s_mean_v_m_s": 3.1292461339186652e-06,
+        "brake_last_0_3s_mean_w_rad_s": -7.940357704683265e-07,
+        "brake_last_0_3s_max_abs_v_m_s": 4.9951268010772765e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": 8.154954684869153e-07,
+        "brake_final_v_m_s": 3.264857014073641e-06,
+        "brake_final_w_rad_s": -7.890566280366329e-07,
+        "opposite_translation_speed_integral_m": 0.05046751282103408,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.018423435414711455,
+          "p95_abs_effort_nm": 0.1463661789894104,
+          "max_abs_effort_nm": 0.22844944894313812,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.00033473968505859375,
+          "native_physics_qd_pair_abs_max_rad_s": 0.0011568069458007812,
+          "policy_q_pair_abs_max_rad": 8.58306884765625e-06,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "commanded_translation_direction_last_1s": true,
+          "commanded_translation_displacement_0_7_to_1_3m": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": 3.2779279877104273e-06,
+        "yaw_rate_last_1s_rad_s": 7.311068088711181e-07,
+        "distance_m": 3.051757275573941e-05,
+        "drive_mean_v_last_1s_m_s": -5.748867988586426e-05,
+        "brake_last_0_3s_mean_v_m_s": 3.386573240504731e-06,
+        "brake_last_0_3s_mean_w_rad_s": 8.480375678724765e-07,
+        "brake_last_0_3s_max_abs_v_m_s": 2.6081982014147798e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": -8.454574071947718e-07,
+        "brake_final_v_m_s": 1.560344458084728e-06,
+        "brake_final_w_rad_s": 8.445154549008294e-07,
+        "opposite_translation_speed_integral_m": -7.797598237892917e-05,
+        "opposite_yaw_rate_integral_rad": null
+      }
+    },
+    "reverse": {
+      "action": [
+        -0.12,
+        -0.12,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": -5.7802503562243146e-05,
+        "yaw_rate_last_1s_rad_s": -3.2814313249218686e-05,
+        "distance_m": -0.9832153320389716,
+        "drive_mean_v_last_1s_m_s": -0.5304009765386581,
+        "brake_last_0_3s_mean_v_m_s": 2.6978079527377e-06,
+        "brake_last_0_3s_mean_w_rad_s": -8.015946093564708e-07,
+        "brake_last_0_3s_max_abs_v_m_s": 4.417518539412413e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": 8.402311095778714e-07,
+        "brake_final_v_m_s": 8.631362220512528e-07,
+        "brake_final_w_rad_s": -8.274809033537167e-07,
+        "opposite_translation_speed_integral_m": 0.050535323674615995,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.018441203693532957,
+          "p95_abs_effort_nm": 0.14657533168792725,
+          "max_abs_effort_nm": 0.2284771353006363,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.004948854446411134,
+          "native_physics_qd_pair_abs_max_rad_s": 0.061842918395996094,
+          "policy_q_pair_abs_max_rad": 0.0016422271728515625,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "commanded_translation_direction_last_1s": true,
+          "commanded_translation_displacement_0_7_to_1_3m": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": -5.566431659076443e-05,
+        "yaw_rate_last_1s_rad_s": -3.4514622575443356e-05,
+        "distance_m": -0.9831199646117926,
+        "drive_mean_v_last_1s_m_s": -0.5304443180561066,
+        "brake_last_0_3s_mean_v_m_s": 5.705561901455288e-07,
+        "brake_last_0_3s_mean_w_rad_s": -5.69750123228611e-07,
+        "brake_last_0_3s_max_abs_v_m_s": 2.2038725546735805e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": 6.431021120079095e-07,
+        "brake_final_v_m_s": 8.854786415213312e-07,
+        "brake_final_w_rad_s": -5.404879743764468e-07,
+        "opposite_translation_speed_integral_m": 0.05056187581662393,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.018435600901683856,
+          "p95_abs_effort_nm": 0.14651338756084442,
+          "max_abs_effort_nm": 0.2284317910671234,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.0002937793731689455,
+          "native_physics_qd_pair_abs_max_rad_s": 0.0010175704956054688,
+          "policy_q_pair_abs_max_rad": 7.62939453125e-06,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "commanded_translation_direction_last_1s": true,
+          "commanded_translation_displacement_0_7_to_1_3m": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": 2.138186971478717e-06,
+        "yaw_rate_last_1s_rad_s": -1.7003093262246693e-06,
+        "distance_m": 9.536742717897173e-05,
+        "drive_mean_v_last_1s_m_s": -4.33415174484475e-05,
+        "brake_last_0_3s_mean_v_m_s": -2.127251762592171e-06,
+        "brake_last_0_3s_mean_w_rad_s": 2.318444861278598e-07,
+        "brake_last_0_3s_max_abs_v_m_s": -2.2136459847388323e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": -1.9712899756996194e-07,
+        "brake_final_v_m_s": 2.2342419470078312e-08,
+        "brake_final_w_rad_s": 2.869929289772699e-07,
+        "opposite_translation_speed_integral_m": 2.6552142007932322e-05,
+        "opposite_yaw_rate_integral_rad": null
+      }
+    },
+    "pivot_left_low": {
+      "action": [
+        -0.1,
+        0.1,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": 0.11304819322697313,
+        "yaw_rate_last_1s_rad_s": 0.08044373355805874,
+        "distance_m": -0.06006240670745434,
+        "drive_mean_v_last_1s_m_s": -0.03902781615033746,
+        "brake_last_0_3s_mean_v_m_s": -2.382323267132354e-05,
+        "brake_last_0_3s_mean_w_rad_s": 0.0027404103505735597,
+        "brake_last_0_3s_max_abs_v_m_s": 4.757652641274035e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002856646431609988,
+        "brake_final_v_m_s": 3.231015580240637e-05,
+        "brake_final_w_rad_s": 0.0027868980541825294,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.4216228640374669,
+          "p95_abs_effort_nm": 0.661050021648407,
+          "max_abs_effort_nm": 0.8727059364318848,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 11.42887659072876,
+          "native_physics_qd_pair_abs_max_rad_s": 19.409570693969727,
+          "policy_q_pair_abs_max_rad": 2.0287647247314453,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {
+          "signed_pivot_yaw_delta_ge_0_1rad": true
+        }
+      },
+      "mimic": {
+        "yaw_delta_rad": 0.24713557571226374,
+        "yaw_rate_last_1s_rad_s": 0.16984409764409064,
+        "distance_m": -0.21718214888720508,
+        "drive_mean_v_last_1s_m_s": -0.16840905398130418,
+        "brake_last_0_3s_mean_v_m_s": 0.0006936002755537629,
+        "brake_last_0_3s_mean_w_rad_s": 0.00265406413624684,
+        "brake_last_0_3s_max_abs_v_m_s": 0.000777768436819315,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.0028000802267342806,
+        "brake_final_v_m_s": 0.0005551090580411255,
+        "brake_final_w_rad_s": 0.002582940272986889,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.4016791142603935,
+          "p95_abs_effort_nm": 0.6013743281364441,
+          "max_abs_effort_nm": 0.7661492228507996,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.03978862762451174,
+          "native_physics_qd_pair_abs_max_rad_s": 0.10024833679199219,
+          "policy_q_pair_abs_max_rad": 0.0003180503845214844,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {
+          "signed_pivot_yaw_delta_ge_0_1rad": true
+        }
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": 0.13408738248529062,
+        "yaw_rate_last_1s_rad_s": 0.0894003640860319,
+        "distance_m": -0.15711974217975075,
+        "drive_mean_v_last_1s_m_s": -0.12938123783096672,
+        "brake_last_0_3s_mean_v_m_s": 0.0007174235082250865,
+        "brake_last_0_3s_mean_w_rad_s": -8.634621432671973e-05,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0007301919104065746,
+        "brake_last_0_3s_max_abs_w_rad_s": -5.6566204875707626e-05,
+        "brake_final_v_m_s": 0.0005227989022387192,
+        "brake_final_w_rad_s": -0.00020395778119564056,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0
+      }
+    },
+    "pivot_right_low": {
+      "action": [
+        0.1,
+        -0.1,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": -0.08773009565175016,
+        "yaw_rate_last_1s_rad_s": -0.06683043260127305,
+        "distance_m": -0.04918670717004783,
+        "drive_mean_v_last_1s_m_s": -0.024739830894395708,
+        "brake_last_0_3s_mean_v_m_s": -2.5024992358642823e-05,
+        "brake_last_0_3s_mean_w_rad_s": -0.0025572505158682666,
+        "brake_last_0_3s_max_abs_v_m_s": 4.07902552979067e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002739422954618931,
+        "brake_final_v_m_s": -3.823673978331499e-05,
+        "brake_final_w_rad_s": -0.002608517650514841,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.42455374077929225,
+          "p95_abs_effort_nm": 0.6589020490646362,
+          "max_abs_effort_nm": 0.8747111558914185,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 10.979760503768922,
+          "native_physics_qd_pair_abs_max_rad_s": 20.422731399536133,
+          "policy_q_pair_abs_max_rad": 2.372603416442871,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {
+          "signed_pivot_yaw_delta_ge_0_1rad": false
+        }
+      },
+      "mimic": {
+        "yaw_delta_rad": -0.24753093882856092,
+        "yaw_rate_last_1s_rad_s": -0.17370983362197875,
+        "distance_m": -0.1251297058910914,
+        "drive_mean_v_last_1s_m_s": -0.11425446644425392,
+        "brake_last_0_3s_mean_v_m_s": 0.0003267307159452078,
+        "brake_last_0_3s_mean_w_rad_s": -0.0022757192297528186,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0005326630198396742,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002340091625228524,
+        "brake_final_v_m_s": 0.0005326630198396742,
+        "brake_final_w_rad_s": -0.002340091625228524,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.40247125372792764,
+          "p95_abs_effort_nm": 0.6086542010307312,
+          "max_abs_effort_nm": 0.820273756980896,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.04096226692199707,
+          "native_physics_qd_pair_abs_max_rad_s": 0.09171199798583984,
+          "policy_q_pair_abs_max_rad": 0.00034427642822265625,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {
+          "signed_pivot_yaw_delta_ge_0_1rad": true
+        }
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": -0.15980084317681076,
+        "yaw_rate_last_1s_rad_s": -0.1068794010207057,
+        "distance_m": -0.07594299872104357,
+        "drive_mean_v_last_1s_m_s": -0.08951463554985822,
+        "brake_last_0_3s_mean_v_m_s": 0.0003517557083038506,
+        "brake_last_0_3s_mean_w_rad_s": 0.00028153128611544797,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0004918727645417675,
+        "brake_last_0_3s_max_abs_w_rad_s": -0.0003993313293904066,
+        "brake_final_v_m_s": 0.0005708997596229892,
+        "brake_final_w_rad_s": 0.00026842602528631687,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0
+      }
+    },
+    "arc_left": {
+      "action": [
+        0.12,
+        0.24,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": 0.03336721149025834,
+        "yaw_rate_last_1s_rad_s": 0.02937490176409483,
+        "distance_m": 1.3699035603553762,
+        "drive_mean_v_last_1s_m_s": 0.7849531650543213,
+        "brake_last_0_3s_mean_v_m_s": -0.000109135782016286,
+        "brake_last_0_3s_mean_w_rad_s": 0.0035507776774466038,
+        "brake_last_0_3s_max_abs_v_m_s": 0.00011408772843424231,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.0037009972147643566,
+        "brake_final_v_m_s": -0.00011091952183051035,
+        "brake_final_w_rad_s": 0.003361801151186228,
+        "opposite_translation_speed_integral_m": 0.06186675039755301,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.40283012126226647,
+          "p95_abs_effort_nm": 0.6242314577102661,
+          "max_abs_effort_nm": 0.9766648411750793,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 8.049500179290773,
+          "native_physics_qd_pair_abs_max_rad_s": 16.74242401123047,
+          "policy_q_pair_abs_max_rad": 0.8409271240234375,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "arc_translation_direction_last_1s": true,
+          "arc_yaw_direction": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": 0.06589554947098009,
+        "yaw_rate_last_1s_rad_s": 0.06851169948931783,
+        "distance_m": 1.3590011517901133,
+        "drive_mean_v_last_1s_m_s": 0.7758555769920349,
+        "brake_last_0_3s_mean_v_m_s": 5.616347273947516e-05,
+        "brake_last_0_3s_mean_w_rad_s": 0.002462495001964271,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0003646201512310654,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.0025150543078780174,
+        "brake_final_v_m_s": 0.0003646201512310654,
+        "brake_final_w_rad_s": 0.0024772302713245153,
+        "opposite_translation_speed_integral_m": 0.05675223454918524,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.37391264659848567,
+          "p95_abs_effort_nm": 0.5596872568130493,
+          "max_abs_effort_nm": 0.8316153287887573,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.025259733200073246,
+          "native_physics_qd_pair_abs_max_rad_s": 0.07563972473144531,
+          "policy_q_pair_abs_max_rad": 0.0003185272216796875,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "arc_translation_direction_last_1s": true,
+          "arc_yaw_direction": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": 0.032528337980721744,
+        "yaw_rate_last_1s_rad_s": 0.039136797725223,
+        "distance_m": -0.010902408565262922,
+        "drive_mean_v_last_1s_m_s": -0.009097588062286444,
+        "brake_last_0_3s_mean_v_m_s": 0.00016529925475576115,
+        "brake_last_0_3s_mean_w_rad_s": -0.0010882826754823327,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0002505324227968231,
+        "brake_last_0_3s_max_abs_w_rad_s": -0.0011859429068863392,
+        "brake_final_v_m_s": 0.00047553967306157574,
+        "brake_final_w_rad_s": -0.0008845708798617125,
+        "opposite_translation_speed_integral_m": -0.005114515848367772,
+        "opposite_yaw_rate_integral_rad": null
+      }
+    },
+    "arc_right": {
+      "action": [
+        0.24,
+        0.12,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": -0.029875613527252654,
+        "yaw_rate_last_1s_rad_s": -0.027613157453015447,
+        "distance_m": 1.3767967263953096,
+        "drive_mean_v_last_1s_m_s": 0.8038932979106903,
+        "brake_last_0_3s_mean_v_m_s": -2.548075341716564e-05,
+        "brake_last_0_3s_mean_w_rad_s": -0.002998217435864111,
+        "brake_last_0_3s_max_abs_v_m_s": 2.8915377697558142e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.003044338431209326,
+        "brake_final_v_m_s": -2.6524387067183852e-05,
+        "brake_final_w_rad_s": -0.0030404930002987385,
+        "opposite_translation_speed_integral_m": 0.05622199102181185,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.3997526102156354,
+          "p95_abs_effort_nm": 0.6182634830474854,
+          "max_abs_effort_nm": 1.0291420221328735,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 7.746388339996338,
+          "native_physics_qd_pair_abs_max_rad_s": 17.595840454101562,
+          "policy_q_pair_abs_max_rad": 1.2570381164550781,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "arc_translation_direction_last_1s": true,
+          "arc_yaw_direction": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": -0.07416199437781756,
+        "yaw_rate_last_1s_rad_s": -0.07226484026759863,
+        "distance_m": 1.35195160864745,
+        "drive_mean_v_last_1s_m_s": 0.7699856132268905,
+        "brake_last_0_3s_mean_v_m_s": -1.8617196246850654e-06,
+        "brake_last_0_3s_mean_w_rad_s": -0.002159614465199411,
+        "brake_last_0_3s_max_abs_v_m_s": 7.179236490628682e-06,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002215007785707712,
+        "brake_final_v_m_s": -2.288058112753788e-06,
+        "brake_final_w_rad_s": -0.002132641850039363,
+        "opposite_translation_speed_integral_m": 0.061699007492694594,
+        "opposite_yaw_rate_integral_rad": null,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.3635611614445782,
+          "p95_abs_effort_nm": 0.5568429827690125,
+          "max_abs_effort_nm": 0.853492021560669,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.028534126281738282,
+          "native_physics_qd_pair_abs_max_rad_s": 0.07072639465332031,
+          "policy_q_pair_abs_max_rad": 0.0003452301025390625,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "arc_translation_direction_last_1s": true,
+          "arc_yaw_direction": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": -0.04428638085056491,
+        "yaw_rate_last_1s_rad_s": -0.04465168281458319,
+        "distance_m": -0.02484511774785969,
+        "drive_mean_v_last_1s_m_s": -0.03390768468379979,
+        "brake_last_0_3s_mean_v_m_s": 2.3619033792480575e-05,
+        "brake_last_0_3s_mean_w_rad_s": 0.0008386029706647,
+        "brake_last_0_3s_max_abs_v_m_s": -2.173614120692946e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": -0.0008293306455016136,
+        "brake_final_v_m_s": 2.4236328954430064e-05,
+        "brake_final_w_rad_s": 0.0009078511502593756,
+        "opposite_translation_speed_integral_m": 0.005477016470882744,
+        "opposite_yaw_rate_integral_rad": null
+      }
+    },
+    "pivot_right_high": {
+      "action": [
+        0.4,
+        -0.4,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": -0.44171609153704594,
+        "yaw_rate_last_1s_rad_s": -0.33210204914212227,
+        "distance_m": -0.04365540312352947,
+        "drive_mean_v_last_1s_m_s": -0.07330688489601016,
+        "brake_last_0_3s_mean_v_m_s": -2.9751266083621886e-05,
+        "brake_last_0_3s_mean_w_rad_s": -0.002777440007776022,
+        "brake_last_0_3s_max_abs_v_m_s": 4.192415872239508e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002853112993761897,
+        "brake_final_v_m_s": -2.1522093447856605e-05,
+        "brake_final_w_rad_s": -0.002747385064139962,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.4253701466092742,
+          "p95_abs_effort_nm": 0.8195143342018127,
+          "max_abs_effort_nm": 1.6347459554672241,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 19.021038150787362,
+          "native_physics_qd_pair_abs_max_rad_s": 36.89312744140625,
+          "policy_q_pair_abs_max_rad": 6.342060089111328,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "signed_pivot_yaw_delta_ge_0_1rad": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": -0.8722820471507191,
+        "yaw_rate_last_1s_rad_s": -0.6193407997488976,
+        "distance_m": -0.05964280594454736,
+        "drive_mean_v_last_1s_m_s": -0.06730402063112706,
+        "brake_last_0_3s_mean_v_m_s": -0.00015658517319631451,
+        "brake_last_0_3s_mean_w_rad_s": -0.0022247566763932505,
+        "brake_last_0_3s_max_abs_v_m_s": 0.00016868862439878285,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.002304140944033861,
+        "brake_final_v_m_s": -0.00015847530448809266,
+        "brake_final_w_rad_s": -0.002159534953534603,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.40354824216624235,
+          "p95_abs_effort_nm": 0.8251138925552368,
+          "max_abs_effort_nm": 1.267361044883728,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.05324335098266602,
+          "native_physics_qd_pair_abs_max_rad_s": 0.19567489624023438,
+          "policy_q_pair_abs_max_rad": 0.000484466552734375,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "signed_pivot_yaw_delta_ge_0_1rad": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": -0.43056595561367317,
+        "yaw_rate_last_1s_rad_s": -0.2872387506067753,
+        "distance_m": -0.01598740282101789,
+        "drive_mean_v_last_1s_m_s": 0.006002864264883098,
+        "brake_last_0_3s_mean_v_m_s": -0.00012683390711269263,
+        "brake_last_0_3s_mean_w_rad_s": 0.0005526833313827715,
+        "brake_last_0_3s_max_abs_v_m_s": 0.00012676446567638777,
+        "brake_last_0_3s_max_abs_w_rad_s": -0.0005489720497280359,
+        "brake_final_v_m_s": -0.00013695321104023606,
+        "brake_final_w_rad_s": 0.0005878501106053591,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0
+      }
+    },
+    "pivot_left_high": {
+      "action": [
+        -0.4,
+        0.4,
+        0.0,
+        0.0
+      ],
+      "initial_state_sha256": "7d7cd17756b8eee3eedc39828b8a2e90537820f208daf8cd611a40d657e8e8af",
+      "baseline": {
+        "yaw_delta_rad": 0.49112125157844844,
+        "yaw_rate_last_1s_rad_s": 0.35376738756895065,
+        "distance_m": -0.08392714766688536,
+        "drive_mean_v_last_1s_m_s": -0.05162407183088362,
+        "brake_last_0_3s_mean_v_m_s": 4.617076986808873e-06,
+        "brake_last_0_3s_mean_w_rad_s": 0.002780893623518447,
+        "brake_last_0_3s_max_abs_v_m_s": 1.657659959164448e-05,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.0028312860522419214,
+        "brake_final_v_m_s": -3.6523442759062164e-06,
+        "brake_final_w_rad_s": 0.002734198234975338,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.4332479780450027,
+          "p95_abs_effort_nm": 0.8388711214065552,
+          "max_abs_effort_nm": 1.5647616386413574,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 20.598933124542246,
+          "native_physics_qd_pair_abs_max_rad_s": 38.25149154663086,
+          "policy_q_pair_abs_max_rad": 6.446311950683594,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": false,
+          "native_qd_abs_max_within_v2_limit": false,
+          "policy_q_abs_max_within_v2_limit": false,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "signed_pivot_yaw_delta_ge_0_1rad": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {}
+      },
+      "mimic": {
+        "yaw_delta_rad": 0.8361261860690945,
+        "yaw_rate_last_1s_rad_s": 0.5942243605852127,
+        "distance_m": -0.14258573188758128,
+        "drive_mean_v_last_1s_m_s": -0.11238717678934336,
+        "brake_last_0_3s_mean_v_m_s": 0.001063120774536704,
+        "brake_last_0_3s_mean_w_rad_s": 0.00260411036045601,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0012075977865606546,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.003000270575284958,
+        "brake_final_v_m_s": 0.001187416142784059,
+        "brake_final_w_rad_s": 0.0024962502066046,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0,
+        "effort": {
+          "physics_rows": 4000,
+          "applied_effort_value_count": 56000,
+          "mean_abs_effort_nm": 0.407582195554062,
+          "p95_abs_effort_nm": 0.8139629364013672,
+          "max_abs_effort_nm": 1.4344851970672607,
+          "finite": true
+        },
+        "native_qd_residual": {
+          "native_physics_qd_pair_abs_p95_rad_s": 0.05156488418579102,
+          "native_physics_qd_pair_abs_max_rad_s": 0.20452880859375,
+          "policy_q_pair_abs_max_rad": 0.000499725341796875,
+          "native_qd_physics_rows": 500,
+          "native_qd_pair_samples": 6000,
+          "policy_q_samples": 20,
+          "policy_q_pair_samples": 240
+        },
+        "native_qd_residual_gates": {
+          "native_qd_abs_p95_within_v2_limit": true,
+          "native_qd_abs_max_within_v2_limit": true,
+          "policy_q_abs_max_within_v2_limit": true,
+          "residual_samples_finite": true,
+          "all_14_actuator_efforts_within_2Nm": true
+        },
+        "native_qd_residual_pass": true,
+        "reference_checks": {
+          "finite_policy_and_effort_samples": true,
+          "all_physics_step_efforts_at_or_below_2Nm": true,
+          "no_task_damage_or_collision_counters": true,
+          "no_episode_done_or_reason": true,
+          "native_overturn_limit_abs_roll_pitch_le_1_2_rad": true,
+          "brake_final_abs_forward_speed_lt_0_02m_s": true,
+          "brake_final_abs_yaw_rate_lt_0_3rad_s": true,
+          "brake_last_0_3s_max_abs_forward_speed_lt_0_02m_s": true,
+          "brake_last_0_3s_max_abs_yaw_rate_lt_0_3rad_s": true,
+          "signed_pivot_yaw_delta_ge_0_1rad": true,
+          "pivot_max_center_drift_lt_0_75m": true
+        },
+        "informational_checks": {}
+      },
+      "delta_mimic_minus_baseline": {
+        "yaw_delta_rad": 0.34500493449064606,
+        "yaw_rate_last_1s_rad_s": 0.240456973016262,
+        "distance_m": -0.05865858422069592,
+        "drive_mean_v_last_1s_m_s": -0.06076310495845974,
+        "brake_last_0_3s_mean_v_m_s": 0.0010585036975498952,
+        "brake_last_0_3s_mean_w_rad_s": -0.00017678326306243709,
+        "brake_last_0_3s_max_abs_v_m_s": 0.0011910211869690102,
+        "brake_last_0_3s_max_abs_w_rad_s": 0.00016898452304303646,
+        "brake_final_v_m_s": 0.0011910684870599653,
+        "brake_final_w_rad_s": -0.00023794802837073803,
+        "opposite_translation_speed_integral_m": null,
+        "opposite_yaw_rate_integral_rad": 0.0
+      }
+    }
+  },
+  "interpretation": [
+    "All observed yaw, speed, distance, effort, brake, and residual values are taken from the original summaries/raw effort JSONL; original run outputs were not edited.",
+    "The candidate passes the frozen v2 coupling-residual and effort gates in all eight response actions; this verifies the mimic mechanism in this fixed simulation protocol.",
+    "Yaw remains a measured response rather than a target. This comparison does not calibrate friction or establish a production repair; any production decision still requires the prescribed same-state old/new validation."
+  ]
+}

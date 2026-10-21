@@ -1,0 +1,295 @@
+[
+  {
+    "ref": "J_BAT_HV",
+    "mpn": null,
+    "libUuid": "5f6efadb84eb4e8582d1374fc21a833f",
+    "pins": {
+      "1": "B9",
+      "2": "B0",
+      "3": null
+    },
+    "note": "电池主正/负外部线束端子及母排边界，具体连接器、铜鼻子、线规、F1安装位由机械与热预算选定；非板上小信号端子。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "3-pin generic header used only as a 2-wire boundary symbol. Pin 3 is explicitly NC; no 3-pin physical connector is implied. Mechanical connection selection pending; schematic-only placeholder.",
+    "value": "BATTERY HV TERMINAL (mechanical connector TBD)",
+    "addIntoBom": false,
+    "x": 250,
+    "y": 180
+  },
+  {
+    "ref": "F1",
+    "mpn": "Littelfuse 142.5395.6102",
+    "libUuid": "445fd9a658964814aae27cc2d15314f8",
+    "pins": {
+      "A": "B9",
+      "B": "BATT+_FUSED"
+    },
+    "note": "外置BF2 58V/100A保险，螺柱/线束连接；A/B无极性。1000A DC分断及总清除I²t须按电池短路电流复核，预熔I²t仅典型值。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic two-terminal fuse symbol; pinRemap maps symbol pins 1/2 to source role keys A/B. External fuse hardware remains the source MPN.",
+    "pinRemap": {
+      "1": "A",
+      "2": "B"
+    },
+    "x": 750,
+    "y": 180,
+    "value": "100A BF2, 58V"
+  },
+  {
+    "ref": "J_PACK_HV",
+    "mpn": null,
+    "libUuid": "5f6efadb84eb4e8582d1374fc21a833f",
+    "pins": {
+      "1": "PACK+",
+      "2": "PACK-",
+      "3": null
+    },
+    "note": "外部母线连接器/螺柱边界；走线、铜排、线束、端子和温升需按60A连续/100A 1s核定。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "3-pin generic header used only as a 2-wire boundary symbol. Pin 3 is explicitly NC; no 3-pin physical connector is implied. Mechanical connection selection pending; schematic-only placeholder.",
+    "value": "PACK HV TERMINAL (mechanical connector TBD)",
+    "addIntoBom": false,
+    "x": 1250,
+    "y": 180
+  },
+  {
+    "ref": "Q_CHG1",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "CHG_G1",
+      "2": "BATT+_FUSED",
+      "3": "FET_MID"
+    },
+    "note": "共漏N-MOS。库symbol脚号1=G/2=S/3=D；TOLL实体引脚/散热焊盘脚位与库footprint映射须人工核验。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1750,
+    "y": 180,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "Q_CHG2",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "CHG_G2",
+      "2": "BATT+_FUSED",
+      "3": "FET_MID"
+    },
+    "note": "同Q_CHG1；单方向3颗并联。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 2250,
+    "y": 180,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "Q_CHG3",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "CHG_G3",
+      "2": "BATT+_FUSED",
+      "3": "FET_MID"
+    },
+    "note": "同Q_CHG1；单方向3颗并联。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 560,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "Q_DSG1",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "DSG_G1",
+      "2": "PACK+",
+      "3": "FET_MID"
+    },
+    "note": "共漏N-MOS；体二极管PACK+→FET_MID。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 750,
+    "y": 560,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "Q_DSG2",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "DSG_G2",
+      "2": "PACK+",
+      "3": "FET_MID"
+    },
+    "note": "同Q_DSG1；单方向3颗并联。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1250,
+    "y": 560,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "Q_DSG3",
+    "mpn": "Infineon IPT015N10N5ATMA1",
+    "libUuid": "ac6dfe6f7ea6436c81914453fbccbc56",
+    "pins": {
+      "1": "DSG_G3",
+      "2": "PACK+",
+      "3": "FET_MID"
+    },
+    "note": "同Q_DSG1；单方向3颗并联。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1750,
+    "y": 560,
+    "value": "IPT015N10N5"
+  },
+  {
+    "ref": "RSHUNT",
+    "mpn": "KOA Speer PSG4NTEBL500F",
+    "libUuid": "18038858e96140379231cc05f79b2b9e",
+    "pins": {
+      "1": "B0",
+      "2": "PACK-",
+      "3": "SRP_KELVIN",
+      "4": "SRN_KELVIN"
+    },
+    "note": "0.5mΩ四端分流器。构建符号pin 1/2为电流端、3/4为Kelvin端，SRP电池侧、SRN负载侧；Kelvin线与大电流焊盘分开走。构建数字脚仅为符号占位映射，不代表KOA实体端子编号；封装pad与实体端号须按KOA外形图人工核对。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic four-terminal shunt schematic symbol. Numeric symbol pins are placeholders only: pin 1=I_BAT, 2=I_LOAD, 3=V_BAT, 4=V_LOAD. They are not KOA physical terminal numbers; physical pad mapping/footprint must be verified against the KOA drawing.",
+    "x": 2250,
+    "y": 560,
+    "value": "0.5mΩ, 4-terminal",
+    "pinRoleMap": {
+      "1": "I_BAT",
+      "2": "I_LOAD",
+      "3": "V_BAT",
+      "4": "V_LOAD"
+    }
+  },
+  {
+    "ref": "R_SRP",
+    "mpn": "Yageo RC0603FR-07100RL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "SRP_KELVIN",
+      "2": "SRP"
+    },
+    "note": "100Ω串联电流采样滤波。U1 SRP脚接SRP。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 940,
+    "value": "100Ω 1% 0.1W"
+  },
+  {
+    "ref": "R_SRN",
+    "mpn": "Yageo RC0603FR-07100RL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "SRN_KELVIN",
+      "2": "SRN"
+    },
+    "note": "100Ω串联电流采样滤波。U1 SRN脚接SRN。",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 940,
+    "value": "100Ω 1% 0.1W"
+  },
+  {
+    "ref": "C_SRP",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "SRP",
+      "2": "SRN"
+    },
+    "note": "100nF differential filter across U1 SRP/SRN, close to AFE. 0603 X7R.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 940,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_CP1",
+    "mpn": "Murata GCM219R71E474KA55D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "CP1",
+      "2": "BAT"
+    },
+    "note": "470nF, 25V, X7R; differential charge-pump storage cap CP1–BAT at U1. BQ76952 has no CP2. Do not connect to B0.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 940,
+    "value": "470nF 25V"
+  },
+  {
+    "ref": "D_TVS",
+    "mpn": "Littelfuse SMCJ45A",
+    "libUuid": "4072e142c1b944e3a0b193f37707afe3",
+    "pins": {
+      "1": "PACK+",
+      "2": "PACK-"
+    },
+    "note": "Unidirectional SMC TVS pin1 cathode, pin2 anode. 45V VRWM, not guaranteed to clamp 48V; short connection at PACK connector. No claim of absorbing 60mF/42.9J.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_MAIN_PATH",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "Native Littelfuse SMCJ45A symbol pin direction confirmed: pin 1=K is wired to PACK+, pin 2=A is wired to PACK-. Human must still verify package pin numbering and footprint before PCB use.",
+    "pinOrientationUnverified": true,
+    "x": 2250,
+    "y": 940,
+    "value": "SMCJ45A, 45V"
+  }
+]

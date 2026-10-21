@@ -1,0 +1,38 @@
+{
+  "title": "创建导线",
+  "params": [
+    {
+      "name": "line",
+      "type": "Array<number> | Array<Array<number>>",
+      "description": "多段线坐标组，每段都是连续的一组 `[x1, y1, x2, y2, x3, y3]` 所描述的线，如若多段线彼此无任何连接则创建将会失败\n1.类型为number[][]的案例说明：\n1.1 设置[[],[0,0,0,1]]，段1没有路径，非法\n1.2 设置[[1], [0,0,0,1]]，段1只有x，缺少y，非法\n1.3 设置[[0,0,-1,0],[0,0,1,1]]，段1为水平线，但段2为斜线，非法\n1.4 设置[[0,0,-1,0,-1,1], [0,1,1,1]]，两段彼此无连接，非法\n1.5 设置[[1,1],[1,2,2,2]]，段1只有一个点，忽略此段，段2为水平段，最终路径仅保留段2，合法\n1.6 设置[[1,1], [1,2]]，段1只有一个点，忽略此段，段2亦忽略，最终路径为空，非法",
+      "required": true
+    },
+    {
+      "name": "net",
+      "type": "string",
+      "description": "网络名称，如若未指定，则遵循：\n1. 没有坐标落在任何图元上，则默认为空网络；\n2. 有一个坐标点在某个网络的图元上，则跟随该图元的网络；\n3. 有多个坐标点在多个不同网络的图元上，则创建失败\n\n如若已指定，则遵循：\n1. 有一个或多个坐标点在其他网络的图元上，且其他图元并未显式（通常指的是包含网络标签或网络端口）指定网络，则其他图元跟随指定的网络；\n2. 如若其他图元指定了网络，则创建失败",
+      "required": false
+    },
+    {
+      "name": "color",
+      "type": "string | null",
+      "description": "导线颜色，`null` 表示默认",
+      "required": false
+    },
+    {
+      "name": "lineWidth",
+      "type": "number | null",
+      "description": "线宽，范围 `1-10`，`null` 表示默认",
+      "required": false
+    },
+    {
+      "name": "lineType",
+      "type": "ESCH_PrimitiveLineType | null",
+      "description": "线型，`null` 表示默认",
+      "required": false
+    }
+  ],
+  "returns": {
+    "type": "ISCH_PrimitiveWire | null"
+  }
+}

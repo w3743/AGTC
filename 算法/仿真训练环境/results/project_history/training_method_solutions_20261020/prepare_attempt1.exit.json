@@ -1,0 +1,9 @@
+{
+  "actual_exit_code": 1,
+  "phase": "prepare completed, first preflight failed",
+  "error": "ValueError: runtime dependencies, upstream revision or robot geometry changed after prepare",
+  "diagnosis": "JSON serializes RobotAssetSpec tuples as lists; geometry comparison did not normalize the live object.",
+  "failed_prepared_trial_preserved": "results/isaac_field_improvement/method_control_20261020",
+  "formal_training_started": false,
+  "repair": "Normalize the live geometry through JSON before equality comparison, add regression test, prepare new v2 directories; do not rewrite the old protocol."
+}

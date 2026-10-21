@@ -1,0 +1,237 @@
+[
+  {
+    "ref": "R_BAT",
+    "mpn": "Yageo RC0603FR-07100RL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "BAT_DIODE",
+      "2": "BAT"
+    },
+    "note": "100Ω series BAT input resistor per TI Fig.16-2.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 150,
+    "value": "100Ω 1% 0.1W"
+  },
+  {
+    "ref": "Q_BREG",
+    "mpn": "Diodes Inc. FCX495TA",
+    "libUuid": "ccb55617316e45928d4c73767f613adf",
+    "pins": {
+      "1": "BREG",
+      "2": "BREG_COLLECTOR",
+      "3": "REGIN"
+    },
+    "note": "FCX495TA SOT-89 official top-view pinout: 1=B, 2=C/tab, 3=E; BREG preregulator transistor.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 750,
+    "y": 150,
+    "value": "FCX495"
+  },
+  {
+    "ref": "D_BREG",
+    "mpn": "Diodes Inc. BAT46W-7-F",
+    "libUuid": "a4a5071e96464e3cb64a8e44e5c0c90e",
+    "pins": {
+      "1": "BREG_DIODE",
+      "2": "B9"
+    },
+    "note": "100V Schottky; pin 1=K (band), pin 2=A. B9 high-side preregulator feed per TI Fig.16-2 adapted to a B9 stack node; thermal/voltage validation required.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1250,
+    "y": 150,
+    "value": "BAT46W"
+  },
+  {
+    "ref": "R_BREG_FEED",
+    "mpn": "Yageo RC0603FR-07300RL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "BREG_DIODE",
+      "2": "BREG_COLLECTOR"
+    },
+    "note": "300Ω, 1% series feed resistor from D_BREG to Q_BREG collector, TI Fig.16-2. Size/power at highest B9 and Q_BREG dissipation to be checked.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 150,
+    "value": "300Ω 1% 0.1W"
+  },
+  {
+    "ref": "C_BREG_COL",
+    "mpn": "Murata GRM32ER72A105KA01L",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "BREG_COLLECTOR",
+      "2": "B0"
+    },
+    "note": "1uF X7R 100V from FCX495 collector to B0; correct full-pack rating (old 16V candidate invalid). Confirm effective capacitance under DC bias.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 2250,
+    "y": 150,
+    "value": "1uF 100V"
+  },
+  {
+    "ref": "R_BREG_PD",
+    "mpn": "Yageo RC0603FR-0710ML",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "BREG",
+      "2": "B0"
+    },
+    "note": "10MΩ BREG-to-VSS discharge resistor per TI shutdown guidance; reduces retained BREG charge.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 450,
+    "value": "10MΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_RST_SHUT",
+    "mpn": "Yageo RC0603FR-071KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "RST_SHUT",
+      "2": "B0"
+    },
+    "note": "1kΩ to VSS per TI shutdown/reset guidance; reset/shutdown control remains hardware-defined.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 450,
+    "value": "1kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_PACK",
+    "mpn": "Yageo RC0603FR-075K1L",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "PACK+",
+      "2": "BQ_PACK"
+    },
+    "note": "5.1kΩ series from PACK+ to BQ PACK per TI Fig.16-3 high-side protection implementation.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 450,
+    "value": "5.1kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_LD",
+    "mpn": "Yageo RC0603FR-075K1L",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "PACK+",
+      "2": "BQ_LD"
+    },
+    "note": "5.1kΩ series from PACK+ to BQ LD per TI Fig.16-3 high-side protection implementation.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 450,
+    "value": "5.1kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_SCL_PU",
+    "mpn": "Yageo RC0603FR-0710KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_I2C_SCL"
+    },
+    "note": "10kΩ open-drain I²C pull-up to MCU rail so the live BQ cannot phantom-power a switched-off MCU through SCL.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 2250,
+    "y": 450,
+    "value": "10kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_SDA_PU",
+    "mpn": "Yageo RC0603FR-0710KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_I2C_SDA"
+    },
+    "note": "10kΩ open-drain I²C pull-up to MCU rail so the live BQ cannot phantom-power a switched-off MCU through SDA.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 750,
+    "value": "10kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_ALERT_SER",
+    "mpn": "Yageo RC0603FR-071KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "BQ_ALERT_IC_N",
+      "2": "BQ_ALERT_N"
+    },
+    "note": "1kΩ series between BQ ALERT and MCU-facing ALERT net per TI Fig.16-2.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 750,
+    "value": "1kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_ALERT_PU",
+    "mpn": "Yageo RC0603FR-0710KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_ALERT_N"
+    },
+    "note": "10kΩ open-drain ALERT pull-up to switched MCU rail; avoids a path into an unpowered MCU.",
+    "sourceFile": "AFE元件连接.json",
+    "pageGroup": "AFE_BREG_HOST",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 750,
+    "value": "10kΩ 1% 0.1W"
+  }
+]

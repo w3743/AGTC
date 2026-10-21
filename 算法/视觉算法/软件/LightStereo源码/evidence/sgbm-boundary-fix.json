@@ -1,0 +1,106 @@
+{
+  "created_at": "2026-10-20T21:51:50+08:00",
+  "change": "Pad both rectified images on the left by num_disparities, crop the result back to original width, and validate x_right=x_left-disparity against original 5x5-supported masks.",
+  "code": {
+    "local_path": "../app/fast_depth.py",
+    "sha256": "df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4"
+  },
+  "board": {
+    "serial": "b1371e33e9f6e49e",
+    "service": "active",
+    "backup_path": "/opt/rk-lightstereo/app/fast_depth.py.backup-20261020-214858",
+    "backup_sha256": "b4d3430420b629a3efbc1dace640a94f1ff5e9b21621ad6e0f4e2731acc43d8f",
+    "installed_sha256": "df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4",
+    "installed_mode": "666 (preserved)",
+    "rollback": "Copy backup_path over /opt/rk-lightstereo/app/fast_depth.py and restart rk-lightstereo.service."
+  },
+  "saved_pair": {
+    "before": {
+      "valid_fraction": 0.475413486,
+      "left_x_0_63": 0.0,
+      "right_x_64_130": 0.929539801
+    },
+    "after": {
+      "valid_fraction": 0.7247137404580153,
+      "left_x_0_63": 0.5425130208333333,
+      "right_x_64_130": 0.8987562189054726
+    },
+    "resolution": [
+      131,
+      240
+    ],
+    "num_disparities": 64
+  },
+  "synthetic_tests": [
+    {
+      "shift_px": 8,
+      "core_valid_fraction": 1.0,
+      "expected_depth_m": 1.775129373320844,
+      "median_depth_m": 1.7751293182373047
+    },
+    {
+      "shift_px": 24,
+      "core_valid_fraction": 1.0,
+      "expected_depth_m": 0.591709791106948,
+      "median_depth_m": 0.5917097926139832
+    }
+  ],
+  "boundary_tests": {
+    "padded_correspondences_outside_original_right_image_rejected": true,
+    "rejected_disparities": [
+      "NaN",
+      "+Infinity",
+      "-Infinity",
+      -1,
+      0
+    ],
+    "runtime_warnings": 0
+  },
+  "live_after_restart": {
+    "status_http": 200,
+    "depth_jpeg_http": 200,
+    "depth_jpeg_content_type": "image/jpeg",
+    "depth_jpeg_bytes": 13290,
+    "valid_fraction": 0.3119274809160305,
+    "fps": 28.9,
+    "process_ms": 24.3,
+    "capture_ready": true,
+    "adb_forward": "tcp:8877 -> tcp:8088",
+    "note": "Live camera frame after restart; saved-pair metrics above come from validation/left.png and validation/right.png."
+  },
+  "browser_ui_validation": {
+    "left_half_hard_boundary_disappeared": true,
+    "measured_pixel": {
+      "z_m": 0.943,
+      "straight_line_m": 0.992,
+      "xy": [
+        55,
+        168
+      ]
+    },
+    "fps_range": [
+      27,
+      30
+    ],
+    "browser_tab": 9,
+    "browser_tab_preserved": true,
+    "live_screenshot": "sgbm-boundary-live.jpg",
+    "measurement_screenshot": "sgbm-boundary-measure.jpg"
+  },
+  "artifacts": {
+    "regression_script": {
+      "path": "verify_sgbm_boundary.py",
+      "sha256": "ffbe9581d4f037becf55b6b4dbf0beb06954bd144cdb5f6f5fe91a3311ea8482"
+    },
+    "live_screenshot_sha256": "5f1d26ff0cc2725de1d202e0754d7430bbfe376f11763246875cd538b67eb140",
+    "measurement_screenshot_sha256": "0ce6288cf0505df6e2cf7882519d19bfd7dea7ba89b51cd2913f90531adc8663"
+  },
+  "rerun": {
+    "script": "verify_sgbm_boundary.py",
+    "loaded_from": "/opt/rk-lightstereo/app/fast_depth.py",
+    "result": "ok",
+    "saved_pair_valid_fraction": 0.7247137404580153,
+    "synthetic_shift_8_and_24_core_valid_fraction": 1.0,
+    "invalid_disparities_rejected": true
+  }
+}

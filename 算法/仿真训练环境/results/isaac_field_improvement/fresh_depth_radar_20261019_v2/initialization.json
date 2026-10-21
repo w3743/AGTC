@@ -1,0 +1,72 @@
+{
+  "checkpoint": "untrained_baseline.zip",
+  "sha256": "b2ecd57b73ebb8fdc9fa95622b166af82c1b0ab964a2daaf226be37ffffc954a",
+  "num_timesteps": 0,
+  "protocol_sha256": "f32707b8fdfa8098613d766b6ce38d0edbd74bf396c2c6abea432f698b9d9e84",
+  "field_encoder_config": {
+    "schema": "depth64-lidar-circular1d-v1",
+    "branch_dims": {
+      "lidar": 32,
+      "depth": 64,
+      "detections": 32,
+      "state": 32
+    },
+    "depth_pool": [
+      8,
+      6
+    ],
+    "radar_pool": 50,
+    "features_dim": 160
+  },
+  "protocol_architecture": {
+    "field_encoder_config": {
+      "schema": "depth64-lidar-circular1d-v1",
+      "branch_dims": {
+        "lidar": 32,
+        "depth": 64,
+        "detections": 32,
+        "state": 32
+      },
+      "depth_pool": [
+        8,
+        6
+      ],
+      "radar_pool": 50,
+      "features_dim": 160
+    },
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "input_contract": "sensor-depth-only-v3",
+    "observation_shapes": {
+      "lidar": [
+        2,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        10
+      ],
+      "state": [
+        43
+      ]
+    },
+    "action_shape": [
+      4
+    ],
+    "goal_gain": 1.0,
+    "lstm_hidden_size": 128,
+    "architecture_is_searched": false
+  },
+  "source_initialization": "new RecurrentPPO, no old checkpoint loaded"
+}

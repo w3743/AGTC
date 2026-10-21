@@ -1,0 +1,73 @@
+{
+  "schema": "pi-confirmation-comparison-repair-v1",
+  "captured_utc": "2026-10-20T00:02:18Z",
+  "reason": "The first comparison-only attempt raised KeyError 'drive_s' because compare_confirmation indexed protocol timing with run metadata names, while confirmation_protocol.json uses drive, brake_observation, policy_dt_expected, and physics_dt_expected. The comparator now uses an explicit run-field to protocol-field mapping and validates the protocol environment metadata.",
+  "change_scope": "Comparator-only repair; existing P/PI simulations and all raw files are unchanged.",
+  "comparator": {
+    "path": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/compare_pi_counterfactual_runs.py",
+    "pre_repair_sha256": "4f599c67dccd92c4b61d28255854f7af0279ea44220ec7b4c13b06118d5f53a1",
+    "repaired_sha256": "b4ca1f4e04141005d800696b05487da1bbf8633773a2a0361399ac46f83679d2",
+    "pre_repair_snapshot": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/source_snapshot/confirmation_comparator_before_fix/compare_pi_counterfactual_runs.py",
+    "pre_repair_snapshot_sha256": "4f599c67dccd92c4b61d28255854f7af0279ea44220ec7b4c13b06118d5f53a1"
+  },
+  "original_confirmation_freeze": {
+    "path": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/confirmation_source_freeze_sha256.txt",
+    "sha256": "366fe12dde59357452ff62e6c34a9747562a5389f6f455188a3f963f4e434dbe",
+    "entries_checked_before_repair": 47,
+    "mismatches_before_repair": 0,
+    "left_unchanged": true
+  },
+  "existing_runs": {
+    "p_exit": 0,
+    "pi_exit": 0,
+    "comparison_exit": 1,
+    "original_pair_status_path": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/confirmation_pair_exit.json",
+    "p_case_count": 4,
+    "pi_case_count": 4,
+    "p_policy_steps": 920,
+    "pi_policy_steps": 920,
+    "p_physics_substeps": 9200,
+    "pi_physics_substeps": 9200,
+    "p_max_applied_effort_nm": 2.0,
+    "pi_max_applied_effort_nm": 2.0,
+    "source_sha256_entry_count_each": 17,
+    "source_sha256_maps_equal": true,
+    "raw_summaries_unchanged": true
+  },
+  "prior_comparison_error": {
+    "exception": "KeyError",
+    "missing_key": "drive_s",
+    "comparator_line": 167,
+    "actual_protocol_timing_keys": [
+      "p_only_settle",
+      "drive",
+      "brake_observation",
+      "brake_tail_gate",
+      "policy_dt_expected",
+      "physics_dt_expected",
+      "decimation_expected"
+    ]
+  },
+  "protocol_mapping": {
+    "settle_s": "p_only_settle",
+    "drive_s": "drive",
+    "brake_observation_s": "brake_observation",
+    "policy_dt_s": "policy_dt_expected",
+    "physics_dt_s": "physics_dt_expected",
+    "decimation": "decimation_expected"
+  },
+  "validation": {
+    "targeted_protocol_test": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/test_confirmation_protocol_contract.py",
+    "targeted_protocol_test_exit": 0,
+    "targeted_protocol_test_passed": 1,
+    "static_validation_log": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/comparison_repair/repair_cpu_static_checks.log",
+    "static_validation_exit": 0,
+    "gpu_or_native_rerun": false
+  },
+  "repaired_comparison": {
+    "output_path": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/comparison_repair/confirmation_pair_summary_repaired.json",
+    "exit_path": "results/isaac_field_diagnosis/minimal_inputs_20261020/pi_counterfactual/comparison_repair/comparison_repair_exit.json",
+    "actual_exit_code": null,
+    "comparator_findings": null
+  }
+}

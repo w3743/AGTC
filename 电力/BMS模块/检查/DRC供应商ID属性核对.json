@@ -1,0 +1,372 @@
+{
+  "reportType": "bms_supplier_id_property_audit",
+  "generatedAt": "2026-10-16",
+  "scope": {
+    "latestDrcLog": "C:/Users/wangj/Downloads/schDrcLog_2026-10-16.txt",
+    "nativeSchematic": "BMS模块/sch/Schematic1/P1.esch2",
+    "bom": "BMS模块/原理图准备/BOM.csv",
+    "sharedLibraryEntry": "元件封装库/README.md",
+    "edaInvoked": false,
+    "nativeModified": false,
+    "inputFilesReadOnly": true,
+    "reportWritten": true
+  },
+  "drc": {
+    "timestamp": "2026-10-16 16:02:28",
+    "summary": "0 fatal, 0 errors, 12 warnings, 72 info",
+    "supplierMismatchLineCount": 1,
+    "refsOnSupplierMismatchLine": 19,
+    "interpretation": "19 refs are listed in one consolidated supplier/property warning; they are not 19 separate warning lines."
+  },
+  "crossReference": {
+    "catalogAudit": "BMS模块/检查/DRC标准化/remaining-catalog-differences.json",
+    "officialOptocouplerQuery": "BMS模块/检查/DRC标准化/official-vo617a-2x007t-query.json",
+    "priorCatalogAuditScope": "188 refs matched by supplier ID; the formal 187-ref comparison had 0 supplier-ID differences. Its 18 identity exceptions among this latest warning set are 7 manufacturer-prefix MPNs, 2 whitespace-only MPNs and 9 catalog-empty Manufacturer fields. U_LOAD_POWER_VALID was separately excluded as unverified; the latest DRC log supplies the exact 19-ref warning set.",
+    "importantScopeNote": "The prior audit did not itself attribute the latest official warning. This report cross-references its field comparisons with the exact refs in the 2026-10-16 16:02:28 log. U_AND2 appears as an extra prior catalog-comparison candidate but is not in this latest warning line; do not treat it as part of this warning."
+  },
+  "classificationCounts": {
+    "manufacturerPrefixOnly": 7,
+    "whitespaceOnly": 2,
+    "savedManufacturerButCatalogBlank": 9,
+    "genuineCarrierPurchaseConflict": 1
+  },
+  "refs": [
+    {
+      "ref": "U_LOAD_POWER_VALID",
+      "instanceId": "$1I1112",
+      "classification": "genuine_carrier_purchase_conflict",
+      "p1ManufacturerPart": "VO617A-2X007T",
+      "bomMpn": "VO617A-2X007T",
+      "p1SupplierPart": "UNVERIFIED_2X",
+      "selectedCadDevice": "VO617A-4X007T",
+      "cadDeviceSupplierPart": "C17528767",
+      "officialQuery": "No exact VO617A-2X007T result; VO617A-2X017T/C17500773 is a different suffix and CTR 63-125%; VO617A-4X007T/C17528767 is CTR 160-320%. Pin/pad signature for the proposed item is unverified.",
+      "assessment": "Real unresolved identity/grade and library-binding mismatch. The CAD carrier must not overwrite the purchase MPN.",
+      "safeAction": "Keep the documented purchase MPN and UNVERIFIED_2X state. Do not restore C17528767 or substitute 2X017T. Bind only after an exact 2X007T catalog item or approved custom carrier has verified supplier identity, CTR, symbol pins and footprint pads; retain the carrier-to-purchase mapping explicitly."
+    },
+    {
+      "ref": "U_GATE1",
+      "instanceId": "$1I1113",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "TI SN74LVC1G11DCKR",
+      "libraryManufacturerPart": "SN74LVC1G11DCKR",
+      "bomMpn": "TI SN74LVC1G11DCKR",
+      "supplierPart": "C529281",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split the manufacturer prefix into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C529281 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "C_CP1",
+      "instanceId": "$1I1136",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "Murata GCM219R71E474KA55D",
+      "libraryManufacturerPart": "GCM219R71E474KA55D",
+      "bomMpn": "Murata GCM219R71E474KA55D",
+      "supplierPart": "C437481",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split Murata into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C437481 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "D_TVS",
+      "instanceId": "$1I1143",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "Littelfuse SMCJ45A",
+      "libraryManufacturerPart": "SMCJ45A",
+      "bomMpn": "Littelfuse SMCJ45A",
+      "supplierPart": "C1973080",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split Littelfuse into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C1973080 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "DZ_QPRE",
+      "instanceId": "$1I1144",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "onsemi MMSZ5242BT1G",
+      "libraryManufacturerPart": "MMSZ5242BT1G",
+      "bomMpn": "onsemi MMSZ5242BT1G",
+      "supplierPart": "C82050",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split onsemi into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C82050 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "NTC_BOARD",
+      "instanceId": "$1I1145",
+      "classification": "whitespace_only",
+      "p1ManufacturerPart": "MF52A103F3950(A1)",
+      "libraryManufacturerPart": "MF52A103F3950 (A1)",
+      "bomMpn": "MF52A103F3950(A1)",
+      "supplierPart": "C13879",
+      "assessment": "Only an inserted display space differs; BOM notes identify the official A1 name as differing only by that space. Native component partId also retains an older P334-4 string while the selected shared-device UUID points to A1, so do not blindly rebind by title.",
+      "safeAction": "Set the CAD-facing Manufacturer Part property to the exact selected catalog representation (MF52A103F3950 (A1)) after UUID and pin/pad mapping confirmation; keep the BOM purchase MPN MF52A103F3950(A1), device binding and C13879. Review the stale component partId as separate carrier metadata; do not rebind by title alone."
+    },
+    {
+      "ref": "NTC_MOS",
+      "instanceId": "$1I1146",
+      "classification": "whitespace_only",
+      "p1ManufacturerPart": "MF52A103F3950(A1)",
+      "libraryManufacturerPart": "MF52A103F3950 (A1)",
+      "bomMpn": "MF52A103F3950(A1)",
+      "supplierPart": "C13879",
+      "assessment": "Only an inserted display space differs; BOM notes identify the official A1 name as differing only by that space. Native component partId also retains an older P334-4 string while the selected shared-device UUID points to A1, so do not blindly rebind by title.",
+      "safeAction": "Set the CAD-facing Manufacturer Part property to the exact selected catalog representation (MF52A103F3950 (A1)) after UUID and pin/pad mapping confirmation; keep the BOM purchase MPN MF52A103F3950(A1), device binding and C13879. Review the stale component partId as separate carrier metadata; do not rebind by title alone."
+    },
+    {
+      "ref": "U_POR",
+      "instanceId": "$1I1245",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "TI TPS3809K33DBVR",
+      "libraryManufacturerPart": "TPS3809K33DBVR",
+      "bomMpn": "TI TPS3809K33DBVR",
+      "supplierPart": "C61364",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split TI into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C61364 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "U_SEQ",
+      "instanceId": "$1I1246",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "TI SN74LVC74ADR",
+      "libraryManufacturerPart": "SN74LVC74ADR",
+      "bomMpn": "TI SN74LVC74ADR",
+      "supplierPart": "C7864",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match.",
+      "safeAction": "If the DRC requires exact MPN text, split TI into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C7864 and the same library/device binding. Keep the purchase identity traceable in the BOM."
+    },
+    {
+      "ref": "U_TIMER",
+      "instanceId": "$1I1247",
+      "classification": "manufacturer_prefix_only",
+      "p1ManufacturerPart": "TI TPL5111DDCR",
+      "libraryManufacturerPart": "TPL5111DDCR",
+      "bomMpn": "TI TPL5111DDCR",
+      "supplierPart": "C2870554",
+      "assessment": "Manufacturer prefix is embedded in the saved MPN display; catalog MPN and supplier ID otherwise match. BOM has a quote record, but the part remains unpurchased and unaccepted.",
+      "safeAction": "If the DRC requires exact MPN text, split TI into its own Manufacturer field using the confirmed source manufacturer and use the bare catalog MPN in the native instance and BOM MPN field; retain C2870554 and the same library/device binding. Preserve the quote and non-purchased status."
+    },
+    {
+      "ref": "C_AND2",
+      "instanceId": "$1I1280",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_CAN_PWR_IN2",
+      "instanceId": "$1I1281",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_CAN_PWR_OUT2",
+      "instanceId": "$1I1282",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_GATE1",
+      "instanceId": "$1I1283",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_POR",
+      "instanceId": "$1I1284",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_PSU_IN2",
+      "instanceId": "$1I1285",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_SRP",
+      "instanceId": "$1I1297",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_SEQ",
+      "instanceId": "$1I1374",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    },
+    {
+      "ref": "C_TIMER",
+      "instanceId": "$1I1380",
+      "classification": "saved_manufacturer_catalog_blank",
+      "p1Manufacturer": "Murata Manufacturing Co., Ltd.",
+      "libraryManufacturer": "",
+      "p1ManufacturerPart": "GRM188R72A104KA35J",
+      "libraryManufacturerPart": "GRM188R72A104KA35J",
+      "bomMpn": "GRM188R72A104KA35J",
+      "supplierPart": "C9900019564",
+      "assessment": "MPN, BOM LibUUID and supplier part match; shared catalog Manufacturer is blank while the saved instance/BOM identify Murata. BOM manufacturer source points to Murata product documentation. Candidate remains pending price and purchase.",
+      "safeAction": "Preserve the Murata identity and C9900019564. If the shared library has an editable authoritative property source, fill its Manufacturer from the BOM source and regenerate the index; otherwise retain this documented metadata exception. Do not blank the instance Manufacturer or swap the supplier ID to suppress DRC."
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "C:/Users/wangj/Downloads/schDrcLog_2026-10-16.txt",
+      "bytes": 12394,
+      "sha256": "6D2E69604E9DD7063C1B94C28AE5BE771987E6ED16CF45ADB95F85D5CC71C40A"
+    },
+    {
+      "path": "BMS模块/sch/Schematic1/P1.esch2",
+      "bytes": 5796801,
+      "sha256": "807049567CE87A4686A76758604914D35467BE16CFF2EA04E97DD8AE17DD9DBD"
+    },
+    {
+      "path": "BMS模块/原理图准备/BOM.csv",
+      "bytes": 154376,
+      "sha256": "3038221D8BD3400E02448DDD869CFF079B68FD82229DB925E26B1DB20037C219"
+    },
+    {
+      "path": "元件封装库/索引/元件总表.json",
+      "bytes": 20397114,
+      "sha256": "2815261E9DC30B2BD00643D9E3C8E1D7309BBC9519488A1756AA98BEE606CCBA"
+    },
+    {
+      "path": "BMS模块/检查/DRC标准化/remaining-catalog-differences.json",
+      "bytes": 33034,
+      "sha256": "A0A97CF4C52347C0A90A4E6A64647094C96DE8A14F9DC823A3AE794A95476B9F"
+    },
+    {
+      "path": "BMS模块/检查/DRC标准化/official-vo617a-2x007t-query.json",
+      "bytes": 3438,
+      "sha256": "E97F28F63C576C8E8DF55BC30686779E8BBCDFA99EB3D7011BAD0369D9DD604F"
+    },
+    {
+      "path": "元件封装库/README.md",
+      "note": "Rule: keep actual procurement MPN separate from CAD carrier MPN; library consistency does not establish electrical or physical acceptance."
+    },
+    {
+      "path": "BMS模块/检查/DRC修复结论.md",
+      "note": "Current status remains 0 fatal/0 errors/12 warnings; DRC review and formal Layout release remain HOLD."
+    },
+    {
+      "path": "BMS模块/检查/本轮落实与验证.md",
+      "note": "Records nine 100 nF bypass instances with Murata manufacturer attribute; this explains the nine saved-Manufacturer/catalog-blank candidates but does not prove supplier ID is wrong."
+    }
+  ],
+  "limitations": [
+    "No EDA calls or live supplier lookups were made. Supplier identity assertions beyond the existing read-only catalog comparison are not purchase acceptance.",
+    "The prior catalog audit reports the formal 187-ref comparison with 0 supplier-ID differences, but it is not a substitute for the latest DRC run; the 2026-10-16 log remains the exact current warning evidence.",
+    "BOM statuses for these items remain candidate/unpurchased/unaccepted; attribute alignment does not validate electrical fit, CTR, packaging, price or procurement."
+  ],
+  "latestLogVerification": {
+    "logPath": "C:/Users/wangj/Downloads/schDrcLog_2026-10-16.txt",
+    "sha256": "6CCB219BBE132776FDFD4229F2DFB36B01148449EC0123ACD1BC6C0A0ACA4B01",
+    "logTimestamp": "2026-10-16 16:39:39",
+    "warningTimestamp": "2026-10-16 16:39:44",
+    "severityCounts": {
+      "fatal": 0,
+      "error": 0,
+      "warning": 1,
+      "info": 72
+    },
+    "rawTaggedLineCounts": {
+      "fatal": 0,
+      "error": 0,
+      "warning": 1,
+      "info": 74
+    },
+    "countNote": "severityCounts来自日志末尾的设计规则检查摘要；rawTaggedLineCounts还含开始/完成提示，所以信息标签原始行数比摘要多2。",
+    "uniqueWarningRuleText": "元件的属性与供应商编号不匹配。，建议使用器件标准化",
+    "referenceInstanceComparison": {
+      "referenceCount": 19,
+      "instanceCount": 19,
+      "referencesAndInstanceIdsExactlyMatchPriorAudit": true,
+      "comparisonBasis": "latest warning line parsed and compared pair-by-pair with the existing refs array"
+    },
+    "duplicateNetNameComparison": {
+      "priorDuplicateNetNameGroups": 11,
+      "presentInLatestLog": false,
+      "groupsNotPresentInLatestLog": 11
+    },
+    "projectIdentity": {
+      "source_project_user_confirmed": true,
+      "user_confirmed_reopened_formal_root": true,
+      "userConfirmedProjectPath": "E:/Pioneer/先进通用履带底盘工程/电力/BMS模块/BMS-9S4P.eprj3",
+      "confirmationBasis": "用户直接确认：本次日志由重新打开该正式路径后导出。",
+      "exportedLogContainsProjectContentHash": false,
+      "hashLevelProjectContentBindingProven": false,
+      "apiRootStatus": "此前官方API root timeout结果保持不变；本次用户确认和日志不构成API PASS。"
+    },
+    "status": {
+      "warning_cleared": false,
+      "genuineOptocouplerGradeConflict": "OPEN"
+    },
+    "sourceContinuity": {
+      "nativeSchematic": {
+        "path": "BMS模块/sch/Schematic1/P1.esch2",
+        "currentSha256": "3B99F65DCEF6FA37A519188D35DCA64D9A6F54843209B3E58DAF07C37C72A16A",
+        "previousAuditSha256": "807049567CE87A4686A76758604914D35467BE16CFF2EA04E97DD8AE17DD9DBD",
+        "sha256MatchesPreviousAudit": false,
+        "assessment": "SHA不一致；本轮未做原理图差异全复核。此前审计仅作比较依据，不宣称当前原生身份连续或完成全复核。已知29项NET属性差异未在本轮独立验证。"
+      },
+      "bom": {
+        "path": "BMS模块/原理图准备/BOM.csv",
+        "currentSha256": "3038221D8BD3400E02448DDD869CFF079B68FD82229DB925E26B1DB20037C219",
+        "previousAuditSha256": "3038221D8BD3400E02448DDD869CFF079B68FD82229DB925E26B1DB20037C219",
+        "sha256MatchesPreviousAudit": true
+      }
+    }
+  }
+}

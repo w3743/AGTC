@@ -1,0 +1,516 @@
+{
+  "capture": {
+    "base_url": "http://127.0.0.1:8770",
+    "endpoint": "/api/frame",
+    "method": "GET",
+    "query_template": "detail=1&selected=<key-from-frame.nodes>&index=0&scale=auto",
+    "sequence": 2,
+    "sim_time": 0.0,
+    "paused": true,
+    "run_state_changed": false,
+    "node_keys_source": "frame_before.json nodes; selected keys resolved from actual branch/title/column metadata"
+  },
+  "tensors": {
+    "input.lidar": {
+      "node": {
+        "title": "激光雷达输入",
+        "branch": "lidar",
+        "column": 0.0,
+        "shape_from_nodes": [
+          2,
+          400
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "input.lidar",
+      "detail": {
+        "key": "input.lidar",
+        "title": "激光雷达输入",
+        "shape": [
+          2,
+          400
+        ],
+        "size": 800,
+        "min": 0.0,
+        "max": 1.0,
+        "mean": 0.5,
+        "std": 0.5,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0
+        ],
+        "value": 1.0,
+        "parameters": [],
+        "description": "距离/8米与有效掩码，2×400",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.laser.0": {
+      "node": {
+        "title": "一维卷积 2→16 · 环形填充",
+        "branch": "lidar",
+        "column": 1.0,
+        "shape_from_nodes": [
+          16,
+          200
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.laser.0",
+      "detail": {
+        "key": "features_extractor.laser.0",
+        "title": "一维卷积 2→16 · 环形填充",
+        "shape": [
+          16,
+          200
+        ],
+        "size": 3200,
+        "min": -0.9791568517684937,
+        "max": 1.0680432319641113,
+        "mean": 0.0840042233467102,
+        "std": 0.4849707782268524,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0
+        ],
+        "value": -0.9791568517684937,
+        "parameters": [
+          "bias",
+          "weight"
+        ],
+        "description": "Conv1d(2, 16, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.laser.2": {
+      "node": {
+        "title": "一维卷积 16→32 · 环形填充",
+        "branch": "lidar",
+        "column": 3.0,
+        "shape_from_nodes": [
+          32,
+          100
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.laser.2",
+      "detail": {
+        "key": "features_extractor.laser.2",
+        "title": "一维卷积 16→32 · 环形填充",
+        "shape": [
+          32,
+          100
+        ],
+        "size": 3200,
+        "min": -0.4424073398113251,
+        "max": 0.5183852314949036,
+        "mean": -0.03359225392341614,
+        "std": 0.2106085866689682,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0
+        ],
+        "value": -0.02258601039648056,
+        "parameters": [
+          "bias",
+          "weight"
+        ],
+        "description": "Conv1d(16, 32, kernel_size=(5,), stride=(2,), padding=(2,), padding_mode=circular)；环形填充把雷达首尾视为相邻方向",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.laser.7": {
+      "node": {
+        "title": "激光雷达编码输出 · 32维",
+        "branch": "lidar",
+        "column": 8.0,
+        "shape_from_nodes": [
+          32
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.laser.7",
+      "detail": {
+        "key": "features_extractor.laser.7",
+        "title": "激光雷达编码输出 · 32维",
+        "shape": [
+          32
+        ],
+        "size": 32,
+        "min": 0.0,
+        "max": 3.149083375930786,
+        "mean": 0.5094515085220337,
+        "std": 0.8650091886520386,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.0,
+        "parameters": [],
+        "description": "ReLU()",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "input.depth": {
+      "node": {
+        "title": "深度图输入",
+        "branch": "depth",
+        "column": 0.0,
+        "shape_from_nodes": [
+          1,
+          160,
+          88
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "input.depth",
+      "detail": {
+        "key": "input.depth",
+        "title": "深度图输入",
+        "shape": [
+          1,
+          160,
+          88
+        ],
+        "size": 14080,
+        "min": 0.0,
+        "max": 0.9525394439697266,
+        "mean": 0.08960169553756714,
+        "std": 0.17957544326782227,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0,
+          0
+        ],
+        "value": 0.0,
+        "parameters": [],
+        "description": "轴向Z深度/量程，1×160×88；无效值为0且无单独掩码；不是RGB图",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.depth.0": {
+      "node": {
+        "title": "二维卷积 1→8",
+        "branch": "depth",
+        "column": 1.0,
+        "shape_from_nodes": [
+          8,
+          80,
+          44
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.depth.0",
+      "detail": {
+        "key": "features_extractor.depth.0",
+        "title": "二维卷积 1→8",
+        "shape": [
+          8,
+          80,
+          44
+        ],
+        "size": 28160,
+        "min": -2.116157054901123,
+        "max": 1.5265114307403564,
+        "mean": -0.06122968718409538,
+        "std": 0.2175331562757492,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0,
+          0
+        ],
+        "value": 0.030038800090551376,
+        "parameters": [
+          "bias",
+          "weight"
+        ],
+        "description": "Conv2d(1, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.depth.2": {
+      "node": {
+        "title": "二维卷积 8→16",
+        "branch": "depth",
+        "column": 3.0,
+        "shape_from_nodes": [
+          16,
+          40,
+          22
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.depth.2",
+      "detail": {
+        "key": "features_extractor.depth.2",
+        "title": "二维卷积 8→16",
+        "shape": [
+          16,
+          40,
+          22
+        ],
+        "size": 14080,
+        "min": -0.9602535963058472,
+        "max": 1.0553715229034424,
+        "mean": 0.00843078549951315,
+        "std": 0.08727613091468811,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0,
+          0,
+          0
+        ],
+        "value": 0.03053712286055088,
+        "parameters": [
+          "bias",
+          "weight"
+        ],
+        "description": "Conv2d(8, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "features_extractor.depth.7": {
+      "node": {
+        "title": "深度图编码输出 · 64维",
+        "branch": "depth",
+        "column": 8.0,
+        "shape_from_nodes": [
+          64
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor.depth.7",
+      "detail": {
+        "key": "features_extractor.depth.7",
+        "title": "深度图编码输出 · 64维",
+        "shape": [
+          64
+        ],
+        "size": 64,
+        "min": 0.0,
+        "max": 0.44420531392097473,
+        "mean": 0.1448475420475006,
+        "std": 0.1248229593038559,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.17958100140094757,
+        "parameters": [],
+        "description": "ReLU()",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "input.state": {
+      "node": {
+        "title": "车辆与目标状态输入",
+        "branch": "state",
+        "column": 0.0,
+        "shape_from_nodes": [
+          43
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "input.state",
+      "detail": {
+        "key": "input.state",
+        "title": "车辆与目标状态输入",
+        "shape": [
+          43
+        ],
+        "size": 43,
+        "min": -0.7310536503791809,
+        "max": 1.0,
+        "mean": 0.070442795753479,
+        "std": 0.3772493600845337,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.0,
+        "parameters": [],
+        "description": "43维归一化状态；点击查看字段与精确数值",
+        "source": "实际前向",
+        "fields": [
+          "任务模式：搜索标记",
+          "任务模式：到点标记",
+          "目标相对车体前向分量（按场地尺寸缩放；仅到点模式）",
+          "目标相对车体侧向分量（按场地尺寸缩放；仅到点模式）",
+          "估计车体 X 位置（按场地尺寸映射）",
+          "估计车体 Y 位置（按场地尺寸映射）",
+          "车体航向正弦",
+          "车体航向余弦",
+          "测得车体前向速度 / 最大速度",
+          "测得车体偏航角速度 / 最大转向率",
+          "云台偏航正弦",
+          "云台偏航余弦",
+          "云台俯仰角 / π",
+          "上一动作：左履带速度指令",
+          "上一动作：右履带速度指令",
+          "上一动作：云台偏航角速度指令",
+          "上一动作：云台俯仰角速度指令",
+          "已用时间 / 时限（上限 1）",
+          "任务步长 dt（秒）",
+          "目标容差 / 场地尺寸",
+          "LiDAR 帧龄 / 2 秒（上限 1）",
+          "LiDAR 新帧标记",
+          "LiDAR 帧位置差 X / LiDAR 量程",
+          "LiDAR 帧位置差 Y / LiDAR 量程",
+          "LiDAR 帧时车体航向差 / π",
+          "LiDAR 帧时云台偏航差 / π",
+          "LiDAR 帧时云台俯仰差 / π",
+          "深度图帧龄 / 2 秒（上限 1）",
+          "深度图新帧标记",
+          "深度图帧位置差 X / LiDAR 量程",
+          "深度图帧位置差 Y / LiDAR 量程",
+          "深度图帧时车体航向差 / π",
+          "深度图帧时云台偏航差 / π",
+          "深度图帧时云台俯仰差 / π",
+          "相机帧龄 / 2 秒（上限 1）",
+          "相机新帧标记",
+          "相机帧位置差 X / LiDAR 量程",
+          "相机帧位置差 Y / LiDAR 量程",
+          "相机帧时车体航向差 / π",
+          "相机帧时云台偏航差 / π",
+          "相机帧时云台俯仰差 / π",
+          "车体横滚角 / π",
+          "车体俯仰角 / π"
+        ]
+      }
+    },
+    "features_extractor": {
+      "node": {
+        "title": "四路特征拼接 · 160维",
+        "branch": "fusion",
+        "column": 9.0,
+        "shape_from_nodes": [
+          160
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "features_extractor",
+      "detail": {
+        "key": "features_extractor",
+        "title": "四路特征拼接 · 160维",
+        "shape": [
+          160
+        ],
+        "size": 160,
+        "min": 0.0,
+        "max": 3.149083375930786,
+        "mean": 0.21286001801490784,
+        "std": 0.4544145166873932,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.0,
+        "parameters": [],
+        "description": "按雷达32、深度64、检测32、状态32拼成160维；没有注意力权重",
+        "source": "实际前向",
+        "fields": []
+      }
+    },
+    "lstm_actor": {
+      "node": {
+        "title": "驾驶记忆 LSTM",
+        "branch": "actor",
+        "column": 14.0,
+        "shape_from_nodes": [
+          128
+        ],
+        "source": "实际驾驶前向"
+      },
+      "query_key": "lstm_actor",
+      "detail": {
+        "key": "lstm_actor",
+        "title": "驾驶记忆 LSTM",
+        "shape": [
+          128
+        ],
+        "size": 128,
+        "min": -0.41060978174209595,
+        "max": 0.4296594560146332,
+        "mean": -0.0008076858939602971,
+        "std": 0.11244700103998184,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.01683421991765499,
+        "parameters": [
+          "bias_hh_l0",
+          "bias_ih_l0",
+          "weight_hh_l0",
+          "weight_ih_l0"
+        ],
+        "description": "LSTM(160, 128)；h是短时输出，c是内部记忆；价值支路不控制车辆",
+        "source": "实际驾驶前向",
+        "fields": []
+      }
+    },
+    "action.applied": {
+      "node": {
+        "title": "四维输出动作",
+        "branch": "output",
+        "column": 19.0,
+        "shape_from_nodes": [
+          4
+        ],
+        "source": "实际前向"
+      },
+      "query_key": "action.applied",
+      "detail": {
+        "key": "action.applied",
+        "title": "四维输出动作",
+        "shape": [
+          4
+        ],
+        "size": 4,
+        "min": -0.002394392853602767,
+        "max": 0.2156621813774109,
+        "mean": 0.07639554142951965,
+        "std": 0.08496102690696716,
+        "nonfinite": 0,
+        "index": 0,
+        "coordinate": [
+          0
+        ],
+        "value": 0.2156621813774109,
+        "parameters": [],
+        "description": "动作分量依次为左履带速度指令、右履带速度指令、云台偏航角速度指令、云台俯仰角速度指令；确定性均值经 SB3 裁剪 / 反归一化后范围为 [-1,1]。前两维分别乘最大履带速度，形成左右独立履带速度指令；后两维保持云台偏航 / 俯仰角速度语义。",
+        "source": "实际前向",
+        "fields": [
+          "左履带速度指令",
+          "右履带速度指令",
+          "云台偏航角速度指令",
+          "云台俯仰角速度指令"
+        ]
+      }
+    }
+  }
+}

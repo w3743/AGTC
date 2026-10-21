@@ -1,0 +1,308 @@
+[
+  {
+    "ref": "U_AND2",
+    "mpn": "TI SN74LVC1G08DBVR",
+    "libUuid": "bc9749d59c264b90888987196d1a86c0",
+    "pins": {
+      "1": "COMP1_OUT",
+      "2": "COMP2_OUT",
+      "3": "B0",
+      "4": "PRE_OK",
+      "5": "PRE_CTRL_3V3"
+    },
+    "note": "AND of both comparator directions; 5-pin DBV mapping 1=A,2=B,3=GND,4=Y,5=VCC.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 150,
+    "value": "SN74LVC1G08"
+  },
+  {
+    "ref": "R_DELAY",
+    "mpn": "Yageo RC0603FR-07100KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "PRECHARGE_WINDOW",
+      "2": "PRE_DELAY_RC"
+    },
+    "note": "100kΩ timing resistor.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 150,
+    "value": "100kΩ 1% 0.1W"
+  },
+  {
+    "ref": "C_DELAY",
+    "mpn": "Murata GRM188R71C105KA12D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_DELAY_RC",
+      "2": "B0"
+    },
+    "note": "1µF X7R timing capacitor; actual threshold delay to verify on hardware.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 150,
+    "value": "1uF 16V"
+  },
+  {
+    "ref": "D_DELAY",
+    "mpn": "Diodes Inc. 1N4148W-7-F",
+    "libUuid": "8f297b9cd0f64fa589d310c9e1af2771",
+    "pins": {
+      "1": "PRECHARGE_WINDOW",
+      "2": "PRE_DELAY_RC"
+    },
+    "note": "SOD-123 pin1=K/cathode, pin2=A/anode; installed as fast RC reset (anode at RC, cathode at window).",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 1750,
+    "y": 150,
+    "value": "1N4148W"
+  },
+  {
+    "ref": "U_DELAY",
+    "mpn": "TI SN74LVC1G17DBVR",
+    "libUuid": "4f7a0ea24d734e93830e74ea7183d607",
+    "pins": {
+      "1": null,
+      "2": "PRE_DELAY_RC",
+      "3": "B0",
+      "4": "PRE_COMPARE_EN",
+      "5": "PRE_CTRL_3V3"
+    },
+    "note": "5-pin DBV:1 NC,2 A,3 GND,4 Y,5 VCC; Schmitt trigger delays comparator enable.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 2250,
+    "y": 150,
+    "value": "SN74LVC1G17"
+  },
+  {
+    "ref": "U_TIMER",
+    "mpn": "ADI LTC6993IS6-1#TRPBF",
+    "libUuid": "f245b4dc9741451393e8e5f8ecaea1e1",
+    "pins": {
+      "1": "TMR_TRIG",
+      "2": "B0",
+      "3": "TMR_SET",
+      "4": "TMR_DIV",
+      "5": "PRE_CTRL_3V3",
+      "6": "TMR_ACTIVE"
+    },
+    "note": "S6 pin1 TRIG,2 GND,3 SET,4 DIV,5 V+,6 OUT; non-retriggerable positive one-shot.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 450,
+    "value": "LTC6993-1"
+  },
+  {
+    "ref": "R_TIMER_SET",
+    "mpn": "Yageo RC0603FR-0768K1L",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "TMR_SET",
+      "2": "B0"
+    },
+    "note": "68.1kΩ 1% sets nominal 2.855s with NDIV=2^21.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 450,
+    "value": "68.1kΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_TIMER_DIV_HI",
+    "mpn": "Yageo RC0603FR-071ML",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "TMR_DIV"
+    },
+    "note": "1.00MΩ 1% DIV selection resistor.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 450,
+    "value": "1MΩ 1% 0.1W"
+  },
+  {
+    "ref": "R_TIMER_DIV_LO",
+    "mpn": "Yageo RC0603FR-07887KL",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "pins": {
+      "1": "TMR_DIV",
+      "2": "B0"
+    },
+    "note": "887kΩ 1% DIV selection resistor; verify DIVCODE against current LTC6993 datasheet.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 450,
+    "value": "887kΩ 1% 0.1W"
+  },
+  {
+    "ref": "U_GATE1",
+    "mpn": "TI SN74LVC1G11DCKR",
+    "libUuid": "27376aeb8ef24d0493ee69f282c2787f",
+    "pins": {
+      "1": "SW_RUN",
+      "2": "B0",
+      "3": "PRE_REQ_HW",
+      "4": "W1",
+      "5": "PRE_CTRL_3V3",
+      "6": "TMR_ACTIVE"
+    },
+    "note": "3-input AND W1=SW_RUN & PRE_REQ_HW & TMR_ACTIVE. DCK pins 1=A,2=GND,3=B,4=Y,5=VCC,6=C.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 2250,
+    "y": 450,
+    "value": "SN74LVC1G11"
+  },
+  {
+    "ref": "U_GATE2",
+    "mpn": "TI SN74LVC1G11DCKR",
+    "libUuid": "27376aeb8ef24d0493ee69f282c2787f",
+    "pins": {
+      "1": "PRE_READY_N",
+      "2": "B0",
+      "3": "PRE_FAULT_N",
+      "4": "W2",
+      "5": "PRE_CTRL_3V3",
+      "6": "POR_OK"
+    },
+    "note": "3-input AND W2=PRE_READY_N & PRE_FAULT_N & POR_OK.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 750,
+    "value": "SN74LVC1G11"
+  },
+  {
+    "ref": "C_TIMER",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_TIMER.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 750,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_AND2",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_AND2.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1250,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_GATE1",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_GATE1.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 1750,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_GATE2",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_GATE2.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 2250,
+    "y": 750,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_DELAY_LOGIC",
+    "mpn": "Murata GRM188R71C104KA01D",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "pins": {
+      "1": "PRE_CTRL_3V3",
+      "2": "B0"
+    },
+    "note": "100nF local bypass at U_DELAY.",
+    "sourceFile": "功率元件连接.json",
+    "pageGroup": "PWR_PRECHARGE_TIMER",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "x": 250,
+    "y": 1050,
+    "value": "100nF 16V"
+  }
+]

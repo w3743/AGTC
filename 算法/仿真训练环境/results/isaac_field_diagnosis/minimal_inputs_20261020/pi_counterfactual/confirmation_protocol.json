@@ -1,0 +1,81 @@
+{
+  "schema": "isaac-field-pi-counterfactual-confirmation-v1",
+  "status": "prepared_not_run",
+  "purpose": "Confirm paired low-differential tracking and stopping behavior for capped-P versus a runtime per-side integral counterfactual under the same v5 Newton environment.",
+  "prior_attempt": {
+    "p_summary": "capped_p_reference/counterfactual_summary.json",
+    "pi_summary": "pi_candidate/counterfactual_summary.json",
+    "pair_exit": "paired_counterfactual_attempt1_exit.json reports actual_exit_code=1 because exact settle-state equality failed",
+    "exact_pair_gate": "The earlier 10-case exact initial-state comparison failed and remains preserved with exit code 1. This confirmation uses the explicit tolerances below; it does not rewrite the earlier result as a pass."
+  },
+  "controllers": {
+    "confirmation_p": {
+      "ki": 0.0,
+      "name": "capped_p_only_reference",
+      "integral_assertion": "side integral state and broadcast feedforward remain exactly zero"
+    },
+    "confirmation_pi": {
+      "ki": 0.1,
+      "name": "runtime_pi_counterfactual",
+      "ki_status": "uncalibrated assumption; do not tune during this experiment",
+      "ki_units": "Nm per proxy wheel / (rad/s side-mean proxy wheel speed * s)"
+    },
+    "architecture": "side_integral_plus_native_per_wheel_P",
+    "integral_states": "two states in left/right order, each updated from the mean target-minus-actual angular velocity across that side's seven proxy wheels; broadcast each side value equally to its seven proxy wheels",
+    "native_pd": "Preserve the configured per-wheel IdealPD gain and v5 effort clamp; do not change actuator or physics configuration."
+  },
+  "case_names": [
+    "diff_left_plus_0.05",
+    "diff_left_plus_0.10",
+    "brake_straight_0.20_to_zero",
+    "brake_diff_left_plus_0.80_to_zero"
+  ],
+  "timing_s": {
+    "p_only_settle": 1.0,
+    "drive": 8.0,
+    "brake_observation": 5.0,
+    "brake_tail_gate": 0.3,
+    "policy_dt_expected": 0.05,
+    "physics_dt_expected": 0.005,
+    "decimation_expected": 10
+  },
+  "environment": {
+    "plants": 0,
+    "terrain_enabled": false,
+    "seed": 90231,
+    "start_pose_xy_yaw": [50.0, 50.0, 0.0],
+    "goal_xy": [90.0, 50.0],
+    "max_time_s": 20.0,
+    "drive_contract": "independent_left_right_track_speed_explicit_v5",
+    "source_sha256_and_base_drive_config_must_match": true
+  },
+  "initial_state_pairing_tolerances": {
+    "position_xy_m": 0.0001,
+    "root_z_m": 0.0001,
+    "roll_pitch_yaw_rad": 0.0001,
+    "actual_v_w": 0.0001,
+    "wheel_actual_qd_rad_s": 0.001,
+    "track_command_mps": 0.0,
+    "wheel_target_rad_s": 0.0,
+    "comparison_rule": "For every selected case and every listed element, absolute PI-minus-P difference must be less than or equal to the field tolerance. Record actual maximum absolute differences by field."
+  },
+  "braking_stop_gate": {
+    "tail_duration_s": 0.3,
+    "expected_tail_policy_steps": 6,
+    "track_command_mps_exact": [0.0, 0.0],
+    "actual_v_mps_abs_strict_limit": 0.2,
+    "actual_w_rad_s_abs_strict_limit": 0.3,
+    "actual_applied_effort_nm_per_proxy_wheel_limit": 2.0,
+    "actual_applied_effort_tolerance_nm": 1e-5,
+    "finite_required": true,
+    "failure_rule": "A gate failure is reported as failure; do not relax any threshold, change Ki, or call this navigation/goal-completion success."
+  },
+  "outputs": {
+    "p_directory": "confirmation_p/",
+    "pi_directory": "confirmation_pi/",
+    "comparison_file": "confirmation_pair_summary.json",
+    "source_snapshot": "source_snapshot/source_snapshot_manifest.json",
+    "source_freeze": "confirmation_source_freeze_sha256.txt"
+  },
+  "execution_guard": "Prepared only. Do not execute native/GPU runs until the parent agent explicitly authorizes them after reviewing the old initial-state deltas."
+}

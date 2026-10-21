@@ -1,0 +1,57 @@
+Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+Camera aperture offsets are not supported by Omniverse. c_x and c_y will be half of width and height
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 90231
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.05
+	Environment step-size : 0.05
+/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:165: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+[INFO]: Time taken for scene creation Last: 2.967388 s, Mean: 2.967388 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 110.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+Finalize builder took: Last: 1.048964 s, Mean: 1.048964 s, Std: 0.000000 s, N: 1
+Contact sensor construction took: Last: 0.012015 s, Mean: 0.012015 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for NewtonSegmentationMapper.build_mapping (instance_segmentation, colorize=False) Last: 0.000535 s, Mean: 0.000535 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 0.606323 s, Mean: 0.606323 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 2.160965 s, Mean: 2.160965 s, Std: 0.000000 s, N: 1
+Traceback (most recent call last):
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_source_ab_probe.py", line 646, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_diagnosis/steering_contact_repair_20261020/contact_source_ab_probe.py", line 375, in main
+    env = IsaacFieldEnv(cfg)
+          ^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/isaac_field/env.py", line 205, in __init__
+    super().__init__(cfg, render_mode, **kwargs)
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab/isaaclab/envs/direct_rl_env.py", line 113, in __init__
+    self._init_sim(render_mode, **kwargs)
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab/isaaclab/envs/direct_rl_env.py", line 174, in _init_sim
+    self.sim.reset()
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab/isaaclab/sim/simulation_context.py", line 711, in reset
+    self.physics_manager.reset(soft)
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 622, in reset
+    cls.initialize_solver()
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1608, in initialize_solver
+    cls._build_solver(cls.backend.model, cfg.solver_cfg)  # type: ignore[union-attr]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/mjwarp_manager.py", line 55, in _build_solver
+    NewtonManager._solver = cls._create_solver(model, solver_cfg)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/external/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/mjwarp_manager.py", line 43, in _create_solver
+    return SolverMuJoCo(model, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 4085, in __init__
+    self._convert_to_mjc(
+  File "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 6547, in _convert_to_mjc
+    add_geoms(-1)
+  File "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 6444, in add_geoms
+    raise ValueError(
+ValueError: MuJoCo contact generation does not support planar mesh collider '/World/envs/env_0/Field/Ground' (shape 0). Use use_mujoco_contacts=False so Newton's collision pipeline handles this mesh, or replace it with a plane/box/thick mesh.
+ACTUAL_EXIT_CODE=1

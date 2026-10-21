@@ -1,0 +1,195 @@
+{
+  "schema": "isaac-field-front-guide-coupled-integration-summary-v1",
+  "date": "2026-10-20",
+  "status": "integration_and_regression_passed",
+  "scope": "front-guide same-side track-speed coupling backend and native/legacy verification",
+  "implementation_chain": {
+    "asset_api": {
+      "module": "isaac_field.assets",
+      "spec_type": "FrontGuideSpec",
+      "wheel_type": "FrontGuideWheelSpec",
+      "default_spec": {
+        "x_m": 0.42,
+        "z_offset_from_support_m": 0.05,
+        "radius_m": 0.045,
+        "width_m": 0.06,
+        "mass_per_wheel_kg": 0.25,
+        "rotation_coupling": "same_side_track_speed"
+      },
+      "derived_wheels": ["left_front_guide", "right_front_guide"],
+      "hash_and_path": {
+        "guide_spec_included_in_asset_hash": true,
+        "guide_asset_directory_pattern": "front_guides_<full_sha256>/field_robot.usda",
+        "no_guide_hash_and_path_preserved": true,
+        "total_robot_mass_kg": 30.0,
+        "independent_guide_drive_api": false
+      }
+    },
+    "config_flow": {
+      "public_parameter": "make_env(front_guide_spec=FrontGuideSpec(...))",
+      "field_env_cfg_representation": "plain dict produced by dataclasses.asdict",
+      "runtime_representation": "IsaacFieldEnv restores FrontGuideSpec before asset/runtime setup"
+    },
+    "newton_runtime": {
+      "hook": "SameSideMimicBuilderHook",
+      "support_relations_per_world": 12,
+      "guide_relations_per_world": 2,
+      "total_relations_per_world": 14,
+      "guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+      "default_radius_ratio": 1.0,
+      "world_local_joint_resolution": true,
+      "cross_world_pairs_observed": 0,
+      "equality_rows_mapped_to_mujoco_joint_constraints": true
+    },
+    "actuation_and_feedback": {
+      "driven_support_wheel_joints_preserved": 14,
+      "guide_drive_motors": 0,
+      "guide_actuator_generalized_force_during_command": 0.0,
+      "added_guide_pid_count": 0,
+      "added_guide_drive_torque_nm": 0.0,
+      "existing_per_wheel_effort_limit_nm": 2.0,
+      "feedback_dimension_preserved": 37
+    },
+    "drive_metadata": {
+      "same_side_wheel_coupling_relations_per_world": 14,
+      "wheel_relations_per_world": 12,
+      "guide_relations_per_world": 2,
+      "front_guide_model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+      "front_guide_mode": "same_side_track_speed",
+      "records_leader_and_radius_ratio": true,
+      "records_no_motor_pid_or_added_torque": true,
+      "actual_guide_contact_material_recorded": true
+    },
+    "fresh_runner_contract": {
+      "module": "scripts.train_isaac_foundation_fresh",
+      "frozen_fields": [
+        "front_guide_spec",
+        "front_guide_wheels",
+        "front_guide_drive_coupling",
+        "same_side_wheel_coupling_counts",
+        "robot_asset_spec_sha256",
+        "contract_sha256",
+        "interpretation"
+      ],
+      "live_environment_contract_checked": true,
+      "training_started_by_this_integration_task": false
+    }
+  },
+  "modes": {
+    "same_side_track_speed": {
+      "guide_equalities_per_world": 2,
+      "total_equalities_per_world": 14,
+      "guide_follows": "same-side wheel 0",
+      "ratio": "main support wheel radius / guide wheel radius"
+    },
+    "free_diagnostic": {
+      "guide_equalities_per_world": 0,
+      "support_wheel_equalities_per_world": 12,
+      "guide_actuators": 0,
+      "model": "passive_free_rotating_guide_wheels_separate_proxy_not_continuous_track"
+    },
+    "no_guide_legacy": {
+      "front_guide_spec": null,
+      "legacy_asset_hash_and_path_preserved": true,
+      "same_side_equalities_per_world_with_default_support_coupling": 12,
+      "blank_front_guide_metadata_added": false,
+      "driven_support_wheels": 14
+    }
+  },
+  "native_motion_residuals": {
+    "measurement": "40 commanded policy steps after 20 settling steps; one straight and one opposing-track pivot world",
+    "existing_limits": {
+      "q_abs_max_rad": 0.02,
+      "qd_abs_p95_rad_s": 0.0926,
+      "qd_abs_max_rad_s": 0.463
+    },
+    "left": {
+      "q_abs_max_rad": 0.000049591064453125,
+      "qd_abs_p95_rad_s": 0.012859535403549671,
+      "qd_abs_max_rad_s": 0.016170501708984375,
+      "ratio": 1.0
+    },
+    "right": {
+      "q_abs_max_rad": 0.000041961669921875,
+      "qd_abs_p95_rad_s": 0.01039276085793972,
+      "qd_abs_max_rad_s": 0.01329803466796875,
+      "ratio": 1.0
+    },
+    "limits_widened": false
+  },
+  "verification": [
+    {
+      "attempt": "attempt8_native_full_pass",
+      "command": "RUN_ISAAC_PHYSICS=1 ./scripts/isaaclab_python.sh -m pytest -q -s tests/test_front_guide_native.py",
+      "pytest_exit_code": 0,
+      "actual_exit_code": 0,
+      "result": "3 passed, 39 warnings",
+      "evidence": "attempt8_native_full_pass/pytest.log",
+      "exit_record": "attempt8_native_full_pass/actual_exit_code.json"
+    },
+    {
+      "attempt": "attempt9_native_legacy14",
+      "command": "RUN_ISAAC_PHYSICS=1 ./scripts/isaaclab_python.sh -m pytest -q -s tests/test_env_integration.py",
+      "pytest_exit_code": 0,
+      "actual_exit_code": 0,
+      "result": "14 passed, 55 warnings, 86.65 s",
+      "evidence": "attempt9_native_legacy14/pytest.log",
+      "exit_record": "attempt9_native_legacy14/actual_exit_code.json"
+    },
+    {
+      "attempt": "attempt1_cpu",
+      "pytest_exit_code": 0,
+      "compileall_exit_code": 0,
+      "actual_exit_code": 0,
+      "result": "12 passed"
+    },
+    {
+      "attempt": "attempt2_static",
+      "compileall_exit_code": 0,
+      "actual_exit_code": 0
+    },
+    {
+      "attempt": "attempt5_cpu_finalized_contract",
+      "pytest_exit_code": 0,
+      "compileall_exit_code": 0,
+      "actual_exit_code": 0,
+      "result": "12 passed"
+    }
+  ],
+  "failed_attempts_preserved": [
+    {
+      "attempt": "attempt3_native_guides_motion",
+      "actual_exit_code": 1,
+      "cause": "Test oracle incorrectly filtered Newton-generated MuJoCo joint equalities by eq_objtype and used unprefixed direct host joint-name lookup in the free-guide case.",
+      "resolution": "Use the per-world solver joint mapping and joint equality type; final native attempt passes.",
+      "evidence": "attempt3_native_guides_motion/pytest.log"
+    },
+    {
+      "attempt": "attempt4_native_mapping_diagnosis",
+      "actual_exit_code": 1,
+      "cause": "Diagnostic assertion repeated the eq_objtype filter false negative; raw host mapping was preserved and showed 14 joint equality rows with the guide rows present.",
+      "evidence": "attempt4_native_mapping_diagnosis/pytest.log"
+    },
+    {
+      "attempt": "attempt6_native_coupling_final",
+      "actual_exit_code": 1,
+      "cause": "Test queried nonexistent MjModel.eq_polycoef instead of the supported eq_data row fields.",
+      "resolution": "Read joint equality coefficients from MjModel.eq_data[row, :5].",
+      "evidence": "attempt6_native_coupling_final/pytest.log"
+    },
+    {
+      "attempt": "attempt7_native_motion_residuals",
+      "actual_exit_code": 1,
+      "cause": "Partial-reset test expected one sample in the untouched world after 60 samples; the expected count was stale.",
+      "resolution": "Assert reset world count 0 and untouched world count 60; guide residual checks had passed.",
+      "evidence": "attempt7_native_motion_residuals/pytest.log"
+    }
+  ],
+  "limitations": [
+    "The front guides are separate discrete proxy wheels, not a continuous track or validated track-contact geometry.",
+    "Proxy dimensions, masses, speed ratio and material values are simulation contract inputs, not real-vehicle calibration.",
+    "These integration tests establish model/metadata consistency and guide-to-wheel motion tracking; they do not establish a learned navigation improvement or a new training result."
+  ],
+  "retained_source_backup_manifest": "source_before/sha256.json",
+  "all_attempt_logs_and_actual_exit_records_preserved": true
+}

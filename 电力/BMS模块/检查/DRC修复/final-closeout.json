@@ -1,0 +1,78 @@
+{
+  "checked_at": "2026-10-16T02:04:47.998045",
+  "status": "PARTIAL_DRC_REPAIR_AWAITING_CURRENT_DETAILS",
+  "user_input": {
+    "path": "C:\\Users\\wangj\\Downloads\\schDrcLog_2026-10-16.txt",
+    "sha256": "1443410b8df55dc4377896846c396902072a7e7b8b5067dd43faa8da511f6ae9"
+  },
+  "warning_count_before": 112,
+  "warning_count_after": 7,
+  "warning_reduction": 105,
+  "remaining_warning_details_reviewed": false,
+  "completed": {
+    "duplicate_same_NET_groups": 97,
+    "off_grid_objects": 7,
+    "missing_external_precharge_R_PRE_restored": true,
+    "explicit_empty_values_restored": 145,
+    "wrong_2X_to_4X_procurement_mapping_removed": true
+  },
+  "native_sources": {
+    "BMS-9S4P.eprj3": {
+      "sha256": "ed3fb7c1ef054aebd9fe3d2e97c0f61c0c4e8003fb9f5a0ad6c5b3b5bcfb7e5f",
+      "bytes": 2055
+    },
+    "sch/Schematic1/P1.esch2": {
+      "sha256": "7338c38954e8d456c87ed69aad2c4ac23593f4b53c54dee3c6d6a64c38cad88a",
+      "bytes": 5764833
+    },
+    "sch/Schematic1/Schematic1.ecfg": {
+      "sha256": "668c78e3354651fafd03f2bc61baed062a0ecdb9ac23cdfef8ac76136a9b6cc1",
+      "bytes": 763
+    },
+    "原理图准备/BOM.csv": {
+      "sha256": "3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219",
+      "bytes": 154376
+    }
+  },
+  "counts": {
+    "pcb_components": 206,
+    "cad_components": 208,
+    "pins": 700,
+    "raw_mpn_strings": 52,
+    "normalized_mpn": 51,
+    "texts": 237,
+    "netports": 347,
+    "native_LINE": 1198,
+    "wiregroups": 381
+  },
+  "strict_semantic_geometry": {
+    "status": "PASS",
+    "pins_checked": 700,
+    "all_defect_counts_zero": true,
+    "bound_sources_match": true
+  },
+  "official_reopen_readback": {
+    "snapshot_equal": true,
+    "drc": [
+      {
+        "type": "warn",
+        "count": 7
+      }
+    ],
+    "metadata_supplement": "final-runtime-metadata.json"
+  },
+  "model_results": {
+    "precharge_logic_window": "PASS for TMR_ACTIVE/logic-window deassertion only; excludes BJT and MOSFET physical release",
+    "precharge_external_resistor": "PASS when external, unobstructed/free-air mounted per TE rating; no added heatsink indicated",
+    "protection_reduction": "PASS_WITH_OPEN_ITEMS",
+    "protection_checks": 17,
+    "charge_limit": "PASS executable reference algorithm and deterministic fail-safe tests; NOT firmware/hardware/vehicle acceptance",
+    "charge_checks": 17,
+    "release_status": "BLOCKED pending physical input qualification, firmware implementation/readback, branch-current, local source-response, and sink validation",
+    "psu": "条件纸面方案，仅供 Layout 初始摆放；PSU 输入已接 TAP_B9，当前原理图官方重开读取 208 器件/700 引脚且源 SHA 不变；DRC 尚有 7 条 warn，细项待导出/复核。辅助正极线支路故障/短路分断、实际电池 DC 预期短路电流及熔断总清除 I²t 配合均 OPEN；未冻结、未放行投板。"
+  },
+  "library_check": "PASS",
+  "no_pcb_created": true,
+  "physical_qualification": "NOT_PERFORMED",
+  "next": "用户重新导出当前原理图DRC明细；官方API只返回数量，尚不能确定剩余7条的规则、Ref及具体字段。"
+}

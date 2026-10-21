@@ -1,0 +1,102 @@
+{
+  "captured_at_local": "2026-10-17T16:38:50.4007365+08:00",
+  "timezone": "Asia/Shanghai",
+  "read_only": true,
+  "scope": "Local Windows/WSL runtime evidence; no Gazebo process was started and no system settings were changed.",
+  "wsl_distribution": "Ubuntu-24.04",
+  "commands": [
+    "Get-CimInstance Win32_VideoController | Select-Object Name,PNPDeviceID",
+    "wsl.exe -d Ubuntu-24.04 -- bash -lc \"ps -p 1318,1621 -o pid=,args=; read selected keys from /proc/1621/environ\"",
+    "wsl.exe -d Ubuntu-24.04 -- /usr/lib/wsl/lib/nvidia-smi",
+    "source scripts/env.sh; glxinfo -B",
+    "Get-Counter GPU Engine utilization percentage, one sample"
+  ],
+  "hardware": [
+    {
+      "name": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+      "pnp_id": "PCI\\VEN_10DE&DEV_2F18&SUBSYS_60421D05&REV_A1\\FD0E999FE62DB04800"
+    },
+    {
+      "name": "Intel(R) Graphics",
+      "pnp_id": "PCI\\VEN_8086&DEV_7D67&SUBSYS_50001D05&REV_06\\3&11583659&0&10"
+    },
+    {
+      "name": "Meta Virtual Monitor",
+      "pnp_id": "ROOT\\DISPLAY\\0000"
+    }
+  ],
+  "live_processes": {
+    "web_server": {
+      "pid": 1318,
+      "command": "/home/wangj/robotics-lab/venv/learning/bin/python -m simulation.serve_field_gazebo ... --port 8768"
+    },
+    "gazebo": {
+      "pid": 1621,
+      "command": "gz sim -v 2 -s --headless-rendering .../results/gazebo_web/live_evaluation/episode_000001_2b5409ee/export/.world_driver_y86i8ut6.sdf"
+    }
+  },
+  "gazebo_process_environment": {
+    "DISPLAY": ":0",
+    "WAYLAND_DISPLAY": "wayland-0",
+    "GALLIUM_DRIVER": "d3d12",
+    "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA",
+    "GZ_PARTITION": "field_driver_1318_0d325aa7",
+    "ROS_DOMAIN_ID": "73"
+  },
+  "nvidia_smi": {
+    "observed_at_local": "2026-10-17T16:37:37+08:00",
+    "gpu": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+    "gpu_utilization_percent": 0,
+    "memory_used_mib": 1675,
+    "process_table_entry": {
+      "pid": 1621,
+      "type": "G",
+      "process": "/ruby"
+    },
+    "interpretation": "The live Gazebo process is listed by the NVIDIA driver as a graphics process. 0% is only the instantaneous sample."
+  },
+  "wsl_glx": {
+    "observed_at_local": "2026-10-17T16:37:05+08:00",
+    "command_context": "WSL GLX probe after sourcing project scripts/env.sh",
+    "accelerated": true,
+    "renderer": "D3D12 (NVIDIA GeForce RTX 5070 Ti Laptop GPU)",
+    "opengl_version": "4.6 (Compatibility Profile) Mesa 25.2.8-0ubuntu0.24.04.2",
+    "interpretation": "This is a new GLX context, corroborating the adapter selected in the live Gazebo process environment; it is not in-process instrumentation."
+  },
+  "task_manager_gpu_engine_sample": {
+    "sample_window_local": "approximately 2026-10-17T16:37:55+08:00 to 16:38:00+08:00",
+    "method": "Get-Counter GPU Engine utilization percentage, filtered to two active app PIDs",
+    "processes": [
+      {
+        "pid": 6020,
+        "process": "msedgewebview2",
+        "luid": "0x00000000_0x00018384",
+        "engine": "3D",
+        "utilization_percent": 6.28
+      },
+      {
+        "pid": 30068,
+        "process": "ChatGPT.exe",
+        "luid": "0x00000000_0x00018384",
+        "engine": "3D",
+        "utilization_percent": 1.21
+      }
+    ],
+    "physical_adapter_for_luid": null,
+    "limitation": "The sampled Windows GPU-engine LUID has not been mapped to Intel or NVIDIA. No conclusion about which adapter renders the browser/Codex UI is made from this sample."
+  },
+  "project_selection_mechanism": {
+    "source": "scripts/env.sh",
+    "behavior": "When running in WSL with /dev/dxg and DISPLAY, and GALLIUM_DRIVER is unset, the script checks nvidia-smi -L, defaults MESA_D3D12_DEFAULT_ADAPTER_NAME to NVIDIA, then selects GALLIUM_DRIVER=d3d12 only if glxinfo reports Accelerated: yes.",
+    "scope": "WSL Gazebo/GL rendering processes that source the script; it does not configure native Windows browser rendering."
+  },
+  "torch_policy_device": {
+    "value": "cpu",
+    "evidence": [
+      "field_sim/policy.py:78 creates RecurrentPPO with device=cpu",
+      "field_sim/policy.py:97 loads RecurrentPPO with device=cpu",
+      "simulation/train_field_gazebo.py:548,588,832 uses/reports device=cpu",
+      "simulation/improve_field_policy.py:353 loads with device=cpu"
+    ]
+  }
+}

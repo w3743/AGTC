@@ -1,0 +1,976 @@
+{
+  "meta": {
+    "purpose": "per-board 1 s power-stage screening for 9S 5065 270KV hall BLDC; not hardware qualification",
+    "input_interpretation": "main P/V calculations assume 1.8 kW at DC bus; motor-terminal AC interpretation is separately tabulated using candidate bridge losses",
+    "direction": "motoring and regenerative current magnitudes use the same synchronous 6-MOS bridge loss screen; actual battery/DC bus energy acceptance is not demonstrated",
+    "single_pulse_initial_condition": "one 1 s event; case temperature held at stated value, no repeated interval known",
+    "limitations": [
+      "motor phase resistance, inductance, pole-pair count, speed, power factor and actual PWM/gate waveform unknown",
+      "MOSFET normalized Rds(T) figures are visually read typical graph factors multiplied by 25 C maximum Rds; hot absolute max is not guaranteed",
+      "switching loss uses datasheet tr/tf under different test currents/voltages/gate resistors; sensitivity includes 0.5x/1x/2x edges and half-loss case",
+      "Coss/Eoss, reverse recovery, deadtime/body-diode conduction, gate-driver switching waveforms, copper, shunts, PCB, connectors, source and clamp losses excluded from MOSFET total",
+      "rated ID and pulse ID are not used as proof; case temperature must remain within specified design boundary over the pulse"
+    ]
+  },
+  "power_and_current": {
+    "one_board": {
+      "p_electrical_w": 1800.0,
+      "duration_s": 1.0,
+      "energy_j": 1800.0,
+      "dc_bus_ideal_current_and_phase_minimum": {
+        "22.5": {
+          "bus_current_at_1800w_dc_input_a": 80.0,
+          "phase_rms_min_at_full_linear_svpwm_unity_pf_a": 65.319726,
+          "phase_peak_min_at_full_linear_svpwm_unity_pf_a": 92.376043,
+          "phase_power_boundary_at_120a_peak_w": 2338.26859,
+          "dc_power_boundary_at_100a_w": 2250.0,
+          "combined_boundary_w": 2250.0,
+          "phase_peak_equivalent_at_100a_bus_full_linear_svpwm_unity_pf_a": 115.470054
+        },
+        "37.8": {
+          "bus_current_at_1800w_dc_input_a": 47.619048,
+          "phase_rms_min_at_full_linear_svpwm_unity_pf_a": 38.88079,
+          "phase_peak_min_at_full_linear_svpwm_unity_pf_a": 54.98574,
+          "phase_power_boundary_at_120a_peak_w": 3928.291232,
+          "dc_power_boundary_at_100a_w": 3780.0,
+          "combined_boundary_w": 3780.0,
+          "phase_peak_equivalent_at_100a_bus_full_linear_svpwm_unity_pf_a": 115.470054
+        }
+      }
+    },
+    "two_identical_boards_simultaneous": {
+      "power_w": 3600.0,
+      "energy_j": 3600.0,
+      "bus_current_at_22_5v_a": 160.0,
+      "bus_current_at_37_8v_a": 95.238095
+    },
+    "motor_terminal_ac_power_case": {
+      "p_ac_per_motor_w": 1800.0,
+      "dc_power_estimate_formula": "Pdc = Pac + Pbridge; candidate 120 A phase-current bridge-loss screen only, other losses omitted",
+      "per_candidate_and_bus_voltage": {
+        "IRLB4030PbF": {
+          "22.5": {
+            "dc_bus_power_with_sine_candidate_losses_w": 2083.766202,
+            "dc_bus_current_with_sine_candidate_losses_a": 92.611831,
+            "dc_bus_power_with_locked_vector_loss_w": 2086.2,
+            "dc_bus_current_with_locked_vector_loss_a": 92.72
+          },
+          "37.8": {
+            "dc_bus_power_with_sine_candidate_losses_w": 2118.831219,
+            "dc_bus_current_with_sine_candidate_losses_a": 56.053736,
+            "dc_bus_power_with_locked_vector_loss_w": 2122.92,
+            "dc_bus_current_with_locked_vector_loss_a": 56.161905
+          }
+        },
+        "STL130N6F7": {
+          "22.5": {
+            "dc_bus_power_with_sine_candidate_losses_w": 1950.653003,
+            "dc_bus_current_with_sine_candidate_losses_a": 86.695689,
+            "dc_bus_power_with_locked_vector_loss_w": 1950.984,
+            "dc_bus_current_with_locked_vector_loss_a": 86.7104
+          },
+          "37.8": {
+            "dc_bus_power_with_sine_candidate_losses_w": 1955.421846,
+            "dc_bus_current_with_sine_candidate_losses_a": 51.730737,
+            "dc_bus_power_with_locked_vector_loss_w": 1955.97792,
+            "dc_bus_current_with_locked_vector_loss_a": 51.745448
+          }
+        }
+      }
+    },
+    "candidate_boundaries_are_independent_not_frozen": {
+      "phase_peak_a": 120.0,
+      "dc_bus_a": 100.0,
+      "max_dc_power_by_dc_current_w": {
+        "22.5": 2250.0,
+        "37.8": 3780.0
+      },
+      "max_ac_power_by_phase_current_at_full_linear_svpwm_unity_pf_w": {
+        "22.5": 2338.26859,
+        "37.8": 3928.291232
+      },
+      "combined_power_cap_w": {
+        "22.5": 2250.0,
+        "37.8": 3780.0
+      },
+      "note": "120 A phase peak and 100 A DC bus are separate candidate limits; at full modulation, unity PF, 120 A phase peak corresponds to about 103.9 A DC current."
+    },
+    "regeneration": {
+      "symmetric_power_stage_screen_w": -1800.0,
+      "energy_requested_per_board_j": 1800.0,
+      "bridge_losses_same_magnitude_assumption": true,
+      "source_acceptance_proven": false,
+      "note": "no separate energy source or storage is assumed; the local DC-link is not an energy sink for 1.8 kJ."
+    }
+  },
+  "mosfet_candidates": {
+    "IRLB4030PbF": {
+      "rds_hot_screen_ohm": 0.01075,
+      "rds_temp_factor_used_at_175c": 2.5,
+      "phase_rms_candidate_a": 84.852814,
+      "sine_conduction_total_w": 232.2,
+      "sine_conduction_average_per_fet_w": 38.7,
+      "locked_phase_vector_a": [
+        120.0,
+        -60.0,
+        -60.0
+      ],
+      "locked_conduction_total_w": 232.2,
+      "locked_hottest_fet_conduction_w": 154.8,
+      "switching_model": "Psw_upper = Vdc * fsw * (tr+tf) * sum_phase(mean(abs(Iphase))); sine sum=6/pi*Ipk; locked vector [120,-60,-60] sum=240 A. Sensitivity half is included because complementary leg commutation may make the six-device overlap approximation conservative.",
+      "switching_sensitivity": {
+        "22.5": {
+          "sine": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 12.89155,
+              "p_sw_half_sensitivity_w": 6.445775
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 25.783101,
+              "p_sw_half_sensitivity_w": 12.89155
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 51.566202,
+              "p_sw_half_sensitivity_w": 25.783101
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 25.783101,
+              "p_sw_half_sensitivity_w": 12.89155
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 51.566202,
+              "p_sw_half_sensitivity_w": 25.783101
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 103.132403,
+              "p_sw_half_sensitivity_w": 51.566202
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 38.674651,
+              "p_sw_half_sensitivity_w": 19.337326
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 77.349302,
+              "p_sw_half_sensitivity_w": 38.674651
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 154.698605,
+              "p_sw_half_sensitivity_w": 77.349302
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 51.566202,
+              "p_sw_half_sensitivity_w": 25.783101
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 103.132403,
+              "p_sw_half_sensitivity_w": 51.566202
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 206.264806,
+              "p_sw_half_sensitivity_w": 103.132403
+            }
+          ],
+          "locked_vector": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 13.5,
+              "p_sw_hottest_fet_upper_w": 3.375,
+              "p_sw_half_sensitivity_total_w": 6.75,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.6875
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 27.0,
+              "p_sw_hottest_fet_upper_w": 6.75,
+              "p_sw_half_sensitivity_total_w": 13.5,
+              "p_sw_half_sensitivity_hottest_fet_w": 3.375
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 54.0,
+              "p_sw_hottest_fet_upper_w": 13.5,
+              "p_sw_half_sensitivity_total_w": 27.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 6.75
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 27.0,
+              "p_sw_hottest_fet_upper_w": 6.75,
+              "p_sw_half_sensitivity_total_w": 13.5,
+              "p_sw_half_sensitivity_hottest_fet_w": 3.375
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 54.0,
+              "p_sw_hottest_fet_upper_w": 13.5,
+              "p_sw_half_sensitivity_total_w": 27.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 6.75
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 108.0,
+              "p_sw_hottest_fet_upper_w": 27.0,
+              "p_sw_half_sensitivity_total_w": 54.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 13.5
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 40.5,
+              "p_sw_hottest_fet_upper_w": 10.125,
+              "p_sw_half_sensitivity_total_w": 20.25,
+              "p_sw_half_sensitivity_hottest_fet_w": 5.0625
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 81.0,
+              "p_sw_hottest_fet_upper_w": 20.25,
+              "p_sw_half_sensitivity_total_w": 40.5,
+              "p_sw_half_sensitivity_hottest_fet_w": 10.125
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 162.0,
+              "p_sw_hottest_fet_upper_w": 40.5,
+              "p_sw_half_sensitivity_total_w": 81.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 20.25
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 54.0,
+              "p_sw_hottest_fet_upper_w": 13.5,
+              "p_sw_half_sensitivity_total_w": 27.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 6.75
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 108.0,
+              "p_sw_hottest_fet_upper_w": 27.0,
+              "p_sw_half_sensitivity_total_w": 54.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 13.5
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 216.0,
+              "p_sw_hottest_fet_upper_w": 54.0,
+              "p_sw_half_sensitivity_total_w": 108.0,
+              "p_sw_half_sensitivity_hottest_fet_w": 27.0
+            }
+          ]
+        },
+        "37.8": {
+          "sine": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 21.657805,
+              "p_sw_half_sensitivity_w": 10.828902
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 43.315609,
+              "p_sw_half_sensitivity_w": 21.657805
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 86.631219,
+              "p_sw_half_sensitivity_w": 43.315609
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 43.315609,
+              "p_sw_half_sensitivity_w": 21.657805
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 86.631219,
+              "p_sw_half_sensitivity_w": 43.315609
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 173.262437,
+              "p_sw_half_sensitivity_w": 86.631219
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 64.973414,
+              "p_sw_half_sensitivity_w": 32.486707
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 129.946828,
+              "p_sw_half_sensitivity_w": 64.973414
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 259.893656,
+              "p_sw_half_sensitivity_w": 129.946828
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 86.631219,
+              "p_sw_half_sensitivity_w": 43.315609
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 173.262437,
+              "p_sw_half_sensitivity_w": 86.631219
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 346.524874,
+              "p_sw_half_sensitivity_w": 173.262437
+            }
+          ],
+          "locked_vector": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 22.68,
+              "p_sw_hottest_fet_upper_w": 5.67,
+              "p_sw_half_sensitivity_total_w": 11.34,
+              "p_sw_half_sensitivity_hottest_fet_w": 2.835
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 45.36,
+              "p_sw_hottest_fet_upper_w": 11.34,
+              "p_sw_half_sensitivity_total_w": 22.68,
+              "p_sw_half_sensitivity_hottest_fet_w": 5.67
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 90.72,
+              "p_sw_hottest_fet_upper_w": 22.68,
+              "p_sw_half_sensitivity_total_w": 45.36,
+              "p_sw_half_sensitivity_hottest_fet_w": 11.34
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 45.36,
+              "p_sw_hottest_fet_upper_w": 11.34,
+              "p_sw_half_sensitivity_total_w": 22.68,
+              "p_sw_half_sensitivity_hottest_fet_w": 5.67
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 90.72,
+              "p_sw_hottest_fet_upper_w": 22.68,
+              "p_sw_half_sensitivity_total_w": 45.36,
+              "p_sw_half_sensitivity_hottest_fet_w": 11.34
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 181.44,
+              "p_sw_hottest_fet_upper_w": 45.36,
+              "p_sw_half_sensitivity_total_w": 90.72,
+              "p_sw_half_sensitivity_hottest_fet_w": 22.68
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 68.04,
+              "p_sw_hottest_fet_upper_w": 17.01,
+              "p_sw_half_sensitivity_total_w": 34.02,
+              "p_sw_half_sensitivity_hottest_fet_w": 8.505
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 136.08,
+              "p_sw_hottest_fet_upper_w": 34.02,
+              "p_sw_half_sensitivity_total_w": 68.04,
+              "p_sw_half_sensitivity_hottest_fet_w": 17.01
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 272.16,
+              "p_sw_hottest_fet_upper_w": 68.04,
+              "p_sw_half_sensitivity_total_w": 136.08,
+              "p_sw_half_sensitivity_hottest_fet_w": 34.02
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 90.72,
+              "p_sw_hottest_fet_upper_w": 22.68,
+              "p_sw_half_sensitivity_total_w": 45.36,
+              "p_sw_half_sensitivity_hottest_fet_w": 11.34
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 181.44,
+              "p_sw_hottest_fet_upper_w": 45.36,
+              "p_sw_half_sensitivity_total_w": 90.72,
+              "p_sw_half_sensitivity_hottest_fet_w": 22.68
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 362.88,
+              "p_sw_hottest_fet_upper_w": 90.72,
+              "p_sw_half_sensitivity_total_w": 181.44,
+              "p_sw_half_sensitivity_hottest_fet_w": 45.36
+            }
+          ]
+        }
+      },
+      "thermal_1s": {
+        "22.5": {
+          "fsw_hz": 20000.0,
+          "edge_scale": 1.0,
+          "zth_used_c_per_w": 0.4001,
+          "zth_method": "RC-network extrapolation to 1 s from the manufacturer-provided fit; case held fixed, losses at the 175 C Rds screen. Model only.",
+          "sine_total_bridge_loss_w": 283.766202,
+          "sine_per_fet_loss_w": 47.294367,
+          "sine_tj_screen_at_tc60_c": 78.922476,
+          "sine_tc_limit_at_tj150_c": 131.077524,
+          "sine_tc_limit_at_tj175_c": 156.077524,
+          "locked_total_bridge_loss_w": 286.2,
+          "locked_hottest_fet_loss_w": 168.3,
+          "locked_tj_screen_at_tc60_c": 127.33683,
+          "locked_tc_limit_at_tj150_c": 82.66317,
+          "locked_tc_limit_at_tj175_c": 107.66317,
+          "locked_phase_a_shunt_power_w": 7.2
+        },
+        "37.8": {
+          "fsw_hz": 20000.0,
+          "edge_scale": 1.0,
+          "zth_used_c_per_w": 0.4001,
+          "zth_method": "RC-network extrapolation to 1 s from the manufacturer-provided fit; case held fixed, losses at the 175 C Rds screen. Model only.",
+          "sine_total_bridge_loss_w": 318.831219,
+          "sine_per_fet_loss_w": 53.138536,
+          "sine_tj_screen_at_tc60_c": 81.260728,
+          "sine_tc_limit_at_tj150_c": 128.739272,
+          "sine_tc_limit_at_tj175_c": 153.739272,
+          "locked_total_bridge_loss_w": 322.92,
+          "locked_hottest_fet_loss_w": 177.48,
+          "locked_tj_screen_at_tc60_c": 131.009748,
+          "locked_tc_limit_at_tj150_c": 78.990252,
+          "locked_tc_limit_at_tj175_c": 103.990252,
+          "locked_phase_a_shunt_power_w": 7.2
+        }
+      }
+    },
+    "STL130N6F7": {
+      "rds_hot_screen_ohm": 0.00665,
+      "rds_temp_factor_used_at_175c": 1.9,
+      "phase_rms_candidate_a": 84.852814,
+      "sine_conduction_total_w": 143.64,
+      "sine_conduction_average_per_fet_w": 23.94,
+      "locked_phase_vector_a": [
+        120.0,
+        -60.0,
+        -60.0
+      ],
+      "locked_conduction_total_w": 143.64,
+      "locked_hottest_fet_conduction_w": 95.76,
+      "switching_model": "Psw_upper = Vdc * fsw * (tr+tf) * sum_phase(mean(abs(Iphase))); sine sum=6/pi*Ipk; locked vector [120,-60,-60] sum=240 A. Sensitivity half is included because complementary leg commutation may make the six-device overlap approximation conservative.",
+      "switching_sensitivity": {
+        "22.5": {
+          "sine": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 1.753251,
+              "p_sw_half_sensitivity_w": 0.876625
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 3.506502,
+              "p_sw_half_sensitivity_w": 1.753251
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 7.013003,
+              "p_sw_half_sensitivity_w": 3.506502
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 3.506502,
+              "p_sw_half_sensitivity_w": 1.753251
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 7.013003,
+              "p_sw_half_sensitivity_w": 3.506502
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 14.026007,
+              "p_sw_half_sensitivity_w": 7.013003
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 5.259753,
+              "p_sw_half_sensitivity_w": 2.629876
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 10.519505,
+              "p_sw_half_sensitivity_w": 5.259753
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 21.03901,
+              "p_sw_half_sensitivity_w": 10.519505
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 7.013003,
+              "p_sw_half_sensitivity_w": 3.506502
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 14.026007,
+              "p_sw_half_sensitivity_w": 7.013003
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 28.052014,
+              "p_sw_half_sensitivity_w": 14.026007
+            }
+          ],
+          "locked_vector": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 1.836,
+              "p_sw_hottest_fet_upper_w": 0.459,
+              "p_sw_half_sensitivity_total_w": 0.918,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.2295
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 3.672,
+              "p_sw_hottest_fet_upper_w": 0.918,
+              "p_sw_half_sensitivity_total_w": 1.836,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.459
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 7.344,
+              "p_sw_hottest_fet_upper_w": 1.836,
+              "p_sw_half_sensitivity_total_w": 3.672,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.918
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 3.672,
+              "p_sw_hottest_fet_upper_w": 0.918,
+              "p_sw_half_sensitivity_total_w": 1.836,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.459
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 7.344,
+              "p_sw_hottest_fet_upper_w": 1.836,
+              "p_sw_half_sensitivity_total_w": 3.672,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.918
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 14.688,
+              "p_sw_hottest_fet_upper_w": 3.672,
+              "p_sw_half_sensitivity_total_w": 7.344,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.836
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 5.508,
+              "p_sw_hottest_fet_upper_w": 1.377,
+              "p_sw_half_sensitivity_total_w": 2.754,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.6885
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 11.016,
+              "p_sw_hottest_fet_upper_w": 2.754,
+              "p_sw_half_sensitivity_total_w": 5.508,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.377
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 22.032,
+              "p_sw_hottest_fet_upper_w": 5.508,
+              "p_sw_half_sensitivity_total_w": 11.016,
+              "p_sw_half_sensitivity_hottest_fet_w": 2.754
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 7.344,
+              "p_sw_hottest_fet_upper_w": 1.836,
+              "p_sw_half_sensitivity_total_w": 3.672,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.918
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 14.688,
+              "p_sw_hottest_fet_upper_w": 3.672,
+              "p_sw_half_sensitivity_total_w": 7.344,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.836
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 29.376,
+              "p_sw_hottest_fet_upper_w": 7.344,
+              "p_sw_half_sensitivity_total_w": 14.688,
+              "p_sw_half_sensitivity_hottest_fet_w": 3.672
+            }
+          ]
+        },
+        "37.8": {
+          "sine": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 2.945461,
+              "p_sw_half_sensitivity_w": 1.472731
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 5.890923,
+              "p_sw_half_sensitivity_w": 2.945461
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 11.781846,
+              "p_sw_half_sensitivity_w": 5.890923
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 5.890923,
+              "p_sw_half_sensitivity_w": 2.945461
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 11.781846,
+              "p_sw_half_sensitivity_w": 5.890923
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 23.563691,
+              "p_sw_half_sensitivity_w": 11.781846
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 8.836384,
+              "p_sw_half_sensitivity_w": 4.418192
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 17.672769,
+              "p_sw_half_sensitivity_w": 8.836384
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 35.345537,
+              "p_sw_half_sensitivity_w": 17.672769
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_w": 11.781846,
+              "p_sw_half_sensitivity_w": 5.890923
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_w": 23.563691,
+              "p_sw_half_sensitivity_w": 11.781846
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_w": 47.127383,
+              "p_sw_half_sensitivity_w": 23.563691
+            }
+          ],
+          "locked_vector": [
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 3.08448,
+              "p_sw_hottest_fet_upper_w": 0.77112,
+              "p_sw_half_sensitivity_total_w": 1.54224,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.38556
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 6.16896,
+              "p_sw_hottest_fet_upper_w": 1.54224,
+              "p_sw_half_sensitivity_total_w": 3.08448,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.77112
+            },
+            {
+              "fsw_hz": 10000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 12.33792,
+              "p_sw_hottest_fet_upper_w": 3.08448,
+              "p_sw_half_sensitivity_total_w": 6.16896,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.54224
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 6.16896,
+              "p_sw_hottest_fet_upper_w": 1.54224,
+              "p_sw_half_sensitivity_total_w": 3.08448,
+              "p_sw_half_sensitivity_hottest_fet_w": 0.77112
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 12.33792,
+              "p_sw_hottest_fet_upper_w": 3.08448,
+              "p_sw_half_sensitivity_total_w": 6.16896,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.54224
+            },
+            {
+              "fsw_hz": 20000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 24.67584,
+              "p_sw_hottest_fet_upper_w": 6.16896,
+              "p_sw_half_sensitivity_total_w": 12.33792,
+              "p_sw_half_sensitivity_hottest_fet_w": 3.08448
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 9.25344,
+              "p_sw_hottest_fet_upper_w": 2.31336,
+              "p_sw_half_sensitivity_total_w": 4.62672,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.15668
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 18.50688,
+              "p_sw_hottest_fet_upper_w": 4.62672,
+              "p_sw_half_sensitivity_total_w": 9.25344,
+              "p_sw_half_sensitivity_hottest_fet_w": 2.31336
+            },
+            {
+              "fsw_hz": 30000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 37.01376,
+              "p_sw_hottest_fet_upper_w": 9.25344,
+              "p_sw_half_sensitivity_total_w": 18.50688,
+              "p_sw_half_sensitivity_hottest_fet_w": 4.62672
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 0.5,
+              "p_sw_upper_total_w": 12.33792,
+              "p_sw_hottest_fet_upper_w": 3.08448,
+              "p_sw_half_sensitivity_total_w": 6.16896,
+              "p_sw_half_sensitivity_hottest_fet_w": 1.54224
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 1.0,
+              "p_sw_upper_total_w": 24.67584,
+              "p_sw_hottest_fet_upper_w": 6.16896,
+              "p_sw_half_sensitivity_total_w": 12.33792,
+              "p_sw_half_sensitivity_hottest_fet_w": 3.08448
+            },
+            {
+              "fsw_hz": 40000.0,
+              "edge_scale": 2.0,
+              "p_sw_upper_total_w": 49.35168,
+              "p_sw_hottest_fet_upper_w": 12.33792,
+              "p_sw_half_sensitivity_total_w": 24.67584,
+              "p_sw_half_sensitivity_hottest_fet_w": 6.16896
+            }
+          ]
+        }
+      },
+      "thermal_1s": {
+        "22.5": {
+          "fsw_hz": 20000.0,
+          "edge_scale": 1.0,
+          "zth_used_c_per_w": 1.2,
+          "zth_method": "conservative asymptotic RthJC upper envelope only; datasheet transient plot does not provide a 1 s qualification point. Not 1 s proof.",
+          "sine_total_bridge_loss_w": 150.653003,
+          "sine_per_fet_loss_w": 25.108834,
+          "sine_tj_screen_at_tc60_c": 90.130601,
+          "sine_tc_limit_at_tj150_c": 119.869399,
+          "sine_tc_limit_at_tj175_c": 144.869399,
+          "locked_total_bridge_loss_w": 150.984,
+          "locked_hottest_fet_loss_w": 97.596,
+          "locked_tj_screen_at_tc60_c": 177.1152,
+          "locked_tc_limit_at_tj150_c": 32.8848,
+          "locked_tc_limit_at_tj175_c": 57.8848,
+          "locked_phase_a_shunt_power_w": 7.2
+        },
+        "37.8": {
+          "fsw_hz": 20000.0,
+          "edge_scale": 1.0,
+          "zth_used_c_per_w": 1.2,
+          "zth_method": "conservative asymptotic RthJC upper envelope only; datasheet transient plot does not provide a 1 s qualification point. Not 1 s proof.",
+          "sine_total_bridge_loss_w": 155.421846,
+          "sine_per_fet_loss_w": 25.903641,
+          "sine_tj_screen_at_tc60_c": 91.084369,
+          "sine_tc_limit_at_tj150_c": 118.915631,
+          "sine_tc_limit_at_tj175_c": 143.915631,
+          "locked_total_bridge_loss_w": 155.97792,
+          "locked_hottest_fet_loss_w": 98.84448,
+          "locked_tj_screen_at_tc60_c": 178.613376,
+          "locked_tc_limit_at_tj150_c": 31.386624,
+          "locked_tc_limit_at_tj175_c": 56.386624,
+          "locked_phase_a_shunt_power_w": 7.2
+        }
+      }
+    }
+  },
+  "dc_link": {
+    "rms_formula": "Ic_rms/Iphase_rms = sqrt(2*m*(sqrt(3)/(4*pi) + PF^2*(sqrt(3)/pi - 9*m/16)))",
+    "m_definition": "Vphase_peak/(Vdc/2); linear SVPWM range 0..2/sqrt(3)",
+    "pf_definition": "fundamental displacement power factor; sinusoidal phase current, ideal DC source and idealized PWM assumptions",
+    "max_factor_pf1": 0.649747,
+    "m_at_max_pf1": 0.612588,
+    "max_factor_pf0_8": 0.578275,
+    "m_at_max_pf0_8": 0.681504,
+    "phase_rms_at_120a_peak_a": 84.852814,
+    "worst_cap_rms_at_120a_peak_pf1_a": 55.13289,
+    "peh226ml3900qe4": {
+      "count_candidate": 6,
+      "capacitance_nominal_f": 0.0054,
+      "single_cap_uF": 900.0,
+      "voltage_rating_v": 63.0,
+      "ripple_current_rated_natural_convection_a_at_5khz_125c": 8.1,
+      "ripple_current_rated_life_condition": "continuous operation at natural convection; 4000 h for Ø20/Ø18 case",
+      "ripple_current_max_natural_convection_a_at_5khz_125c": 10.2,
+      "ripple_current_max_life_condition": "maximum at natural convection; 2000 h for Ø20/Ø18 case",
+      "ripple_current_max_with_heatsink_a_at_5khz_125c": 22.2,
+      "natural_convection_bank_rated_ideal_share_a": 48.6,
+      "natural_convection_bank_max_ideal_share_a": 61.2,
+      "heatsink_bank_max_ideal_share_a": 133.2,
+      "hot_esr_max_mohm_at_5_to_100khz_125_to_150c": 10.6,
+      "bank_esr_ideal_parallel_ohm": 0.001767,
+      "bank_esr_loss_at_worst_cap_rms_w": 5.370023,
+      "esr_loss_per_cap_equal_share_w": 0.895004,
+      "stored_energy_37_8_to_22_5v_j_nominal": 2.490993,
+      "fraction_of_1800j_pulse": 0.001384,
+      "ideal_c_needed_to_supply_1800j_from_37_8_to_22_5_f": 3.902058
+    },
+    "vesc6_author_bulk_reference": {
+      "bulk_electrolytics": "4 x 220 uF / 63 V from C48-C51; only these bus bulk caps are counted here",
+      "nominal_c_f": 0.00088,
+      "stored_energy_37_8_to_22_5v_j": 0.40594,
+      "fraction_of_1800j_pulse": 0.000226,
+      "ceramic_parts_not_added_to_bulk_total": "six 4.7 uF parts near the switching stage; schematic inventory alone is not used to count all six as DC-bus-parallel capacitance"
+    },
+    "minimum_cap_constraints": [
+      "ripple-current thermal rating at actual ambient, frequency spectrum, mounting and 1 s pulse duration",
+      "capacitance from the actual PWM ripple charge integral: C >= max|integral(iC dt)|/allowed_deltaV; not I*dt without waveform",
+      "ESR ripple: deltaV_ESR approximately delta_i*ESR_eq; P_ESR=Ic_rms^2*ESR_eq; share/temperature must be verified",
+      "ESL switching edge: deltaV_ESL approximately L_eq*di/dt; requires physical loop/parasitic and switching waveform"
+    ]
+  },
+  "shunts": {
+    "source_topology": "three 0.5 mOhm / 6 W / 2512 phase shunts R24/R29/R32; author firmware marks HW_HAS_3_SHUNTS and HW_HAS_PHASE_SHUNTS",
+    "phase_sense_gain_v_per_v": 20.0,
+    "at_120a_phase_peak": {
+      "shunt_peak_voltage_mv": 60.0,
+      "amplifier_output_delta_v_at_gain20": 1.2,
+      "sine_rms_current_a": 84.852814,
+      "sine_resistor_power_w_per_phase": 3.6,
+      "locked_phase_a_120a_dc_power_w": 7.2,
+      "locked_phase_a_120a_dc_energy_1s_j": 7.2,
+      "locked_phase_b_c_60a_dc_power_w_each": 1.8,
+      "initial_nameplate_candidate_floor_w": 10.0,
+      "selection_note": "10 W is a screening nameplate floor; a 6 W part can only be conditionally retained after its manufacturer 1 s pulse curve and measured temperature/current protection are checked."
+    },
+    "hypothetical_single_0_5mohm_dc_bus_shunt_at_100a": {
+      "drop_mv": 50.0,
+      "dissipation_w": 5.0,
+      "note": "not the VESC phase-shunt topology"
+    },
+    "limits": "60 mV x gain20 is signal swing only; amplifier REF/common-mode/ADC headroom and actual 1 s resistor pulse capability are not established by the schematic marking."
+  }
+}

@@ -1,0 +1,17 @@
+[Unit]
+Description=RK3588 stereo camera capture
+After=NetworkManager.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/rk-stereo
+Environment=PYTHONPATH=/opt/rk-stereo/vendor
+ExecStart=/usr/bin/python3 -B /opt/rk-stereo/server.py --host 0.0.0.0
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

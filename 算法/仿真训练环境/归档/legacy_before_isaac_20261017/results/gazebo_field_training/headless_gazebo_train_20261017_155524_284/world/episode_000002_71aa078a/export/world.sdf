@@ -1,0 +1,4191 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="field_training">
+    <physics name="field_4ms" type="dart">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <dart>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
+    <gravity>0 0 -9.81</gravity>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>30</latitude_deg>
+      <longitude_deg>120</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <plugin name="gz::sim::systems::Physics" filename="gz-sim-physics-system" />
+    <plugin name="gz::sim::systems::UserCommands" filename="gz-sim-user-commands-system" />
+    <plugin name="gz::sim::systems::SceneBroadcaster" filename="gz-sim-scene-broadcaster-system" />
+    <plugin name="gz::sim::systems::Sensors" filename="gz-sim-sensors-system">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin name="gz::sim::systems::Imu" filename="gz-sim-imu-system" />
+    <plugin name="gz::sim::systems::Magnetometer" filename="gz-sim-magnetometer-system" />
+    <scene>
+      <ambient>0.55 0.58 0.52 1</ambient>
+      <background>0.12 0.15 0.18 1</background>
+      <shadows>false</shadows>
+    </scene>
+    <light name="sun" type="directional">
+      <pose>0 0 12 0 0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <diffuse>0.9 0.9 0.86 1</diffuse>
+      <direction>-0.45 0.2 -1</direction>
+    </light>
+    <model name="field_terrain">
+      <static>true</static>
+      <link name="terrain_link">
+        <pose>0 0 0 0 0 0</pose>
+        <collision name="terrain_collision">
+          <pose>0 0 -0.349516435 0 0 0</pose>
+          <geometry>
+            <heightmap>
+              <uri>assets/terrain.png</uri>
+              <size>100 100 0.695990586</size>
+              <pos>0 0 0</pos>
+              <sampling>1</sampling>
+            </heightmap>
+          </geometry>
+        </collision>
+        <visual name="terrain_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <heightmap>
+              <uri>assets/terrain.png</uri>
+              <size>100 100 0.695990586</size>
+              <pos>0 0 -0.349516435</pos>
+              <sampling>1</sampling>
+              <texture>
+                <size>10</size>
+                <diffuse>assets/soil_diffuse.png</diffuse>
+                <normal>assets/flat_normal.png</normal>
+              </texture>
+              <blend>
+                <min_height>-0.349516435</min_height>
+                <fade_dist>0.695990586</fade_dist>
+              </blend>
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_000">
+      <static>true</static>
+      <pose>-13.8795815 -43.2217259 0.0815949813 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0928160399 0.0928160399 0.0461946167</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0928160399 0.0928160399 0.0461946167</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_001">
+      <static>true</static>
+      <pose>49.1115112 44.3571472 0.272324145 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0572328269 0.0572328269 0.0401005484</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0572328269 0.0572328269 0.0401005484</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_002">
+      <static>true</static>
+      <pose>31.1133728 12.5177116 -0.0267263576 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0696705282 0.0696705282 0.0389235914</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0696705282 0.0696705282 0.0389235914</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_003">
+      <static>true</static>
+      <pose>-13.0415993 -15.9370804 -0.0720767528 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0839825198 0.0839825198 0.0613156781</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0839825198 0.0839825198 0.0613156781</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_004">
+      <static>true</static>
+      <pose>-15.7224579 -36.7943878 0.08234521 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0673405156 0.0673405156 0.0799404979</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0673405156 0.0673405156 0.0799404979</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_005">
+      <static>true</static>
+      <pose>28.1873932 -27.8384724 -0.0373891629 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.189641014 0.189641014 0.19781366</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.189641014 0.189641014 0.19781366</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_006">
+      <static>true</static>
+      <pose>35.5470276 -31.3936596 0.0047699213 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.19722572 0.19722572 0.190678269</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.19722572 0.19722572 0.190678269</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_007">
+      <static>true</static>
+      <pose>41.7849197 -27.340847 0.0682451725 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0543244369 0.0543244369 0.0406624824</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0543244369 0.0543244369 0.0406624824</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_008">
+      <static>true</static>
+      <pose>45.9134979 34.6249084 0.156116903 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.200490907 0.200490907 0.254108578</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.200490907 0.200490907 0.254108578</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_009">
+      <static>true</static>
+      <pose>-30.7791023 39.7754517 -0.0429758504 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.074550353 0.074550353 0.0351890065</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.074550353 0.074550353 0.0351890065</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_010">
+      <static>true</static>
+      <pose>43.143425 20.098877 0.0810866952 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.213521406 0.213521406 0.162554696</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.213521406 0.213521406 0.162554696</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_011">
+      <static>true</static>
+      <pose>-38.1222248 22.9721756 0.0341917425 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.218533188 0.218533188 0.273823768</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.218533188 0.218533188 0.273823768</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_012">
+      <static>true</static>
+      <pose>1.79212189 -8.05306625 0.230361462 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.154406324 0.154406324 0.190802768</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.154406324 0.154406324 0.190802768</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_013">
+      <static>true</static>
+      <pose>-2.75063324 -22.1892586 -0.0565690547 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0831914246 0.0831914246 0.0529770069</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0831914246 0.0831914246 0.0529770069</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_014">
+      <static>true</static>
+      <pose>47.3844376 18.2975388 0.0591994449 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.29455322 0.29455322 0.230707213</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.29455322 0.29455322 0.230707213</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_015">
+      <static>true</static>
+      <pose>0.325771332 -21.0068855 0.0317912027 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.087391004 0.087391004 0.0794335306</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.087391004 0.087391004 0.0794335306</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_016">
+      <static>true</static>
+      <pose>-41.5290089 -22.2287178 -0.131238461 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0695223883 0.0695223883 0.0602063164</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0695223883 0.0695223883 0.0602063164</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_017">
+      <static>true</static>
+      <pose>-46.8495393 -1.43996811 0.0356708914 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0708954632 0.0708954632 0.0574646927</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0708954632 0.0708954632 0.0574646927</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_018">
+      <static>true</static>
+      <pose>-28.5269108 16.4366226 0.161921024 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0690883324 0.0690883324 0.0708593503</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0690883324 0.0690883324 0.0708593503</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_019">
+      <static>true</static>
+      <pose>0.847064972 -0.218070984 -0.187722981 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0799469799 0.0799469799 0.0643865988</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0799469799 0.0799469799 0.0643865988</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_020">
+      <static>true</static>
+      <pose>-1.53911209 -3.35602951 0.0144147351 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0854027048 0.0854027048 0.0458533354</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0854027048 0.0854027048 0.0458533354</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_021">
+      <static>true</static>
+      <pose>-0.742794037 0.719585419 -0.225424826 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.061790172 0.061790172 0.0754142776</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.061790172 0.061790172 0.0754142776</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_022">
+      <static>true</static>
+      <pose>42.8917007 40.5356674 -0.0704147294 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237859935 0.237859935 0.214522928</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237859935 0.237859935 0.214522928</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_023">
+      <static>true</static>
+      <pose>42.4087296 -28.0606194 0.0879626572 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0668335408 0.0668335408 0.05665759</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0668335408 0.0668335408 0.05665759</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_024">
+      <static>true</static>
+      <pose>21.7871323 -7.36453629 0.0893711671 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0639684945 0.0639684945 0.077431716</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0639684945 0.0639684945 0.077431716</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_025">
+      <static>true</static>
+      <pose>30.9208145 3.63676453 0.00970820151 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0933876187 0.0933876187 0.0514853336</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0933876187 0.0933876187 0.0514853336</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_026">
+      <static>true</static>
+      <pose>-46.587178 -27.8928699 0.0618374348 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0677712113 0.0677712113 0.0359206945</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0677712113 0.0677712113 0.0359206945</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_027">
+      <static>true</static>
+      <pose>6.09939575 14.4940186 0.0322720781 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.085806556 0.085806556 0.0326125361</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.085806556 0.085806556 0.0326125361</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_028">
+      <static>true</static>
+      <pose>-35.3251266 -30.9032154 -0.064072378 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.07030911 0.07030911 0.038308423</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.07030911 0.07030911 0.038308423</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_029">
+      <static>true</static>
+      <pose>-14.9181213 -20.5065575 -0.251423776 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0955975875 0.0955975875 0.0361591615</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0955975875 0.0955975875 0.0361591615</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_030">
+      <static>true</static>
+      <pose>1.37184906 9.85731888 -0.193919078 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0793217793 0.0793217793 0.0373294763</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0793217793 0.0793217793 0.0373294763</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_031">
+      <static>true</static>
+      <pose>18.9647293 -45.0723786 0.0958656967 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.191012487 0.191012487 0.2682769</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.191012487 0.191012487 0.2682769</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_032">
+      <static>true</static>
+      <pose>-4.78412247 13.4354057 -0.0881043077 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0938906595 0.0938906595 0.0576504618</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0938906595 0.0938906595 0.0576504618</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_033">
+      <static>true</static>
+      <pose>-5.52052689 4.32150269 -0.0586876497 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0731853396 0.0731853396 0.0549083911</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0731853396 0.0731853396 0.0549083911</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_034">
+      <static>true</static>
+      <pose>41.3999481 25.525116 -0.0893013477 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0739742219 0.0739742219 0.0507715642</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0739742219 0.0739742219 0.0507715642</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_035">
+      <static>true</static>
+      <pose>49.0677643 -5.55751419 0.048454579 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.271017045 0.271017045 0.195842952</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.271017045 0.271017045 0.195842952</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_036">
+      <static>true</static>
+      <pose>-34.3763437 10.2378922 -0.00405495241 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.045144476 0.045144476 0.0654781833</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.045144476 0.045144476 0.0654781833</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_037">
+      <static>true</static>
+      <pose>-49.4349629 21.6417999 -0.234694362 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0540014282 0.0540014282 0.0362090804</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0540014282 0.0540014282 0.0362090804</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_038">
+      <static>true</static>
+      <pose>15.3970947 -19.9588623 -0.00191062689 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.283123642 0.283123642 0.229417622</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.283123642 0.283123642 0.229417622</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_039">
+      <static>true</static>
+      <pose>4.76545715 -23.8174953 -0.122336462 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0847592577 0.0847592577 0.0622650087</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0847592577 0.0847592577 0.0622650087</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_040">
+      <static>true</static>
+      <pose>-40.5140638 46.3303299 -0.0528333038 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0533880703 0.0533880703 0.0705959499</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0533880703 0.0533880703 0.0705959499</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_041">
+      <static>true</static>
+      <pose>-48.1429874 -24.4698811 -0.118410237 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0808560029 0.0808560029 0.0369583815</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0808560029 0.0808560029 0.0369583815</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_042">
+      <static>true</static>
+      <pose>-33.5669575 8.10495758 -0.198220298 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0838280916 0.0838280916 0.0654356703</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0838280916 0.0838280916 0.0654356703</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_043">
+      <static>true</static>
+      <pose>-7.89612961 4.3884964 -0.214909017 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0500567444 0.0500567444 0.0331057943</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0500567444 0.0500567444 0.0331057943</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_044">
+      <static>true</static>
+      <pose>-32.4564037 -18.0656147 -0.126210064 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0691312253 0.0691312253 0.0348901823</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0691312253 0.0691312253 0.0348901823</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_045">
+      <static>true</static>
+      <pose>13.2940788 -27.9521313 -0.0139717981 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0486240238 0.0486240238 0.0480620973</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0486240238 0.0486240238 0.0480620973</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_046">
+      <static>true</static>
+      <pose>-19.5168648 27.6208191 -0.184802175 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.196914315 0.196914315 0.258418292</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.196914315 0.196914315 0.258418292</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_047">
+      <static>true</static>
+      <pose>23.0560532 -12.2056885 -0.164610088 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.207774192 0.207774192 0.175662234</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.207774192 0.207774192 0.175662234</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_048">
+      <static>true</static>
+      <pose>15.6886215 -5.84023285 -0.0443656072 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0757654086 0.0757654086 0.0769663304</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0757654086 0.0757654086 0.0769663304</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_049">
+      <static>true</static>
+      <pose>35.5024796 -47.444129 -0.122158289 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.069898352 0.069898352 0.0351532437</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.069898352 0.069898352 0.0351532437</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_050">
+      <static>true</static>
+      <pose>12.3023567 -29.8530483 0.0160458423 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0860279948 0.0860279948 0.0408677459</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0860279948 0.0860279948 0.0408677459</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_051">
+      <static>true</static>
+      <pose>6.61558151 -40.8375072 -0.117809497 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0628519431 0.0628519431 0.0326550156</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0628519431 0.0628519431 0.0326550156</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_052">
+      <static>true</static>
+      <pose>20.6933441 -1.79602814 0.100470215 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0995568261 0.0995568261 0.07917092</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0995568261 0.0995568261 0.07917092</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_053">
+      <static>true</static>
+      <pose>-10.1223488 -8.17388535 0.0781363249 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.154856145 0.154856145 0.251611024</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.154856145 0.154856145 0.251611024</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_054">
+      <static>true</static>
+      <pose>-22.1186657 5.22793579 0.177890405 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0791168883 0.0791168883 0.0614285022</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0791168883 0.0791168883 0.0614285022</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_055">
+      <static>true</static>
+      <pose>28.9320602 47.8932495 0.0604611523 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.160704657 0.160704657 0.178565904</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.160704657 0.160704657 0.178565904</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_056">
+      <static>true</static>
+      <pose>-19.1993732 -16.2587852 0.0491694398 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0597329624 0.0597329624 0.0329878889</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0597329624 0.0597329624 0.0329878889</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_057">
+      <static>true</static>
+      <pose>-14.3351402 4.52587128 0.0352288559 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0583844259 0.0583844259 0.0621148869</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0583844259 0.0583844259 0.0621148869</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_058">
+      <static>true</static>
+      <pose>32.860321 40.4988022 -0.130815387 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.092463024 0.092463024 0.0319630802</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.092463024 0.092463024 0.0319630802</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_059">
+      <static>true</static>
+      <pose>38.2311783 -41.1560097 0.0772732198 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0716801733 0.0716801733 0.0513872802</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0716801733 0.0716801733 0.0513872802</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_060">
+      <static>true</static>
+      <pose>21.197113 1.19150162 0.142772719 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.180905372 0.180905372 0.184533268</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.180905372 0.180905372 0.184533268</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_061">
+      <static>true</static>
+      <pose>23.6319275 1.44336319 0.0998768881 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0425398014 0.0425398014 0.0729166493</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0425398014 0.0425398014 0.0729166493</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_062">
+      <static>true</static>
+      <pose>0.915439606 14.8893738 0.075607352 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.281002313 0.281002313 0.291942388</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.281002313 0.281002313 0.291942388</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_063">
+      <static>true</static>
+      <pose>-23.8370914 31.3975601 -0.112128198 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.166253299 0.166253299 0.274982631</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.166253299 0.166253299 0.274982631</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_064">
+      <static>true</static>
+      <pose>-35.5739193 42.2590942 -0.11393024 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0900097787 0.0900097787 0.0364550389</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0900097787 0.0900097787 0.0364550389</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_065">
+      <static>true</static>
+      <pose>12.6175461 23.1782227 -0.185632437 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0477956906 0.0477956906 0.0557252243</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0477956906 0.0477956906 0.0557252243</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_066">
+      <static>true</static>
+      <pose>-6.71401978 7.39251328 -0.0323143974 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.228116259 0.228116259 0.227694511</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.228116259 0.228116259 0.227694511</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_067">
+      <static>true</static>
+      <pose>28.5527115 -3.6858902 -0.0378911532 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0526626147 0.0526626147 0.0460243709</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0526626147 0.0526626147 0.0460243709</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_068">
+      <static>true</static>
+      <pose>24.2687225 49.3063812 0.0931212828 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0451899916 0.0451899916 0.0465340018</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0451899916 0.0451899916 0.0465340018</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_069">
+      <static>true</static>
+      <pose>30.5456314 -25.6292362 -0.234071285 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0861833394 0.0861833394 0.0589017682</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0861833394 0.0861833394 0.0589017682</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_070">
+      <static>true</static>
+      <pose>11.8458176 36.0107269 0.0753110871 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0944326892 0.0944326892 0.0704930648</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0944326892 0.0944326892 0.0704930648</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_071">
+      <static>true</static>
+      <pose>-4.47419357 17.1725006 -0.0608955733 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0816772431 0.0816772431 0.0767743737</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0816772431 0.0816772431 0.0767743737</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_072">
+      <static>true</static>
+      <pose>32.0409164 -30.7527962 0.100387543 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237857282 0.237857282 0.247127846</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237857282 0.237857282 0.247127846</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_073">
+      <static>true</static>
+      <pose>-27.395752 15.644455 0.139185727 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0538950004 0.0538950004 0.0754582733</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0538950004 0.0538950004 0.0754582733</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_074">
+      <static>true</static>
+      <pose>32.9855347 -2.50999832 0.0983077139 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0603820458 0.0603820458 0.0359803848</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0603820458 0.0603820458 0.0359803848</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_075">
+      <static>true</static>
+      <pose>16.7971268 -2.89080048 -0.149624065 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.072556518 0.072556518 0.0504947267</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.072556518 0.072556518 0.0504947267</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_076">
+      <static>true</static>
+      <pose>42.87603 22.9806671 0.0159554724 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0750564858 0.0750564858 0.0644340664</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0750564858 0.0750564858 0.0644340664</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_077">
+      <static>true</static>
+      <pose>-36.2424879 46.161705 -0.176577166 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.163442329 0.163442329 0.212649256</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.163442329 0.163442329 0.212649256</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_078">
+      <static>true</static>
+      <pose>22.976532 43.6265259 0.124957129 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0612819046 0.0612819046 0.0572642274</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0612819046 0.0612819046 0.0572642274</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_079">
+      <static>true</static>
+      <pose>47.8913803 29.1568298 0.0897350386 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0797670484 0.0797670484 0.0517479666</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0797670484 0.0797670484 0.0517479666</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_080">
+      <static>true</static>
+      <pose>26.2774658 -8.32350922 0.0718277544 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0545483157 0.0545483157 0.0592415109</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0545483157 0.0545483157 0.0592415109</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_081">
+      <static>true</static>
+      <pose>-9.30814743 40.4933014 -0.254649818 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0548772328 0.0548772328 0.0692726001</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0548772328 0.0548772328 0.0692726001</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_082">
+      <static>true</static>
+      <pose>34.6409607 1.74348068 -0.200673953 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0796373487 0.0796373487 0.0317465849</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0796373487 0.0796373487 0.0317465849</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_083">
+      <static>true</static>
+      <pose>19.9774857 -1.74488831 0.0417360403 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0773722604 0.0773722604 0.0793118626</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0773722604 0.0773722604 0.0793118626</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_084">
+      <static>true</static>
+      <pose>12.6178932 3.62811279 0.105958149 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.051995907 0.051995907 0.0744947046</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.051995907 0.051995907 0.0744947046</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_085">
+      <static>true</static>
+      <pose>4.3241806 -20.3382053 -0.0194297656 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0859422758 0.0859422758 0.0724155083</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0859422758 0.0859422758 0.0724155083</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_086">
+      <static>true</static>
+      <pose>28.1224213 39.9555664 -0.0242409427 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.177366957 0.177366957 0.259096622</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.177366957 0.177366957 0.259096622</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_087">
+      <static>true</static>
+      <pose>-20.2481937 38.1583099 -0.194489196 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0959274694 0.0959274694 0.0407993533</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0959274694 0.0959274694 0.0407993533</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_088">
+      <static>true</static>
+      <pose>-7.90225983 -28.0693073 -0.135413706 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0873930156 0.0873930156 0.0707862899</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0873930156 0.0873930156 0.0707862899</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_089">
+      <static>true</static>
+      <pose>-5.07033157 2.61864471 -0.0434843227 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237282857 0.237282857 0.153589964</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.237282857 0.237282857 0.153589964</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_090">
+      <static>true</static>
+      <pose>-46.3871486 -16.5151711 -0.161054045 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.094503969 0.094503969 0.0559913963</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.094503969 0.094503969 0.0559913963</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_091">
+      <static>true</static>
+      <pose>4.99894333 8.79019547 0.0884686932 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0889759213 0.0889759213 0.0349709056</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0889759213 0.0889759213 0.0349709056</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_092">
+      <static>true</static>
+      <pose>24.9586792 27.3179245 0.0767256394 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.152871355 0.152871355 0.224709809</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.152871355 0.152871355 0.224709809</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_093">
+      <static>true</static>
+      <pose>-4.10907745 -33.0801678 0.0607186332 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0550772212 0.0550772212 0.0510683283</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0550772212 0.0550772212 0.0510683283</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_094">
+      <static>true</static>
+      <pose>40.9028549 13.4495354 0.110134095 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0608541816 0.0608541816 0.0667121708</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0608541816 0.0608541816 0.0667121708</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_095">
+      <static>true</static>
+      <pose>-8.61947632 25.9784546 0.268291473 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0921122655 0.0921122655 0.0778100863</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0921122655 0.0921122655 0.0778100863</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_096">
+      <static>true</static>
+      <pose>-48.4990367 21.5087509 -0.167022586 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0708511099 0.0708511099 0.0363919809</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0708511099 0.0708511099 0.0363919809</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="rock_097">
+      <static>true</static>
+      <pose>-8.23737717 45.2758408 0.0045333989 0 0 0</pose>
+      <link name="rock_link">
+        <collision name="rock_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0932996422 0.0932996422 0.0574036427</scale>
+            </mesh>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>0.7</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="rock_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/rock_cap.obj</uri>
+              <scale>0.0932996422 0.0932996422 0.0574036427</scale>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.537254902 0.568627451 0.584313725 1</ambient>
+            <diffuse>0.537254902 0.568627451 0.584313725 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="field_vegetation">
+      <static>true</static>
+      <link name="vegetation_visuals">
+        <visual name="healthy_leaves">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/healthy_leaves.obj</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.290196078 0.525490196 0.223529412 1</ambient>
+            <diffuse>0.290196078 0.525490196 0.223529412 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <visual name="dry_leaves">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/dry_leaves.obj</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.694117647 0.482352941 0.258823529 1</ambient>
+            <diffuse>0.694117647 0.482352941 0.258823529 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <visual name="stems">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>assets/stems.obj</uri>
+            </mesh>
+          </geometry>
+          <material>
+            <ambient>0.4 0.545098039 0.211764706 1</ambient>
+            <diffuse>0.4 0.545098039 0.211764706 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+    </model>
+    <model name="field_robot">
+      <pose>-48 -48 0.00579305203 0.0399201248 -0.00415567012 0.785398163</pose>
+      <link name="base_link">
+        <inertial>
+          <pose>0 0 0.147777778 0 0 0</pose>
+          <mass>27</mass>
+          <inertia>
+            <ixx>0.082125</ixx>
+            <iyy>1.204425</iyy>
+            <izz>1.2105</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="chassis_collision">
+          <pose>0 0 0.16 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.72 0.14 0.13</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="chassis_visual">
+          <pose>0 0 0.16 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.72 0.14 0.13</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.23 0.27 0.28 1</ambient>
+            <diffuse>0.23 0.27 0.28 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+        <sensor name="field_imu" type="imu">
+          <pose>0 0 0.3 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>100</update_rate>
+          <visualize>false</visualize>
+          <topic>/field/imu/data</topic>
+          <imu />
+        </sensor>
+        <sensor name="field_magnetometer" type="magnetometer">
+          <pose>0 0 0.3 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>20</update_rate>
+          <visualize>false</visualize>
+          <topic>/field/magnetometer/data</topic>
+          <magnetometer />
+        </sensor>
+      </link>
+      <link name="left_track">
+        <pose>0 0.11 0.055 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00154166667</ixx>
+            <iyy>0.0543416667</iyy>
+            <izz>0.0538666667</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="left_track_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.8 0.08 0.11</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="left_track_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.8 0.08 0.11</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.12 0.13 1</ambient>
+            <diffuse>0.1 0.12 0.13 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+      <joint name="left_track_fixed_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>left_track</child>
+        <pose relative_to="base_link">0 0.11 0.055 0 0 0</pose>
+      </joint>
+      <link name="right_track">
+        <pose>0 -0.11 0.055 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00154166667</ixx>
+            <iyy>0.0543416667</iyy>
+            <izz>0.0538666667</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="right_track_collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.8 0.08 0.11</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.7</mu>
+                <mu2>150</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="right_track_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.8 0.08 0.11</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.12 0.13 1</ambient>
+            <diffuse>0.1 0.12 0.13 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+      <joint name="right_track_fixed_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>right_track</child>
+        <pose relative_to="base_link">0 -0.11 0.055 0 0 0</pose>
+      </joint>
+      <link name="gimbal_yaw_link">
+        <pose>0 0 0.4 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>0.6</mass>
+          <inertia>
+            <ixx>0.000765</ixx>
+            <iyy>0.000765</iyy>
+            <izz>0.00144</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <visual name="turret_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.07</radius>
+              <length>0.025</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>0.14 0.24 0.25 1</ambient>
+            <diffuse>0.14 0.24 0.25 1</diffuse>
+            <specular>0.05 0.05 0.05 1</specular>
+          </material>
+          <cast_shadows>false</cast_shadows>
+        </visual>
+      </link>
+      <joint name="gimbal_yaw_joint" type="revolute">
+        <parent>base_link</parent>
+        <child>gimbal_yaw_link</child>
+        <pose relative_to="base_link">0 0 0.4 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-3.14159265</lower>
+            <upper>3.14159265</upper>
+            <effort>20</effort>
+            <velocity>3</velocity>
+          </limit>
+        </axis>
+      </joint>
+      <link name="gimbal_pitch_link">
+        <pose>0 0 0.4 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>0.4</mass>
+          <inertia>
+            <ixx>0.000203333333</ixx>
+            <iyy>0.000416666667</iyy>
+            <izz>0.000453333333</izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <sensor name="field_lidar" type="gpu_lidar">
+          <pose>0 0 0 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+          <visualize>false</visualize>
+          <topic>/field/lidar/scan</topic>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>400</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.14159265</min_angle>
+                <max_angle>3.12588469</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.12</min>
+              <max>8</max>
+              <resolution>0.01</resolution>
+            </range>
+          </lidar>
+        </sensor>
+        <sensor name="field_depth_camera" type="depth_camera">
+          <pose>0 0 0 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>2.5</update_rate>
+          <visualize>false</visualize>
+          <topic>/field/depth/image</topic>
+          <camera>
+            <horizontal_fov>0.841540074</horizontal_fov>
+            <image>
+              <width>88</width>
+              <height>160</height>
+              <format>R_FLOAT32</format>
+            </image>
+            <clip>
+              <near>0.3</near>
+              <far>5</far>
+            </clip>
+            <lens>
+              <type>gnomonical</type>
+              <intrinsics>
+                <fx>98.3247986</fx>
+                <fy>98.3247986</fy>
+                <cx>44.0112534</cx>
+                <cy>80.5578613</cy>
+                <s>0</s>
+              </intrinsics>
+            </lens>
+            <depth_camera>
+              <output>depths</output>
+              <clip>
+                <near>0.3</near>
+                <far>5</far>
+              </clip>
+            </depth_camera>
+            <camera_info_topic>/field/depth/camera_info</camera_info_topic>
+          </camera>
+        </sensor>
+      </link>
+      <joint name="gimbal_pitch_joint" type="revolute">
+        <parent>gimbal_yaw_link</parent>
+        <child>gimbal_pitch_link</child>
+        <pose relative_to="gimbal_yaw_link">0 0 0 0 0 0</pose>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <limit>
+            <lower>-0.436332313</lower>
+            <upper>1.04719755</upper>
+            <effort>20</effort>
+            <velocity>3</velocity>
+          </limit>
+        </axis>
+      </joint>
+      <plugin name="gz::sim::systems::TrackedVehicle" filename="gz-sim-tracked-vehicle-system">
+        <left_track>
+          <link>left_track</link>
+          <velocity_topic>/field/track/left/velocity</velocity_topic>
+          <center_of_rotation_topic>/field/track/left/center_of_rotation</center_of_rotation_topic>
+        </left_track>
+        <right_track>
+          <link>right_track</link>
+          <velocity_topic>/field/track/right/velocity</velocity_topic>
+          <center_of_rotation_topic>/field/track/right/center_of_rotation</center_of_rotation_topic>
+        </right_track>
+        <tracks_separation>0.22</tracks_separation>
+        <track_height>0.11</track_height>
+        <steering_efficiency>0.5</steering_efficiency>
+        <topic>/field/cmd_vel</topic>
+        <odom_publish_frequency>20</odom_publish_frequency>
+        <odom_topic>/field/odom</odom_topic>
+        <tf_topic>/field/tf</tf_topic>
+        <frame_id>field_odom</frame_id>
+        <child_frame_id>field_robot/base_link</child_frame_id>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>left_track</link>
+        <track_orientation>0 0 0</track_orientation>
+        <velocity_topic>/field/track/left/velocity</velocity_topic>
+        <center_of_rotation_topic>/field/track/left/center_of_rotation</center_of_rotation_topic>
+        <min_velocity>-4.16666667</min_velocity>
+        <max_velocity>4.16666667</max_velocity>
+      </plugin>
+      <plugin name="gz::sim::systems::TrackController" filename="gz-sim-track-controller-system">
+        <link>right_track</link>
+        <track_orientation>0 0 0</track_orientation>
+        <velocity_topic>/field/track/right/velocity</velocity_topic>
+        <center_of_rotation_topic>/field/track/right/center_of_rotation</center_of_rotation_topic>
+        <min_velocity>-4.16666667</min_velocity>
+        <max_velocity>4.16666667</max_velocity>
+      </plugin>
+      <plugin name="gz::sim::systems::JointPositionController" filename="gz-sim-joint-position-controller-system">
+        <joint_name>gimbal_yaw_joint</joint_name>
+        <topic>/field/gimbal/yaw/cmd_pos</topic>
+        <initial_position>0</initial_position>
+        <use_velocity_commands>true</use_velocity_commands>
+        <cmd_max>0.5</cmd_max>
+      </plugin>
+      <plugin name="gz::sim::systems::JointPositionController" filename="gz-sim-joint-position-controller-system">
+        <joint_name>gimbal_pitch_joint</joint_name>
+        <topic>/field/gimbal/pitch/cmd_pos</topic>
+        <initial_position>0</initial_position>
+        <use_velocity_commands>true</use_velocity_commands>
+        <cmd_max>0.5</cmd_max>
+      </plugin>
+      <plugin name="gz::sim::systems::JointStatePublisher" filename="gz-sim-joint-state-publisher-system">
+        <topic>/field/joint_states</topic>
+      </plugin>
+    </model>
+  </world>
+</sdf>

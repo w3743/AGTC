@@ -1,0 +1,404 @@
+{
+  "document": "2026-10-21 FOC P1 current saved source review: TLV6700 internal-reference BUS_OV implemented; raw official exports and geometry bound; reopen NOT_VERIFIED.",
+  "status": "PASS_STATIC_ENET_GEOMETRY_PIN_CONTRACT_REOPEN_NOT_VERIFIED_DRC_AND_HARDWARE_OPEN",
+  "native_source": {
+    "project_sha256": "114CAF88E36C054FBB5E58921A47038DBD0FDA3F24884050CC6529190578B5E5",
+    "page_sha256": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
+    "config_sha256": "331CDEE9347659004EC337A2F9230C684E82E9FC97380E19E241F4B754F8EFE9",
+    "pcb_sha256": "602A48835A0A37C5E8C57E8221C2F420429A30FF1EBAD2DD87488CBDF8D94D53",
+    "pcb_status": "PCB1 source hash unchanged; no placement or routing update.",
+    "save_status": "Official native save returned true; current source hashes recorded.",
+    "page_sha256_note": "Native P1 RSO_W Temperature Coefficient remains ±100ppm/℃; the native source contains no U+FFFD."
+  },
+  "official_headless_reopen": {
+    "status": "NOT_VERIFIED",
+    "pageUuid": "90aa6c46493624cf",
+    "pageName": "P1",
+    "components": 169,
+    "pins": 506,
+    "attempt": "After save, new-session project API timed out twice (REQUEST_TIMEOUT); return ping worked; root closed session sid20.",
+    "previous_reopen_evidence": "Prior 170-component/504-pin close record is stale for current source and is not claimed as current validation."
+  },
+  "net_contract": {
+    "status": "PASS_STATIC_ENET_GEOMETRY_PIN_CONTRACT_REOPEN_NOT_VERIFIED",
+    "scope": "Saved native P1 bytes, current raw official ENET pin maps, API geometry, and expected pin/population contract; excludes DRC warning semantics, attributes affected by the export defect, component thermal qualification, dynamic behavior, firmware and hardware acceptance.",
+    "components": 169,
+    "pinsChecked": 506,
+    "ncPins": 15,
+    "connectedPins": 491,
+    "nets": 102,
+    "onePinNets": {
+      "PACK+": [
+        "F_MAIN.1"
+      ]
+    },
+    "failures": [],
+    "exportAttributeDefect": "RSO_W Temperature Coefficient is ±100ppm/℃ in native P1 but ��100ppm/℃ (two U+FFFD) in raw ENET. Pin mappings match; attribute text is not identical."
+  },
+  "official_drc": {
+    "errors": 0,
+    "warnings": 6,
+    "status": "OPEN",
+    "detailsAvailable": false,
+    "result": "Current official export returns only [{\"type\":\"warn\",\"count\":6}]; no per-warning records were returned.",
+    "rawExportFile": "检查/当前源/当前整改官方导出.json",
+    "rawExportSha256": "CC783118354C3ADFF40CA377F1A5726423A3A6DC6161716D4C9FA559B8C21816",
+    "evidenceSha256": "9F614088269C999282245E64DAD32C62A8A07E8EBE7FCA1342577BD30D63F798"
+  },
+  "current_single_board_bom": {
+    "officialExport": true,
+    "dataRows": 91,
+    "quantityTotal": 156,
+    "path": "eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+    "sha256": "7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
+    "R_LOAD_VALID_BIAS": {
+      "value": "1kΩ",
+      "mpn": "RC0603FR-071KL",
+      "supplierPart": "C22548",
+      "population": "FOC-A INSTALL; FOC-B DNP"
+    }
+  },
+  "dump_rail": {
+    "architecture": "BUS-fed independent DUMP_5V from U6 TPS7A4001DGNR; powers U3 TLV1704, U4 UCC27511A and U7 TLV6700; independent of SAFE_5V, MCU, BMS permission and return TTL, but shares BUS/GND_SYS.",
+    "five_board_parts_per_board": [
+      "U6 TPS7A4001DGNR/C55006",
+      "U6_RTOP RC0603FR-0797K6L",
+      "U6_RBOT RC0603FR-0730K1L",
+      "U6_CIN C3225X7R2A225K230AE/C2167875",
+      "U6_COUT C3225X7R1A106K160AE/UNVERIFIED"
+    ],
+    "project_unique_new_mpns": 0,
+    "output_volts_screen": [
+      4.7771,
+      5.1983
+    ],
+    "ucc27511a_rising_uvlo_max_v": 4.65,
+    "minimum_screened_uvlo_headroom_v": 0.127,
+    "effective_capacitance_requirements": "U6_CIN >=1uF at maximum BUS bias; U6_COUT >=4.7uF at 5V bias; exact effective values not verified.",
+    "output_volts_screen_basis": "Assumption-only extrapolated screen: TI TPS7A4001 Rev.B Table 6.5 line-regulation unit is %VOUT; over VIN=7–100 V its typical value is 0.03% VOUT with MIN/MAX blank, not 0.03%/V. Overall accuracy ±2.5% is specified only for VIN <= 24 V. The 4.7771–5.1983 V range at high BUS is not guaranteed; any per-volt multiplication of 0.03% is a user-defined assumption, not a datasheet limit.",
+    "output_volts_status": "ASSUMPTION_ONLY_NOT_GUARANTEED_AT_HIGH_BUS"
+  },
+  "precision_reference_alternative": {
+    "status": "implemented_in_current_saved_native_source; static connectivity verified; post-save reopen NOT_VERIFIED",
+    "source": "Current saved native source and raw official ENET show U7 TLV6700DDCR plus internal 400mV reference and current 1M/10k BUS divider; geometry confirms 169/506/102. New-session reopen not verified after timeouts.",
+    "per_foc_board": {
+      "add_refs": {
+        "U7": {
+          "mpn": "TLV6700DDCR",
+          "manufacturer": "TI",
+          "supplier": "LCSC",
+          "supplier_part": "C2868382"
+        },
+        "C_U7": {
+          "mpn": "C1608X7R1A104K080AE",
+          "manufacturer": "TDK",
+          "supplier_part": "",
+          "value": "100nF/10V"
+        }
+      },
+      "remove_refs": [
+        "R_OVREF_TOP",
+        "R_OVREF_BOT",
+        "R_OV_HYS"
+      ],
+      "change_ref": {
+        "R_OVTOP": "162kΩ RT0603BRD07162KL → 1.00MΩ RC0603FR-071ML"
+      },
+      "retain_refs": [
+        "R_OVBOT 10.0kΩ HoAR0603",
+        "C_OV_SENSE 1nF",
+        "R_OV_PU 4.7kΩ",
+        "U3 TLV1704A for three phase-negative channels",
+        "U4 UCC27511A",
+        "Q7 IRLB4030"
+      ],
+      "bom_net_physical_delta": -1,
+      "expected_native_components": 169,
+      "expected_native_pins": 506,
+      "expected_native_nets": 102,
+      "implementation": {
+        "U7_pins": {
+          "1": "NC",
+          "2": "GND_SYS",
+          "3": "GND_SYS",
+          "4": "VBUS_OV_SENSE",
+          "5": "DUMP_5V",
+          "6": "BUSOV_N"
+        },
+        "C_U7": {
+          "mpn": "C1608X7R1A104K080AE",
+          "manufacturer": "TDK",
+          "value": "100nF",
+          "voltage_rating": "10V",
+          "supplier_part": ""
+        },
+        "R_OVTOP": {
+          "mpn": "RC0603FR-071ML",
+          "manufacturer": "Yageo",
+          "supplier_part": "C105578",
+          "value": "1MΩ"
+        },
+        "U3_unused_channel": {
+          "10": "GND_SYS",
+          "11": "DUMP_5V",
+          "13": "NC"
+        }
+      }
+    },
+    "two_foc_boards": {
+      "add_U7": 2,
+      "add_C_U7": 2,
+      "remove_resistors": 6,
+      "net_physical_delta": -2
+    },
+    "unique_project_mpn_delta": 0,
+    "threshold_screen_V": {
+      "turn_on": [
+        39.209,
+        41.724
+      ],
+      "release": [
+        38.318,
+        41.311
+      ]
+    },
+    "threshold_basis": "TLV6700 full-temperature VIT+=396–404mV, VIT−=387–400mV; full tolerance/TCR corners of 1.00MΩ ±1% ±100ppm/°C top and 10.0kΩ ±0.1% ±25ppm/°C bottom. Independent envelopes; not paired values, and excludes INB− current at 0.4V because TI does not specify it at that condition.",
+    "deadband": "Built-in hysteresis 5.5mV typ/12mV max with no minimum; approximately 0.56V typical and up to 1.24V at BUS. Keep 1nF C0G filter (τ≈9.90µs); this is not a guaranteed minimum deadband.",
+    "logic": "U7 pin4=VBUS_OV_SENSE, pin6=BUSOV_N; U4 IN−=BUSOV_N and IN+=DUMP_THERM_OK, so active-low BOV asserts UCC output high only when thermal contact is closed. Candidate U3 unused channel pins10=GND_SYS, 11=DUMP_5V, 13=NC.",
+    "failure_boundary": "U7 unpowered with DUMP_5V still alive leaves OUTB high impedance and BUSOV_N pulled high; loss of DUMP_5V leaves UCC below UVLO and Q7 off. Startup may take up to 450µs after U7 VDD exceeds 1.8V. Still a single-point local energy path.",
+    "cost_boundary": "No new unique project MPN; no price/MOQ/assembly quote, so no total-cost reduction claim.",
+    "qualification": "Implemented topology; these are independent reference/resistor screens, not guarantees or paired threshold values. Native save true; post-save reopen NOT_VERIFIED. No physical/thermal qualification.",
+    "datasheet": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf"
+  },
+  "bov_threshold_screen": {
+    "turn_on_v_independent_corner_range": [
+      39.209,
+      41.724
+    ],
+    "release_v_independent_corner_range": [
+      38.318,
+      41.311
+    ],
+    "basis": "TLV6700 full-temperature internal threshold limits and 1MΩ/10kΩ divider tolerance/TCR corners; excludes unspecified INB− input current at 0.4V, dynamic parasitics and physical measurements.",
+    "note": "U7 internal reference no longer depends on TPS7A4001 output accuracy. DUMP_5V must still keep U7 within operating range and UCC27511A above its maximum 4.65V rising UVLO. RSO_W ENET property text defect is separate from pin connectivity.",
+    "status": "ASSUMPTION_SCREEN_ONLY_NOT_GUARANTEED"
+  },
+  "dump_energy_screen": {
+    "external_resistors": "2 x Vishay LPS0300H2R00FB, 2Ω ±1%, parallel",
+    "bank_ohms_range": [
+      0.99,
+      1.01
+    ],
+    "BOV_turn_on_screen_V": [
+      39.209,
+      41.724
+    ],
+    "per_board_dissipation_screen_kw": [
+      1.522124,
+      1.758477
+    ],
+    "per_board_1s_energy_screen_kj": [
+      1.522124,
+      1.758477
+    ],
+    "two_board_dissipation_screen_kw": [
+      3.044249,
+      3.516954
+    ],
+    "two_board_1s_energy_screen_kj": [
+      3.044249,
+      3.516954
+    ],
+    "paper_target_per_board_kw_s": [
+      1.8,
+      1.0
+    ],
+    "paper_target_two_board_kw": [
+      3.6
+    ],
+    "target_status": "The user confirmed N5065 selection at 1.8 kW motor-side bus input; the seller rating conditions are unspecified. No evidence makes local dump absorption of 1.8 kW for 1 s a hard user requirement. One second is a project single-pulse screening assumption; 3.6 kW is only the arithmetic two-board simultaneous extrapolation. The current resistor bank screens 1.522–1.758 kW/board statically; pulse, thermal and system regeneration capability remain unqualified and HOLD.",
+    "q7_screen": "At upper 41.724V screen and 0.99Ω bank, about42.145A; using 4.5mΩ max RDS at 4.5V x 2.5 hot factor gives about20.0W on-state; 60°C case plus 0.4°C/W yields about68.0°C steady estimate, not 1s transient qualification.",
+    "status": "paper screening only; external pulse rating, heatsink, case temperature, repeated duty, harness/connector/fuse and actual regen envelope remain unqualified.",
+    "power_requirement_boundary": {
+      "user_confirmed_input_selection": {
+        "value": "1.8 kW motor bus input selection per N5065",
+        "source": "参考资料/电机资料/N5065参数证据.md",
+        "meaning": "User confirmed selection based on the seller-listed 1800 W maximum-power label; seller test conditions and duration are unspecified. This does not define dump-bank absorption capability."
+      },
+      "one_second_duration": {
+        "classification": "Project design single-pulse screening condition, not an independently confirmed user hard requirement or a manufacturer pulse qualification."
+      },
+      "two_board_3p6kw": {
+        "classification": "Arithmetic extrapolation of two boards simultaneously at the 1.8 kW input-selection screening point; no separate user confirmation and not qualified regeneration capability."
+      },
+      "acceptance_status": "HOLD until the measured regeneration envelope and external resistor/thermal assembly are qualified."
+    }
+  },
+  "hard_dump_logic": {
+    "equation": "DUMP_EN = THERM_OK AND NOT BUSOV_N",
+    "BUSOV_N_high": "No overvoltage; chopper inhibited.",
+    "BUSOV_N_low_and_thermal_contact_closed": "UCC27511A drives Q7; dump resistor connected.",
+    "BUSOV_N_stuck_high": "Dump unavailable.",
+    "BUSOV_N_stuck_low_and_thermal_contact_closed": "Continuous dump command.",
+    "thermal_contact_open_or_wire_open": "Dump inhibited (loss-of-sink single point).",
+    "UCC27511A_UVLO": "Output held low; dump unavailable.",
+    "MCU_dump_gpio_stuck_high_or_low": "GPIO is monitor-only, not in the U4 hard path; it neither enables nor masks chopper.",
+    "Q7_off_body_diode": "Source GND_SYS to drain DUMP_SW; blocks positive dump-current direction while off. Main bridge body diodes may still send motor regen into BUS."
+  },
+  "buck_valid_interface": {
+    "parts": "BC847C reused for Q_BUCK_CLAMP/Q_BUCK_RELEASE; 1kΩ bias installed on FOC-A only; 4.7kΩ base resistor and 100kΩ base pulldown per board.",
+    "strict_kcl_min_base_current_ma": 0.5061,
+    "opto_output_load_ma_range": [
+      1.046,
+      1.425
+    ],
+    "at_bus_45_5898v_clamp_sink_ma": 0.456,
+    "forced_beta1_base_current_margin_ua": 50.1,
+    "forced_beta1_margin_percent": 11.0,
+    "default": "No BMS permission/open line/opto off -> Q_BUCK_RELEASE off; Q_BUCK_CLAMP pulls BUCK_RT_SD low, intended Buck default OFF.",
+    "boundary": "VO617A min CTR is specified at 5mA/25°C and its 0.4V VCE(sat) point is 1mA; present load reaches 1.425mA. BC847C saturation max data point does not cover this low-current operating point. Full-temperature optical level and BUCK_RT_SD <0.4V remain OPEN."
+  },
+  "two_board_assembly": {
+    "FOC_A_installed_new_parts": 12,
+    "FOC_B_installed_new_parts": 11,
+    "system_board_mounted_new_parts": 23,
+    "per_board_dump_rail_parts": 5,
+    "R_LOAD_VALID_BIAS": {
+      "FOC_A": "INSTALL 1kΩ",
+      "FOC_B": "DNP",
+      "systemInstalledQuantity": 1
+    },
+    "offboardMatingPlugs": {
+      "systemQuantity": 2,
+      "quantityPerBoard": 1,
+      "mpn": "2EDGK-5.08-02P-14-1000A(H)",
+      "supplierPart": "C581323"
+    },
+    "assemblySupplementSha256": "7A39392A5672AB567C7F9F644CADA8EDF7D2433FC1D17580BE9E9E06D6DB81BF"
+  },
+  "mpnReuse": {
+    "uniqueNewProjectMpns": 0,
+    "lowestCostProven": false,
+    "priceStatus": "No verified landed-price/MOQ quote; reuse reduces new SKUs but does not prove lowest total cost."
+  },
+  "pdf": {
+    "file": "eda工程文件/导出/当前交付/FOC_G431_单页原理图.pdf",
+    "sha256": "8C1C1EE086EFEE02D9F8537CA44D32EEF0F2EFD1F8C79E22057F11BDA4FEC8E2",
+    "bytes": 458354,
+    "pages": 1,
+    "pageSize": "2706.48 x 1775.01 pt",
+    "extractableTextCharacters": 6743,
+    "render": "FOC_G431_P1_pdf_page1.png",
+    "latestReview": {
+      "fullPageVisualReview": true,
+      "U7_and_U3_detailVisualReview": true,
+      "finalBusOvPixelsMatchReviewed": true,
+      "claimBoundary": "document rendering/readability only; excludes PCB/electrical transient/hardware qualification"
+    },
+    "claimBoundary": "Current official source PDF one-page, nonempty, text/font extraction and full-page render checked by root; visual review excludes electrical and PCB qualification."
+  },
+  "sharedLibrarySync": {
+    "status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
+    "executionRecord": "../检查/统一审查/最终同步执行记录.json",
+    "executionRecordSha256": "75e9d6384c6ebe6f1e648811209cbda34a3901639f36924a4795699724be305d",
+    "indexSha256": "415d7933ff885105c5ea5ace8155a3a873720cec1324f64060f4d1731f5c3496",
+    "exitCodes": [
+      0,
+      0
+    ],
+    "electricalOrHardwareRelease": false
+  },
+  "old_evidence_preserved": {
+    "path": "检查/当前原理图证据_20261015工程历史.json",
+    "sha256": "05BD05D9366EEDCFBAA159D49AFF80A6B2A5199A348B50C420769A7F4C5DF07A",
+    "status": "Historical 2026-10-15 verification only. The old archive path remains missing; the newly created BOV-before snapshot is not a restoration of that archive."
+  },
+  "currentEvidenceHashes": {
+    "eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3": "114CAF88E36C054FBB5E58921A47038DBD0FDA3F24884050CC6529190578B5E5",
+    "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
+    "eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg": "331CDEE9347659004EC337A2F9230C684E82E9FC97380E19E241F4B754F8EFE9",
+    "eda工程文件/FOC_G431_Driver/pcb/PCB1.epcb2": "602A48835A0A37C5E8C57E8221C2F420429A30FF1EBAD2DD87488CBDF8D94D53",
+    "检查/当前源/当前整改官方导出.json": "CC783118354C3ADFF40CA377F1A5726423A3A6DC6161716D4C9FA559B8C21816",
+    "检查/当前源/当前整改几何.json": "BA7057E36D2BF72DC9F0178A6C36E2641E4E12257C7512A768FAEAD3D11674FF",
+    "检查/当前源/FOC_G431_P1_drc_final.json": "9F614088269C999282245E64DAD32C62A8A07E8EBE7FCA1342577BD30D63F798",
+    "检查/当前源/FOC_G431_P1_pdf_qa_final.json": "1D50B0B0B6ADE8923421FFFB6DCB87D2846526EEFEC01D852C67D1316EA9845A",
+    "eda工程文件/导出/当前交付/FOC_G431_P1.enet": "F9A60EFEDE72D927B34456F352788A91807FF69765CD438DE8322D637DB91284",
+    "eda工程文件/导出/当前交付/FOC_G431_BOM.csv": "7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
+    "eda工程文件/导出/当前交付/FOC_G431_单页原理图.pdf": "8C1C1EE086EFEE02D9F8537CA44D32EEF0F2EFD1F8C79E22057F11BDA4FEC8E2",
+    "原理图准备/当前原理图连接.json": "EB7747FDAD9C00536AAE7713D01425AF8B729E250131CADC9C8A1CED8EDE89FA",
+    "原理图准备/外围选型依据.md": "04B9E390FB2358160D70F033D6509B1950A7C8269D7F9C422951499EF57955D2",
+    "原理图准备/外围选型候选.json": "FDD67D6E01698FDC8BE9A811832BC7450D87D052D937058655EBBAA270619BD3",
+    "检查/原理图电气复核结论.md": "2399339CB5514A4072B55AE208CFAD7BFF25573C3C87FBC3EEB1EB1A57C65116",
+    "检查/当前源/当前整改备份.json": "91C48BDED0DD5DFE3BAD63D2C4A5590011322383BD9867F2940F29D24D0AFA31",
+    "归档/历史与调试.zip": "EB999AFD510971D78786376A86A100BA2A5CD21BE116E0CA7A780DCE6911EE99",
+    "README.md": "7C35ABC7F687F5B9A50665DBEC3A33BFCBB9C3684744144FD1A1B5DD34414A30",
+    "交付说明.md": "4B64F81B7D042D7B0575B3DC4ADFB7CBFC34F153646F8A197A11DA56BA03A626",
+    "保护与固件约束.md": "6B50C8F4536B885FC5874C77B26D781A23DC61C524D4A9109D44E259FA20D4B0",
+    "FOC驱动设计构想.md": "7FD413BA95CBF4513680F7D59106421FF6D4404C24A35861C261C07DF9CDE36E",
+    "参考资料/电机资料/N5065参数证据.md": "B39466641E45C81BC37331D21E3A52AE902C2D77B93124EF0F5EB171C1D840D8",
+    "检查/当前源/FOC_G431_P1_contract_verify_final.json": "1829A28A41BE48EDE078CE41E2A6A0BDD3DB05B3241865DA436FE28D1F9DC47A"
+  },
+  "qualificationLimits": [
+    "Official DRC has 6 warnings with no detail; static pin-contract pass is not an electrical qualification.",
+    "TPS7A4001 line regulation and output at actual high BUS/load, 127mV UCC UVLO margin, and effective CIN/COUT capacitances need measurement.",
+    "TLV6700 BOV resistor/reference screen is 39.209–41.724V ON and 38.318–41.311V release; independent corners, not full guarantees or paired values. Rdump bank is only 1.522–1.758kW/board over the ON screen, below the 1.8kW/1s paper target; actual regen envelope must define the requirement.",
+    "VO617A CTR/VCEsat and BC847C saturation are not guaranteed over this exact low-current operating point and full temperature; Buck RT/SD below 0.4V requires bench verification.",
+    "Chopper frequency and 1s thermal model are not established; resistor pulse energy, case/heatsink, repeated duty, Q7 thermal behavior, fuse, harness and connector remain open.",
+    "Thermal contact open disables dump; Q7 short, U6/U3/U4 failure or absent BUS still needs external source isolation and residual-energy handling.",
+    "Motor back-EMF, regen power/time, battery/BMS sink acceptance, inter-board sharing, speed/insulation and thermal limits require system/mechanical inputs and physical tests.",
+    "Firmware Break configuration, full PWM/gate behavior, PCB placement/routing and real hardware acceptance remain open.",
+    "Root created a new 2026-10-21 BOV-before snapshot ZIP; the previous missing historical archive and its old restore mapping remain unrecovered.",
+    "SMCJ40A min breakdown is 44.4V vs 41.724V maximum static BOV screen (2.676V gap); dynamic waveform, source accuracy and TVS pulse energy still require qualification.",
+    "KOA 0.5 mOhm shunts are rated 5 W / 100 A. At 100 A continuous each reaches rated power; higher phase-current duty requires a lower limit or thermal redesign.",
+    "Hard BOV still has single points: BUS absent, U6/U3/U4/Q7 failed, or thermal contact/wiring open prevents dump; Q7 short cannot be interrupted by its gate.",
+    "Full schematic coverage and source/export/hash binding are in 检查/原理图电气复核结论.md; current new-session reopen status is NOT_VERIFIED.",
+    "TI TPS7A4001 Rev.B Table 6.5 line-regulation unit is %VOUT: over VIN=7–100 V the typical value is 0.03% VOUT, with MIN/MAX blank, not 0.03%/V; ±2.5% overall accuracy is specified only through VIN=24 V. The 4.7771–5.1983 V high-BUS range and BOV threshold corners are assumption-only screens, not guarantees. Any per-volt multiplication is a user-defined assumption, not a manufacturer limit."
+  ],
+  "q_bov_pnp_metadata": {
+    "designator": "Q_BOV_PNP",
+    "mpn": "BC857C",
+    "manufacturer": "Nexperia",
+    "pinMap": {
+      "1": "BOV_PNP_BASE (B)",
+      "2": "DUMP_5V (E)",
+      "3": "BOV_BK_SRC (C)"
+    },
+    "sourceDescription": "BC857C PNP; pin1=B, pin2=E, pin3=C; E=DUMP_5V, C=BOV_BK_SRC; current native P1 pin 2 is on the BUS-fed independent dump-control rail.",
+    "status": "Actual reopened ENET, API readback, BOM MPN and current candidate plan reconciled; previous SAFE_5V free-text mismatch corrected."
+  },
+  "full_schematic_review": {
+    "report": "检查/原理图电气复核结论.md",
+    "scope": "Current saved native P1 with official ENET and API geometry, 169 components/506 pins/102 nets. Pin connectivity contract passes; post-save new-session reopen NOT_VERIFIED. Functional coverage table lists devices, actual nets, static result and remaining electrical/physical boundaries.",
+    "candidate_precision_option": "Implemented current topology: U7 TLV6700DDCR + C_U7 100nF/10V; R_OVTOP=1M RC0603FR-071ML/C105578; remove R_OVREF_TOP/BOT and R_OV_HYS. U3 pins10=GND_SYS, 11=DUMP_5V, 13=NC. Raw ENET has isolated RSO_W TCR U+FFFD text defect; source P1 remains valid. See connected formal source and bound report.",
+    "high_priority_items": [
+      "TPS7A4001 overall output accuracy ±2.5% is specified only to VIN=24 V; line regulation is 0.03% VOUT typical over VIN=7–100 V, with MIN/MAX blank (not 0.03%/V), so BOV absolute threshold remains a screen.",
+      "Current two-resistor bank screens about1.522–1.758kW/board at the implemented BOV threshold, below the prior1.8kW/1s paper target at all corners; target is not a confirmed user hard limit and pulse qualification remains open.",
+      "PSF4NTEBL500F shunt is 0.5 mΩ/5 W/100 A; at 100 A continuous it reaches nameplate power, and higher current exceeds the rating.",
+      "Dump resistor pulse/case/repetition, Q7/U4/U6 thermal behavior, fuse/harness and actual regeneration envelope are unqualified.",
+      "VO617A/BC847C low-current full-temperature permit level and BUCK_RT_SD <0.4 V remain open.",
+      "PWM/COMP/BREAK firmware mapping, exact Hall output/pin orientation, CAN bus termination, coreboard pin mux and all hardware transients remain open."
+    ],
+    "boundaries": [
+      "Static pin-contract PASS is not electrical or safety qualification.",
+      "DRC reports 6 warnings without per-item details; status remains OPEN.",
+      "SAFE_5V/BMS/capacitor acceptance is not credited as guaranteed regeneration energy sink.",
+      "PCB not modified. Official DRC 6 warnings have no detail; post-save reopen NOT_VERIFIED; no physical/thermal/transient qualification or central library sync in this turn."
+    ]
+  },
+  "referenceDataSources": {
+    "DRV8353": "https://www.ti.com/lit/ds/symlink/drv8353.pdf",
+    "TPS7A4001": "https://www.ti.com/lit/ds/symlink/tps7a4001.pdf",
+    "KOA_PSF4": "https://www.koaglobal.com/-/media/Files/KOA_Global/EN/product/commonpdf/psf4.pdf?amp%3Bhash=896AB0F88A1A4048824E334919171313&la=en",
+    "SMCJ_series": "https://www.smc-diodes.com/propdf/SMCJ%20SERIES%20N0002%20REV.D.pdf",
+    "IPT015N10N5": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipt015n10n5-datasheet-en.pdf",
+    "TLV6700": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf"
+  },
+  "archive_snapshot": {
+    "path": "归档/历史与调试.zip",
+    "sha256": "E3BAC443CA7DFDA992D7BB61638649257ADBC5DD521DCDDAEB3EA7BD4B51FC50",
+    "manifest": "检查/当前源/当前整改备份.json",
+    "manifest_sha256": "91C48BDED0DD5DFE3BAD63D2C4A5590011322383BD9867F2940F29D24D0AFA31",
+    "created_new_archive": true,
+    "scope": "2026-10-21 BOV-reference-before snapshot of listed source/planning/current delivery files; does not restore or replace the previously missing historical archive."
+  }
+}

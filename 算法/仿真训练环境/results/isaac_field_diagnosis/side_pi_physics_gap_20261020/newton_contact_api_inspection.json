@@ -1,0 +1,74 @@
+{
+  "scope": "source/API inspection only; no Isaac app, simulator, GPU, or contact sample created",
+  "newton_version": "1.6.1",
+  "contacts": {
+    "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/sim/contacts.py",
+    "sha256": "84d3ccff76e8c2c10706dff557459aab57474e73aad1a1ef8a429c36fe51fea1",
+    "identity_fields": [
+      {
+        "line": 254,
+        "text": "self.rigid_contact_count = self.contact_counters[0:1]"
+      },
+      {
+        "line": 264,
+        "text": "self.rigid_contact_shape0 = wp.full(rigid_contact_max, -1, dtype=wp.int32)"
+      },
+      {
+        "line": 265,
+        "text": "self.rigid_contact_shape1 = wp.full(rigid_contact_max, -1, dtype=wp.int32)"
+      },
+      {
+        "line": 286,
+        "text": "self.rigid_contact_normal = wp.zeros(rigid_contact_max, dtype=wp.vec3)"
+      }
+    ],
+    "force_fields": [
+      {
+        "line": 293,
+        "text": "# to be filled by the solver (currently unused)"
+      },
+      {
+        "line": 294,
+        "text": "self.rigid_contact_force = wp.zeros(rigid_contact_max, dtype=wp.vec3)"
+      },
+      {
+        "line": 422,
+        "text": "self.force: wp.array | None = None"
+      },
+      {
+        "line": 430,
+        "text": "if requested_attributes and \"force\" in requested_attributes:"
+      },
+      {
+        "line": 432,
+        "text": "self.force = wp.zeros(total_contacts, dtype=wp.spatial_vector, requires_grad=requires_grad)"
+      }
+    ]
+  },
+  "sensor_contact": {
+    "source": "/home/wangj/robotics-lab/venv/isaaclab-field/lib/python3.12/site-packages/newton/_src/sensors/sensor_contact.py",
+    "sha256": "6ec9b973ed43cf96c6d6882b610f849a4627616dd2e60a586ace537d201fb803",
+    "force_aggregation": [
+      {
+        "line": 98,
+        "text": "force = wp.spatial_top(contact_force[contact_index])"
+      },
+      {
+        "line": 105,
+        "text": "friction = force - wp.dot(force, n) * n"
+      },
+      {
+        "line": 114,
+        "text": "wp.atomic_add(total_force, row0, force)"
+      },
+      {
+        "line": 115,
+        "text": "wp.atomic_add(total_force_friction, row0, friction)"
+      },
+      {
+        "line": 388,
+        "text": "\"\"\"Total friction (tangential) contact force [N] per sensing object, shape ``(n_sensing,)``,"
+      }
+    ]
+  }
+}

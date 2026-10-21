@@ -1,0 +1,71 @@
+{
+  "model": "/opt/rk-lightstereo/models/lightstereo_640_352.rknn",
+  "runtime": "/opt/rk-lightstereo/runtime/librknnrt.so",
+  "warmup_pairs": 2,
+  "timed_pairs": 6,
+  "input": "pre-normalized uint8 NHWC references",
+  "serial_mask7": {
+    "pair_ms": {
+      "median_ms": 417.4880420014233,
+      "p95_ms": 428.42143874895555
+    }
+  },
+  "parallel_mask1_2": {
+    "pair_ms": {
+      "median_ms": 288.8889250025386,
+      "p95_ms": 300.02024875102506
+    },
+    "masks": {
+      "forward": 1,
+      "reverse": 2
+    }
+  },
+  "parallel_mask1_2_speedup": 1.4451507339637706,
+  "differences_px": {
+    "forward": {
+      "serial_vs_onnx_px": {
+        "mean": 0.07781527936458588,
+        "p95": 0.29874534606933567,
+        "max": 1.4041481018066406
+      },
+      "parallel_vs_onnx_px": {
+        "mean": 0.07781527936458588,
+        "p95": 0.29874534606933567,
+        "max": 1.4041481018066406
+      },
+      "parallel_vs_serial_px": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      }
+    },
+    "reverse": {
+      "serial_vs_onnx_px": {
+        "mean": 0.051659196615219116,
+        "p95": 0.12847919464111324,
+        "max": 0.9133987426757812
+      },
+      "parallel_vs_onnx_px": {
+        "mean": 0.051659196615219116,
+        "p95": 0.12847919464111324,
+        "max": 0.9133987426757812
+      },
+      "parallel_vs_serial_px": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      }
+    }
+  },
+  "thresholds_px": {
+    "onnx_mean_lt": 0.2,
+    "onnx_p95_lt": 0.6,
+    "onnx_max_lt": 5.0
+  },
+  "scope": "NPU inference only; no camera, service, depth.jpg, frequency or network access",
+  "thresholds_pass": {
+    "serial_vs_onnx": true,
+    "parallel_mask1_2_vs_onnx": true
+  },
+  "mask3_4": "skipped: mask1/2 pair was at least 5% faster than serial"
+}

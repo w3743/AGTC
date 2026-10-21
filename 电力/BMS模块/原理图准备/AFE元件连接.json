@@ -1,0 +1,1652 @@
+[
+  {
+    "ref": "U1",
+    "mpn": "BQ7695202PFBR",
+    "libUuid": null,
+    "pins": {
+      "1": "VC15_FILT",
+      "2": "VC8_FILT",
+      "3": "VC8_FILT",
+      "4": "VC8_FILT",
+      "5": "VC8_FILT",
+      "6": "VC8_FILT",
+      "7": "VC8_FILT",
+      "8": "VC8_FILT",
+      "9": "VC7_FILT",
+      "10": "VC6_FILT",
+      "11": "VC5_FILT",
+      "12": "VC4_FILT",
+      "13": "VC3_FILT",
+      "14": "VC2_FILT",
+      "15": "VC1_FILT",
+      "16": "VC0_FILT",
+      "17": "B0",
+      "18": "SRP",
+      "19": null,
+      "20": "SRN",
+      "21": "BQ_TS1",
+      "22": "NTC_BOARD_NODE",
+      "23": "BQ_TS3",
+      "24": "BQ_REG18",
+      "25": "BQ_ALERT_IC_N",
+      "26": "BQ_I2C_SCL",
+      "27": "BQ_I2C_SDA",
+      "28": null,
+      "29": "BQ_CFETOFF",
+      "30": "DFETOFF",
+      "31": "BQ_DCHG",
+      "32": null,
+      "33": "RST_SHUT",
+      "34": null,
+      "35": "REG1",
+      "36": "REGIN",
+      "37": "BREG",
+      "38": null,
+      "39": null,
+      "40": null,
+      "41": "BQ_LD",
+      "42": "BQ_PACK",
+      "43": "DSG",
+      "44": null,
+      "45": "CHG",
+      "46": "CP1",
+      "47": "BAT",
+      "48": "VC16_FILT"
+    },
+    "note": "48-pin PFB/TQFP top-view physical pin map, TI BQ76952 Fig.16-2. 9S: VC0=B0, VC1..VC8 sample protected taps TAP_B1..TAP_B8; VC9..VC14 tie VC8_FILT; VC15 separately filtered from TAP_B8; VC16 samples TAP_B9. BAT/BREG supply is fed from fused TAP_B9 downstream of F_CELL_B9; VC sampling remains on its separate protected tap domain. Real cell slots 1..8 and 16 enabled; Vcell mode=0x80FF. Pins 21/31/29 use representative thermal zones A/B/C thermistors respectively; these three points do not provide per-group coverage. Pins 28 HDQ and 32 DDSG are NC after removing two thermistor channels. Pin29 CFETOFF remains configured as zone C thermistor; pin30 DFETOFF remains the active-high BOTHOFF hardware shutdown. Pins 19,34,38,39,40,44 NC; TS2 pin22 receives NTC_BOARD_NODE from NTC_BOARD through C_NTC_BOARD_FILT to B0; MCU board-temperature ADC output is retired and the temperature is read over BQ I2C."
+  },
+  {
+    "ref": "R_VC0",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "B0",
+      "2": "VC0_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC1",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B1",
+      "2": "VC1_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC2",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B2",
+      "2": "VC2_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC3",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B3",
+      "2": "VC3_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC4",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B4",
+      "2": "VC4_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC5",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B5",
+      "2": "VC5_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC6",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B6",
+      "2": "VC6_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC7",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B7",
+      "2": "VC7_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC8",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B8",
+      "2": "VC8_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC15",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B8",
+      "2": "VC15_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "R_VC16",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "TAP_B9",
+      "2": "VC16_FILT"
+    },
+    "note": "100Ω ±1%, 0603, 0.1W, 75V, Fenghua ABD03K1000FT; reuse existing board model. TI SLUAA81A recommends input resistors 20–100Ω. Together with existing 220nF (22us nominal RC), supports optional BQ internal passive fine trim without external FETs/resistors. At 4.2V, two resistors each >=99Ω bound current <=21.22mA even treating internal Rcb=0; either input resistor dissipation <=0.0446W. Enable at most one real cell at a time; cell slots 1..8 and 16 only, mask 0x80FF; never enable shorted VC9..14 or VC15 interval. Active ETA and passive trim must not overlap. Firmware must stop balancing, wait for two fresh scans, then use voltage for decisions; temperature/current limits and BQ finite balancing timeout remain mandatory. See 检查/AFE内均衡零增件修整说明.md. Pin mapping unchanged; inventory calculation only, no tests. Sources: https://www.ti.com/lit/an/sluaa81a/sluaa81a.pdf ; https://www.oneyac.com/product/27807722.html .",
+    "value": "100Ω ±1%, 0603, 0.1W, 75V"
+  },
+  {
+    "ref": "C_VC0",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC0_FILT",
+      "2": "B0"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC1",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC1_FILT",
+      "2": "VC0_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC2",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC2_FILT",
+      "2": "VC1_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC3",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC3_FILT",
+      "2": "VC2_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC4",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC4_FILT",
+      "2": "VC3_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC5",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC5_FILT",
+      "2": "VC4_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC6",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC6_FILT",
+      "2": "VC5_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC7",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC7_FILT",
+      "2": "VC6_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC8",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC8_FILT",
+      "2": "VC7_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "C_VC16",
+    "mpn": "0603B224K500NT",
+    "libUuid": "deb58ebf274a470eb09a4ef1f2830d36",
+    "pins": {
+      "1": "VC16_FILT",
+      "2": "VC15_FILT"
+    },
+    "note": "风华国产普通MLCC；保留220nF标称滤波值和原连接。单节最高4.2V，50V耐压；含初始容差/温度的零偏估算下沿168.3nF，DC偏压及老化合计需保留至少59.42%才能满足TI有效容量≥100nF。没有精确型号DC偏压曲线，不写成有效容量保证；首板或供应商需确认100nF下限。官方库pin/pad1、2一一对应，无极性。",
+    "value": "220nF ±10% 50V X7R 0603",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "d51bebe2064349b49fab3fa4ac23071c",
+    "footprintUuid": "76d6c29a47804db487f8a92b2621751b",
+    "libraryKey": "0603B224K500NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C83626"
+  },
+  {
+    "ref": "D_BAT",
+    "mpn": "BAT46W",
+    "libUuid": "69581c733a9b4122b1036b1811ea4efa",
+    "pins": {
+      "1": "BAT_DIODE",
+      "2": "TAP_B9"
+    },
+    "note": "FUXINSEMI BAT46W C915627；pin1=K/色环端，pin2=A，官方elibz符号与pad编号对应。0°时pad1在左侧。保留原串联供电网络；100V反向额定、150mA、SOD-123。正常≤30mA/偏高45mA纸面热包络适合；高温漏电最大值未保证，影响本地电容衰减，不作为仓储隔离器。37.8V/297Ω的127mA仅是故障电阻上界，非持续设计点；首板需确认节点瞬态和实际电流。详见检查/国产供电二极管设计依据.md。 Current boundary: anode pin2 is downstream of external 5A source fuse F_CELL_B9 (Eaton PV-5A10F in CHPV1U), net TAP_B9; this is not a raw CELL_B9 bypass. Pin mapping is bound to P1 SHA256 d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef. Keep the VC cell-sampling nets separate.",
+    "libraryKey": "BAT46W",
+    "manufacturer": "FUXINSEMI/富芯森美",
+    "supplierPart": "C915627",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "a36d21b5c06546c0a99cfb86a4a0ff0e",
+    "footprintUuid": "4c916d2a81e041d1994c4a255c0bd893",
+    "value": "100V 150mA Schottky SOD-123",
+    "pinNetVerifiedAgainstP1Sha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef"
+  },
+  {
+    "ref": "R_BAT",
+    "mpn": "ABD03K1000FT",
+    "libUuid": null,
+    "pins": {
+      "1": "BAT_DIODE",
+      "2": "BAT"
+    },
+    "note": "风华 ABD03K1000FT（立创C20616261，100Ω ±1%、100mW、75V）。100Ω series BAT input resistor per TI Fig.16-2.",
+    "value": "100Ω ±1% 100mW 75V"
+  },
+  {
+    "ref": "C_BAT1",
+    "mpn": "TCC1210X7R225K101MT",
+    "libUuid": null,
+    "pins": {
+      "1": "BAT",
+      "2": "B0"
+    },
+    "note": "潮州三环2.2µF/X7R/100V/1210整包辅助旁路；替代旧Murata 1µF/100V。TI BAT旁路1µF为参考建议值，本设计采用更高标称容量；未将标称容量当作偏压后保证值。保留100V耐压与原网络；与FOC 2.2µF/100V/1210档位统一，其他板精确MPN尚未替换。原厂资料及目录报价见检查/国产整包旁路换料依据.md。",
+    "value": "2.2µF X7R ±10%, 100V, 1210"
+  },
+  {
+    "ref": "C_BAT2",
+    "mpn": "0603CG101J101NT",
+    "libUuid": null,
+    "pins": {
+      "1": "BAT",
+      "2": "B0"
+    },
+    "note": "风华100pF/C0G/100V/0603整包BAT高频旁路；将旧50V额定提高至100V，覆盖当前45V TVS约72.7V纸面钳位边界。网络不变。不是瞬态实测；当前精确料库重新绑定。",
+    "value": "100pF C0G ±5%, 100V, 0603"
+  },
+  {
+    "ref": "Q_BREG",
+    "mpn": "FCX495TA",
+    "libUuid": null,
+    "pins": {
+      "1": "BREG",
+      "2": "BREG_COLLECTOR",
+      "3": "REGIN"
+    },
+    "note": "FCX495TA SOT-89 official top-view pinout: 1=B, 2=C/tab, 3=E; BREG preregulator transistor."
+  },
+  {
+    "ref": "D_BREG",
+    "mpn": "BAT46W",
+    "libUuid": "69581c733a9b4122b1036b1811ea4efa",
+    "pins": {
+      "1": "BREG_DIODE",
+      "2": "TAP_B9"
+    },
+    "note": "FUXINSEMI BAT46W C915627；pin1=K/色环端，pin2=A，官方elibz符号与pad编号对应。0°时pad1在左侧。保留原串联供电网络；100V反向额定、150mA、SOD-123。REG1正常10mA规划及约38.2mA故障电阻包络适合；高温漏电最大值未保证，影响本地电容衰减，不作为仓储隔离器。37.8V/990Ω的38.2mA仅是故障电阻上界，非持续设计点；首板需确认节点瞬态和实际电流。详见检查/国产供电二极管设计依据.md。 Current boundary: anode pin2 is downstream of external 5A source fuse F_CELL_B9 (Eaton PV-5A10F in CHPV1U), net TAP_B9; this is not a raw CELL_B9 bypass. Pin mapping is bound to P1 SHA256 d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef. Keep the VC cell-sampling nets separate.",
+    "libraryKey": "BAT46W",
+    "manufacturer": "FUXINSEMI/富芯森美",
+    "supplierPart": "C915627",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "a36d21b5c06546c0a99cfb86a4a0ff0e",
+    "footprintUuid": "4c916d2a81e041d1994c4a255c0bd893",
+    "value": "100V 150mA Schottky SOD-123",
+    "pinNetVerifiedAgainstP1Sha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef"
+  },
+  {
+    "ref": "R_BREG_FEED",
+    "mpn": "RC2512FK-7W1KL",
+    "libUuid": "68cf3f01625846fe8d2e424073695d36",
+    "pins": {
+      "1": "BREG_DIODE",
+      "2": "BREG_COLLECTOR"
+    },
+    "note": "REGIN串联供电电阻从300Ω改为1kΩ/2W，与两颗均衡LED驱动电阻统一。REG1正常总量规划10mA；22.5V、二极管1V、1010Ω条件集电极11.4V。37.8V/990Ω串联模型：NPN最大静态耗散0.361W，电阻短路上界1.444W；考虑0～60°C的±200ppm/°C温漂，约0.364W/1.454W。厂家70°C前额定2W，安装和实际温升仍由人类确认；启动电容能量及SOA不由静态式证明。见检查/1k2W电阻选型合并.md。",
+    "value": "1kΩ ±1% 2W 2512",
+    "libraryKey": "RC2512FK-7W1KL",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libType": "3",
+    "symbolUuid": "3788f89dd31646569d1acc028af5e222",
+    "footprintUuid": "7ab38fe3a2e64d01a1bea3ef8ce9e7f3",
+    "expectedFootprintName": "R2512",
+    "manufacturer": "YAGEO(国巨)",
+    "supplierPart": "C2838662",
+    "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC2512FK-7W1KL"
+  },
+  {
+    "ref": "C_BREG_COL",
+    "mpn": "TCC1210X7R225K101MT",
+    "libUuid": null,
+    "pins": {
+      "1": "BREG_COLLECTOR",
+      "2": "B0"
+    },
+    "note": "潮州三环2.2µF/X7R/100V/1210整包辅助旁路；替代旧Murata 1µF/100V。TI BAT旁路1µF为参考建议值，本设计采用更高标称容量；未将标称容量当作偏压后保证值。保留100V耐压与原网络；与FOC 2.2µF/100V/1210档位统一，其他板精确MPN尚未替换。原厂资料及目录报价见检查/国产整包旁路换料依据.md。",
+    "value": "2.2µF X7R ±10%, 100V, 1210"
+  },
+  {
+    "ref": "R_BREG_PD",
+    "mpn": "RS-03L1005FT",
+    "libUuid": null,
+    "pins": {
+      "1": "BREG",
+      "2": "B0"
+    },
+    "note": "10MΩ BREG-to-VSS discharge resistor per TI shutdown guidance; reduces retained BREG charge."
+  },
+  {
+    "ref": "C_REGIN",
+    "mpn": "GRM188R71H223KA01D",
+    "libUuid": null,
+    "pins": {
+      "1": "REGIN",
+      "2": "B0"
+    },
+    "note": "22nF X7R REGIN bypass per TI Fig.16-2."
+  },
+  {
+    "ref": "C_REG1",
+    "mpn": "GRM188R71E105KA12D",
+    "libUuid": "4920ceec7a3b4025906dfcb270eea6e2",
+    "pins": {
+      "1": "REG1",
+      "2": "B0"
+    },
+    "note": "1µF ±10% 25V X7R 0603 REG1 bypass per TI Fig.16-2. Configure REG1=3.3V; do not power MCU from REG1.",
+    "libraryKey": "GRM188R71E105KA12D",
+    "value": "1µF ±10% 25V X7R",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+  },
+  {
+    "ref": "C_REG18",
+    "mpn": "0805B475K250NT",
+    "libUuid": "ac314fb5b03142e9a6489bc87f588b59",
+    "pins": {
+      "1": "BQ_REG18",
+      "2": "B0"
+    },
+    "note": "风华国产普通MLCC，REG18去耦由标称2.2µF/0603改为4.7µF/0805以留容量裕量；不得驱动外部负载。TI要求有效1.8~22µF；按初始-10%和X7R-15%零偏估算下沿3.5955µF，DC偏压/老化需保留至少50.06%。1.8V仅为25V额定的7.2%；尚无本型号DC偏压曲线，以上是设计裕量估算而非有效容量保证。官方库pin/pad1、2一一对应，无极性。",
+    "value": "4.7µF ±10% 25V X7R 0805",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "b7a4c46445f640888078b177d6951b65",
+    "footprintUuid": "ccb32feceadc4298b406326a506ce8e7",
+    "libraryKey": "0805B475K250NT",
+    "manufacturer": "FH/风华高科",
+    "supplierPart": "C37818"
+  },
+  {
+    "ref": "R_RST_SHUT",
+    "mpn": "RMC06031K1%N",
+    "libUuid": null,
+    "pins": {
+      "1": "RST_SHUT",
+      "2": "B0"
+    },
+    "note": "1kΩ to VSS per TI shutdown/reset guidance; reset/shutdown control remains hardware-defined.  普通电阻跨板复用：Tyohm幸亚RMC06031K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分≤3.6V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC06031K1%N",
+    "value": "1kΩ ±1%, 0603, 100mW, 50V"
+  },
+  {
+    "ref": "R_PACK",
+    "mpn": "RC0603FR-075K1L",
+    "libUuid": null,
+    "pins": {
+      "1": "PACK+",
+      "2": "BQ_PACK"
+    },
+    "note": "5.1kΩ series from PACK+ to BQ PACK per TI Fig.16-3 high-side protection implementation."
+  },
+  {
+    "ref": "R_LD",
+    "mpn": "RC0603FR-075K1L",
+    "libUuid": null,
+    "pins": {
+      "1": "PACK+",
+      "2": "BQ_LD"
+    },
+    "note": "5.1kΩ series from PACK+ to BQ LD per TI Fig.16-3 high-side protection implementation."
+  },
+  {
+    "ref": "R_SCL_PU",
+    "mpn": "RS-03K1002FT",
+    "libUuid": null,
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_I2C_SCL"
+    },
+    "note": "风华 RS-03K1002FT（立创C115324，10kΩ ±1%、100mW、50V）。10kΩ open-drain I²C pull-up to MCU rail so the live BQ cannot phantom-power a switched-off MCU through SCL.",
+    "libraryKey": "RS-03K1002FT",
+    "value": "10kΩ ±1% 100mW 50V",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+  },
+  {
+    "ref": "R_SDA_PU",
+    "mpn": "RS-03K1002FT",
+    "libUuid": null,
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_I2C_SDA"
+    },
+    "note": "风华 RS-03K1002FT（立创C115324，10kΩ ±1%、100mW、50V）。10kΩ open-drain I²C pull-up to MCU rail so the live BQ cannot phantom-power a switched-off MCU through SDA.",
+    "libraryKey": "RS-03K1002FT",
+    "value": "10kΩ ±1% 100mW 50V",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+  },
+  {
+    "ref": "R_ALERT_SER",
+    "mpn": "RMC06031K1%N",
+    "libUuid": null,
+    "pins": {
+      "1": "BQ_ALERT_IC_N",
+      "2": "BQ_ALERT_N"
+    },
+    "note": "1kΩ series between BQ ALERT and MCU-facing ALERT net per TI Fig.16-2.  普通电阻跨板复用：Tyohm幸亚RMC06031K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分≤3.6V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC06031K1%N",
+    "value": "1kΩ ±1%, 0603, 100mW, 50V"
+  },
+  {
+    "ref": "R_ALERT_PU",
+    "mpn": "RS-03K1002FT",
+    "libUuid": null,
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "BQ_ALERT_N"
+    },
+    "note": "风华 RS-03K1002FT（立创C115324，10kΩ ±1%、100mW、50V）。10kΩ open-drain ALERT pull-up to switched MCU rail; avoids a path into an unpowered MCU.",
+    "libraryKey": "RS-03K1002FT",
+    "value": "10kΩ ±1% 100mW 50V",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+  },
+  {
+    "ref": "U_ETA_BAL1",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B1",
+      "2": "TAP_B2",
+      "3": "BAL_ETA_SW_1",
+      "4": "B0",
+      "5": "BAL_ETA_BIAS_1",
+      "6": null,
+      "7": "BAL_ETA_ISET_1",
+      "8": "BAL_ETA_EN_1",
+      "9": "B0"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B1；2 BATP=TAP_B2；3 SW；4 BATN=B0；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP1默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL1",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_1",
+      "2": "TAP_B1"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL1",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "B0",
+      "2": "TAP_B1"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS1",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_1",
+      "2": "BAL_ETA_SW_1"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET1",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_1",
+      "2": "B0"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET1",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_1",
+      "2": "B0"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP1",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_1",
+      "2": "B0",
+      "3": "BAL_ETA_EN_1"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN B0，D=ETA EN，G=BAL_EN_CLAMP_GATE_1。对应栅极由R_BAL_EN_GATE_PU1拉到本级BATP TAP_B2，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU1",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B2",
+      "2": "BAL_EN_CLAMP_GATE_1"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B2上拉至BATN=B0；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL2",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B2",
+      "2": "TAP_B3",
+      "3": "BAL_ETA_SW_2",
+      "4": "TAP_B1",
+      "5": "BAL_ETA_BIAS_2",
+      "6": null,
+      "7": "BAL_ETA_ISET_2",
+      "8": "BAL_ETA_EN_2",
+      "9": "TAP_B1"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B2；2 BATP=TAP_B3；3 SW；4 BATN=TAP_B1；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP2默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL2",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_2",
+      "2": "TAP_B2"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL2",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B1",
+      "2": "TAP_B2"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS2",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_2",
+      "2": "BAL_ETA_SW_2"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET2",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_2",
+      "2": "TAP_B1"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET2",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_2",
+      "2": "TAP_B1"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP2",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_2",
+      "2": "TAP_B1",
+      "3": "BAL_ETA_EN_2"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B1，D=ETA EN，G=BAL_EN_CLAMP_GATE_2。对应栅极由R_BAL_EN_GATE_PU2拉到本级BATP TAP_B3，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU2",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B3",
+      "2": "BAL_EN_CLAMP_GATE_2"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B3上拉至BATN=TAP_B1；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL3",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B3",
+      "2": "TAP_B4",
+      "3": "BAL_ETA_SW_3",
+      "4": "TAP_B2",
+      "5": "BAL_ETA_BIAS_3",
+      "6": null,
+      "7": "BAL_ETA_ISET_3",
+      "8": "BAL_ETA_EN_3",
+      "9": "TAP_B2"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B3；2 BATP=TAP_B4；3 SW；4 BATN=TAP_B2；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP3默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL3",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_3",
+      "2": "TAP_B3"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL3",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B2",
+      "2": "TAP_B3"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS3",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_3",
+      "2": "BAL_ETA_SW_3"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET3",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_3",
+      "2": "TAP_B2"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET3",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_3",
+      "2": "TAP_B2"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP3",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_3",
+      "2": "TAP_B2",
+      "3": "BAL_ETA_EN_3"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B2，D=ETA EN，G=BAL_EN_CLAMP_GATE_3。对应栅极由R_BAL_EN_GATE_PU3拉到本级BATP TAP_B4，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU3",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B4",
+      "2": "BAL_EN_CLAMP_GATE_3"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B4上拉至BATN=TAP_B2；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL4",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B4",
+      "2": "TAP_B5",
+      "3": "BAL_ETA_SW_4",
+      "4": "TAP_B3",
+      "5": "BAL_ETA_BIAS_4",
+      "6": null,
+      "7": "BAL_ETA_ISET_4",
+      "8": "BAL_ETA_EN_4",
+      "9": "TAP_B3"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B4；2 BATP=TAP_B5；3 SW；4 BATN=TAP_B3；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP4默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL4",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_4",
+      "2": "TAP_B4"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL4",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B3",
+      "2": "TAP_B4"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS4",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_4",
+      "2": "BAL_ETA_SW_4"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET4",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_4",
+      "2": "TAP_B3"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET4",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_4",
+      "2": "TAP_B3"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP4",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_4",
+      "2": "TAP_B3",
+      "3": "BAL_ETA_EN_4"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B3，D=ETA EN，G=BAL_EN_CLAMP_GATE_4。对应栅极由R_BAL_EN_GATE_PU4拉到本级BATP TAP_B5，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU4",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B5",
+      "2": "BAL_EN_CLAMP_GATE_4"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B5上拉至BATN=TAP_B3；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL5",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B5",
+      "2": "TAP_B6",
+      "3": "BAL_ETA_SW_5",
+      "4": "TAP_B4",
+      "5": "BAL_ETA_BIAS_5",
+      "6": null,
+      "7": "BAL_ETA_ISET_5",
+      "8": "BAL_ETA_EN_5",
+      "9": "TAP_B4"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B5；2 BATP=TAP_B6；3 SW；4 BATN=TAP_B4；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP5默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL5",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_5",
+      "2": "TAP_B5"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL5",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B4",
+      "2": "TAP_B5"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS5",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_5",
+      "2": "BAL_ETA_SW_5"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET5",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_5",
+      "2": "TAP_B4"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET5",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_5",
+      "2": "TAP_B4"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP5",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_5",
+      "2": "TAP_B4",
+      "3": "BAL_ETA_EN_5"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B4，D=ETA EN，G=BAL_EN_CLAMP_GATE_5。对应栅极由R_BAL_EN_GATE_PU5拉到本级BATP TAP_B6，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU5",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B6",
+      "2": "BAL_EN_CLAMP_GATE_5"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B6上拉至BATN=TAP_B4；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL6",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B6",
+      "2": "TAP_B7",
+      "3": "BAL_ETA_SW_6",
+      "4": "TAP_B5",
+      "5": "BAL_ETA_BIAS_6",
+      "6": null,
+      "7": "BAL_ETA_ISET_6",
+      "8": "BAL_ETA_EN_6",
+      "9": "TAP_B5"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B6；2 BATP=TAP_B7；3 SW；4 BATN=TAP_B5；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP6默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL6",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_6",
+      "2": "TAP_B6"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL6",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B5",
+      "2": "TAP_B6"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS6",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_6",
+      "2": "BAL_ETA_SW_6"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET6",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_6",
+      "2": "TAP_B5"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET6",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_6",
+      "2": "TAP_B5"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP6",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_6",
+      "2": "TAP_B5",
+      "3": "BAL_ETA_EN_6"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B5，D=ETA EN，G=BAL_EN_CLAMP_GATE_6。对应栅极由R_BAL_EN_GATE_PU6拉到本级BATP TAP_B7，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU6",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B7",
+      "2": "BAL_EN_CLAMP_GATE_6"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B7上拉至BATN=TAP_B5；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL7",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B7",
+      "2": "TAP_B8",
+      "3": "BAL_ETA_SW_7",
+      "4": "TAP_B6",
+      "5": "BAL_ETA_BIAS_7",
+      "6": null,
+      "7": "BAL_ETA_ISET_7",
+      "8": "BAL_ETA_EN_7",
+      "9": "TAP_B6"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B7；2 BATP=TAP_B8；3 SW；4 BATN=TAP_B6；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP7默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL7",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_7",
+      "2": "TAP_B7"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL7",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B6",
+      "2": "TAP_B7"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS7",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_7",
+      "2": "BAL_ETA_SW_7"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET7",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_7",
+      "2": "TAP_B6"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET7",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_7",
+      "2": "TAP_B6"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP7",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_7",
+      "2": "TAP_B6",
+      "3": "BAL_ETA_EN_7"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B6，D=ETA EN，G=BAL_EN_CLAMP_GATE_7。对应栅极由R_BAL_EN_GATE_PU7拉到本级BATP TAP_B8，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU7",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B8",
+      "2": "BAL_EN_CLAMP_GATE_7"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B8上拉至BATN=TAP_B6；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_ETA_BAL8",
+    "mpn": "ETA3000D2I",
+    "value": "相邻两节自动均衡控制器；DFN2×2-8",
+    "pins": {
+      "1": "TAP_B8",
+      "2": "TAP_B9",
+      "3": "BAL_ETA_SW_8",
+      "4": "TAP_B7",
+      "5": "BAL_ETA_BIAS_8",
+      "6": null,
+      "7": "BAL_ETA_ISET_8",
+      "8": "BAL_ETA_EN_8",
+      "9": "TAP_B7"
+    },
+    "source": "BMS模块/厂商资料/ETA3000D2I.pdf p2-4,p8-p9; https://www.synixsemi.com/downloads/ETA_Product%20_Manual_2.pdf (2024 Q4 catalog)",
+    "note": "ETA3000D2I 8腳：1 BATC=TAP_B8；2 BATP=TAP_B9；3 SW；4 BATN=TAP_B7；5 BIAS；6 STAT開漏未用；7 ISET；8 EN高有效。EN仅使用芯片内部约1µA典型上拉；Q_BAL_EN_CLAMP8默认钳位EN，光耦点亮后释放EN。内部上拉无最大值，首板按15–40°C窗口人工检查EN默认态与释放态。裸露焊盘EP接本级BATN。 厂家PDF第4页要求EP接GND，BATN为本级公共地；官方库把中心EP编号为9，现行连接源9与4同网。9是库编号，不是厂家数字脚号。"
+  },
+  {
+    "ref": "L_ETA_BAL8",
+    "mpn": "SWPA8040S1R0NT",
+    "value": "1.0uH ±30%; Isat 9.85A min / 14.0A typ; Irms 6.30A min / 6.90A typ; DCR 10mOhm max / 8mOhm typ; 8.0x8.0x4.0mm",
+    "pins": {
+      "1": "BAL_ETA_SW_8",
+      "2": "TAP_B8"
+    },
+    "source": "https://www.sunlordinc.com/uploads/files/20221122/SWPA%20series%20of%20SMD%20Power%20Inductor.pdf",
+    "note": "Sunlord series datasheet exact part SWPA8040S1R0NT; selected current ratings provide higher saturation and thermal margin. Verify ETA switching frequency, cell-voltage range, ripple peak current and temperature rise from the actual IC operating conditions before board release."
+  },
+  {
+    "ref": "C_BAL_CELL8",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B7",
+      "2": "TAP_B8"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨本级单节电芯抽头；须核对偏压后的有效容量。"
+  },
+  {
+    "ref": "C_BAL_BIAS8",
+    "mpn": "0603B103K500NT",
+    "value": "10nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_BIAS_8",
+      "2": "BAL_ETA_SW_8"
+    },
+    "source": "https://www.lcsc.com/product-detail/C57112.html",
+    "note": "BIAS对SW本地去耦，贴近芯片。"
+  },
+  {
+    "ref": "R_BAL_ISET8",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ETA_ISET_8",
+      "2": "TAP_B7"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "ISET至BATN；ETA手册p8给出100k设置约500mA平均电感电流，对应约250mA均衡电流(Ibal=Iind/2)，不是电芯净流保证。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_ISET8",
+    "mpn": "0603B102K500NT",
+    "value": "1nF 50V X7R ±10% 0603",
+    "pins": {
+      "1": "BAL_ETA_ISET_8",
+      "2": "TAP_B7"
+    },
+    "source": "https://www.lcsc.com/de/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-guangdong-fenghua-advanced-tech-0603b102k500nt_C44369.html",
+    "note": "ISET至BATN本地滤波；是否为必需外围须按原厂完整典型电路确认。"
+  },
+  {
+    "ref": "Q_BAL_EN_CLAMP8",
+    "mpn": "AO3400A",
+    "value": "UMW N沟道MOS；30V，VGS ±12V；RDS(on)≤48mΩ@2.5V；SOT-23 G1/S2/D3",
+    "pins": {
+      "1": "BAL_EN_CLAMP_GATE_8",
+      "2": "TAP_B7",
+      "3": "BAL_ETA_EN_8"
+    },
+    "source": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+    "note": "本地默认EN钳位：S=本级BATN TAP_B7，D=ETA EN，G=BAL_EN_CLAMP_GATE_8。对应栅极由R_BAL_EN_GATE_PU8拉到本级BATP TAP_B9，VGS为两节电压和（典型5.0–8.4V），低于±12V额定；optocoupler导通时将栅极拉回BATN，MOS关断，ETA内部弱上拉释放EN。厂家Ta=25°C RDS(on)最大值48mΩ的规格点为VGS=2.5V；本应用以EN小电流钳位，首板确认开/关态。 低压控制统一为UMW AO3400A C347475，本级两节差分≤8.4V；原G1/S2/D3网络和电阻保持。IGSS按100nA室温上界估算；门极容量较旧管增大，启动/关断动态仍需首板确认。原厂与官方库依据见检查/小信号MOS统一依据.md。",
+    "manufacturer": "UMW(友台半导体)",
+    "libUuid": "b68850111fa243d3b18c9ddb8fac8962",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libraryKey": "AO3400A",
+    "symbolUuid": "c3b6163e06f0471fab397fe3b566fabb",
+    "footprintUuid": "bdad16194d454cb292a50525f39c3ffd"
+  },
+  {
+    "ref": "R_BAL_EN_GATE_PU8",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "TAP_B9",
+      "2": "BAL_EN_CLAMP_GATE_8"
+    },
+    "source": "BMS模块/原理图准备/AFE元件连接.json现用100kΩ料号；https://item.szlcsc.com/116568.html",
+    "note": "本级MOS栅极从BATP=TAP_B9上拉至BATN=TAP_B7；与光耦输出构成默认钳位控制。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "U_BAL_OPTO_Q1",
+    "mpn": "AT3H74-CuH-S",
+    "value": "4路光耦；SSOP-16；每路输入A/K、输出C/E",
+    "pins": {
+      "1": "BAL_OPTO_LED_0",
+      "2": "BAL_OPTO_LED_1",
+      "16": "BAL_EN_CLAMP_GATE_1",
+      "15": "B0",
+      "3": "BAL_OPTO_LED_1",
+      "4": "BAL_OPTO_LED_2",
+      "14": "BAL_EN_CLAMP_GATE_2",
+      "13": "TAP_B1",
+      "5": "BAL_OPTO_LED_2",
+      "6": "BAL_OPTO_LED_3",
+      "12": "BAL_EN_CLAMP_GATE_3",
+      "11": "TAP_B2",
+      "7": "BAL_OPTO_LED_3",
+      "8": "BAL_OPTO_LED_4",
+      "10": "BAL_EN_CLAMP_GATE_4",
+      "9": "TAP_B3"
+    },
+    "source": "AOTE manufacturer datasheet: https://www.aotesemi.com/uploadfile/202405/ffb1a2e2ebecfaf.pdf",
+    "note": "四路输入LED分别串入BAL_OPTO_LED_0..BAL_OPTO_LED_4链。输出按原厂脚图：16C/15E→stage1, 14C/13E→stage2, 12C/11E→stage3, 10C/9E→stage4；各E接对应级BATN，各C接UMW AO3400A栅极。输入LED有效时拉低栅极并释放ETA EN；CTR表列为IF=5mA、VCE=5V条件，未宣称全温最低CTR；失效时默认EN关闭。"
+  },
+  {
+    "ref": "U_BAL_OPTO_Q2",
+    "mpn": "AT3H74-CuH-S",
+    "value": "4路光耦；SSOP-16；每路输入A/K、输出C/E",
+    "pins": {
+      "1": "BAL_OPTO_LED_4",
+      "2": "BAL_OPTO_LED_5",
+      "16": "BAL_EN_CLAMP_GATE_5",
+      "15": "TAP_B4",
+      "3": "BAL_OPTO_LED_5",
+      "4": "BAL_OPTO_LED_6",
+      "14": "BAL_EN_CLAMP_GATE_6",
+      "13": "TAP_B5",
+      "5": "BAL_OPTO_LED_6",
+      "6": "BAL_OPTO_LED_7",
+      "12": "BAL_EN_CLAMP_GATE_7",
+      "11": "TAP_B6",
+      "7": "BAL_OPTO_LED_7",
+      "8": "BAL_OPTO_LED_8",
+      "10": "BAL_EN_CLAMP_GATE_8",
+      "9": "TAP_B7"
+    },
+    "source": "AOTE manufacturer datasheet: https://www.aotesemi.com/uploadfile/202405/ffb1a2e2ebecfaf.pdf",
+    "note": "四路输入LED分别串入BAL_OPTO_LED_4..BAL_OPTO_LED_8链。输出按原厂脚图：16C/15E→stage5, 14C/13E→stage6, 12C/11E→stage7, 10C/9E→stage8；各E接对应级BATN，各C接UMW AO3400A栅极。输入LED有效时拉低栅极并释放ETA EN；CTR表列为IF=5mA、VCE=5V条件，未宣称全温最低CTR；失效时默认EN关闭。"
+  },
+  {
+    "ref": "R_BAL_OPTO_TOP",
+    "mpn": "RC2512FK-7W1KL",
+    "value": "1kΩ ±1% 2W 2512",
+    "pins": {
+      "1": "TAP_B9",
+      "2": "BAL_OPTO_LED_0"
+    },
+    "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC2512FK-7W1KL",
+    "note": "8路光耦输入LED串限流；与另一端1kΩ合计2kΩ，原网络和阻值保持，额定功率1W提高到2W，与REGIN供电复用同一RC2512FK-7W1KL。两脚独立电阻，非排阻。详见检查/1k2W电阻选型合并.md。",
+    "libUuid": "68cf3f01625846fe8d2e424073695d36",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libType": "3",
+    "symbolUuid": "3788f89dd31646569d1acc028af5e222",
+    "footprintUuid": "7ab38fe3a2e64d01a1bea3ef8ce9e7f3",
+    "expectedFootprintName": "R2512",
+    "libraryKey": "RC2512FK-7W1KL",
+    "manufacturer": "YAGEO(国巨)",
+    "supplierPart": "C2838662"
+  },
+  {
+    "ref": "R_BAL_OPTO_BOTTOM",
+    "mpn": "RC2512FK-7W1KL",
+    "value": "1kΩ ±1% 2W 2512",
+    "pins": {
+      "1": "BAL_OPTO_LED_8",
+      "2": "BAL_OPTO_SINK"
+    },
+    "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC2512FK-7W1KL",
+    "note": "8路光耦输入LED串限流；与另一端1kΩ合计2kΩ，原网络和阻值保持，额定功率1W提高到2W，与REGIN供电复用同一RC2512FK-7W1KL。两脚独立电阻，非排阻。详见检查/1k2W电阻选型合并.md。",
+    "libUuid": "68cf3f01625846fe8d2e424073695d36",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "libType": "3",
+    "symbolUuid": "3788f89dd31646569d1acc028af5e222",
+    "footprintUuid": "7ab38fe3a2e64d01a1bea3ef8ce9e7f3",
+    "expectedFootprintName": "R2512",
+    "libraryKey": "RC2512FK-7W1KL",
+    "manufacturer": "YAGEO(国巨)",
+    "supplierPart": "C2838662"
+  },
+  {
+    "ref": "Q_BAL_MAINCLR",
+    "mpn": "MMBT5551",
+    "value": "NPN; VCEO 160V; SOT-23 pin1=B,pin2=E,pin3=C",
+    "pins": {
+      "1": "BAL_MAINCLR_BASE",
+      "2": "BAL_SWITCH_MID",
+      "3": "BAL_OPTO_SINK"
+    },
+    "source": "https://www.lcsc.com/product-detail/C408396.html",
+    "note": "MDD MMBT5551 C408396，160V NPN，SOT-23；官方符号B1/E2/C3与PAD1/2/3及现行网络一致。MAIN_CLR_N控制上侧串联开关，默认关闭均衡LED回路。",
+    "manufacturer": "MDD(辰达半导体)",
+    "libraryKey": "MMBT5551",
+    "libUuid": "f7f17a35ca194afdbda992d103e80c1c",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "ae2bf03bd595485b92f4aa67aaa3743c",
+    "footprintUuid": "078e43bc93394f49815211c4fd533d19"
+  },
+  {
+    "ref": "R_BAL_MAINCLR_BASE",
+    "mpn": "RMC06033.3K1%N",
+    "value": "3.3kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "MAIN_CLR_N",
+      "2": "BAL_MAINCLR_BASE"
+    },
+    "source": "https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_3-3KR-3301-1_C108078.html",
+    "note": "Q_BAL_MAINCLR基极限流。 普通电阻跨板复用：Tyohm幸亚RMC06033.3K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分≤3.6V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC06033.3K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "R_BAL_MAINCLR_BE",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_MAINCLR_BASE",
+      "2": "BAL_SWITCH_MID"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "Q_BAL_MAINCLR基极-发射极下拉，失电默认关断。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "Q_BAL_ENABLE",
+    "mpn": "MMBT5551",
+    "value": "NPN; VCEO 160V; SOT-23 pin1=B,pin2=E,pin3=C",
+    "pins": {
+      "1": "BAL_ENABLE_BASE",
+      "2": "B0",
+      "3": "BAL_SWITCH_MID"
+    },
+    "source": "https://www.lcsc.com/product-detail/C408396.html",
+    "note": "MDD MMBT5551 C408396，160V NPN，SOT-23；官方符号B1/E2/C3与PAD1/2/3及现行网络一致。MCU静态均衡许可控制下侧串联开关；复位/断线由基极下拉保持关闭。",
+    "manufacturer": "MDD(辰达半导体)",
+    "libraryKey": "MMBT5551",
+    "libUuid": "f7f17a35ca194afdbda992d103e80c1c",
+    "libraryUuid": "0819f05c4eef4c71ace90d822a990e87",
+    "symbolUuid": "ae2bf03bd595485b92f4aa67aaa3743c",
+    "footprintUuid": "078e43bc93394f49815211c4fd533d19"
+  },
+  {
+    "ref": "R_BAL_ENABLE_BASE",
+    "mpn": "RMC06033.3K1%N",
+    "value": "3.3kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ENABLE_CMD",
+      "2": "BAL_ENABLE_BASE"
+    },
+    "source": "https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_3-3KR-3301-1_C108078.html",
+    "note": "PA5/P2-13静态命令到Q_BAL_ENABLE基极；MCU复位先保持低。 普通电阻跨板复用：Tyohm幸亚RMC06033.3K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分≤3.6V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC06033.3K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "R_BAL_ENABLE_BE",
+    "mpn": "RMC0603100K1%N",
+    "value": "100kΩ ±1%, 0603, 100mW, 50V",
+    "pins": {
+      "1": "BAL_ENABLE_BASE",
+      "2": "B0"
+    },
+    "source": "https://item.szlcsc.com/116568.html",
+    "note": "Q_BAL_ENABLE基极-发射极下拉，MCU复位/断线默认关断。 普通电阻跨板复用：Tyohm幸亚RMC0603100K1%N，0603、±1%、0.1W、50V、独立两脚，非排阻。沿用原阻值和引脚网络；此组支路两端工作差分普通控制下拉≤3.6V；8路均衡门极上拉跨两节≤8.4V，按3.6V逻辑及8.4V两节均衡供电上限，各阻值保守计算耗散不超过13.1mW。与稳压板同订货号，不能继承旧精确器件库绑定。数据依据见检查/普通电阻跨板复用依据.md。现行报价及MOQ边界见检查/当前主板成本.csv。",
+    "manufacturer": "Tyohm（幸亚）",
+    "libraryKey": "RMC0603100K1%N",
+    "libUuid": null
+  },
+  {
+    "ref": "C_BAL_CELL9",
+    "mpn": "0603B105K250NT",
+    "value": "1uF 25V X7R ±10% 0603",
+    "pins": {
+      "1": "TAP_B8",
+      "2": "TAP_B9"
+    },
+    "source": "https://www.fhcomp.com/en/product_info/?prod_code=0603B105K250NT",
+    "note": "跨第9节电芯抽头TAP_B8-TAP_B9；须核对偏压后的有效容量。"
+  }
+]

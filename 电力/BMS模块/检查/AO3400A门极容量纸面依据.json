@@ -1,0 +1,160 @@
+{
+  "title": "UMW AO3400A gate charge, capacitance and logic timing paper review",
+  "date": "2026-10-14",
+  "scope": "当前AO3400A手册及门极充放电纸面分析，非动态验收",
+  "candidate": {
+    "manufacturer": "UMW (友台半导体)",
+    "mpn": "AO3400A",
+    "lcsc": "C347475",
+    "vds_abs_max_v": 30,
+    "vgs_abs_max_v": 12,
+    "vgs_range_v": "±12",
+    "vgs_th_v": {
+      "min": 0.7,
+      "typ": 1.1,
+      "max": 1.4,
+      "condition": "VDS=VGS, ID=250µA"
+    },
+    "rds_on_max_ohm": {
+      "value": 0.048,
+      "condition": "VGS=2.5V, ID=4A, TA=25°C"
+    },
+    "igss_max_a": 1e-07,
+    "igss_condition": "VDS=0V, VGS=±12V, TA=25°C",
+    "gate": {
+      "Qg_nC": {
+        "typ": 9.7,
+        "max": 12
+      },
+      "Qgs_typ_nC": 1.6,
+      "Qgd_typ_nC": 3.1,
+      "condition": "VGS=4.5V, VDS=15V, ID=5.8A"
+    },
+    "capacitance_pF": {
+      "Ciss": {
+        "typ": 823,
+        "max": 1050
+      },
+      "Coss_typ": 99,
+      "Crss_typ": 77,
+      "condition": "VGS=0V, VDS=15V, f=1MHz"
+    },
+    "pinning": {
+      "symbol": {
+        "1": "G",
+        "2": "S",
+        "3": "D"
+      },
+      "packagePads": [
+        "1",
+        "2",
+        "3"
+      ]
+    },
+    "manufacturer_pdf": {
+      "url": "https://www.umw-ic.com/static/pdf/db97d75d2121bceb9305ec17148391f8.pdf",
+      "page": 2,
+      "local": {
+        "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\tmp\\UMW_AO3400A_2024.pdf",
+        "sha256": "f1718202d2b33136fc9ab2cd697cc0b59ca89abdbed752f1a2b64ab002664e7b"
+      }
+    }
+  },
+  "existing_part": {
+    "manufacturer": "UMW (友台半导体)",
+    "mpn": "BSS138",
+    "lcsc": "C347484",
+    "vds_abs_max_v": 50,
+    "vgs_abs_max_v": 20,
+    "vgs_th_v": {
+      "min": 0.7,
+      "max": 1.5,
+      "condition": "VDS=VGS, ID=250µA"
+    },
+    "rds_on_max_ohm": {
+      "value": 3.5,
+      "condition": "VGS=2.5V, ID=100mA, TA=25°C"
+    },
+    "igss_max_a": 1e-05,
+    "igss_condition": "VDS=0V, VGS=±20V, TA=25°C",
+    "capacitance_pF": {
+      "Ciss": 50,
+      "Coss": 25,
+      "Crss": 8,
+      "condition": "VGS=0V, VDS=10V, f=1MHz"
+    },
+    "gate_charge": "No Qg/Qgs/Qgd values listed in the UMW BSS138 datasheet table",
+    "manufacturer_pdf": {
+      "url": "https://www.umw-ic.com/static/pdf/493e10da2532f2961f91526e524f7946.pdf",
+      "page": 1,
+      "local": {
+        "path": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\厂商资料\\UMW_BSS138.pdf",
+        "sha256": "80624e34533bf3cb73a5df35668d54cc9d0be512e5802ab7baf57c9e126ea49a"
+      }
+    }
+  },
+  "working_boundary_readback": {
+    "quantity": 10,
+    "refs": [
+      "Q_BAL_EN_CLAMP1..8",
+      "Q_DFETOFF",
+      "Q_LOAD_POWER_VALID_DRV"
+    ],
+    "balance_clamp": {
+      "local_floating_pair_v": "5.0..8.4",
+      "gate_resistor_ohm": 100000,
+      "topology": "S=local BATN; D=ETA EN; G=local BATP through 100k pull-up; optocoupler pulls gate low"
+    },
+    "FET_RELEASE": {
+      "driver": "U_SEQ SN74LVC74A Q1 / FET_RELEASE (single output net)",
+      "mos_gate_branches": 2,
+      "series_resistor_ohm_each": 1000,
+      "gate_source_pull_down_ohm_each": 100000,
+      "DFETOFF_drain_v": 3.6,
+      "LOAD_POWER_VALID_drain_v": 5.06,
+      "static_gate_drive_floor_v_existing_analysis": 2.762
+    },
+    "max_vgs_margin_v": 3.6,
+    "do_not_change": "three high-voltage NPN devices are outside scope"
+  },
+  "paper_estimates_not_guarantees": {
+    "ciss_ratio_typ_ao_to_bss": 16.46,
+    "two_FET_total_Ciss_pF": {
+      "BSS138_typ": 100,
+      "AO3400A_typ": 1646
+    },
+    "per_gate_active_drive_RC_s": {
+      "AO3400A_typ_using_1k_parallel_100k": 8.22e-07,
+      "AO3400A_1050pF_table_max_using_1k_parallel_100k": 1.049e-06,
+      "BSS138_table_value_using_1k_parallel_100k": 5e-08
+    },
+    "per_gate_high_impedance_100k_RC_s": {
+      "AO3400A_typ": 8.23e-05,
+      "AO3400A_1050pF_table_max": 0.000105,
+      "BSS138_table_value": 5e-06
+    },
+    "two_gate_initial_current_estimate": {
+      "per_branch_at_2.8V_A": 0.0028,
+      "total_A": 0.0056,
+      "note": "rough resistor-limited initial current; TI SN74LVC74A VOH is guaranteed at 100µA and specified at other discrete currents; no directly matching transient VOH guarantee for this two-branch charge event"
+    },
+    "charge_qualification": "Qg values are specified at VGS=4.5V, above the approximately 2.762V static logic-drive floor; do not use them to claim an exact charge time at 2.762V.",
+    "balance_gate_cross_threshold_estimate": "With 100k pull-up and AO Ciss table values, approximate tau=82..105us; this is a comparative RC estimate, not guaranteed switching time. ETA3000D2I p2 lists T_ALLOW=3.85ms typ, T_CHECK=7.68ms typ and T_SLEEP=2s typ. The 2s sleep interval is not a guaranteed initial startup blanking time. Neither the typical checking timers nor this RC estimate prove first-cell insertion transient safety.",
+    "default_state": "The settled FET_RELEASE default remains gate-low through each 100k gate-source pulldown; larger gate capacitance changes only edge/power-loss decay timing. Balance EN clamps still have 100k BATP pull-up and optocoupler pull-down; a brief EN rise during initial ramp is not ruled out by this paper estimate.",
+    "claim_boundary": "Ciss values are at different VDS points (AO 15V, BSS 10V); BSS Ciss has no min/max limits shown; these RC values are comparative estimates only, not guaranteed maximum switching/off time or full-temperature result."
+  },
+  "supporting_sources": {
+    "power_connections": "BMS模块/原理图准备/功率元件连接.json",
+    "interface_connections": "BMS模块/原理图准备/接口元件连接.json",
+    "afe_connections": "BMS模块/原理图准备/AFE元件连接.json",
+    "current_design_basis": "BMS模块/检查/小信号MOS统一依据.md",
+    "ti_driver_datasheet": "https://www.ti.com/lit/ds/symlink/sn54lvc74a.pdf"
+  },
+  "formal_project_modified": false,
+  "tests_run": false,
+  "eta_timing_correction": {
+    "date": "2026-10-14",
+    "basis": "厂商资料/ETA3000D2I.pdf p2 electrical characteristics, p7 state machine",
+    "correction": "撤回此前2s T_CHECK解释；没有改变电路连接或器件。"
+  }
+}

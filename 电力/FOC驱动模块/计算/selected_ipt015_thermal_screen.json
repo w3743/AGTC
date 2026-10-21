@@ -1,0 +1,171 @@
+{
+  "title": "Selected IPT015N10N5ATMA1 conditional thermal screen",
+  "status": "calculation_screen_only_not_1s_thermal_acceptance",
+  "device": {
+    "manufacturer": "Infineon",
+    "mpn": "IPT015N10N5ATMA1",
+    "quantity_per_bridge": 6,
+    "package": "PG-HSOF-8 / TOLL",
+    "vds_rating_v": 100.0,
+    "rds_max_at_6v_25c_ohm": 0.002,
+    "rds_hot_screen_factor": 2.5,
+    "rds_hot_screen_ohm": 0.005,
+    "rtheta_jc_max_c_per_w": 0.4,
+    "tj_max_c": 175.0,
+    "official_datasheet": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipt015n10n5-datasheet-en.pdf",
+    "datasheet_basis": "Rev. 2.4, Table 4: RDS(on) max 2.0 mOhm at VGS=6 V, ID=75 A; Table 3: RthetaJC max 0.4 C/W; maximum Tj 175 C."
+  },
+  "inputs": {
+    "phase_peak_a": 120.0,
+    "switching_frequency_hz": 20000.0,
+    "tr_plus_tf_nominal_ns": 500.0,
+    "tr_plus_tf_sensitivity_ns": [
+      300.0,
+      500.0,
+      1000.0
+    ],
+    "bus_voltage_cases_v": [
+      22.5,
+      32.4,
+      37.8
+    ],
+    "input_power_for_bus_current_a": 1800.0,
+    "initial_tj_max_assumption_c": 60.0,
+    "case_temperature_max_throughout_pulse_assumption_c": 60.0,
+    "pulse_duration_s": 1.0
+  },
+  "formulas": {
+    "rds_hot_screen": "2 mOhm * 2.5 = 5 mOhm",
+    "bridge_conduction": "Pcond_bridge = 3/2 * Iphase_pk^2 * Rds_hot_screen",
+    "bridge_switching_upper": "Psw_bridge_upper = 6/pi * VBUS * Iphase_pk * (tr+tf) * fsw; conservative all-six-device sinusoidal overlap screen",
+    "hottest_device_conduction": "Pcond_device_upper = Iphase_pk^2 * Rds_hot_screen; assumes 120 A continuously through one device for the conservative bound",
+    "hottest_device_switching": "Psw_device_upper = VBUS * Iphase_pk/2 * (tr+tf) * fsw",
+    "temperature_bound": "Tj_upper = Tc_max + (Pcond_device_upper + Psw_device_upper) * RthetaJC_max",
+    "one_second_energy": "E_1s = P * 1 s",
+    "bus_current": "Ibus = 1800 W / VBUS; ideal input-current arithmetic, no efficiency allowance"
+  },
+  "bridge_conduction_w": 108.0,
+  "hottest_device_conduction_w": 72.0,
+  "nominal_500ns_bus_cases": [
+    {
+      "vbus_v": 22.5,
+      "input_current_at_1p8kw_a": 80.0,
+      "bridge_conduction_w": 108.0,
+      "bridge_switching_upper_w_500ns": 51.566202,
+      "bridge_total_upper_w_500ns": 159.566202,
+      "bridge_energy_j_1s_500ns": 159.566202,
+      "hottest_device_conduction_w": 72.0,
+      "hottest_device_switching_w_500ns": 13.5,
+      "hottest_device_total_w_500ns": 85.5,
+      "hottest_device_energy_j_1s_500ns": 85.5,
+      "tj_upper_c_under_case_and_start_assumptions": 94.2,
+      "tj_margin_to_175c_c_under_assumptions": 80.8
+    },
+    {
+      "vbus_v": 32.4,
+      "input_current_at_1p8kw_a": 55.555556,
+      "bridge_conduction_w": 108.0,
+      "bridge_switching_upper_w_500ns": 74.25533,
+      "bridge_total_upper_w_500ns": 182.25533,
+      "bridge_energy_j_1s_500ns": 182.25533,
+      "hottest_device_conduction_w": 72.0,
+      "hottest_device_switching_w_500ns": 19.44,
+      "hottest_device_total_w_500ns": 91.44,
+      "hottest_device_energy_j_1s_500ns": 91.44,
+      "tj_upper_c_under_case_and_start_assumptions": 96.576,
+      "tj_margin_to_175c_c_under_assumptions": 78.424
+    },
+    {
+      "vbus_v": 37.8,
+      "input_current_at_1p8kw_a": 47.619048,
+      "bridge_conduction_w": 108.0,
+      "bridge_switching_upper_w_500ns": 86.631219,
+      "bridge_total_upper_w_500ns": 194.631219,
+      "bridge_energy_j_1s_500ns": 194.631219,
+      "hottest_device_conduction_w": 72.0,
+      "hottest_device_switching_w_500ns": 22.68,
+      "hottest_device_total_w_500ns": 94.68,
+      "hottest_device_energy_j_1s_500ns": 94.68,
+      "tj_upper_c_under_case_and_start_assumptions": 97.872,
+      "tj_margin_to_175c_c_under_assumptions": 77.128
+    }
+  ],
+  "edge_time_sensitivity": [
+    {
+      "vbus_v": 22.5,
+      "tr_plus_tf_ns": 300.0,
+      "bridge_switching_upper_w": 30.939721,
+      "bridge_total_upper_w": 138.939721,
+      "bridge_energy_j_1s": 138.939721,
+      "hottest_device_switching_w": 8.1,
+      "hottest_device_total_w": 80.1,
+      "hottest_device_tj_upper_c": 92.04
+    },
+    {
+      "vbus_v": 22.5,
+      "tr_plus_tf_ns": 500.0,
+      "bridge_switching_upper_w": 51.566202,
+      "bridge_total_upper_w": 159.566202,
+      "bridge_energy_j_1s": 159.566202,
+      "hottest_device_switching_w": 13.5,
+      "hottest_device_total_w": 85.5,
+      "hottest_device_tj_upper_c": 94.2
+    },
+    {
+      "vbus_v": 22.5,
+      "tr_plus_tf_ns": 1000.0,
+      "bridge_switching_upper_w": 103.132403,
+      "bridge_total_upper_w": 211.132403,
+      "bridge_energy_j_1s": 211.132403,
+      "hottest_device_switching_w": 27.0,
+      "hottest_device_total_w": 99.0,
+      "hottest_device_tj_upper_c": 99.6
+    },
+    {
+      "vbus_v": 37.8,
+      "tr_plus_tf_ns": 300.0,
+      "bridge_switching_upper_w": 51.978731,
+      "bridge_total_upper_w": 159.978731,
+      "bridge_energy_j_1s": 159.978731,
+      "hottest_device_switching_w": 13.608,
+      "hottest_device_total_w": 85.608,
+      "hottest_device_tj_upper_c": 94.2432
+    },
+    {
+      "vbus_v": 37.8,
+      "tr_plus_tf_ns": 500.0,
+      "bridge_switching_upper_w": 86.631219,
+      "bridge_total_upper_w": 194.631219,
+      "bridge_energy_j_1s": 194.631219,
+      "hottest_device_switching_w": 22.68,
+      "hottest_device_total_w": 94.68,
+      "hottest_device_tj_upper_c": 97.872
+    },
+    {
+      "vbus_v": 37.8,
+      "tr_plus_tf_ns": 1000.0,
+      "bridge_switching_upper_w": 173.262437,
+      "bridge_total_upper_w": 281.262437,
+      "bridge_energy_j_1s": 281.262437,
+      "hottest_device_switching_w": 45.36,
+      "hottest_device_total_w": 117.36,
+      "hottest_device_tj_upper_c": 106.944
+    }
+  ],
+  "limitations": [
+    "The 2.5 hot factor is a project screening assumption applied to the 6 V, 25 C maximum RDS(on); it is not an Infineon guaranteed value for this assembly.",
+    "The 6/pi bridge switching term is a conservative all-six-device overlap upper screen; complementary commutation may reduce the sum. No reduction is used in the headline values.",
+    "The hottest-device conduction term assumes one device carries the full 120 A continuously; it is a conservative local-hotspot screen, not sinusoidal per-device average sharing.",
+    "The temperature calculation uses steady-state RthetaJC as a coarse 1 s screen. It is not the manufacturer's transient Zth curve or a measured 1 s junction-temperature result.",
+    "It assumes starting Tj <= 60 C and case temperature Tc <= 60 C throughout the pulse. Case temperature, mounting, PCB copper, package interface and actual thermal path must be verified.",
+    "It excludes diode reverse recovery, output-capacitance loss, gate-drive loss, ringing, deadtime, current ripple, unequal current sharing, control-induced recirculation and surrounding-component heating.",
+    "The 1.8 kW bus current values are ideal arithmetic only; they do not establish motor operating point, inverter efficiency, bus-current limit or system acceptance."
+  ],
+  "sources": [
+    {
+      "title": "Infineon IPT015N10N5 official datasheet, Rev. 2.4",
+      "url": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipt015n10n5-datasheet-en.pdf",
+      "relevant_sections": "Table 3 thermal characteristics; Table 4 static characteristics; Tj maximum ratings."
+    }
+  ]
+}

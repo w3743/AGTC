@@ -1,0 +1,521 @@
+{
+  "document": "QXV255-CuH-S shared-inductor 4S2P cycle calculation",
+  "date": "2026-10-14",
+  "status": "candidate design calculation only; no source/BOM change; not simulation, ERC, measurement or acceptance",
+  "part": {
+    "mpn": "QXV255-CuH-S",
+    "lcsc": "C52164497",
+    "datasheet": "https://www.qxmicro.com/upfiles/products/202505/ZBKM0912HBU7.pdf",
+    "supply_snapshot_date": "2026-10-14",
+    "lcsc_stock": 1000,
+    "lcsc_moq": 1,
+    "lcsc_price_usd": {
+      "1": 2.8121,
+      "10": 2.3909,
+      "30": 2.1276,
+      "100": 1.8216,
+      "500": 1.6998,
+      "1000": 1.6471
+    },
+    "ron_boundary": "Datasheet maximum RDS(on) condition is limited to turn-on within 1 second per root review. 0.04 ohm at 40 C is a design budget, not a vendor-guaranteed maximum; sustained Ron/thermal needs first-board qualification."
+  },
+  "inputs": {
+    "architecture": "4S2P buffer; existing 9-group selector and shared bidirectional inductor stage",
+    "capacity_F": [
+      4,
+      6
+    ],
+    "buffer_esr_ohm": 0.13,
+    "bleeder_equivalent_ohm": 1320,
+    "source_and_receiver_path_each_ohm": 0.235,
+    "path_breakdown_ohm": {
+      "existing_selector_path": 0.185,
+      "wire_socket_margin": 0.05
+    },
+    "charge_efficiency": 0.85,
+    "discharge_efficiency": 0.85,
+    "base_cycle_overhead_s": {
+      "two_blank_events": 0.06,
+      "two_settle_events": 0.02,
+      "softstart_once": 0.0848,
+      "total": 0.1648
+    },
+    "buffer_terminal_windows_V": {
+      "nominal": {
+        "low": 5.381322,
+        "high": 6.23
+      },
+      "narrowest_correlated_static_corner": {
+        "low": 5.19259181,
+        "high": 6.001615316,
+        "swing": 0.809023506
+      }
+    },
+    "cell_scenarios_3v8": [
+      {
+        "name": "50mV",
+        "source_V": 3.8,
+        "receiver_V": 3.75,
+        "selected_current_A": 2.9
+      },
+      {
+        "name": "100mV",
+        "source_V": 3.8,
+        "receiver_V": 3.7,
+        "selected_current_A": 2.9
+      }
+    ],
+    "cell_scenarios_3v_derated": [
+      {
+        "name": "50mV",
+        "source_V": 3.05,
+        "receiver_V": 3.0,
+        "selected_current_A": 1.0
+      },
+      {
+        "name": "100mV",
+        "source_V": 3.1,
+        "receiver_V": 3.0,
+        "selected_current_A": 1.0
+      }
+    ]
+  },
+  "method": {
+    "type": "numerical integration of design equations, not circuit simulation",
+    "power_W": [
+      "Pch=eta_ch*I*(Vs-I*Rpath)",
+      "Pdis=I*(Vt+I*Rpath)/eta_dis"
+    ],
+    "esr_bleeder": "a=1+Resr/Rbleed; Vp_charge(x)=(x+sqrt(x^2+4*a*Resr*Pch))/(2*a); Vp_discharge(x)=(x+sqrt(x^2-4*a*Resr*Pdis))/(2*a); Icap_charge=Pch/Vp-Vp/Rbleed; Icap_discharge=Pdis/Vp+Vp/Rbleed; dt/dx=C/Icap.",
+    "internal_voltage_boundaries": "xlo=Vlo+Resr*(Pdis/Vlo+Vlo/Rbleed); xhi=Vhi-Resr*(Pch/Vhi-Vhi/Rbleed). Integrate both phases from xlo to xhi to include ESR-induced terminal threshold jumps.",
+    "cycle_mean": "Iselected*t_discharge/(t_charge+ t_discharge + 0.1648 s + optional segmentation pauses)",
+    "segmentation": "If a phase exceeds 0.9 s, divide it into ceil(phase/0.9) pieces and add 40 ms per internal restart. This is only a sensitivity case; repeated restart/softstart has not been qualified."
+  },
+  "results_3v8_2p9A": [
+    {
+      "window": "nominal",
+      "delta": "50mV",
+      "C_F": 4,
+      "xlo_V": 5.747097,
+      "xhi_V": 6.070209,
+      "charge_s": 1.024733,
+      "discharge_s": 0.474052,
+      "cycle_s": 1.663585,
+      "receiver_avg_A": 0.826378,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.806975
+    },
+    {
+      "window": "nominal",
+      "delta": "50mV",
+      "C_F": 6,
+      "xlo_V": 5.747097,
+      "xhi_V": 6.070209,
+      "charge_s": 1.537099,
+      "discharge_s": 0.711078,
+      "cycle_s": 2.412977,
+      "receiver_avg_A": 0.854598,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.840662
+    },
+    {
+      "window": "nominal",
+      "delta": "100mV",
+      "C_F": 4,
+      "xlo_V": 5.742976,
+      "xhi_V": 6.070209,
+      "charge_s": 1.037457,
+      "discharge_s": 0.485748,
+      "cycle_s": 1.688005,
+      "receiver_avg_A": 0.834517,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.815199
+    },
+    {
+      "window": "nominal",
+      "delta": "100mV",
+      "C_F": 6,
+      "xlo_V": 5.742976,
+      "xhi_V": 6.070209,
+      "charge_s": 1.556186,
+      "discharge_s": 0.728621,
+      "cycle_s": 2.449607,
+      "receiver_avg_A": 0.862588,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.848729
+    },
+    {
+      "window": "narrowest_correlated_corner",
+      "delta": "50mV",
+      "C_F": 4,
+      "xlo_V": 5.571623,
+      "xhi_V": 5.835697,
+      "charge_s": 0.809807,
+      "discharge_s": 0.372168,
+      "cycle_s": 1.346775,
+      "receiver_avg_A": 0.801386,
+      "extra_segmentation_s": 0,
+      "receiver_avg_segmented_A": 0.801386
+    },
+    {
+      "window": "narrowest_correlated_corner",
+      "delta": "50mV",
+      "C_F": 6,
+      "xlo_V": 5.571623,
+      "xhi_V": 5.835697,
+      "charge_s": 1.214711,
+      "discharge_s": 0.558252,
+      "cycle_s": 1.937762,
+      "receiver_avg_A": 0.835464,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.818566
+    },
+    {
+      "window": "narrowest_correlated_corner",
+      "delta": "100mV",
+      "C_F": 4,
+      "xlo_V": 5.567353,
+      "xhi_V": 5.835697,
+      "charge_s": 0.822611,
+      "discharge_s": 0.382651,
+      "cycle_s": 1.370062,
+      "receiver_avg_A": 0.809955,
+      "extra_segmentation_s": 0,
+      "receiver_avg_segmented_A": 0.809955
+    },
+    {
+      "window": "narrowest_correlated_corner",
+      "delta": "100mV",
+      "C_F": 6,
+      "xlo_V": 5.567353,
+      "xhi_V": 5.835697,
+      "charge_s": 1.233917,
+      "discharge_s": 0.573977,
+      "cycle_s": 1.972694,
+      "receiver_avg_A": 0.843787,
+      "extra_segmentation_s": 0.04,
+      "receiver_avg_segmented_A": 0.827017
+    }
+  ],
+  "results_3v_selected_current_1A": [
+    {
+      "delta": "50mV",
+      "C_F": 4,
+      "charge_s": 7.025257,
+      "discharge_s": 4.236889,
+      "cycle_s": 11.426945,
+      "receiver_avg_A": 0.370781,
+      "extra_segmentation_s": 0.44,
+      "receiver_avg_segmented_A": 0.357033
+    },
+    {
+      "delta": "50mV",
+      "C_F": 6,
+      "charge_s": 10.537885,
+      "discharge_s": 6.355333,
+      "cycle_s": 17.058018,
+      "receiver_avg_A": 0.372572,
+      "extra_segmentation_s": 0.72,
+      "receiver_avg_segmented_A": 0.357483
+    },
+    {
+      "delta": "100mV",
+      "C_F": 4,
+      "charge_s": 6.893245,
+      "discharge_s": 4.231246,
+      "cycle_s": 11.289291,
+      "receiver_avg_A": 0.374802,
+      "extra_segmentation_s": 0.44,
+      "receiver_avg_segmented_A": 0.360742
+    },
+    {
+      "delta": "100mV",
+      "C_F": 6,
+      "charge_s": 10.339868,
+      "discharge_s": 6.346869,
+      "cycle_s": 16.851537,
+      "receiver_avg_A": 0.376634,
+      "extra_segmentation_s": 0.72,
+      "receiver_avg_segmented_A": 0.361202
+    }
+  ],
+  "ocp_and_thermal": {
+    "refs": [
+      "R_OC_HI_T",
+      "R_OC_LO_B"
+    ],
+    "resistor": "RT0603BRD0730K1L, 30.1 kohm, 0.1%; replaces 44.2 kohm",
+    "software_target_A": 2.9,
+    "root_estimated_hard_trip_range_A": [
+      2.98,
+      3.85
+    ],
+    "fault_upper_bound_is_transient_only": true,
+    "per_ssr_loss_at_Ron_0_04ohm_W": {
+      "2.9A": 0.3364,
+      "3.6A": 0.5184,
+      "3.85A": 0.5929
+    },
+    "note": "Each active P/N path has two SSRs in series; listed loss is per SSR. 0.04 ohm at 40 C is a design budget only, not a datasheet guarantee. Comparator/driver delay, commutation and actual fault peak need first-board verification."
+  },
+  "latest_finite_candidate": {
+    "status": "calculation_only; formal_source_and_BOM_unchanged; no_simulation_or_hardware_test",
+    "supersedes_older_5A_baseline_for_decision": true,
+    "candidate_changes": {
+      "BAL_tap_fuses": {
+        "refs": "F_BAL_TAP_B1..F_BAL_TAP_B9",
+        "candidate_mpn": "Eaton PV-10A10F",
+        "cell_sense_fuses_remain": "5A",
+        "any_pair_active_fuses": 2
+      },
+      "feedback": {
+        "R_BAL_FB_TOP_ohm": 549000,
+        "R_BAL_FB_TOP_tolerance_pct": 0.1,
+        "R_BAL_FB_EXTRA_ohm": 2210000,
+        "R_BAL_FB_EXTRA_tolerance_pct": 1,
+        "R_BAL_FB_BOT_ohm": 100000,
+        "R_BAL_FB_BOT_tolerance_pct": 0.1,
+        "nominal_low_V": 5.397571584,
+        "nominal_high_V": 6.49,
+        "narrow_correlated_static_window_V": {
+          "low": 5.2099513,
+          "high": 6.251753,
+          "swing": 1.04180168
+        },
+        "max_static_high_corner_V": 6.728993661,
+        "estimated_global_BUF_OV_min_V": 6.939,
+        "static_OV_headroom_V": 0.210006339
+      }
+    },
+    "fuse_loss_reference_not_max_resistance": {
+      "source": "https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/fuses/data-sheets/bus-ele-ds-10121-pv10m.pdf",
+      "points": {
+        "PV-5A10F": {
+          "0.8In": {
+            "current_A": 4,
+            "power_W": 1,
+            "equivalent_R_mohm": 62.5
+          },
+          "In": {
+            "current_A": 5,
+            "power_W": 1.6,
+            "equivalent_R_mohm": 64
+          }
+        },
+        "PV-8A10F": {
+          "0.8In": {
+            "current_A": 6.4,
+            "power_W": 1.2,
+            "equivalent_R_mohm": 29.296875
+          },
+          "In": {
+            "current_A": 8,
+            "power_W": 2.1,
+            "equivalent_R_mohm": 32.8125
+          }
+        },
+        "PV-10A10F": {
+          "0.8In": {
+            "current_A": 8,
+            "power_W": 1.2,
+            "equivalent_R_mohm": 18.75
+          },
+          "In": {
+            "current_A": 10,
+            "power_W": 2.3,
+            "equivalent_R_mohm": 23
+          }
+        }
+      },
+      "caveat": "P/I^2 gives only an equivalent resistance at each published watt-loss point; the datasheet table does not specify a cold resistance maximum. The 2.9A modeled current is below 0.8In for the 8A and 10A candidates."
+    },
+    "path_model": {
+      "formula": "Rpath = 2*QXV_Ron + 2*R_fuse_equivalent + 0.050 ohm connection allowance",
+      "two_QXV_Ron_0_04ohm_and_50mohm_connection_allowance": {
+        "PV-5A10F_In_ohm": 0.258,
+        "PV-8A10F_In_ohm": 0.195625,
+        "PV-10A10F_0.8In_ohm": 0.1675,
+        "PV-10A10F_In_ohm": 0.176
+      },
+      "PV10A_with_QXV_Ron_0_03ohm_sensitivity_only": {
+        "0.8In_path_ohm": 0.1475,
+        "In_path_ohm": 0.156
+      },
+      "connection_allowance_must_cover": [
+        "two selected fuse holders",
+        "terminals",
+        "wire",
+        "board paths"
+      ]
+    },
+    "integrator_inputs": {
+      "C_F": [
+        4,
+        6
+      ],
+      "buffer_ESR_ohm": 0.13,
+      "bleeder_equivalent_ohm": 1320,
+      "cell_source_V": 3.8,
+      "phase_current_A": 2.9,
+      "charge_efficiency": 0.85,
+      "discharge_efficiency": 0.85,
+      "base_overhead_s": 0.1648,
+      "feedback_window": "narrow_correlated_static_corner",
+      "segmentation_added": false
+    },
+    "PV10A_40C_Ron0_04_reference_results": [
+      {
+        "fuse_point": "In",
+        "Rpath_ohm": 0.176,
+        "delta": "50mV",
+        "C4_charge_s": 1.51723,
+        "C4_discharge_s": 0.769207,
+        "C4_cycle_s": 2.451237,
+        "C4_receiver_avg_A": 0.91003,
+        "C6_receiver_avg_A": 0.930892
+      },
+      {
+        "fuse_point": "In",
+        "Rpath_ohm": 0.176,
+        "delta": "100mV",
+        "C4_charge_s": 1.529349,
+        "C4_discharge_s": 0.785107,
+        "C4_cycle_s": 2.479255,
+        "C4_receiver_avg_A": 0.918344,
+        "C6_receiver_avg_A": 0.939153
+      },
+      {
+        "fuse_point": "0.8In",
+        "Rpath_ohm": 0.1675,
+        "delta": "50mV",
+        "C4_receiver_avg_A": 0.918057,
+        "C6_receiver_avg_A": 0.93913
+      },
+      {
+        "fuse_point": "0.8In",
+        "Rpath_ohm": 0.1675,
+        "delta": "100mV",
+        "C4_receiver_avg_A": 0.926455,
+        "C6_receiver_avg_A": 0.947474
+      }
+    ],
+    "QXV_Ron0_03ohm_sensitivity_only": [
+      {
+        "fuse_point": "In",
+        "Rpath_ohm": 0.156,
+        "delta": "50mV",
+        "C4_receiver_avg_A": 0.928956,
+        "C6_receiver_avg_A": 0.950316
+      },
+      {
+        "fuse_point": "In",
+        "Rpath_ohm": 0.156,
+        "delta": "100mV",
+        "C4_receiver_avg_A": 0.937469,
+        "C6_receiver_avg_A": 0.958773
+      },
+      {
+        "fuse_point": "0.8In",
+        "Rpath_ohm": 0.1475,
+        "delta": "50mV",
+        "C4_receiver_avg_A": 0.937043,
+        "C6_receiver_avg_A": 0.958612
+      },
+      {
+        "fuse_point": "0.8In",
+        "Rpath_ohm": 0.1475,
+        "delta": "100mV",
+        "C4_receiver_avg_A": 0.945641,
+        "C6_receiver_avg_A": 0.967153
+      }
+    ],
+    "100mV_0_95A_model_path_ceiling_at_C4_ohm": 0.1429768,
+    "decision": "50mV requirement is met by this model with margin. The 100mV result is 0.918A at C4 and 0.939A at C6 using the PV10A rated-current power-loss reference; even the 0.8In/0.03ohm sensitivity gives only 0.946A at C4. Do not claim the approximately-1A target or 0.95A closure.",
+    "open_items": [
+      "Eaton power-loss points are not fuse cold-R maximums; procurement and holder qualification are not complete",
+      "verify actual two-fuse path including CHPV1U, terminals and wire against the 50mohm allowance",
+      "QXV 0.04ohm at 40C is a design budget, not guaranteed sustained Ron or thermal data",
+      "charge phase is about 1.5s; no repeated segmentation or on-time guarantee is assumed",
+      "verify 10A fuse interruption/voltage and connector coordination",
+      "global BUF_OV dynamic headroom and converter efficiency/current remain unverified"
+    ]
+  },
+  "temp_open_reference_merge_check": {
+    "source_refs": {
+      "R_BAL_TEMP_OPEN_REF_T": {
+        "mpn": "RT0603BRD07110KL",
+        "value_ohm": 110000,
+        "pins": {
+          "1": "BAL_FLOAT_5V",
+          "2": "BAL_TEMP_OPEN_REF"
+        }
+      },
+      "R_BAL_TEMP_OPEN_REF_B": {
+        "mpn": "MCT06030E9002BP100",
+        "value_ohm": 90000,
+        "pins": {
+          "1": "BAL_TEMP_OPEN_REF",
+          "2": "BAL_N"
+        }
+      },
+      "U_BAL_CMP2": {
+        "mpn": "TLV1704AIPWR",
+        "pin5": "BAL_TEMP_OPEN_REF",
+        "pin4": "BAL_TEMP_HALF"
+      },
+      "half_divider": "two 100kohm resistors from BAL_TEMP_DIV to BAL_N; 10kohm FLOAT_5V pullup; open sensor leaves 200kohm load to BAL_N"
+    },
+    "source_mpn_value_correction": "MCT06030E9002BP100 is 90.0kohm per current source JSON; it is not 900kohm.",
+    "proposed_candidate": {
+      "top_mpn_reuse": "RT0603BRD07100KL",
+      "top_ohm": 100000,
+      "bottom_new_nominal_ohm": 82000,
+      "bottom_tolerance_pct": 0.1,
+      "independent_value_type_delta": -1,
+      "component_count_delta": 0,
+      "source_changed": false
+    },
+    "voltage_ratio_nominal": {
+      "reference_pin5_V5_ratio": 0.45054945,
+      "open_sensor_pin4_V5_ratio": 0.47619048,
+      "difference_V5_ratio": 0.02564103
+    },
+    "worst_static_margin": {
+      "all_resistors_tolerance_pct": 0.1,
+      "V5_min_assumed_V": 4.75,
+      "worst_ratio_difference": 0.02464702,
+      "margin_before_comparator_errors_mV": 117.07,
+      "TLV1704_full_temp_offset_max_mV": 5.5,
+      "TLV1704_full_temp_input_bias_max_nA_per_input": 20,
+      "signal_source_Rth_ohm_approx": 52378,
+      "reference_source_Rth_ohm_approx": 45100,
+      "worst_bias_error_mV": 1.95,
+      "remaining_static_margin_mV_approx": 109.62
+    },
+    "vendor_sources": {
+      "TLV1704": "https://www.ti.com/lit/ds/symlink/tlv1704.pdf",
+      "TLV760": "https://www.ti.com/lit/ds/symlink/tlv760.pdf"
+    },
+    "decision": "100k/82k is acceptable for static open-sensor voltage margin with the stated tolerance and full-temperature comparator offset/bias; its comparator input is half-scale. A 1Mohm bottom resistor would produce about 4.505V at REF while pin4 remains about 2.38V at sensor-open and is not a drop-in. This calculation does not verify hysteresis, RC, cable leakage, fault transients or the final shutdown chain."
+  },
+  "decision": {
+    "50mV": "Latest PV10A/high-feedback 4S2P model: 0.910A at C4 and 0.931A at C6 at the rated-current fuse-loss reference; above 0.5A, but fuse and SSR resistance are not guaranteed maxima.",
+    "100mV": "Latest PV10A/high-feedback 4S2P model: 0.918A at C4 and 0.939A at C6 at rated-current fuse-loss reference; below 0.95A and approximately-1A target. Do not claim closure.",
+    "3V": "The previous 1A selected-phase model is not recalculated with the latest fuse/feedback candidate; do not treat its earlier cycle values as validation of the new candidate.",
+    "open_first_article_items": [
+      "procure/qualify PV10A10F, CHPV1U and interruption coordination",
+      "measure complete selector path resistance including two fuse holders and wiring",
+      "40 C sustained QXV Ron and thermal rise over the approximately-1.5s charge phase",
+      "current trip tolerance/delay and inductive commutation peak",
+      "actual bidirectional converter current and efficiency",
+      "dynamic buffer OVP margin"
+    ],
+    "source_bom_unchanged": true
+  },
+  "currentValidityCorrection": {
+    "date": "2026-10-14",
+    "issue": "80+125+50 mΩ equals255 mΩ; historical integration used235 mΩ",
+    "recomputed": false,
+    "currentDesignAcceptanceEvidence": false
+  }
+}

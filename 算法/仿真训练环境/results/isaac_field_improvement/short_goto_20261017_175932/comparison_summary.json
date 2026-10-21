@@ -1,0 +1,242 @@
+{
+  "schema": "isaac-field-short-policy-improvement-v1",
+  "algorithm": "SB3-Contrib RecurrentPPO",
+  "checkpoint_before": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_migration/field_policy_16384_latest.zip",
+  "checkpoint_after": "/mnt/e/Pioneer/先进通用履带底盘工程/算法/仿真训练环境/results/isaac_field_improvement/short_goto_20261017_175932/field_policy_after.zip",
+  "evaluation": {
+    "mode": "goto",
+    "goal_distance_m": [
+      0.6,
+      1.2
+    ],
+    "goal_angle_rad": 0.5235987755982988,
+    "max_time_s": 8.0,
+    "distance_cost": 0.0,
+    "deterministic": true,
+    "plants": 16,
+    "layout": "rows",
+    "row_spacing_m": 0.8,
+    "plant_spacing_m": 0.3,
+    "terrain_enabled": false,
+    "heldout_seeds": [
+      51001,
+      51002,
+      51003,
+      51004
+    ],
+    "training_seed": 31001
+  },
+  "training": {
+    "requested_timesteps": 4096,
+    "trained_timesteps": 4096,
+    "seed": 31001,
+    "num_envs": 2,
+    "distance_cost": 1.0,
+    "n_steps": 128,
+    "batch_size": 128,
+    "n_epochs": 5
+  },
+  "heldout_before_summary": {
+    "episodes": 4,
+    "successes": 2,
+    "success_rate": 0.5,
+    "mean_raw_return": 2.439818944333095,
+    "mean_damage": 0.0,
+    "mean_collisions": 0.0,
+    "mean_final_distance": 0.8825920062439828,
+    "timed_out_episodes": 2
+  },
+  "heldout_after_summary": {
+    "episodes": 4,
+    "successes": 2,
+    "success_rate": 0.5,
+    "mean_raw_return": 2.4441123775001263,
+    "mean_damage": 0.0,
+    "mean_collisions": 0.0,
+    "mean_final_distance": 0.8764691184637734,
+    "timed_out_episodes": 2
+  },
+  "heldout_before_after_rows": [
+    {
+      "seed": 51001,
+      "before": {
+        "seed": 51001,
+        "mode": "goto",
+        "raw_return": 5.083904525640222,
+        "success": true,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 0.10927949722081598,
+        "reason": "goal_reached",
+        "steps": 36,
+        "terminated": true,
+        "truncated": false,
+        "timed_out": false,
+        "goal": [
+          74.55205931222581,
+          80.62475173851496
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      },
+      "after": {
+        "seed": 51001,
+        "mode": "goto",
+        "raw_return": 5.05055127577988,
+        "success": true,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 0.25496782962309794,
+        "reason": "goal_reached",
+        "steps": 59,
+        "terminated": true,
+        "truncated": false,
+        "timed_out": false,
+        "goal": [
+          74.55205931222581,
+          80.62475173851496
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      }
+    },
+    {
+      "seed": 51002,
+      "before": {
+        "seed": 51002,
+        "mode": "goto",
+        "raw_return": -0.07858177525442876,
+        "success": false,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 0.8562402982910257,
+        "reason": "time_limit",
+        "steps": 160,
+        "terminated": false,
+        "truncated": true,
+        "timed_out": true,
+        "goal": [
+          12.339377102305745,
+          25.099898298098584
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      },
+      "after": {
+        "seed": 51002,
+        "mode": "goto",
+        "raw_return": 5.047995685474779,
+        "success": true,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 0.3757238934296437,
+        "reason": "goal_reached",
+        "steps": 51,
+        "terminated": true,
+        "truncated": false,
+        "timed_out": false,
+        "goal": [
+          12.339377102305745,
+          25.099898298098584
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      }
+    },
+    {
+      "seed": 51003,
+      "before": {
+        "seed": 51003,
+        "mode": "goto",
+        "raw_return": -0.2897476125116719,
+        "success": false,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 2.3719529902745435,
+        "reason": "time_limit",
+        "steps": 160,
+        "terminated": false,
+        "truncated": true,
+        "timed_out": true,
+        "goal": [
+          33.92731959205822,
+          63.29143771739759
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      },
+      "after": {
+        "seed": 51003,
+        "mode": "goto",
+        "raw_return": -0.11026282810842152,
+        "success": false,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 1.175387760919541,
+        "reason": "time_limit",
+        "steps": 160,
+        "terminated": false,
+        "truncated": true,
+        "timed_out": true,
+        "goal": [
+          33.92731959205822,
+          63.29143771739759
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      }
+    },
+    {
+      "seed": 51004,
+      "before": {
+        "seed": 51004,
+        "mode": "goto",
+        "raw_return": 5.043700639458257,
+        "success": true,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 0.19289523918954582,
+        "reason": "goal_reached",
+        "steps": 101,
+        "terminated": true,
+        "truncated": false,
+        "timed_out": false,
+        "goal": [
+          16.225233790474977,
+          76.33507121351849
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      },
+      "after": {
+        "seed": 51004,
+        "mode": "goto",
+        "raw_return": -0.21183462314573262,
+        "success": false,
+        "damage": 0,
+        "collisions": 0,
+        "final_distance": 1.6997969898828114,
+        "reason": "time_limit",
+        "steps": 160,
+        "terminated": false,
+        "truncated": true,
+        "timed_out": true,
+        "goal": [
+          16.225233790474977,
+          76.33507121351849
+        ],
+        "reset_info": {
+          "targets": 4
+        }
+      }
+    }
+  ],
+  "claim_limit": "This is a short flat-terrain, 16-plant smoke comparison on four fixed seeds; it does not establish general navigation competence or statistically reliable improvement."
+}
