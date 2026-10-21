@@ -251,6 +251,20 @@ def _model_or_checkpoint(
     input_schema: str,
     expected_observation_config: Mapping[str, Any] | None,
 ):
+    # RSL checkpoints retain their own model/metadata format. Adapt prediction
+    # only, so both backends use the same episode and physical-trace evaluator.
+    if getattr(model_or_checkpoint, "backend", None) == "rsl_rl":
+        model_or_checkpoint.validate_contract(input_schema, expected_observation_config)
+        return model_or_checkpoint, getattr(model_or_checkpoint, "checkpoint", None)
+    if isinstance(model_or_checkpoint, (str, Path)) and Path(model_or_checkpoint).suffix.lower() in (".pt", ".pth"):
+        from isaac_field.rsl_rl_inference import RslPredictionModel
+
+        path = _existing_checkpoint_path(model_or_checkpoint)
+        model = RslPredictionModel(
+            path, device=device, input_schema=input_schema,
+            expected_observation_config=expected_observation_config,
+        )
+        return model, path
     from isaac_field.policy import (
         _validate_checkpoint_action_metadata,
         _validate_checkpoint_encoder_metadata,

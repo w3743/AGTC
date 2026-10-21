@@ -53,7 +53,7 @@ actual_commit="$(git -C "$ISAACLAB_ROOT" rev-parse HEAD)"
 
 mkdir -p "$UV_CACHE_DIR" "$WARP_CACHE_PATH" "$(dirname "$UV_PROJECT_ENVIRONMENT")"
 cd "$ISAACLAB_ROOT"
-"$UV_EXECUTABLE" sync --locked --extra sb3 --extra viser --extra test --python /usr/bin/python3.12
+"$UV_EXECUTABLE" sync --locked --extra sb3 --extra rsl-rl --extra viser --extra test --python /usr/bin/python3.12
 
 # Isaac Lab's lock pins Torch and SB3. Install only the matching contrib package
 # without dependency resolution so it cannot replace those upstream pins.

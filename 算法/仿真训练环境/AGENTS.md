@@ -17,6 +17,8 @@
 
 ## 当前批次与运行状态
 
+- 2026-10-22：用户已明确授权RSL-RL代码迁移。本worktree为`E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，基于main `9c93aafc`，不带入未完成的v2奖励/ablation改动。新`train`薄转发固定Isaac Lab官方RSL入口；旧训练保留为显式`train-sb3`。第十八批5/5迁移及范围内整理已完成：WSL CPU最终530 passed/23 skipped/55 warnings、26.40s真实exit0，官方CLI帮助/导出/静态检查通过，详情见ISAAC_LAB.md首段；下一批为0/5。旧奖励对照仍失败/未完成，不记为成功。原runtime预览、旧ablation的51份冻结源/模型/协议不改；本轮未启动GPU训练或原生物理验证，不自行恢复automation。
+
 
 - 当前课程trial为 `results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2`；动态进展集中在 `ISAAC_LAB.md` TRAIN-01与trial原始run_status/decisions/probes，不在本文件滚动复制。运行中不得改47项冻结训练源、protocol、模型或成绩。两自动跟进项保持PAUSED；实际预览与后继采样均须等课程自然完成、真实exit 0且无并行GPU仿真后串行启动，不能用定时任务或替代轮询绕过暂停。
 - 第十七批5/5项功能已完成并整理：①LASSC生产消费桥与模型回放，②快停512可追溯续训，③mastery独立fast_stop_512课程，④配对过程量评估，⑤暂停策略地图点选预览。全套WSL CPU pytest在显示修复前真实exit 0（428 passed、22 skipped、8 warnings）；MDX显示修复后预览专项18 passed，py_compile与--check均exit 0。课程冻结47源与protocol保持一致；此前报告、模型、试验成绩未改。CPU-only Viser 1.0.30浏览器交互已通过（证据截图`results/project_history/fast_stop_objective_20261020/preview_map_cpu_verified.png`），但这不等于原生策略物理验收；训练自然完成且真实exit 0前不启动实际策略预览。第十八批计数1/5：新增非冻结的课程全场过程采样入口，复用既有轨迹adapter；验收与运行边界统一见ISAAC_LAB.md TRAIN-01。训练及只读审计不另计功能。
@@ -47,7 +49,7 @@
 
 ## 任务边界与验收
 
-- 后端仅发展Isaac Lab + Newton MJWarp，复用本地external和SB3-Contrib；模型自己学，连续四维动作，无Nav2或手写规划器替代策略。
+- 后端仅发展Isaac Lab + Newton MJWarp；新训练复用本地固定Isaac Lab官方RSL-RL入口、wrapper和runner，SB3-Contrib用于历史训练/回放兼容。项目适配只处理五路观测、共享编码器、模型身份和既有评估接口；不另造通用训练器。模型自己学，连续四维动作，无Nav2或手写规划器替代策略。
 - 不做训练速度/FPS基准。必要的物理正确性、学习效果、PC负载和UI核验仍做；逻辑20Hz配置不冒充实测帧率。
 - 优先不压苗，允许更慢或超时。历史/通用默认到点为0.4m位置范围、低速hold0.3s；用户最新fast_stop_v1实验为位置≤0.4m、真实水平XY速度<0.05m/s、完整车体角速度模长<0.1rad/s持续0.5s，优先成功并尽量缩短用时，不要求终态朝向。不同成功判据的报告不得混算。
 - 安全验收必须同配置/同初态配对：clean成功增加，且损伤episode数、平均损伤、碰撞不恶化；不能把成功/损伤权衡称能力提升。旧权重可在当前物理重评，但不同规则/几何/驱动/观测下的旧报告不混算，不重贴metadata。
