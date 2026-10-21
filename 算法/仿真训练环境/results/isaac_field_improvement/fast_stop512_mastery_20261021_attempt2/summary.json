@@ -1,0 +1,77 @@
+{
+  "schema": "isaac-field-mastery-experiment-v1",
+  "method": "mastery",
+  "profile": "fast_stop_512",
+  "num_timesteps": 196608,
+  "budget": 196608,
+  "latest_checkpoint": "results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2/checkpoints/steps_0196608_near.zip",
+  "best_checkpoint": "results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2/untrained_baseline.zip",
+  "best_checkpoint_sha256": "cc5d0e9b238fcb9fd9ec615135c5d0fbd1f41388adcb7fab5115dcd9a33b055c",
+  "controller": {
+    "schema": "isaac-field-curriculum-control-v1",
+    "consumed_timesteps": 196608,
+    "total_timesteps": 196608,
+    "remaining_timesteps": 0,
+    "budget_exhausted": true,
+    "can_train": false,
+    "probe_due": false,
+    "active_stage_timesteps": 196608,
+    "next_probe_at_active_timesteps": 204800,
+    "active_timesteps_until_probe": 8192,
+    "active_stage": {
+      "name": "near",
+      "mode": "goto",
+      "goal_distance": [
+        0.6,
+        1.2
+      ],
+      "goal_angle": 0.2617993877991494,
+      "sampling_options": {
+        "plants": 0
+      }
+    },
+    "active_stage_index": 0,
+    "mastered": false,
+    "consecutive_passes": 0,
+    "required_consecutive_passes": 2,
+    "last_probe_passed": false,
+    "last_probe_metrics": {
+      "episodes": 16,
+      "clean_successes": 6,
+      "clean_success_rate": 0.375,
+      "damaged_episodes": 0,
+      "mean_damage": 0.0,
+      "total_collisions": 0
+    },
+    "promotion_blocked_reason": null,
+    "enable_curriculum_promotion": true,
+    "enable_best_checkpoint_selection": true,
+    "long_run_cycle": {
+      "block_order": [
+        "near"
+      ],
+      "target_distribution": [
+        {
+          "stage": {
+            "name": "near",
+            "mode": "goto",
+            "goal_distance": [
+              0.6,
+              1.2
+            ],
+            "goal_angle": 0.2617993877991494,
+            "sampling_options": {
+              "plants": 0
+            }
+          },
+          "weight": 1.0
+        }
+      ],
+      "semantics": "target weights over complete cycles; actual finite-run exposure comes from completed training blocks"
+    },
+    "pending_plan": null
+  },
+  "training_finished": true,
+  "capability_improvement_established": false,
+  "claim_limit": "Transfer development probe only; this does not establish full-field capability or held-out generalization."
+}

@@ -1,0 +1,3084 @@
+{
+  "schema": "isaac-field-heldout-v1",
+  "reward": "raw_task_reward_distance_cost_zero",
+  "distance_cost": 0.0,
+  "checkpoint": "results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2/checkpoints/steps_0180224_near.zip",
+  "model_class": "RecurrentPPO",
+  "action_config": {
+    "schema": "direct-track-speed-v1",
+    "components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ],
+    "normalized_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "checkpoint_action_config": {
+    "schema": "direct-track-speed-v1",
+    "components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ],
+    "normalized_range": [
+      -1.0,
+      1.0
+    ]
+  },
+  "damage_config": {
+    "metric": "stem-contact-v2",
+    "penalty_per_plant": 20.0,
+    "track_geometry": "two swept rectangular contact bands",
+    "track_contact_length_m": 0.595,
+    "track_band_width_m": 0.06,
+    "track_center_separation_m": 0.41,
+    "track_outer_width_m": 0.47,
+    "track_center_separation_status": "0.41 m center separation derived from user-confirmed 0.47 m overall width and 0.06 m track width; 0.30 m chassis width excludes tracks",
+    "track_vertical_model": "union of RobotAssetSpec wheel-cylinder vertical AABBs rotated by current pitch/roll; damage requires overlap with stem root_z +/- stem_radius",
+    "stem_radius_source": "Scene.stem_radius",
+    "chassis_geometry": "RobotAssetSpec box footprint against main stem only",
+    "chassis_length_m": 0.8,
+    "chassis_width_m": 0.3,
+    "chassis_height_m": 0.15,
+    "vertical_model": "2.5D: current engine root Z with pitch/roll-expanded vertical AABB; horizontal footprint remains level; compare against stem root_z..root_z+height"
+  },
+  "damage_metric": "stem-contact-v2",
+  "checkpoint_damage_config": {
+    "metric": "stem-contact-v2",
+    "penalty_per_plant": 20.0,
+    "track_geometry": "two swept rectangular contact bands",
+    "track_contact_length_m": 0.595,
+    "track_band_width_m": 0.06,
+    "track_center_separation_m": 0.41,
+    "track_outer_width_m": 0.47,
+    "track_center_separation_status": "0.41 m center separation derived from user-confirmed 0.47 m overall width and 0.06 m track width; 0.30 m chassis width excludes tracks",
+    "track_vertical_model": "union of RobotAssetSpec wheel-cylinder vertical AABBs rotated by current pitch/roll; damage requires overlap with stem root_z +/- stem_radius",
+    "stem_radius_source": "Scene.stem_radius",
+    "chassis_geometry": "RobotAssetSpec box footprint against main stem only",
+    "chassis_length_m": 0.8,
+    "chassis_width_m": 0.3,
+    "chassis_height_m": 0.15,
+    "vertical_model": "2.5D: current engine root Z with pitch/roll-expanded vertical AABB; horizontal footprint remains level; compare against stem root_z..root_z+height"
+  },
+  "checkpoint_damage_metric": "stem-contact-v2",
+  "drive_config": {
+    "interface": "independent_left_right_track_speed_coupled_pi_v7",
+    "actuator_model": "explicit_IdealPD_velocity_servo",
+    "controller": "native_per_wheel_P_plus_two_state_side_integral_feedforward",
+    "motor_torque_constant_nm_per_a": 0.035,
+    "current_feedback_source": "equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured",
+    "max_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.04,
+    "integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+    "integral_update_period_s": 0.05,
+    "integral_state_count_per_env": 2,
+    "integral_state_unit": "Nm_per_proxy_wheel",
+    "integral_error_source": "per_side_mean_target_minus_actual_wheel_qd_rad_s",
+    "integral_broadcast": "same_side_integral_ff_to_each_of_7_proxy_wheels",
+    "integral_limit_nm_per_proxy_wheel": 2.0,
+    "integral_antiwindup": "conditional_on_side_mean_P_estimate; final_safety_is_Newton_native_per_wheel_clamp",
+    "integral_gain_status": "uncalibrated simulation candidate; not real motor/controller calibration",
+    "wheel_effort_limit_nm": 2.0,
+    "actuator_effort_limit_nm": 2.0,
+    "joint_effort_limit_nm": 2.0,
+    "effort_clamp_source": "NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward",
+    "wheel_effort_limit_basis": "actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+    "gimbal_solver_joint_effort_limit_nm": 1.0,
+    "gimbal_effort_limit_basis": "implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "b381e579e3d80259c6fd8a953907f35e866dd2df74bebd5cab4e0205df794718",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+    "same_side_wheel_coupling": {
+      "enabled": true,
+      "treatment": "same_side_wheel0_master_six_mimic_followers_each_side",
+      "relation": "q_follower = 0 + 1*q_leader",
+      "relations_per_world": 14,
+      "leader_wheel_index_per_side": 0,
+      "follower_wheel_indices_per_side": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "equality_solref": [
+        0.004,
+        1.0
+      ],
+      "equality_solimp": [
+        0.999,
+        0.9999,
+        0.001,
+        0.5,
+        2.0
+      ],
+      "execution": "retain existing per-wheel actuators, PI state and configured effort limits",
+      "source_usd_changed": false,
+      "wheel_relations_per_world": 12,
+      "guide_relations_per_world": 2,
+      "front_guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0"
+    },
+    "physics_contact": {
+      "backend": "NewtonCfg",
+      "physics_manager": "ResolvableString",
+      "solver_cfg": "MJWarpSolverCfg",
+      "solver_type": "mujoco_warp",
+      "solver": "newton",
+      "physics_dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "newton_num_substeps": 1,
+      "collision_decimation": 0,
+      "cone": "elliptic",
+      "impratio": 1.0,
+      "njmax": 256,
+      "nconmax": 128,
+      "iterations": 40,
+      "ls_iterations": 30,
+      "tolerance": 1e-06,
+      "integrator": "implicitfast",
+      "use_mujoco_contacts": false,
+      "disable_contacts": false,
+      "contact_generation": "newton_collision_pipeline",
+      "shape_cfg_defaults": {
+        "mu": 0.8,
+        "kf": null,
+        "ke": 2500.0,
+        "kd": 100.0,
+        "margin": 0.002,
+        "gap": 0.005,
+        "kf_source": "not_exposed_by_NewtonShapeCfg"
+      },
+      "actual_wheel_ground_shape_materials": {
+        "ground": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "wheel": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "passive_front_guide": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        }
+      },
+      "front_guide_contact_body_names": [
+        "left_front_guide_link",
+        "right_front_guide_link"
+      ]
+    },
+    "front_guide": {
+      "enabled": true,
+      "model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+      "wheels": [
+        {
+          "name": "left_front_guide",
+          "side": "left",
+          "x_m": 0.42,
+          "y_m": 0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        },
+        {
+          "name": "right_front_guide",
+          "side": "right",
+          "x_m": 0.42,
+          "y_m": -0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        }
+      ],
+      "drive_motor_count": 0,
+      "added_drive_torque_nm": 0.0,
+      "rotation_coupling": "same_side_track_speed",
+      "coupling": {
+        "enabled": true,
+        "relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+        "relations_per_world": 2,
+        "leader_joint_by_side": {
+          "left": "left_wheel_0_wheel_joint",
+          "right": "right_wheel_0_wheel_joint"
+        },
+        "ratio_by_side": {
+          "left": 1.0,
+          "right": 1.0
+        },
+        "guide_actuator_count": 0,
+        "added_pid_count": 0
+      }
+    },
+    "body_stability": {
+      "enabled": true,
+      "config": {
+        "excess_tilt_threshold_rad": 0.6108652381980153,
+        "tilt_weight": 0.0,
+        "angular_rate_weight": 0.0
+      },
+      "rate_source": "root_link_com_angular_velocity_world_rotated_to_body",
+      "policy_observation_included": false,
+      "hard_tilt_termination_rad": 1.2
+    }
+  },
+  "checkpoint_drive_config": {
+    "interface": "independent_left_right_track_speed_coupled_pi_v7",
+    "actuator_model": "explicit_IdealPD_velocity_servo",
+    "controller": "native_per_wheel_P_plus_two_state_side_integral_feedforward",
+    "motor_torque_constant_nm_per_a": 0.035,
+    "current_feedback_source": "equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured",
+    "max_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.04,
+    "integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+    "integral_update_period_s": 0.05,
+    "integral_state_count_per_env": 2,
+    "integral_state_unit": "Nm_per_proxy_wheel",
+    "integral_error_source": "per_side_mean_target_minus_actual_wheel_qd_rad_s",
+    "integral_broadcast": "same_side_integral_ff_to_each_of_7_proxy_wheels",
+    "integral_limit_nm_per_proxy_wheel": 2.0,
+    "integral_antiwindup": "conditional_on_side_mean_P_estimate; final_safety_is_Newton_native_per_wheel_clamp",
+    "integral_gain_status": "uncalibrated simulation candidate; not real motor/controller calibration",
+    "wheel_effort_limit_nm": 2.0,
+    "actuator_effort_limit_nm": 2.0,
+    "joint_effort_limit_nm": 2.0,
+    "effort_clamp_source": "NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward",
+    "wheel_effort_limit_basis": "actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+    "gimbal_solver_joint_effort_limit_nm": 1.0,
+    "gimbal_effort_limit_basis": "implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "b381e579e3d80259c6fd8a953907f35e866dd2df74bebd5cab4e0205df794718",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+    "same_side_wheel_coupling": {
+      "enabled": true,
+      "treatment": "same_side_wheel0_master_six_mimic_followers_each_side",
+      "relation": "q_follower = 0 + 1*q_leader",
+      "relations_per_world": 14,
+      "leader_wheel_index_per_side": 0,
+      "follower_wheel_indices_per_side": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "equality_solref": [
+        0.004,
+        1.0
+      ],
+      "equality_solimp": [
+        0.999,
+        0.9999,
+        0.001,
+        0.5,
+        2.0
+      ],
+      "execution": "retain existing per-wheel actuators, PI state and configured effort limits",
+      "source_usd_changed": false,
+      "wheel_relations_per_world": 12,
+      "guide_relations_per_world": 2,
+      "front_guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0"
+    },
+    "physics_contact": {
+      "backend": "NewtonCfg",
+      "physics_manager": "ResolvableString",
+      "solver_cfg": "MJWarpSolverCfg",
+      "solver_type": "mujoco_warp",
+      "solver": "newton",
+      "physics_dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "newton_num_substeps": 1,
+      "collision_decimation": 0,
+      "cone": "elliptic",
+      "impratio": 1.0,
+      "njmax": 256,
+      "nconmax": 128,
+      "iterations": 40,
+      "ls_iterations": 30,
+      "tolerance": 1e-06,
+      "integrator": "implicitfast",
+      "use_mujoco_contacts": false,
+      "disable_contacts": false,
+      "contact_generation": "newton_collision_pipeline",
+      "shape_cfg_defaults": {
+        "mu": 0.8,
+        "kf": null,
+        "ke": 2500.0,
+        "kd": 100.0,
+        "margin": 0.002,
+        "gap": 0.005,
+        "kf_source": "not_exposed_by_NewtonShapeCfg"
+      },
+      "actual_wheel_ground_shape_materials": {
+        "ground": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "wheel": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        },
+        "passive_front_guide": {
+          "mu": [
+            0.800000011920929
+          ],
+          "kf": [
+            1000.0
+          ],
+          "ke": [
+            2500.0
+          ],
+          "kd": [
+            100.0
+          ],
+          "margin": [
+            0.0020000000949949026
+          ],
+          "gap": [
+            0.004999999888241291
+          ]
+        }
+      },
+      "front_guide_contact_body_names": [
+        "left_front_guide_link",
+        "right_front_guide_link"
+      ]
+    },
+    "front_guide": {
+      "enabled": true,
+      "model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+      "wheels": [
+        {
+          "name": "left_front_guide",
+          "side": "left",
+          "x_m": 0.42,
+          "y_m": 0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        },
+        {
+          "name": "right_front_guide",
+          "side": "right",
+          "x_m": 0.42,
+          "y_m": -0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        }
+      ],
+      "drive_motor_count": 0,
+      "added_drive_torque_nm": 0.0,
+      "rotation_coupling": "same_side_track_speed",
+      "coupling": {
+        "enabled": true,
+        "relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+        "relations_per_world": 2,
+        "leader_joint_by_side": {
+          "left": "left_wheel_0_wheel_joint",
+          "right": "right_wheel_0_wheel_joint"
+        },
+        "ratio_by_side": {
+          "left": 1.0,
+          "right": 1.0
+        },
+        "guide_actuator_count": 0,
+        "added_pid_count": 0
+      }
+    },
+    "body_stability": {
+      "enabled": true,
+      "config": {
+        "excess_tilt_threshold_rad": 0.6108652381980153,
+        "tilt_weight": 0.0,
+        "angular_rate_weight": 0.0
+      },
+      "rate_source": "root_link_com_angular_velocity_world_rotated_to_body",
+      "policy_observation_included": false,
+      "hard_tilt_termination_rad": 1.2
+    }
+  },
+  "observation_config": {
+    "schema": "sensor-minimal-v6",
+    "state_dim": 33,
+    "state_fields": [
+      "mode_0_search_1_goto",
+      "goal_local_x_over_field_size",
+      "goal_local_y_over_field_size",
+      "estimated_x_normalized",
+      "estimated_y_normalized",
+      "heading_sin",
+      "heading_cos",
+      "previous_left_track_speed",
+      "previous_right_track_speed",
+      "previous_gimbal_yaw_rate",
+      "previous_gimbal_pitch_rate",
+      "episode_time_ratio",
+      "lidar_age_ratio",
+      "lidar_new_frame",
+      "lidar_motion_dx_over_lidar_range",
+      "lidar_motion_dy_over_lidar_range",
+      "lidar_heading_delta_over_pi",
+      "lidar_gimbal_yaw_delta_over_pi",
+      "lidar_gimbal_pitch_delta_over_pi",
+      "depth_age_ratio",
+      "depth_new_frame",
+      "depth_motion_dx_over_lidar_range",
+      "depth_motion_dy_over_lidar_range",
+      "depth_heading_delta_over_pi",
+      "depth_gimbal_yaw_delta_over_pi",
+      "depth_gimbal_pitch_delta_over_pi",
+      "camera_age_ratio",
+      "camera_new_frame",
+      "camera_motion_dx_over_lidar_range",
+      "camera_motion_dy_over_lidar_range",
+      "camera_heading_delta_over_pi",
+      "camera_gimbal_yaw_delta_over_pi",
+      "camera_gimbal_pitch_delta_over_pi"
+    ],
+    "observation_shapes": {
+      "lidar": [
+        1,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        8
+      ],
+      "state": [
+        33
+      ],
+      "feedback": [
+        37
+      ]
+    },
+    "lidar_fields": [
+      "normalized_range"
+    ],
+    "lidar_invalid_value": 0.0,
+    "detection_fields": [
+      "cx",
+      "cy",
+      "width",
+      "height",
+      "class_id",
+      "confidence",
+      "range",
+      "range_valid"
+    ],
+    "detection_presence": "positive width and height",
+    "feedback": {
+      "input_schema": "sensor-minimal-v6",
+      "state_dim": 33,
+      "schema": "gimbal-imu-drive-feedback-v2",
+      "dimension": 37,
+      "value_dimension": 21,
+      "value_order": [
+        "云台IMU加速度X / 9.80665（g）",
+        "云台IMU加速度Y / 9.80665（g）",
+        "云台IMU加速度Z / 9.80665（g）",
+        "云台IMU角速度X / π（rad/s）",
+        "云台IMU角速度Y / π（rad/s）",
+        "云台IMU角速度Z / π（rad/s）",
+        "磁场X计数 / 32768",
+        "磁场Y计数 / 32768",
+        "磁场Z计数 / 32768",
+        "云台IMU姿态四元数X",
+        "云台IMU姿态四元数Y",
+        "云台IMU姿态四元数Z",
+        "云台IMU姿态四元数W",
+        "云台偏航关节角 / π（rad）",
+        "云台偏航关节速率 / π（rad/s）",
+        "云台俯仰关节角 / π（rad）",
+        "云台俯仰关节速率 / π（rad/s）",
+        "左侧等效Iq / 100（A）",
+        "左侧机械转速 / 10000（rpm）",
+        "右侧等效Iq / 100（A）",
+        "右侧机械转速 / 10000（rpm）"
+      ],
+      "valid_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "age_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "group_slices": {
+        "accel": {
+          "start": 0,
+          "stop": 3
+        },
+        "gyro": {
+          "start": 3,
+          "stop": 6
+        },
+        "mag": {
+          "start": 6,
+          "stop": 9
+        },
+        "attitude": {
+          "start": 9,
+          "stop": 13
+        },
+        "gimbal_yaw": {
+          "start": 13,
+          "stop": 15
+        },
+        "gimbal_pitch": {
+          "start": 15,
+          "stop": 17
+        },
+        "motor_left": {
+          "start": 17,
+          "stop": 19
+        },
+        "motor_right": {
+          "start": 19,
+          "stop": 21
+        }
+      },
+      "valid_slice": {
+        "start": 21,
+        "stop": 29
+      },
+      "age_slice": {
+        "start": 29,
+        "stop": 37
+      },
+      "labels": [
+        "云台IMU加速度X / 9.80665（g）",
+        "云台IMU加速度Y / 9.80665（g）",
+        "云台IMU加速度Z / 9.80665（g）",
+        "云台IMU角速度X / π（rad/s）",
+        "云台IMU角速度Y / π（rad/s）",
+        "云台IMU角速度Z / π（rad/s）",
+        "磁场X计数 / 32768",
+        "磁场Y计数 / 32768",
+        "磁场Z计数 / 32768",
+        "云台IMU姿态四元数X",
+        "云台IMU姿态四元数Y",
+        "云台IMU姿态四元数Z",
+        "云台IMU姿态四元数W",
+        "云台偏航关节角 / π（rad）",
+        "云台偏航关节速率 / π（rad/s）",
+        "云台俯仰关节角 / π（rad）",
+        "云台俯仰关节速率 / π（rad/s）",
+        "左侧等效Iq / 100（A）",
+        "左侧机械转速 / 10000（rpm）",
+        "右侧等效Iq / 100（A）",
+        "右侧机械转速 / 10000（rpm）",
+        "有效标记：accel",
+        "有效标记：gyro",
+        "有效标记：mag",
+        "有效标记：attitude",
+        "有效标记：gimbal_yaw",
+        "有效标记：gimbal_pitch",
+        "有效标记：motor_left",
+        "有效标记：motor_right",
+        "数据年龄 / 2秒：accel",
+        "数据年龄 / 2秒：gyro",
+        "数据年龄 / 2秒：mag",
+        "数据年龄 / 2秒：attitude",
+        "数据年龄 / 2秒：gimbal_yaw",
+        "数据年龄 / 2秒：gimbal_pitch",
+        "数据年龄 / 2秒：motor_left",
+        "数据年龄 / 2秒：motor_right"
+      ],
+      "simulation_assumptions": {
+        "name": "simulated-gimbal-imu-drive-feedback-v1",
+        "dt_s": 0.05,
+        "filter_rate_hz": 20.0,
+        "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+        "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+        "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+        "magnetic_reference": "ENU with magnetic north along +Y",
+        "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+        "sensor_mount_rot_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+        "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+        "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+        "accel_white_noise_std_mps2": 0.025,
+        "accel_episode_bias_std_mps2": 0.05,
+        "gyro_white_noise_std_rad_s": 0.0015,
+        "gyro_episode_bias_std_rad_s": 0.003,
+        "mag_white_noise_std_counts": 12.0,
+        "mag_episode_bias_std_counts": 24.0,
+        "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+        "gimbal_position_white_noise_std_rad": 0.0005,
+        "gimbal_rate_white_noise_std_rad_s": 0.003,
+        "motor_iq_white_noise_std_A": 0.02,
+        "motor_rpm_white_noise_std_rpm": 1.0,
+        "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+        "timeout_s": 0.25,
+        "age_max_s": 2.0,
+        "value_scaling": {
+          "accel": {
+            "factor": 0.10197162129779283,
+            "unit": "g (m/s^2 divided by 9.80665)"
+          },
+          "gyro": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s divided by pi"
+          },
+          "mag_counts": {
+            "factor": 3.0517578125e-05,
+            "unit": "raw signed counts / 32768"
+          },
+          "attitude_quaternion": {
+            "factor": 1.0,
+            "unit": "unitless xyzw"
+          },
+          "gimbal_position": {
+            "factor": 0.3183098861837907,
+            "unit": "rad / pi"
+          },
+          "gimbal_rate": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s / pi"
+          },
+          "motor_iq": {
+            "factor": 0.01,
+            "unit": "A / 100; simulation value is model-equivalent"
+          },
+          "motor_rpm": {
+            "factor": 0.0001,
+            "unit": "mechanical rpm / 10000"
+          },
+          "age": {
+            "factor": 0.5,
+            "unit": "s / age_max_s; bounded, not signal-clipped"
+          }
+        }
+      },
+      "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+    },
+    "feedback_dim": 37,
+    "estimated_pose": {
+      "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+      "position_noise_std_m": 0.025,
+      "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+      "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+      "gimbal_source": "feedback measured joint positions; zero when invalid"
+    },
+    "imu_mount_body": "gimbal_pitch_link",
+    "imu_offset_pos_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "imu_offset_rot_xyzw": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "depth_channels": 1,
+    "depth_invalid_value": 0.0,
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "measured_velocity_indices": [],
+    "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+    "previous_command_indices": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+    "action_components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ]
+  },
+  "checkpoint_observation_config": {
+    "schema": "sensor-minimal-v6",
+    "state_dim": 33,
+    "state_fields": [
+      "mode_0_search_1_goto",
+      "goal_local_x_over_field_size",
+      "goal_local_y_over_field_size",
+      "estimated_x_normalized",
+      "estimated_y_normalized",
+      "heading_sin",
+      "heading_cos",
+      "previous_left_track_speed",
+      "previous_right_track_speed",
+      "previous_gimbal_yaw_rate",
+      "previous_gimbal_pitch_rate",
+      "episode_time_ratio",
+      "lidar_age_ratio",
+      "lidar_new_frame",
+      "lidar_motion_dx_over_lidar_range",
+      "lidar_motion_dy_over_lidar_range",
+      "lidar_heading_delta_over_pi",
+      "lidar_gimbal_yaw_delta_over_pi",
+      "lidar_gimbal_pitch_delta_over_pi",
+      "depth_age_ratio",
+      "depth_new_frame",
+      "depth_motion_dx_over_lidar_range",
+      "depth_motion_dy_over_lidar_range",
+      "depth_heading_delta_over_pi",
+      "depth_gimbal_yaw_delta_over_pi",
+      "depth_gimbal_pitch_delta_over_pi",
+      "camera_age_ratio",
+      "camera_new_frame",
+      "camera_motion_dx_over_lidar_range",
+      "camera_motion_dy_over_lidar_range",
+      "camera_heading_delta_over_pi",
+      "camera_gimbal_yaw_delta_over_pi",
+      "camera_gimbal_pitch_delta_over_pi"
+    ],
+    "observation_shapes": {
+      "lidar": [
+        1,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        8
+      ],
+      "state": [
+        33
+      ],
+      "feedback": [
+        37
+      ]
+    },
+    "lidar_fields": [
+      "normalized_range"
+    ],
+    "lidar_invalid_value": 0.0,
+    "detection_fields": [
+      "cx",
+      "cy",
+      "width",
+      "height",
+      "class_id",
+      "confidence",
+      "range",
+      "range_valid"
+    ],
+    "detection_presence": "positive width and height",
+    "feedback": {
+      "input_schema": "sensor-minimal-v6",
+      "state_dim": 33,
+      "schema": "gimbal-imu-drive-feedback-v2",
+      "dimension": 37,
+      "value_dimension": 21,
+      "value_order": [
+        "云台IMU加速度X / 9.80665（g）",
+        "云台IMU加速度Y / 9.80665（g）",
+        "云台IMU加速度Z / 9.80665（g）",
+        "云台IMU角速度X / π（rad/s）",
+        "云台IMU角速度Y / π（rad/s）",
+        "云台IMU角速度Z / π（rad/s）",
+        "磁场X计数 / 32768",
+        "磁场Y计数 / 32768",
+        "磁场Z计数 / 32768",
+        "云台IMU姿态四元数X",
+        "云台IMU姿态四元数Y",
+        "云台IMU姿态四元数Z",
+        "云台IMU姿态四元数W",
+        "云台偏航关节角 / π（rad）",
+        "云台偏航关节速率 / π（rad/s）",
+        "云台俯仰关节角 / π（rad）",
+        "云台俯仰关节速率 / π（rad/s）",
+        "左侧等效Iq / 100（A）",
+        "左侧机械转速 / 10000（rpm）",
+        "右侧等效Iq / 100（A）",
+        "右侧机械转速 / 10000（rpm）"
+      ],
+      "valid_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "age_order": [
+        "accel",
+        "gyro",
+        "mag",
+        "attitude",
+        "gimbal_yaw",
+        "gimbal_pitch",
+        "motor_left",
+        "motor_right"
+      ],
+      "group_slices": {
+        "accel": {
+          "start": 0,
+          "stop": 3
+        },
+        "gyro": {
+          "start": 3,
+          "stop": 6
+        },
+        "mag": {
+          "start": 6,
+          "stop": 9
+        },
+        "attitude": {
+          "start": 9,
+          "stop": 13
+        },
+        "gimbal_yaw": {
+          "start": 13,
+          "stop": 15
+        },
+        "gimbal_pitch": {
+          "start": 15,
+          "stop": 17
+        },
+        "motor_left": {
+          "start": 17,
+          "stop": 19
+        },
+        "motor_right": {
+          "start": 19,
+          "stop": 21
+        }
+      },
+      "valid_slice": {
+        "start": 21,
+        "stop": 29
+      },
+      "age_slice": {
+        "start": 29,
+        "stop": 37
+      },
+      "labels": [
+        "云台IMU加速度X / 9.80665（g）",
+        "云台IMU加速度Y / 9.80665（g）",
+        "云台IMU加速度Z / 9.80665（g）",
+        "云台IMU角速度X / π（rad/s）",
+        "云台IMU角速度Y / π（rad/s）",
+        "云台IMU角速度Z / π（rad/s）",
+        "磁场X计数 / 32768",
+        "磁场Y计数 / 32768",
+        "磁场Z计数 / 32768",
+        "云台IMU姿态四元数X",
+        "云台IMU姿态四元数Y",
+        "云台IMU姿态四元数Z",
+        "云台IMU姿态四元数W",
+        "云台偏航关节角 / π（rad）",
+        "云台偏航关节速率 / π（rad/s）",
+        "云台俯仰关节角 / π（rad）",
+        "云台俯仰关节速率 / π（rad/s）",
+        "左侧等效Iq / 100（A）",
+        "左侧机械转速 / 10000（rpm）",
+        "右侧等效Iq / 100（A）",
+        "右侧机械转速 / 10000（rpm）",
+        "有效标记：accel",
+        "有效标记：gyro",
+        "有效标记：mag",
+        "有效标记：attitude",
+        "有效标记：gimbal_yaw",
+        "有效标记：gimbal_pitch",
+        "有效标记：motor_left",
+        "有效标记：motor_right",
+        "数据年龄 / 2秒：accel",
+        "数据年龄 / 2秒：gyro",
+        "数据年龄 / 2秒：mag",
+        "数据年龄 / 2秒：attitude",
+        "数据年龄 / 2秒：gimbal_yaw",
+        "数据年龄 / 2秒：gimbal_pitch",
+        "数据年龄 / 2秒：motor_left",
+        "数据年龄 / 2秒：motor_right"
+      ],
+      "simulation_assumptions": {
+        "name": "simulated-gimbal-imu-drive-feedback-v1",
+        "dt_s": 0.05,
+        "filter_rate_hz": 20.0,
+        "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+        "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+        "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+        "magnetic_reference": "ENU with magnetic north along +Y",
+        "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+        "sensor_mount_rot_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+        "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+        "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+        "accel_white_noise_std_mps2": 0.025,
+        "accel_episode_bias_std_mps2": 0.05,
+        "gyro_white_noise_std_rad_s": 0.0015,
+        "gyro_episode_bias_std_rad_s": 0.003,
+        "mag_white_noise_std_counts": 12.0,
+        "mag_episode_bias_std_counts": 24.0,
+        "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+        "gimbal_position_white_noise_std_rad": 0.0005,
+        "gimbal_rate_white_noise_std_rad_s": 0.003,
+        "motor_iq_white_noise_std_A": 0.02,
+        "motor_rpm_white_noise_std_rpm": 1.0,
+        "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+        "timeout_s": 0.25,
+        "age_max_s": 2.0,
+        "value_scaling": {
+          "accel": {
+            "factor": 0.10197162129779283,
+            "unit": "g (m/s^2 divided by 9.80665)"
+          },
+          "gyro": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s divided by pi"
+          },
+          "mag_counts": {
+            "factor": 3.0517578125e-05,
+            "unit": "raw signed counts / 32768"
+          },
+          "attitude_quaternion": {
+            "factor": 1.0,
+            "unit": "unitless xyzw"
+          },
+          "gimbal_position": {
+            "factor": 0.3183098861837907,
+            "unit": "rad / pi"
+          },
+          "gimbal_rate": {
+            "factor": 0.3183098861837907,
+            "unit": "rad/s / pi"
+          },
+          "motor_iq": {
+            "factor": 0.01,
+            "unit": "A / 100; simulation value is model-equivalent"
+          },
+          "motor_rpm": {
+            "factor": 0.0001,
+            "unit": "mechanical rpm / 10000"
+          },
+          "age": {
+            "factor": 0.5,
+            "unit": "s / age_max_s; bounded, not signal-clipped"
+          }
+        }
+      },
+      "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+    },
+    "feedback_dim": 37,
+    "estimated_pose": {
+      "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+      "position_noise_std_m": 0.025,
+      "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+      "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+      "gimbal_source": "feedback measured joint positions; zero when invalid"
+    },
+    "imu_mount_body": "gimbal_pitch_link",
+    "imu_offset_pos_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "imu_offset_rot_xyzw": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "depth_channels": 1,
+    "depth_invalid_value": 0.0,
+    "depth_value_range": [
+      0.0,
+      1.0
+    ],
+    "depth_space_bounds": [
+      -1.0,
+      1.0
+    ],
+    "measured_velocity_indices": [],
+    "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+    "previous_command_indices": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+    "action_components": [
+      "left_track_speed",
+      "right_track_speed",
+      "gimbal_yaw_rate",
+      "gimbal_pitch_rate"
+    ]
+  },
+  "goal_distance": [
+    0.6,
+    1.2
+  ],
+  "goal_angle_rad": 0.2617993877991494,
+  "mode": "goto",
+  "deterministic": true,
+  "seeds": [
+    88100,
+    88101,
+    88102,
+    88103,
+    88104,
+    88105,
+    88106,
+    88107,
+    88108,
+    88109,
+    88110,
+    88111,
+    88112,
+    88113,
+    88114,
+    88115
+  ],
+  "summary": {
+    "episodes": 16,
+    "successes": 1,
+    "success_rate": 0.0625,
+    "mean_raw_return": -14.08218529345719,
+    "mean_damage": 0.0,
+    "mean_collisions": 0.0,
+    "mean_final_distance": 2.082227480482536,
+    "timed_out_episodes": 14,
+    "mean_success_time_s": 6.399999999999985,
+    "median_success_time_s": 6.399999999999985
+  },
+  "rows": [
+    {
+      "seed": 88100,
+      "mode": "goto",
+      "raw_return": -16.000005048414714,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.127391593005093,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        67.47156776971788,
+        30.57057184807828
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.00032531123724766076,
+        "max_abs_pitch_rad": 0.00020967483578715473,
+        "max_tilt_rad": 0.0003662128976832538,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.030614791816395908,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.022588637193803347,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.04032115757343143,
+        "angular_speed_rad_s": 0.034002299071847035,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88100,
+        "start_pose_xy_yaw": [
+          67.12577056884766,
+          31.174768447875977,
+          -0.8755438327789307
+        ],
+        "goal_xy": [
+          67.47156776971788,
+          30.57057184807828
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88101,
+      "mode": "goto",
+      "raw_return": -16.00000735195865,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 1.8871376046316986,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        71.7551831048923,
+        73.51754371185929
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0001792099792510271,
+        "max_abs_pitch_rad": 0.00016646790027152747,
+        "max_tilt_rad": 0.00022365247894658413,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.008418396399848316,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.011845108976456973,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.004402403635592695,
+        "angular_speed_rad_s": 0.0014210487817384624,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88101,
+        "start_pose_xy_yaw": [
+          71.09770965576172,
+          73.15657806396484,
+          0.6575288772583008
+        ],
+        "goal_xy": [
+          71.7551831048923,
+          73.51754371185929
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88102,
+      "mode": "goto",
+      "raw_return": -15.999998821170193,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 4.154370289052859,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        32.61740006357725,
+        71.7397003189818
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.00028400952578522265,
+        "max_abs_pitch_rad": 0.00018737553909886628,
+        "max_tilt_rad": 0.00034025138143586333,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.015913652937240418,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.016285808206963896,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.07659274725961471,
+        "angular_speed_rad_s": 0.00309670462088203,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88102,
+        "start_pose_xy_yaw": [
+          31.58603858947754,
+          71.94355010986328,
+          -0.07771160453557968
+        ],
+        "goal_xy": [
+          32.61740006357725,
+          71.7397003189818
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88103,
+      "mode": "goto",
+      "raw_return": -16.0000043261216,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 1.8377704762635436,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        26.0617936233448,
+        85.86604419915611
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.00033477693796157837,
+        "max_abs_pitch_rad": 0.00024334355839528143,
+        "max_tilt_rad": 0.0004138739947212405,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.04625804371635906,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.02776629963233609,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.03968384193749125,
+        "angular_speed_rad_s": 0.048472865297014334,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88103,
+        "start_pose_xy_yaw": [
+          27.073009490966797,
+          85.87760162353516,
+          -3.0225718021392822
+        ],
+        "goal_xy": [
+          26.0617936233448,
+          85.86604419915611
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88104,
+      "mode": "goto",
+      "raw_return": -15.999982360477246,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.7736771591341944,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        14.945864958701895,
+        74.80685505389687
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0004352429532445967,
+        "max_abs_pitch_rad": 0.0003277975192759186,
+        "max_tilt_rad": 0.0005448739626377022,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.04834896534073086,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.028386899954242945,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.08411018826286869,
+        "angular_speed_rad_s": 0.07984699587952397,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88104,
+        "start_pose_xy_yaw": [
+          15.163713455200195,
+          75.4743881225586,
+          -2.097952127456665
+        ],
+        "goal_xy": [
+          14.945864958701895,
+          74.80685505389687
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88105,
+      "mode": "goto",
+      "raw_return": 9.360019998938434,
+      "success": true,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 0.21601170882747023,
+      "reason": "goal_reached",
+      "steps": 128,
+      "episode_time_s": 6.399999999999985,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": false,
+      "goal": [
+        87.24420350782283,
+        64.88438684298478
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 128,
+        "duration_s": 6.399999999999985,
+        "max_abs_roll_rad": 0.00026135818916372955,
+        "max_abs_pitch_rad": 0.00021525321062654257,
+        "max_tilt_rad": 0.00033858831452018026,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.005716516307414019,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.029886546689663604,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.024648129273642596,
+        "angular_speed_rad_s": 0.05518299100752667,
+        "hold_s": 0.49999999999999994,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88105,
+        "start_pose_xy_yaw": [
+          87.91110229492188,
+          65.09747314453125,
+          -2.9260354042053223
+        ],
+        "goal_xy": [
+          87.24420350782283,
+          64.88438684298478
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88106,
+      "mode": "goto",
+      "raw_return": -16.000001532517715,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 1.0388915867541657,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        37.03165310533102,
+        62.837411770331
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002971416397485882,
+        "max_abs_pitch_rad": 0.0002662459737621248,
+        "max_tilt_rad": 0.0003989737717836142,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.04689332700235924,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.027956313241186456,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.04307989812527787,
+        "angular_speed_rad_s": 0.05561554774270141,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88106,
+        "start_pose_xy_yaw": [
+          37.83300018310547,
+          62.94245910644531,
+          -2.845607042312622
+        ],
+        "goal_xy": [
+          37.03165310533102,
+          62.837411770331
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88107,
+      "mode": "goto",
+      "raw_return": -15.999989963633897,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 0.7599404323896567,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        84.35057997089078,
+        90.89123813764203
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.000186883335118182,
+        "max_abs_pitch_rad": 0.00015795076615177095,
+        "max_tilt_rad": 0.00020830002817957927,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.01126297773230459,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.01370095965757194,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.014767260746143129,
+        "angular_speed_rad_s": 0.0008281074507401635,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88107,
+        "start_pose_xy_yaw": [
+          83.6894760131836,
+          90.79170989990234,
+          0.3934426009654999
+        ],
+        "goal_xy": [
+          84.35057997089078,
+          90.89123813764203
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88108,
+      "mode": "goto",
+      "raw_return": -15.999983313049038,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 3.081981490591811,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        23.586449850143424,
+        92.48903457427996
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002610780065879226,
+        "max_abs_pitch_rad": 0.00029652350349351764,
+        "max_tilt_rad": 0.0003950796270864052,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.026634848938329816,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.021069270252483188,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.05860450389035553,
+        "angular_speed_rad_s": 0.044910183373262295,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88108,
+        "start_pose_xy_yaw": [
+          23.107576370239258,
+          93.4540023803711,
+          -1.052520513534546
+        ],
+        "goal_xy": [
+          23.586449850143424,
+          92.48903457427996
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88109,
+      "mode": "goto",
+      "raw_return": -16.00000594250277,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.878724806139783,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        11.006883206266606,
+        66.40756263105878
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002650210808496922,
+        "max_abs_pitch_rad": 0.00020845771359745413,
+        "max_tilt_rad": 0.0003099920769444559,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.042435283374283136,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.026594261089654923,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.089998771840439,
+        "angular_speed_rad_s": 0.020142767114631317,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88109,
+        "start_pose_xy_yaw": [
+          11.366730690002441,
+          67.01402282714844,
+          -2.2464988231658936
+        ],
+        "goal_xy": [
+          11.006883206266606,
+          66.40756263105878
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88110,
+      "mode": "goto",
+      "raw_return": -15.999998380395386,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 3.8402347150155016,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        11.46223078159077,
+        20.492614953223082
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002536821411922574,
+        "max_abs_pitch_rad": 0.0002066408342216164,
+        "max_tilt_rad": 0.0003055571448480312,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.04076501762456414,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.02606562794964696,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.062478452282327956,
+        "angular_speed_rad_s": 0.08699037111766247,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88110,
+        "start_pose_xy_yaw": [
+          10.994257926940918,
+          21.578603744506836,
+          -1.3968788385391235
+        ],
+        "goal_xy": [
+          11.46223078159077,
+          20.492614953223082
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88111,
+      "mode": "goto",
+      "raw_return": -10.675000932712162,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.10277101055609,
+      "reason": "outside_or_overturned",
+      "steps": 135,
+      "episode_time_s": 6.749999999999984,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": false,
+      "goal": [
+        11.248831342637622,
+        1.4514346593781622
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 135,
+        "duration_s": 6.749999999999984,
+        "max_abs_roll_rad": 0.4678214490413666,
+        "max_abs_pitch_rad": 0.16511321067810059,
+        "max_tilt_rad": 0.4940620688258678,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 1.686107563003858,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.4997936704657325,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": true,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.4428280395174753,
+        "angular_speed_rad_s": 3.7803165368604,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": false,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88111,
+        "start_pose_xy_yaw": [
+          11.974716186523438,
+          0.581271767616272,
+          2.342527151107788
+        ],
+        "goal_xy": [
+          11.248831342637622,
+          1.4514346593781622
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88112,
+      "mode": "goto",
+      "raw_return": -16.00000506553622,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 1.2438003143740657,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        80.49649400121753,
+        22.054766330463565
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002891899785026908,
+        "max_abs_pitch_rad": 0.0002773909654933959,
+        "max_tilt_rad": 0.0004007200887265026,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.03290820686347766,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.023419438814610952,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.044429883249903476,
+        "angular_speed_rad_s": 0.0582277607380737,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88112,
+        "start_pose_xy_yaw": [
+          79.82817840576172,
+          22.772371292114258,
+          -0.7703487277030945
+        ],
+        "goal_xy": [
+          80.49649400121753,
+          22.054766330463565
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88113,
+      "mode": "goto",
+      "raw_return": -16.000004966826964,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.7331616996497177,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        66.96427116357675,
+        88.74087924553326
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.00010916055180132389,
+        "max_abs_pitch_rad": 7.333231042139232e-05,
+        "max_tilt_rad": 0.00011252982036487077,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.0006843692485060671,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.003377299830007402,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.008605993603993783,
+        "angular_speed_rad_s": 0.06144027928520154,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88113,
+        "start_pose_xy_yaw": [
+          67.20940399169922,
+          87.79155731201172,
+          1.706238031387329
+        ],
+        "goal_xy": [
+          66.96427116357675,
+          88.74087924553326
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88114,
+      "mode": "goto",
+      "raw_return": -15.999998738166465,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 0.5521959589953317,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        92.81033767161637,
+        89.59144444636085
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0001808645756682381,
+        "max_abs_pitch_rad": 0.0002369515277678147,
+        "max_tilt_rad": 0.00028896391094188523,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.012050815327405658,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.014172047210033978,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.017084078823883932,
+        "angular_speed_rad_s": 0.00022092524739087565,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88114,
+        "start_pose_xy_yaw": [
+          92.18741607666016,
+          89.16893768310547,
+          0.36452916264533997
+        ],
+        "goal_xy": [
+          92.81033767161637,
+          89.59144444636085
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    },
+    {
+      "seed": 88115,
+      "mode": "goto",
+      "raw_return": -15.999997950770446,
+      "success": false,
+      "damage": 0,
+      "damage_metric": "stem-contact-v2",
+      "collisions": 0,
+      "final_distance": 2.0875788423395942,
+      "reason": "time_limit",
+      "steps": 1200,
+      "episode_time_s": 59.99999999999873,
+      "terminated": true,
+      "truncated": false,
+      "timed_out": true,
+      "goal": [
+        52.50062645410802,
+        32.42222772601017
+      ],
+      "reset_info": {
+        "mode": "goto",
+        "targets": 0,
+        "terrain_seed": 90003
+      },
+      "body_stability": {
+        "sample_count": 1200,
+        "duration_s": 59.99999999999873,
+        "max_abs_roll_rad": 0.0002868689189199358,
+        "max_abs_pitch_rad": 0.00033411994809284806,
+        "max_tilt_rad": 0.000440374741855878,
+        "excess_tilt_duration_s": 0.0,
+        "roll_pitch_rate_sq_integral": 0.049753820912548694,
+        "penalty_sum": 0.0,
+        "roll_pitch_angular_rate_rms_rad_s": 0.028796359987722335,
+        "sampling": "policy-step samples; not physics-substep extrema"
+      },
+      "termination_detail": {
+        "boundary": false,
+        "overtilt_roll": false,
+        "overtilt_pitch": false
+      },
+      "goal_stop": {
+        "schema": "goal_stop_v1",
+        "profile": "fast_stop_v1",
+        "linear_speed_m_s": 0.04553148296342438,
+        "angular_speed_rad_s": 0.047144879868356734,
+        "hold_s": 0.0,
+        "stop_speed_limit_m_s": 0.05,
+        "stop_angular_speed_limit_rad_s": 0.1,
+        "hold_required_s": 0.5,
+        "distance_tolerance_m": 0.4,
+        "within_stop_limits": true,
+        "speed_source": "root_com_vel_w"
+      },
+      "reset_initial_condition": {
+        "seed": 88115,
+        "start_pose_xy_yaw": [
+          53.395328521728516,
+          32.459320068359375,
+          -2.9036128520965576
+        ],
+        "goal_xy": [
+          52.50062645410802,
+          32.42222772601017
+        ],
+        "plant_count": 0,
+        "plant_xy_sha256": "c571327cb01ac1de6972713cbf6cc1fc3c2cab8b581ee0bc3fe6d8b56963fd5b"
+      },
+      "trajectory_start_matches_reset": true
+    }
+  ],
+  "evaluation_config": {
+    "task": {
+      "size": 100.0,
+      "cell": 0.5,
+      "plants": 0,
+      "dry_fraction": 0.25,
+      "leaves_per_plant": 8,
+      "layout": "rows",
+      "row_spacing": 0.8,
+      "plant_spacing": 0.3,
+      "plant_height": 1.0,
+      "plant_height_spread": 0.05,
+      "stem_radius": 0.012,
+      "robot_length": 0.8,
+      "robot_width": 0.47,
+      "max_speed": 4.166666666666667,
+      "max_turn_rate": 1.5,
+      "acceleration": 1.5,
+      "angular_acceleration": 4.0,
+      "camera_height": 0.4,
+      "pitch_min": -0.4363323129985824,
+      "pitch_max": 1.0471975511965976,
+      "gimbal_yaw_rate": 1.8,
+      "gimbal_pitch_rate": 1.2,
+      "dt": 0.05,
+      "max_time": 60.0,
+      "lidar_model": "X2",
+      "lidar_rays": 400,
+      "lidar_range": 8.0,
+      "lidar_min_range": 0.12,
+      "lidar_relative_error": 0.05,
+      "lidar_period": 0.1,
+      "lidar_latency": 0.03,
+      "depth_height": 160,
+      "depth_width": 88,
+      "depth_min_range": 0.3,
+      "depth_range": 5.0,
+      "depth_period": 0.4,
+      "depth_latency": 0.3,
+      "camera_range": 7.0,
+      "camera_period": 0.2,
+      "camera_latency": 0.12,
+      "max_detections": 16,
+      "position_noise": 0.025,
+      "range_noise": 0.01,
+      "detection_drop": 0.08,
+      "class_error": 0.015,
+      "goal_tolerance": 0.4,
+      "goal_hold": 0.5,
+      "damage_penalty": 20.0,
+      "collision_penalty": 0.1,
+      "time_penalty": 0.1,
+      "progress_weight": 0.15,
+      "stop_on_damage": false,
+      "validate_scene": true,
+      "terrain_enabled": false,
+      "terrain_amplitude": 0.35,
+      "terrain_wavelength_min": 4.0,
+      "terrain_wavelength_max": 10.0,
+      "rock_density": 0.0,
+      "large_rock_fraction": 0.2,
+      "terrain_seed": null,
+      "goal_progress_budget": 5.0,
+      "damage_metric": "stem-contact-v2",
+      "goto_reward_profile": "fast_stop_v1",
+      "goal_stop_speed": 0.05,
+      "goal_stop_angular_speed": 0.1
+    },
+    "environment_seed": 90003,
+    "stage": {
+      "name": "near",
+      "mode": "goto",
+      "goal_distance": [
+        0.6,
+        1.2
+      ],
+      "goal_angle": 0.2617993877991494,
+      "plants": 0
+    }
+  },
+  "probe": {
+    "schema": "isaac-field-fixed-probe-v1",
+    "purpose": "mastery",
+    "probe_stage": "near",
+    "seeds": [
+      88100,
+      88101,
+      88102,
+      88103,
+      88104,
+      88105,
+      88106,
+      88107,
+      88108,
+      88109,
+      88110,
+      88111,
+      88112,
+      88113,
+      88114,
+      88115
+    ],
+    "config": {
+      "action_config": {
+        "schema": "direct-track-speed-v1",
+        "components": [
+          "left_track_speed",
+          "right_track_speed",
+          "gimbal_yaw_rate",
+          "gimbal_pitch_rate"
+        ],
+        "normalized_range": [
+          -1.0,
+          1.0
+        ]
+      },
+      "drive_config": {
+        "interface": "independent_left_right_track_speed_coupled_pi_v7",
+        "actuator_model": "explicit_IdealPD_velocity_servo",
+        "controller": "native_per_wheel_P_plus_two_state_side_integral_feedforward",
+        "motor_torque_constant_nm_per_a": 0.035,
+        "current_feedback_source": "equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured",
+        "max_track_speed_mps": 4.166666666666667,
+        "track_acceleration_mps2": 1.5,
+        "velocity_gain": 0.04,
+        "integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+        "integral_update_period_s": 0.05,
+        "integral_state_count_per_env": 2,
+        "integral_state_unit": "Nm_per_proxy_wheel",
+        "integral_error_source": "per_side_mean_target_minus_actual_wheel_qd_rad_s",
+        "integral_broadcast": "same_side_integral_ff_to_each_of_7_proxy_wheels",
+        "integral_limit_nm_per_proxy_wheel": 2.0,
+        "integral_antiwindup": "conditional_on_side_mean_P_estimate; final_safety_is_Newton_native_per_wheel_clamp",
+        "integral_gain_status": "uncalibrated simulation candidate; not real motor/controller calibration",
+        "wheel_effort_limit_nm": 2.0,
+        "actuator_effort_limit_nm": 2.0,
+        "joint_effort_limit_nm": 2.0,
+        "effort_clamp_source": "NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward",
+        "wheel_effort_limit_basis": "actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+        "gimbal_solver_joint_effort_limit_nm": 1.0,
+        "gimbal_effort_limit_basis": "implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range",
+        "drive_sprocket_radius_m": 0.03,
+        "drive_sprocket_diameter_m": 0.06,
+        "drive_reduction_ratio": 4.0,
+        "proxy_wheel_radius_m": 0.045,
+        "proxy_wheel_count_per_side": 7,
+        "track_ground_contact_length_m": 0.595,
+        "robot_asset_spec_sha256": "b381e579e3d80259c6fd8a953907f35e866dd2df74bebd5cab4e0205df794718",
+        "drive_efficiency_assumption": 1.0,
+        "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+        "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+        "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+        "same_side_wheel_coupling": {
+          "enabled": true,
+          "treatment": "same_side_wheel0_master_six_mimic_followers_each_side",
+          "relation": "q_follower = 0 + 1*q_leader",
+          "relations_per_world": 14,
+          "leader_wheel_index_per_side": 0,
+          "follower_wheel_indices_per_side": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "equality_solref": [
+            0.004,
+            1.0
+          ],
+          "equality_solimp": [
+            0.999,
+            0.9999,
+            0.001,
+            0.5,
+            2.0
+          ],
+          "execution": "retain existing per-wheel actuators, PI state and configured effort limits",
+          "source_usd_changed": false,
+          "wheel_relations_per_world": 12,
+          "guide_relations_per_world": 2,
+          "front_guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0"
+        },
+        "physics_contact": {
+          "backend": "NewtonCfg",
+          "physics_manager": "ResolvableString",
+          "solver_cfg": "MJWarpSolverCfg",
+          "solver_type": "mujoco_warp",
+          "solver": "newton",
+          "physics_dt_s": 0.001,
+          "decimation": 50,
+          "policy_dt_s": 0.05,
+          "newton_num_substeps": 1,
+          "collision_decimation": 0,
+          "cone": "elliptic",
+          "impratio": 1.0,
+          "njmax": 256,
+          "nconmax": 128,
+          "iterations": 40,
+          "ls_iterations": 30,
+          "tolerance": 1e-06,
+          "integrator": "implicitfast",
+          "use_mujoco_contacts": false,
+          "disable_contacts": false,
+          "contact_generation": "newton_collision_pipeline",
+          "shape_cfg_defaults": {
+            "mu": 0.8,
+            "kf": null,
+            "ke": 2500.0,
+            "kd": 100.0,
+            "margin": 0.002,
+            "gap": 0.005,
+            "kf_source": "not_exposed_by_NewtonShapeCfg"
+          },
+          "actual_wheel_ground_shape_materials": {
+            "ground": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            },
+            "wheel": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            },
+            "passive_front_guide": {
+              "mu": [
+                0.800000011920929
+              ],
+              "kf": [
+                1000.0
+              ],
+              "ke": [
+                2500.0
+              ],
+              "kd": [
+                100.0
+              ],
+              "margin": [
+                0.0020000000949949026
+              ],
+              "gap": [
+                0.004999999888241291
+              ]
+            }
+          },
+          "front_guide_contact_body_names": [
+            "left_front_guide_link",
+            "right_front_guide_link"
+          ]
+        },
+        "front_guide": {
+          "enabled": true,
+          "model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+          "wheels": [
+            {
+              "name": "left_front_guide",
+              "side": "left",
+              "x_m": 0.42,
+              "y_m": 0.205,
+              "z_m": -0.05499999999999999,
+              "radius_m": 0.045,
+              "width_m": 0.06,
+              "mass_kg": 0.25
+            },
+            {
+              "name": "right_front_guide",
+              "side": "right",
+              "x_m": 0.42,
+              "y_m": -0.205,
+              "z_m": -0.05499999999999999,
+              "radius_m": 0.045,
+              "width_m": 0.06,
+              "mass_kg": 0.25
+            }
+          ],
+          "drive_motor_count": 0,
+          "added_drive_torque_nm": 0.0,
+          "rotation_coupling": "same_side_track_speed",
+          "coupling": {
+            "enabled": true,
+            "relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+            "relations_per_world": 2,
+            "leader_joint_by_side": {
+              "left": "left_wheel_0_wheel_joint",
+              "right": "right_wheel_0_wheel_joint"
+            },
+            "ratio_by_side": {
+              "left": 1.0,
+              "right": 1.0
+            },
+            "guide_actuator_count": 0,
+            "added_pid_count": 0
+          }
+        },
+        "body_stability": {
+          "enabled": true,
+          "config": {
+            "excess_tilt_threshold_rad": 0.6108652381980153,
+            "tilt_weight": 0.0,
+            "angular_rate_weight": 0.0
+          },
+          "rate_source": "root_link_com_angular_velocity_world_rotated_to_body",
+          "policy_observation_included": false,
+          "hard_tilt_termination_rad": 1.2
+        }
+      },
+      "observation_config": {
+        "schema": "sensor-minimal-v6",
+        "state_dim": 33,
+        "state_fields": [
+          "mode_0_search_1_goto",
+          "goal_local_x_over_field_size",
+          "goal_local_y_over_field_size",
+          "estimated_x_normalized",
+          "estimated_y_normalized",
+          "heading_sin",
+          "heading_cos",
+          "previous_left_track_speed",
+          "previous_right_track_speed",
+          "previous_gimbal_yaw_rate",
+          "previous_gimbal_pitch_rate",
+          "episode_time_ratio",
+          "lidar_age_ratio",
+          "lidar_new_frame",
+          "lidar_motion_dx_over_lidar_range",
+          "lidar_motion_dy_over_lidar_range",
+          "lidar_heading_delta_over_pi",
+          "lidar_gimbal_yaw_delta_over_pi",
+          "lidar_gimbal_pitch_delta_over_pi",
+          "depth_age_ratio",
+          "depth_new_frame",
+          "depth_motion_dx_over_lidar_range",
+          "depth_motion_dy_over_lidar_range",
+          "depth_heading_delta_over_pi",
+          "depth_gimbal_yaw_delta_over_pi",
+          "depth_gimbal_pitch_delta_over_pi",
+          "camera_age_ratio",
+          "camera_new_frame",
+          "camera_motion_dx_over_lidar_range",
+          "camera_motion_dy_over_lidar_range",
+          "camera_heading_delta_over_pi",
+          "camera_gimbal_yaw_delta_over_pi",
+          "camera_gimbal_pitch_delta_over_pi"
+        ],
+        "observation_shapes": {
+          "lidar": [
+            1,
+            400
+          ],
+          "depth": [
+            1,
+            160,
+            88
+          ],
+          "detections": [
+            16,
+            8
+          ],
+          "state": [
+            33
+          ],
+          "feedback": [
+            37
+          ]
+        },
+        "lidar_fields": [
+          "normalized_range"
+        ],
+        "lidar_invalid_value": 0.0,
+        "detection_fields": [
+          "cx",
+          "cy",
+          "width",
+          "height",
+          "class_id",
+          "confidence",
+          "range",
+          "range_valid"
+        ],
+        "detection_presence": "positive width and height",
+        "feedback": {
+          "input_schema": "sensor-minimal-v6",
+          "state_dim": 33,
+          "schema": "gimbal-imu-drive-feedback-v2",
+          "dimension": 37,
+          "value_dimension": 21,
+          "value_order": [
+            "云台IMU加速度X / 9.80665（g）",
+            "云台IMU加速度Y / 9.80665（g）",
+            "云台IMU加速度Z / 9.80665（g）",
+            "云台IMU角速度X / π（rad/s）",
+            "云台IMU角速度Y / π（rad/s）",
+            "云台IMU角速度Z / π（rad/s）",
+            "磁场X计数 / 32768",
+            "磁场Y计数 / 32768",
+            "磁场Z计数 / 32768",
+            "云台IMU姿态四元数X",
+            "云台IMU姿态四元数Y",
+            "云台IMU姿态四元数Z",
+            "云台IMU姿态四元数W",
+            "云台偏航关节角 / π（rad）",
+            "云台偏航关节速率 / π（rad/s）",
+            "云台俯仰关节角 / π（rad）",
+            "云台俯仰关节速率 / π（rad/s）",
+            "左侧等效Iq / 100（A）",
+            "左侧机械转速 / 10000（rpm）",
+            "右侧等效Iq / 100（A）",
+            "右侧机械转速 / 10000（rpm）"
+          ],
+          "valid_order": [
+            "accel",
+            "gyro",
+            "mag",
+            "attitude",
+            "gimbal_yaw",
+            "gimbal_pitch",
+            "motor_left",
+            "motor_right"
+          ],
+          "age_order": [
+            "accel",
+            "gyro",
+            "mag",
+            "attitude",
+            "gimbal_yaw",
+            "gimbal_pitch",
+            "motor_left",
+            "motor_right"
+          ],
+          "group_slices": {
+            "accel": {
+              "start": 0,
+              "stop": 3
+            },
+            "gyro": {
+              "start": 3,
+              "stop": 6
+            },
+            "mag": {
+              "start": 6,
+              "stop": 9
+            },
+            "attitude": {
+              "start": 9,
+              "stop": 13
+            },
+            "gimbal_yaw": {
+              "start": 13,
+              "stop": 15
+            },
+            "gimbal_pitch": {
+              "start": 15,
+              "stop": 17
+            },
+            "motor_left": {
+              "start": 17,
+              "stop": 19
+            },
+            "motor_right": {
+              "start": 19,
+              "stop": 21
+            }
+          },
+          "valid_slice": {
+            "start": 21,
+            "stop": 29
+          },
+          "age_slice": {
+            "start": 29,
+            "stop": 37
+          },
+          "labels": [
+            "云台IMU加速度X / 9.80665（g）",
+            "云台IMU加速度Y / 9.80665（g）",
+            "云台IMU加速度Z / 9.80665（g）",
+            "云台IMU角速度X / π（rad/s）",
+            "云台IMU角速度Y / π（rad/s）",
+            "云台IMU角速度Z / π（rad/s）",
+            "磁场X计数 / 32768",
+            "磁场Y计数 / 32768",
+            "磁场Z计数 / 32768",
+            "云台IMU姿态四元数X",
+            "云台IMU姿态四元数Y",
+            "云台IMU姿态四元数Z",
+            "云台IMU姿态四元数W",
+            "云台偏航关节角 / π（rad）",
+            "云台偏航关节速率 / π（rad/s）",
+            "云台俯仰关节角 / π（rad）",
+            "云台俯仰关节速率 / π（rad/s）",
+            "左侧等效Iq / 100（A）",
+            "左侧机械转速 / 10000（rpm）",
+            "右侧等效Iq / 100（A）",
+            "右侧机械转速 / 10000（rpm）",
+            "有效标记：accel",
+            "有效标记：gyro",
+            "有效标记：mag",
+            "有效标记：attitude",
+            "有效标记：gimbal_yaw",
+            "有效标记：gimbal_pitch",
+            "有效标记：motor_left",
+            "有效标记：motor_right",
+            "数据年龄 / 2秒：accel",
+            "数据年龄 / 2秒：gyro",
+            "数据年龄 / 2秒：mag",
+            "数据年龄 / 2秒：attitude",
+            "数据年龄 / 2秒：gimbal_yaw",
+            "数据年龄 / 2秒：gimbal_pitch",
+            "数据年龄 / 2秒：motor_left",
+            "数据年龄 / 2秒：motor_right"
+          ],
+          "simulation_assumptions": {
+            "name": "simulated-gimbal-imu-drive-feedback-v1",
+            "dt_s": 0.05,
+            "filter_rate_hz": 20.0,
+            "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+            "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+            "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+            "magnetic_reference": "ENU with magnetic north along +Y",
+            "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+            "sensor_mount_rot_xyzw": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+            "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+            "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+            "accel_white_noise_std_mps2": 0.025,
+            "accel_episode_bias_std_mps2": 0.05,
+            "gyro_white_noise_std_rad_s": 0.0015,
+            "gyro_episode_bias_std_rad_s": 0.003,
+            "mag_white_noise_std_counts": 12.0,
+            "mag_episode_bias_std_counts": 24.0,
+            "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+            "gimbal_position_white_noise_std_rad": 0.0005,
+            "gimbal_rate_white_noise_std_rad_s": 0.003,
+            "motor_iq_white_noise_std_A": 0.02,
+            "motor_rpm_white_noise_std_rpm": 1.0,
+            "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+            "timeout_s": 0.25,
+            "age_max_s": 2.0,
+            "value_scaling": {
+              "accel": {
+                "factor": 0.10197162129779283,
+                "unit": "g (m/s^2 divided by 9.80665)"
+              },
+              "gyro": {
+                "factor": 0.3183098861837907,
+                "unit": "rad/s divided by pi"
+              },
+              "mag_counts": {
+                "factor": 3.0517578125e-05,
+                "unit": "raw signed counts / 32768"
+              },
+              "attitude_quaternion": {
+                "factor": 1.0,
+                "unit": "unitless xyzw"
+              },
+              "gimbal_position": {
+                "factor": 0.3183098861837907,
+                "unit": "rad / pi"
+              },
+              "gimbal_rate": {
+                "factor": 0.3183098861837907,
+                "unit": "rad/s / pi"
+              },
+              "motor_iq": {
+                "factor": 0.01,
+                "unit": "A / 100; simulation value is model-equivalent"
+              },
+              "motor_rpm": {
+                "factor": 0.0001,
+                "unit": "mechanical rpm / 10000"
+              },
+              "age": {
+                "factor": 0.5,
+                "unit": "s / age_max_s; bounded, not signal-clipped"
+              }
+            }
+          },
+          "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+        },
+        "feedback_dim": 37,
+        "estimated_pose": {
+          "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+          "position_noise_std_m": 0.025,
+          "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+          "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+          "gimbal_source": "feedback measured joint positions; zero when invalid"
+        },
+        "imu_mount_body": "gimbal_pitch_link",
+        "imu_offset_pos_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "imu_offset_rot_xyzw": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "depth_channels": 1,
+        "depth_invalid_value": 0.0,
+        "depth_value_range": [
+          0.0,
+          1.0
+        ],
+        "depth_space_bounds": [
+          -1.0,
+          1.0
+        ],
+        "measured_velocity_indices": [],
+        "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+        "previous_command_indices": [
+          7,
+          8,
+          9,
+          10
+        ],
+        "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+        "action_components": [
+          "left_track_speed",
+          "right_track_speed",
+          "gimbal_yaw_rate",
+          "gimbal_pitch_rate"
+        ]
+      },
+      "damage_config": {
+        "metric": "stem-contact-v2",
+        "penalty_per_plant": 20.0,
+        "track_geometry": "two swept rectangular contact bands",
+        "track_contact_length_m": 0.595,
+        "track_band_width_m": 0.06,
+        "track_center_separation_m": 0.41,
+        "track_outer_width_m": 0.47,
+        "track_center_separation_status": "0.41 m center separation derived from user-confirmed 0.47 m overall width and 0.06 m track width; 0.30 m chassis width excludes tracks",
+        "track_vertical_model": "union of RobotAssetSpec wheel-cylinder vertical AABBs rotated by current pitch/roll; damage requires overlap with stem root_z +/- stem_radius",
+        "stem_radius_source": "Scene.stem_radius",
+        "chassis_geometry": "RobotAssetSpec box footprint against main stem only",
+        "chassis_length_m": 0.8,
+        "chassis_width_m": 0.3,
+        "chassis_height_m": 0.15,
+        "vertical_model": "2.5D: current engine root Z with pitch/roll-expanded vertical AABB; horizontal footprint remains level; compare against stem root_z..root_z+height"
+      },
+      "damage_metric": "stem-contact-v2",
+      "distance_cost": 0.0,
+      "goal_distance": [
+        0.6,
+        1.2
+      ],
+      "goal_angle_rad": 0.2617993877991494,
+      "mode": "goto",
+      "deterministic": true,
+      "evaluation_config": {
+        "task": {
+          "size": 100.0,
+          "cell": 0.5,
+          "plants": 0,
+          "dry_fraction": 0.25,
+          "leaves_per_plant": 8,
+          "layout": "rows",
+          "row_spacing": 0.8,
+          "plant_spacing": 0.3,
+          "plant_height": 1.0,
+          "plant_height_spread": 0.05,
+          "stem_radius": 0.012,
+          "robot_length": 0.8,
+          "robot_width": 0.47,
+          "max_speed": 4.166666666666667,
+          "max_turn_rate": 1.5,
+          "acceleration": 1.5,
+          "angular_acceleration": 4.0,
+          "camera_height": 0.4,
+          "pitch_min": -0.4363323129985824,
+          "pitch_max": 1.0471975511965976,
+          "gimbal_yaw_rate": 1.8,
+          "gimbal_pitch_rate": 1.2,
+          "dt": 0.05,
+          "max_time": 60.0,
+          "lidar_model": "X2",
+          "lidar_rays": 400,
+          "lidar_range": 8.0,
+          "lidar_min_range": 0.12,
+          "lidar_relative_error": 0.05,
+          "lidar_period": 0.1,
+          "lidar_latency": 0.03,
+          "depth_height": 160,
+          "depth_width": 88,
+          "depth_min_range": 0.3,
+          "depth_range": 5.0,
+          "depth_period": 0.4,
+          "depth_latency": 0.3,
+          "camera_range": 7.0,
+          "camera_period": 0.2,
+          "camera_latency": 0.12,
+          "max_detections": 16,
+          "position_noise": 0.025,
+          "range_noise": 0.01,
+          "detection_drop": 0.08,
+          "class_error": 0.015,
+          "goal_tolerance": 0.4,
+          "goal_hold": 0.5,
+          "damage_penalty": 20.0,
+          "collision_penalty": 0.1,
+          "time_penalty": 0.1,
+          "progress_weight": 0.15,
+          "stop_on_damage": false,
+          "validate_scene": true,
+          "terrain_enabled": false,
+          "terrain_amplitude": 0.35,
+          "terrain_wavelength_min": 4.0,
+          "terrain_wavelength_max": 10.0,
+          "rock_density": 0.0,
+          "large_rock_fraction": 0.2,
+          "terrain_seed": null,
+          "goal_progress_budget": 5.0,
+          "damage_metric": "stem-contact-v2",
+          "goto_reward_profile": "fast_stop_v1",
+          "goal_stop_speed": 0.05,
+          "goal_stop_angular_speed": 0.1
+        },
+        "environment_seed": 90003,
+        "stage": {
+          "name": "near",
+          "mode": "goto",
+          "goal_distance": [
+            0.6,
+            1.2
+          ],
+          "goal_angle": 0.2617993877991494,
+          "plants": 0
+        }
+      }
+    }
+  }
+}
