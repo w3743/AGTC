@@ -10,6 +10,15 @@ CONFIG = MODULE/'原理图准备/AFE启动配置.json'
 config = json.loads(CONFIG.read_text(encoding='utf-8'))
 params = config['software_contract']
 registers = {int(r['address'],16):int(r['value'],16) for r in config['registers']}
+cap_model_module = runpy.run_path(str(MODULE/'仿真/源码/增容筛选.py'))
+derive_supercapacitor_model = cap_model_module['derive_supercapacitor_model']
+simulate = cap_model_module['simulate']
+verify_simulation_api = cap_model_module['verify_simulation_api']
+verify_cancelled_configuration_rejected = cap_model_module['verify_cancelled_configuration_rejected']
+supercapacitor = derive_supercapacitor_model(config)
+sensitivity = config['energy_sensitivity']
+api_validation = verify_simulation_api()
+api_validation['cancelled_16_cell_configuration_rejected'] = verify_cancelled_configuration_rejected(config)
 checks = []
 
 def check(name, passed, **evidence):
@@ -29,6 +38,15 @@ check('autonomous_output_logic_enabled', registers[0x9308]&8 and
 check('no_charge_pump_no_internal_balancing', registers[0x9309] == 0 and
       registers[0x9335] == 0x10)
 check('healthy_high_logic', all(registers[a] == 0xaa for a in (0x9301,0x9302)))
+check('selected_supercapacitor_is_current_8S1P',
+      supercapacitor['series_groups'] == 8 and
+      supercapacitor['parallel_cells_per_group'] == 1 and
+      supercapacitor['cell_count'] == 8 and
+      supercapacitor['cell_count'] == supercapacitor['series_groups'] * supercapacitor['parallel_cells_per_group'],
+      manufacturer_part=supercapacitor['manufacturer_part'],
+      series_groups=supercapacitor['series_groups'],
+      parallel_cells_per_group=supercapacitor['parallel_cells_per_group'],
+      cell_count=supercapacitor['cell_count'])
 
 # Conservative resistor tolerance + 100 ppm/C x 100 C absolute temperature
 # deviation for logic resistors. 3.0V is the specified REG1 minimum, not nominal.
@@ -87,7 +105,7 @@ check('preregulator_static_load_budget', available>iregin_budget,
       min_stack_V=13.6, diode_drop_assumption_V=1.,
       max_prereg_output_V=5.8, transistor_headroom_allocation_V=.2)
 
-group_c_min = 350*.8*2
+group_c_min = float(supercapacitor['eol_capacitance_per_group_F'])
 max_i = params['provisional_peak_current_screen_A']
 soft_dv = max_i/group_c_min*params['soft_trip_inclusive_age_to_zero_pwm_budget_s']
 hard_dv = max_i/group_c_min*params['hard_trip_complete_response_budget_s']
@@ -107,50 +125,105 @@ check('hard_uv_avoids_reversal_conditional', hard_uv_bound>0,
       voltage_lower_bound_V=hard_uv_bound,
       note='Emergency threshold permits loss of normal voltage window; it does not prove sustained power.')
 
-# Use the independent constant-power integrator, now with per-group measurement
-# and imbalance allocations instead of treating total stack voltage as enough.
-simulate=runpy.run_path(str(MODULE/'仿真/源码/增容筛选.py'))['simulate']
-cap=group_c_min/8
-resistance=8*.0028*2/2*1.3+.005
+# Use the current 8S1P equivalent stack capacitance and configured ESR model.
+cap = float(supercapacitor['eol_stack_equivalent_capacitance_F'])
 idle=params['idle_internal_target_V']
 bias=params['idle_target_error_allocation_V']
 deviation=params['max_true_group_deviation_from_mean_allocation_V']
 energy_rows=[]
-for power in (800.,1000.):
-    row=dict(power_W=power)
-    for direction in ('support','absorb'):
-        result=simulate(cap,resistance,idle+(-bias if direction=='support' else bias),power,.9,direction,.0001)
-        peak=result['maximum_average_port_current_A']+7.875
-        if direction=='support':
-            measured_worst=result['minimum_terminal_V']/8-deviation-e
-            voltage_ok=measured_worst>=params['normal_cell_soft_uv_V']
-        else:
-            measured_worst=result['maximum_terminal_V']/8+deviation+e
-            voltage_ok=measured_worst<=params['normal_cell_soft_ov_V']
-        row[direction]=dict(result, estimated_inductor_peak_A=peak,
-                            adverse_measured_cell_V=measured_worst,
-                            conditional_screen_pass=voltage_ok and peak<=80)
-    energy_rows.append(row)
-check('800W_one_second_both_directions_conditional',
-      all(energy_rows[0][d]['conditional_screen_pass'] for d in ('support','absorb')),
-      idle_target_V=idle,measurement_allocation_V=e,true_imbalance_allocation_V=deviation)
-check('do_not_claim_fixed_1kW_both_directions',
-      not all(energy_rows[1][d]['conditional_screen_pass'] for d in ('support','absorb')))
+series = int(supercapacitor['series_groups'])
+ripple_half_peak = float(sensitivity['ripple_bus_voltage_V']) / (
+    8 * float(sensitivity['inductor_min_H']) * float(sensitivity['switching_frequency_Hz'])
+)
+energy_scenarios = [
+    ('eol_parameter_sensitivity', float(sensitivity['nominal_efficiency_assumption']),
+     float(supercapacitor['eol_stack_series_resistance_ohm']), 0.,
+     'PARAMETER_SENSITIVITY_ONLY'),
+    ('unqualified_extra_loss_sensitivity', float(sensitivity['unqualified_stress_efficiency_assumption']),
+     float(supercapacitor['extra_loss_stack_series_resistance_ohm']),
+     float(sensitivity['unqualified_start_voltage_error_V']),
+     'UNQUALIFIED_SENSITIVITY_ONLY'),
+]
+for scenario_name, eta, resistance, start_error, qualification in energy_scenarios:
+    for power in sensitivity['illustrative_bus_power_W']:
+        for duration in sensitivity['illustrative_durations_s']:
+            row=dict(scenario=scenario_name, qualification=qualification,
+                     power_W=float(power), duration_s=float(duration),
+                     duration_role='one_second_reference_only' if float(duration)==1.0 else 'illustrative_sensitivity_only')
+            for direction in ('support','absorb'):
+                initial=idle+(-start_error if direction=='support' else start_error)
+                coarse=simulate(cap,resistance,initial,float(power),eta,direction,.0001,float(duration))
+                fine=simulate(cap,resistance,initial,float(power),eta,direction,.00005,float(duration))
+                if coarse['trajectory_complete'] and fine['trajectory_complete']:
+                    difference=max(abs(coarse[k]-fine[k]) for k in ('minimum_terminal_V','maximum_terminal_V'))
+                    coarse['terminal_voltage_timestep_difference_V']=difference
+                    coarse['timestep_convergence_pass']=difference<.001
+                    coarse['refined_energy_balance_residual_J']=fine['energy_balance_residual_J']
+                    peak=float(coarse['maximum_average_port_current_A'])+ripple_half_peak
+                    if direction=='support':
+                        measured_worst=coarse['minimum_terminal_V']/series-deviation-e
+                        voltage_ok=measured_worst>=params['normal_cell_soft_uv_V']
+                    else:
+                        measured_worst=coarse['maximum_terminal_V']/series+deviation+e
+                        voltage_ok=measured_worst<=params['normal_cell_soft_ov_V']
+                    coarse['estimated_inductor_peak_A']=peak
+                    coarse['adverse_measured_cell_V']=measured_worst
+                    coarse['conditional_screen_pass']=bool(voltage_ok and peak<=max_i and coarse['timestep_convergence_pass'])
+                else:
+                    coarse['terminal_voltage_timestep_difference_V']=None
+                    coarse['timestep_convergence_pass']=False
+                    coarse['estimated_inductor_peak_A']=None
+                    coarse['adverse_measured_cell_V']=None
+                    coarse['conditional_screen_pass']=False
+                    coarse['screen_failure_reason']='constant-power branch has no real solution before requested end'
+                row[direction]=coarse
+            energy_rows.append(row)
+check('energy_sensitivity_grid_is_current_configuration',
+      len(energy_rows)==len(energy_scenarios)*len(sensitivity['illustrative_bus_power_W'])*len(sensitivity['illustrative_durations_s'])
+      and all(api_validation.values()),
+      cell_count=supercapacitor['cell_count'],
+      durations_s=sensitivity['illustrative_durations_s'],
+      invalid_duration_rejected=api_validation['nonpositive_duration_rejected'])
 
+completed_trajectories=[v for row in energy_rows for d in ('support','absorb')
+                        for v in (row[d],) if v['trajectory_complete']]
+infeasible_trajectories=[dict(scenario=row['scenario'],power_W=row['power_W'],
+                               duration_s=row['duration_s'],direction=d,
+                               failure_time_s=row[d].get('failure_time_s'))
+                         for row in energy_rows for d in ('support','absorb')
+                         if not row[d]['trajectory_complete']]
+energy_numerical_ok=bool(completed_trajectories) and all(
+    abs(float(x['energy_balance_residual_J']))<.1 and
+    abs(float(x['refined_energy_balance_residual_J']))<.1 and
+    x['timestep_convergence_pass']
+    for x in completed_trajectories)
 result=dict(status='CONDITIONAL_DESIGN_CALCULATIONS_ONLY_NO_HARDWARE_RELEASE',
             source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             config_sha256=hashlib.sha256(CONFIG.read_bytes()).hexdigest(),
+            capacitor_model_source_sha256=hashlib.sha256((MODULE/'仿真/源码/增容筛选.py').read_bytes()).hexdigest(),
+            supercapacitor_model=supercapacitor,
             all_checks_pass=all(x['passed'] for x in checks),checks=checks,
-            analog_transfer_functions=transfer_functions,energy_rows=energy_rows,
+            analog_transfer_functions=transfer_functions,
+            energy_sensitivity=dict(requirement_status=sensitivity['requirement_status'],
+                                    illustrative_bus_power_W=sensitivity['illustrative_bus_power_W'],
+                                    illustrative_durations_s=sensitivity['illustrative_durations_s'],
+                                    rows=energy_rows),
+            numerical_verification=dict(completed_trajectories=len(completed_trajectories),
+                                        infeasible_sensitivity_trajectories=infeasible_trajectories,
+                                        energy_balance_and_step_convergence_pass=energy_numerical_ok,
+                                        simulation_api_validation=api_validation),
             residuals=['Native netlist and actual selected component bindings require independent verification.',
                        'The 25mV measurement, 25mV group imbalance, 50ms/150ms response allocations require hardware tests.',
                        '80A peak screen is not a qualified hard current clamp. Calibrate CSA and validate COMP/TIM1 propagation.',
                        'High/low power MOS short and fuse clearing/energy isolation are separate unresolved fault cases.',
-                       'No zero-volt autonomous recovery is implemented. Commissioning charging remains controlled.'])
+                       'No zero-volt autonomous recovery is implemented. Commissioning charging remains controlled.',
+                       'Energy rows are 8S1P power-duration sensitivities only; startup power and duration are not specified and 1s is not a requirement.'])
 out=MODULE/'仿真/结果/AFE保护边界验证.json'
 out.parent.mkdir(parents=True,exist_ok=True)
 out.write_text(json.dumps(result,ensure_ascii=False,indent=2,allow_nan=False)+'\n',encoding='utf-8')
 print(json.dumps(dict(all_checks_pass=result['all_checks_pass'],checks=len(checks),
                       failed=[x['name'] for x in checks if not x['passed']],
+                      energy_sensitivity_rows=len(energy_rows),
+                      energy_sensitivity_numerics=energy_numerical_ok,
                       analog_transfer_functions=transfer_functions),ensure_ascii=True))
-raise SystemExit(0 if result['all_checks_pass'] else 2)
+raise SystemExit(0 if result['all_checks_pass'] and energy_numerical_ok and all(api_validation.values()) else 2)

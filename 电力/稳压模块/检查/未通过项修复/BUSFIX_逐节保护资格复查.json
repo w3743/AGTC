@@ -68,26 +68,38 @@
           "current_source_sha256": "9B432B1599407D2922F2B7DD1282D2265F6A38A03FF21C8C82610C6C581B2D4B",
           "current_source_matches_registered_baseline": true
         }
-      ]
+      ],
+      "observed_at": "2026-10-15 historical capture; not a current README hash check",
+      "meaning": "Historical comparison at original report capture. Current model bindings are in current_followup."
     }
   },
   "reproduction": {
-    "working_directory": "E:/Pioneer/先进通用履带底盘工程/电力",
-    "command": "python -u \"稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py\"",
-    "actual_output": "BUSFIX-CELL-PROTECTION: state_tests=19/19 PASS; T2.56_E100_T50ms_margin=25.714mV; raw_conditional_error_stress_max=339.174mV (E100=FAIL); energy_midpoint=618.45J; C_EOL@midpoint_800W/1000W=362.2/452.7F_per_cell; snapshot_hashes=PASS; actual_input_gate=CLOSED_OFF; overall=MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL"
+    "working_directory": "E:/Pioneer/先进通用履带底盘工程",
+    "command": "python -u \"电力/稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py\"",
+    "result_file": "电力/稳压模块/仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
+    "expected_persisted_result": {
+      "source_sha256": "efa95844c51f52273e094086412702115c9174e1af1dd82663a93c5ebe1a9572",
+      "input_sha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3",
+      "result_sha256": "f01a62daea8d270b0d3c87eca92a2c34f868d57492d15601d6b111650d7a3d30",
+      "state_machine_tests": "27/27 PASS",
+      "normal_charge_low_voltage_inhibit": "PASS_MODEL_ONLY",
+      "persisted_qualification_gates": "all false; charge output inhibited"
+    }
   },
   "pass_fail": {
-    "algorithmic_state_tests": "PASS_19_OF_19_CONDITIONAL_MODEL_TESTS",
+    "algorithmic_state_tests": "PASS_27_OF_27_MODEL_TESTS; normal-charge low-voltage inhibit included; physical qualification remains open",
     "19_6V_single_cell_imbalance_cutoff_test": "PASS; 2.66V actual cell with -100mV modeled error measures 2.56V and latches off at 19.60V pack total, below 20.8V total SC_OV",
     "persisted_input_charge_gate": "CLOSED_OFF_UNTIL_E100_80A_T50_AND_FIRMWARE_VERIFICATION",
     "2_7V_hard_max_guard": "CONDITIONAL_ONLY; 25.714mV model margin if abs error <=100mV, charge <=80A, and response <=50ms",
     "end_to_end_measurement_error_E100mV": "FAIL_OPEN; max additive known conditional stress 339.174mV at T8/125C, not a complete hard bound",
     "80A_and_T50ms_physical_response": "NOT_MEASURED",
-    "800W_and_1000W_for_1s": "FAIL_AT_280F_EOL_PER_CELL",
+    "800W_and_1000W_for_1s": "HISTORICAL_SENSITIVITY_ONLY; not a current requirement or release gate",
     "20_8V_total_sc_ov_as_per_cell_proof": "FAIL_TOTAL_VOLTAGE_IS_NOT_PER_CELL_PROTECTION",
     "independent_mcu_failure_shutdown": "OPEN",
     "physical_board_vehicle_acceptance": "NOT_ESTABLISHED",
-    "central_total_cost_le_500_CNY": "NOT_VERIFIED"
+    "central_total_cost_le_500_CNY": "NOT_VERIFIED",
+    "normal_charge_low_voltage_inhibit": "PASS_MODEL_ONLY; measured cell floor 2.2V, explicit request required at inclusive floor",
+    "controlled_initial_charge_from_0V": "NOT_IMPLEMENTED_OR_QUALIFIED"
   },
   "protection_candidate": {
     "series_cells": 8,
@@ -181,6 +193,99 @@
       "source_document": "稳压模块/计算与保护边界.md",
       "target": "1 kW、至少1 kJ/1 s短时吸收目标",
       "meaning": "BUS dump电阻吸收路径，不能与SC经DC/DC向BUS支撑能量混同"
-    }
+    },
+    "source_wording": "Historical 2026-10-15 source wording said about 0.8-1kW for about 1s; superseded by 2026-10-21 requirement update.",
+    "status": "HISTORICAL_CONTEXT_ONLY_NOT_CURRENT_REQUIREMENT"
+  },
+  "asOf": "2026-10-21",
+  "current_followup": {
+    "date": "2026-10-21",
+    "scope": "BUSFIX normal-charge low-voltage state-machine model only; not hardware or physical qualification",
+    "source": {
+      "path": "稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py",
+      "sha256": "efa95844c51f52273e094086412702115c9174e1af1dd82663a93c5ebe1a9572"
+    },
+    "input": {
+      "path": "稳压模块/仿真/输入/V1.6-BUSFIX/model_input.json",
+      "sha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3"
+    },
+    "result": {
+      "path": "稳压模块/仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
+      "sha256": "f01a62daea8d270b0d3c87eca92a2c34f868d57492d15601d6b111650d7a3d30",
+      "status": "MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL",
+      "stateMachineTests": {
+        "pass": 27,
+        "fail": 0
+      }
+    },
+    "capacitorModel": {
+      "mpn": "LICAP SC0350-270-RSS",
+      "topology": "8S1P",
+      "cellCount": 8,
+      "nominalCapacitance_F_perCell": 350,
+      "minimumEOLCapacitance_F_perCell": 280,
+      "seriesEquivalentCapacitance_F": 35,
+      "esrScreening_mOhm": {
+        "lifetimeSensitivity": 44.8,
+        "stress": 63.24,
+        "qualification": "not measured; these screening values are excluded from BUSFIX ideal-energy result"
+      }
+    },
+    "normalChargeLowVoltage": {
+      "minimumMeasuredCellVoltage_V": 2.2,
+      "afeTakeoverBoundaryTest_V": 2.05,
+      "afeBoundaryIsNormalHighPowerPermission": false,
+      "inclusiveFloorRequiresExplicitLocalRequest": true,
+      "modelOutcome": "PASS_MODEL_ONLY",
+      "coveredCases": [
+        "all-zero cells rejected",
+        "any one cell at zero rejected",
+        "2.05 V AFE takeover test rejected for normal charging",
+        "any cell below 2.2 V rejected",
+        "exact 2.2 V requires explicit request",
+        "low voltage immediately revokes request",
+        "healthy samples after low voltage do not auto-rearm",
+        "forced request cannot bypass final output voltage gate"
+      ]
+    },
+    "persistedQualificationGates": {
+      "end_to_end_E100mV_validated": false,
+      "80A_maximum_charge_current_validated": false,
+      "trip_to_zero_current_T50ms_validated": false,
+      "local_firmware_implementation_verified": false,
+      "defaultOutput": "inhibited"
+    },
+    "controlledInitialChargeFrom0V": "NOT_IMPLEMENTED_OR_QUALIFIED",
+    "otherOpenItems": [
+      "hardware 0 V current-limited startup and per-cell protection",
+      "independent shutdown for arbitrary MCU failure",
+      "core-board power-off backfeed",
+      "end-to-end measurement accuracy and response qualification",
+      "actual startup power gap and duration"
+    ],
+    "oneSecondRequirement": "cancelled; 800-1000 W x 1 s is historical sensitivity only, not a release gate",
+    "designRelease": "HOLD"
+  },
+  "historical_20261015": {
+    "review_id": "V1.6-BUSFIX-cell-protection-qualification-20261015",
+    "reproduction": {
+      "working_directory": "E:/Pioneer/先进通用履带底盘工程/电力",
+      "command": "python -u \"稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py\"",
+      "actual_output": "BUSFIX-CELL-PROTECTION: state_tests=19/19 PASS; T2.56_E100_T50ms_margin=25.714mV; raw_conditional_error_stress_max=339.174mV (E100=FAIL); energy_midpoint=618.45J; C_EOL@midpoint_800W/1000W=362.2/452.7F_per_cell; snapshot_hashes=PASS; actual_input_gate=CLOSED_OFF; overall=MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL"
+    },
+    "pass_fail": {
+      "algorithmic_state_tests": "PASS_19_OF_19_CONDITIONAL_MODEL_TESTS",
+      "19_6V_single_cell_imbalance_cutoff_test": "PASS; 2.66V actual cell with -100mV modeled error measures 2.56V and latches off at 19.60V pack total, below 20.8V total SC_OV",
+      "persisted_input_charge_gate": "CLOSED_OFF_UNTIL_E100_80A_T50_AND_FIRMWARE_VERIFICATION",
+      "2_7V_hard_max_guard": "CONDITIONAL_ONLY; 25.714mV model margin if abs error <=100mV, charge <=80A, and response <=50ms",
+      "end_to_end_measurement_error_E100mV": "FAIL_OPEN; max additive known conditional stress 339.174mV at T8/125C, not a complete hard bound",
+      "80A_and_T50ms_physical_response": "NOT_MEASURED",
+      "800W_and_1000W_for_1s": "FAIL_AT_280F_EOL_PER_CELL",
+      "20_8V_total_sc_ov_as_per_cell_proof": "FAIL_TOTAL_VOLTAGE_IS_NOT_PER_CELL_PROTECTION",
+      "independent_mcu_failure_shutdown": "OPEN",
+      "physical_board_vehicle_acceptance": "NOT_ESTABLISHED",
+      "central_total_cost_le_500_CNY": "NOT_VERIFIED"
+    },
+    "note": "Preserved historical 2026-10-15 report/run values and archive references; these are not current results."
   }
 }

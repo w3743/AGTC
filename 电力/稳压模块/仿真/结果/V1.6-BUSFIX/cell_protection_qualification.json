@@ -7,11 +7,20 @@
   },
   "inputs": {
     "path": "稳压模块/仿真/输入/V1.6-BUSFIX/model_input.json",
-    "sha256": "c267b56daa58cb984b285aaff355c2a2c5ff5b806f4b51bb6c9785906c9b1aff"
+    "sha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3"
+  },
+  "supercapacitor_configuration": {
+    "manufacturer_part": "SC0350-270-RSS",
+    "series_cells": 8,
+    "parallel_cells_per_group": 1,
+    "cell_count": 8,
+    "cell_capacitance_nominal_F": 350.0,
+    "cell_capacitance_min_EOL_F": 280.0,
+    "cancelled_16_cell_configuration_rejected": true
   },
   "source_code": {
     "path": "稳压模块/仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py",
-    "sha256": "4cf9b9416cdb608988a590f119ebb464e6925fe0d591d051e229c307c8ce428b"
+    "sha256": "efa95844c51f52273e094086412702115c9174e1af1dd82663a93c5ebe1a9572"
   },
   "source_snapshot_checks": [
     {
@@ -64,7 +73,7 @@
     }
   ],
   "state_machine_tests": {
-    "pass_count": 19,
+    "pass_count": 27,
     "fail_count": 0,
     "tests": [
       {
@@ -86,6 +95,46 @@
         "name": "explicit_local_request_enables_with_fresh_data",
         "pass": true,
         "evidence": "complete fresh sample + TEST low"
+      },
+      {
+        "name": "all_zero_cells_cannot_enter_normal_charge",
+        "pass": true,
+        "evidence": "complete low-voltage data remains diagnostic; it cannot authorize normal PWM"
+      },
+      {
+        "name": "one_zero_cell_cannot_enter_normal_charge",
+        "pass": true,
+        "evidence": "complete low-voltage data remains diagnostic; it cannot authorize normal PWM"
+      },
+      {
+        "name": "AFE_takeover_voltage_is_not_normal_operating_permission",
+        "pass": true,
+        "evidence": "complete low-voltage data remains diagnostic; it cannot authorize normal PWM"
+      },
+      {
+        "name": "one_cell_below_normal_floor_blocks_charge",
+        "pass": true,
+        "evidence": "complete low-voltage data remains diagnostic; it cannot authorize normal PWM"
+      },
+      {
+        "name": "normal_floor_boundary_requires_explicit_request",
+        "pass": true,
+        "evidence": "measured normal-mode floor is inclusive; this does not qualify physical measurement or initial charging"
+      },
+      {
+        "name": "low_voltage_scan_immediately_revokes_pending_request",
+        "pass": true,
+        "evidence": "a low cell revokes normal charge before any subsequent healthy scan"
+      },
+      {
+        "name": "healthy_scan_after_low_voltage_does_not_rearm",
+        "pass": true,
+        "evidence": "returning to the operating window requires a new explicit local request"
+      },
+      {
+        "name": "forced_request_cannot_bypass_low_voltage_output_gate",
+        "pass": true,
+        "evidence": "the final output gate independently checks the measured operating floor"
       },
       {
         "name": "sample_age_20ms_accepted",
@@ -490,32 +539,155 @@
     "worst_actual_target_ideal_bus_energy_J": 726.1800000000001,
     "nominal_actual_2_45V_storage_energy_J": 1302.0000000000007,
     "nominal_actual_2_45V_ideal_bus_energy_J": 1236.9000000000005,
-    "energy_targets": [
+    "requirement_status": "SENSITIVITY_ONLY; actual startup transient power and duration are unspecified; 1s is a reference only",
+    "energy_sensitivity": [
+      {
+        "power_W": 800.0,
+        "duration_s": 0.02,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 16.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 7.243916242218452,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 9.054895302773064,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 3.621958121109223,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 4.527447651386528,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 6.169269327164064,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 1000.0,
+        "duration_s": 0.02,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 20.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 9.054895302773064,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 11.31861912846633,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 4.527447651386528,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 5.65930956423316,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 7.711586658955079,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 800.0,
+        "duration_s": 0.05,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 40.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 18.109790605546127,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 22.63723825693266,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 9.054895302773057,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 11.31861912846632,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 15.423173317910159,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 1000.0,
+        "duration_s": 0.05,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 50.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 22.637238256932662,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 28.296547821165827,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 11.318619128466322,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 14.148273910582901,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 19.278966647387698,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 800.0,
+        "duration_s": 0.1,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 80.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 36.219581211092255,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 45.27447651386532,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 18.109790605546113,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 22.63723825693264,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 30.846346635820318,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 1000.0,
+        "duration_s": 0.1,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 100.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 45.274476513865324,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 56.593095642331654,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 22.637238256932644,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 28.296547821165802,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 38.557933294775395,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 800.0,
+        "duration_s": 0.2,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 160.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 72.43916242218451,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 90.54895302773063,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 36.219581211092226,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 45.27447651386528,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 61.692693271640636,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
+      {
+        "power_W": 1000.0,
+        "duration_s": 0.2,
+        "duration_role": "illustrative_sensitivity_only",
+        "required_bus_energy_J": 200.0,
+        "required_EOL_cell_capacitance_F_at_energy_midpoint": 90.54895302773065,
+        "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 113.18619128466331,
+        "required_EOL_cell_capacitance_F_from_full_2_45V_start": 45.27447651386529,
+        "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 56.593095642331605,
+        "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 77.11586658955079,
+        "ideal_energy_screen_at_midpoint_pass": true,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": true,
+        "ideal_energy_shortfall_J_at_midpoint": 0.0,
+        "ideal_energy_shortfall_J_at_measured_target_worst_actual": 0.0
+      },
       {
         "power_W": 800.0,
         "duration_s": 1.0,
+        "duration_role": "one_second_reference_only",
         "required_bus_energy_J": 800.0,
         "required_EOL_cell_capacitance_F_at_energy_midpoint": 362.1958121109226,
         "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 452.74476513865324,
         "required_EOL_cell_capacitance_F_from_full_2_45V_start": 181.09790605546115,
         "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 226.37238256932642,
         "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 308.46346635820316,
-        "current_280F_midpoint_pass": false,
-        "current_280F_at_measured_target_worst_actual_pass": false,
+        "ideal_energy_screen_at_midpoint_pass": false,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": false,
         "ideal_energy_shortfall_J_at_midpoint": 181.5500000000003,
         "ideal_energy_shortfall_J_at_measured_target_worst_actual": 73.81999999999994
       },
       {
         "power_W": 1000.0,
         "duration_s": 1.0,
+        "duration_role": "one_second_reference_only",
         "required_bus_energy_J": 1000.0,
         "required_EOL_cell_capacitance_F_at_energy_midpoint": 452.74476513865324,
         "required_initial_cell_capacitance_F_at_energy_midpoint_if_80pct_EOL": 565.9309564233165,
         "required_EOL_cell_capacitance_F_from_full_2_45V_start": 226.37238256932642,
         "required_initial_cell_capacitance_F_from_full_2_45V_start_if_80pct_EOL": 282.965478211658,
         "required_EOL_cell_capacitance_F_at_measured_target_worst_actual": 385.579332947754,
-        "current_280F_midpoint_pass": false,
-        "current_280F_at_measured_target_worst_actual_pass": false,
+        "ideal_energy_screen_at_midpoint_pass": false,
+        "ideal_energy_screen_at_measured_target_worst_actual_pass": false,
         "ideal_energy_shortfall_J_at_midpoint": 381.5500000000003,
         "ideal_energy_shortfall_J_at_measured_target_worst_actual": 273.81999999999994
       }
@@ -523,9 +695,10 @@
     "limitations": [
       "Ideal capacitor energy only; excludes ESR, converter dynamic loss beyond eta, wiring, temperature/cold derating and control reserve.",
       "The 280F value is minimum end-of-life cell capacitance (350F initial nameplate x 80% retention), not a measured cell.",
+      "The sensitivity power and duration pairs are not a user requirement, tested operating profile, or release gate.",
       "No topology or component selection is made; capacitance/pre-bias options require verified physical parts and cost."
     ],
-    "status": "FAIL_AT_ENERGY_MIDPOINT_AND_AT_E100MV_WORST_CASE_CHARGE_TARGET"
+    "status": "SENSITIVITY_ONLY_NO_STARTUP_ENERGY_REQUIREMENT_OR_PHYSICAL_RELEASE"
   },
   "acceptance": {
     "algorithmic_state_model": "PASS",
@@ -533,7 +706,10 @@
     "2_7V_single_cell_guard": "CONDITIONAL_PASS_ONLY_IF_E100_AND_T50MS_QUALIFIED",
     "end_to_end_E100mV_measurement_qualification": "FAIL",
     "80A_and_50ms_physical_response": "NOT_MEASURED",
-    "800W_1000W_1s_energy_target": "FAIL",
+    "normal_charge_low_voltage_inhibit": "PASS_MODEL_ONLY",
+    "normal_charge_measured_cell_floor_V": 2.2,
+    "controlled_initial_charge_from_0V": "NOT_IMPLEMENTED_OR_QUALIFIED; normal charge permission cannot be used as initial-charge permission",
+    "startup_energy_sufficiency": "NOT_EVALUATED_AS_REQUIREMENT; actual transient power and duration are unspecified",
     "20_8V_total_SC_OV_individual_cell_proof": "NO; total-voltage threshold is not per-cell protection",
     "hardware_MCU_failure_independence": "FAIL_OPEN",
     "hardware_or_firmware_acceptance": "NOT_ESTABLISHED"
@@ -542,6 +718,8 @@
     "No CAD, BOM or firmware change was made.",
     "The persisted qualification gate remains closed; conditional candidate state tests do not enable the current input or prove firmware/hardware qualification.",
     "The 20.8V total SC_OV value is retained; total voltage cannot prove per-cell <=2.7V.",
+    "The BUSFIX energy arithmetic is illustrative sensitivity only; 1s is a reference duration, not a current requirement.",
+    "This model does not simulate 0V DC/DC startup, gate-driver bootstrap, minimum PWM pulses, reverse-current paths, or core-board power-off backfeed.",
     "V1.5 LICAP energy/SPICE outputs remain historical and are not current BUSFIX simulation results.",
     "CAN cannot refresh local ADC working samples or override the local protection state."
   ]

@@ -402,9 +402,19 @@
     {
       "id": "IO02",
       "status": "OPEN",
-      "subject": "0V正常充电",
-      "finding": "超级电容从0V正常可充，不需恢复激活；目前硬件没有证明闭环限流初充、低压测量/驱动建立、自举最小脉宽及硬许可时序完整。原8S1P与候选BQ从SC供电均不能靠文字认定闭合。",
-      "action": "复用双向DC/DC进行受控初充；独立限流电源只用于台架，不将其写为用户日常维护要求，也不允许直接并接9S BUS。"
+      "subject": "0V受控初充与普通充电低压边界",
+      "finding": "BUSFIX normal-charge state-machine low-voltage permissive defect is closed in the current model only: the measured-cell floor is 2.2 V; all-zero, any-zero-cell, the 2.05 V AFE-takeover test, and values below 2.2 V are rejected. Exactly 2.2 V still requires an explicit local request; falling below the floor revokes the request immediately, healthy data does not auto-rearm, and a forced request cannot bypass the final output gate. The persisted qualification gates remain false. Controlled 0 V initial charge, current-limited startup, hardware measurement/driver/bootstrap timing, MCU-failure shutdown, and power-off backfeed remain unproved.",
+      "action": "Keep normal charge inhibited below 2.2 V per measured cell; do not treat 2.05 V AFE takeover as normal high-power permission. Implement and qualify a separate controlled 0 V startup with per-cell protection before enabling hardware. The model passes 27/27 logic tests only; IO02 stays OPEN and designRelease stays HOLD.",
+      "modelUpdate": {
+        "date": "2026-10-21",
+        "status": "PASS_MODEL_ONLY",
+        "testCount": "27/27",
+        "normalMeasuredCellFloor_V": 2.2,
+        "afeTakeoverBoundaryTest_V": 2.05,
+        "physicalInitialCharge": "NOT_IMPLEMENTED_OR_QUALIFIED",
+        "persistedQualificationGatesAllFalse": true,
+        "resultSha256": "f01a62daea8d270b0d3c87eca92a2c34f868d57492d15601d6b111650d7a3d30"
+      }
     }
   ],
   "calculations": {
@@ -4324,5 +4334,73 @@
     "https://www.littelfuse.com/~/media/electronics/datasheets/tvs_diodes/littelfuse_tvs_diode_smcj_datasheet.pdf.pdf",
     "https://content.kemet.com/datasheets/KEM_A4034_PEH200.pdf",
     "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf"
-  ]
+  ],
+  "currentModelFollowup": {
+    "date": "2026-10-21",
+    "scope": "BUSFIX normal-charge low-voltage state-machine model only; not hardware or physical qualification",
+    "source": {
+      "path": "仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py",
+      "sha256": "efa95844c51f52273e094086412702115c9174e1af1dd82663a93c5ebe1a9572"
+    },
+    "input": {
+      "path": "仿真/输入/V1.6-BUSFIX/model_input.json",
+      "sha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3"
+    },
+    "result": {
+      "path": "仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
+      "sha256": "f01a62daea8d270b0d3c87eca92a2c34f868d57492d15601d6b111650d7a3d30",
+      "status": "MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL",
+      "stateMachineTests": {
+        "pass": 27,
+        "fail": 0
+      }
+    },
+    "capacitorModel": {
+      "mpn": "LICAP SC0350-270-RSS",
+      "topology": "8S1P",
+      "cellCount": 8,
+      "nominalCapacitance_F_perCell": 350,
+      "minimumEOLCapacitance_F_perCell": 280,
+      "seriesEquivalentCapacitance_F": 35,
+      "esrScreening_mOhm": {
+        "lifetimeSensitivity": 44.8,
+        "stress": 63.24,
+        "qualification": "not measured; these screening values are excluded from BUSFIX ideal-energy result"
+      }
+    },
+    "normalChargeLowVoltage": {
+      "minimumMeasuredCellVoltage_V": 2.2,
+      "afeTakeoverBoundaryTest_V": 2.05,
+      "afeBoundaryIsNormalHighPowerPermission": false,
+      "inclusiveFloorRequiresExplicitLocalRequest": true,
+      "modelOutcome": "PASS_MODEL_ONLY",
+      "coveredCases": [
+        "all-zero cells rejected",
+        "any one cell at zero rejected",
+        "2.05 V AFE takeover test rejected for normal charging",
+        "any cell below 2.2 V rejected",
+        "exact 2.2 V requires explicit request",
+        "low voltage immediately revokes request",
+        "healthy samples after low voltage do not auto-rearm",
+        "forced request cannot bypass final output voltage gate"
+      ]
+    },
+    "persistedQualificationGates": {
+      "end_to_end_E100mV_validated": false,
+      "80A_maximum_charge_current_validated": false,
+      "trip_to_zero_current_T50ms_validated": false,
+      "local_firmware_implementation_verified": false,
+      "defaultOutput": "inhibited"
+    },
+    "controlledInitialChargeFrom0V": "NOT_IMPLEMENTED_OR_QUALIFIED",
+    "otherOpenItems": [
+      "hardware 0 V current-limited startup and per-cell protection",
+      "independent shutdown for arbitrary MCU failure",
+      "core-board power-off backfeed",
+      "end-to-end measurement accuracy and response qualification",
+      "actual startup power gap and duration"
+    ],
+    "oneSecondRequirement": "cancelled; 800-1000 W x 1 s is historical sensitivity only, not a release gate",
+    "designRelease": "HOLD"
+  }
 }
