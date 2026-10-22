@@ -172,15 +172,8 @@ def _rsl_environment_configs(contract: dict[str, Any]):
     task_config = contract.get("task_config")
     if not isinstance(task_config, dict):
         raise ValueError("RSL field_policy_contract缺少task_config，无法复现训练任务配置")
-    expected_task_fields = {item.name for item in fields(Config)}
-    if set(task_config) != expected_task_fields:
-        missing_task = sorted(expected_task_fields - set(task_config))
-        extra_task = sorted(set(task_config) - expected_task_fields)
-        raise ValueError(
-            f"RSL task_config字段不完整；missing={missing_task}, extra={extra_task}"
-        )
     try:
-        cfg = Config(**task_config)
+        cfg = Config.from_checkpoint_config(task_config, require_complete=True)
         guide_data = contract.get("front_guide_spec")
         stability_data = contract.get("body_stability_config")
         if guide_data is not None and not isinstance(guide_data, dict):

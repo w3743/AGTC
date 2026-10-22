@@ -45,14 +45,31 @@ def _checkpoint_sha256(path: Path) -> str:
 def _validate_rsl_task_contract(contract: dict[str, Any]):
     """Rebuild the complete saved task and verify its strict fast-stop semantics."""
     from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
+    from isaac_field.task import FAST_STOP_REWARD_PROFILES
+
+    supported_profiles = {"fast_stop_v1", "fast_stop_v2"}
+    raw_task_config = contract.get("task_config")
+    if isinstance(raw_task_config, dict):
+        raw_profile = raw_task_config.get("goto_reward_profile")
+        if raw_profile not in supported_profiles or raw_profile not in FAST_STOP_REWARD_PROFILES:
+            raise ValueError(
+                "RSL checkpoint task_config has unsupported fast-stop reward profile: "
+                f"{raw_profile!r}"
+            )
     task, front_guides, body_stability = goal_viewer._rsl_environment_configs(contract)
 
     # Reuse the objective source of truth while preserving every other saved
     # Config field exactly as recorded in the checkpoint contract.
     from scripts import train_isaac_foundation_fresh as fresh
 
+    task_profile = task.goto_reward_profile
+    if task_profile not in supported_profiles or task_profile not in FAST_STOP_REWARD_PROFILES:
+        raise ValueError(
+            f"RSL checkpoint task_config has unsupported fast-stop reward profile: {task_profile!r}"
+        )
     expected_semantics = {
-        **fresh.FAST_STOP_CONFIG,
+        **{key: value for key, value in fresh.FAST_STOP_CONFIG.items()
+           if key != "goto_reward_profile"},
         "input_schema": ABSOLUTE_GOAL_INPUT_SCHEMA,
         "max_time": 60.0,
         "size": 100.0,
@@ -69,6 +86,11 @@ def _validate_rsl_task_contract(contract: dict[str, Any]):
         raise ValueError(
             "RSL checkpoint task_config is not the strict fast-stop 60 s absolute-goal full-map profile; "
             f"mismatched fields: {differences}"
+        )
+    if (task_profile == "fast_stop_v2"
+            and actual_task.get("fast_stop_failure_remaining_time_cost") is not True):
+        raise ValueError(
+            "fast_stop_v2 requires fast_stop_failure_remaining_time_cost=True in task_config"
         )
     if contract.get("input_schema") != ABSOLUTE_GOAL_INPUT_SCHEMA:
         raise ValueError("RSL checkpoint input_schema must be the absolute-goal schema")
@@ -234,7 +256,7 @@ def run_rsl_smoke(
         "checkpoint": str(path),
         "checkpoint_sha256": evaluated["checkpoint_sha256"],
         "input_schema": evaluated["input_schema"],
-        "task_profile": "fast_stop_v1",
+        "task_profile": contract["task_config"]["goto_reward_profile"],
         "task_config": contract["task_config"],
         "front_guide_spec": contract["front_guide_spec"],
         "body_stability_config": contract["body_stability_config"],

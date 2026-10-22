@@ -1,4 +1,4 @@
-"""RSL-RL configs for the fast-stop absolute-goal task."""
+"""RSL-RL configs for the fast-stop-v2 absolute-goal task."""
 from __future__ import annotations
 
 from dataclasses import asdict
@@ -21,7 +21,7 @@ from .task import Config
 
 
 def _fast_stop_env_values() -> tuple[Config, dict, dict]:
-    """Reuse the project's frozen fast-stop baseline and physics components."""
+    """Reuse the fast-stop physics profile with the v2 reward semantics."""
     # These helpers are the source of truth for the existing fast-stop profile.
     # Import lazily so importing the task registration does not pull the training
     # protocol into the normal Isaac Field environment path.
@@ -41,7 +41,9 @@ def _fast_stop_env_values() -> tuple[Config, dict, dict]:
     task_values.update(
         max_time=60.0,
         input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+        goto_reward_profile="fast_stop_v2",
         rock_density=0.0,
+        fast_stop_failure_remaining_time_cost=True,
     )
     front_guides, body_stability = _rough_profile_components(PROFILE_RANDOM_ROUGH_FAST_STOP)
     return Config(**task_values), asdict(front_guides), body_stability.as_dict()
@@ -52,7 +54,7 @@ _FAST_STOP_TASK, _FAST_STOP_FRONT_GUIDES, _FAST_STOP_BODY_STABILITY = _fast_stop
 
 @configclass
 class FieldFastStopRslEnvCfg(FieldEnvCfg):
-    """Fast-stop task config: full-map baseline, absolute goal, terminal 60 s horizon."""
+    """Fast-stop-v2 task: full-map absolute goal with a terminal 60 s horizon."""
 
     task: Config = _FAST_STOP_TASK
     mode: str = "goto"
@@ -96,7 +98,7 @@ class FieldFastStopRslRunnerCfg(RslRlOnPolicyRunnerCfg):
         obs_normalization=False,
         distribution_cfg=RslRlMLPModelCfg.GaussianDistributionCfg(
             class_name="rsl_rl.modules.distribution.GaussianDistribution",
-            init_std=math.exp(-2),
+            init_std=0.05,
             std_type="log",
         ),
         rnn_type="lstm",
@@ -132,10 +134,10 @@ class FieldFastStopRslRunnerCfg(RslRlOnPolicyRunnerCfg):
         num_learning_epochs=5,
         num_mini_batches=4,
         learning_rate=3.0e-4,
-        schedule="fixed",
+        schedule="adaptive",
         gamma=1.0,
-        lam=0.95,
-        desired_kl=0.03,
+        lam=0.99,
+        desired_kl=0.01,
         max_grad_norm=0.5,
         share_cnn_encoders=True,
     )

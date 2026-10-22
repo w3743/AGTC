@@ -141,6 +141,62 @@ def make_algorithm():
     return env, cfg, algorithm
 
 
+@pytest.mark.parametrize("init_std", [0.2, 0.5, 1.0, 2.0])
+def test_field_gaussian_accepts_finite_positive_exploration_scales(init_std):
+    from isaac_field.rsl_rl_policy import _normalized_gaussian_config
+
+    config = {
+        "class_name": "rsl_rl.modules.distribution.GaussianDistribution",
+        "init_std": init_std,
+        "std_type": "log",
+    }
+    normalized = _normalized_gaussian_config(config)
+    assert normalized["init_std"] == float(init_std)
+    assert normalized["std_type"] == "log"
+
+    observations = make_obs(1)
+    groups = {
+        "actor": list(FIELD_OBSERVATION_KEYS),
+        "critic": list(FIELD_OBSERVATION_KEYS),
+    }
+    actor = RslFieldRNNModel(
+        observations,
+        groups,
+        "actor",
+        4,
+        input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+        distribution_cfg=config,
+    )
+    assert actor.distribution.log_std_param.detach().eq(math.log(init_std)).all()
+    assert actor.constructor_config()["distribution_cfg"]["init_std"] == float(init_std)
+
+
+@pytest.mark.parametrize("init_std", [0.0, -0.1, float("nan"), float("inf"), True])
+def test_field_gaussian_rejects_nonpositive_or_nonfinite_exploration_scales(init_std):
+    from isaac_field.rsl_rl_policy import _normalized_gaussian_config
+
+    with pytest.raises(ValueError, match="finite and positive"):
+        _normalized_gaussian_config(
+            {
+                "class_name": "rsl_rl.modules.distribution.GaussianDistribution",
+                "init_std": init_std,
+                "std_type": "log",
+            }
+        )
+
+
+def test_nondefault_gaussian_init_std_is_preserved_in_checkpoint_contract():
+    env = SyntheticFieldEnv()
+    cfg = make_cfg()
+    cfg["actor"]["distribution_cfg"]["init_std"] = 0.5
+
+    algorithm = RslFieldPPO.construct_algorithm(make_obs(), env, cfg, "cpu")
+    contract = validate_field_policy_contract(algorithm.save()["field_policy_contract"])
+
+    assert contract["distribution"]["init_std"] == 0.5
+    assert contract["actor_config"]["distribution_cfg"]["init_std"] == 0.5
+
+
 def test_real_rsl_construct_and_shared_encoder_has_single_optimizer_owner():
     _, cfg, algorithm = make_algorithm()
     actor = algorithm._raw_actor
@@ -303,14 +359,64 @@ def test_rsl_checkpoint_contract_round_trip_and_rejects_sb3_zip(tmp_path):
         restored.load({"actor_state_dict": {}}, load_cfg=None, strict=True)
 
 
-def test_real_field_runner_config_constructs_through_official_on_policy_runner():
+def test_legacy_task_contract_missing_failure_cost_matches_only_live_false():
+    _env, _cfg, algorithm = make_algorithm()
+    live_false = copy.deepcopy(algorithm.save()["field_policy_contract"])
+    live_false["task_config"] = {
+        "max_time": 60.0,
+        "goto_reward_profile": "fast_stop_v1",
+        "fast_stop_failure_remaining_time_cost": False,
+    }
+    old_contract = copy.deepcopy(live_false)
+    old_contract["task_config"].pop("fast_stop_failure_remaining_time_cost")
+
+    normalized = validate_field_policy_contract(old_contract, expected=live_false)
+    assert normalized["task_config"] == live_false["task_config"]
+
+    explicit_true = copy.deepcopy(live_false)
+    explicit_true["task_config"]["fast_stop_failure_remaining_time_cost"] = True
+    with pytest.raises(ValueError, match="differs from the live"):
+        validate_field_policy_contract(explicit_true, expected=live_false)
+
+    true_live = copy.deepcopy(live_false)
+    true_live["task_config"]["fast_stop_failure_remaining_time_cost"] = True
+    with pytest.raises(ValueError, match="differs from the live"):
+        validate_field_policy_contract(old_contract, expected=true_live)
+
+    changed_other_field = copy.deepcopy(live_false)
+    changed_other_field["task_config"]["max_time"] = 61.0
+    with pytest.raises(ValueError, match="differs from the live"):
+        validate_field_policy_contract(old_contract, expected=changed_other_field)
+
+    missing_other_field = copy.deepcopy(old_contract)
+    missing_other_field["task_config"].pop("max_time")
+    with pytest.raises(ValueError, match="differs from the live"):
+        validate_field_policy_contract(missing_other_field, expected=live_false)
+
+
+def test_official_runner_learn_zero_saves_inference_loadable_untrained_checkpoint(tmp_path):
     pytest.importorskip("isaaclab")
     from isaaclab_rl.rsl_rl import handle_deprecated_rsl_rl_cfg
     from isaac_field.rsl_rl_cfg import FieldFastStopRslRunnerCfg
+    from isaac_field.rsl_rl_inference import RslPredictionModel
+    from isaac_field.assets import FrontGuideSpec
+    from isaac_field.body_stability import BodyStabilityConfig
+    from isaac_field.task import Config
     from rsl_rl.runners import OnPolicyRunner
+    from scripts.train_isaac_foundation_fresh import FAST_STOP_CONFIG
 
     class RunnerEnv(SyntheticFieldEnv):
         cfg = {}
+
+        def __init__(self):
+            self.field_cfg = Config(
+                size=20.0,
+                input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+                max_time=60.0,
+                **FAST_STOP_CONFIG,
+            )
+            self.front_guide_spec = FrontGuideSpec()
+            self.body_stability_config = BodyStabilityConfig()
 
         def get_observations(self):
             return make_obs(self.num_envs)
@@ -320,11 +426,59 @@ def test_real_field_runner_config_constructs_through_official_on_policy_runner()
     runner_cfg.algorithm.num_learning_epochs = 1
     runner_cfg.algorithm.num_mini_batches = 1
     runner_cfg = handle_deprecated_rsl_rl_cfg(runner_cfg, "5.5.1")
-    runner = OnPolicyRunner(RunnerEnv(), runner_cfg.to_dict(), log_dir=None, device="cpu")
+    runner = OnPolicyRunner(RunnerEnv(), runner_cfg.to_dict(), log_dir=str(tmp_path), device="cpu")
 
     assert isinstance(runner.alg, RslFieldPPO)
     assert runner.alg._raw_actor.sensor_encoder is runner.alg._raw_critic.sensor_encoder
     assert runner.alg.field_policy_contract["actor_config"]["distribution_cfg"]["std_range"] == [1e-6, 1e6]
+    assert "task_config" in runner.alg.field_policy_contract
+    assert "front_guide_spec" in runner.alg.field_policy_contract
+    assert "body_stability_config" in runner.alg.field_policy_contract
+
+    actor_before = {
+        key: value.detach().clone()
+        for key, value in runner.alg._raw_actor.state_dict().items()
+    }
+    critic_before = {
+        key: value.detach().clone()
+        for key, value in runner.alg._raw_critic.state_dict().items()
+    }
+    contract_before = copy.deepcopy(runner.alg.field_policy_contract)
+    assert runner.alg.optimizer.state == {}
+
+    # The upstream runner performs its final save even when the learning loop is empty.
+    runner.learn(num_learning_iterations=0, init_at_random_ep_len=False)
+
+    checkpoint_path = tmp_path / "model_0.pt"
+    payload = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    assert payload["iter"] == 0
+    assert payload["num_timesteps"] == 0
+    assert payload["infos"] is None
+    assert payload["field_policy_contract"] == contract_before
+    assert payload["optimizer_state_dict"]["state"] == {}
+    for payload_key, before in (
+        ("actor_state_dict", actor_before),
+        ("critic_state_dict", critic_before),
+    ):
+        assert payload[payload_key].keys() == before.keys()
+        assert all(torch.equal(payload[payload_key][name], before[name]) for name in before)
+    assert runner.alg.optimizer.state == {}
+
+    predictor = RslPredictionModel(checkpoint_path, device="cpu")
+    observations = {
+        key: np.zeros((1, *shape), dtype=np.float32)
+        for key, shape in OBSERVATION_SHAPES.items()
+    }
+    actions, state = predictor.predict(
+        observations,
+        state=None,
+        episode_start=np.ones(1, dtype=bool),
+        deterministic=True,
+    )
+    assert actions.shape == (1, 4)
+    assert np.isfinite(actions).all()
+    assert len(state) == 2
+    assert all(np.isfinite(value).all() for value in state)
 
 
 def test_checkpoint_records_full_task_reconstruction_config():

@@ -615,6 +615,85 @@ def _make_fast_stop_task(**updates):
     return task
 
 
+@pytest.mark.parametrize("value", [0, 1, None, "false"])
+def test_fast_stop_failure_remaining_time_cost_requires_a_real_bool(value):
+    with pytest.raises(ValueError, match="fast_stop_failure_remaining_time_cost must be a bool"):
+        _small_config(fast_stop_failure_remaining_time_cost=value)
+
+
+@pytest.mark.parametrize("time_penalty", [0.2, 0.0])
+def test_fast_stop_failure_remaining_time_cost_equalizes_early_failure_and_timeout(time_penalty):
+    def run_failure(fail_after: int | None):
+        task = _make_fast_stop_task(
+            dt=1.0, max_time=60.0, time_penalty=time_penalty, goal_hold=61.0,
+            fast_stop_failure_remaining_time_cost=True,
+        )
+        task.prepare(seed=425, options={"start": [2.0, 2.0, 0.0], "goal": [4.0, 2.0]})
+        _attach_empty_sensors(task, task.cfg)
+        terminal_info = None
+        for step in range(60):
+            before = task.robot.copy()
+            old_distance = float(np.linalg.norm(task.goal - task.robot[:2]))
+            _, _, terminated, truncated, info = task.finish(
+                np.zeros(4, dtype=np.float32), before, old_distance,
+                boundary=fail_after is not None and step + 1 == fail_after,
+            )
+            assert sum(info["reward_components"].values()) == pytest.approx(task.reward)
+            if terminated or truncated:
+                terminal_info = info
+                break
+        assert terminal_info is not None
+        return task, terminal_info
+
+    early_failure, early_info = run_failure(5)
+    timeout, timeout_info = run_failure(None)
+
+    assert early_info["reason"] == "outside_or_overturned"
+    assert timeout_info["reason"] == "time_limit"
+    assert early_info["reward_components"]["failure_remaining_time_cost"] == pytest.approx(
+        -time_penalty * 55.0
+    )
+    assert timeout_info["reward_components"]["failure_remaining_time_cost"] == 0.0
+    assert early_failure.total_reward == pytest.approx(timeout.total_reward)
+
+
+def test_fast_stop_remaining_time_cost_preserves_faster_success_preference_and_legacy_default():
+    def run_success(wait_steps: int):
+        task = _make_fast_stop_task(
+            dt=1.0, max_time=60.0, time_penalty=0.1, goal_hold=1.0,
+            fast_stop_failure_remaining_time_cost=True,
+        )
+        task.prepare(seed=426, options={"start": [2.0, 2.0, 0.0], "goal": [4.0, 2.0]})
+        _attach_empty_sensors(task, task.cfg)
+        for _ in range(wait_steps):
+            _step_task_to(task, [2.0, 2.0])
+        _, _, terminated, truncated, info = _step_task_to(task, [3.8, 2.0])
+        assert (terminated, truncated) == (True, False)
+        assert info["reason"] == "goal_reached"
+        assert "failure_remaining_time_cost" not in info["reward_components"]
+        return task.total_reward
+
+    faster_success = run_success(0)
+    slower_success = run_success(4)
+    assert faster_success > slower_success
+
+    # The existing default fast-stop path keeps its historical timeout return
+    # and does not emit an extra reward component.
+    legacy_default = _make_fast_stop_task(dt=1.0, max_time=3.0, time_penalty=0.1)
+    assert legacy_default.cfg.fast_stop_failure_remaining_time_cost is False
+    legacy_default.prepare(seed=427, options={"start": [2.0, 2.0, 0.0], "goal": [4.0, 2.0]})
+    _attach_empty_sensors(legacy_default, legacy_default.cfg)
+    last_info = None
+    for _ in range(3):
+        _, _, terminated, truncated, last_info = _step_task_to(legacy_default, [2.0, 2.0])
+    assert (terminated, truncated) == (True, False)
+    assert last_info["reason"] == "time_limit"
+    assert "failure_remaining_time_cost" not in last_info["reward_components"]
+    assert legacy_default.total_reward == pytest.approx(
+        FAST_STOP_FAILURE_REWARD - 0.1 * legacy_default.time
+    )
+
+
 def test_fast_stop_requires_world_xy_speed_and_full_body_angular_hold_for_half_second():
     task = _make_fast_stop_task()
     task.robot[3:] = 0.0  # forward/yaw projections alone would incorrectly declare a stop
@@ -854,6 +933,47 @@ def test_damage_metric_defaults_and_legacy_checkpoint_config_resolution():
                                               "terrain_enabled": False,
                                               "damage_metric": DAMAGE_METRIC_STEM_CONTACT_V2})
     assert explicit.damage_metric == DAMAGE_METRIC_STEM_CONTACT_V2
+
+
+def test_checkpoint_config_strict_mode_defaults_only_the_new_failure_cost_flag():
+    from dataclasses import asdict
+
+    saved = asdict(Config(size=12.0, plants=0, terrain_enabled=False))
+    old_saved = dict(saved)
+    old_saved.pop("fast_stop_failure_remaining_time_cost")
+    restored = Config.from_checkpoint_config(old_saved, require_complete=True)
+    assert restored.fast_stop_failure_remaining_time_cost is False
+
+    missing_other = dict(old_saved)
+    missing_other.pop("goal_hold")
+    with pytest.raises(ValueError, match="missing=.*goal_hold"):
+        Config.from_checkpoint_config(missing_other, require_complete=True)
+
+    unknown = dict(old_saved, unrecognized_task_setting=1)
+    with pytest.raises(ValueError, match="unknown=.*unrecognized_task_setting"):
+        Config.from_checkpoint_config(unknown, require_complete=True)
+
+    explicit_true = dict(saved, fast_stop_failure_remaining_time_cost=True)
+    assert Config.from_checkpoint_config(
+        explicit_true, require_complete=True
+    ).fast_stop_failure_remaining_time_cost is True
+
+
+def test_fast_stop_remaining_time_cost_requires_a_discrete_horizon_only_when_enabled():
+    with pytest.raises(ValueError, match="max_time/dt.*integer"):
+        _small_config(
+            dt=1.0, max_time=2.5, goto_reward_profile="fast_stop_v1",
+            goal_progress_budget=5.0, fast_stop_failure_remaining_time_cost=True,
+        )
+
+    legacy_fractional = _small_config(dt=1.0, max_time=2.5)
+    assert legacy_fractional.fast_stop_failure_remaining_time_cost is False
+
+    old_horizon = _small_config(
+        dt=0.05, max_time=60.0, goto_reward_profile="fast_stop_v1",
+        goal_progress_budget=5.0, fast_stop_failure_remaining_time_cost=True,
+    )
+    assert old_horizon.max_time / old_horizon.dt == pytest.approx(1200.0)
 
 
 def test_stem_contact_v2_ignores_root_protection_circle_and_legacy_keeps_it():

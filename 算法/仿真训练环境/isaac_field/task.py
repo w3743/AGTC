@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from collections import deque
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 import hashlib
 import math
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
@@ -37,6 +38,16 @@ DAMAGE_METRIC_STEM_CONTACT_V2 = "stem-contact-v2"
 DAMAGE_METRIC_ROOT_PROTECTION_V1 = "root-protection-v1"
 FAST_STOP_SUCCESS_REWARD = 10.0
 FAST_STOP_FAILURE_REWARD = -10.0
+FAST_STOP_REWARD_PROFILES = frozenset(("fast_stop_v1", "fast_stop_v2"))
+
+
+def _goal_set_progress_potential(initial_distance: float, distance: float,
+                                 tolerance: float, budget: float) -> float:
+    """Bound progress outside the accepted goal disk; its interior is flat."""
+    initial_error = max(0.0, initial_distance - tolerance)
+    error = max(0.0, distance - tolerance)
+    progress = (initial_error - error) / max(initial_error, tolerance)
+    return budget * max(-1.0, min(1.0, progress))
 
 STATE_FIELDS = (
     "mode_0_search_1_goto",
@@ -143,22 +154,37 @@ class Config:
     damage_metric: str = DAMAGE_METRIC_STEM_CONTACT_V2
     # Opt-in scoring contract; legacy remains the default for old runs.
     goto_reward_profile: str = "legacy"
-    # Stop thresholds are used by fast_stop_v1; legacy keeps its historical
+    # Stop thresholds are used by fast-stop profiles; legacy keeps its historical
     # strict 0.2 m/s and 0.3 rad/s checks regardless of these fields.
     goal_stop_speed: float = 0.2
     goal_stop_angular_speed: float = 0.3
     # Select the semantic meaning of state[1:3]; legacy remains the default.
     input_schema: str = INPUT_SCHEMA
+    # Optional correction for failure termination before the finite horizon.
+    fast_stop_failure_remaining_time_cost: bool = False
 
     @classmethod
-    def from_checkpoint_config(cls, values: dict[str, Any]) -> "Config":
-        """Build a task config while preserving pre-metric checkpoint scoring.
+    def from_checkpoint_config(
+        cls, values: Mapping[str, Any], *, require_complete: bool = False
+    ) -> "Config":
+        """Rebuild serialized task settings with narrow legacy migrations.
 
-        New callers should use ``Config(...)`` and receive stem-contact-v2.
-        Serialized configs written before a damage metric was recorded must
-        pass through this loader, where the missing field means legacy scoring.
+        In strict contract mode, every field must be present except the newer
+        failure-time-cost flag. Its historical absence means ``False``. The
+        default non-strict mode retains existing pre-metric checkpoint loading.
         """
         config = dict(values)
+        fields_by_name = {item.name for item in fields(cls)}
+        if require_complete:
+            missing = fields_by_name - set(config)
+            missing.discard("fast_stop_failure_remaining_time_cost")
+            unknown = set(config) - fields_by_name
+            if missing or unknown:
+                raise ValueError(
+                    "task_config must be complete; "
+                    f"missing={sorted(missing)}, unknown={sorted(unknown)}"
+                )
+        config.setdefault("fast_stop_failure_remaining_time_cost", False)
         if "damage_metric" not in config:
             config["damage_metric"] = DAMAGE_METRIC_ROOT_PROTECTION_V1
             # Before the metric version existed, robot_width meant the 300 mm
@@ -183,8 +209,21 @@ class Config:
         if self.damage_metric not in (DAMAGE_METRIC_STEM_CONTACT_V2,
                                       DAMAGE_METRIC_ROOT_PROTECTION_V1):
             raise ValueError("damage_metric must be 'stem-contact-v2' or 'root-protection-v1'")
-        if self.goto_reward_profile not in ("legacy", "fast_stop_v1"):
-            raise ValueError("goto_reward_profile must be 'legacy' or 'fast_stop_v1'")
+        if self.goto_reward_profile not in {"legacy", *FAST_STOP_REWARD_PROFILES}:
+            raise ValueError("goto_reward_profile must be 'legacy', 'fast_stop_v1' or 'fast_stop_v2'")
+        if type(self.fast_stop_failure_remaining_time_cost) is not bool:
+            raise ValueError("fast_stop_failure_remaining_time_cost must be a bool")
+        if (self.goto_reward_profile == "fast_stop_v2"
+                and not self.fast_stop_failure_remaining_time_cost):
+            raise ValueError("fast_stop_v2 requires fast_stop_failure_remaining_time_cost=True")
+        if self.fast_stop_failure_remaining_time_cost:
+            horizon_steps = self.max_time / self.dt
+            if (not math.isfinite(horizon_steps)
+                    or abs(horizon_steps - round(horizon_steps)) > 1e-9):
+                raise ValueError(
+                    "fast_stop_failure_remaining_time_cost requires max_time/dt "
+                    "to be an integer within 1e-9"
+                )
         if (not math.isfinite(self.row_spacing) or self.row_spacing <= 0
                 or not math.isfinite(self.plant_spacing) or self.plant_spacing <= 0):
             raise ValueError("row and plant spacing must be finite and positive")
@@ -252,8 +291,8 @@ class Config:
                             ("goal stop angular speed", self.goal_stop_angular_speed)):
             if isinstance(value, bool) or not math.isfinite(value) or value < 0:
                 raise ValueError(f"{name} must be finite and non-negative")
-        if self.goto_reward_profile == "fast_stop_v1" and self.goal_progress_budget is None:
-            raise ValueError("fast_stop_v1 requires goal_progress_budget")
+        if self.goto_reward_profile in FAST_STOP_REWARD_PROFILES and self.goal_progress_budget is None:
+            raise ValueError(f"{self.goto_reward_profile} requires goal_progress_budget")
 
 
 def _terrain_seed_from_rng(rng: np.random.Generator) -> int:
@@ -1081,7 +1120,7 @@ class FieldTask:
             raise ValueError("old_distance must be finite and non-negative")
         if rock_collision:
             self.collisions += 1
-        fast_stop = self.cfg.goto_reward_profile == "fast_stop_v1" and self.mode == "goto"
+        fast_stop = self.cfg.goto_reward_profile in FAST_STOP_REWARD_PROFILES and self.mode == "goto"
         tilt_failure = abs(self.body_pose[1]) > 1.2 or abs(self.body_pose[2]) > 1.2
         self.physics_failure = bool(
             self.physics_failure or physics_failure
@@ -1248,7 +1287,7 @@ class FieldTask:
                      physics_failure=False):
         """Apply shared damage, sensing, reward, and episode bookkeeping."""
         c = self.cfg
-        fast_stop = c.goto_reward_profile == "fast_stop_v1" and self.mode == "goto"
+        fast_stop = c.goto_reward_profile in FAST_STOP_REWARD_PROFILES and self.mode == "goto"
         self._damage_sweep(before, self.robot)
         self.time += c.dt
         self.trail.append(self.robot[:2].tolist())
@@ -1326,15 +1365,23 @@ class FieldTask:
                     -2 * (1 - len(self.reported) / max(1, int(self.scene.targets.sum())))
                 )
         if fast_stop:
-            # Potential shaping telescopes over a complete episode. Setting
-            # terminal potential to zero cancels all progress at either outcome.
             initial_distance = (self._initial_goal_distance if self._initial_goal_distance is not None
                                 else float(old_distance))
             budget = float(c.goal_progress_budget)
-            normalizer = max(initial_distance, c.goal_tolerance)
-            phi_old = budget * (initial_distance - float(old_distance)) / normalizer
-            phi_next = (0.0 if self.done else
-                        budget * (initial_distance - float(distance)) / normalizer)
+            if c.goto_reward_profile == "fast_stop_v2":
+                # Retain bounded terminal progress so failed approaches remain
+                # distinguishable. Every point inside the accepted disk has
+                # the same potential, so success is ordered only by time.
+                phi_old = _goal_set_progress_potential(
+                    initial_distance, float(old_distance), c.goal_tolerance, budget)
+                phi_next = _goal_set_progress_potential(
+                    initial_distance, float(distance), c.goal_tolerance, budget)
+            else:
+                # Preserve v1: terminal potential cancels all episode progress.
+                normalizer = max(initial_distance, c.goal_tolerance)
+                phi_old = budget * (initial_distance - float(old_distance)) / normalizer
+                phi_next = (0.0 if self.done else
+                            budget * (initial_distance - float(distance)) / normalizer)
             components["goal_progress"] = float(phi_next - phi_old)
             reward += components["goal_progress"]
             if self.done:
@@ -1344,6 +1391,12 @@ class FieldTask:
                 else:
                     components["terminal_failure"] = FAST_STOP_FAILURE_REWARD
                     reward += FAST_STOP_FAILURE_REWARD
+                    if c.fast_stop_failure_remaining_time_cost:
+                        remaining_time_cost = -c.time_penalty * max(
+                            0.0, c.max_time - self.time
+                        )
+                        components["failure_remaining_time_cost"] = float(remaining_time_cost)
+                        reward += remaining_time_cost
         # Keep the prior policy command separately for temporal context.
         self.last_action = np.array(a, dtype=np.float32, copy=True)
         self.reward = float(reward)
@@ -1357,7 +1410,7 @@ class FieldTask:
 
     def _goal_stop_state(self) -> dict[str, Any]:
         """Report the physical stop criterion with a pure-task kinematic fallback."""
-        fast_stop = self.cfg.goto_reward_profile == "fast_stop_v1" and self.mode == "goto"
+        fast_stop = self.cfg.goto_reward_profile in FAST_STOP_REWARD_PROFILES and self.mode == "goto"
         if not fast_stop:
             linear_speed = abs(float(self.robot[3]))
             angular_speed = abs(float(self.robot[4]))

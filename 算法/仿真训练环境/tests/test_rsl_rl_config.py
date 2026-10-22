@@ -12,7 +12,7 @@ from isaac_field.rsl_rl_cfg import FieldFastStopRslEnvCfg, FieldFastStopRslRunne
 from isaac_field.rsl_rl_env import IsaacFieldRslEnv, expose_policy_observation_space
 
 
-def test_fast_stop_rsl_configs_keep_the_existing_task_contract():
+def test_fast_stop_v2_rsl_configs_keep_the_strict_task_contract():
     env_cfg = FieldFastStopRslEnvCfg()
     runner_cfg = FieldFastStopRslRunnerCfg()
 
@@ -22,11 +22,12 @@ def test_fast_stop_rsl_configs_keep_the_existing_task_contract():
     assert env_cfg.task.terrain_enabled is False
     assert env_cfg.task.rock_density == 0.0
     assert env_cfg.task.damage_metric == "stem-contact-v2"
-    assert env_cfg.task.goto_reward_profile == "fast_stop_v1"
+    assert env_cfg.task.goto_reward_profile == "fast_stop_v2"
     assert env_cfg.task.goal_tolerance == 0.4
     assert env_cfg.task.goal_stop_speed == 0.05
     assert env_cfg.task.goal_stop_angular_speed == 0.1
     assert env_cfg.task.goal_hold == 0.5
+    assert env_cfg.task.fast_stop_failure_remaining_time_cost is True
     assert env_cfg.task.input_schema == "sensor-absolute-goal-v1"
     assert env_cfg.is_finite_horizon is True
     assert env_cfg.scene.num_envs == 4
@@ -38,6 +39,7 @@ def test_fast_stop_rsl_configs_keep_the_existing_task_contract():
     assert runner_cfg.init_at_random_ep_len is False
     assert runner_cfg.num_steps_per_env == 128
     assert runner_cfg.max_iterations == 384
+    assert runner_cfg.save_interval == 16
     assert runner_cfg.obs_groups == {"actor": leaves, "critic": leaves}
     assert runner_cfg.actor.class_name == "isaac_field.rsl_rl_policy:RslFieldRNNModel"
     assert runner_cfg.critic.class_name == "isaac_field.rsl_rl_policy:RslFieldRNNModel"
@@ -55,6 +57,10 @@ def test_fast_stop_rsl_configs_keep_the_existing_task_contract():
     assert runner_cfg.actor.rnn_type == runner_cfg.critic.rnn_type == "lstm"
     assert runner_cfg.actor.rnn_hidden_dim == runner_cfg.critic.rnn_hidden_dim == 512
     assert runner_cfg.actor.rnn_num_layers == runner_cfg.critic.rnn_num_layers == 1
+    assert runner_cfg.actor.hidden_dims == runner_cfg.critic.hidden_dims == [64]
+    assert runner_cfg.actor.activation == runner_cfg.critic.activation == "tanh"
+    assert runner_cfg.actor.distribution_cfg.init_std == 0.05
+    assert runner_cfg.actor.distribution_cfg.std_type == "log"
     assert runner_cfg.algorithm.class_name == "isaac_field.rsl_rl_policy:RslFieldPPO"
     assert runner_cfg.algorithm.share_cnn_encoders is True
     assert runner_cfg.algorithm.max_grad_norm == 0.5
@@ -62,12 +68,28 @@ def test_fast_stop_rsl_configs_keep_the_existing_task_contract():
     assert runner_cfg.algorithm.use_clipped_value_loss is False
     assert runner_cfg.algorithm.entropy_coef == 0.0
     assert runner_cfg.algorithm.gamma == 1.0
-    assert runner_cfg.algorithm.lam == 0.95
+    assert runner_cfg.algorithm.lam == 0.99
     assert runner_cfg.algorithm.clip_param == 0.2
     assert runner_cfg.algorithm.learning_rate == 3.0e-4
     assert runner_cfg.algorithm.num_learning_epochs == 5
-    assert runner_cfg.algorithm.schedule == "fixed"
-    assert runner_cfg.algorithm.desired_kl == 0.03
+    assert runner_cfg.algorithm.schedule == "adaptive"
+    assert runner_cfg.algorithm.desired_kl == 0.01
+
+
+def test_hydra_can_override_v2_actor_init_std_to_point_three():
+    import isaac_field.tasks  # noqa: F401
+    from isaaclab_tasks.utils import resolve_task_config
+
+    env_cfg, agent_cfg = resolve_task_config(
+        "Isaac-Field-FastStop-Rsl-Direct",
+        "rsl_rl_cfg_entry_point",
+        overrides=["agent.actor.distribution_cfg.init_std=0.3"],
+    )
+
+    assert env_cfg.task.goto_reward_profile == "fast_stop_v2"
+    assert env_cfg.task.fast_stop_failure_remaining_time_cost is True
+    assert agent_cfg.actor.distribution_cfg.init_std == 0.3
+    assert agent_cfg.algorithm.entropy_coef == 0.0
 
 
 def test_task_registration_keeps_legacy_and_selects_rsl_for_new_task():

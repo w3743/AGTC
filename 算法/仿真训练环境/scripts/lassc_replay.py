@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import copy
-from dataclasses import fields
 import hashlib
 import json
 import math
@@ -318,18 +317,10 @@ def _rsl_config_from_contract(contract) -> Config:
         raise ValueError(
             "RSL replay requires field_policy_contract.task_config; refusing to infer observation normalization"
         )
-    expected_fields = {field.name for field in fields(Config)}
-    actual_fields = set(task_config)
-    missing = sorted(expected_fields - actual_fields)
-    unknown = sorted(actual_fields - expected_fields)
-    if missing or unknown:
-        details = []
-        if missing:
-            details.append(f"missing {missing}")
-        if unknown:
-            details.append(f"unknown {unknown}")
-        raise ValueError("RSL task_config must be complete for this Config version: " + "; ".join(details))
-    cfg = Config(**dict(task_config))
+    try:
+        cfg = Config.from_checkpoint_config(task_config, require_complete=True)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"RSL task_config is invalid for this Config version: {exc}") from exc
     schema = contract.get("input_schema")
     if cfg.input_schema != schema:
         raise ValueError(
