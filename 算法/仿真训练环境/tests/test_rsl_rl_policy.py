@@ -13,7 +13,7 @@ from tensordict import TensorDict
 
 from isaac_field.action_contract import action_config
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA, feedback_config
-from isaac_field.policy import OBSERVATION_SHAPES
+from isaac_field.policy_contract import OBSERVATION_SHAPES
 from isaac_field.task import state_fields_for_schema
 from isaac_field.rsl_rl_policy import (
     FIELD_OBSERVATION_KEYS,
@@ -225,6 +225,12 @@ def test_recurrent_storage_handles_partial_dones_and_padded_t_by_n_update():
 
     algorithm.compute_returns(next_obs)
     losses = algorithm.update()
+    assert algorithm.save()["num_timesteps"] == 8
+    _, _, resumed = make_algorithm()
+    resumed.load(algorithm.save(), load_cfg=None, strict=True)
+    assert resumed.num_timesteps == 8
+    resumed.load(algorithm.save(), load_cfg={"actor": True}, strict=True)
+    assert resumed.num_timesteps == 0
     assert set(losses) == {"value", "surrogate", "entropy"}
     assert all(math.isfinite(float(value)) for value in losses.values())
     assert any(
@@ -255,11 +261,15 @@ def test_rsl_checkpoint_contract_round_trip_and_rejects_sb3_zip(tmp_path):
 
     restored = RslFieldPPO.construct_algorithm(make_obs(), env, cfg, "cpu")
     restored.load(loaded, load_cfg=None, strict=True)
+    assert restored.num_timesteps == payload["num_timesteps"]
     for key, tensor in source._raw_actor.state_dict().items():
         assert torch.equal(tensor, restored._raw_actor.state_dict()[key])
     for key, tensor in source._raw_critic.state_dict().items():
         assert torch.equal(tensor, restored._raw_critic.state_dict()[key])
     assert restored.field_policy_contract == source.field_policy_contract
+    legacy_marker = copy.deepcopy(loaded)
+    legacy_marker["field_policy_contract"]["encoder_config"]["class_name"] = "isaac_field.policy:SensorEncoder"
+    restored.load(legacy_marker, load_cfg=None, strict=True)
 
     play_env = SyntheticFieldEnv()
     play_env.num_envs = 1
@@ -315,6 +325,25 @@ def test_real_field_runner_config_constructs_through_official_on_policy_runner()
     assert isinstance(runner.alg, RslFieldPPO)
     assert runner.alg._raw_actor.sensor_encoder is runner.alg._raw_critic.sensor_encoder
     assert runner.alg.field_policy_contract["actor_config"]["distribution_cfg"]["std_range"] == [1e-6, 1e6]
+
+
+def test_checkpoint_records_full_task_reconstruction_config():
+    from dataclasses import asdict
+    from isaac_field.assets import FrontGuideSpec
+    from isaac_field.body_stability import BodyStabilityConfig
+    from isaac_field.task import Config
+    from scripts.train_isaac_foundation_fresh import FAST_STOP_CONFIG
+
+    env = SyntheticFieldEnv()
+    env.field_cfg = Config(size=20.0, input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+                           max_time=60.0, **FAST_STOP_CONFIG)
+    env.front_guide_spec = FrontGuideSpec()
+    env.body_stability_config = BodyStabilityConfig()
+    algorithm = RslFieldPPO.construct_algorithm(make_obs(), env, make_cfg(), "cpu")
+    contract = algorithm.save()["field_policy_contract"]
+    assert contract["task_config"] == asdict(env.field_cfg)
+    assert contract["front_guide_spec"] == asdict(env.front_guide_spec)
+    assert contract["body_stability_config"] == asdict(env.body_stability_config)
 
 
 def _save_payload(tmp_path, payload, name):

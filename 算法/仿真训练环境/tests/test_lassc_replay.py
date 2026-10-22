@@ -16,15 +16,21 @@ if str(ROOT) not in sys.path:
 
 from isaac_field.task import Config
 from isaac_field.telemetry import make_hardware_feedback_estimator
+from isaac_field.action_contract import action_config
+from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
+from isaac_field.policy_contract import OBSERVATION_SHAPES, validate_policy_spaces
 from scripts.lassc_consumer import PoseHistory
 from scripts.lassc_replay import (
     SYNTHETIC_CLOCK,
     SYNTHETIC_SESSION,
     _action_codec_check,
     _policy_env,
+    _rsl_config_from_contract,
+    _rsl_spaces_from_contract,
     build_depth_fixture,
     build_telemetry_snapshot,
     make_depth_metadata,
+    run_replay,
 )
 
 
@@ -101,9 +107,11 @@ def test_checkpoint_space_adapter_matches_saved_bounds_without_fake_steps():
     checkpoint = os.environ.get("LASSC_REPLAY_CHECKPOINT")
     if not checkpoint:
         pytest.skip("set LASSC_REPLAY_CHECKPOINT to inspect trusted checkpoint spaces")
+    checkpoint = Path(checkpoint).expanduser().resolve()
+    if checkpoint.suffix.lower() != ".zip":
+        pytest.skip("saved-space pickle inspection is only meaningful for explicit SB3 .zip fixtures")
     from stable_baselines3.common.save_util import load_from_zip_file
 
-    checkpoint = Path(checkpoint).expanduser().resolve()
     data, _params, _pytorch_variables = load_from_zip_file(str(checkpoint), device="cpu")
     saved_observation_space = data["observation_space"]
     saved_action_space = data["action_space"]
@@ -126,16 +134,144 @@ def test_checkpoint_space_adapter_matches_saved_bounds_without_fake_steps():
     assert np.all(saved_action_space.low == -1.0)
     assert np.all(saved_action_space.high == 1.0)
 
-    env = _policy_env(checkpoint)
+    env = _policy_env(checkpoint, legacy_sb3=True)
     assert env.observation_space == saved_observation_space
     assert env.action_space == saved_action_space
+    assert env.input_schema
     with pytest.raises(NotImplementedError):
         env.reset()
     with pytest.raises(NotImplementedError):
         env.step(np.zeros(4, dtype=np.float32))
-    from isaac_field.policy import validate_policy_spaces
-    validate_policy_spaces(env.observation_space, env.action_space)
+    validate_policy_spaces(env.observation_space, env.action_space, input_schema=env.input_schema)
     env.close()
+
+
+def test_rsl_checkpoint_contract_rebuilds_read_only_spaces():
+    from test_absolute_goal_policy import _observation_config
+
+    observation_config = _observation_config(ABSOLUTE_GOAL_INPUT_SCHEMA)
+    contract = {
+        "backend": "rsl_rl",
+        "input_schema": ABSOLUTE_GOAL_INPUT_SCHEMA,
+        "observation_shapes": {key: list(shape) for key, shape in OBSERVATION_SHAPES.items()},
+        "observation_config": observation_config,
+        "action_config": action_config(),
+    }
+    env = _rsl_spaces_from_contract(contract)
+    assert env.num_envs == 1
+    assert env.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA
+    assert env.observation_config == observation_config
+    assert env.action_config == action_config()
+    expected = {
+        "lidar": (0.0, 1.0),
+        "depth": (-1.0, 1.0),
+        "detections": (-1.0, 1.0),
+        "state": (-1.0, 1.0),
+        "feedback": (-np.inf, np.inf),
+    }
+    assert set(env.observation_space.spaces) == set(expected)
+    for name, (low, high) in expected.items():
+        space = env.observation_space.spaces[name]
+        assert tuple(space.shape) == OBSERVATION_SHAPES[name]
+        assert space.dtype == np.float32
+        assert np.all(space.low == low)
+        assert np.all(space.high == high)
+    assert env.action_space.shape == (4,)
+    assert env.action_space.dtype == np.float32
+    assert np.all(env.action_space.low == -1.0)
+    assert np.all(env.action_space.high == 1.0)
+    with pytest.raises(NotImplementedError):
+        env.reset()
+    with pytest.raises(NotImplementedError):
+        env.step(np.zeros(4, dtype=np.float32))
+    env.close()
+
+
+def test_rsl_replay_requires_complete_task_config():
+    with pytest.raises(ValueError, match="task_config"):
+        _rsl_config_from_contract({
+            "backend": "rsl_rl",
+            "input_schema": ABSOLUTE_GOAL_INPUT_SCHEMA,
+            "observation_config": {},
+        })
+
+
+def test_sb3_zip_requires_explicit_legacy_selection_before_loading(tmp_path):
+    checkpoint = tmp_path / "legacy.zip"
+    checkpoint.write_bytes(b"not loaded without opt-in")
+    with pytest.raises(ValueError, match="--legacy-sb3"):
+        _policy_env(checkpoint)
+    with pytest.raises(ValueError, match="only an SB3 .zip"):
+        _policy_env(tmp_path / "field.pt", legacy_sb3=True)
+
+
+def test_native_rsl_checkpoint_runs_cpu_lassc_replay(tmp_path):
+    torch = pytest.importorskip("torch")
+    pytest.importorskip("rsl_rl")
+    from tensordict import TensorDict
+    from types import SimpleNamespace
+
+    from isaac_field.assets import FrontGuideSpec
+    from isaac_field.body_stability import BodyStabilityConfig
+    from isaac_field.rsl_rl_policy import RslFieldRNNModel, build_field_policy_contract
+    from test_absolute_goal_policy import _observation_config
+
+    torch.set_num_threads(1)
+    task_cfg = Config(size=20.0, input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA)
+    observation_config = _observation_config(ABSOLUTE_GOAL_INPUT_SCHEMA)
+    observation_config["absolute_goal_coordinates"]["field_size_m"] = task_cfg.size
+    observations = TensorDict({
+        key: torch.zeros((1, *tuple(shape)), dtype=torch.float32)
+        for key, shape in OBSERVATION_SHAPES.items()
+    }, batch_size=[1])
+    groups = {name: list(observations.keys()) for name in ("actor", "critic")}
+    actor = RslFieldRNNModel(
+        observations, groups, "actor", 4,
+        input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+        distribution_cfg={
+            "class_name": "rsl_rl.modules.distribution:GaussianDistribution",
+            "init_std": float(np.exp(-2)), "std_type": "log",
+        },
+    )
+    critic = RslFieldRNNModel(
+        observations, groups, "critic", 1, cnns=actor.cnns,
+        input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+    )
+    env_contract = SimpleNamespace(
+        num_envs=1,
+        observation_config=observation_config,
+        action_config=action_config(),
+        field_cfg=task_cfg,
+        front_guide_spec=FrontGuideSpec(),
+        body_stability_config=BodyStabilityConfig(),
+    )
+    contract = build_field_policy_contract(
+        actor, critic, obs_groups=groups, env=env_contract,
+        num_steps_per_env=128,
+    )
+    checkpoint = tmp_path / "native_field.pt"
+    torch.save({
+        "field_policy_contract": contract,
+        "actor_state_dict": actor.state_dict(),
+        "critic_state_dict": critic.state_dict(),
+        "iter": 0,
+    }, checkpoint)
+
+    report, code = run_replay(checkpoint, output=tmp_path / "replay.json")
+    assert code == 0, report
+    assert report["all_required_checks_passed"] is True
+    assert report["checkpoint"]["backend"] == "rsl_rl"
+    assert report["checkpoint"]["device"] == "cpu"
+    assert report["checkpoint"]["sha256"]
+    assert len(report["replay"]) >= 3
+    assert report["checks"]["epoch_change_resets_recurrent_state"] is True
+    first = report["replay"][0]
+    assert abs(first["estimated_heading_rad"]) > 0.1
+    assert not np.allclose(first["estimated_xy"], first["goal_xy"])
+    np.testing.assert_allclose(first["goal_state_features"], [-0.7, -0.8], atol=1e-6)
+    np.testing.assert_allclose(first["goal_state_features"],
+                               first["expected_goal_features"], atol=1e-6)
+    assert report["checks"]["absolute_goal_state_uses_world_goal_coordinates"] is True
 
 
 def test_real_checkpoint_cpu_replay_subprocess_opt_in(tmp_path):
@@ -146,6 +282,8 @@ def test_real_checkpoint_cpu_replay_subprocess_opt_in(tmp_path):
     output = tmp_path / "lassc_replay.json"
     command = [sys.executable, str(ROOT / "scripts/lassc_replay.py"),
                "--checkpoint", checkpoint, "--output", str(output)]
+    if Path(checkpoint).suffix.lower() == ".zip":
+        command.append("--legacy-sb3")
     live_url = os.environ.get("LASSC_REPLAY_LIVE_URL")
     if live_url:
         command.extend(("--live-url", live_url))
@@ -160,5 +298,8 @@ def test_real_checkpoint_cpu_replay_subprocess_opt_in(tmp_path):
     assert all(value is True for value in report["checks"].values())
     assert report["checkpoint"]["device"] == "cpu"
     assert report["checkpoint"]["sha256"]
+    assert report["checkpoint"]["backend"] == (
+        "sb3_legacy" if Path(checkpoint).suffix.lower() == ".zip" else "rsl_rl"
+    )
     assert len(report["replay"]) >= 3
     assert report["live"]["status"] in ("not_tested", "tested")

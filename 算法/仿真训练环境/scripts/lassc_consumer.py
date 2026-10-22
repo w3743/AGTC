@@ -1,13 +1,16 @@
-"""LASSC consumer bridge; no camera, CAN, serial or simulator is started here.
+"""Backend-neutral LASSC consumer bridge; it never starts sensors or a simulator.
 
 Depth decoding is reused from the RK implementation, never forked. Sensor frame
 dictionaries and observation packing reuse FieldTask. All actions are returned
 as data; the application owns arming, drive sessions and physical safety limits.
+The policy is an injected recurrent runner, so this production bridge does not
+load SB3 or choose a checkpoint backend.
 """
 from __future__ import annotations
 
 import copy
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 import hashlib
 import importlib
@@ -24,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from isaac_field.feedback import FeedbackSnapshot
+from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA, FeedbackSnapshot
 from isaac_field.task import Config, FieldTask
 from isaac_field.telemetry import encode_speed_command
 
@@ -148,6 +151,125 @@ class _MeasuredObservationTask(FieldTask):
         return self.measured_pose.copy()
 
 
+_OBSERVATION_CONFIG_FIELDS = (
+    "size", "max_time", "input_schema", "lidar_rays", "lidar_range",
+    "lidar_min_range", "depth_height", "depth_width", "depth_range",
+    "depth_min_range", "max_detections", "camera_range",
+)
+
+
+def _same_contract_value(expected, actual) -> bool:
+    if isinstance(expected, bool) or isinstance(actual, bool):
+        return expected is actual
+    if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
+        return math.isclose(float(expected), float(actual), rel_tol=0.0, abs_tol=1e-9)
+    return expected == actual
+
+
+def _validate_runner_observation_contract(cfg: Config, runner) -> None:
+    """Reject checkpoint metadata that would change FieldTask packing semantics.
+
+    Injected runners without checkpoint metadata remain valid for isolated
+    consumer tests and custom deployments. Production RSL runners expose their
+    schema, observation contract and full task configuration.
+    """
+    if runner is None:
+        return
+    model = getattr(runner, "model", None)
+    contract = getattr(model, "contract", None)
+    if contract is not None and not isinstance(contract, Mapping):
+        raise ValueError("runner model contract must be a mapping when provided")
+    if contract is None:
+        contract = {}
+    is_rsl_contract = contract.get("backend") == "rsl_rl"
+
+    observation_config = getattr(runner, "observation_config", None)
+    if observation_config is None:
+        observation_config = getattr(model, "field_observation_config", None)
+    if observation_config is None:
+        observation_config = contract.get("observation_config")
+    if observation_config is not None and not isinstance(observation_config, Mapping):
+        raise ValueError("runner observation_config must be a mapping when provided")
+    if is_rsl_contract and not isinstance(observation_config, Mapping):
+        raise ValueError("RSL runner contract is missing observation_config")
+
+    schema = getattr(runner, "input_schema", None)
+    if schema is None:
+        schema = getattr(model, "input_schema", None)
+    if schema is None and isinstance(observation_config, Mapping):
+        schema = observation_config.get("schema")
+    if schema is None:
+        schema = contract.get("input_schema")
+    has_contract_metadata = bool(
+        schema is not None or observation_config is not None or contract
+    )
+    if not has_contract_metadata:
+        return
+    if schema is not None and schema != cfg.input_schema:
+        raise ValueError(
+            f"consumer Config input_schema {cfg.input_schema!r} does not match runner {schema!r}"
+        )
+
+    if isinstance(observation_config, Mapping):
+        declared_schema = observation_config.get("schema")
+        if declared_schema is not None and declared_schema != cfg.input_schema:
+            raise ValueError(
+                f"consumer Config input_schema {cfg.input_schema!r} does not match runner observation_config"
+            )
+        shapes = observation_config.get("observation_shapes")
+        if isinstance(shapes, Mapping):
+            expected_shapes = {
+                "lidar": [1, cfg.lidar_rays],
+                "depth": [1, cfg.depth_height, cfg.depth_width],
+                "detections": [cfg.max_detections, 8],
+                "state": [33],
+                "feedback": [37],
+            }
+            mismatches = {
+                key: (shapes.get(key), expected)
+                for key, expected in expected_shapes.items()
+                if (key in shapes and shapes.get(key) != expected)
+                or (is_rsl_contract and key not in shapes)
+            }
+            if mismatches:
+                raise ValueError(
+                    f"consumer Config sensor dimensions do not match runner observation_config: {mismatches}"
+                )
+        elif is_rsl_contract or cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+            raise ValueError("runner observation_config must declare observation_shapes")
+
+        if cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+            from isaac_field.policy_contract import _validate_observation_config
+
+            _validate_observation_config(observation_config, cfg.input_schema)
+            coordinates = observation_config.get("absolute_goal_coordinates", {})
+            if not _same_contract_value(coordinates.get("field_size_m"), cfg.size):
+                raise ValueError(
+                    "consumer Config size does not match runner absolute-goal field_size_m"
+                )
+
+    task_config = contract.get("task_config")
+    if task_config is not None and not isinstance(task_config, Mapping):
+        raise ValueError("runner contract task_config must be a mapping when provided")
+    if is_rsl_contract and not isinstance(task_config, Mapping):
+        raise ValueError("RSL runner contract is missing task_config observation normalization")
+    if isinstance(task_config, Mapping):
+        missing = [key for key in _OBSERVATION_CONFIG_FIELDS if key not in task_config]
+        if is_rsl_contract and missing:
+            raise ValueError(
+                f"RSL runner task_config is missing observation normalization fields: {missing}"
+            )
+        mismatches = {
+            key: (task_config[key], getattr(cfg, key))
+            for key in _OBSERVATION_CONFIG_FIELDS
+            if key in task_config and not _same_contract_value(task_config[key], getattr(cfg, key))
+        }
+        if mismatches:
+            raise ValueError(
+                f"consumer Config observation normalization does not match runner task_config: {mismatches}"
+            )
+
+
 class LASSCConsumer:
     """Transactional bridge: rejected packets never advance accepted state.
 
@@ -156,6 +278,9 @@ class LASSCConsumer:
     explicit deployment/test configuration, not asserted hardware safe values.
     Repeated identical fresh frames may be consumed at control rate with
     new_frame=False. Session/epoch switches reset recurrent state on acceptance.
+    The injected runner follows the small ``state`` / ``episode_start`` /
+    ``reset`` / ``action`` protocol implemented by both production RSL and the
+    opt-in legacy SB3 adapter; no backend is imported by this module.
     """
     def __init__(self, adapter, *, cfg: Config, max_depth_age_s: float,
                  max_other_age_s: float, runner=None):
@@ -163,10 +288,11 @@ class LASSCConsumer:
             if not math.isfinite(age) or age <= 0:
                 raise ValueError("explicit finite positive age limits required")
         if (cfg.depth_height, cfg.depth_width, cfg.depth_range) != (160, 88, 5.0):
-            raise ValueError("legacy depth profile must be (160,88), 5 metres")
+            raise ValueError("LASSC depth profile must be (160,88), 5 metres")
         target_k = getattr(adapter, "target_k", load_depth_modules()[0].TARGET_K)
         if not np.allclose(target_k, load_depth_modules()[0].TARGET_K, rtol=0, atol=1e-6):
-            raise ValueError("57344 consumer requires the centered Isaac Camera target K")
+            raise ValueError("LASSC consumer requires the registered centered depth target K")
+        _validate_runner_observation_contract(cfg, runner)
         self.adapter = adapter
         self.cfg = cfg
         self.max_depth_age_s = max_depth_age_s

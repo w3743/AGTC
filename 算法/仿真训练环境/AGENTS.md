@@ -17,7 +17,7 @@
 
 ## 当前批次与运行状态
 
-- 2026-10-22：用户已明确授权RSL-RL代码迁移。本worktree为`E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，基于main `9c93aafc`，不带入未完成的v2奖励/ablation改动。新`train`薄转发固定Isaac Lab官方RSL入口；旧训练保留为显式`train-sb3`。第十八批5/5迁移及范围内整理已完成：WSL CPU最终530 passed/23 skipped/55 warnings、26.40s真实exit0，官方CLI帮助/导出/静态检查通过，详情见ISAAC_LAB.md首段；下一批为0/5。旧奖励对照仍失败/未完成，不记为成功。原runtime预览、旧ablation的51份冻结源/模型/协议不改；本轮未启动GPU训练或原生物理验证，不自行恢复automation。
+- 2026-10-22全链迁移完成：本worktree `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，分支`feat/rsl-rl-completion`，基于已合入PR18的main `bb54e169`。新训练/续训、完整评估与显式smoke、LASSC消费/回放、暂停全图点选/跟随预览、真实网络检查及导出均接RSL `.pt`；旧SB3入口显式legacy，历史协议/快照/模型原字节保留，未引入v2奖励。纯Torch encoder保持旧SB3类路径/键兼容，SB3依赖可选。第十九批当前1/5：全链迁移作为一项功能，含范围内整理。全CPU585 passed/23 skipped/55 warnings、31.52s、exit0；后续仅HTML首帧选层修复专项19 passed，静态检查通过。训练时56源快照保留，其后模型卡/HTML补丁单独存身份。唯一原生4×128×1=512步训练exit0、同checkpoint1场景2步评估exit0；Adam保存step20/权重及状态有限，LASSC回放18检查通过，JIT/ONNX核验通过。当前8783/8784真实RSL预览暂停/time0，模型明确smoke未控制验收，全图/点选/跟随/reset/真实61节点网络已浏览器验证。证据在`results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/`与`results/isaac_field_viewer/rsl_completion_smoke_20261022_attempt3/`；早期CPU/audit/UI失败原记录保留，退出口径见ISAAC_LAB.md，不以marker推断未实测退出。未启动完整训练、未宣称控制改善；硬件只有CAD/原理图，无实车验收；两automation保持PAUSED。
 
 
 - 当前课程trial为 `results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2`；动态进展集中在 `ISAAC_LAB.md` TRAIN-01与trial原始run_status/decisions/probes，不在本文件滚动复制。运行中不得改47项冻结训练源、protocol、模型或成绩。两自动跟进项保持PAUSED；实际预览与后继采样均须等课程自然完成、真实exit 0且无并行GPU仿真后串行启动，不能用定时任务或替代轮询绕过暂停。

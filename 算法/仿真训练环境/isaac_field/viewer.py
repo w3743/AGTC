@@ -9,6 +9,7 @@ callbacks run outside the simulation-owner thread. Call ``process_pending`` and
 from __future__ import annotations
 
 from collections.abc import Mapping
+from pathlib import Path
 from queue import Empty, SimpleQueue
 from threading import Event
 import time
@@ -395,7 +396,8 @@ class FieldViewerControls:
                 self._manual_sliders.append(slider)
 
             self._checkpoint_input = gui.add_text(
-                "检查点路径", initial_value=checkpoint or "", hint="SB3 RecurrentPPO .zip 策略文件"
+                "检查点路径", initial_value=checkpoint or "",
+                hint="RSL-RL原生 .pt；Legacy SB3 RecurrentPPO .zip（旧版兼容）",
             )
             load = gui.add_button("加载检查点")
             load.on_click(lambda _: self._enqueue("load_checkpoint", str(self._checkpoint_input.value).strip()))
@@ -777,8 +779,6 @@ class FieldViewerControls:
     def _load_checkpoint(self, checkpoint: str, *, select_policy: bool) -> None:
         if not checkpoint:
             raise ValueError("请先输入检查点路径")
-        from .policy import PolicyRunner
-
         # Keep the current runner if loading a new file fails.
         observation_config = None
         for source in (self.adapter, getattr(self.adapter, "engine", None)):
@@ -791,19 +791,42 @@ class FieldViewerControls:
             if isinstance(candidate, Mapping):
                 observation_config = candidate
                 break
-        if (
-            observation_config is not None
-            and observation_config.get("schema") == ABSOLUTE_GOAL_INPUT_SCHEMA
-        ):
-            runner = PolicyRunner(
+        checkpoint_path = Path(checkpoint).expanduser()
+        extension = checkpoint_path.suffix.lower()
+        if extension == ".pt":
+            from .rsl_rl_inference import RslPolicyRunner
+
+            if observation_config is not None and observation_config.get("schema") != ABSOLUTE_GOAL_INPUT_SCHEMA:
+                raise ValueError(
+                    "RSL-RL .pt要求绝对目标观测schema；当前环境与检查点不兼容"
+                )
+            runner = RslPolicyRunner(
                 self.adapter,
-                checkpoint,
+                checkpoint_path,
+                device="cpu",
                 input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
                 expected_observation_config=observation_config,
             )
+        elif extension == ".zip":
+            # ZIP is an explicit legacy SB3 checkpoint path. RSL checkpoints
+            # are native .pt files and are never silently routed through SB3.
+            from .policy import PolicyRunner
+
+            if (
+                observation_config is not None
+                and observation_config.get("schema") == ABSOLUTE_GOAL_INPUT_SCHEMA
+            ):
+                runner = PolicyRunner(
+                    self.adapter,
+                    checkpoint,
+                    input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+                    expected_observation_config=observation_config,
+                )
+            else:
+                # Preserve the legacy call shape for v6 and lightweight adapters.
+                runner = PolicyRunner(self.adapter, checkpoint)
         else:
-            # Preserve the legacy call shape for v6 and existing lightweight adapters.
-            runner = PolicyRunner(self.adapter, checkpoint)
+            raise ValueError("检查点扩展名必须是原生RSL-RL .pt或显式legacy SB3 .zip")
         runner.reset()
         self._runner = runner
         self._checkpoint = checkpoint
@@ -822,7 +845,12 @@ class FieldViewerControls:
             "未训练的随机初始化模型"
             if getattr(runner.model, "num_timesteps", None) == 0 else "检查点"
         )
-        self._status = f"已加载{model_kind}：{checkpoint}（加载成功不代表策略已具备任务能力）。"
+        backend = getattr(runner.model, "backend", "sb3")
+        backend_label = "RSL-RL原生 .pt" if backend == "rsl_rl" else "Legacy SB3 .zip"
+        self._status = (
+            f"已加载{backend_label}{model_kind}：{checkpoint}"
+            "（加载成功不代表策略已具备任务能力）。"
+        )
 
     def _refresh_observation(self) -> dict[str, np.ndarray] | None:
         getter = getattr(self.adapter, "current_observation", None)
@@ -1099,6 +1127,7 @@ class FieldViewerControls:
                 "**三维传感器显示：** 青色为激光雷达回波，橙色为 8 米量程，蓝色为有效深度点（每 4 个像素采样）  ",
                 f"**最近奖励：** {self._last_reward if self._last_reward is not None else '未记录'}  ",
                 f"**检查点：** {self._checkpoint or '无'}  ",
+                f"**策略后端：** {'RSL-RL原生 .pt' if getattr(getattr(self._runner, 'model', None), 'backend', None) == 'rsl_rl' else ('Legacy SB3 .zip' if self._runner is not None else '未加载')}  ",
                 f"**驱动 / 观测配置：** 增益={_metadata_status_label(gain)}；结构版本={_metadata_status_label(schema)}  ",
                 f"**动作协议：** {ACTION_SCHEMA}  ",
                 f"**检查点兼容性：** 步数={_metadata_status_label(timesteps)}；驱动={_metadata_status_label(drive_status)}；观测={_metadata_status_label(observation_status)}；动作={_metadata_status_label(action_status)}  ",

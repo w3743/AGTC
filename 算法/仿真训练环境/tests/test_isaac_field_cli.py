@@ -86,6 +86,7 @@ def test_viewer_cli_separates_geometry_and_episode_seeds_and_records_replay_stat
             "--seed", "80003", "--episode-seed", "81001", "--reward-profile", "protect_plants",
             "--plants", "16", "--flat", "--max-time", "20", "--mode", "goto",
             "--goal-distance", "1", "3", "--goal-angle", "60", "--checkpoint", str(checkpoint),
+            "--legacy-sb3",
             "--output", str(output),
         ],
     )

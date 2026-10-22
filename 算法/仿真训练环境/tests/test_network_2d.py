@@ -6,6 +6,8 @@ import base64
 import io
 import json
 from pathlib import Path
+import shutil
+import subprocess
 import time
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
@@ -113,6 +115,137 @@ def test_fusion_dimension_is_carried_from_the_live_frame_and_html_label_is_dynam
     html_source = Path(network_2d.__file__).with_name("network_2d.html").read_text(encoding="utf-8")
     assert "融合 · 128维" not in html_source
     assert "function fusionLabel(node)" in html_source
+
+
+def test_rsl_graph_uses_actual_server_default_and_rejects_sb3_alias(http_server):
+    server, _commands = http_server
+    server.publish(
+        {"sequence": 1, "mode": "RSL actor forward"},
+        [
+            _layer("rsl.actor.input", np.zeros(48, dtype=np.float32), branch="input"),
+            _layer("rsl.actor.encoder", np.zeros(192, dtype=np.float32), summary=True),
+            _layer("rsl.actor.lstm", np.zeros((1, 512), dtype=np.float32)),
+        ],
+    )
+
+    # The first request intentionally omits `selected`; the server chooses a
+    # real key from this frame instead of relying on an SB3-only default.
+    payload = _get_json(server, "/api/frame?detail=1")
+    actual_keys = {node["key"] for node in payload["nodes"]}
+    assert actual_keys == {"rsl.actor.input", "rsl.actor.encoder", "rsl.actor.lstm"}
+    assert payload["detail"]["key"] in actual_keys
+
+    with pytest.raises(HTTPError) as unknown_sb3_layer:
+        urlopen(server.url.rstrip("/") + "/api/frame?selected=features_extractor", timeout=3.0)
+    assert unknown_sb3_layer.value.code == 400
+
+
+def test_network_html_adopts_frame_selection_and_bounds_unknown_key_retry():
+    html_source = Path(network_2d.__file__).with_name("network_2d.html").read_text(encoding="utf-8")
+
+    assert 'let selectedKey = null;' in html_source
+    assert 'if (includeSelected && selectedKey !== null) query.set("selected", selectedKey);' in html_source
+    assert 'if (response.status === 400 && requestedKey !== null)' in html_source
+    assert 'errorMessage === "selected layer is unknown"' in html_source
+    assert 'response = await fetch(queryUrl({ includeSelected: false }), requestOptions);' in html_source
+    assert 'const detailKey = frame.detail && frame.detail.key;' in html_source
+    assert 'frameKeys.has(detailKey) ? detailKey' in html_source
+
+
+def test_network_html_400_handling_only_retries_unknown_selection_and_preserves_other_inputs():
+    html_path = Path(network_2d.__file__).with_name("network_2d.html")
+    node = shutil.which("node") or next(
+        (candidate for candidate in (
+            Path("/mnt/c/Program Files/nodejs/node.exe"),
+            Path(r"C:\Program Files\nodejs\node.exe"),
+        ) if candidate.is_file()),
+        None,
+    )
+    if node is None:
+        pytest.skip("Node.js is required for the network fetch behavior harness")
+
+    harness = r"""
+const fs = require("node:fs");
+const vm = require("node:vm");
+const html = fs.readFileSync(process.argv[1], "utf8");
+function extract(name, nextName) {
+  const start = html.indexOf("    " + name);
+  const end = html.indexOf("    " + nextName, start + 1);
+  if (start < 0 || end < 0) throw new Error("Could not find " + name);
+  return html.slice(start, end).trim();
+}
+const queryUrlSource = extract("function queryUrl(", "async function responseErrorMessage(");
+const responseSource = extract("async function responseErrorMessage(", "async function pollOnce(");
+  const responseFns = responseSource;
+if (!responseFns.includes("async function fetchFrameResponse(")) {
+  throw new Error("fetchFrameResponse was not extracted");
+}
+
+function makeResponse(status, body) {
+  return { status, ok: status >= 200 && status < 300, json: async () => body };
+}
+async function runCase(name, statuses, expected) {
+  const calls = [];
+  const context = {
+    URLSearchParams,
+    els: { detailLocalScale: { checked: false } },
+    fetch: async url => { calls.push(url); return statuses.shift(); }
+  };
+  vm.runInNewContext(`
+    let selectedKey = "features_extractor";
+    let tensorName = "weight";
+    let elementIndex = 19;
+    let resets = 0;
+    function resetDetailCursor() { resets += 1; tensorName = "激活值"; elementIndex = 0; }
+    ${queryUrlSource}
+    ${responseFns}
+    globalThis.invoke = () => fetchFrameResponse({}, selectedKey);
+    globalThis.snapshot = () => ({ selectedKey, tensorName, elementIndex, resets });
+  `, context);
+  let error = "";
+  try { await context.invoke(); } catch (caught) { error = String(caught.message || caught); }
+  const state = context.snapshot();
+  if (calls.length !== expected.calls) throw new Error(name + ": unexpected fetch count " + calls.length);
+  if (state.resets !== expected.resets) throw new Error(name + ": unexpected reset count " + state.resets);
+  if (error !== expected.error) throw new Error(name + ": unexpected error " + JSON.stringify(error));
+  if (state.tensorName !== expected.tensorName || state.elementIndex !== expected.elementIndex) {
+    throw new Error(name + ": detail cursor changed unexpectedly");
+  }
+  if (expected.fallback && !new URL(calls[0], "http://local").searchParams.has("selected")) {
+    throw new Error(name + ": initial request omitted its selected key");
+  }
+  if (expected.fallback && new URL(calls[1], "http://local").searchParams.has("selected")) {
+    throw new Error(name + ": fallback still includes selected");
+  }
+}
+
+(async () => {
+  await runCase("unknown selected", [
+    makeResponse(400, { error: "selected layer is unknown" }),
+    makeResponse(200, { nodes: [], detail: null })
+  ], { calls: 2, resets: 1, error: "", tensorName: "激活值", elementIndex: 0, fallback: true });
+  await runCase("invalid index", [
+    makeResponse(400, { error: "index is outside the selected tensor" })
+  ], { calls: 1, resets: 0, error: "index is outside the selected tensor", tensorName: "weight", elementIndex: 19 });
+  await runCase("invalid tensor", [
+    makeResponse(400, { error: "tensor parameter is unavailable for selected layer" })
+  ], { calls: 1, resets: 0, error: "tensor parameter is unavailable for selected layer", tensorName: "weight", elementIndex: 19 });
+  console.log("network 2D fetch behavior: unknown selection retries once; invalid index/tensor preserve cursor and server error");
+})().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
+"""
+    node_html_path = str(html_path)
+    if str(node).lower().endswith(".exe") and html_path.as_posix().startswith("/mnt/"):
+        drive, relative = html_path.as_posix()[5:].split("/", 1)
+        node_html_path = drive.upper() + ":\\" + relative.replace("/", "\\")
+    completed = subprocess.run(
+        [str(node), "-e", harness, node_html_path],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "unknown selection retries once" in completed.stdout
 
 
 def test_feedback_layer_exposes_the_complete_37_field_contract(http_server):

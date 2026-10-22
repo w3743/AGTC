@@ -13,7 +13,8 @@ from typing import Tuple
 import torch
 from torch import nn
 
-from .policy import ACTION_SHAPE, FEATURES_DIM, SensorEncoder
+from .policy_contract import ACTION_SHAPE, FEATURES_DIM
+from .sensor_encoder import SensorEncoderCore as SensorEncoder
 
 
 def _validate_actor(model: nn.Module) -> tuple[SensorEncoder, nn.LSTM, nn.Module, nn.Module, nn.Module]:
@@ -30,7 +31,7 @@ def _validate_actor(model: nn.Module) -> tuple[SensorEncoder, nn.LSTM, nn.Module
         raise ValueError("field export accepts the actor only, not a critic model")
     encoder = getattr(model, "sensor_encoder", None)
     if not isinstance(encoder, SensorEncoder):
-        raise TypeError("model.sensor_encoder must be isaac_field.policy.SensorEncoder")
+        raise TypeError("model.sensor_encoder must be isaac_field.sensor_encoder.SensorEncoderCore")
     recurrent = getattr(getattr(model, "rnn", None), "rnn", None)
     if not isinstance(recurrent, nn.LSTM):
         raise TypeError("field export supports an LSTM actor")

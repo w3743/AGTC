@@ -1,6 +1,6 @@
 """RSL-RL adapter for the field sensor policy.
 
-The sensor encoder is the existing :class:`isaac_field.policy.SensorEncoder`.
+The sensor encoder is the shared pure Torch sensor encoder.
 RSL-RL owns the recurrent models, distributions, PPO update and runner; this
 module only adapts TensorDict inputs, assigns one owner to the shared encoder,
 and tags checkpoints with the field policy contract.
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import copy
 import math
+from dataclasses import asdict, is_dataclass
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -24,11 +25,11 @@ from rsl_rl.models import RNNModel
 
 from .action_contract import action_config
 from .feedback import INPUT_SCHEMA
-from .policy import (
+from .sensor_encoder import SensorEncoderCore as SensorEncoder
+from .policy_contract import (
     BRANCH_DIMS,
     FEATURES_DIM,
     OBSERVATION_SHAPES,
-    SensorEncoder,
     _validate_observation_config,
     _encoder_schema_for_input,
     _field_encoder_config,
@@ -376,7 +377,7 @@ def build_field_policy_contract(
         "version": RSL_FIELD_CHECKPOINT_VERSION,
         "input_schema": actor.input_schema,
         "encoder_config": {
-            "class_name": "isaac_field.policy:SensorEncoder",
+            "class_name": "isaac_field.sensor_encoder:SensorEncoderCore",
             **_field_encoder_config(actor.input_schema),
             "goal_gain": actor.goal_gain,
             "cache_inference": actor.cache_inference,
@@ -408,6 +409,13 @@ def build_field_policy_contract(
         value = _resolve_env_contract_value(env, name)
         if value is not None:
             config[name] = value
+    source = getattr(env, "unwrapped", env)
+    task = getattr(source, "field_cfg", None)
+    if task is not None:
+        config["task_config"] = asdict(task) if is_dataclass(task) else task
+        for name in ("front_guide_spec", "body_stability_config"):
+            value = getattr(source, name, None)
+            config[name] = asdict(value) if is_dataclass(value) else value
     return _json_safe(config)
 
 
@@ -430,7 +438,7 @@ def validate_field_policy_contract(
     if not isinstance(encoder_cfg, dict):
         raise ValueError("checkpoint field encoder config is missing")
     if (
-        encoder_cfg.get("class_name") != "isaac_field.policy:SensorEncoder"
+        encoder_cfg.get("class_name") not in {"isaac_field.sensor_encoder:SensorEncoderCore", "isaac_field.policy:SensorEncoder"}
         or any(encoder_cfg.get(key) != value for key, value in expected_encoder.items())
         or encoder_cfg.get("schema") != expected_encoder["schema"]
         or encoder_cfg.get("features_dim") != FEATURES_DIM
@@ -517,6 +525,10 @@ def validate_field_policy_contract(
         raise ValueError("checkpoint field rollout metadata is invalid")
     if expected is not None:
         expected_safe = _json_safe(expected)
+        # The pure Torch extraction kept parameter keys and encoder semantics.
+        # Accept the original RSL class marker when resuming those checkpoints.
+        safe["encoder_config"]["class_name"] = "isaac_field.sensor_encoder:SensorEncoderCore"
+        expected_safe["encoder_config"]["class_name"] = "isaac_field.sensor_encoder:SensorEncoderCore"
         for key in _RUNTIME_CONTRACT_KEYS:
             safe.pop(key, None)
             expected_safe.pop(key, None)
@@ -529,6 +541,11 @@ class RslFieldPPO(PPO):
     """Official RSL-RL PPO plus strict field checkpoint identity metadata."""
 
     field_policy_contract: dict[str, Any] | None = None
+    num_timesteps: int = 0
+
+    def process_env_step(self, obs, rewards, dones, extras) -> None:
+        super().process_env_step(obs, rewards, dones, extras)
+        self.num_timesteps += int(rewards.numel())
 
     @staticmethod
     def construct_algorithm(obs: TensorDict, env: Any, cfg: dict, device: str) -> "RslFieldPPO":
@@ -557,6 +574,7 @@ class RslFieldPPO(PPO):
             raise ValueError("cannot save RslFieldPPO before the environment policy contract is bound")
         saved = super().save()
         saved["field_policy_contract"] = copy.deepcopy(self.field_policy_contract)
+        saved["num_timesteps"] = self.num_timesteps
         return saved
 
     def load(self, loaded_dict: dict, load_cfg: dict | None, strict: bool) -> bool:
@@ -564,7 +582,12 @@ class RslFieldPPO(PPO):
         if not isinstance(contract, Mapping):
             raise ValueError("checkpoint lacks field_policy_contract; SB3 .zip checkpoints cannot resume in RSL-RL")
         validate_field_policy_contract(contract, expected=self.field_policy_contract)
-        return super().load(loaded_dict, load_cfg, strict)
+        count = loaded_dict.get("num_timesteps", 0)
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise ValueError("checkpoint num_timesteps must be a nonnegative integer")
+        resume_iteration = super().load(loaded_dict, load_cfg, strict)
+        self.num_timesteps = count if resume_iteration else 0
+        return resume_iteration
 
 
 def load_rsl_checkpoint_payload(
@@ -584,4 +607,7 @@ def load_rsl_checkpoint_payload(
     if not isinstance(contract, Mapping):
         raise ValueError("checkpoint lacks field_policy_contract; SB3 .zip checkpoints cannot resume in RSL-RL")
     validate_field_policy_contract(contract)
+    count = payload.get("num_timesteps")
+    if count is not None and (isinstance(count, bool) or not isinstance(count, int) or count < 0):
+        raise ValueError("checkpoint num_timesteps must be a nonnegative integer")
     return payload

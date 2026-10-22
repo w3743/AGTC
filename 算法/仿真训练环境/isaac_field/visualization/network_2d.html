@@ -570,7 +570,7 @@
     };
     const scaleReadoutBaseTitle = els.scaleReadout.title;
 
-    let selectedKey = "features_extractor";
+    let selectedKey = null;
     let tensorName = "激活值";
     let elementIndex = 0;
     let frozen = false;
@@ -937,14 +937,16 @@
       const nodes = normalizeNodes(rawNodes);
       const layerSelect = document.getElementById("layer-select");
       const choices = nodes.map(node => [node.key, node.title || node.key]);
-      if (!choices.some(([key]) => key === selectedKey)) choices.push([selectedKey, selectedKey]);
+      if (selectedKey !== null && !choices.some(([key]) => key === selectedKey)) {
+        choices.push([selectedKey, selectedKey]);
+      }
       const choicesSignature = JSON.stringify(choices);
       if (choicesSignature !== layerOptionsSignature) {
         clearChildren(layerSelect);
         for (const [key, title] of choices) addOption(layerSelect, key, title + " · " + key);
         layerOptionsSignature = choicesSignature;
       }
-      layerSelect.value = selectedKey;
+      layerSelect.value = selectedKey ?? "";
       const graph = graphFromLayout(nodes, layoutData);
       const signature = asText(layoutData && layoutData.topology) || JSON.stringify(graph.edgePairs);
       const topologyChanged = signature !== topologySignature;
@@ -1138,16 +1140,57 @@
       if (message) els.message.textContent = message;
     }
 
-    function queryUrl() {
+    function resetDetailCursor() {
+      tensorName = "激活值";
+      elementIndex = 0;
+      els.detailImage.parentElement.classList.remove("zoomed");
+      els.detailImage.title = "点击查看原图";
+      els.tensor.value = tensorName;
+      els.index.value = "0";
+    }
+
+    function queryUrl({ includeSelected = true } = {}) {
       const query = new URLSearchParams({
         detail: "1",
-        selected: selectedKey,
         tensor: tensorName,
         index: String(Math.max(0, elementIndex)),
         scale: "auto",
         detail_scale: els.detailLocalScale.checked ? "local" : "global"
       });
+      if (includeSelected && selectedKey !== null) query.set("selected", selectedKey);
       return "/api/frame?" + query.toString();
+    }
+
+    async function responseErrorMessage(response) {
+      try {
+        const payload = await response.json();
+        return payload && typeof payload.error === "string" ? payload.error : "";
+      } catch (_) {
+        return "";
+      }
+    }
+
+    async function fetchFrameResponse(requestOptions, requestedKey) {
+      let response = await fetch(queryUrl(), requestOptions);
+      let retriedWithoutSelected = false;
+      if (response.status === 400 && requestedKey !== null) {
+        const errorMessage = await responseErrorMessage(response);
+        if (errorMessage === "selected layer is unknown" && selectedKey === requestedKey) {
+          // Only a confirmed stale layer key justifies dropping the selection.
+          // Reset detail cursors for the newly selected layer; keep user input
+          // intact for every other 400 response.
+          resetDetailCursor();
+          response = await fetch(queryUrl({ includeSelected: false }), requestOptions);
+          retriedWithoutSelected = true;
+        } else {
+          throw new Error(errorMessage || "HTTP " + response.status);
+        }
+      }
+      if (!response.ok) {
+        const errorMessage = await responseErrorMessage(response);
+        throw new Error(errorMessage || "HTTP " + response.status);
+      }
+      return { frame: await response.json(), retriedWithoutSelected };
     }
 
     async function pollOnce() {
@@ -1160,14 +1203,29 @@
       const controller = new AbortController();
       const timeout = window.setTimeout(() => controller.abort(), 4000);
       try {
-        const response = await fetch(queryUrl(), { method: "GET", cache: "no-store", headers: { "Accept": "application/json" }, signal: controller.signal });
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const frame = await response.json();
+        const requestOptions = { method: "GET", cache: "no-store", headers: { "Accept": "application/json" }, signal: controller.signal };
+        const { frame, retriedWithoutSelected } = await fetchFrameResponse(requestOptions, requestedKey);
         if (!frame || typeof frame !== "object") throw new Error("帧数据格式无效");
+        const frameNodes = normalizeNodes(frame.nodes);
+        const frameKeys = new Set(frameNodes.map(node => node.key));
+        const detailKey = frame.detail && frame.detail.key;
+        let selectionAdopted = false;
+        if (selectedKey === null || !frameKeys.has(selectedKey)) {
+          const nextKey = frameKeys.has(detailKey) ? detailKey : (frameNodes[0]?.key ?? null);
+          selectionAdopted = nextKey !== selectedKey;
+          selectedKey = nextKey;
+          if (selectionAdopted) resetDetailCursor();
+        }
         lastFrame = frame;
         updateHeader(frame);
         drawGraph(frame.nodes, frame.layout);
-        if (requestedKey === selectedKey && requestedTensor === tensorName && requestedLocalScale === els.detailLocalScale.checked) renderDetail(frame.detail);
+        const detailMatchesSelection = frame.detail
+          && String(frame.detail.key ?? "") === String(selectedKey ?? "");
+        if ((requestedKey === selectedKey && requestedTensor === tensorName
+             && requestedLocalScale === els.detailLocalScale.checked)
+            || selectionAdopted || (retriedWithoutSelected && detailMatchesSelection)) {
+          renderDetail(frame.detail);
+        }
       } catch (error) {
         setConnection(false, "等待本地服务恢复：" + asText(error && error.message || error));
       } finally {
@@ -1232,12 +1290,7 @@
       }
       selectedKey = key;
       document.getElementById("layer-select").value = key;
-      tensorName = "激活值";
-      elementIndex = 0;
-      els.detailImage.parentElement.classList.remove("zoomed");
-      els.detailImage.title = "点击查看原图";
-      els.tensor.value = tensorName;
-      els.index.value = "0";
+      resetDetailCursor();
       updateSelectionStyle();
       requestRefresh();
     }
