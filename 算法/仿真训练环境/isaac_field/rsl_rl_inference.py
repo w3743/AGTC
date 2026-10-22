@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
+import hashlib
 from typing import Any
 
 import numpy as np
@@ -15,7 +16,12 @@ from tensordict import TensorDict
 
 from .action_contract import action_config
 from .feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
-from .policy import _field_encoder_config, _json_safe, _validate_observation_config
+from .policy_contract import _field_encoder_config, _json_safe, _validate_observation_config
+
+
+def _checkpoint_sha(path):
+    with Path(path).open('rb') as stream:
+        return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
 class RslPredictionModel:
@@ -39,7 +45,10 @@ class RslPredictionModel:
 
         self.device = torch.device(device)
         self.checkpoint = Path(checkpoint)
+        self.checkpoint_sha256 = _checkpoint_sha(self.checkpoint)
         payload = load_rsl_checkpoint_payload(self.checkpoint, map_location="cpu")
+        if _checkpoint_sha(self.checkpoint) != self.checkpoint_sha256:
+            raise ValueError("RSL checkpoint changed while loading")
         self.contract = payload["field_policy_contract"]
         self.validate_contract(input_schema, expected_observation_config)
         self.input_schema = input_schema
@@ -72,6 +81,33 @@ class RslPredictionModel:
                 raise ValueError("RSL actor checkpoint contains nonfinite parameters")
         # An iteration index alone is not a verified transition count.
         self.num_timesteps = payload.get("num_timesteps")
+        self._critic = None
+
+    @property
+    def critic(self):
+        """Load the real critic only when a diagnostic explicitly requests it."""
+        if self._critic is None:
+            from .rsl_rl_policy import RslFieldRNNModel, load_rsl_checkpoint_payload
+            if _checkpoint_sha(self.checkpoint) != self.checkpoint_sha256:
+                raise ValueError("RSL checkpoint changed since actor loading")
+            payload = load_rsl_checkpoint_payload(self.checkpoint, map_location='cpu')
+            if _checkpoint_sha(self.checkpoint) != self.checkpoint_sha256:
+                raise ValueError("RSL checkpoint changed while loading the critic")
+            observations = TensorDict({key: torch.zeros((1, *shape), device=self.device)
+                                       for key, shape in self.shapes.items()}, batch_size=[1])
+            config = dict(self.contract['critic_config'])
+            output_dim, obs_set = config.pop('output_dim'), config.pop('obs_set')
+            config.pop('class_name', None)
+            if output_dim != 1 or obs_set != 'critic':
+                raise ValueError('RSL checkpoint does not identify the critic')
+            critic = RslFieldRNNModel(observations, self.contract['obs_groups'], obs_set,
+                                      output_dim, cnns=self.actor.cnns, **config).to(self.device)
+            critic.load_state_dict(payload['critic_state_dict'], strict=True)
+            critic.eval()
+            if any(not torch.isfinite(parameter).all() for parameter in critic.parameters()):
+                raise ValueError('RSL critic checkpoint contains nonfinite parameters')
+            self._critic = critic
+        return self._critic
 
     def validate_contract(
         self, input_schema: str, expected_observation_config: Mapping[str, Any] | None,
@@ -87,7 +123,7 @@ class RslPredictionModel:
         if self.contract.get("action_config") != action_config():
             raise ValueError("RSL checkpoint action contract differs from direct-track-speed-v1")
 
-    def predict(self, observation, state=None, episode_start=None, deterministic=True):
+    def _predict(self, model, observation, state=None, episode_start=None, *, deterministic=True, clip=False):
         if not isinstance(observation, Mapping) or set(observation) != set(self.shapes):
             raise ValueError("RSL prediction requires the five sensor observation leaves")
         values = {}
@@ -106,7 +142,7 @@ class RslPredictionModel:
                 raise ValueError(f"RSL observation {key} contains nonfinite values")
             batch, unbatched = value.shape[0], single
             values[key] = value
-        rnn = self.actor.rnn.rnn
+        rnn = model.rnn.rnn
         hidden_shape = (rnn.num_layers, batch, rnn.hidden_size)
         if state is None:
             hidden = tuple(torch.zeros(hidden_shape, device=self.device) for _ in range(2))
@@ -122,15 +158,66 @@ class RslPredictionModel:
                 raise ValueError("episode_start must identify each observation row")
             for value in hidden:
                 value[:, starts, :] = 0
-        previous = self.actor.get_hidden_state()
+        previous = model.get_hidden_state()
         try:
-            self.actor.reset(hidden_state=hidden)
+            model.reset(hidden_state=hidden)
             with torch.inference_mode():
-                actions = self.actor(TensorDict(values, batch_size=[batch]), stochastic_output=not deterministic)
-                next_state = tuple(value.detach().cpu().numpy().copy() for value in self.actor.get_hidden_state())
-                actions = actions.clamp(-1, 1).detach().cpu().numpy()
+                actions = model(TensorDict(values, batch_size=[batch]), stochastic_output=not deterministic)
+                next_state = tuple(value.detach().cpu().numpy().copy() for value in model.get_hidden_state())
+                if clip:
+                    actions = actions.clamp(-1, 1)
+                actions = actions.detach().cpu().numpy()
             if not np.isfinite(actions).all():
                 raise ValueError("RSL actor produced nonfinite actions")
         finally:
-            self.actor.reset(hidden_state=previous)
+            model.reset(hidden_state=previous)
         return (actions[0] if unbatched else actions), next_state
+
+    def predict(self, observation, state=None, episode_start=None, deterministic=True):
+        return self._predict(self.actor, observation, state, episode_start, deterministic=deterministic, clip=True)
+
+    def predict_values(self, observation, state=None, episode_start=None):
+        return self._predict(self.critic, observation, state, episode_start)
+
+
+class RslPolicyRunner:
+    """Stateful field policy boundary shared by production and paused viewers."""
+
+    backend = 'rsl_rl'
+
+    def __init__(self, env, checkpoint, *, device='cpu', input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+                 expected_observation_config=None):
+        if checkpoint is None:
+            raise ValueError('RSL inference requires an explicit .pt checkpoint')
+        expected = expected_observation_config
+        if expected is None:
+            expected = getattr(env, 'observation_config', None)
+        self.model = RslPredictionModel(checkpoint, device=device, input_schema=input_schema,
+                                        expected_observation_config=expected)
+        self.input_schema = input_schema
+        self.observation_config = self.model.field_observation_config
+        self.num_envs = int(getattr(env, 'num_envs', 1))
+        self.state = None
+        self.episode_start = np.ones(self.num_envs, dtype=bool)
+        self.label = 'RSL checkpoint loaded; control competence is not established'
+
+    def reset(self, done=None):
+        if done is None:
+            self.state = None
+            self.episode_start = np.ones(self.num_envs, dtype=bool)
+            return
+        done = np.asarray(done, dtype=bool).reshape(-1)
+        if done.shape != (self.num_envs,):
+            raise ValueError(f'done must have shape ({self.num_envs},)')
+        if self.state is not None:
+            self.state = tuple(np.asarray(value).copy() for value in self.state)
+            for value in self.state:
+                value[:, done, :] = 0
+        self.episode_start = done.copy()
+
+    def action(self, observation):
+        action, state = self.model.predict(observation, state=self.state,
+                                           episode_start=self.episode_start, deterministic=True)
+        self.state = state
+        self.episode_start = np.zeros(self.num_envs, dtype=bool)
+        return action

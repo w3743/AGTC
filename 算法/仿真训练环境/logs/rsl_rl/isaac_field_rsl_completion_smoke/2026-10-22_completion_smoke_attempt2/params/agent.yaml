@@ -1,0 +1,117 @@
+seed: 69001
+device: cuda:0
+num_steps_per_env: 128
+init_at_random_ep_len: false
+max_iterations: 1
+empirical_normalization: {}
+obs_groups:
+  actor:
+  - lidar
+  - depth
+  - detections
+  - state
+  - feedback
+  critic:
+  - lidar
+  - depth
+  - detections
+  - state
+  - feedback
+clip_actions: 1.0
+check_for_nan: true
+save_interval: 16
+experiment_name: isaac_field_rsl_completion_smoke
+run_name: ''
+logger: tensorboard
+neptune_project: isaaclab
+wandb_project: isaaclab
+resume: false
+load_run: .*
+load_checkpoint: model_.*.pt
+class_name: OnPolicyRunner
+actor:
+  class_name: isaac_field.rsl_rl_policy:RslFieldRNNModel
+  hidden_dims:
+  - 64
+  activation: tanh
+  obs_normalization: false
+  distribution_cfg:
+    class_name: rsl_rl.modules.distribution.GaussianDistribution
+    init_std: 0.1353352832366127
+    std_type: log
+    std_range: !!python/tuple
+    - 1.0e-06
+    - 1000000.0
+  rnn_type: lstm
+  rnn_hidden_dim: 512
+  rnn_num_layers: 1
+  input_schema: sensor-absolute-goal-v1
+  encoder_schema: depth64-lidar-single1d-absolute-goal-v4
+  goal_gain: 1.0
+  cache_inference: true
+  observation_shapes:
+    lidar:
+    - 1
+    - 400
+    depth:
+    - 1
+    - 160
+    - 88
+    detections:
+    - 16
+    - 8
+    state:
+    - 33
+    feedback:
+    - 37
+critic:
+  class_name: isaac_field.rsl_rl_policy:RslFieldRNNModel
+  hidden_dims:
+  - 64
+  activation: tanh
+  obs_normalization: false
+  distribution_cfg: null
+  rnn_type: lstm
+  rnn_hidden_dim: 512
+  rnn_num_layers: 1
+  input_schema: sensor-absolute-goal-v1
+  encoder_schema: depth64-lidar-single1d-absolute-goal-v4
+  goal_gain: 1.0
+  cache_inference: true
+  observation_shapes:
+    lidar:
+    - 1
+    - 400
+    depth:
+    - 1
+    - 160
+    - 88
+    detections:
+    - 16
+    - 8
+    state:
+    - 33
+    feedback:
+    - 37
+algorithm:
+  class_name: isaac_field.rsl_rl_policy:RslFieldPPO
+  num_learning_epochs: 5
+  num_mini_batches: 4
+  learning_rate: 0.0003
+  schedule: fixed
+  gamma: 1.0
+  lam: 0.95
+  entropy_coef: 0.0
+  desired_kl: 0.03
+  max_grad_norm: 0.5
+  optimizer: adam
+  value_loss_coef: 0.5
+  use_clipped_value_loss: false
+  clip_param: 0.2
+  normalize_advantage_per_mini_batch: false
+  share_cnn_encoders: true
+  use_mixed_precision: false
+  rnd_cfg: null
+  symmetry_cfg: null
+torch_compile_mode: null
+policy: {}

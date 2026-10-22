@@ -229,8 +229,11 @@ def test_parallel_simulation_refuses_launch_before_output_creation(tmp_path, mon
     ["python", "-m", "isaac_field", "viewer"],
     ["python", "-m", "isaac_field", "smoke"],
     ["python", "-m", "isaac_field", "train"],
+    ["python", "-m", "isaac_field", "resume", "--checkpoint", "model.pt"],
+    ["python", "-m", "isaac_field", "train-sb3"],
     ["python", "-m", "isaac_field", "evaluate"],
     ["python", "-m", "isaac_field", "adversary"],
+    ["python", "-m", "isaac_field", "adversary-sb3"],
     ["python", "-m", "isaac_field.viewer"],
 ])
 def test_parallel_process_classifier_blocks_python_simulation_argv(argv):

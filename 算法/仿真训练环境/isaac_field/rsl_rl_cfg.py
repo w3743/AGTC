@@ -16,7 +16,7 @@ from isaaclab_rl.rsl_rl import (
 
 from .env import FieldEnvCfg
 from .feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
-from .policy import ABSOLUTE_GOAL_ENCODER_SCHEMA, OBSERVATION_SHAPES
+from .policy_contract import ABSOLUTE_GOAL_ENCODER_SCHEMA, OBSERVATION_SHAPES
 from .task import Config
 
 

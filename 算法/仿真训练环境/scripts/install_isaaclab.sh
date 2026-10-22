@@ -6,6 +6,7 @@ ISAACLAB_ROOT="$FIELD_ROOT/external/IsaacLab"
 ISAACLAB_URL="https://github.com/isaac-sim/IsaacLab.git"
 ISAACLAB_COMMIT="5870804e4f6aee57bdef68d59f67d328b990d1e1"
 ISAACLAB_TOOLS_HOME="${ISAACLAB_TOOLS_HOME:-$HOME/robotics-lab/isaac-tools}"
+INSTALL_LEGACY_SB3="${ISAAC_FIELD_INSTALL_LEGACY_SB3:-0}"
 
 export UV_PROJECT_ENVIRONMENT="/home/wangj/robotics-lab/venv/isaaclab-field"
 export UV_CACHE_DIR="$FIELD_ROOT/.cache/uv"
@@ -25,6 +26,8 @@ fail() {
 [[ -x /usr/bin/python3.12 ]] || fail '缺少 /usr/bin/python3.12。'
 command -v git >/dev/null 2>&1 || fail '缺少 git。'
 [[ "$EUID" -ne 0 ]] || fail '请使用 Ubuntu 的普通用户运行，不要以 root 安装。'
+[[ "$INSTALL_LEGACY_SB3" == "0" || "$INSTALL_LEGACY_SB3" == "1" ]] \
+    || fail 'ISAAC_FIELD_INSTALL_LEGACY_SB3 只能设为 0 或 1。'
 
 UV_EXECUTABLE="$ISAACLAB_TOOLS_HOME/bin/uv"
 if [[ ! -x "$UV_EXECUTABLE" ]]; then
@@ -53,14 +56,22 @@ actual_commit="$(git -C "$ISAACLAB_ROOT" rev-parse HEAD)"
 
 mkdir -p "$UV_CACHE_DIR" "$WARP_CACHE_PATH" "$(dirname "$UV_PROJECT_ENVIRONMENT")"
 cd "$ISAACLAB_ROOT"
-"$UV_EXECUTABLE" sync --locked --extra sb3 --extra rsl-rl --extra viser --extra test --python /usr/bin/python3.12
+ISAACLAB_EXTRAS=(--extra rsl-rl --extra viser --extra test)
+if [[ "$INSTALL_LEGACY_SB3" == "1" ]]; then
+    ISAACLAB_EXTRAS+=(--extra sb3)
+fi
+# --inexact keeps packages from an existing Isaac Lab environment, including an
+# already-installed SB3 stack, when it is no longer selected for the RSL setup.
+"$UV_EXECUTABLE" sync --locked --inexact "${ISAACLAB_EXTRAS[@]}" --python /usr/bin/python3.12
 
-# Isaac Lab's lock pins Torch and SB3. Install only the matching contrib package
-# without dependency resolution so it cannot replace those upstream pins.
-"$UV_EXECUTABLE" pip install --python "$UV_PROJECT_ENVIRONMENT/bin/python" --no-deps 'sb3-contrib==2.9.0'
+# RSL-RL and Torch versions come from the pinned Isaac Lab lockfile. The legacy
+# stack is opt-in and its matching contrib package cannot replace those pins.
+if [[ "$INSTALL_LEGACY_SB3" == "1" ]]; then
+    "$UV_EXECUTABLE" pip install --python "$UV_PROJECT_ENVIRONMENT/bin/python" --no-deps 'sb3-contrib==2.9.0'
+fi
 "$UV_EXECUTABLE" pip install --python "$UV_PROJECT_ENVIRONMENT/bin/python" --no-deps 'vqf==2.1.2'
 "$UV_EXECUTABLE" pip install --python "$UV_PROJECT_ENVIRONMENT/bin/python" --no-deps -e "$FIELD_ROOT"
 
 "$UV_PROJECT_ENVIRONMENT/bin/python" -c \
-    'import isaaclab, sb3_contrib, stable_baselines3, torch; print("Isaac Lab", isaaclab.__file__); print("PyTorch", torch.__version__); print("Stable-Baselines3", stable_baselines3.__version__); print("SB3-Contrib", sb3_contrib.__version__)'
+    'import importlib.metadata as md, importlib.util as util, isaaclab, torch; import isaac_field.policy_contract, isaac_field.rsl_rl_policy, isaac_field.sensor_encoder; print("Isaac Lab", isaaclab.__file__); print("PyTorch", torch.__version__); print("RSL-RL", md.version("rsl-rl-lib")); print("SB3 legacy stack", "installed" if util.find_spec("stable_baselines3") else "not installed")'
 printf 'Isaac Lab runtime 安装完成（提交 %s）。\n' "$ISAACLAB_COMMIT"

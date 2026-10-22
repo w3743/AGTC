@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import fields
 import hashlib
 import json
 import math
@@ -154,6 +155,77 @@ def _checkpoint_record(path: Path, expected: str | None = None) -> dict[str, Any
     return {"path": str(path), "sha256": actual, "bytes": after.st_size,
             "num_timesteps": timesteps, "gamma": 1.0, "lstm_hidden_size": 512,
             "n_lstm_layers": 1}
+
+
+def _rsl_environment_configs(contract: dict[str, Any]):
+    """Rebuild the typed task and optional physics inputs recorded by RSL."""
+    from isaac_field.assets import FrontGuideSpec
+    from isaac_field.body_stability import BodyStabilityConfig
+    from isaac_field.task import Config
+
+    required = {"task_config", "front_guide_spec", "body_stability_config"}
+    missing = sorted(required - contract.keys())
+    if missing:
+        raise ValueError(
+            "RSL field_policy_contract缺少可复现环境字段：" + ", ".join(missing)
+        )
+    task_config = contract.get("task_config")
+    if not isinstance(task_config, dict):
+        raise ValueError("RSL field_policy_contract缺少task_config，无法复现训练任务配置")
+    expected_task_fields = {item.name for item in fields(Config)}
+    if set(task_config) != expected_task_fields:
+        missing_task = sorted(expected_task_fields - set(task_config))
+        extra_task = sorted(set(task_config) - expected_task_fields)
+        raise ValueError(
+            f"RSL task_config字段不完整；missing={missing_task}, extra={extra_task}"
+        )
+    try:
+        cfg = Config(**task_config)
+        guide_data = contract.get("front_guide_spec")
+        stability_data = contract.get("body_stability_config")
+        if guide_data is not None and not isinstance(guide_data, dict):
+            raise TypeError("front_guide_spec必须是对象或null")
+        if stability_data is not None and not isinstance(stability_data, dict):
+            raise TypeError("body_stability_config必须是对象或null")
+        for name, data, target in (
+            ("front_guide_spec", guide_data, FrontGuideSpec),
+            ("body_stability_config", stability_data, BodyStabilityConfig),
+        ):
+            if data is not None and set(data) != {item.name for item in fields(target)}:
+                raise ValueError(f"{name}必须完整记录其全部字段，禁止依赖默认值")
+        guide = None if guide_data is None else FrontGuideSpec(**guide_data)
+        stability = None if stability_data is None else BodyStabilityConfig(**stability_data)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"RSL field_policy_contract任务/物理配置无效：{exc}") from exc
+    return cfg, guide, stability
+
+
+def _rsl_checkpoint_record(path: Path) -> dict[str, Any]:
+    """Load a native RSL checkpoint on CPU and verify its actor and contract."""
+    if not path.is_file() or path.suffix.lower() != ".pt":
+        raise ValueError(f"RSL检查点必须是已存在的原生 .pt 文件：{path}")
+    before = path.stat()
+    actual = _sha256(path)
+    from isaac_field.rsl_rl_inference import RslPredictionModel
+
+    model = RslPredictionModel(path, device="cpu")
+    contract = model.contract
+    critic = model.critic
+    if critic is None:
+        raise ValueError("RSL field checkpoint没有可严格加载的实际critic")
+    _rsl_environment_configs(contract)
+    after = path.stat()
+    if ((before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns)
+            or actual != model.checkpoint_sha256 or _sha256(path) != actual):
+        raise ValueError(f"RSL检查点读取期间发生变化：{path}")
+    raw_steps = model.num_timesteps
+    steps = int(raw_steps) if isinstance(raw_steps, (int, np.integer)) and not isinstance(raw_steps, (bool, np.bool_)) else None
+    return {
+        "path": str(path), "sha256": actual, "bytes": after.st_size,
+        "backend": "rsl_rl", "num_timesteps": steps,
+        "actor_loaded": True, "critic_loaded": True,
+        "contract_sha256": _stable_hash(contract), "field_policy_contract": contract,
+    }
 
 
 def _manifest_rows(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -520,24 +592,53 @@ class FastStopGoalControls(FieldViewerControls):
         """Describe the active artifact without assigning it an evaluation rank."""
         model = getattr(runner, "model", None) if runner is not None else None
         if model is None:
-            return "**模型：** 未加载\n\n**训练步数：** —\n\n**LSTM维度：** —"
+            return ("**模型：** 未加载\n\n**训练步数：** 未记录\n\n"
+                    "**模型状态：** 未加载检查点；控制能力尚未验收\n\n**LSTM维度：** —")
 
         filename = Path(checkpoint).name if checkpoint else "未命名模型"
+        backend = getattr(model, "backend", "sb3")
+        backend_text = "RSL-RL原生 field_policy_contract" if backend == "rsl_rl" else "Legacy SB3 ZIP"
         steps = getattr(model, "num_timesteps", None)
-        if isinstance(steps, (int, np.integer)) and not isinstance(steps, (bool, np.bool_)):
-            steps_text = f"{int(steps):,} 步"
-        else:
+        if not isinstance(steps, (int, np.integer)) or isinstance(steps, (bool, np.bool_)):
             recorded_steps = selection.get("num_timesteps") if isinstance(selection, dict) else None
-            steps_text = f"{int(recorded_steps):,} 步" if isinstance(recorded_steps, int) else "未记录"
+            if isinstance(recorded_steps, (int, np.integer)) and not isinstance(
+                    recorded_steps, (bool, np.bool_)):
+                steps = recorded_steps
+            else:
+                steps = None
+        if isinstance(steps, (int, np.integer)) and not isinstance(steps, (bool, np.bool_)):
+            steps = int(steps)
+            steps_text = f"{steps:,} 步"
+            if steps == 0:
+                capability_status = "未训练（0步）；未完成控制能力验收"
+            elif backend == "rsl_rl" and 0 < steps <= 512:
+                capability_status = "迁移 smoke（≤512步），未完成控制能力验收"
+            elif steps > 0:
+                capability_status = "已记录检查点；能力以独立评估为准"
+            else:
+                steps_text = "未记录"
+                capability_status = "训练步数未记录；能力以独立评估为准"
+        else:
+            steps_text = "未记录"
+            capability_status = "训练步数未记录；能力以独立评估为准"
 
-        policy = getattr(model, "policy", None)
         dimensions = []
-        for role in ("actor", "critic"):
-            lstm = getattr(policy, f"lstm_{role}", None)
-            hidden = getattr(lstm, "hidden_size", None)
-            layers = getattr(lstm, "num_layers", None)
-            if isinstance(hidden, int) and isinstance(layers, int):
-                dimensions.append(f"{role} {hidden}×{layers}")
+        if backend == "rsl_rl":
+            contract = getattr(model, "contract", None)
+            for role in ("actor", "critic"):
+                config = contract.get(f"{role}_config", {}) if isinstance(contract, dict) else {}
+                hidden = config.get("rnn_hidden_dim") if isinstance(config, dict) else None
+                layers = config.get("rnn_num_layers") if isinstance(config, dict) else None
+                if isinstance(hidden, int) and isinstance(layers, int):
+                    dimensions.append(f"{role} {hidden}×{layers}")
+        else:
+            policy = getattr(model, "policy", None)
+            for role in ("actor", "critic"):
+                lstm = getattr(policy, f"lstm_{role}", None)
+                hidden = getattr(lstm, "hidden_size", None)
+                layers = getattr(lstm, "num_layers", None)
+                if isinstance(hidden, int) and isinstance(layers, int):
+                    dimensions.append(f"{role} {hidden}×{layers}")
         dimension_text = "；".join(dimensions) if dimensions else "未检测到LSTM层"
 
         selection_text = "显式加载的检查点"
@@ -549,8 +650,15 @@ class FastStopGoalControls(FieldViewerControls):
                 selection_text = "最新已保存检查点"
             elif kind == "explicit":
                 selection_text = "显式指定检查点"
-        return (f"**模型：** `{filename}`\n\n**训练步数：** {steps_text}\n\n"
-                f"**LSTM维度：** {dimension_text}\n\n**评估身份：** {selection_text}")
+            elif kind == "rsl-checkpoint":
+                selection_text = "RSL-RL原生 field_policy_contract 检查点"
+        contract_text = ""
+        contract = getattr(model, "contract", None)
+        if backend == "rsl_rl" and isinstance(contract, dict):
+            contract_text = f"\n\n**合同：** `{contract.get('format', 'field_policy_contract')}` v{contract.get('version', '?')}"
+        return (f"**模型：** `{filename}`\n\n**后端：** {backend_text}\n\n"
+                f"**训练步数：** {steps_text}\n\n**模型状态：** {capability_status}\n\n"
+                f"**LSTM维度：** {dimension_text}{contract_text}\n\n**评估身份：** {selection_text}")
 
     def _update_model_identity(self) -> None:
         handle = getattr(self, "_model_identity_handle", None)
@@ -970,46 +1078,213 @@ def _launch_viewer(trial: Path, output: Path, port: int, checkpoint: dict[str, A
         adapter.close()
 
 
+def _record_rsl_preview(output: Path, checkpoint: dict[str, Any], adapter: Any,
+                        controls: FastStopGoalControls) -> None:
+    """Write the loaded checkpoint identity and paused initial state once."""
+    runner = controls._runner
+    model = getattr(runner, "model", None)
+    if model is None or getattr(model, "backend", None) != "rsl_rl":
+        raise RuntimeError("预览没有加载原生RSL-RL模型，拒绝记录")
+    if getattr(model, "checkpoint_sha256", None) != checkpoint["sha256"]:
+        raise ValueError("viewer实际加载的RSL检查点SHA与CPU校验记录不一致")
+    if controls._running:
+        raise RuntimeError("预览必须保持初始暂停，拒绝记录运行中的环境")
+    steps = checkpoint.get("num_timesteps")
+    if isinstance(steps, int) and not isinstance(steps, bool) and steps > 512:
+        smoke_label = "recorded_checkpoint"
+    elif isinstance(steps, int) and not isinstance(steps, bool) and 0 < steps <= 512:
+        smoke_label = "smoke_checkpoint"
+    else:
+        smoke_label = "unrecorded"
+    output.mkdir(parents=True, exist_ok=False)
+    state = _safe_json(adapter.state_payload())
+    record = {
+        "schema": "rsl-field-viewer-smoke-v1",
+        "backend": "rsl_rl",
+        "checkpoint_path": str(Path(checkpoint["path"]).resolve()),
+        "checkpoint_sha256": checkpoint["sha256"],
+        "checkpoint_bytes": checkpoint["bytes"],
+        "num_timesteps": checkpoint["num_timesteps"],
+        "contract_sha256": checkpoint["contract_sha256"],
+        "field_policy_contract": model.contract,
+        "loaded": bool(controls.policy_loaded),
+        "paused": not controls._running,
+        "initial_state": state,
+        "initial_time_s": float(adapter.task.time),
+        "initial_hold_s": float(adapter.task._hold),
+        "checkpoint_stage": smoke_label,
+        "smoke_max_steps": 512 if smoke_label == "smoke_checkpoint" else None,
+        "smoke_only": True if smoke_label == "smoke_checkpoint" else (False if smoke_label == "recorded_checkpoint" else None),
+        "smoke_step_source": "checkpoint.num_timesteps" if smoke_label != "unrecorded" else "unrecorded",
+        "control_acceptance": False,
+        "viewer_mode": "policy_control_paused",
+    }
+    (output / "initial_state.json").write_text(
+        json.dumps(record, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _launch_rsl_viewer(output: Path, port: int, checkpoint: dict[str, Any]) -> None:
+    """Create the existing IsaacFieldEnv/SingleFieldAdapter from contract data."""
+    from isaac_field.env import SingleFieldAdapter, make_env
+    from isaac_field import viewer as viewer_module
+
+    contract = checkpoint["field_policy_contract"]
+    cfg, guide, stability = _rsl_environment_configs(contract)
+    seed = 90003
+    engine = make_env(
+        cfg=cfg,
+        mode="goto",
+        num_envs=1,
+        seed=seed,
+        auto_reset=False,
+        goal_distance=(0.6, 1.2),
+        goal_angle=math.radians(15),
+        distance_cost=0.0,
+        front_guide_spec=guide,
+        body_stability_config=stability,
+        viewer_port=port,
+    )
+    adapter = SingleFieldAdapter(engine)
+    try:
+        _verify_rsl_environment_contract(engine, contract)
+        adapter.reset(seed=seed, options={"mode": "goto"})
+        visualizer = next((item for item in engine.sim.visualizers
+                           if getattr(item.cfg, "visualizer_type", None) == "viser"), None)
+        if visualizer is None:
+            raise RuntimeError("环境没有Isaac Lab官方Viser visualizer")
+        factory = viewer_module.attach_field_controls
+        recorded = False
+
+        def attach(visualizer_arg, adapter_arg, checkpoint_arg=None, *, reset_seed=None):
+            nonlocal recorded
+            controls = FastStopGoalControls(
+                visualizer_arg,
+                adapter_arg,
+                checkpoint_arg,
+                reset_seed=reset_seed,
+                checkpoint_metadata={
+                    "path": checkpoint["path"],
+                    "sha256": checkpoint["sha256"],
+                    "num_timesteps": checkpoint["num_timesteps"],
+                    "contract_sha256": checkpoint["contract_sha256"],
+                    "selection": "rsl-checkpoint",
+                },
+            )
+            controls.process_pending()
+            if not controls.policy_loaded:
+                raise RuntimeError("预览控件未加载原生RSL检查点；拒绝记录或启动预览")
+            if controls._control_mode != "policy" or controls._running:
+                raise RuntimeError("RSL预览必须处于策略模式且初始暂停")
+            model = controls._runner.model
+            if (getattr(model, "backend", None) != "rsl_rl"
+                    or getattr(model, "checkpoint_sha256", None) != checkpoint["sha256"]):
+                raise ValueError("viewer加载的策略后端或SHA与已校验检查点不匹配")
+            if not recorded:
+                _record_rsl_preview(output, checkpoint, adapter_arg, controls)
+                recorded = True
+            return controls
+
+        viewer_module.attach_field_controls = attach
+        try:
+            print(f"官方Isaac Lab Viser: http://127.0.0.1:{port}/", flush=True)
+            viewer_module.run_viewer(adapter, visualizer, checkpoint["path"], reset_seed=seed)
+        finally:
+            viewer_module.attach_field_controls = factory
+    finally:
+        adapter.close()
+
+
+def _verify_rsl_environment_contract(engine: Any, contract: dict[str, Any]) -> None:
+    """Reject a viewer environment whose live metadata differs from the checkpoint."""
+    for name in ("drive_config", "observation_config", "action_config", "damage_config"):
+        expected = contract.get(name)
+        if not isinstance(expected, dict):
+            raise ValueError(f"RSL field_policy_contract缺少{name}，拒绝猜测环境配置")
+        actual = getattr(engine, name, None)
+        if not isinstance(actual, dict):
+            raise ValueError(f"IsaacFieldEnv没有可核对的{name}元数据")
+        if _stable_hash(_safe_json(actual)) != _stable_hash(_safe_json(expected)):
+            raise ValueError(f"RSL viewer live {name}与field_policy_contract不一致")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     actions = parser.add_mutually_exclusive_group()
-    actions.add_argument("--prepare", action="store_true", help="CPU-only protocol/source/checkpoint validation")
-    actions.add_argument("--check", action="store_true", help="CPU-only validation; default action")
-    actions.add_argument("--launch", action="store_true", help="launch only after actual completed exit 0")
-    parser.add_argument("--trial", type=Path, default=DEFAULT_TRIAL)
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--checkpoint", type=Path, help="explicit SB3 policy ZIP")
-    parser.add_argument("--selection", choices=("latest", "near-best"), default="near-best")
+    actions.add_argument("--prepare", action="store_true", help="CPU-only check; no simulator")
+    actions.add_argument("--check", action="store_true", help="CPU-only contract check; default action")
+    actions.add_argument("--launch", action="store_true", help="launch the paused viewer after validation")
+    parser.add_argument("--checkpoint", type=Path,
+                        help="native RSL-RL .pt; required unless --legacy-sb3 is selected")
+    parser.add_argument("--legacy-sb3", action="store_true",
+                        help="explicitly use the historical SB3 ZIP/trial completion-gate path")
+    parser.add_argument("--trial", type=Path, default=DEFAULT_TRIAL,
+                        help="legacy-SB3 trial directory (used only with --legacy-sb3)")
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT,
+                        help="new, non-existing directory for initial preview metadata")
+    parser.add_argument("--selection", choices=("latest", "near-best"), default="near-best",
+                        help="legacy-SB3 manifest selection")
     parser.add_argument("--port", type=int, default=8783)
     args = parser.parse_args(argv)
     try:
-        trial, output = _resolve(args.trial), _resolve(args.output)
-        if args.launch:
-            gate = validate_completed_trial(trial)
+        output = _resolve(args.output)
+        if args.legacy_sb3:
+            trial = _resolve(args.trial)
+            if args.checkpoint is not None and args.checkpoint.suffix.lower() != ".zip":
+                raise ValueError("--legacy-sb3只接受SB3 .zip检查点")
+            if args.launch:
+                gate = validate_completed_trial(trial)
+                protocol = _json(trial / "protocol.json")
+                sources = _verify_sources(trial, protocol)
+                checkpoint = _resolve_checkpoint(trial, protocol, args.selection, args.checkpoint)
+                _require_viewer_ports(args.port)
+                if output.exists():
+                    raise FileExistsError(f"拒绝覆盖已有预览输出：{output}")
+                output.parent.mkdir(parents=True, exist_ok=True)
+                print(json.dumps({"status": "launching", "backend": "legacy_sb3",
+                                  "completion_gate": gate, "checkpoint": checkpoint,
+                                  "output": str(output)}, ensure_ascii=False, indent=2), flush=True)
+                _launch_viewer(trial, output, args.port, checkpoint, protocol, sources)
+                return 0
             protocol = _json(trial / "protocol.json")
+            _validate_protocol(protocol)
             sources = _verify_sources(trial, protocol)
             checkpoint = _resolve_checkpoint(trial, protocol, args.selection, args.checkpoint)
+            _require_viewer_ports(args.port)
+            print(json.dumps({"status": "check_passed", "backend": "legacy_sb3",
+                              "launch_allowed": False,
+                              "note": "legacy --prepare/--check不启动Isaac Lab且不创建输出目录",
+                              "trial": str(trial), "protocol_sha256": _sha256(trial / "protocol.json"),
+                              "source_sha256": sources["source_sha256"],
+                              "source_file_count": sources["file_count"], "checkpoint": checkpoint,
+                              "run_status": _json(trial / "run_status.json")},
+                             ensure_ascii=False, indent=2), flush=True)
+            return 0
+
+        if args.checkpoint is None:
+            raise ValueError("RSL-RL默认模式必须显式传入真实检查点：--checkpoint <existing .pt>")
+        if args.checkpoint.suffix.lower() != ".pt":
+            raise ValueError(".zip是Legacy SB3检查点；请显式添加 --legacy-sb3")
+        checkpoint = _rsl_checkpoint_record(_resolve(args.checkpoint))
+        if args.launch:
             _require_viewer_ports(args.port)
             if output.exists():
                 raise FileExistsError(f"拒绝覆盖已有预览输出：{output}")
             output.parent.mkdir(parents=True, exist_ok=True)
-            print(json.dumps({"status": "launching", "completion_gate": gate,
-                              "checkpoint": checkpoint, "output": str(output)},
-                             ensure_ascii=False, indent=2), flush=True)
-            _launch_viewer(trial, output, args.port, checkpoint, protocol, sources)
+            print(json.dumps({
+                "status": "launching", "backend": "rsl_rl",
+                "checkpoint": {key: value for key, value in checkpoint.items()
+                                if key != "field_policy_contract"},
+                "output": str(output),
+            }, ensure_ascii=False, indent=2), flush=True)
+            _launch_rsl_viewer(output, args.port, checkpoint)
             return 0
-        protocol = _json(trial / "protocol.json")
-        _validate_protocol(protocol)
-        sources = _verify_sources(trial, protocol)
-        checkpoint = _resolve_checkpoint(trial, protocol, args.selection, args.checkpoint)
-        _require_viewer_ports(args.port)
-        print(json.dumps({"status": "check_passed", "launch_allowed": False,
-                          "note": "--prepare/--check不启动Isaac Lab且不创建输出目录",
-                          "trial": str(trial), "protocol_sha256": _sha256(trial / "protocol.json"),
-                          "source_sha256": sources["source_sha256"],
-                          "source_file_count": sources["file_count"], "checkpoint": checkpoint,
-                          "run_status": _json(trial / "run_status.json")},
-                         ensure_ascii=False, indent=2), flush=True)
+        print(json.dumps({
+            "status": "check_passed", "backend": "rsl_rl", "launch_allowed": False,
+            "note": "CPU-only actor/contract validation; no Isaac Lab, physics, network bind or output directory",
+            "checkpoint": checkpoint,
+        }, ensure_ascii=False, indent=2), flush=True)
         return 0
     except Exception as exc:
         print(f"PREVIEW REFUSED: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)

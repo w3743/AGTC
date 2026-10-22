@@ -1,5 +1,6 @@
 """One Isaac Lab backend, with task-specific train/evaluate/view commands."""
 import argparse
+import importlib
 import sys
 from dataclasses import asdict
 import json
@@ -9,6 +10,101 @@ from collections.abc import Mapping
 import numpy as np
 
 from .feedback import INPUT_SCHEMA, SUPPORTED_INPUT_SCHEMAS
+
+
+RSL_TASK = "Isaac-Field-FastStop-Rsl-Direct"
+
+
+def _checkpoint_argument(argv: list[str]) -> str | None:
+    for index, token in enumerate(argv):
+        if token.startswith("--checkpoint="):
+            return token.split("=", 1)[1]
+        if token == "--checkpoint" and index + 1 < len(argv):
+            return argv[index + 1]
+    return None
+
+
+def _reject_zip_for_rsl(argv: list[str], *, command: str) -> None:
+    checkpoint = _checkpoint_argument(argv)
+    if checkpoint and Path(checkpoint).suffix.lower() == ".zip":
+        raise SystemExit(
+            f"{command} uses the official RSL-RL backend and cannot load an SB3 .zip; "
+            "use the explicit train-sb3/evaluate --legacy-sb3 path for legacy checkpoints"
+        )
+
+
+def _run_official_rsl_cli(arguments: list[str]) -> int:
+    from isaaclab_rl.entrypoints import run_train_cli
+
+    return run_train_cli(["--rl_library", "rsl_rl", "--task", RSL_TASK, *arguments])
+
+
+def _run_official_rsl_resume(arguments: list[str]) -> int:
+    parser = argparse.ArgumentParser(prog="isaac_field resume", add_help=False)
+    parser.add_argument("--checkpoint", required=True)
+    parsed, remaining = parser.parse_known_args(arguments)
+    if Path(parsed.checkpoint).suffix.lower() == ".zip":
+        parser.error("SB3 .zip checkpoints require the explicit train-sb3 legacy command")
+    return _run_official_rsl_cli(["--checkpoint", parsed.checkpoint, *remaining])
+
+
+def _forward_checkpoint_viewer(args) -> int:
+    checkpoint = Path(args.checkpoint).expanduser()
+    extension = checkpoint.suffix.lower()
+    if args.legacy_sb3:
+        if extension != ".zip":
+            raise SystemExit("--legacy-sb3 viewer mode requires an SB3 .zip checkpoint")
+    elif extension != ".pt":
+        raise SystemExit("viewer requires an RSL .pt checkpoint; pass --legacy-sb3 explicitly for an SB3 .zip")
+    view_fast_stop_goal = importlib.import_module("scripts.view_fast_stop_goal")
+
+    forwarded = ["--checkpoint", str(checkpoint)]
+    if args.legacy_sb3:
+        forwarded.append("--legacy-sb3")
+    if args.launch:
+        forwarded.append("--launch")
+    if args.output is not None:
+        forwarded.extend(("--output", str(args.output)))
+    if args.port is not None:
+        forwarded.extend(("--port", str(args.port)))
+    return view_fast_stop_goal.main(forwarded)
+
+
+def _run_rsl_evaluation(args, parser) -> int:
+    if not args.checkpoint:
+        parser.error("evaluate requires --checkpoint")
+    extension = Path(args.checkpoint).suffix.lower()
+    if extension == ".zip":
+        if not args.legacy_sb3:
+            parser.error("SB3 .zip evaluation requires --legacy-sb3")
+        parser.error("SB3 .zip evaluation must be routed through the legacy evaluation path")
+    if args.legacy_sb3:
+        parser.error("--legacy-sb3 is only valid with an SB3 .zip checkpoint")
+    if extension != ".pt":
+        parser.error("new RSL evaluation requires an .pt checkpoint; SB3 .zip requires --legacy-sb3")
+    evaluate_fast_stop_mastery = importlib.import_module("scripts.evaluate_fast_stop_mastery")
+
+    if args.smoke and args.max_steps is None:
+        parser.error("RSL smoke requires --max-steps 1 or 2")
+    if args.smoke and args.scenario_count not in (None, 1, 2):
+        parser.error("RSL smoke supports at most two scenarios")
+
+    output = Path(args.output or "results/isaac_field/run").resolve()
+    report_path = output / "evaluation.json"
+    if report_path.exists():
+        raise FileExistsError(f"refusing to overwrite evaluation report: {report_path}")
+    output.mkdir(parents=True, exist_ok=True)
+    forwarded = ["--checkpoint", str(Path(args.checkpoint).expanduser())]
+    if args.smoke:
+        forwarded.append("--smoke")
+    if args.max_steps is not None:
+        forwarded.extend(("--max-steps", str(args.max_steps)))
+    if args.scenario_count is not None:
+        forwarded.extend(("--scenario-count", str(args.scenario_count)))
+    if args.seed is not None:
+        forwarded.extend(("--seed", str(args.seed)))
+    forwarded.extend(("--device", args.policy_device, "--output", str(report_path)))
+    return evaluate_fast_stop_mastery.main(forwarded)
 
 
 def _json_safe(value):
@@ -58,17 +154,17 @@ def _viewer_initial_state(adapter, cfg, *, env_seed, episode_seed, repeat_reset_
 
 
 def main():
-    # New training delegates to Isaac Lab's maintained CLI/runner. Keep the
-    # original SB3 command explicit for historical checkpoints and protocols.
+    # Current training and resume use Isaac Lab's official RSL-RL CLI. SB3
+    # remains reachable only through commands that name the legacy backend.
     if len(sys.argv) > 1 and sys.argv[1] == 'train':
-        from isaaclab_rl.entrypoints import run_train_cli
-        return run_train_cli([
-            '--rl_library', 'rsl_rl', '--task', 'Isaac-Field-FastStop-Rsl-Direct',
-            *sys.argv[2:],
-        ])
+        _reject_zip_for_rsl(sys.argv[2:], command="train")
+        return _run_official_rsl_cli(sys.argv[2:])
+    if len(sys.argv) > 1 and sys.argv[1] == 'resume':
+        return _run_official_rsl_resume(sys.argv[2:])
     parser=argparse.ArgumentParser(description='Isaac Lab agricultural robot')
-    parser.add_argument('command',choices=['viewer','smoke','train','train-sb3','evaluate','adversary'])
-    parser.add_argument('--seed',type=int,default=7)
+    parser.add_argument('command',choices=['viewer','smoke','train','resume','train-sb3',
+                                           'evaluate','adversary-sb3'])
+    parser.add_argument('--seed',type=int,default=None)
     parser.add_argument('--episode-seed',type=int,default=None,
                         help='Viewer reset seed, independent of --seed; explicit values repeat the same episode on Reset')
     parser.add_argument('--reward-profile',choices=['legacy','protect_plants'],default='legacy',
@@ -88,6 +184,16 @@ def main():
     parser.add_argument('--port',type=int,default=8768)
     parser.add_argument('--max-time',type=float,default=30.)
     parser.add_argument('--checkpoint')
+    parser.add_argument('--legacy-sb3',action='store_true',
+                        help='explicitly enable an SB3 .zip viewer/evaluation path')
+    parser.add_argument('--launch',action='store_true',
+                        help='launch a checkpoint viewer after its preflight check')
+    parser.add_argument('--smoke', action='store_true',
+                        help='run a bounded RSL native smoke check (not a competence evaluation)')
+    parser.add_argument('--max-steps',type=int,default=None,
+                        help='optional step cap for RSL evaluation; RSL smoke is limited to 1 or 2')
+    parser.add_argument('--scenario-count',type=int,default=None,
+                        help='RSL evaluation scenario count; smoke is limited to 1 or 2')
     parser.add_argument('--input-schema', choices=SUPPORTED_INPUT_SCHEMAS, default=INPUT_SCHEMA,
                         help='Versioned state encoding; checkpoint metadata must match')
     parser.add_argument('--policy-device',default='cpu')
@@ -95,6 +201,44 @@ def main():
     parser.add_argument('--goal-distance',type=float,nargs=2)
     parser.add_argument('--goal-angle',type=float,default=180.,help='Goal bearing range in degrees')
     args=parser.parse_args()
+    if args.command == 'viewer' and args.checkpoint:
+        extension = Path(args.checkpoint).suffix.lower()
+        if extension == '.pt':
+            return _forward_checkpoint_viewer(args)
+        if extension != '.zip' or not args.legacy_sb3:
+            return _forward_checkpoint_viewer(args)
+    if args.command == 'viewer' and args.legacy_sb3 and not args.checkpoint:
+        parser.error('viewer --legacy-sb3 requires --checkpoint <SB3 .zip>')
+    if args.command == 'evaluate':
+        extension = Path(args.checkpoint or '').suffix.lower()
+        if extension == '.pt':
+            return _run_rsl_evaluation(args, parser)
+        if extension == '.zip' and args.legacy_sb3:
+            if args.smoke:
+                parser.error('--smoke is only available for RSL .pt checkpoints')
+            if args.max_steps is not None or args.scenario_count is not None:
+                parser.error('--max-steps/--scenario-count are only available for RSL checkpoint evaluation')
+        else:
+            _run_rsl_evaluation(args, parser)
+    elif args.legacy_sb3 and not (
+            args.command == 'viewer' and args.checkpoint
+            and Path(args.checkpoint).suffix.lower() == '.zip'):
+        parser.error('--legacy-sb3 is only valid with viewer/evaluate checkpoint commands')
+    if args.command == 'adversary-sb3' and (
+            not args.checkpoint or Path(args.checkpoint).suffix.lower() != '.zip'):
+        parser.error('adversary-sb3 requires an explicit SB3 .zip checkpoint')
+    if args.command == 'train-sb3' and args.checkpoint and Path(args.checkpoint).suffix.lower() != '.zip':
+        parser.error('train-sb3 accepts only an SB3 .zip checkpoint; RSL resume uses the resume command')
+    if args.launch and args.command != 'viewer':
+        parser.error('--launch is only valid with viewer')
+    if args.smoke and args.command != 'evaluate':
+        parser.error('--smoke is only valid with evaluate --checkpoint <RSL .pt>')
+    if args.max_steps is not None and args.max_steps < 1:
+        parser.error('--max-steps must be positive')
+    if args.scenario_count is not None and args.scenario_count < 1:
+        parser.error('--scenario-count must be positive')
+    if args.seed is None:
+        args.seed = 7
     from .task import Config
     from .env import make_env,SingleFieldAdapter
     output=Path(args.output or 'results/isaac_field/run').resolve()
@@ -119,7 +263,7 @@ def main():
     if args.body_stability:
         from .body_stability import BodyStabilityConfig
         body_stability_config = BodyStabilityConfig()
-    single=args.command in ('viewer','evaluate','adversary')
+    single=args.command in ('viewer','evaluate','adversary-sb3')
     env=make_env(cfg,args.mode,1 if single else args.envs,args.seed,not single,
                  goal_distance=tuple(args.goal_distance) if args.goal_distance else None,
                  goal_angle=np.deg2rad(args.goal_angle),distance_cost=0.0,
@@ -194,7 +338,6 @@ def main():
             (output/'evaluation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
             print(json.dumps(result,indent=2))
         else:
-            if not args.checkpoint:parser.error('adversary requires --checkpoint')
             from .adversarial_training import run_round
             result=run_round(env,args.checkpoint,output,teacher_steps=args.teacher_steps,
                 student_steps=args.steps,seed=args.seed,

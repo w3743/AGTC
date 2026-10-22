@@ -8,12 +8,14 @@ from __future__ import annotations
 
 import argparse
 import copy
+from dataclasses import fields
 import hashlib
 import json
 import math
 from pathlib import Path
 import struct
 import sys
+from collections.abc import Mapping
 from typing import Any
 from urllib.error import URLError
 
@@ -23,7 +25,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from isaac_field.feedback import FeedbackSample, FeedbackSnapshot
+from isaac_field.feedback import (
+    ABSOLUTE_GOAL_INPUT_SCHEMA,
+    INPUT_SCHEMA,
+    FeedbackSample,
+    FeedbackSnapshot,
+)
+from isaac_field.policy_contract import ACTION_SHAPE, OBSERVATION_SHAPES, validate_policy_spaces
 from isaac_field.task import Config
 from isaac_field.telemetry import (
     ATKIMU901StreamDecoder,
@@ -95,6 +103,7 @@ def build_telemetry_snapshot(
     estimator,
     gimbal_q: tuple[float, float] = (0.10, 0.20),
     gimbal_qd: tuple[float, float] = (0.01, -0.02),
+    attitude_yaw_rad: float = 0.0,
 ) -> tuple[FeedbackSnapshot, dict[str, Any]]:
     """Feed real protocol decoders with deterministic checked-in QA payloads."""
     vectors, golden_sha = _golden_vectors()
@@ -109,10 +118,19 @@ def build_telemetry_snapshot(
         if name in ("state_left", "quality_left") and result is None:
             raise ValueError(f"golden CAN vector {name} was not decoded")
 
-    # These are the exact ATK frame layouts covered by test_telemetry.py:
-    # identity firmware quaternion, 1 g Z acceleration, zero gyro, and mag.
+    # These are the exact ATK frame layouts covered by test_telemetry.py. A
+    # parameterized yaw quaternion keeps the QA pose measured through the real
+    # decoder/fusion path while allowing the absolute-goal semantic check to
+    # distinguish world coordinates from heading-relative goal coordinates.
+    if not math.isfinite(attitude_yaw_rad):
+        raise ValueError("attitude_yaw_rad must be finite")
+    half_yaw = attitude_yaw_rad / 2.0
+    quaternion_wxyz = (
+        int(round(math.cos(half_yaw) * 32767)), 0, 0,
+        int(round(math.sin(half_yaw) * 32767)),
+    )
     atk_bytes = b"".join((
-        _atk_packet(0x02, _i16s((32767, 0, 0, 0))),
+        _atk_packet(0x02, _i16s(quaternion_wxyz)),
         _atk_packet(0x03, _i16s((0, 0, 8192, 0, 0, 0))),
         _atk_packet(0x04, _i16s((100, -50, 200, 2500))),
     ))
@@ -215,26 +233,22 @@ def make_qa_adapter(adapter_module):
     )
 
 
-def _policy_env(checkpoint: Path):
-    """Expose spaces serialized in the actual checkpoint; never step an env."""
+def _space_only_env(observation_space, action_space, *, observation_config=None,
+                    action_config=None, input_schema=None):
     import gymnasium as gym
-    from stable_baselines3.common.save_util import load_from_zip_file
-    from isaac_field.policy import validate_policy_spaces
-
-    data, _params, _pytorch_variables = load_from_zip_file(str(checkpoint), device="cpu")
-    observation_space = data.get("observation_space")
-    action_space = data.get("action_space")
-    if observation_space is None or action_space is None:
-        raise ValueError("checkpoint does not serialize observation_space and action_space")
-    validate_policy_spaces(observation_space, action_space)
 
     class SpaceOnlyEnv(gym.Env):
         metadata = {"render_modes": []}
 
-        def __init__(self):
+        def __init__(self, observation_space, action_space, observation_config,
+                     action_config, input_schema):
             super().__init__()
             self.observation_space = observation_space
             self.action_space = action_space
+            self.observation_config = copy.deepcopy(observation_config)
+            self.action_config = copy.deepcopy(action_config)
+            self.input_schema = input_schema
+            self.num_envs = 1
 
         def reset(self, *, seed=None, options=None):
             raise NotImplementedError("checkpoint space adapter does not simulate environment reset")
@@ -242,7 +256,150 @@ def _policy_env(checkpoint: Path):
         def step(self, action):
             raise NotImplementedError("checkpoint space adapter does not simulate environment steps")
 
-    return SpaceOnlyEnv()
+    return SpaceOnlyEnv(observation_space, action_space, observation_config,
+                        action_config, input_schema)
+
+
+def _rsl_spaces_from_contract(contract):
+    """Rebuild the RSL checkpoint's read-only Gym spaces from its field contract."""
+    import gymnasium as gym
+
+    if not isinstance(contract, dict) or contract.get("backend") != "rsl_rl":
+        raise ValueError("checkpoint does not contain an RSL-RL field policy contract")
+    input_schema = contract.get("input_schema")
+    if input_schema != ABSOLUTE_GOAL_INPUT_SCHEMA:
+        raise ValueError(
+            "production RSL replay requires the absolute-goal input schema; "
+            "use an explicitly supported checkpoint or select SB3 legacy mode"
+        )
+    observation_config = contract.get("observation_config")
+    action_config = contract.get("action_config")
+    declared_shapes = contract.get("observation_shapes")
+    expected_shapes = {key: list(shape) for key, shape in OBSERVATION_SHAPES.items()}
+    if declared_shapes != expected_shapes:
+        raise ValueError("RSL checkpoint observation_shapes do not match the field policy contract")
+
+    bounds = {
+        "lidar": (0.0, 1.0),
+        "depth": (-1.0, 1.0),
+        "detections": (-1.0, 1.0),
+        "state": (-1.0, 1.0),
+        "feedback": (-np.inf, np.inf),
+    }
+    observation_space = gym.spaces.Dict({
+        key: gym.spaces.Box(low=low, high=high, shape=OBSERVATION_SHAPES[key], dtype=np.float32)
+        for key, (low, high) in bounds.items()
+    })
+    action_space = gym.spaces.Box(-1.0, 1.0, shape=ACTION_SHAPE, dtype=np.float32)
+    validate_policy_spaces(
+        observation_space, action_space,
+        input_schema=input_schema,
+        expected_observation_config=observation_config,
+    )
+    env = _space_only_env(
+        observation_space, action_space,
+        observation_config=observation_config,
+        action_config=action_config,
+        input_schema=input_schema,
+    )
+    # Keep the exact source contract available to the replay constructor. The
+    # space-only adapter is still read-only and does not infer task defaults.
+    env.field_policy_contract = copy.deepcopy(contract)
+    env.task_config = copy.deepcopy(contract.get("task_config"))
+    return env
+
+
+def _rsl_config_from_contract(contract) -> Config:
+    """Create the LASSC task packer from the checkpoint's complete task contract."""
+    if not isinstance(contract, Mapping):
+        raise ValueError("RSL replay requires a field_policy_contract mapping")
+    task_config = contract.get("task_config")
+    if not isinstance(task_config, Mapping):
+        raise ValueError(
+            "RSL replay requires field_policy_contract.task_config; refusing to infer observation normalization"
+        )
+    expected_fields = {field.name for field in fields(Config)}
+    actual_fields = set(task_config)
+    missing = sorted(expected_fields - actual_fields)
+    unknown = sorted(actual_fields - expected_fields)
+    if missing or unknown:
+        details = []
+        if missing:
+            details.append(f"missing {missing}")
+        if unknown:
+            details.append(f"unknown {unknown}")
+        raise ValueError("RSL task_config must be complete for this Config version: " + "; ".join(details))
+    cfg = Config(**dict(task_config))
+    schema = contract.get("input_schema")
+    if cfg.input_schema != schema:
+        raise ValueError(
+            f"RSL task_config input_schema {cfg.input_schema!r} does not match checkpoint {schema!r}"
+        )
+    observation_config = contract.get("observation_config")
+    if not isinstance(observation_config, Mapping):
+        raise ValueError("RSL checkpoint observation_config is required to validate task normalization")
+    expected_shapes = {
+        "lidar": [1, cfg.lidar_rays],
+        "depth": [1, cfg.depth_height, cfg.depth_width],
+        "detections": [cfg.max_detections, 8],
+        "state": [33],
+        "feedback": [37],
+    }
+    declared_shapes = observation_config.get("observation_shapes")
+    if not isinstance(declared_shapes, Mapping):
+        raise ValueError("RSL observation_config must declare observation_shapes")
+    mismatched_shapes = {
+        key: (declared_shapes.get(key), expected)
+        for key, expected in expected_shapes.items()
+        if declared_shapes.get(key) != expected
+    }
+    if mismatched_shapes:
+        raise ValueError(f"RSL task_config dimensions disagree with observation_config: {mismatched_shapes}")
+    if schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
+        coordinates = observation_config.get("absolute_goal_coordinates")
+        if (not isinstance(coordinates, Mapping)
+                or coordinates.get("field_size_m") != cfg.size):
+            raise ValueError(
+                "RSL task_config size does not match absolute_goal_coordinates.field_size_m"
+            )
+    return cfg
+
+
+def _policy_env(checkpoint: Path, *, legacy_sb3: bool = False):
+    """Expose checkpoint-bound spaces without creating or stepping an environment.
+
+    RSL is the production path. SB3 ZIP inspection remains available only when
+    the caller explicitly opts into its legacy compatibility branch.
+    """
+    checkpoint = Path(checkpoint)
+    suffix = checkpoint.suffix.lower()
+    if suffix == ".zip":
+        if not legacy_sb3:
+            raise ValueError("SB3 .zip replay requires the explicit --legacy-sb3 option")
+        from stable_baselines3.common.save_util import load_from_zip_file
+
+        data, _params, _pytorch_variables = load_from_zip_file(str(checkpoint), device="cpu")
+        observation_space = data.get("observation_space")
+        action_space = data.get("action_space")
+        if observation_space is None or action_space is None:
+            raise ValueError("checkpoint does not serialize observation_space and action_space")
+        validate_policy_spaces(observation_space, action_space, input_schema=INPUT_SCHEMA)
+        return _space_only_env(
+            observation_space, action_space, input_schema=INPUT_SCHEMA,
+        )
+    if legacy_sb3:
+        raise ValueError("--legacy-sb3 accepts only an SB3 .zip checkpoint")
+    if suffix != ".pt":
+        raise ValueError(f"RSL replay requires a .pt checkpoint, got {suffix or '<no extension>'}")
+
+    from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+    payload = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")
+    try:
+        contract = payload["field_policy_contract"]
+        return _rsl_spaces_from_contract(contract)
+    finally:
+        del payload
 
 
 def _state_copy(runner):
@@ -347,26 +504,47 @@ def _action_codec_check(cfg: Config) -> dict[str, Any]:
 
 
 def run_replay(checkpoint: str | Path, *, output: str | Path,
-               live_url: str | None = None, live_timeout_s: float = 2.0) -> tuple[dict[str, Any], int]:
+               live_url: str | None = None, live_timeout_s: float = 2.0,
+               legacy_sb3: bool = False) -> tuple[dict[str, Any], int]:
     checkpoint = Path(checkpoint).expanduser().resolve()
     output = Path(output).expanduser().resolve()
     if not checkpoint.is_file():
         raise FileNotFoundError(f"checkpoint does not exist: {checkpoint}")
+    checkpoint_sha = sha256_file(checkpoint)
+    if checkpoint.suffix.lower() == ".zip" and not legacy_sb3:
+        raise ValueError("SB3 .zip replay requires the explicit --legacy-sb3 option")
+    if legacy_sb3 and checkpoint.suffix.lower() != ".zip":
+        raise ValueError("--legacy-sb3 accepts only an SB3 .zip checkpoint")
 
     adapter_module, wire = load_depth_modules()
-    cfg = Config()
     adapter = make_qa_adapter(adapter_module)
-    # The trained 57344 checkpoint was rendered on IsaacCamera's centered 88x160
-    # target grid. Reuse the adapter's centered TARGET_K; do not substitute the
-    # simulator-independent FieldTask reference K here.
+    # Reuse the adapter's registered centered target grid; do not substitute
+    # the simulator-independent FieldTask reference K here.
     target_k = np.asarray(adapter.target_k, dtype=np.float64)
     if not np.allclose(target_k, adapter_module.TARGET_K, rtol=0.0, atol=1e-9):
-        raise ValueError("depth adapter target K differs from its registered centered camera K")
+        raise ValueError("depth adapter target K differs from its registered target camera K")
 
-    from isaac_field.policy import PolicyRunner
+    env = _policy_env(checkpoint, legacy_sb3=legacy_sb3)
+    if legacy_sb3:
+        cfg = Config()
+        # Keep SB3 import isolated to the explicit compatibility path. The
+        # legacy replay retains the v6 packer and its historical defaults.
+        from isaac_field.policy import PolicyRunner
 
-    env = _policy_env(checkpoint)
-    runner = PolicyRunner(env, checkpoint, device="cpu")
+        runner = PolicyRunner(
+            env, checkpoint, device="cpu", input_schema=INPUT_SCHEMA,
+        )
+        backend = "sb3_legacy"
+    else:
+        cfg = _rsl_config_from_contract(env.field_policy_contract)
+        from isaac_field.rsl_rl_inference import RslPolicyRunner
+
+        runner = RslPolicyRunner(
+            env, checkpoint, device="cpu",
+            input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+            expected_observation_config=env.observation_config,
+        )
+        backend = "rsl_rl"
     if str(runner.model.device) != "cpu":
         raise ValueError(f"checkpoint runner did not remain on CPU: {runner.model.device}")
     consumer = LASSCConsumer(adapter, cfg=cfg, max_depth_age_s=0.5,
@@ -387,6 +565,7 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
     all_finite = True
     observation_contract_checks = []
     recurrent_states = []
+    absolute_goal_semantic_checks = []
 
     # Separate source/current telemetry samples are deliberate. At 250 ms depth
     # age, fresh current CAN/IMU feedback must not be fabricated from command output.
@@ -401,6 +580,7 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
         source_feedback, source_telemetry = build_telemetry_snapshot(
             source_episode, 100.0 + source_episode, estimator=source_estimator,
             gimbal_q=(0.10 + index * 0.005, 0.20 - index * 0.004),
+            attitude_yaw_rad=0.6,
         )
         metadata = make_depth_metadata(seq=index + 1, pipeline_epoch=0,
                                        source_mono_ns=source_ns)
@@ -414,6 +594,7 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
         current_feedback, current_telemetry = build_telemetry_snapshot(
             consume_episode, 100.0 + consume_episode, estimator=current_estimator,
             gimbal_q=(0.11 + index * 0.005, 0.19 - index * 0.004),
+            attitude_yaw_rad=0.6,
         )
         context = _policy_context(cfg, consume_episode, current_feedback,
                                   current_xy, previous_action)
@@ -461,6 +642,32 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
             "keys_match_checkpoint_space": set(result.observation) == set(env.observation_space.spaces),
             "fields": observation_fields,
         }
+        state_goal_features = np.asarray(result.observation["state"][1:3], dtype=np.float64)
+        world_goal_normalized = np.clip(
+            np.asarray(context.goal_xy, dtype=np.float64) / cfg.size * 2.0 - 1.0,
+            -1.0, 1.0,
+        )
+        delta_world = np.asarray(context.goal_xy, dtype=np.float64) - np.asarray(
+            context.estimated_xy, dtype=np.float64,
+        )
+        heading = float(context.feedback.estimated_heading_rad)
+        relative_goal_normalized = np.asarray((
+            math.cos(heading) * delta_world[0] + math.sin(heading) * delta_world[1],
+            -math.sin(heading) * delta_world[0] + math.cos(heading) * delta_world[1],
+        )) / cfg.size
+        expected_goal_features = (
+            world_goal_normalized
+            if cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA
+            else np.clip(relative_goal_normalized, -1.0, 1.0)
+        )
+        absolute_goal_semantic_checks.append(bool(
+            cfg.input_schema != ABSOLUTE_GOAL_INPUT_SCHEMA
+            or (np.allclose(state_goal_features, world_goal_normalized, rtol=0.0, atol=1e-6)
+                and abs(heading) > 0.1
+                and np.linalg.norm(delta_world) > 0.1
+                and not np.allclose(world_goal_normalized, relative_goal_normalized,
+                                    rtol=0.0, atol=1e-3))
+        ))
         action_space_contains = bool(env.action_space.contains(action))
         all_finite &= all(np.isfinite(value).all() for value in result.observation.values())
         observation_contract_checks.append(observation_contract)
@@ -474,6 +681,15 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
             "action": action.tolist(),
             "action_space_contains": action_space_contains,
             "observation_contract": observation_contract,
+            "goal_state_features": state_goal_features.tolist(),
+            "expected_goal_features": expected_goal_features.tolist(),
+            "goal_coordinate_semantics": (
+                "field_world_xy_normalized" if cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA
+                else "heading_relative_body_xy_normalized"
+            ),
+            "estimated_heading_rad": heading,
+            "estimated_xy": list(context.estimated_xy),
+            "goal_xy": list(context.goal_xy),
             "action_commands": {
                 "motor_request_rpm": policy_commands["motor_request_rpm"],
                 "drive_packets": [{k: v for k, v in packet.items() if k != "data"}
@@ -564,6 +780,7 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
     epoch_source_feedback, _ = build_telemetry_snapshot(
         epoch_source_episode, 100.0 + epoch_source_episode,
         estimator=epoch_source_estimator,
+        attitude_yaw_rad=0.6,
     )
     epoch_meta = make_depth_metadata(seq=1, pipeline_epoch=1,
                                      source_mono_ns=epoch_source_ns)
@@ -587,16 +804,27 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
     codec = _action_codec_check(cfg)
     source_paths = [
         Path(__file__), ROOT / "scripts/lassc_consumer.py",
-        ROOT / "isaac_field/policy.py", ROOT / "isaac_field/task.py",
+        ROOT / "isaac_field/task.py",
         ROOT / "isaac_field/feedback.py", ROOT / "isaac_field/telemetry.py",
         ROOT / "isaac_field/action_contract.py", CAN_GOLDEN_PATH,
         CAN_GOLDEN_PROVENANCE_PATH,
     ]
+    if legacy_sb3:
+        source_paths.append(ROOT / "isaac_field/policy.py")
+    else:
+        source_paths.extend((
+            ROOT / "isaac_field/policy_contract.py",
+            ROOT / "isaac_field/sensor_encoder.py",
+            ROOT / "isaac_field/rsl_rl_policy.py",
+            ROOT / "isaac_field/rsl_rl_inference.py",
+        ))
     if DEPTH_CONTRACT_PATH.is_file():
         source_paths.append(DEPTH_CONTRACT_PATH)
     source_hashes = {str(path.resolve()): sha256_file(path) for path in source_paths if path.is_file()}
     source_hashes.update(depth_source_hashes())
-    checkpoint_sha = sha256_file(checkpoint)
+    model_checkpoint_sha = getattr(runner.model, "checkpoint_sha256", None)
+    if model_checkpoint_sha is not None and model_checkpoint_sha != checkpoint_sha:
+        raise ValueError("runner checkpoint SHA-256 differs from the selected checkpoint file")
 
     checks: dict[str, bool] = {
         "checkpoint_loaded_on_cpu": str(runner.model.device) == "cpu",
@@ -632,6 +860,9 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
         "centered_depth_target_intrinsics": bool(np.allclose(
             target_k, adapter_module.TARGET_K, rtol=0.0, atol=1e-9)),
     }
+    if backend == "rsl_rl":
+        checks["absolute_goal_state_uses_world_goal_coordinates"] = bool(
+            absolute_goal_semantic_checks and all(absolute_goal_semantic_checks))
 
     live: dict[str, Any] = {"status": "not_tested", "reason": "live_url_not_requested"}
     if live_url:
@@ -683,7 +914,9 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
     report = {
         "schema": "lassc-cpu-replay-qa-v1",
         "checkpoint": {"path": str(checkpoint), "sha256": checkpoint_sha,
-                       "device": str(runner.model.device), "label": runner.label},
+                       "device": str(runner.model.device),
+                       "backend": backend,
+                       "label": getattr(runner, "label", f"{backend} checkpoint loaded")},
         "source_sha256": dict(sorted(source_hashes.items())),
         "depth_target_intrinsics": {
             "source": "RK DepthAdapter.TARGET_K; IsaacCamera centered 88x160 renderer target",
@@ -738,7 +971,10 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", required=True, help="real SB3 RecurrentPPO checkpoint (.zip)")
+    parser.add_argument("--checkpoint", required=True,
+                        help="native RSL-RL field checkpoint (.pt); SB3 .zip requires --legacy-sb3")
+    parser.add_argument("--legacy-sb3", action="store_true",
+                        help="explicitly replay an older SB3 RecurrentPPO .zip checkpoint")
     parser.add_argument("--output", required=True, help="write JSON QA report here")
     parser.add_argument("--live-url", help="optional atomic /depth.bin endpoint to probe")
     parser.add_argument("--live-timeout", type=float, default=2.0)
@@ -747,7 +983,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--live-timeout must be finite and positive")
     try:
         report, code = run_replay(args.checkpoint, output=args.output,
-                                  live_url=args.live_url, live_timeout_s=args.live_timeout)
+                                  live_url=args.live_url, live_timeout_s=args.live_timeout,
+                                  legacy_sb3=args.legacy_sb3)
     except Exception as exc:
         report = {
             "schema": "lassc-cpu-replay-qa-v1",

@@ -194,10 +194,16 @@ class PolicyNetworkPanel:
             for layer in snapshot["layers"]
             if layer["values"] is not None
         }
+        state_dict = getattr(self.inspector, "state_dict", None)
+        if callable(state_dict):
+            weights = state_dict()
+        else:
+            # Compatibility for small external inspector adapters.
+            weights = self.inspector.policy.state_dict()
         arrays.update(
             {
                 "weight/" + name: value.detach().cpu().numpy()
-                for name, value in self.inspector.policy.state_dict().items()
+                for name, value in weights.items()
             }
         )
         np.savez_compressed(path, **arrays)
