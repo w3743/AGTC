@@ -79,14 +79,14 @@
     {
       "source_id": "mech_baseline",
       "path": "机械/参数基线.json",
-      "sha256": "b909ca567eb445efe95d2bbf3c9e98a7326a90b0b071ccca5f1697d436586a1e",
+      "sha256": "4b4ce6a8743f78fcebf686f1a8e14adfad4dd3e8f0df1d9ad0efe77132169fd9",
       "locator": "id=drive_motor_configuration 的 value/source 字段（行走电机项目选型）"
     },
     {
       "source_id": "electrical_baseline",
       "path": "电力/基本设计.md",
-      "sha256": "151e0b074897a7ea338b1bce5d70c65a00bd1c789e66a4e1a47bfb60bd88e516",
-      "locator": "2026-10-21稳压模块要求更新：固定8颗LICAP SC0350-270-RSS、启动瞬态用途、无持续1秒硬门槛；同时包含9S4P电池与21V有刷水泵用户基线。"
+      "sha256": "b19b3f04c86173d1f0ef911d67cee99a6224a94841132bbd135f6a612026df60",
+      "locator": "2026-10-21稳压模块要求更新：固定8颗LICAP SC0350-270-RSS、启动瞬态用途、无持续1秒硬门槛；同时包含9S4P电池与21V有刷水泵用户基线。末尾两条：ATK-IMU901/X2雷达及云台传感器与几何设计基线（非实测）；厂家完整MPN、实物数量和云台电驱接口/驱动器未核实。"
     },
     {
       "source_id": "vision_current",
@@ -95,16 +95,10 @@
       "locator": "第7行：保留双IMX415与RK3588"
     },
     {
-      "source_id": "robotics_baseline",
-      "path": "算法/仿真训练环境/AGENTS.md",
-      "sha256": "adc80e6d7017bfe6d543e76eb8a3f262348736a066dc277ba4891dd8687901c6",
-      "locator": "ATK-IMU901、X2雷达与云台参考系/性能条目"
-    },
-    {
       "source_id": "pump_project_requirements",
       "path": "电力/水泵驱动模块/项目要求.md",
-      "sha256": "84f687849280d7caa4e42d98ff4dd4d18da8b6c8faf938b54c946aca69dbc5da",
-      "locator": "第7、16-18行：用户确认有刷、21V、运行最大约3A；品牌型号未知；原始输入回查turn证据"
+      "sha256": "c4954d06ea201bb1f464150a3af7b2cf7788d1455201c3b182c451600704eb25",
+      "locator": "第9、18行及原始对话turn证据：用户确认21V有刷水泵、运行最大约3A；品牌型号未知"
     },
     {
       "source_id": "foc_motor_drive_mapping",
@@ -115,14 +109,14 @@
     {
       "source_id": "vehicle_project_constraints",
       "path": "电力/AGENTS.md",
-      "sha256": "fecd2f6cbf6530e0dfa97aafa8fc77ff3ad0fad2d834a0a442a79d4da52a5137",
-      "locator": "第29行：全项目成本约束、稳压旧预算取消、固定SC型号与8颗总量；启动瞬态用途、不设持续1秒要求；800–1000 W仅为未验证参考。"
+      "sha256": "c915b6b7ab21c17e7ddd74b3586edfaaf3a8a068c1e417871d8699a126cacf08",
+      "locator": "通用偏好：全系统成本、性能与稳定性；电力项目记忆：固定LICAP8颗8S1P、启动瞬态、无持续1秒硬要求；用户分工：原理图后由人类实施。"
     },
     {
       "source_id": "bms_board_budget",
       "path": "电力/BMS模块/项目要求.md",
-      "sha256": "1381e6ecbe65d6d78bf33e33fc81c04d5ff8c2a1a4a10da4cd7001c527a60fdd",
-      "locator": "第57行：BMS板内200元目标、板内与板外配套分别列明。"
+      "sha256": "4284d253e98008411934081e68aab389d28eff558c5aa4fd4c5f423c0e7b124a",
+      "locator": "第58行：BMS板内200元目标、板内与板外配套分别列明。"
     }
   ],
   "items": [
@@ -251,7 +245,7 @@
         "installation": "gimbal yaw/pitch assembly"
       },
       "source_ids": [
-        "robotics_baseline"
+        "electrical_baseline"
       ],
       "notes": "基线确认型号和随云台安装关系，但文件未给出可核实的实物套数；数量留空。",
       "preferred_quote_marketplace": "LCSC_CN"
@@ -275,7 +269,7 @@
         "points_per_scan": 400
       },
       "source_ids": [
-        "robotics_baseline"
+        "electrical_baseline"
       ],
       "notes": "基线按X2雷达描述性能，但未证实具体厂家、订货号或实物数量；保留型号描述，不将其扩写成完整MPN。",
       "preferred_quote_marketplace": "LCSC_CN"
@@ -329,7 +323,7 @@
       "status": "unresolved",
       "reason": "接口、驱动器与数量未冻结。",
       "source_ids": [
-        "robotics_baseline"
+        "electrical_baseline"
       ]
     },
     {
@@ -433,6 +427,20 @@
       "status": "not_proven",
       "source_ids": [
         "bms_board_budget"
+      ]
+    },
+    "post_schematic_human_scope": {
+      "owner": "human",
+      "items": [
+        "PCB design and layout",
+        "fabrication and manufacturing handoff",
+        "prototyping",
+        "assembly",
+        "firmware implementation",
+        "physical testing and qualification"
+      ],
+      "source_ids": [
+        "vehicle_project_constraints"
       ]
     }
   }

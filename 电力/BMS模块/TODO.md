@@ -2,6 +2,8 @@
 
 当前 P1 `ce6fc600…962124f` 已更新三路NTC与四个DNP裸孔，并清理四条重复温度TEXT；新会话API/ENET复读未返回，215/710及旧700针映射保持是基于前一官方网表与TEXT-only字节差分的派生证明。layoutEntry=HOLD，现有PCB需先同步/复核接口。布线冻结与投板HOLD。原生文件、BOM、布局约束入口见[README](README.md)。
 
+**分工与成本边界（2026-10-22）：**代理负责原理图、选型、接口合同、计算和原理级验证；本清单中的Layout、制造、打样、装配、固件、台架与实车任务均是人类接手项。全电力系统持续按最少选型与最低总成本优化，BMS约200元板内目标仍待报价核验。
+
 - [x] 正式根EPRJ3及当前P1页已由官方CLI/API打开PASS；源SHA不变且rows/ports/wires/texts与发布快照一致，详见[Layout准入核对](检查/Layout验证/layout-entry-check.json)。16:39用户日志及此前自动API超时仅作历史。
 - [x] 本轮U18局部连线重画：同字节隔离副本官方保存/重开rows按ID匹配/ports按ID匹配/wires按ID匹配/texts按ID匹配；除针脚x/y外字段精确，针脚x/y绝对容差1e-09，最大实际偏差0；快照文件字节相同=True。旧源208位号/700针严格语义PASS结果作为基线；当前正式源为215位号/710针，旧700针映射保持不变，新增10针为温度焊线接口。当前官方网表重开PASS；layoutEntry因PCB尚未同步本轮接口而HOLD；manufacturingRelease=HOLD。
 - [x] 历史DRC/原理图定点修复记录：既往修复细节仅作历史；当前局部连线与DRC状态以本轮发布证据为准。

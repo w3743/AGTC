@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -177,13 +178,114 @@ def quote_supplier_part(observation: dict[str, Any]) -> str:
     return norm(observation.get("supplier_part"))
 
 
+def selected_quote_is_bound_to_current_bom(observation: dict[str, Any]) -> bool:
+    """Validate an explicit current-BOM selection binding against source bytes and row identity."""
+    if observation.get("selection_scope") != "selected_current_bom":
+        return False
+    binding = observation.get("selected_bom_binding")
+    if not isinstance(binding, dict):
+        return False
+    relative_path = binding.get("source_path")
+    expected_sha = norm(binding.get("source_sha256"))
+    reference = str(binding.get("reference") or "").strip()
+    if not relative_path or not expected_sha or not reference:
+        return False
+    source_path = (PROJECT / str(relative_path)).resolve()
+    project_root = PROJECT.resolve()
+    if project_root not in source_path.parents or not source_path.is_file():
+        return False
+    try:
+        if sha256_file(source_path) != expected_sha:
+            return False
+        with source_path.open("r", encoding="utf-8-sig", newline="") as stream:
+            rows = list(csv.DictReader(stream, delimiter="\t"))
+    except (OSError, csv.Error, UnicodeError):
+        return False
+    matches = [row for row in rows if str(row.get("Designator") or "").strip() == reference]
+    if len(matches) != 1:
+        return False
+    row = matches[0]
+    primary_match = (
+        norm(row.get("Manufacturer Part")) == norm(observation.get("mpn")) == norm(binding.get("manufacturer_part"))
+        and norm(row.get("Manufacturer")) == norm(binding.get("manufacturer_as_listed"))
+        and quote_supplier_part(observation) == norm(row.get("Supplier Part")) == norm(binding.get("supplier_part"))
+        and str(row.get("Quantity") or "").strip() == str(binding.get("quantity_per_board") or "").strip()
+    )
+    if not primary_match:
+        return False
+
+    # A selected cross-board SKU may be installed in several current BOMs. Keep the
+    # legacy primary FOC binding above for backwards compatibility, while validating
+    # every additional source with its explicit column map and all covered references.
+    extra_bindings = observation.get("selected_bom_bindings", [])
+    if not isinstance(extra_bindings, list):
+        return False
+    for extra in extra_bindings:
+        if not isinstance(extra, dict):
+            return False
+        rel = extra.get("source_path")
+        expected_sha = norm(extra.get("source_sha256"))
+        ref_field = str(extra.get("reference_field") or "")
+        refs = {str(x).strip() for x in extra.get("references", []) if str(x).strip()}
+        mpn_field = str(extra.get("manufacturer_part_field") or "")
+        maker_field = str(extra.get("manufacturer_field") or "")
+        qty_field = str(extra.get("quantity_field") or "")
+        code_field = extra.get("supplier_part_field")
+        if not rel or not re.fullmatch(r"[0-9a-f]{64}", expected_sha) or not refs or not all((ref_field, mpn_field, maker_field, qty_field)):
+            return False
+        path = (PROJECT / str(rel)).resolve()
+        if PROJECT.resolve() not in path.parents or not path.is_file():
+            return False
+        try:
+            if sha256_file(path) != expected_sha:
+                return False
+            with path.open("r", encoding="utf-8-sig", newline="") as stream:
+                rows = list(csv.DictReader(stream, delimiter=str(extra.get("delimiter", ","))))
+        except (OSError, csv.Error, UnicodeError):
+            return False
+        covered: set[str] = set()
+        matched_rows: list[dict[str, str]] = []
+        quantity_total = 0
+        for candidate in rows:
+            row_refs = {x.strip() for x in str(candidate.get(ref_field) or "").split(str(extra.get("reference_separator", ","))) if x.strip()}
+            overlap = row_refs & refs
+            if not overlap:
+                continue
+            if not row_refs.issubset(refs) or covered & overlap:
+                return False
+            if norm(candidate.get(mpn_field)) != norm(observation.get("mpn")):
+                return False
+            if norm(candidate.get(maker_field)) != norm(observation.get("manufacturer")):
+                return False
+            if code_field and quote_supplier_part(observation) != norm(candidate.get(str(code_field))):
+                return False
+            try:
+                quantity_total += int(float(str(candidate.get(qty_field) or "").strip()))
+            except (TypeError, ValueError):
+                return False
+            covered.update(overlap)
+            matched_rows.append(candidate)
+        if covered != refs or not matched_rows or quantity_total != int(extra.get("quantity_total", -1)):
+            return False
+    return True
+
+
 def is_usable_quote(observation: dict[str, Any]) -> bool:
     url = str(observation.get("source_url") or "")
     acquisition = observation.get("acquisition")
+    selection_scope = norm(observation.get("selection_scope"))
+    if selection_scope in {"candidate_not_selected", "unselected", "not_selected"}:
+        return False
+    if selection_scope == "selected_current_bom" and not selected_quote_is_bound_to_current_bom(observation):
+        return False
     capture_verified = acquisition == "browser_visible_DOM" or (
         acquisition == "compact_batch_import"
         and observation.get("evidence_kind") == "compact_browser_transcription"
         and str(observation.get("raw_evidence") or "").startswith("compact_browser_transcription;")
+    ) or (
+        acquisition == "user_supplied_screenshot"
+        and observation.get("evidence_kind") in {"candidate_page_screenshot", "product_page_screenshot"}
+        and bool(str(observation.get("raw_evidence") or "").strip())
     )
     return (
         observation.get("identity_verified") is True
@@ -654,7 +756,7 @@ def build() -> dict[str, Any]:
                 "quote_id": quote_id,
                 "match_status": "excluded_unverified_or_invalid",
                 "matched_part_ids": [],
-                "reason": "requires verified LCSC CNY item URL, visible-DOM evidence, exact identity fields, and valid price tiers",
+                "reason": "requires verified LCSC CNY item URL, visible-DOM, compact transcription, or trusted user-screenshot evidence, exact identity fields, and valid price tiers; explicitly unselected candidates are excluded and current-BOM selections require an exact source-hash/row binding",
                 "source_path": "商城报价.json",
             })
             continue
@@ -1014,6 +1116,7 @@ def render_markdown(data: dict[str, Any]) -> str:
     constraints = data.get("project_constraints", {})
     supercap = constraints.get("regulator_supercapacitor", {})
     bms_budget = constraints.get("bms_cost_target", {})
+    post_schematic = constraints.get("post_schematic_human_scope", {})
     status_labels = {
         "selected": "已选型", "current": "现行", "candidate": "候选",
         "DNP": "不装", "obsolete": "作废", "unresolved": "未闭合",
@@ -1045,6 +1148,11 @@ def render_markdown(data: dict[str, Any]) -> str:
     if bms_budget:
         lines.append(
             f"- BMS 板内成本目标：{md_cell(bms_budget.get('target_cny'))} 元，仅板上器件；外部 MCU 与板外配套不在该范围内，状态为 {md_cell(bms_budget.get('status'))}。"
+        )
+    if post_schematic:
+        scope_items = "、".join(post_schematic.get("items") or []) or "各项原理图后工作"
+        lines.append(
+            f"- 原理图后的工作由人类负责：{scope_items}。本主档和原理图审查不代表这些后续工作已完成。"
         )
     lines.extend([
         "- 全项目仍需优先复用满足要求的器件、减少型号并控制采购总成本；缺少精确报价或订单数量时不填价格、不声称降本。",

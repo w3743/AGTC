@@ -1,7 +1,7 @@
 {
   "document": "FOC外围选型与原理图候选",
   "revision": "0.1-candidate + electrical-review-20261011",
-  "date": "2026-10-11",
+  "date": "2026-10-22",
   "status": "候选网表骨架；供仿真/原理图起步，不是投板、实测或安全验收冻结",
   "scope": {
     "boards": 1,
@@ -148,7 +148,7 @@
     "BUS_ADC": [
       "BUS+ through R_BUSADC_TOP=180k to VBUS_ADC_SENSE",
       "R_BUSADC_BOT=10k from sense to GND_SYS; R_BUSADC_SER=1k to BUS_ADC at PC4/P2-12",
-      "C_BUSADC=1nF and D_BUSADC_CLAMP=BZT52H-C3V6 from BUS_ADC to GND_SYS; software only"
+      "C_BUSADC=1nF and D_BUSADC_CLAMP=BZT52C3V6 (ElecSuper C5334032, SOD-123, pin1=cathode) from BUS_ADC to GND_SYS; software only"
     ],
     "SAFE_ADC": [
       "SAFE_5V through R_SAFEADC_TOP=27.4k to SAFE_ADC",
@@ -4159,5 +4159,15 @@
       "official_ENET": "��100ppm/℃ (two U+FFFD)",
       "action": "Preserved exact API ENET raw text; not normalized. No connectivity difference."
     }
+  },
+  "cost_replacement_C5334032": {
+    "status": "IMPLEMENTED_IN_CURRENT_SCHEMATIC",
+    "ref": "D_BUSADC_CLAMP",
+    "part": "ElecSuper BZT52C3V6 / C5334032",
+    "package": "SOD-123",
+    "pin1": "BUS_ADC cathode",
+    "pin2": "GND_SYS anode",
+    "unchanged": "180k/10k divider, 1k series, 1nF filter and net mapping",
+    "limits": "Low-current clamp voltage, temperature and MCU-off injection remain OPEN; no PCB changes; all post-schematic work by human."
   }
 }

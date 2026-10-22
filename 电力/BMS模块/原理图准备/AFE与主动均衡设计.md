@@ -29,7 +29,7 @@ BMS采集电芯、板与MOS温度，仅经现有CAN上传温度和有效/无效/
 ## BQ配置交接（不烧录OTP）
 
 - 9S实际槽位1–8和16，VCell mask=0x80FF；未用输入按TI规定连接。
-- DFETOFF 0x92FB=0x42（active-high BOTHOFF）；FET Options 0x9308=0x2D，PDSG自动转换关闭。原记录的 CFETOFF 0x92FA=0x07 按 TRM §13.3.2.9 解码为 18 kΩ 上拉、18K 温度模型槽位、电芯温度保护类别及热敏输入功能，通道用途与电芯代表温区规划相符；该值本身只选择模型槽位，没有附带或证明其中写入了符合 NTCLE100E3103GB0 的系数。应核实计算器输出应写入的全局槽位，再生成系数、回读确认；当前值不能单独作为完整温度配置交接。
+- DFETOFF 0x92FB=0x42（active-high BOTHOFF）；FET Options 0x9308=0x2D，PDSG自动转换关闭。原记录的 CFETOFF 0x92FA=0x07 按 TRM §13.3.2.9 解码为18 kΩ上拉、18K温度模型槽位、电芯温度保护类别及热敏输入功能，符合板外Semitec 103AT-2使用TI默认18K模型的候选映射；默认模型基于103-AT，但无精确“-2”后缀误差保证。该字节只选择模型槽，不证明温度精度、读回或保护已启用。
 - 温度配置交接尚未闭合：逐项给出并核对 TS1、TS2、TS3、DCHG、CFETOFF 的 pin configuration、上拉选择、温度模型/系数、报告/保护类别和保护阈值；尤其 DCHG、TS2、TS3 当前默认值不能视为已配置的热敏通道。当前没有经批准的完整数值表，不得把本段视为可直接烧录配置。
 - 对温度输入同时定义换算温度限值和原始 ADC counts 有效窗口；开路/短路的 fail-closed 判定由固件实现并以首板故障注入验证，不能依赖 AFE 自动开短路标志。
 - ALERT 0x92FC=0x82，inactive高阻；Default Alarm Mask 0x926D与AlarmEnable 0x66屏蔽正常OFF的XCHG bit6/XDSG bit5，避免启动死锁；保留SSBC/SSA/PF及实际保护源并逐项核对映射。记录原因再清告警，不能盲清故障。

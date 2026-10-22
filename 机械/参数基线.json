@@ -2,6 +2,18 @@
   "schema_version": "1.0",
   "as_of": "2026-10-21",
   "scope": "只读机械/控制/感知参数基线；已只读读取SolidWorks车、炮台和双目支架默认配置，提取CAD实体极值与装配引用。CAD质量/质心仅为未资格计算，实车值仍按未知记录。未运行仿真/训练/硬件。",
+  "mechanical_prototype_stage": {
+    "status": "cad_schematic_only",
+    "scope": "整车机械样机",
+    "mechanical_prototype_fabricated": false,
+    "as_of": "2026-10-22",
+    "source": {
+      "kind": "user_fact_transmitted_via_coordinator",
+      "date": "2026-10-22",
+      "statement_as_transmitted": "目前只有CAD和原理图，尚未制作。"
+    },
+    "note": "仅描述整车机械样机状态，不表示没有既有板端/传感器台架测试；制作前仍可继续CAD装配/坐标复核与材料数据选型。"
+  },
   "source_catalog": [
     {
       "source_id": "sim_agents",
@@ -102,7 +114,7 @@
           }
         ],
         "interface_impact": "影响牵引、地压、越障、结构和制动预算。",
-        "validation_gap": "仅为项目文档输入；未找到独立称重记录。仿真总质量同为30kg，不代表实物称重。"
+        "validation_gap": "30kg仅为项目文档设计基线，尚未独立称重。[post_fabrication_qualification] 整车机械样机完成后按实际电池/炮台/传感器/载荷配置称重；制作前可继续BOM、材料输入与CAD质量属性核对。"
       },
       {
         "id": "vehicle_body_envelope",
@@ -135,7 +147,7 @@
           }
         ],
         "interface_impact": "决定碰撞包络、履带侧向空间、炮台/云台和相机间隙。",
-        "validation_gap": "已读取车.SLDASM默认配置CAD实体极值，但原生XYZ未映射到车辆纵/横/高轴，且总装范围未证明与文档“不含履带”定义相同；不能据此判定0.8×0.3m一致或不一致。需确认建模范围/轴向并现场核测。"
+        "validation_gap": "CAD可先核对原生轴向映射、总装建模范围及0.8×0.3m“不含履带”定义；[post_fabrication_qualification] 样机完成后再核测实际外廓。当前CAD实体极值不能直接映射车长/宽/高。"
       },
       {
         "id": "vehicle_overall_width",
@@ -159,7 +171,7 @@
           }
         ],
         "interface_impact": "用于场景碰撞包络、田间行距适配和上车平台间隙。",
-        "validation_gap": "缺CAD宽度复核和实车外廓测量。"
+        "validation_gap": "可先从CAD复核履带/附件最外侧宽度及轴向；[post_fabrication_qualification] 整车机械样机完成后核测实际最外宽。"
       },
       {
         "id": "track_band_width",
@@ -183,7 +195,7 @@
           }
         ],
         "interface_impact": "影响地压、田垄/株距通行和接触损伤模型。",
-        "validation_gap": "未读取履带实体或测量接地带宽；仿真圆柱宽度只是代理。"
+        "validation_gap": "可先核对CAD履带实体/节块和带宽定义；[post_fabrication_qualification] 样机装配后再测实际接地带宽。仿真圆柱宽度仅为代理。"
       },
       {
         "id": "track_center_separation",
@@ -207,7 +219,7 @@
           }
         ],
         "interface_impact": "影响差速转向角速度、轮间约束位置和跨障姿态。",
-        "validation_gap": "按外宽和履带宽得到的文档推导值；未以CAD/现场测量复核。"
+        "validation_gap": "可先由CAD装配基准复核左右履带中心距与轴定义；[post_fabrication_qualification] 制作后再核实际装配尺寸。"
       },
       {
         "id": "track_ground_contact_length",
@@ -231,7 +243,7 @@
           }
         ],
         "interface_impact": "影响地压、茎秆损伤几何、轮/履带位置分布和越障。",
-        "validation_gap": "虽在代码注释中称hardware-confirmed，但未找到独立尺寸测量或CAD证据。"
+        "validation_gap": "可先核对CAD履带接地几何、节距和张紧设计；[post_fabrication_qualification] 样机装配后确认真实接地长度与张紧状态。"
       },
       {
         "id": "nominal_top_speed",
@@ -303,7 +315,7 @@
           }
         ],
         "interface_impact": "决定电机RPM到主动轮RPM、转矩和闭环反馈换算。",
-        "validation_gap": "保留4:1文档含义；未核实际输入输出方向、齿轮/链传动级数和实测轴速。"
+        "validation_gap": "可先用CAD/传动设计核对4:1对应的级数、输入输出轴与方向约定；[post_fabrication_qualification] 样机驱动链装好后再用实测轴速核验。"
       },
       {
         "id": "active_drive_sprocket_diameter",
@@ -327,7 +339,7 @@
           }
         ],
         "interface_impact": "与减速比共同决定履带线速度和牵引速度换算。",
-        "validation_gap": "主动轮与45mm半径的仿真支承滚轮必须分开；未从CAD或实车核验主动轮尺寸。"
+        "validation_gap": "可先从CAD复核主动轮齿顶/节圆及其直径定义；[post_fabrication_qualification] 样机装配后核实际零件尺寸。45mm仿真支承轮代理值不可代用。"
       },
       {
         "id": "gimbal_center_height_nominal",
@@ -351,7 +363,7 @@
           }
         ],
         "interface_impact": "影响相机/雷达视场、地面点投影、深度和目标定位变换。",
-        "validation_gap": "文档名义值；未从车辆CAD或实车测量确认高度、零点和传感器偏置。"
+        "validation_gap": "可先在CAD中核对名义中心高度、车体基准面、云台零点和传感器偏置；[post_fabrication_qualification] 样机安装后复测实际高度与安装偏差。"
       },
       {
         "id": "gimbal_pitch_limits",
@@ -378,7 +390,7 @@
           }
         ],
         "interface_impact": "限制相机和雷达覆盖、目标对准、传感器时变外参。",
-        "validation_gap": "文档角度与仿真关节限值一致；真实硬止挡、零位和误差尚未测量。"
+        "validation_gap": "可先复核CAD关节轴和设计角限位；[post_fabrication_qualification] 样机装配后核真实硬止挡、零位和回差。"
       },
       {
         "id": "gimbal_sensor_motion_relationship",
@@ -399,7 +411,7 @@
           }
         ],
         "interface_impact": "任何传感器投影、姿态融合或地面坐标变换都需使用关节角和时间戳。",
-        "validation_gap": "安装外参需实机核验；云台IMU不是车体IMU。"
+        "validation_gap": "云台/传感器的设计随动关系及名义安装坐标可继续用CAD核对；[post_fabrication_qualification] 最终安装后的运动关系和外参需在样机上实核。云台IMU不是车体IMU。"
       },
       {
         "id": "sensor_and_drive_feedback_readbacks",
@@ -427,7 +439,7 @@
           }
         ],
         "interface_impact": "作为控制器反馈和状态估计入口；RPM轴/单位与数据时龄决定履带速度和制动反馈。",
-        "validation_gap": "硬件联调未完成；电机侧还是减速后轴、采样频率/延迟、单位/噪声均待核。"
+        "validation_gap": "信号合同、单位与接口设计可继续推进；[post_fabrication_qualification] 整车驱动/云台系统装配后核反馈取样轴、频率、延迟、单位及噪声。"
       },
       {
         "id": "stereo_calibration_grid_square",
@@ -493,7 +505,7 @@
           }
         ],
         "interface_impact": "当前几何校正已部署，但不能把深度输出直接当作验证过的实物距离或地图。",
-        "validation_gap": "缺独立已知距离目标的实物测距误差、不同距离/视角精度与车辆安装外参验证。"
+        "validation_gap": "离车相机几何/米制距离可用现有双目/RK3588台架继续验证；车辆安装外参与装车后的综合精度属post-fabrication_qualification。当前geometry_pass_metric_accuracy_unverified状态保持。"
       },
       {
         "id": "stereo_optical_center_spacing_estimate",
@@ -774,7 +786,7 @@
           }
         ],
         "interface_impact": "影响倾覆边界、姿态控制、传感器稳定和制动。",
-        "validation_gap": "默认车装配CAD原始质心仍未资格（历史读取时part材料名为空、聚合密度报告1000kg/m3）；材料族已由用户确认：非齿轮普通零件PC、齿轮PA，但CAD属性未赋值，具体牌号/填料/调湿状态/密度及匿名虚拟件齿轮身份待核。5个part实例无solid body，载荷/附件完整性与车体坐标映射未核；实车质心仍为null，需锁定BOM/材料/载荷并用支点载荷称重验证。"
+        "validation_gap": "实车质量分布/质心值仍为null，属[post_fabrication_qualification]，当前没有已制作的机械样机可称重。制作前可继续核对CAD轴向/装配范围、补齐零实体组件并依据具体材料牌号与密度复核设计CAD质量属性；历史CAD材料名空/聚合密度1000kg/m3仍未资格。"
       },
       {
         "id": "physical_inertia_tensor",
@@ -798,7 +810,7 @@
           }
         ],
         "interface_impact": "影响姿态/云台耦合、转向响应和控制器标定。",
-        "validation_gap": "本次未读取CAD惯量张量，也无实车惯量测量；材料族已确认但CAD属性未赋值，具体牌号/密度、匿名虚拟件角色、装配完整性、配置与参考轴仍未资格，仿真代理惯量不可当作实车值。"
+        "validation_gap": "实车惯量测量属[post_fabrication_qualification]，当前无机械样机，值保持null。制作前仍可在材料牌号/密度明确后导出设计CAD惯量、核对装配范围和参考轴；本次未导出CAD惯量张量，仿真代理值不能代替实车值。"
       },
       {
         "id": "payload_capacity",
@@ -822,7 +834,7 @@
           }
         ],
         "interface_impact": "影响30kg车辆质量口径、质心、履带地压和稳定控制。",
-        "validation_gap": "未找到额定载荷、安装面强度或重心边界。"
+        "validation_gap": "额定载荷与连接强度可先按CAD结构、材料牌号/性能和安装面开展设计核验；样机完成后的静载/负载试验用于[post_fabrication_qualification]，当前无已测载荷能力。"
       },
       {
         "id": "physical_support_roller_geometry",
@@ -846,7 +858,7 @@
           }
         ],
         "interface_impact": "决定履带速度、接地压力、越障和同侧轮运动学。",
-        "validation_gap": "45mm为仿真支承轮代理值，不能转记为实车滚轮尺寸；履带节距/张紧也未找到。"
+        "validation_gap": "可先从CAD核对支承轮/链节几何、节距和张紧设计；[post_fabrication_qualification] 样机装配后再测实际滚轮尺寸与履带接触。45mm仍仅为仿真代理。"
       },
       {
         "id": "verified_vehicle_speed",
@@ -870,7 +882,7 @@
           }
         ],
         "interface_impact": "决定控制指令缩放、感知时延、停止距离和功率上限。",
-        "validation_gap": "文档15km/h无独立测速；需记录空载/额定负载和不同地面下速度。"
+        "validation_gap": "15km/h仅为文档设计基线。[post_fabrication_qualification] 真实机械样机完成后，在空载/载荷及不同地面条件下测速；当前不要求提供未制作样机的实测值。"
       },
       {
         "id": "turn_time_and_turn_rate",
@@ -888,7 +900,7 @@
           }
         ],
         "interface_impact": "决定差速转向映射、路径跟踪和底盘安全边界。",
-        "validation_gap": "项目文档明确缺值；需实车记录完整一圈时间与转弯半径/滑移。"
+        "validation_gap": "原地转向时间/角速度属[post_fabrication_qualification]，机械样机完成后测完整转圈时间、半径与滑移；当前可继续完善CAD传动/履带接口和控制设计。"
       },
       {
         "id": "braking_response",
@@ -912,7 +924,7 @@
           }
         ],
         "interface_impact": "影响快速停车任务、安全裕度和电驱/能量吸收边界。",
-        "validation_gap": "没有实测减速度、停止距离、回馈期间制动能力或失电制动边界。"
+        "validation_gap": "实车减速度、停止距离、回馈和失电制动边界属[post_fabrication_qualification]，须在机械样机和驱动系统完成后按安全条件测试；当前值保持null，设计安全分析仍可先行。"
       },
       {
         "id": "encoder_and_drive_feedback_calibration",
@@ -936,7 +948,7 @@
           }
         ],
         "interface_impact": "决定真实履带速度估计、差速里程计、反馈时龄和停车闭环。",
-        "validation_gap": "未找到编码器型号/CPR、反馈轴位、减速换算、时间戳和有效状态定义。"
+        "validation_gap": "CPR、实际反馈轴、RPM/履带速度换算及时戳校准属[post_fabrication_qualification]，待样机驱动链和传感器装配后实测；制作前可继续确定器件规格和软件接口，不要求当前提供样机测值。"
       },
       {
         "id": "physical_gimbal_yaw_limits",
@@ -966,7 +978,7 @@
           }
         ],
         "interface_impact": "约束相机/雷达指向范围、线束寿命和云台动作规划。",
-        "validation_gap": "需要读取炮台装配约束并确认实物限位、是否使用滑环及回零方法。"
+        "validation_gap": "可先读取/核对CAD云台旋转约束、限位和线缆空间；[post_fabrication_qualification] 样机装配后确认真实硬限位、滑环/线缆方案及回零方式。"
       },
       {
         "id": "sensor_extrinsics_to_vehicle",
@@ -990,7 +1002,7 @@
           }
         ],
         "interface_impact": "决定视觉/雷达/IMU数据融合、车体运动补偿和目标定位准确度。",
-        "validation_gap": "缺位置、方向、旋转顺序、零位与时间同步的实测外参。"
+        "validation_gap": "名义安装位姿、CAD坐标基准与装配关系可在制作前继续核对；相机/IMU/雷达到车体的实际测量外参属[post_fabrication_qualification]，待机械样机按最终安装状态完成后实测。"
       },
       {
         "id": "stereo_rig_vehicle_integration",
@@ -1014,7 +1026,7 @@
           }
         ],
         "interface_impact": "决定相机视场遮挡、俯仰运动、线缆布置和视觉外参。",
-        "validation_gap": "双目支架零件本身已读，但未建立到车.SLDASM/炮台.SLDASM的装配引用、安装孔位/姿态或光心关系；当前组件命名中未定位明确相机支架引用，需核对实际装配并测量安装外参。"
+        "validation_gap": "可先继续核对双目支架与车/炮台CAD的装配引用、孔位、姿态及名义光心；[post_fabrication_qualification] 样机装配后确认实物安装和车辆坐标外参。"
       },
       {
         "id": "stereo_metric_distance_accuracy",
@@ -1038,7 +1050,7 @@
           }
         ],
         "interface_impact": "限制用双目深度进行避障、制动距离估计和农作物距离决策。",
-        "validation_gap": "需对多个独立已知距离、纹理、光照和姿态做尺量验证。"
+        "validation_gap": "离车双目/RK3588现有台架可在当前阶段先用已知距离目标做米制精度资格验证；整车最终安装的外参耦合和综合测距精度属post_fabrication_qualification。此分类不替代、不改写已有台架证据。"
       },
       {
         "id": "field_surface_and_track_friction",
@@ -1062,7 +1074,7 @@
           }
         ],
         "interface_impact": "影响牵引、差速转向、制动、陷车和仿真迁移。",
-        "validation_gap": "没有目标农田地形扫描、土壤参数或可复现实车滑移记录。"
+        "validation_gap": "真实机械样机可用后，在目标田地采集地形/土壤、履带滑移与摩擦记录，属[post_fabrication_qualification]；当前可继续准备地形采样方案和仿真场景，不要求不存在的样机实测。"
       }
     ]
   },
@@ -1097,12 +1109,50 @@
       "field_surface_and_track_friction"
     ],
     "shortest_measurement_set": [
-      "整车称重（含电池/炮台/传感器与计划载荷），并测支点载荷以定位质心。",
-      "最大速度、制动距离/减速度、原地转一圈时间；同步记录左右驱动RPM/电流和履带运动。",
-      "核实减速比的输入输出轴方向、主动轮/支承轮实际尺寸与履带接地尺寸。",
-      "实测云台俯仰/偏航止挡、IMU/相机/雷达到车体外参及反馈分辨率/时延。",
-      "用多个已知距离目标验证双目米制误差，并采集目标田地形/摩擦与作物间距。"
-    ]
+      "[post_fabrication_qualification] 整车机械样机完成后，按实际电池/炮台/传感器/计划载荷配置称重，并测支点载荷以定位质心。",
+      "[post_fabrication_qualification] 记录最高速度、制动距离/减速度、原地转一圈时间；同步记录左右驱动RPM/电流和履带运动。",
+      "[post_fabrication_qualification] 样机驱动链装配后校准编码器CPR、反馈取样轴、RPM/履带速度换算及时间戳/有效状态。",
+      "[post_fabrication_qualification] 机械样机装配后核实云台真实止挡、IMU/相机/雷达到车体的安装外参与反馈分辨率/时延。",
+      "[existing_sensor_bench_qualification] 现有双目/RK3588台架可先用多个已知距离目标验证米制误差；整车安装后的外参与综合精度另作post_fabrication_qualification。",
+      "[post_fabrication_qualification] 使用机械样机在目标地表记录滑移/制动，并采集目标田地形、土壤与作物间距。"
+    ],
+    "cad_review_before_fabrication": [
+      "vehicle_body_envelope",
+      "vehicle_overall_width",
+      "track_band_width",
+      "track_center_separation",
+      "track_ground_contact_length",
+      "active_drive_sprocket_diameter",
+      "physical_support_roller_geometry",
+      "drive_reduction_ratio",
+      "payload_capacity",
+      "physical_center_of_mass",
+      "physical_inertia_tensor",
+      "gimbal_center_height_nominal",
+      "gimbal_pitch_limits",
+      "physical_gimbal_yaw_limits",
+      "sensor_extrinsics_to_vehicle",
+      "stereo_rig_vehicle_integration"
+    ],
+    "existing_sensor_bench_qualification": [
+      "stereo_metric_distance_accuracy"
+    ],
+    "post_fabrication_qualification": [
+      "vehicle_mass_nominal",
+      "physical_center_of_mass",
+      "physical_inertia_tensor",
+      "verified_vehicle_speed",
+      "turn_time_and_turn_rate",
+      "braking_response",
+      "encoder_and_drive_feedback_calibration",
+      "sensor_and_drive_feedback_readbacks",
+      "physical_gimbal_yaw_limits",
+      "sensor_extrinsics_to_vehicle",
+      "stereo_rig_vehicle_integration",
+      "stereo_metric_distance_accuracy",
+      "field_surface_and_track_friction"
+    ],
+    "qualification_scope_note": "post_fabrication_qualification只指整车机械样机上的实物称重、运动/制动、安装外参与集成验收，不阻塞当前CAD/材料输入核查；stereo_metric_distance_accuracy可先用既有双目/RK3588台架验证，post-fabrication条目仅指最终装车状态复核。"
   },
   "verification_summary": {
     "measurement_verified_count": 0,

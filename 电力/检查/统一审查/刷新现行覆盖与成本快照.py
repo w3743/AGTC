@@ -26,6 +26,7 @@ POWER = Path(__file__).resolve().parents[2]
 WORKSPACE = POWER.parent
 COVERAGE_PATH = POWER / "检查" / "统一审查" / "全部原理图检查覆盖.json"
 COST_PATH = POWER / "元件封装库" / "检查" / "四板复用与成本核对.json"
+SUPPLEMENT_PATH = POWER / "元件封装库" / "整车器件补充.json"
 
 MODULES: list[dict[str, Any]] = [
     {
@@ -233,9 +234,11 @@ def report_page_binding(report: Any, page_rel: str) -> str | None:
     def walk(value: Any, parent_key: str = ""):
         if isinstance(value, dict):
             path_value = (
-                value.get("schematic") or value.get("path") or value.get("sourcePath") or value.get("source")
+                value.get("schematic") or value.get("path") or value.get("sourcePath")
+                or value.get("nativePath") or value.get("source")
             )
-            hash_value = value.get("schematic_sha256") or value.get("sha256") or value.get("sourceSha256")
+            hash_value = (value.get("schematic_sha256") or value.get("sha256")
+                          or value.get("sourceSha256") or value.get("nativeSha256"))
             if isinstance(path_value, str) and isinstance(hash_value, str):
                 normalized = path_value.replace("\\", "/").casefold()
                 if any(normalized.endswith(candidate) for candidate in candidates):
@@ -251,7 +254,19 @@ def report_page_binding(report: Any, page_rel: str) -> str | None:
             for child in value:
                 yield from walk(child, parent_key)
 
-    hashes = set(walk(report))
+    # Final reports retain before/after proofs as historical evidence. Prefer
+    # explicit current-source sections; still reject conflicts between them.
+    current_sections = (
+        "sourceFiles", "sourceBinding", "source_binding", "native_source",
+        "current_native_source", "schematic_source", "source",
+    )
+    hashes = set()
+    if isinstance(report, dict):
+        for key in current_sections:
+            if isinstance(report.get(key), (dict, list)):
+                hashes.update(walk(report[key], key))
+    if not hashes:
+        hashes = set(walk(report))
     if len(hashes) > 1:
         raise ValueError(f"报告对同一P1记录多个不同SHA：{page_rel}: {sorted(hashes)}")
     return next(iter(hashes), None)
@@ -356,6 +371,39 @@ def refresh_cost(coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
     cost = read_json(COST_PATH)
     if not isinstance(cost, dict):
         raise ValueError("成本JSON顶层必须是对象")
+    supplement = read_json(SUPPLEMENT_PATH)
+    project_constraints = supplement.get("project_constraints", {})
+    sc_constraints = project_constraints.get("regulator_supercapacitor", {})
+    if not isinstance(sc_constraints, dict) or sc_constraints.get("fixed_manufacturer_part") != "SC0350-270-RSS":
+        raise ValueError("整车器件补充缺少已确认的LICAP超容约束，拒绝生成成本快照")
+    if sc_constraints.get("total_count_max") != 8 or sc_constraints.get("native_current_count") != 8:
+        raise ValueError("整车器件补充超容数量与当前用户固定8颗约束不符")
+    optimization = cost.setdefault("global_optimization_rule", {})
+    supercapacitor = optimization.setdefault("supercapacitor", {})
+    supercapacitor.update({
+        "required_mpn": sc_constraints["fixed_manufacturer_part"],
+        "max_cells": sc_constraints["total_count_max"],
+        "current_regulator_bom_cells": sc_constraints["native_current_count"],
+        "candidate_total_count": sc_constraints.get("candidate_total_count"),
+        "candidate_added_count": sc_constraints.get("candidate_added_count"),
+        "candidate_is_current": sc_constraints.get("candidate_is_current"),
+        "candidate_status": sc_constraints.get("candidate_status"),
+        "historical_cancelled_candidate_total_count": sc_constraints.get("historical_cancelled_candidate_total_count"),
+        "historical_cancelled_candidate_added_count": sc_constraints.get("historical_cancelled_candidate_added_count"),
+        "quantity_rule": sc_constraints.get("quantity_rule"),
+        "use_case": sc_constraints.get("use_case"),
+        "sustained_1s_requirement": sc_constraints.get("sustained_1s_requirement"),
+        "duration_s": sc_constraints.get("duration_s"),
+        "duration_status": sc_constraints.get("duration_status"),
+        "reference_power_w": sc_constraints.get("reference_power_w"),
+        "screened_model_candidates": {
+            "8S2P_low_voltage_window_800W_bidirectional": "cancelled_obsolete_historical",
+            "1000W_directional": "cancelled_obsolete_historical",
+            "active_candidate": False,
+            "transfer_to_current_bom_quantity": False,
+            "note": "用户最新决定固定现有8颗，仅作启动瞬态功率辅助；16颗扩容及其模型候选已取消，不进入当前用量/成本。历史仿真结果仍留在原仿真位置。",
+        },
+    })
     index_path = POWER / "元件封装库" / "索引" / "元件总表.json"
     procurement_path = POWER / "元件封装库" / "索引" / "采购补充.json"
     source_config_path = POWER / "元件封装库" / "来源配置.json"
@@ -519,6 +567,11 @@ def refresh_cost(coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
         "generated_at_utc": index.get("generated_at_utc"),
         "summary": index.get("summary", {}),
     }
+    cost["snapshot"]["vehicle_supplement"] = {
+        "path": "元件封装库/整车器件补充.json",
+        "sha256": sha256(SUPPLEMENT_PATH),
+        "project_constraints": project_constraints,
+    }
     cost["snapshot"]["source_configuration"] = {
         "path": "元件封装库/来源配置.json",
         "sha256": source_config_sha,
@@ -574,10 +627,15 @@ def refresh_cost(coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
     cost["snapshot"]["final_library_check_status_note"] = (
         "final_library_check仅在同步证明索引SHA、采购索引SHA、来源配置SHA与现存文件一致且源SHA相符时视为当前PASS；本脚本不运行同步或--check。"
     )
-    note = cost["snapshot"].get("note", "")
     warning = "本次机械快照与当前中央索引/同步证明绑定；索引缺失、源SHA不匹配或同步证明过期时明确标为STALE；价格未刷新。"
-    if warning not in note:
-        cost["snapshot"]["note"] = (note + " " + warning).strip()
+    native_instance_count = index.get("summary", {}).get("bom_instance_count")
+    native_module_count = index.get("summary", {}).get("module_count")
+    cost["snapshot"]["note"] = (
+        f"{native_module_count}类当前原生源、{len(fresh_boms)}个采购CSV来源；"
+        f"{native_instance_count}是按各模块单板/单套口径统计的原生BOM实例总数，非全车实装量。"
+        "采购行关联不重复加入原生实例；FOC装配采购补充及整车数量口径分别见snapshot.module_boms与board_scope。 "
+        f"{warning}"
+    )
     cost.setdefault("nonclaims", [])
     statement = "本轮文件哈希/行数机械快照不代表中央元件库同步、价格核验或设计放行。"
     if statement not in cost["nonclaims"]:
