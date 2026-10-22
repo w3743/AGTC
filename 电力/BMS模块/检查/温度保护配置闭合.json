@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-10-21",
+  "as_of": "2026-10-22",
   "document": "温度保护配置闭合.md",
   "status": "selected_sensor_and_threshold_candidates; TI_configuration_readback_and_physical_qualification_open",
   "scope": {
@@ -243,7 +243,7 @@
       "external_cell_sensor": "SEMITEC 103AT-2",
       "onboard_board_and_mos_sensor": "MF52A103F3950(A1)",
       "intended_curve_families": 2,
-      "slot_assignment": "TS1/DCHG/CFETOFF use TI 18K default candidate based on Semitec 103-AT; TS2/TS3 share Custom fitted from the A1 manufacturer R/T table. Both use 18k pull-up. Exact 103AT-2 error needs sweep; A1 coefficients require TI GPC output.",
+      "slot_assignment": "TS1/DCHG/CFETOFF use TI 18K default candidate based on Semitec 103-AT; TS2/TS3 share Custom fitted from the exact A1 manufacturer P477-4B R/T table. Both use 18k pull-up. Exact 103AT-2 error needs sweep; A1 coefficients require TI GPC output.",
       "pin_model_bytes": "0x07 on TS1/DCHG/CFETOFF; 0x2B on TS2; 0x2F on TS3; candidate only; none written/read back."
     },
     {
@@ -264,7 +264,7 @@
       "ProcessingType": 7,
       "Rpullup": "18k"
     },
-    "slot_mapping_status": "Semitec 103AT-2→TI default 18K candidate; A1→Custom pending GPC/report/readback/sweep; pin bytes not written/read back.",
+    "slot_mapping_status": "Semitec 103AT-2 -> TI default 18K candidate; A1 P477-4B -> Custom pending GPC report/readback/sweep; pin bytes not written/read back.",
     "source_difference": {
       "guide_2022": "The guide directs an 18-kΩ pull-up calculator result to the 18K Temperature Model, and a 180-kΩ pull-up result to the 180K Temperature Model.",
       "faq_2024_section_5_9": "For thermistors other than the FAQ named Semitec defaults, use the calculator and add the generated coefficients to the Custom Temperature Model.",
@@ -282,7 +282,7 @@
       {
         "thermistor": "MF52A103F3950(A1)",
         "path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input.zip",
-        "sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
+        "sha256": "54160257118499f4cf520a1be7f9d3b0f854a52a420707cfaae7eec1063b01a4",
         "archive_entries": [
           "config.txt",
           "thermistor.txt"
@@ -291,7 +291,7 @@
           "ProcessingType": 7,
           "Rpullup": "18k"
         },
-        "data_source": "../厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+        "data_source": "../厂商资料/MF52A103F3950_A1_P477-4B_R-T中心及误差.csv",
         "points": 181,
         "temperature_range_c": [
           -55,
@@ -305,7 +305,10 @@
         "coefficient_fit_or_slot_verified": false,
         "project_candidate_model_slot": "Custom",
         "project_candidate_slot_basis": "TI FAQ §5.9 for non-default thermistors; model mapping remains a project candidate pending fit/report/readback/sweep.",
-        "selection_status": "selected_for_Custom_GPC_submission; output not generated"
+        "selection_status": "current_P477-4B_input_ready; not uploaded; coefficients not returned",
+        "curve_revision": "P477-4B",
+        "manufacturer_pdf": "../厂商资料/时恒_MF52A103F3950_A1_P477-4B_20220811.pdf",
+        "manufacturer_pdf_sha256": "d37e99618c1ec9039c80bfc842f17d0d1942927856e8a9fbaaf3bf26aab0f50d"
       },
       {
         "thermistor": "Vishay NTCLE100E3103GB0",
@@ -542,7 +545,7 @@
       "status": "fit_coefficients_missing; Rc0_and_Adc0_have_nominal_candidates; not_final_or_frozen"
     },
     "manufacturer_curve_sources": {
-      "MF52A103F3950_A1": "../厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+      "MF52A103F3950_A1": "../厂商资料/MF52A103F3950_A1_P477-4B_R-T中心及误差.csv",
       "SEMITEC_103AT-2": "https://www.semitec.co.jp/products/thermistor_at/"
     },
     "nominal_calibration_candidate": {
@@ -796,7 +799,7 @@
   ],
   "minimum_inputs_to_close": [
     "Procure three Semitec 103AT-2 external sensors after quote; confirm supplier/lot, wire gauge, insulation, strain relief and thermal zones A/B/C. Qty remains three off-board parts; installation unverified.",
-    "Submit the prepared A1 manufacturer-table ZIP to TI GPC and archive output coefficients/report/fit plot; configure TS2/TS3 Custom and read back. Semitec 103AT-2 uses TI default 18K as candidate; require readback and sweep, not Vishay coefficients.",
+    "Current A1 GPC input ZIP uses P477-4B (SHA256 54160257118499f4cf520a1be7f9d3b0f854a52a420707cfaae7eec1063b01a4); obtain the TI report/fit log through an authorized human login, then validate Custom coefficients and configuration write/readback. Semitec 103AT-2 remains a TI default 18K candidate; require exact-variant sweep, not Vishay coefficients.",
     "Review/approve EVE 30P cell-surface trip/recovery candidates, 5°C guard band, total sensor/thermal/response budget and charger derating; verify all three installed zones.",
     "Measure A1 TS3-to-MOS hotspot delta and validate candidate 80/65°C; Tj rating does not establish sensor margin.",
     "optional target-chip raw-count calibration at a known temperature only if the approved accuracy budget requires board/device-specific Adc0 correction; nominal 11703 candidate does not depend on this measurement",
@@ -857,7 +860,7 @@
       "url": "https://www.ti.com/lit/an/sluaaq5/sluaaq5.pdf"
     },
     {
-      "title": "Vishay NTCLE100E3 datasheet",
+      "title": "Historical withdrawn candidate: Vishay NTCLE100E3 datasheet",
       "url": "https://www.vishay.com/docs/29049/ntcle100.pdf"
     },
     {
@@ -891,8 +894,8 @@
     {
       "title": "Prepared TI GPC A1 input ZIP",
       "path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input.zip",
-      "sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
-      "use": "prepared from the project A1 full R/T center table; exact required config.txt and thermistor.txt only; not uploaded or coefficient-validated; candidate model slot is Custom"
+      "sha256": "54160257118499f4cf520a1be7f9d3b0f854a52a420707cfaae7eec1063b01a4",
+      "use": "Current input rebuilt from exact A1 P477-4B manufacturer R/T table; not uploaded to TI and no coefficient report/output returned; candidate model slot Custom."
     },
     {
       "title": "Prepared TI GPC Vishay NTCLE100E3103GB0 input ZIP",
@@ -904,6 +907,58 @@
       "title": "SEMITEC AT thermistor official product data",
       "url": "https://www.semitec.co.jp/products/thermistor_at/",
       "use": "103AT-2,3 R25=10kΩ±1%, B25/85=3435K±1%, rated -50…+110°C, still-air time constant approx.15s; BMS accuracy/thermal coupling unqualified"
+    },
+    {
+      "title": "Historical TI GPC A1 P163-6 input ZIP (not current)",
+      "path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input_P163-6_historical.zip",
+      "sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
+      "use": "Byte-preserved predecessor input generated from P163-6; retained for traceability only, superseded by current P477-4B input, not uploaded."
+    },
+    {
+      "title": "Shiheng MF52A103F3950(A1) P477-4B manufacturer approval sheet, Rev. B0, 2022-08-11",
+      "url": "https://www.shiheng.com.cn/resource/attachments/d467cdbd622a4b919b2edf07a7f8cca7_19.pdf",
+      "path": "../厂商资料/时恒_MF52A103F3950_A1_P477-4B_20220811.pdf",
+      "sha256": "d37e99618c1ec9039c80bfc842f17d0d1942927856e8a9fbaaf3bf26aab0f50d",
+      "use": "Exact selected MF52A103F3950(A1) source; P477-4B full R/T table, R25/B25/50 tolerances, still-air dissipation/time constant and rated temperature."
+    },
+    {
+      "title": "Shiheng MF52A103F3950(A1) P477-4B R/T center and tolerance CSV",
+      "path": "../厂商资料/MF52A103F3950_A1_P477-4B_R-T中心及误差.csv",
+      "sha256": "70f234e1c905c33e0ed7a2f344b3ebd8f2ee70358c3381f3450f8dcc8022295e",
+      "use": "181 exact manufacturer table rows from PDF pages 7-11, -55..125°C in 1°C steps; values retained at printed precision."
     }
-  ]
+  ],
+  "ntc_curve_contract": {
+    "effective_date": "2026-10-22",
+    "part": "Shiheng MF52A103F3950(A1)",
+    "lcsc_supplier_code": "C13879",
+    "current_curve_revision": "P477-4B",
+    "current_datasheet_path": "../厂商资料/时恒_MF52A103F3950_A1_P477-4B_20220811.pdf",
+    "current_datasheet_sha256": "d37e99618c1ec9039c80bfc842f17d0d1942927856e8a9fbaaf3bf26aab0f50d",
+    "current_rt_csv_path": "../厂商资料/MF52A103F3950_A1_P477-4B_R-T中心及误差.csv",
+    "current_rt_csv_sha256": "70f234e1c905c33e0ed7a2f344b3ebd8f2ee70358c3381f3450f8dcc8022295e",
+    "curve_points": 181,
+    "temperature_range_c": [
+      -55,
+      125
+    ],
+    "temperature_step_c": 1,
+    "r25_ohm_nominal": 10000,
+    "r25_tolerance_percent": 1,
+    "b25_50_k_nominal": 3950,
+    "b25_50_tolerance_percent": 1,
+    "dissipation_factor_mw_per_c_min_still_air": 2,
+    "thermal_time_constant_s_max_still_air": 7,
+    "rated_power_mw": 50,
+    "historical_curve_revision": "P163-6",
+    "historical_source_path": "../厂商资料/MF52A103F3950_A1_P163-6_R-T中心及误差.csv",
+    "historical_gpc_input_path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input_P163-6_historical.zip",
+    "historical_gpc_input_sha256": "4a27018e6ff1a613d75f4fe056db4ab0ca269fa181fe1fbf95f880a4adf54395",
+    "current_gpc_input_path": "../仿真/输入/TI_GPC_A1_MF52A103F3950_input.zip",
+    "current_gpc_input_sha256": "54160257118499f4cf520a1be7f9d3b0f854a52a420707cfaae7eec1063b01a4",
+    "gpc_uploaded": false,
+    "gpc_coefficients_returned": false,
+    "configuration_written_or_read_back": false,
+    "qualification_status": "P477-4B source and input ZIP ready; TI fit, device configuration, readback, per-channel temperature sweep, and physical thermal coupling remain OPEN."
+  }
 }

@@ -1,0 +1,339 @@
+{
+  "schema": "agtc.static-electrical-review/v1",
+  "created_date": "2026-10-22",
+  "status": "STATIC_REVIEW_ONLY_NOT_NATIVE_NOT_HARDWARE_QUALIFIED; C5334032 selected as formal schematic candidate, source/BOM unchanged by this review",
+  "scope": [
+    "FOC D_BUSADC_CLAMP: retain the protection branch and assess the low-MOQ C5334032 alternative.",
+    "Read-only BQ76952 + TMUX1511 + SN74LVC1G11 supply, permit, power-off and interface boundaries for the 8S1P candidate.",
+    "Record TS2 as NC to preserve the BQ76952 TS2 shutdown-wakeup path."
+  ],
+  "project_evidence_read": [
+    "电力/稳压模块/原理图准备/AFE启动配置.json",
+    "电力/稳压模块/原理图准备/采样与硬关断实现.md",
+    "parent-provided live FOC values: BUS ADC divider 180k/10k, 1k series resistor; D_BUSADC_CLAMP pin1 BUS_ADC, pin2 GND."
+  ],
+  "invariants_and_limits": {
+    "native_or_bom_changed": false,
+    "pcb_or_gui_touched": false,
+    "threshold_interpretation": "The 2.2–2.45 V per-cell range is not classified here as either the complete usable-energy window or only an enable/startup window. Existing 1.74 V software UV, 2.50 V software OV, BQ CUV=1.518 V and COV=2.5806 V are documented settings, not presumed erroneous. Requirement owner must distinguish startup/charge-enable window from full discharge/operation limits before changing thresholds.",
+    "0v_start": "Not covered by this normal-window supply analysis. The BQ is powered from the supercapacitor stack; 0 V startup has no qualified BQ supply or cell-monitoring path.",
+    "hardware_status": "All calculations are paper checks. Board-level injection, power sequencing, logic levels, protection delay, temperature behavior and startup transitions remain unverified."
+  },
+  "foc_adc_clamp": {
+    "existing_network": {
+      "path": "BUS -> R_BUSADC_TOP 180kΩ (1%) -> VBUS_ADC_SENSE -> R_BUSADC_SER 1kΩ (1%) -> BUS_ADC; R_BUSADC_BOT 10kΩ (1%) from VBUS_ADC_SENSE to GND; C_BUS_ADC 1nF and D_BUSADC_CLAMP from BUS_ADC to GND.",
+      "diode_pins": "pin 1 = BUS_ADC/cathode; pin 2 = GND/anode. Positive rail clamp requires cathode at BUS_ADC.",
+      "assumed_screening_bus_voltage_V": 80,
+      "voltage_basis": "80 V is an assumed stress calculation point only, not a specified or qualified maximum bus voltage. No bus upper-bound assumption is used to justify deletion."
+    },
+    "current_part": {
+      "manufacturer": "Nexperia",
+      "mpn": "BZT52H-C3V6,115",
+      "supplier_code": "C550347",
+      "package": "SOD-123F",
+      "manufacturer_datasheet": "https://assets.nexperia.com/documents/data-sheet/BZT52H_SER.pdf",
+      "datasheet_revision": "Rev. 7, 2023-01-01",
+      "specification": "At Tj=25 °C unless otherwise specified: BZT52H-C3V6 (C-grade) VZ=3.4–3.8 V at IZ=5 mA; Table 8 maximum differential resistance rdif=500 Ω at IZ=1 mA (Zzk) and 95 Ω at IZ=5 mA (Zzt); IR max 5 µA at VR=1 V. Pin 1 cathode, pin 2 anode; marking band denotes cathode. Ptot is 375 mW on a standard FR4 footprint at Tamb≤25 °C, or 830 mW only with a 1 cm² cathode copper pad under the stated FR4 mounting; Tj max 150 °C."
+    },
+    "low_moq_candidate": {
+      "manufacturer": "ElecSuper",
+      "mpn": "BZT52C3V6",
+      "supplier_code": "C5334032",
+      "package": "SOD-123",
+      "merchant_item": "https://item.szlcsc.com/6097584.html",
+      "merchant_hosted_vendor_marked_family_datasheet": "https://datasheet.lcsc.com/lcsc/2410121516_ElecSuper-BZT52C16_C5334038.pdf",
+      "datasheet_identity_note": "The hosted document is marked ElecSuper BZT52Cxx SERIES, Rev. 1.1; the URL item suffix is C5334038 (a different voltage member of the family). The C5334032 listing identifies the 3.6 V BZT52C3V6. Treat this as a family-level series specification, not a C5334032-specific signed qualification report.",
+      "datasheet_pages": {
+        "page_1": "SOD-123 package; marking band denotes cathode. Ptot=500 mW only when mounted on the specified ceramic PCB (7.6×9.4×0.87 mm, pad areas 25 mm²) at Tamb≤25 °C; this rating is not automatically the board rating on the human-designed PCB. Storage −65…+150 °C and RθJA=400 K/W under that mounting condition.",
+        "page_2": "BZT52C3V6: VZ=3.4–3.8 V at IZT=5 mA; maximum ZZT=90 Ω at 5 mA; maximum ZZK=600 Ω at IZK=1 mA; IR max=5 µA at VR=1 V; listed temperature coefficient −3.5…0 mV/°C at IZTC=5 mA. Ratings are at 25 °C unless stated otherwise."
+      },
+      "operating_temperature_note": "The retrieved ElecSuper family table gives storage temperature but no distinct maximum operating junction-temperature limit. Storage −65…+150 °C is not an operating-temperature qualification."
+    },
+    "corner_calculation": {
+      "inputs": {
+        "BUS_V": 80,
+        "Rtop_nominal_ohm": 180000,
+        "Rtop_tolerance": 0.01,
+        "Rbottom_nominal_ohm": 10000,
+        "Rbottom_tolerance": 0.01,
+        "Rseries_nominal_ohm": 1000,
+        "Rseries_tolerance": 0.01
+      },
+      "high_clamp_current_corner": "Rtop=min 178.2kΩ, Rbottom=max 10.1kΩ, Rseries=min 990Ω.",
+      "thevenin_at_sense_V": 4.29102496,
+      "thevenin_resistance_ohm": 9558.258,
+      "total_series_from_thevenin_ohm": 10548.258,
+      "current_if_clamped_at_3v4_uA": 84.47,
+      "current_if_clamped_at_3v6_uA": 65.51,
+      "current_if_clamped_at_3v8_uA": 46.55,
+      "maximum_assumed_clamp_power_mW": 0.288,
+      "interpretation": "At the 80 V stress point, current is only about 47–84 µA, far below the 1 mA Zzk and 5 mA Zener-voltage test points. Both manufacturers' 3.4–3.8 V limits therefore do not guarantee the actual clamp voltage at this circuit current. The candidate's 90 Ω Zzt is marginally lower than Nexperia's 95 Ω at the same 5 mA test condition, while breakdown range, Zzk and leakage limits are similar. Its 500 mW rating is lower than the old part's special 830 mW large-pad rating, but remains far above the calculated <0.3 mW at the assumed 80 V point.",
+      "nominal_total_source_resistance_ohm": 10473.684,
+      "max_dynamic_resistance_comparison": {
+        "nexperia_zk_max_ohm_at_1mA": 500,
+        "elecsuper_zk_max_ohm_at_1mA": 600,
+        "candidate_increase_ohm": 100,
+        "candidate_increase_percent": 20,
+        "added_resistance_as_fraction_of_nominal_divider_plus_series_resistance_percent": 0.955,
+        "voltage_difference_at_1mA_if_both_limits_are_used_as_linear_resistance": 0.1,
+        "linear_extrapolation_to_actual_80V_screen_current_uV": "At 46.55–84.47 µA this would project about 4.7–8.4 mV, but extrapolation is outside the 1 mA Zzk test point and is not a datasheet guarantee.",
+        "interpretation": "The 600 Ω candidate limit is measurably worse than the old 500 Ω limit at the stated 1 mA test point. Its +100 Ω is <1% of the nominal 10.474 kΩ divider/series source resistance, so it does not create a material new static selection blocker while the branch is retained; however neither part guarantees its voltage or leakage behavior at the actual sub-0.1 mA branch current."
+      }
+    },
+    "decision": {
+      "recommendation": "Select C5334032 (ElecSuper BZT52C3V6, MOQ 5) as the formal schematic/BOM candidate and retain the D_BUSADC_CLAMP shunt branch. Its published 3.4–3.8 V/5 mA, 5 µA/1 V leakage, and 90 Ω/5 mA match or improve the old entries; its Zzk is explicitly worse (600 Ω vs 500 Ω at 1 mA). The +100 Ω is <1% of the nominal divider-plus-series resistance and does not block the static part choice. This selection does not close low-current clamp voltage, temperature or power-off-injection qualification; do not remove the existing HOLD.",
+      "not_a_drop_in": "The candidate is SOD-123; the current part is SOD-123F. The PCB is unbuilt and backward compatibility is not required, so this package change is allowed as a new human schematic/footprint contract. It still requires the formal footprint/pad mapping to be updated; keep pin 1 cathode at BUS_ADC and pin 2 anode at GND.",
+      "project_sku_count_if_adopted": "Across the current four-module BOMs, C550347/BZT52H-C3V6,115 appears only in the FOC current BOM (one per board, two instances total). Replacing both with C5334032 adds 1 gross distinct active MPN, retires 1 existing distinct active MPN, for net 0 active project-wide distinct MPNs; 2 physical instances change to 2 instances. This is conditional on the current four-module BOM baseline and does not imply native or BOM edits in this review.",
+      "open_qualification": [
+        "Measure clamp voltage/current on the actual divider at the maximum specified bus transient and across temperature; no suitable maximum bus transient was supplied for this calculation.",
+        "Verify STM32G431 ADC pin current/injection and unpowered-core behavior. The MCU absolute maximum voltage rating alone does not establish a permissible injection current or powered-off safety limit.",
+        "Recheck ADC settling/noise and diode leakage at temperature after the package change."
+      ],
+      "qualification_not_a_selection_gate": "Because the shunt branch is retained and the candidate preserves the same nominal family voltage, the low-current/temperature/power-off hardware HOLD need not block schematic selection. The hold remains attached to release/qualification, not to making the low-MOQ schematic choice."
+    },
+    "official_side_by_side_review": {
+      "conditions": "Nexperia Table 8 is specified at Tj=25 °C unless noted. ElecSuper family PDF says ratings at 25 °C ambient unless otherwise specified. Compare like-for-like only at listed currents.",
+      "breakdown_voltage": "Equal stated C-grade window: 3.4–3.8 V at 5 mA.",
+      "reverse_leakage": "Equal maximum: 5 µA at VR=1 V; neither condition guarantees leakage at the circuit reverse voltage around 3.4–3.8 V.",
+      "differential_resistance": "Candidate Zzt is 90 Ω vs old 95 Ω at 5 mA (candidate 5 Ω lower); candidate Zzk is 600 Ω vs old 500 Ω at 1 mA (candidate 100 Ω higher, 20%). Do not describe all parameters as equal.",
+      "power": "Candidate 500 mW is conditional on its specified ceramic mounting with 25 mm² pad areas at Tamb≤25 °C. Old device has 375 mW on standard FR4 footprint at Tamb≤25 °C and 830 mW only with 1 cm² cathode copper. The old 830 mW value is not its standard-footprint rating.",
+      "polarity": "Both vendor documents identify the band as cathode; Nexperia explicitly maps pin 1=K/pin 2=A. Schematic contract must retain cathode at BUS_ADC and anode at GND.",
+      "actual_circuit": "At the 80 V assumed screening point only, the existing 180 kΩ/10 kΩ/1 kΩ network yields about 46.55–84.47 µA through the shunt branch and <0.288 mW. The diode is tested at 1 mA/5 mA, well above this current. No maximum BUS transient was supplied; 80 V is not an asserted real limit.",
+      "conclusion": "The higher Zzk limit is a real difference, but it is a small series-resistance perturbation relative to the nominal 10.474 kΩ divider path and does not prohibit selecting the low-MOQ device for the retained schematic branch. Low-current clamp voltage, temperature behavior and MCU power-off injection remain OPEN; keep the existing hardware HOLD.",
+      "temperature_coefficient": "Both family tables list −3.5…0 mV/°C at 5 mA for C3V6; this does not qualify behavior at the actual sub-0.1 mA branch current or the candidate full operating temperature range."
+    },
+    "procurement_and_mpn_delta": {
+      "source_date": "2026-10-22 review; quoted observations captured 2026-10-21",
+      "current_FOC_BOM": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+      "current_FOC_BOM_sha256": "7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
+      "price_table": "电力/元件封装库/商城报价.json",
+      "price_table_sha256": "6CFE42EB47316B39C5CF908399F30B1D41E399D5862AA418649D18463E05CB59",
+      "old_part_observation": "LCSC_CN-C550347-20261021-PAGE-RECHECK",
+      "old_part": "Nexperia BZT52H-C3V6,115 / C550347",
+      "old_required_quantity": 2,
+      "old_moq": 3000,
+      "old_observed_tiers_CNY": "3000×0.36=1080; 6000×0.354; 12000×0.345; 24000×0.33",
+      "old_availability": "Page reports no spot stock but supports order, while also showing stock 90,000; current spot status is conflicting/unresolved.",
+      "candidate_observation": "LCSC_CN-C5334032-20261021-CANDIDATE-SCREENSHOT",
+      "candidate_part": "ElecSuper BZT52C3V6 / C5334032",
+      "candidate_required_quantity": 2,
+      "candidate_moq": 5,
+      "candidate_observed_tiers_CNY": "5×0.0761=0.3805; 50×0.0597; 150×0.0506; 500×0.0451; 3000×0.0404",
+      "candidate_stock_snapshot": 1530,
+      "candidate_packaging": "3000/reel; 3 units remain after MOQ purchase for two FOC boards",
+      "cost_comparison_limit": "Observed unit tiers are market snapshots, before shipping/tax and without any promise of later availability. Do not call this guaranteed savings.",
+      "sku_delta": "gross distinct MPN +1 (C5334032); retire old distinct MPN C550347 (−1); active project-wide distinct MPN net 0, conditional on the four-module BOM check."
+    },
+    "other_passive_cost_screen": {
+      "scope": "Read current official two-board FOC BOM against exact product observations already present in 商城报价.json. This is a bounded cost screen, not a substitute search or permission to change values.",
+      "source_files": [
+        "FOC_G431_BOM.csv SHA256 7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
+        "商城报价.json SHA256 6CFE42EB47316B39C5CF908399F30B1D41E399D5862AA418649D18463E05CB59"
+      ],
+      "findings": [
+        {
+          "part": "TDK C1608X7R1C105K080AC / C2167399",
+          "refs": "U1_DVDD_C,U1_VCP_C,U1_VGLS_C,U3_C2,U4_C2",
+          "two_board_quantity": 10,
+          "observed_moq": 10,
+          "observed_price_CNY": "10+0.3352; 100+0.2688; 300+0.2355",
+          "conclusion": "MOQ exactly matches the two-board demand; no MOQ-driven overbuy or evidenced same-function replacement found."
+        },
+        {
+          "part": "Panasonic EEEF K2A330P / C178571",
+          "refs": "U1_VM_C3",
+          "two_board_quantity": 2,
+          "observed_moq": 1,
+          "observed_price_CNY": "1+4.35; 10+3.62; 30+3.31; 100+2.92",
+          "conclusion": "Highest quoted passive unit-price item found, but no high MOQ. It is the 33 µF/100 V VM bulk capacitor; changing voltage, capacitance, ripple-current or lifetime without the rail transient and ripple requirement is unsupported. Keep as selected; no lower-cost alternate is evidenced."
+        },
+        {
+          "part": "Yageo RC0603FR-071ML / C105578",
+          "refs": "R_OVTOP,U1_BUCK_RCL",
+          "two_board_quantity": 4,
+          "observed_moq": 100,
+          "observed_price_CNY": "100+0.0254",
+          "minimum_order_cash_CNY": 2.54,
+          "excess_after_MOQ": 96,
+          "conclusion": "A small MOQ excess only. Both values are accuracy/current-limit-setting elements; no verified equivalent or cost-effective alternate was found."
+        },
+        {
+          "part": "Yageo RC0603FR-0710KL / C98220",
+          "refs": "18 distinct 10 kΩ functions",
+          "two_board_quantity": 36,
+          "observed_moq": 100,
+          "observed_price_CNY": "100+0.0215",
+          "minimum_order_cash_CNY": 2.15,
+          "excess_after_MOQ": 64,
+          "conclusion": "Small procurement excess; these pulldown, gate-source and signal-bias values serve different safety roles and are already the same exact MPN. No value reduction or substitute is justified by the available circuit evidence."
+        }
+      ],
+      "conclusion": "No second resistor/capacitor replacement with both a demonstrated circuit margin and verified exact procurement evidence was identified. Do not select a weaker-rating or different-value passive merely to lower MOQ."
+    }
+  },
+  "afe_candidate": {
+    "population_and_supply": {
+      "stack_configuration": "8S1P, eight SC0350-270-RSS units.",
+      "conditional_normal_cell_range_V": [
+        2.2,
+        2.45
+      ],
+      "implied_stack_range_V": [
+        17.6,
+        19.6
+      ],
+      "interpretation": "The stack range is conditional on all eight groups being in the stated window; this does not define the product's full usable-energy range.",
+      "BQ76952_operating_support": "TI specifies BAT operation from 4.7 V to 80 V with charge pump disabled. REG1 configured to 3.3 V is specified 3.0–3.6 V for REGIN≥4.1 V and 0–45 mA. The design's FCX495TA/REG0 preregulator is expected to supply approximately 5.5 V REGIN; its actual 17.6–19.6 V input/load corner and minimum REGIN were not re-derived from a frozen native netlist here.",
+      "headroom": "At the conditional 17.6 V stack minimum, BAT is 12.9 V above the specified 4.7 V lower operating bound. The assumed 5.5 V REGIN is below BAT and above the 4.1 V REG1 requirement. This is a static headroom check, not a guarantee that the preregulator starts or remains regulated at the candidate startup trajectory.",
+      "normal_cell_measurement": "The stated 2.2–2.45 V cell values lie inside BQ's 2–5 V cell-measurement accuracy range. The VCx common-mode/input constraints and all eight actual pin connections still require final schematic review and hardware measurement.",
+      "zero_volt": "Not supported by the normal-range supply path: BQ BAT operation below 4.7 V and the VC5 common-mode requirements are not qualified for 0 V start."
+    },
+    "permit_contract": {
+      "devices": [
+        "U_BQ: BQ7695202PFBR candidate; powered from the SC stack using the existing REG0/FCX495TA preregulator concept; REG1=3.3 V supplies the healthy-signal AND and the candidate TMUX devices.",
+        "U_AND: existing SN74LVC1G11, powered by BQ REG1. Pin map: 1=A, 2=GND, 3=B, 4=Y, 5=VCC, 6=C.",
+        "U_OV: existing TLV6700 open-drain comparator output asserts low on its assigned fault and sinks the MCU permit node; keep it separate from the push-pull AND output.",
+        "DRV8161 nFAULT/nDRVOFF common enable input is fed from U_AND.Y through 680 Ω and has a 10 kΩ pulldown."
+      ],
+      "input_wiring": {
+        "A": "BQ DCHG through 47 kΩ pulldown; DCHG config 0xAA means function DCHG, active-low when CHG disabled, active-high drive sourced from REG1, weak pull-down selected.",
+        "B": "BQ DDSG through 47 kΩ pulldown; DDSG config 0xAA means function DDSG, active-low when DSG disabled, active-high drive sourced from REG1, weak pull-down selected.",
+        "C": "MCU_PERMIT from 3V3_CORE through 4.7 kΩ, with 47 kΩ pulldown at the LVC input; TLV6700 open-drain fault output sinks this same node.",
+        "output": "Y high only when all three inputs are high; any BQ fault/invalid output, MCU reset/high-Z, MCU permit low, or TLV fault makes Y low."
+      },
+      "static_kcl": {
+        "assumptions": {
+          "BQ_REG1_V_range_V": [
+            3.0,
+            3.6
+          ],
+          "pulldown_47k_tolerance": "±1%",
+          "permit_series_4k7_tolerance": "±1%",
+          "LVC_input_leakage_max_uA": 5,
+          "LVC_Icc_max_uA": 10,
+          "TMUX1511_Idd_max_uA_each": 70,
+          "LVC_output_stage_static_load": "10 kΩ pulldown through 680 Ω series resistor"
+        },
+        "BQ_DCHG_or_DDSG_high_load_max_uA": 82.37,
+        "both_BQ_outputs_high_load_max_uA": 164.74,
+        "MCU_PERMIT_high_worst_case": "At VMCU=3.0 V, Rseries=4.747 kΩ, Rpd=46.53 kΩ and 5 µA LVC input leakage to ground, node≈2.701 V; IMCU≈63.0 µA. This exceeds LVC VIH(min)=2.0 V by≈0.70 V.",
+        "TLV6700_fault_sink_current_upper_bound_mA": 0.774,
+        "TLV6700_fault_sink_current_assumption": "At VMCU=3.6 V and Rseries=4.653 kΩ, the current is ≤0.774 mA even if the open-drain output is treated as 0 V. This is below the 40 mA absolute output-terminal current rating; the actual VOL/low-level behavior still needs datasheet-corner and board verification.",
+        "AND_output_pull_down_current_mA_at_REG1_3v0": 0.281,
+        "AND_output_pull_down_current_mA_at_REG1_3v6": 0.337,
+        "AND_output_node_using_VOH_2v4_screen_V": 2.247,
+        "AND_output_margin_over_DRV_VIH_2v2_screen_mV": 47,
+        "REG1_external_load_upper_estimate_uA": 651.82,
+        "REG1_load_breakdown": "Two DCHG/DDSG 47 kΩ pulls plus worst-case LVC input leakage≈164.7 µA; two TMUX1511 devices at 70 µA each=140 µA; LVC ICC max=10 µA; 10 kΩ output pulldown through 680 Ω at REG1=3.6 V≈337.1 µA. Total≈651.8 µA, excluding BQ internal current, local preregulator losses and any additional pullups/loads.",
+        "qualification_note": "BQ's 3.3 V REG1 output range is guaranteed, but the retrieved BQ digital-output VOH/VOL table is explicitly characterized for the 5 V REG1 case, not the 3.3 V setting. Its output loads here are only about 70–82 µA per pin, yet high-level threshold margin at 3.3 V still needs bench confirmation. The LVC output screen uses the datasheet 2.4 V VOH value at VCC=3 V/IOH=16 mA as a conservative loaded-value estimate; it is not a direct guarantee at the actual ~0.28–0.34 mA load. Resulting calculated DRV input margin is only about 47 mV and should be improved or verified before release. When U_AND VCC=0, the LVC output Ioff limit ±10 µA through the 10 kΩ DRV pulldown corresponds to ≤0.1 V at the driver node, keeping it below the 2.2 V enable threshold."
+      },
+      "default_state_truth_table": [
+        {
+          "condition": "MCU reset, unpowered or GPIO high-Z",
+          "MCU_PERMIT": "low from 47 kΩ pull-down",
+          "AND_Y": "low",
+          "driver": "disabled"
+        },
+        {
+          "condition": "BQ not configured, RESET or outputs high-Z",
+          "DCHG/DDSG": "low from 47 kΩ pull-downs",
+          "AND_Y": "low",
+          "driver": "disabled"
+        },
+        {
+          "condition": "Configured BQ reports charge/discharge-disabled fault",
+          "respective DCHG or DDSG": "low per 0xAA polarity",
+          "AND_Y": "low",
+          "driver": "disabled"
+        },
+        {
+          "condition": "SC overvoltage comparator active",
+          "inputs": "TLV6700 open-drain sinks MCU_PERMIT",
+          "AND_Y": "low",
+          "driver": "disabled"
+        },
+        {
+          "condition": "BQ REG1 lost / LVC VCC=0",
+          "inputs": "DCHG/DDSG pulldowns keep inputs low; LVC output partial-power-down Ioff applies",
+          "AND_Y": "low; DRV node held by 10 kΩ to GND",
+          "driver": "disabled"
+        },
+        {
+          "condition": "All protections healthy, MCU explicitly armed, no comparator fault",
+          "inputs": "all three AND inputs high",
+          "AND_Y": "high",
+          "driver": "may enable subject to all other startup gates"
+        }
+      ],
+      "delay_and_threshold_state": {
+        "configured_BQ_CUV": "0x1E = 1.518 V; delay 0x001C is 99 ms nominal per current candidate config.",
+        "configured_BQ_COV": "0x33 = 2.5806 V; delay 0x001C is 99 ms nominal per current candidate config.",
+        "software_soft_uv_ov": [
+          1.74,
+          2.5
+        ],
+        "requirement_boundary": "These values must be compared to the separately defined startup/charge-enable and full operation windows. 2.2–2.45 V is not assumed to be the complete energy window. Do not retune based only on this review.",
+        "qualification": "BQ detection + configured delay + DCHG/DDSG transition + LVC + 680 Ω/10 kΩ + driver response has no verified end-to-end worst-case response here. The nominal 99 ms delay alone is not a maximum response guarantee."
+      }
+    },
+    "ts2_shutdown_wakeup": {
+      "decision": "Leave BQ76952 TS2, pin 22, NC in this candidate; do not ground it or fit an external pulldown.",
+      "reason": "TI datasheet §7.6 specifies a weak TS2 high level in SHUTDOWN (about 4.5–6 V when VBAT>6 V; 3–6 V for low BAT condition) and the TS2 falling-edge wake threshold is specified. TI describes the SHUTDOWN TS2 wake function in the datasheet; a hard ground would defeat this wake input.",
+      "config": "TS2 Config=0x00 leaves it unused for normal thermistor/ADC sampling; firmware must explicitly request SHUTDOWN only when intended and then use the documented TS2 wake behavior.",
+      "source": "https://www.ti.com/lit/gpn/BQ76952, Rev. B, Table 7-6 / §12.6; BQ76952 TRM Rev. B, §7."
+    },
+    "tmux_and_i2c_power_off": {
+      "signal_mux_candidate": "One TMUX1511 can switch BUS_ADC, T8 and IMON. It is bidirectional, 1.5–5.5 V supply, and has 6 MΩ internal pulldowns on SEL; logic low is OFF. Its powered-off protection is guaranteed only for signal path voltages through 3.6 V, with I/O leakage up to ±2 µA under VDD=0 V, VS=0–3.6 V, VD=0 V.",
+      "current_hole": "The BQ startup config still lists I2C2 pullups to 3V3_CORE and no I2C isolation. If the core remains powered while the BQ/REG1 rail is off, the direct 4.7 kΩ pullups drive SDA/SCL into unpowered BQ pins. BQ absolute input voltage limits are not a powered-off Ioff guarantee. If the BQ remains powered while the core is off, the converse MCU injection also needs closure.",
+      "option_a_same_sku_more_channels": "Use a second TMUX1511, powered from BQ REG1, for SDA and SCL; keep core-side pullups to 3V3_CORE and add BQ-side pullups to REG1. Add local 100 nF at each TMUX. Consider 47 kΩ pull-downs on BQ-side bus nodes so the worst ±2 µA power-off leakage corresponds to ≤94 mV. This reuses the same MPN but adds one four-channel IC (two channels used) plus passives; it remains a candidate until leakage and power sequencing are measured.",
+      "option_b_single_mux_hdq": "BQ76952 supports one-wire HDQ (TRM communication mode 0x04 on the HDQ pin). If MCU pin allocation and human firmware permit changing from I2C2 to HDQ, the fourth channel of the existing one TMUX1511 could isolate HDQ instead of adding a second mux. It avoids a second IC but changes the communication protocol and requires a new pin/timing/firmware review; it is not silently substituted for the current I2C plan.",
+      "signal_range_open": "Before relying on TMUX powered-off protection, prove every switched analog node stays ≤3.6 V in the unpowered condition. BUS_ADC is about 2.59 V at the assumed 80 V stress point from the FOC divider, but no actual maximum BUS transient is established here; T8 and IMON ranges require their own bound.",
+      "status": "NOT_COMPLETE: one TMUX for three analog channels does not close the current I2C two-domain power-off path. Compare the second same-MPN TMUX option against one-channel HDQ before committing quantities."
+    }
+  },
+  "source_register": [
+    {
+      "manufacturer": "ElecSuper (vendor-marked LCSC-hosted family PDF)",
+      "document": "BZT52Cxx SERIES Rev. 1.1",
+      "url": "https://datasheet.lcsc.com/lcsc/2410121516_ElecSuper-BZT52C16_C5334038.pdf",
+      "pages": "1–2; page 1 package, band polarity and conditional 500 mW mounting; page 2 C3V6 table conditions."
+    },
+    {
+      "manufacturer": "Nexperia",
+      "document": "BZT52H series Rev. 7, 2023-01-01",
+      "url": "https://assets.nexperia.com/documents/data-sheet/BZT52H_SER.pdf",
+      "pages": "Table 2 pinning/marking p.2; Table 1 Ptot and Table 5 limiting values p.4; Table 8 C3V6 electrical rows p.5 (Rev. 7 PDF)."
+    },
+    {
+      "manufacturer": "Texas Instruments",
+      "document": "BQ76952 datasheet Rev. B",
+      "url": "https://www.ti.com/lit/gpn/BQ76952",
+      "pages": "Table 7-3 (operating range); Table 7-6 (TS2 wake); Table 7-12 (REG1); Table 7-6/§12.6 (TS2/RST_SHUT)"
+    },
+    {
+      "manufacturer": "Texas Instruments",
+      "document": "BQ76952 Technical Reference Manual Rev. B",
+      "url": "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+      "pages": "Table 13-13 and 13-14 (DCHG/DDSG configuration); §6.3 (REG1/REGIN); §6.7 (digital fault outputs); communication-mode table (HDQ mode 0x04)"
+    },
+    {
+      "manufacturer": "Texas Instruments",
+      "document": "SN74LVC1G11 datasheet Rev. I",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74lvc1g11.pdf",
+      "pages": "Table 4-1 (pin map); Tables 5-3/5-5 (input thresholds, leakage, VOH/VOL, Ioff); Table 7-1 (AND truth table)"
+    },
+    {
+      "manufacturer": "Texas Instruments",
+      "document": "TMUX1511 datasheet Rev. B",
+      "url": "https://www.ti.com/lit/ds/symlink/tmux1511.pdf",
+      "pages": "Table 5-1 (IDD, powered-off leakage, SEL thresholds/pulldown); §3 (powered-off protection)"
+    },
+    {
+      "manufacturer": "Texas Instruments",
+      "document": "TLV6700 datasheet Rev. B",
+      "url": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf",
+      "pages": "§3 and Table 7-1 (open-drain output, 40 mA absolute terminal-current limit, threshold behavior)"
+    }
+  ],
+  "overall_result": "Static review only; no native source or BOM was edited. Recommend formal selection of C5334032 for both FOC clamp positions, retaining the shunt branch. Candidate Zzk is 600 Ω versus Nexperia 500 Ω at 1 mA, while its voltage/leakage windows match and Zzt is 90 Ω versus 95 Ω at 5 mA. This does not qualify the actual 47–84 µA clamp current, full temperature or MCU power-off injection. No second resistor/capacitor substitution was supported by current BOM and quote evidence. AFE startup/permit chain remains separately OPEN/HOLD."
+}

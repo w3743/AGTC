@@ -1,13 +1,13 @@
 # BMS 全原理图逐针与故障链复核
 
-审查日期：2026-10-21。当前正式源为 P1 `d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef`，EPRJ3 `8801494dc4c79e7f07aa45d0730ace36e23d3338a53596d0000539de9d3f5bf7`。这份审查绑定该保存源；它不是 PCB 审查或硬件资格结论。
+审查日期：2026-10-22。当前正式源为 P1 `bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e`，EPRJ3 `4de6f6a845074505476aeec2e3dc4d57c0643c259daa0e84f4aa3d01a47b4805`，采购候选 BOM SHA `665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba`。当前官方网表 `跨板并料_当前.enet` SHA `537caa4389b5fae40fe5508d4ae1c194f69ed53982c99c0fb8fe04959f53c6eb`；保存、关闭、根工程重开、API/ENET复核和最终关闭均已完成。此报告仍不是 PCB 审查或硬件资格结论。
 
 ## 当前证据边界
 
-- 官方 headless 重开到根 EPRJ3/P1 后直接读回 **226 位号、740 针、246 条 TEXT**。该 headless 会话随后已关闭。当前源 DRC 和 ENET 都没有返回；不把旧源 1 个 warning 写成当前 DRC，也不把旧 a713 网表写成当前 ENET。
-- 完整 740 脚映射见 [current-pin-net-coverage.json](current-pin-net-coverage.json)，SHA256 `17799fa27474ad47ddcad476d289139cb72937740c68b904fb035f6b242b0d3e`。其余基线针网是从已验证的 215/710 源与历史官方 ENET，经原生差分推导；新增边界对象和 30 个针网来自本次同根官方 API 直接读回。因此它是源绑定的派生针网覆盖，不是当前官方 ENET 导出。
-- 层次正确的基线：P1 `56f8f62e…` 已有 **215/710**，其中已经包含前一阶段新增的 3 颗电芯 NTC（6 针）和 4 个裸孔焊线点（4 针）。`56f8…→4d274…` 仅修改 TEXT `58db56e9107cff1e`。本轮新增 `F_CELL_B1..9`、`F1`、`J_CELL_SERVICE` 共 11 对象/30 针，并将 `D_BAT.2`、`D_BREG.2` 从 `CELL_B9` 改接 `TAP_B9`，最终 **226/740**。较早的 700 针不应直接加 30。
-- 当前采购候选 BOM：248 行数据，SHA256 `a1ccd3260a3bfb2a36113a3019f60c041697996ad1dba9e0fee65005cd1456b0`；待询价，未视为已采购。NTC_CELL1/2/3 列 Semitec 103AT-2 候选料号；9 路外置熔断器/座不增加板上 BOM。
+- 官方正式会话保存、关闭并从根 EPRJ3 重开后，当前 P1 直接复读 **226 位号、740 针、246 条 TEXT**；当前 ENET 与 live API 针网差异为 0。严格 DRC 为 **0 error、9 warning groups**：8 组 `SHOWDANDLING`、1 组 `ATTRMATCHCODE`。本结果只说明当前EDA源与检查结果，不构成 PCB、实物或制造资格。 Netport `bdb539cd08ac77ae` 的 Add into BOM 与 Convert to PCB 均为 false，因此不形成额外采购/PCB实例。
+- 完整 740 脚映射见 [current-pin-net-coverage.json](current-pin-net-coverage.json)，当前版本 SHA256 `0d47680be75332f48788a98e72e00dca4838ff5b93429cc3bb908f16b9730698`，按当前官方 ENET 的 Designator 刷新，并与 live API 逐脚比对为 0 mismatch。全局proof [跨板并料复核.json](../跨板并料复核.json) SHA256 `cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09`，原始API输出ZIP SHA256 `1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb`；本报告和网表均由该当前proof绑定。
+- 层次正确的基线：P1 `56f8f62e…` 已有 **215/710**，其中已经包含 3 路电芯 NTC（6 针）和 4 个裸孔焊线点（4 针）；`56f8…→4d274…` 仅修改 TEXT `58db56e9107cff1e`。当前边界增加 `F_CELL_B1..9`、`F1`、`J_CELL_SERVICE` 共 11 对象/30 针。当前网表还确认 13 个 B9 端点由 `CELL_B9` 改为 `TAP_B9`，其中包括 `D_BAT.2`、`D_BREG.2`、`F_CELL_B9.2` 与服务端 pin10；最终 **226/740**。较早的 700 针不应直接加 30。
+- 当前采购候选 BOM：248 行数据，SHA256 `665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba`；采购状态仍以BOM注明状态为准，不将列入BOM视为实购。11 个 1uF 项目电容 `C_BAL_CELL1..9/C_REG1/C_CAN_VCC2_2` 当前统一为 Samsung `CL10B105KA8NNNC` / C29936；有效偏压容量和硬件表现仍待验证。NTC_CELL1/2/3 列 Semitec 103AT-2 候选料号；9 路外置熔断器/座不增加板上 BOM。当前成本入口为[当前商城成本](../../元件封装库/索引/当前商城成本.md)+冻结BOM；模块内旧“当前主板成本.csv”是旧快照。
 
 ## 单体抽头、保险和板外接口
 
@@ -128,16 +128,16 @@
 | `NTC_CELL1` | A | `BQ_TS1` | `B0` | Semitec 103AT-2 候选，BOM 待询价未购买；TI 18k default byte `0x07` 候选 |
 | `NTC_CELL2` | B | `BQ_DCHG` | `B0` | Semitec 103AT-2 候选，BOM 待询价未购买；TI 18k default byte `0x07` 候选 |
 | `NTC_CELL3` | C | `BQ_CFETOFF` | `B0` | Semitec 103AT-2 候选，BOM 待询价未购买；TI 18k default byte `0x07` 候选 |
-| `NTC_BOARD` | 板内 | `BQ_TS2`/`NTC_BOARD_NODE` | `B0` | 时恒 MF52A103F3950(A1)，R/T 表为 2018-06-04 规格书附表1 P163-6；GPC 输入包已准备，尚未收到系数或目标芯片写入/读回 |
-| `NTC_MOS` | MOSFET | `BQ_TS3` | `B0` | 时恒 MF52A103F3950(A1)，R/T 表为 2018-06-04 规格书附表1 P163-6；GPC 输入包已准备，尚未收到系数或目标芯片写入/读回 |
+| `NTC_BOARD` | 板内 | `BQ_TS2`/`NTC_BOARD_NODE` | `B0` | 时恒 MF52A103F3950(A1)，R/T 表为时恒 P477-4B；P163-6仅作历史资料。GPC 输入包已准备，系数和目标芯片写入/读回仍未完成 |
+| `NTC_MOS` | MOSFET | `BQ_TS3` | `B0` | 时恒 MF52A103F3950(A1)，R/T 表为时恒 P477-4B；P163-6仅作历史资料。GPC 输入包已准备，系数和目标芯片写入/读回仍未完成 |
 
-采购候选 BOM 为 NTC_CELL1/2/3 列出的 Semitec 103AT-2；当前待询价，未视为已采购。原理图旧 Vishay symbol/device/footprint 仅作 CAD 几何载体，`Convert to PCB=false`，两种身份在采购/设计数据中分开标识，不构成采购 MPN 冲突。板外探头、线束、绝缘与热耦合尚未实物验收。A/B/C 外置通道的 TI 18k 默认模型字节 `0x07` 是候选；NTC_BOARD/NTC_MOS 为时恒 MF52A103F3950(A1)，使用厂家 2018-06-04 规格书附表1 P163-6 曲线。A1 的 GPC 输入包已准备，但系数返回未收到，目标 BQ 写入及读回均未完成。raw 格式已确认：DASTATUS6 `0x0076` 中 CFETOFF bytes 12–15、TS1 24–27、TS2 28–31；DASTATUS7 `0x0077` 中 TS3 bytes 0–3、HDQ 4–7、DCHG 8–11，均为 signed 32-bit little-endian counts。候选窗 `250000 < raw < 4700000` 尚未对实际芯片/通道完成阈值资格验证，不能作为已验证固件常量；不要将 0.1 K 温度命令读数混同 raw counts。三外置通道任一开路/短路/读超时/配置读回不符应关闭充放电、预充与均衡并锁定故障；该固件策略未见实现证据。
+采购候选 BOM 为 NTC_CELL1/2/3 列出的 Semitec 103AT-2；当前待询价，未视为已采购。原理图旧 Vishay symbol/device/footprint 仅作 CAD 几何载体，`Convert to PCB=false`，两种身份在采购/设计数据中分开标识，不构成采购 MPN 冲突。板外探头、线束、绝缘与热耦合尚未实物验收。A/B/C 外置通道的 TI 18k 默认模型字节 `0x07` 是候选；NTC_BOARD/NTC_MOS 为时恒 MF52A103F3950(A1)，使用厂家 P477-4B R/T曲线；P163-6只作历史资料。A1 P477-4B 的 GPC 输入包已准备，但系数返回未收到，目标 BQ 写入及读回均未完成。raw 格式已确认：DASTATUS6 `0x0076` 中 CFETOFF bytes 12–15、TS1 24–27、TS2 28–31；DASTATUS7 `0x0077` 中 TS3 bytes 0–3、HDQ 4–7、DCHG 8–11，均为 signed 32-bit little-endian counts。候选窗 `250000 < raw < 4700000` 尚未对实际芯片/通道完成阈值资格验证，不能作为已验证固件常量；不要将 0.1 K 温度命令读数混同 raw counts。三外置通道任一开路/短路/读超时/配置读回不符应关闭充放电、预充与均衡并锁定故障；该固件策略未见实现证据。
 
 ## 优先未闭合项
 
-1. 当前源没有新 DRC/ENET 结果，740 脚映射是分层派生证据；当前官方重开计数和新增边界脚网读回已记录。
+1. 当前源已有官方保存/重开 ENET 与严格 DRC：226/740、0 net/live mismatch、0 error/9 warning groups。警告均需保留审查；此项不是硬件放行。
 2. BQ76952 的 9S 通道、保护阈值、BOTHOFF `0x42` 与三外置热敏 `0x07` 尚未在实物写入/读回；REG1 单独掉电的 DFETOFF 状态没有证明。
-3. 温度配置仍未 commissioned：A/B/C 的 0x07 候选及 TS2/TS3 A1 自定义模型都未在目标器件写入/读回；A1 GPC 输入包已准备但系数未返回。signed-32 LE raw 格式已确认，250000/4700000 counts 仍是未资格化的候选开短窗；BOM 列出的 Semitec 候选 MPN 与旧 Vishay CAD carrier 已明确分离，不是采购冲突；传感器尚待询价。
+3. 温度配置仍未 commissioned：A/B/C 的 0x07 候选及 TS2/TS3 A1 自定义模型都未在目标器件写入/读回；P477-4B GPC输入包已准备但系数未返回。signed-32 LE raw 格式已确认，250000/4700000 counts 仍是未资格化的候选开短窗；BOM 列出的 Semitec 候选 MPN 与旧 Vishay CAD carrier 已明确分离，不是采购冲突；传感器尚待询价。
 4. 每路 5A 抽头保险与 100A 主保险在 37.8V 电池上的切断选择性、低于额定的故障、线束/座/PCB 最弱段 I²t 未闭合。
 5. 预充 2.858 s 是逻辑时间窗，不是全温最大电流清零保证；需物理量测、主接触/允许延迟及异常负载 SOA 通过。
 6. 双板光耦静态角点纸面 margin 约 50.1 µA/11%（单支最差 0.5061 mA 对约 0.4560 mA sink）；VO617A 0–60°C CTR/VCEsat及两块 4.7 kΩ基极负载组合没有全角保证，必须实测。
@@ -168,6 +168,6 @@
 - [Eaton CHPV holder family data](https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/fuses/data-sheets/bus-ele-ds-10430-chcc-chm-chpv.pdf)
 - [Littelfuse JLLN data](https://www.littelfuse.com/assetdocs/jlln-datasheet?assetguid=3a7bc9bf-d932-4401-bdc7-b39f302195cf)
 
-`R_QPRE_PU` 属性通过官方 API 与当前 P1 原文双重核对，未执行任何 native 写入；P1 SHA 起末一致。本轮只更新审查证据文档，没有改 PCB、BOM或全局库，也没有执行中央同步。
+`R_QPRE_PU` 属性与当前正式P1及BOM一致，且由当前官方proof绑定。本次只刷新派生审查入口/JSON/文档，没有改native或BOM、没有改PCB，也没有执行中央库同步；下游PCB及全部实物工作由人类完成。
 
 机器可读完整针网：[current-pin-net-coverage.json](current-pin-net-coverage.json)。报告结构：[BMS全原理图逐针与故障链复核.json](BMS全原理图逐针与故障链复核.json)。

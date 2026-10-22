@@ -4,27 +4,33 @@
   "status": "PARTIAL_PASS_RELEASE_GATES_OPEN",
   "source_binding": {
     "schematic": "电力/水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
-    "schematic_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
-    "enet": "电力/水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动.enet",
-    "enet_sha256": "156f3e1de76dc2400c66ef6fb8ae9e2d8c398c5e5c8bc116c53b8a707de079cb",
+    "schematic_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+    "enet": "水泵驱动模块/检查/当前源/跨板并料_当前.enet",
+    "enet_sha256": "b2aa66cb61232d8a02a069be2b41fe4ac0548d49adf8cf1525515a1a2b69dff9",
     "pdf": "电力/水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动原理图.pdf",
-    "pdf_sha256": "8bd781851334cc6370b934cc5b5c6fbc26c36f56e83c90f0d1a81e3904343354"
+    "pdf_sha256": "8bd781851334cc6370b934cc5b5c6fbc26c36f56e83c90f0d1a81e3904343354",
+    "pdf_status": "Previous PDF from pre-cross-module source; not regenerated and not bound to the final integrated source.",
+    "bom": "水泵驱动模块/原理图准备/BOM.csv",
+    "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+    "design_plan_sha256": "9a36666ca5ceaa9af84c47b522644cfa9e1f06ce080e75147fddaf537116326f",
+    "final_cross_module_proof": "检查/统一审查/跨板并料复核.json",
+    "final_cross_module_proof_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
   },
-  "scope": "只审当前水泵驱动P1原理图、导出的ENET/PDF、BOM、项目连接契约及原厂器件边界；未审PCB铜箔/热设计实物、线束整车，未改元件或网络。",
+  "scope": "Current PUMP P1, official BOM/connection contract and official ENET pin mapping are reviewed. Cross-module integration changed the two 1uF parts and local geometry only; no pin/net changes. PCB thermal design, hardware and vehicle harness are not reviewed.",
   "summary": {
-    "contract_vs_enet": "PASS",
+    "contract_vs_enet": "PASS_OFFICIAL_SAVED_REOPENED",
     "components": 49,
     "pins_compared": 197,
     "pin_mismatches": 0,
     "nc_pins_explicitly_compared": true,
-    "drc": "OPEN_WARN_COUNT_ONLY",
+    "drc": "OPEN_WARNINGS_WITH_DETAILS",
     "actual_pump_operation": "NOT_QUALIFIED",
     "visual_readability": "OPEN_OVERLAPPING_TEXT",
-    "pcb_and_hardware": "NOT_TESTED"
+    "pcb_and_hardware": "HOLD_NOT_TESTED"
   },
   "pin_check_evidence": {
     "report": "检查/网表逐脚核对.json",
-    "status": "PASS",
+    "status": "PASS_FINAL_OFFICIAL_SOURCE",
     "component_count": 49,
     "compared_pin_count": 197,
     "mismatch_count": 0,
@@ -1409,7 +1415,18 @@
         "exported_enet_net": "GND_SYS",
         "status": "PASS"
       }
-    ]
+    ],
+    "current_verification": {
+      "source_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+      "enet_path": "水泵驱动模块/检查/当前源/跨板并料_当前.enet",
+      "enet_sha256": "b2aa66cb61232d8a02a069be2b41fe4ac0548d49adf8cf1525515a1a2b69dff9",
+      "final_proof": "检查/统一审查/跨板并料复核.json",
+      "final_proof_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+      "saved_reopened": true,
+      "session_closed": true,
+      "net_mismatches": [],
+      "live_mismatches": []
+    }
   },
   "critical_device_pin_review": [
     {
@@ -1504,14 +1521,17 @@
     }
   ],
   "drc_status": {
-    "current_source_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
+    "current_source_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
     "current_api_result": 24,
-    "details_status": "PENDING_VERIFICATION",
-    "explanation": "当前交付证据对本源只返回warn=24数量，不含逐项对象/性质；不得由历史告警明细推断当前类别。历史warn=1/GUI类别1属于不同SHA da0caa8b…，中间记录97d9b05e…也非当前e16c343b…。",
-    "source_evidence": "检查/当前交付清单.json、检查/原生DRC.json、检查/DRC明细与处理.json"
+    "details_status": "AVAILABLE_IN_FINAL_PROOF",
+    "explanation": "Strict official DRC returned 0 errors and 24 warning groups. Raw warning objects and primitive IDs are available in the final cross-module proof; warnings remain OPEN.",
+    "source_evidence": "检查/统一审查/跨板并料复核.json",
+    "errors": 0,
+    "warning_groups": 24,
+    "source_evidence_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
   },
   "visual_review": {
-    "status": "OPEN_TEXT_OVERLAP",
+    "status": "PREVIOUS_PDF_REVIEW_NOT_BOUND_TO_FINAL_SOURCE",
     "pdf_size": "单张超宽横向图；整体缩放可读性差，放大分区可辨。",
     "findings": [
       "顶部标题与母线要求文字发生重叠。",
@@ -1520,7 +1540,8 @@
       "控制/保护注释重复；图纸标题栏日期仍为2026-10-18，而原理图源更新为2026-10-21。"
     ],
     "effect": "影响评审和打印可读性；未发现其对应网络错连证据。",
-    "native_fix": "未修复：本轮无已验证的活动EasyEDA API会话/备份与图元精确ID，故未发起任何TEXT变更；原生源保持SHA绑定值。"
+    "native_fix": "未修复：本轮无已验证的活动EasyEDA API会话/备份与图元精确ID，故未发起任何TEXT变更；原生源保持SHA绑定值。",
+    "current_source_pdf_status": "Final integrated source has not been exported to PDF; old overlap observations bind only the prior PDF and should be rechecked from a new PDF before print review."
   },
   "issue_list": [
     {
@@ -1630,5 +1651,113 @@
       "source": "https://www.littelfuse.com/assetdocs/littelfuse-datasheet-997-mini58v?assetguid=838cc4ad-f429-4185-a8e8-ccc70cd2b713",
       "sections": "5A/58VDC fuse time-current and interrupt rating."
     }
-  ]
+  ],
+  "cross_module_1uF_source_screen": {
+    "review_date": "2026-10-22",
+    "status": "SELECTED_IN_CURRENT_SOURCE_BOM_HARDWARE_HOLD",
+    "source_binding": "Official source and BOM are implemented and verified against 检查/统一审查/跨板并料复核.json (SHA256 cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09); P1 e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5, BOM 11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686, connection contract 9a36666ca5ceaa9af84c47b522644cfa9e1f06ce080e75147fddaf537116326f. Saved/closed/reopened with zero net/live mismatches. Hardware effective-C and dynamic qualification remain open.",
+    "target_part": {
+      "manufacturer": "Samsung Electro-Mechanics",
+      "manufacturer_part_number": "CL10B105KA8NNNC",
+      "supplier": "LCSC",
+      "supplier_part_number": "C29936",
+      "value": "1uF",
+      "tolerance": "±10%",
+      "rated_voltage": "25VDC",
+      "temperature_characteristic": "X7R, -55..+125°C",
+      "package": "0603 / C0603"
+    },
+    "pump_refs": [
+      "C_DRV_DVDD",
+      "C_DRV_VCP"
+    ],
+    "quantity": 2,
+    "official_sources": [
+      {
+        "part": "CL10B105KA8NNNC",
+        "url": "https://product.samsungsem.com/cn/mlcc/CL10B105KA8NNN.do",
+        "manufacturer_status": "Mass Production",
+        "properties": "1.0uF, ±10%, 25VDC, X7R (-55..+125°C), 0603 (1.60×0.80×0.80mm); suffix C is listed as an available package code.",
+        "dc_bias_plot_condition": "LCR meter, 1kHz, 1Vrms",
+        "data_qualification": "Manufacturer states plotted values are typical and for design reference only."
+      },
+      {
+        "part": "C1608X7R1C105K080AC",
+        "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+        "curve_pdf": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c1608x7r1c105k080ac.pdf",
+        "properties": "1uF, ±10%, 16VDC, X7R (-55..+125°C), 0603; product status Production.",
+        "qualification": "Manufacturer curve is a typical/reference curve, not a guaranteed minimum-effective-capacitance limit."
+      }
+    ],
+    "typical_dc_bias_visual_screen": {
+      "method": "Approximate visual reading from the public Samsung manufacturer graph and TDK manufacturer graph for the exact parts; no CSV or tabulated point export was obtained.",
+      "reading_uncertainty_uF": 0.05,
+      "points": [
+        {
+          "voltage_v": 5,
+          "samsung_typical_uF_approx": 0.9,
+          "tdk_typical_uF_approx": 0.85
+        },
+        {
+          "voltage_v": 10,
+          "samsung_typical_uF_approx": 0.75,
+          "tdk_typical_uF_approx": 0.5
+        },
+        {
+          "voltage_v": 12,
+          "samsung_typical_uF_approx": 0.65,
+          "tdk_typical_uF_approx": 0.4
+        }
+      ],
+      "interpretation": "The typical curves visually suggest approximately 0.25..0.30uF more per part at 10..12V for Samsung versus the current TDK 16V capacitor. This is a screening estimate only; do not claim a guaranteed effective-C, ripple, lifetime, or transient improvement.",
+      "application_boundary": "Pump C_DRV_VCP is across DRV_VCP and BUS_M, and C_DRV_DVDD is on DRV_DVDD to GND_SYS. The VCP node is the more DC-biased position; the actual differential bias/ripple must be confirmed from operating waveforms."
+    },
+    "qualification_open": [
+      "Minimum effective capacitance under actual DRV8262 VCP/DVDD DC bias, AC ripple and temperature.",
+      "Transient response and ripple-current heating on the actual PCB and pump load.",
+      "Confirm actual bias, ripple and transient performance; Samsung curves are typical screening only and do not provide a minimum capacitance guarantee."
+    ],
+    "final_source_proof": {
+      "path": "检查/统一审查/跨板并料复核.json",
+      "sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+      "native_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+      "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+      "plan_sha256": "9a36666ca5ceaa9af84c47b522644cfa9e1f06ce080e75147fddaf537116326f",
+      "official_enet_path": "水泵驱动模块/检查/当前源/跨板并料_当前.enet",
+      "official_enet_sha256": "b2aa66cb61232d8a02a069be2b41fe4ac0548d49adf8cf1525515a1a2b69dff9",
+      "component_count": 49,
+      "pin_count": 197,
+      "saved_reopened": true,
+      "session_closed": true,
+      "net_mismatches": [],
+      "live_mismatches": [],
+      "drc_errors": 0,
+      "drc_warning_groups": 24
+    },
+    "actual_module_quantities": {
+      "BMS": 11,
+      "FOC_A_and_B": 10,
+      "PUMP": 2,
+      "vehicle_total": 23
+    },
+    "actual_in_current_bom": true
+  },
+  "final_source_verification": {
+    "path": "检查/统一审查/跨板并料复核.json",
+    "sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "native_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+    "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+    "plan_sha256": "9a36666ca5ceaa9af84c47b522644cfa9e1f06ce080e75147fddaf537116326f",
+    "official_enet_path": "水泵驱动模块/检查/当前源/跨板并料_当前.enet",
+    "official_enet_sha256": "b2aa66cb61232d8a02a069be2b41fe4ac0548d49adf8cf1525515a1a2b69dff9",
+    "component_count": 49,
+    "pin_count": 197,
+    "saved_reopened": true,
+    "session_closed": true,
+    "net_mismatches": [],
+    "live_mismatches": [],
+    "drc_errors": 0,
+    "drc_warning_groups": 24,
+    "cross_module_1uF_vehicle_quantity": 23
+  }
 }

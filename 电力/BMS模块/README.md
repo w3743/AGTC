@@ -1,20 +1,24 @@
 # 9S4P BMS
 
-当前工程：[BMS-9S4P.eprj3](BMS-9S4P.eprj3)，必须与同目录`sch/`配套保留。交付仅使用EPRJ3，不新增其它CAD导出格式。
+**当前责任边界与成本约束（2026-10-22）：**原理图、器件选择、接口合同和原理级计算由当前自动化审查维护；原理图之后的全部工作，包括PCB、封装/布局布线、制造、打样、装配、固件、台架和整车验证，均由人类完成。全电力系统以最低总成本取得最好性价比；BMS约200元板内目标尚未证明，列入BOM不代表已采购。
 
-当前正式P1 SHA256为 `56f8f62e754d1e4af8f068bdc7b19c37dfa4788101cdb2852dc2f2254db41e8f`；EPRJ3 SHA256为 `fd5caba1dd80d61fcbfa895b93fd6c647de7378443d248db7c3e99f283369a6d`。官方会话已打开根EPRJ3/P1，但本轮同源DRC/ENET调用未返回，故不引用旧DRC作当前PASS。此前官方电气基线加后续精确文本差分可派生215位号/710针和原700针映射不变；不是当前同源官方网表复读。采购BOM SHA256 `6690cb1b5c26e6872f827f07592ff63aacc61b4541f53a3fccbc867b65ae0f3b`，248项数据行。三路板外探头为Semitec `103AT-2`（原有三颗采购输入，换料号未增加数量）；采购报价未知，200元目标仍未证明。四个裸孔载体DNP且不进BOM；未构成PCB或实物验收。
+当前根工程：[BMS-9S4P.eprj3](BMS-9S4P.eprj3)，与同目录 `sch/` 配套。P1 SHA256 `bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e`；EPRJ3 SHA256 `4de6f6a845074505476aeec2e3dc4d57c0643c259daa0e84f4aa3d01a47b4805`；采购候选BOM SHA256 `665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba`（248行）。全局当前证明 [跨板并料复核.json](../检查/统一审查/跨板并料复核.json) SHA256 `cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09`，当前官方 ENET SHA256 `537caa4389b5fae40fe5508d4ae1c194f69ed53982c99c0fb8fe04959f53c6eb`，原始API输出ZIP SHA256 `1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb`。
 
-本轮BMS闭合继续以正式P1 `56f8f62e…41e8f`、248行BOM和连接合同为纸面输入。原理图接口已将三路板外电芯探头选为Semitec `103AT-2`，并把QPRE源栅上拉改成项目复用的0603 4.7kΩ；详细配置/计算见[温度保护配置](检查/温度保护配置闭合.md)、[预充Layout闭合](检查/预充Layout闭合.md)、[PSU支路闭合](检查/PSU支路闭合.md)和[控制与接口设计](原理图准备/控制与接口设计.md)。同源DRC/ENET本轮调用未返回，不冒称PASS；现有PCB尚未按该原理图接口更新，layoutEntry=HOLD、manufacturingRelease=HOLD。光耦全温驱动、PSU故障分断、AFE温度写入/读回与物理资格仍开放。
+官方保存后关闭会话、根工程重开、ENET/live API读回已完成：226位号、740针，逐针网名0差异；严格DRC为0错误、9组warning（8组 `SHOWDANDLING`、1组 `ATTRMATCHCODE`）。该结果仅绑定当前EDA源，不是PCB或硬件资格结论。完整入口见[当前设计状态](检查/当前设计状态.md)、[当前源快照](../检查/统一审查/BMS/current-official-snapshot.json)、[740针覆盖](../检查/统一审查/BMS/current-pin-net-coverage.json)和[全原理图故障链复核](../检查/统一审查/BMS/BMS全原理图逐针与故障链复核.md)。
+
+基线说明：validated 215/710源已包含之前的3颗电芯NTC共6针与4个裸孔共4针。当前边界增加11对象/30针；13个B9端点由 `CELL_B9` 改接 `TAP_B9`，使源端保险在分流前有效。不要用旧700针直接加30解释740。 Netport `bdb539cd08ac77ae` 位于 `TAP_B9`，Add into BOM=false、Convert to PCB=false，不计采购/PCB实例。
+
+温度候选：板外 `NTC_CELL1/2/3` 为Semitec `103AT-2`；旧Vishay symbol/device/footprint只作 `Convert to PCB=false` 的CAD几何载体。板内 `NTC_BOARD/NTC_MOS` 为时恒 `MF52A103F3950(A1)`，采用厂家 P477-4B R/T表；P163-6为历史。GPC输入已准备，系数未返回，BQ写入/读回与传感器热耦合和温度故障测试未完成。RAW格式为signed 32-bit little-endian counts；250000/4700000开短窗只是未资格化候选值。
+
+当前11颗1uF电容 `C_BAL_CELL1..9/C_REG1/C_CAN_VCC2_2` 统一使用Samsung `CL10B105KA8NNNC` / LCSC `C29936`。偏压有效容量和硬件效果仍待验证。当前成本以[冻结BOM](原理图准备/BOM.csv)及[元件封装库当前商城成本](../元件封装库/索引/当前商城成本.md)为准；[当前主板成本.csv](检查/当前主板成本.csv)是旧本地快照，不是现行成本入口。
 
 | 内容 | 入口 |
 |---|---|
 | 当前要求与待办 | [项目要求](项目要求.md) · [TODO](TODO.md) |
-| 当前状态与证据 | [设计状态](检查/当前设计状态.md) · [DRC修复结论](检查/DRC修复结论.md) · [局部连线](检查/局部连线/结论.md) · [当前发布](检查/Layout验证/当前发布.json) |
-| 原理图设计输入 | [原理图准备](原理图准备/) · [BOM](原理图准备/BOM.csv) |
-| Layout与接口约束 | [Layout交接](原理图准备/Layout交接.md) |
+| 当前状态与证据 | [设计状态](检查/当前设计状态.md) · [全图逐针/故障链报告](../检查/统一审查/BMS/BMS全原理图逐针与故障链复核.md) · [温度保护配置](检查/温度保护配置闭合.md) |
+| 原理图设计输入 | [原理图准备](原理图准备/) · [当前采购候选BOM](原理图准备/BOM.csv) |
+| Layout与接口交接 | [Layout交接](原理图准备/Layout交接.md) |
 | 当前计算与模型 | [结果索引](仿真/结果/README.md) · [源码](仿真/源码/) · [输入](仿真/输入/) |
 | 历史恢复 | [历史与调试.zip](归档/历史与调试.zip) · [本轮整理记录](../归档/目录整理.json) |
 
-BMS仅经CAN上传温度，独立冷却板自行控制；板上无风扇供电、驱动或测速。5V使用海凌科URB4805YMD-10WR3，输入取保险下游TAP_B9。电池净充电16A为上界，资格不足时CCL=0；30W太阳能由独立MPPT接母线，超额回馈由超容双向DC/DC承接，整车回馈能力仍待资格验证。PSU故障分断、预充实体关断等开放项继续保留。
-
-目录按[电力工程约定](../README.md)维护；当前证据和可复现模型保留，旧风扇/旧方案测试和过程副本收入历史ZIP。PCB布局布线与固件由人类完成。
+BMS仅经CAN上传温度，独立冷却板自行控制；板上无风扇供电、驱动或测速。5V使用海凌科URB4805YMD-10WR3，输入从保险下游TAP_B9取得。AFE设置、预充硬截止、光耦全温余量、低压保险清除配合、热耦合与整车回馈均未完成硬件资格验证。当前设计保持HOLD。

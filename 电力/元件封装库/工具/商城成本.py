@@ -6,7 +6,8 @@ Default: write 索引/商城成本.json and 索引/当前商城成本.md.
 
 This tool never reads old BOM prices as quotes, never treats a CAD carrier as a purchase item,
 and only joins a price when the verified quote's exact manufacturer part, manufacturer, and
-LCSC code match the current procurement identity.
+LCSC code match the current procurement identity. MOQ is taken only from an explicitly observed
+minimum-order field; it is never inferred from the first price tier or a reel/package quantity.
 """
 from __future__ import annotations
 
@@ -898,6 +899,11 @@ def tier_price(obs: dict[str, Any], quantity: int) -> Decimal | None:
 def choose_purchase_lot(obs: dict[str, Any], required_qty: int) -> dict[str, Any]:
     moq = as_int(obs.get("moq"), default=0) if obs.get("moq") is not None else None
     multiple = as_int(obs.get("order_multiple"), default=0) if obs.get("order_multiple") is not None else None
+    if moq is not None and moq < 1:
+        moq = None
+    if multiple is not None and multiple < 1:
+        multiple = None
+    moq_basis = obs.get("moq_basis") or ("recorded_quote_field" if moq is not None else "unknown_not_inferred_from_tiers_or_packaging")
     floor = max(required_qty, moq or 1)
     purchase_qty = round_up_multiple(floor, multiple)
     unit = tier_price(obs, purchase_qty)
@@ -920,6 +926,9 @@ def choose_purchase_lot(obs: dict[str, Any], required_qty: int) -> dict[str, Any
             "tier_min_quantity": None,
             "overbuy_quantity": None,
             "status": "no_price_tier_covers_required_or_MOQ_quantity",
+            "moq": moq,
+            "moq_basis": moq_basis,
+            "moq_known": moq is not None,
             "order_multiple_known": multiple is not None,
         }
     q = purchase_qty
@@ -939,15 +948,25 @@ def choose_purchase_lot(obs: dict[str, Any], required_qty: int) -> dict[str, Any
         stock_status = "shortage" if stock < q else "sufficient_at_observation"
     else:
         stock_status = "unknown"
+    if moq is None and multiple is None:
+        lot_status = "MOQ_and_order_multiple_unknown_cost_assumes_required_quantity"
+    elif moq is None:
+        lot_status = "MOQ_unknown_cost_assumes_required_quantity"
+    elif multiple is None:
+        lot_status = "order_multiple_unknown_assumed_piece_quantity"
+    else:
+        lot_status = "ok"
     return {
         "cash_cost_at_required_order_lot_cny": cash,
         "purchase_quantity": q,
         "unit_price_cny": unit,
         "tier_min_quantity": tier_min,
         "overbuy_quantity": q - required_qty,
-        "status": "ok" if multiple is not None else "order_multiple_unknown_assumed_piece_quantity",
+        "status": lot_status,
         "order_multiple_known": multiple is not None,
         "moq": moq,
+        "moq_basis": moq_basis,
+        "moq_known": moq is not None,
         "order_multiple": multiple,
         "stock_status": stock_status,
         "stock_quantity": stock,
@@ -1109,7 +1128,7 @@ def scenario_result(
         x["manufacturer_part"] and x["manufacturer"] and x["supplier_part"] and x["quantity_required"] > 0
         for x in sku_rows
     )
-    all_cash_constraints_known = all((x.get("purchase") or {}).get("order_multiple_known", False) and (x.get("purchase") or {}).get("moq") is not None for x in sku_rows if x["quote_match_status"] == "verified_exact_quote")
+    all_cash_constraints_known = all((x.get("purchase") or {}).get("order_multiple_known", False) and (x.get("purchase") or {}).get("moq_known", False) for x in sku_rows if x["quote_match_status"] == "verified_exact_quote")
     quoted_overbuy_qty = sum(as_int((x.get("purchase") or {}).get("overbuy_quantity", 0)) for x in sku_rows if x["quote_match_status"] == "verified_exact_quote")
     complete_total = known_installed if all_priced and all_quantity_identity_known else None
     complete_cash = known_cash if all_priced and all_quantity_identity_known and all_cash_constraints_known and not any(x["stock_shortage"] for x in sku_rows) else None

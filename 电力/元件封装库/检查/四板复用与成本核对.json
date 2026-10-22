@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "title": "四板复用与成本边界核对",
-  "generated_date": "2026-10-21",
+  "generated_date": "2026-10-22",
   "status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES_ELECTRICAL_AND_FULL_COST_OPEN",
   "global_optimization_rule": {
     "scope": "全电力系统",
@@ -16,14 +16,31 @@
     "previous_500_cny_supercapacitor_cap": "cancelled",
     "supercapacitor": {
       "required_mpn": "SC0350-270-RSS",
-      "max_cells": 16,
+      "max_cells": 8,
       "current_regulator_bom_cells": 8,
       "previous_40_cell_candidate": "excluded",
       "screened_model_candidates": {
-        "8S2P_low_voltage_window_800W_bidirectional": "model_candidate_only",
-        "1000W_directional": "model_candidate_only",
+        "8S2P_low_voltage_window_800W_bidirectional": "cancelled_obsolete_historical",
+        "1000W_directional": "cancelled_obsolete_historical",
+        "active_candidate": false,
         "transfer_to_current_bom_quantity": false,
-        "note": "Both are simulation-screen candidates under stated assumptions; they do not change the sourced BOM quantity or establish a hardware rating."
+        "note": "用户最新决定固定现有8颗，仅作启动瞬态功率辅助；16颗扩容及其模型候选已取消，不进入当前用量/成本。历史仿真结果仍留在原仿真位置。"
+      },
+      "candidate_total_count": null,
+      "candidate_added_count": 0,
+      "candidate_is_current": false,
+      "candidate_status": "cancelled_obsolete",
+      "historical_cancelled_candidate_total_count": 16,
+      "historical_cancelled_candidate_added_count": 8,
+      "quantity_rule": "用户最新决定仅保留现有8颗；有效总量上限8，当前增量0。历史16颗扩容方案已取消/作废，不是有效候选且不计入成本。",
+      "use_case": "startup_transient_power_assist",
+      "sustained_1s_requirement": false,
+      "duration_s": null,
+      "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+      "reference_power_w": {
+        "min": 800,
+        "max": 1000,
+        "status": "unverified_design_reference_only"
       }
     },
     "budget_interpretation": "未设统一整车总额；不取消模块独立成本目标。仅稳压旧500元硬上限取消，BMS板内约200元目标保留。",
@@ -35,18 +52,18 @@
   "snapshot": {
     "central_native_index": {
       "path": "元件封装库/索引/元件总表.json",
-      "sha256": "415d7933ff885105c5ea5ace8155a3a873720cec1324f64060f4d1731f5c3496",
-      "generated_at_utc": "2026-10-21T03:45:00+00:00",
+      "sha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
+      "generated_at_utc": "2026-10-21T18:47:05+00:00",
       "summary": {
         "module_count": 4,
-        "bom_instance_count": 579,
-        "part_count": 203,
+        "bom_instance_count": 580,
+        "part_count": 201,
         "shared_model_count": 17,
         "mpn_same_cross_board_manufacturer_mismatch_count": 8,
-        "excluded_non_bom_count": 2630,
+        "excluded_non_bom_count": 2655,
         "missing_mpn_count": 5,
         "missing_manufacturer_count": 28,
-        "mpn_diff_count": 77,
+        "mpn_diff_count": 79,
         "mpn_changed_with_value_inherited_count": 0,
         "mpn_changed_without_actual_value_count": 0,
         "missing_device_binding_count": 0,
@@ -60,12 +77,12 @@
     },
     "procurement_index": {
       "path": "元件封装库/索引/采购补充.json",
-      "sha256": "4a22a1552c0a4bacb081bdcc473f7f7b0deef962c28f0ec1b4690c0fc8d753aa",
-      "generated_at": "2026-10-21T03:45:01.820564+00:00",
+      "sha256": "03b12a923fd2049e572e3ce225d27caf864ea3510387cecb1ff94d0c1fdabe07",
+      "generated_at": "2026-10-21T18:47:06.590269+00:00",
       "summary": {
-        "bom_rows": 566,
+        "bom_rows": 567,
         "relations": {
-          "原生已有，采购行关联，不重复计件": 514,
+          "原生已有，采购行关联，不重复计件": 515,
           "BOM独有条目，未在原生BOM中登记": 52
         }
       }
@@ -79,7 +96,7 @@
         "bom_rows": 248,
         "bom_reference_occurrences": 248,
         "unique_bom_references": 248,
-        "bom_sha256": "a1ccd3260a3bfb2a36113a3019f60c041697996ad1dba9e0fee65005cd1456b0",
+        "bom_sha256": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba",
         "vehicle_reference_occurrences": 248,
         "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
         "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
@@ -94,7 +111,7 @@
         "bom_rows": 91,
         "bom_reference_occurrences": 156,
         "unique_bom_references": 156,
-        "bom_sha256": "7a6788f96e9e82a276ced672c02da30bb3509b3eeb92c1b8cbb80e8005d8ab43",
+        "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
         "vehicle_reference_occurrences": 312,
         "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
         "bom_basis": "本轮官方CAD导出",
@@ -121,11 +138,11 @@
         "vehicle_board_multiplicity": 1,
         "bom_path": "稳压模块/原理图准备/BOM.csv",
         "format": "regulator",
-        "bom_rows": 168,
-        "bom_reference_occurrences": 168,
-        "unique_bom_references": 168,
-        "bom_sha256": "5eb712d38f48b24ec8a799cadc06f9b62a36ecd181956c031763c3ecb1b6c562",
-        "vehicle_reference_occurrences": 168,
+        "bom_rows": 169,
+        "bom_reference_occurrences": 169,
+        "unique_bom_references": 169,
+        "bom_sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+        "vehicle_reference_occurrences": 169,
         "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
         "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
         "matches_current_procurement_index": true,
@@ -139,7 +156,7 @@
         "bom_rows": 37,
         "bom_reference_occurrences": 58,
         "unique_bom_references": 58,
-        "bom_sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117",
+        "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
         "vehicle_reference_occurrences": 58,
         "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
         "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
@@ -151,68 +168,68 @@
       {
         "module": "BMS模块",
         "path": "BMS模块/sch/Schematic1/P1.esch2",
-        "index_sha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef",
-        "current_sha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef",
+        "index_sha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
+        "current_sha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
         "matches": true,
         "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
       },
       {
         "module": "FOC驱动模块",
         "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
-        "index_sha256": "1b0236c2760177bbe8619cc8fabb9257e040224d713285b8932b6c40d5a345f1",
-        "current_sha256": "1b0236c2760177bbe8619cc8fabb9257e040224d713285b8932b6c40d5a345f1",
+        "index_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+        "current_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
         "matches": true,
         "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
       },
       {
         "module": "稳压模块",
         "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
-        "index_sha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
-        "current_sha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
+        "index_sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+        "current_sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
         "matches": true,
         "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
       },
       {
         "module": "水泵驱动模块",
         "path": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
-        "index_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
-        "current_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
+        "index_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+        "current_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
         "matches": true,
         "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
       }
     ],
     "final_library_check": {
       "path": "检查/统一审查/全库同步与只读校验.json",
-      "sha256": "0136e45cf7daa2110cceae2c2f6d13167f8271e072a586eee24fadf1d47e4dde",
+      "sha256": "55769ed1631cf9513a1c037ca15d60bbaea2e6897d0074269cc7d09aeedc7b92",
       "status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
       "reported_status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
       "matches_current_index_artifacts": true
     },
-    "note": "4类原生、5个采购CSV来源；575是每模块单套原生BOM实例，非全车实装量。采购关联不重复加原生件；FOC装配覆盖另见下项。 本次机械快照与当前中央索引/同步证明绑定；索引缺失、源SHA不匹配或同步证明过期时明确标为STALE；价格未刷新。",
+    "note": "4类当前原生源、5个采购CSV来源；580是按各模块单板/单套口径统计的原生BOM实例总数，非全车实装量。采购行关联不重复加入原生实例；FOC装配采购补充及整车数量口径分别见snapshot.module_boms与board_scope。 本次机械快照与当前中央索引/同步证明绑定；索引缺失、源SHA不匹配或同步证明过期时明确标为STALE；价格未刷新。",
     "local_source_refresh": {
-      "as_of": "2026-10-21",
+      "as_of": "2026-10-22",
       "coverage_path": "检查/统一审查/全部原理图检查覆盖.json",
-      "coverage_sha256": "7bf940b9336e6223a844f39a8534b48e76858c0959970ab4157e2a49f54bab66",
+      "coverage_sha256": "b25fc2e999355a59d5662c60c7244b0bf1ee7311aa6c31d6d08a2b052c15fe0b",
       "central_sync_run_by_this_script": false,
       "central_index_status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES",
       "index_path": "元件封装库/索引/元件总表.json",
-      "index_sha256": "415d7933ff885105c5ea5ace8155a3a873720cec1324f64060f4d1731f5c3496",
+      "index_sha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
       "procurement_index_path": "元件封装库/索引/采购补充.json",
-      "procurement_index_sha256": "4a22a1552c0a4bacb081bdcc473f7f7b0deef962c28f0ec1b4690c0fc8d753aa",
-      "sync_proof_sha256": "0136e45cf7daa2110cceae2c2f6d13167f8271e072a586eee24fadf1d47e4dde",
+      "procurement_index_sha256": "03b12a923fd2049e572e3ce225d27caf864ea3510387cecb1ff94d0c1fdabe07",
+      "sync_proof_sha256": "55769ed1631cf9513a1c037ca15d60bbaea2e6897d0074269cc7d09aeedc7b92",
       "pages_different_from_current_index": [],
       "bom_sources_different_from_current_procurement_index": [],
       "sync_proof_matches_current_index_artifacts": true,
       "current_index_summary": {
         "module_count": 4,
-        "bom_instance_count": 579,
-        "part_count": 203,
+        "bom_instance_count": 580,
+        "part_count": 201,
         "shared_model_count": 17,
         "mpn_same_cross_board_manufacturer_mismatch_count": 8,
-        "excluded_non_bom_count": 2630,
+        "excluded_non_bom_count": 2655,
         "missing_mpn_count": 5,
         "missing_manufacturer_count": 28,
-        "mpn_diff_count": 77,
+        "mpn_diff_count": 79,
         "mpn_changed_with_value_inherited_count": 0,
         "mpn_changed_without_actual_value_count": 0,
         "missing_device_binding_count": 0,
@@ -222,14 +239,76 @@
       "prices_recalculated": false,
       "note": "本次仅读取当前源及真实中央索引/同步证明重算路径、SHA、BOM和索引派生统计；未运行中央同步或刷新价格。"
     },
-    "final_library_check_status_note": "final_library_check仅在同步证明索引SHA、采购索引SHA、来源配置SHA与现存文件一致且源SHA相符时视为当前PASS；本脚本不运行同步或--check。"
+    "final_library_check_status_note": "final_library_check仅在同步证明索引SHA、采购索引SHA、来源配置SHA与现存文件一致且源SHA相符时视为当前PASS；本脚本不运行同步或--check。",
+    "vehicle_supplement": {
+      "path": "元件封装库/整车器件补充.json",
+      "sha256": "62286305a709a34cfb71328e0b0fc40e1f788bfef62f628bd20a7ebfd49931a3",
+      "project_constraints": {
+        "vehicle_cost_policy": {
+          "applies_to_all_modules": true,
+          "priority": "优先复用已满足要求的精确器件，减少不同型号并比较可核验的总采购成本；缺报价保留null，不宣称未证实降本。",
+          "source_ids": [
+            "vehicle_project_constraints"
+          ]
+        },
+        "regulator_supercapacitor": {
+          "manufacturer": "LICAP Technologies",
+          "fixed_manufacturer_part": "SC0350-270-RSS",
+          "total_count_max": 8,
+          "native_current_count": 8,
+          "candidate_total_count": null,
+          "candidate_added_count": 0,
+          "candidate_is_current": false,
+          "legacy_budget_cny": 500,
+          "legacy_budget_status": "cancelled_not_a_current_limit",
+          "source_ids": [
+            "vehicle_project_constraints"
+          ],
+          "candidate_status": "cancelled_obsolete",
+          "historical_cancelled_candidate_total_count": 16,
+          "historical_cancelled_candidate_added_count": 8,
+          "quantity_rule": "用户最新决定仅保留现有8颗；有效总量上限8，当前增量0。历史16颗扩容方案已取消/作废，不是有效候选且不计入成本。",
+          "use_case": "startup_transient_power_assist",
+          "sustained_1s_requirement": false,
+          "duration_s": null,
+          "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+          "reference_power_w": {
+            "min": 800,
+            "max": 1000,
+            "status": "unverified_design_reference_only"
+          }
+        },
+        "bms_cost_target": {
+          "target_cny": 200,
+          "scope": "BMS board-mounted parts only; external MCU and off-board accessories are excluded and reported separately.",
+          "status": "not_proven",
+          "source_ids": [
+            "bms_board_budget"
+          ]
+        },
+        "post_schematic_human_scope": {
+          "owner": "human",
+          "items": [
+            "PCB design and layout",
+            "fabrication and manufacturing handoff",
+            "prototyping",
+            "assembly",
+            "firmware implementation",
+            "physical testing and qualification"
+          ],
+          "source_ids": [
+            "vehicle_project_constraints"
+          ]
+        }
+      }
+    }
   },
   "board_scope": {
     "BMS模块": {
       "vehicle_multiplicity": 1,
-      "native_component_primitives": 1420,
+      "native_component_primitives": 1431,
       "native_bom_instances": 209,
-      "excluded_non_bom_instances": 1211,
+      "excluded_non_bom_instances": 1222,
       "pcb_counts": {
         "yes": 206,
         "no": 3,
@@ -246,7 +325,7 @@
           "bom_rows": 248,
           "bom_reference_occurrences": 248,
           "unique_bom_references": 248,
-          "bom_sha256": "a1ccd3260a3bfb2a36113a3019f60c041697996ad1dba9e0fee65005cd1456b0",
+          "bom_sha256": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba",
           "vehicle_reference_occurrences": 248,
           "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
           "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
@@ -257,9 +336,9 @@
     },
     "FOC驱动模块": {
       "vehicle_multiplicity": 2,
-      "native_component_primitives": 337,
+      "native_component_primitives": 344,
       "native_bom_instances": 156,
-      "excluded_non_bom_instances": 181,
+      "excluded_non_bom_instances": 188,
       "pcb_counts": {
         "yes": 148,
         "no": 8,
@@ -276,7 +355,7 @@
           "bom_rows": 91,
           "bom_reference_occurrences": 156,
           "unique_bom_references": 156,
-          "bom_sha256": "7a6788f96e9e82a276ced672c02da30bb3509b3eeb92c1b8cbb80e8005d8ab43",
+          "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
           "vehicle_reference_occurrences": 312,
           "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
           "bom_basis": "本轮官方CAD导出",
@@ -302,15 +381,15 @@
     },
     "稳压模块": {
       "vehicle_multiplicity": 1,
-      "native_component_primitives": 729,
-      "native_bom_instances": 165,
-      "excluded_non_bom_instances": 564,
+      "native_component_primitives": 735,
+      "native_bom_instances": 166,
+      "excluded_non_bom_instances": 569,
       "pcb_counts": {
-        "yes": 156,
+        "yes": 157,
         "no": 9,
         "unknown": 0
       },
-      "procurement_records": 168,
+      "procurement_records": 169,
       "procurement_only_records": 3,
       "procurement_sources": [
         {
@@ -318,11 +397,11 @@
           "vehicle_board_multiplicity": 1,
           "bom_path": "稳压模块/原理图准备/BOM.csv",
           "format": "regulator",
-          "bom_rows": 168,
-          "bom_reference_occurrences": 168,
-          "unique_bom_references": 168,
-          "bom_sha256": "5eb712d38f48b24ec8a799cadc06f9b62a36ecd181956c031763c3ecb1b6c562",
-          "vehicle_reference_occurrences": 168,
+          "bom_rows": 169,
+          "bom_reference_occurrences": 169,
+          "unique_bom_references": 169,
+          "bom_sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+          "vehicle_reference_occurrences": 169,
           "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
           "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
           "matches_current_procurement_index": true,
@@ -332,9 +411,9 @@
     },
     "水泵驱动模块": {
       "vehicle_multiplicity": 1,
-      "native_component_primitives": 723,
+      "native_component_primitives": 725,
       "native_bom_instances": 49,
-      "excluded_non_bom_instances": 674,
+      "excluded_non_bom_instances": 676,
       "pcb_counts": {
         "yes": 49,
         "no": 0,
@@ -351,7 +430,7 @@
           "bom_rows": 37,
           "bom_reference_occurrences": 58,
           "unique_bom_references": 58,
-          "bom_sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117",
+          "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
           "vehicle_reference_occurrences": 58,
           "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
           "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
@@ -502,15 +581,16 @@
       "carrier_mpn_diff_instances": 0
     },
     {
-      "mpn": "C1608X7R1C105K080AC",
-      "manufacturer": "TDK",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
       "modules": [
+        "BMS模块",
         "FOC驱动模块",
         "水泵驱动模块"
       ],
-      "indexed_instance_count": 7,
-      "device_asset_variants": 2,
-      "footprint_asset_variants": 2,
+      "indexed_instance_count": 18,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
       "carrier_mpn_diff_instances": 0
     },
     {
@@ -578,12 +658,13 @@
       "manufacturer": "时恒",
       "modules": [
         "BMS模块",
+        "稳压模块",
         "水泵驱动模块"
       ],
-      "indexed_instance_count": 3,
-      "device_asset_variants": 2,
-      "footprint_asset_variants": 2,
-      "carrier_mpn_diff_instances": 3
+      "indexed_instance_count": 5,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 5
     }
   ],
   "same_mpn_manufacturer_mismatch_groups_from_index_snapshot": [
@@ -956,7 +1037,7 @@
     }
   ],
   "carrier_identity": {
-    "mpn_diff_instances": 77,
+    "mpn_diff_instances": 79,
     "rule": "采购目标与CAD载体分开；不据载体下单或自动合并。"
   },
   "low_change_reuse_candidates": [
@@ -982,14 +1063,18 @@
       "boundary": "Separate CAD identities remain; device/footprint verification per board."
     },
     {
-      "mpn": "C1608X7R1C105K080AC",
+      "mpn": "CL10B105KA8NNNC",
       "boards": [
+        "BMS模块",
         "FOC驱动模块",
         "水泵驱动模块"
       ],
-      "indexed_instances": 7,
-      "change": "Retain exact TDK MPN across existing decoupling positions; no circuit substitution.",
-      "boundary": "Two footprint/device asset variants; verify DC-bias/voltage and keep local land patterns."
+      "indexed_instances": 18,
+      "change": "原三种1uF型号已并为Samsung 1uF±10%25V X7R0603；BMS11、FOC每板5×2、水泵2。",
+      "boundary": "按工作节点核对；厂家DC-bias仅典型值，纹波/有效容量/瞬态仍待人类验证；当前商城无现货，不能保证交期。",
+      "supplier_part": "C29936",
+      "vehicle_quantity": 23,
+      "status": "IMPLEMENTED_SAVED_REOPENED_VERIFIED_HARDWARE_HOLD"
     },
     {
       "mpn": "B3B-XH-A(LF)(SN)",
@@ -1114,7 +1199,7 @@
       },
       {
         "module": "稳压模块",
-        "procurement_record_count": 168,
+        "procurement_record_count": 169,
         "current_full_price_complete": false,
         "quote_status": "BMS少量旧报价保留为历史，其余未取得全套现行到手价"
       },
@@ -1562,7 +1647,7 @@
             "mpn": "",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 158,
+            "row": 159,
             "notes": "2-pin external 5V interface, exact connector pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"2-pin external 5V interface, exact connector pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=2-pin external 5V interface, exact connector pending; placement=ON_BOARD_PACKAGE_PENDING"
           }
         ]
@@ -1583,7 +1668,7 @@
             "mpn": "",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 159,
+            "row": 160,
             "notes": "High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
           }
         ]
@@ -1604,7 +1689,7 @@
             "mpn": "",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 160,
+            "row": 161,
             "notes": "External resistor interface; high-current stud/connector footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"External resistor interface; high-current stud/connector footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=External resistor interface; high-current stud/connector footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
           }
         ]
@@ -1625,7 +1710,7 @@
             "mpn": "",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 161,
+            "row": 162,
             "notes": "High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
           }
         ]
@@ -1645,7 +1730,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 146,
+            "row": 147,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1665,7 +1750,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 147,
+            "row": 148,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1685,7 +1770,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 148,
+            "row": 149,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1705,7 +1790,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 149,
+            "row": 150,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1725,7 +1810,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 150,
+            "row": 151,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1745,7 +1830,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 151,
+            "row": 152,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1765,7 +1850,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 152,
+            "row": 153,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1785,7 +1870,7 @@
             "mpn": "BW6101-C1AP",
             "manufacturer": "",
             "source": "稳压模块/原理图准备/BOM.csv",
-            "row": 153,
+            "row": 154,
             "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
           }
         ]
@@ -1793,7 +1878,66 @@
     ],
     "scope": "由当前元件总表.instances直接重建；空字段仍是采购身份缺口，不代表结构一致性检查失败。"
   },
-  "candidate_analysis_basis": "低改动候选保留为工程候选；其历史数量/身份以本轮snapshot覆盖。高价值MOS分析仍适用原主功率件，未替换、未核现价。",
+  "candidate_analysis_basis": "已实施的1uF并料以当前proof及implemented_cost_performance_changes为准；其他候选保留待核，不自动修改源。高价值MOS仍未替换、未核现价。",
   "report_refresh_mutates_native_or_procurement_sources": false,
-  "board_scope_snapshot_status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES"
+  "board_scope_snapshot_status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES",
+  "implemented_cost_performance_changes": {
+    "date": "2026-10-22",
+    "proof_path": "检查/统一审查/跨板并料复核.json",
+    "proof_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "currency": "CNY",
+    "scope": "本轮Samsung23颗并料与REG TH_SC/TH_MAIN两只NTC替换；不含更早C533更换，不是整车总价。",
+    "installed_value": {
+      "before": 65.2617,
+      "after": 23.3034,
+      "saving": 41.9583
+    },
+    "estimated_moq_cash": {
+      "before": 86.9734,
+      "after": 24.8649,
+      "saving": 62.1085,
+      "guaranteed_order_total": false
+    },
+    "quantities": {
+      "Samsung_C29936": {
+        "BMS": 11,
+        "FOC_two_boards": 10,
+        "PUMP": 2,
+        "vehicle": 23
+      },
+      "ShiHeng_C13879": {
+        "BMS": 2,
+        "PUMP": 1,
+        "REG": 2,
+        "vehicle": 5
+      },
+      "ATI_retained_TH_DUMP": 1,
+      "C5334032_FOC_two_boards": 2,
+      "SC0350_270_RSS": 8
+    },
+    "performance_and_stability": [
+      "BMS B9网标恢复保险前后边界，13针恢复既有合同，零新增器件成本。",
+      "FOC/水泵相应电容额定由16V提高到25V；Samsung工作点典型DC-bias保容曲线更有利，但不是最低保证值或实测稳定性证明。",
+      "REG温度探头复用既有时恒型号，高温TH_DUMP保留；R/T曲线、容差与候选阈值计算已写入合同，安装热滞后与动态仍待验证。"
+    ],
+    "purchase_limits": [
+      "C29936 MOQ10、C13879 MOQ10，订单步进未知，现金估算暂按单颗步进；ATI起订约束未全部核实。",
+      "C29936页面现货0，在途和页面3工作日不构成交期保证。",
+      "报价观察不含运费/优惠/装配/验证；没有发生采购。"
+    ],
+    "design_release": "HOLD"
+  },
+  "current_price_snapshot": {
+    "path": "元件封装库/索引/商城成本.json",
+    "sha256": "568ef0be1c6b38fba4e19ea03308b9233d6dab33d8b6acf7f6f92cb113cfd948",
+    "scenario": "actual_vehicle",
+    "verified_installed_subtotal_cny": 785.805502,
+    "complete_installed_total_cny": null,
+    "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 950.540725,
+    "complete_minimum_cash_purchase_cny": null,
+    "unpriced_sku_count": 105,
+    "unpriced_quantity": 376,
+    "status": "PARTIAL",
+    "note": "已报价小计不是整车总价；缺价保持null。"
+  }
 }

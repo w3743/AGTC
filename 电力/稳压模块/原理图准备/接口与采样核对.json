@@ -1,6 +1,6 @@
 {
   "document": "稳压模块单页原理图接口与采样核对",
-  "date": "2026-10-10",
+  "date": "2026-10-22",
   "designVersion": "V1.3",
   "status": "preparation_candidate_not_frozen",
   "scope": "coreboard interface, sensing pins, current comparator route, BW6101 and TCAN332 pin/passive references",
@@ -9,7 +9,7 @@
     "oneSchematicPage": true,
     "coreboardModified": false,
     "independentHardwareBusOvervoltageDump": false,
-    "powerTarget": "0.8-1 kW for about 1 s; unverified candidate",
+    "powerTarget": "启动瞬态补能与母线支撑；无固定持续时间目标；0.8-1 kW仅为未经验证的历史敏感性参考",
     "workWindowPerCellV": [
       2.2,
       2.45
@@ -37,7 +37,8 @@
     "model": "WeAct Normal QFN48 STM32G431CBU6, V1.0",
     "localSchematic": "E:/Pioneer/FOC驱动审阅/硬件/数据手册/WeAct_normal_QFN48_V1.0.pdf",
     "localSchematicSha256": "57ECA2E3467ABD45BD6D4BC993EB11E9C83389A7C390DA2543C3F20CFC2C640D",
-    "headerPitchMm": 2.54,
+      "headerPitchMm": 2.54,
+      "currentMapClarification": "PB10/P2-5=TEST, PB11/P2-6=NTC_MAIN, PA0/P2-20=AD_T1. I2C2 reuse of PB10/PB11 is an unimplemented future candidate and is not part of current connectivity.",
     "headerRows": 2,
     "headerPositions": 12,
     "P1": [
@@ -178,12 +179,12 @@
       {
         "pin": 5,
         "net": "PB10",
-        "use": "TEST_CTRL; GPIO IDR digital status check"
+        "use": "TEST; GPIO IDR digital status check"
       },
       {
         "pin": 6,
         "net": "PB11",
-        "use": "NTC_MAIN_MOS_ADC12_IN14"
+        "use": "NTC_MAIN_ADC12_IN14"
       },
       {
         "pin": 7,
@@ -253,7 +254,7 @@
       {
         "pin": 20,
         "net": "PA0",
-        "use": "T1_ADC12_IN1"
+        "use": "AD_T1_ADC12_IN1"
       },
       {
         "pin": 21,
@@ -311,11 +312,11 @@
   },
   "candidateSignals": [
     {
-      "name": "T1",
+      "name": "AD_T1",
       "mcu": "PA0",
       "header": "P2-20",
       "adc": "ADC12_IN1",
-      "role": "cumulative SC tap 1"
+      "role": "cumulative SC tap 1; current external pin net AD_T1"
     },
     {
       "name": "T2",
@@ -380,7 +381,7 @@
       "adc": "ADC2_IN5"
     },
     {
-      "name": "NTC_MAIN_MOS",
+      "name": "NTC_MAIN",
       "mcu": "PB11",
       "header": "P2-6",
       "adc": "ADC12_IN14"
@@ -392,7 +393,7 @@
       "adc": "ADC1_IN11"
     },
     {
-      "name": "TEST_CTRL",
+      "name": "TEST",
       "mcu": "PB10",
       "header": "P2-5",
       "direction": "push-pull output; IDR readback is digital only"
@@ -873,7 +874,7 @@
       "pins": [
         {
           "pin": 1,
-          "net": "NTC_MAIN_MOS_ADC"
+          "net": "NTC_MAIN"
         },
         {
           "pin": 2,
@@ -908,16 +909,31 @@
     "footprintSha256": "d0eb1497f3d48e36938b9b3d0e4cf64485351a0a294b6ce03f710160004ddbcf",
     "qualification": "read-only format precedent; not approved for this module without physical fit/binding check"
   },
+  "unimplementedCandidates": [
+    {
+      "name": "I2C2 on PB10/PB11",
+      "status": "unimplemented",
+      "reason": "PB10/P2-5 remains TEST and PB11/P2-6 remains NTC_MAIN in the current pin map; do not imply I2C wiring or move either signal in this NTC source revision."
+    },
+    {
+      "name": "TH_SC and TH_MAIN A1 thermistors",
+      "status": "selected_for_next_source_revision_not_yet_verified",
+      "mpn": "MF52A103F3950(A1)",
+      "lcscCode": "C13879",
+      "retained": "TH_DUMP ATI ATH10K1R8B3950K",
+      "thermalQualification": "open"
+    }
+  ],
   "unresolved": [
     "TEST_FB loading and dynamic accuracy, cell voltage error, SC-negative shunt Kelvin reference/compensation, and single-channel fault coverage limits",
     "PB14 is shared for T8 and SC_SUM; no independent T8 ADC redundancy",
     "Tap-divider resistor ratio tolerance, input RC values and ADC acquisition/settling time",
     "COMP/DAC polarity, thresholds, TIM1 Break mapping and latch/rearm behavior; bench response time",
-    "NTC exact part, bias resistor, filter, mounting and calibration",
+    "NTC curve/configuration, threshold implementation, mounting and thermal response qualification",
     "Connector MPN, current/voltage rating, keying, wire sizes and assembly protection",
     "CAN endpoint status, termination implementation, system ESD/EFT/surge protection and ground/shield policy",
     "Total schematic part count and A1/A0 fit; native ERC and PCB evidence",
-    "Measured/verified power and thermal capacity for 0.8-1 kW, about 1 s target"
+    "Measured/verified startup-transient power and thermal capability; actual startup deficit and duration are unquantified, with no fixed 1 s acceptance target"
   ],
   "sources": {
     "stm32Datasheet": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",

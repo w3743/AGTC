@@ -1,35 +1,19 @@
 {
-  "schemaVersion": 1,
-  "asOf": "2026-10-21",
-  "requirementUpdate": {
-    "date": "2026-10-21",
-    "userText": "不一定非要持续1秒，就是启动的瞬间用来供电",
-    "use": "启动瞬态补能和母线支撑",
-    "capacitorMpn": "LICAP SC0350-270-RSS",
-    "capacitorCount": 8,
-    "topology": "8S1P",
-    "addedCapacitors": 0,
-    "previous800To1000W1sRequirement": "CANCELLED_HISTORICAL_REFERENCE_ONLY_NOT_A_RELEASE_GATE",
-    "durationSeconds": null,
-    "startupPowerGapW": null,
-    "openChecks": [
-      "真实启动功率缺口和持续时间",
-      "峰值电流、变换器、ESR、逐节保护和响应"
-    ]
-  },
-  "scope": "现行8S1P原生单页全部166对象及450脚；不含未落图AFE候选",
+  "schemaVersion": 2,
+  "asOf": "2026-10-22",
+  "scope": "现行8S1P原生单页全部167个对象及452脚；不含未落图AFE/TMUX候选",
   "reviewComplete": true,
   "designRelease": "HOLD",
   "sourceFiles": [
     {
       "path": "eda工程文件/sc-regulator/sc-regulator.eprj3",
-      "sha256": "5f759ee30cd96bc543388eae47bae57223cbd152a5e69f85f9cddd77cb0b22b2",
+      "sha256": "aca7c3a4f5977859bac49031dd8480a0f32856f998db86d9e400a1fc13e68f4b",
       "bytes": 2077
     },
     {
       "path": "eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
-      "sha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
-      "bytes": 3990006
+      "sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+      "bytes": 4058908
     },
     {
       "path": "eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg",
@@ -37,17 +21,143 @@
       "bytes": 818
     }
   ],
+  "downstreamWorkBoundary": {
+    "postSchematicWorkOwner": "HUMAN",
+    "pcbModifiedThisTurn": false,
+    "physicalAssemblyAndQualification": "NOT_PERFORMED"
+  },
+  "sourceBinding": {
+    "nativePath": "eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+    "nativeSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+    "bomPath": "原理图准备/BOM.csv",
+    "bomSha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+    "designPlanPath": "原理图准备/design-plan.json",
+    "designPlanSha256": "bd8d5d336373735283c7f6cad2fa106103be759ab5efc423adfdddae0ccd9d0e",
+    "ad01ProofPath": "检查/原理整改/AD01_分压修正.json",
+    "ad01ProofSha256": "7af5c3698b22c974635ee4af815def6663c7f9afb7b5f765df400dd107a9c674",
+    "crossBoardProofPath": "检查/统一审查/跨板并料复核.json",
+    "crossBoardProofSha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
+  },
   "enet": {
     "path": "检查/当前官方网表.enet",
-    "sha256": "e7589f1d6e02b8a9c2ae45e8ea693f8105a95dcbede1333683779b002bfbd3ce",
-    "freshExportThisRun": false,
-    "status": "STALE_MATERIAL_METADATA",
-    "basis": "保留修改前官方ENET；六件采购/额定属性已更新，旧材料属性不可作为当前采购依据。当前针网/几何与基线逐记录字节相同，见材料变更证明；新官方导出未成功。"
+    "sha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70",
+    "freshlyExportedAfterSaveReopen": true,
+    "status": "CURRENT_OFFICIAL_ENET_BOUND_TO_AFTER_NATIVE",
+    "sourceNativeSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+    "basis": "正式原生保存并整会话重开后读取的官方ENET；元件/引脚/网名及几何由全局并料proof的原始API rows、ENET、当前design-plan与native重新计算核对。"
   },
   "contract": {
-    "components": 166,
-    "pins": 450,
+    "components": 167,
+    "pins": 452,
     "mismatches": 0,
+    "liveGeometryMismatches": [],
+    "nativeGeometryMismatches": [],
+    "verifiedNetChangesFromAD01": [],
+    "verifiedIdentityRefsFromAD01": [
+      "TH_MAIN",
+      "TH_SC"
+    ],
+    "verifiedGeometryBridges": [
+      {
+        "ref": "TH_SC",
+        "pin": "1",
+        "net": "NTC_SC",
+        "wireGroup": "08875f3373572335",
+        "lineId": "e2ae87e588efd777",
+        "from": [
+          110,
+          169.99999999999997
+        ],
+        "to": [
+          109.99999999999999,
+          180
+        ],
+        "lengthSchematicUnits": 10.000000000000028,
+        "lengthMm": 2.540000000000007,
+        "currentPinNetMatchesBridge": true,
+        "networkContactLineIds": [
+          "bf123c3fbd350e29"
+        ],
+        "segmentAlreadyPresentInBaseline": true
+      },
+      {
+        "ref": "TH_SC",
+        "pin": "2",
+        "net": "GND_SYS",
+        "wireGroup": "c86821377ffedcee",
+        "lineId": "a34466eb3195d502",
+        "from": [
+          110,
+          129.99999999999997
+        ],
+        "to": [
+          109.99999999999997,
+          120
+        ],
+        "lengthSchematicUnits": 9.999999999999972,
+        "lengthMm": 2.539999999999993,
+        "currentPinNetMatchesBridge": true,
+        "networkContactLineIds": [
+          "26d5233b169583e9",
+          "7decc3643192d969"
+        ],
+        "segmentAlreadyPresentInBaseline": true
+      },
+      {
+        "ref": "TH_MAIN",
+        "pin": "1",
+        "net": "NTC_MAIN",
+        "wireGroup": "df16a487efc8b418",
+        "lineId": "303b4319fa2305f2",
+        "from": [
+          440,
+          170
+        ],
+        "to": [
+          440,
+          180
+        ],
+        "lengthSchematicUnits": 10.0,
+        "lengthMm": 2.54,
+        "currentPinNetMatchesBridge": true,
+        "networkContactLineIds": [
+          "6e1c400a5902a3c4"
+        ],
+        "segmentAlreadyPresentInBaseline": true
+      },
+      {
+        "ref": "TH_MAIN",
+        "pin": "2",
+        "net": "GND_SYS",
+        "wireGroup": "70943590b7356668",
+        "lineId": "cb2047b20677ec95",
+        "from": [
+          440,
+          130
+        ],
+        "to": [
+          440,
+          120
+        ],
+        "lengthSchematicUnits": 10.0,
+        "lengthMm": 2.54,
+        "currentPinNetMatchesBridge": true,
+        "networkContactLineIds": [
+          "86483b9fd9fa46ea",
+          "26d76bda01a1d7bc"
+        ],
+        "segmentAlreadyPresentInBaseline": true
+      }
+    ],
+    "wirePersistence": {
+      "baselineLinePrimitives": 1136,
+      "currentLinePrimitives": 1136,
+      "addedLinePrimitives": 0,
+      "deletedLinePrimitives": 0,
+      "changedLinePrimitives": 0,
+      "existingConnectionSegmentsVerified": 4,
+      "schematicUnitMm": 0.254
+    },
     "meaning": "合同一致只证明映射，不证明设计正确"
   },
   "groups": {
@@ -178,16 +288,16 @@
       "references": [
         "R_NTC_SC_PU",
         "C_NTC_SC",
-        "TH_SC",
         "J_NTC_SC",
         "R_NTC_MAIN_PU",
         "C_NTC_MAIN",
-        "TH_MAIN",
         "J_NTC_MAIN",
         "R_NTC_DUMP_PU",
         "C_NTC_DUMP",
         "TH_DUMP",
-        "J_NTC_DUMP"
+        "J_NTC_DUMP",
+        "TH_SC",
+        "TH_MAIN"
       ],
       "pins": 24
     },
@@ -195,9 +305,10 @@
       "references": [
         "R_BUS_HI",
         "R_BUS_LO",
-        "C_BUS_ADC"
+        "C_BUS_ADC",
+        "R_BUS_HI2"
       ],
-      "pins": 6
+      "pins": 8
     },
     "抽头测试回读": {
       "references": [
@@ -297,9 +408,9 @@
     {
       "id": "SC01",
       "status": "OPEN",
-      "subject": "容量/保护实现",
-      "finding": "现行方案固定8S1P、8只LICAP，16只/8S2P已因新增成本过大取消。用户要求启动瞬态补能和母线支撑；此前800–1000W持续1s工况已取消为硬要求，模型仅作历史参考。实际启动功率缺口与持续时间未知，启动能力仍未验证。",
-      "action": "保持固定8颗、不增加电容；以真实启动过程核算功率缺口和持续时间，再验证峰值电流、变换器、ESR、逐组保护、响应与失效隔离。BQ76952或其他专用AFE仍可作为8S1P逐组保护候选并继续验证；SC02的逐节测量FAIL和designRelease=HOLD保持。"
+      "subject": "启动瞬态容量与保护实现",
+      "finding": "现行约束固定LICAP SC0350-270-RSS共8只、8S1P，新增数量0；16只/8S2P已取消。用途是启动瞬态补能与母线支撑，不要求持续1秒。BUSFIX为8S1P模型；实际启动功率缺口、峰值电流和持续时间未量化，变换器、ESR、逐组保护、响应及故障隔离未完成实物验收。",
+      "action": "保持8只不扩容；按实车启动波形确定功率/持续时间，再核验峰值、变换器、ESR、逐节保护与故障路径。BQ76952或其他专用AFE仍是8S1P逐组保护待验证候选。"
     },
     {
       "id": "SC02",
@@ -380,10 +491,17 @@
     },
     {
       "id": "AD01",
-      "status": "FAIL",
-      "subject": "BUS ADC过压/核心板失电",
-      "finding": "当前150k/10k比例16；37.8V为2.3625V。钳位若到69.4V则ADC为4.3375V，超过3.3V模拟电源允许范围。live BUS/SC而核心板断电还可通过采样输入反灌。",
-      "action": "重算分压及抗失电开关/限注入，所有正常和瞬态边界均需满足；候选TMUX1511离电信号上限3.6V不能承接4.3375V。"
+      "status": "PASS_WITH_LIMITS",
+      "subject": "BUS ADC直流分压与初始容差",
+      "finding": "现行plan和fresh ENET核对为R_BUS_HI2(150kΩ)串R_BUS_HI(150kΩ)，下臂R_BUS_LO(10kΩ)，Vbus/Vadc=31；独立±0.1%阻值容差下比例30.94006..31.06006。列出的37.8/69.4/80V静态点最大Vadc为2.5856V，低于3.3V。69.4V是TVS数据表指定Ipp点，80V仅器件电压边界筛查，不是整车瞬态上界。旧37.386 V/V仅属未实施TMUX1511候选，不适用于当前直接分压。",
+      "action": "本次只关闭列定静态点下的电阻初始容差量程子项。保持低复杂度直连分压；不得将静态窗口写成TVS/浪涌、ADC动态采样或整板过压保护通过。"
+    },
+    {
+      "id": "AD02",
+      "status": "OPEN",
+      "subject": "核心板失电反灌与ADC动态采样",
+      "finding": "BUS_ADC仍由无源分压直接接WeAct核心板PB0/ADC1_IN15；核心板掉电而BUS仍带电时，输入钳位可能抬升3V3_CORE或造成注入电流。分压电阻/C_BUS_ADC的一阶RC不能证明STM32 ADC采样获取时间、复用通道建立/串扰、转换误差或掉电注入安全。TMUX1511隔离路由没有落在当前原生。",
+      "action": "在实际核心板和固件采样时序下测量掉电注入、3V3_CORE抬升、ADC建立与误差，并按芯片限值核对；未闭合前保持核心板掉电/带电母线场景HOLD。"
     },
     {
       "id": "AX01",
@@ -403,8 +521,8 @@
       "id": "IO02",
       "status": "OPEN",
       "subject": "0V受控初充与普通充电低压边界",
-      "finding": "BUSFIX normal-charge state-machine low-voltage permissive defect is closed in the current model only: the measured-cell floor is 2.2 V; all-zero, any-zero-cell, the 2.05 V AFE-takeover test, and values below 2.2 V are rejected. Exactly 2.2 V still requires an explicit local request; falling below the floor revokes the request immediately, healthy data does not auto-rearm, and a forced request cannot bypass the final output gate. The persisted qualification gates remain false. Controlled 0 V initial charge, current-limited startup, hardware measurement/driver/bootstrap timing, MCU-failure shutdown, and power-off backfeed remain unproved.",
-      "action": "Keep normal charge inhibited below 2.2 V per measured cell; do not treat 2.05 V AFE takeover as normal high-power permission. Implement and qualify a separate controlled 0 V startup with per-cell protection before enabling hardware. The model passes 27/27 logic tests only; IO02 stays OPEN and designRelease stays HOLD.",
+      "finding": "BUSFIX普通充电低压许可漏洞已在27/27模型用例中关闭：每节测量值须≥2.2V，2.2V仍需显式请求；全零、任一节为0、2.05V AFE接管测试和低于2.2V均拒绝，低压撤销后不自动重启，强置请求不能绕过输出门。四个持久资格门仍为false。硬件受控0V初充、限流级、逐节测量/AFE交接、驱动自举最小脉宽、MCU失效独立关断和核心板掉电反灌仍未实现/资格验证。",
+      "action": "普通充电保持每节≥2.2V且需要显式请求；2.05V仅为AFE接管边界，不是高功率许可。设计并验证受控0V启动与独立逐节保护前，不开放硬件初充。",
       "modelUpdate": {
         "date": "2026-10-21",
         "status": "PASS_MODEL_ONLY",
@@ -419,9 +537,64 @@
   ],
   "calculations": {
     "busDivider": {
-      "ratio": 16,
-      "at37_8V": 2.3625,
-      "at69_4V": 4.3375
+      "status": "IMPLEMENTED_IN_CURRENT_NATIVE; OFFICIAL_PROOF_BOUND; NOT_HARDWARE_QUALIFIED",
+      "resistors": [
+        {
+          "ref": "R_BUS_HI2",
+          "nominalOhm": 150000.0,
+          "tolerancePct": 0.1,
+          "sourceValue": "150k ±0.1%"
+        },
+        {
+          "ref": "R_BUS_HI",
+          "nominalOhm": 150000.0,
+          "tolerancePct": 0.1,
+          "sourceValue": "150k ±0.1%"
+        },
+        {
+          "ref": "R_BUS_LO",
+          "nominalOhm": 10000.0,
+          "tolerancePct": 0.1,
+          "sourceValue": "10k ±0.1%"
+        }
+      ],
+      "upperTotalNominalOhm": 300000.0,
+      "lowerNominalOhm": 10000.0,
+      "nominalBusToAdcRatio": 31.0,
+      "tolerancePctEach": 0.1,
+      "busToAdcRatioRange": [
+        30.940059940059946,
+        31.060060060060053
+      ],
+      "reviewPoints": [
+        {
+          "busV": 37.8,
+          "nominalAdcV": 1.2193548387096773,
+          "minAdcV": 1.2169970028038288,
+          "maxAdcV": 1.221717090181137,
+          "below3V3AtListedInitialTolerance": true
+        },
+        {
+          "busV": 69.4,
+          "nominalAdcV": 2.238709677419355,
+          "minAdcV": 2.2343807405975062,
+          "maxAdcV": 2.2430467211262144,
+          "below3V3AtListedInitialTolerance": true
+        },
+        {
+          "busV": 80.0,
+          "nominalAdcV": 2.5806451612903225,
+          "minAdcV": 2.575655032389056,
+          "maxAdcV": 2.5856446353039937,
+          "below3V3AtListedInitialTolerance": true
+        }
+      ],
+      "scope": "Static resistor-ratio tolerance only. 69.4V is the listed TVS clamp point at specified Ipp; 80V is a separate voltage-boundary screen. Neither establishes the installed transient ceiling or MCU-off safety.",
+      "tmux1511Alternative": {
+        "ratioVbusPerVadc": 37.386,
+        "status": "UNIMPLEMENTED_CANDIDATE_ONLY",
+        "appliesToCurrentNetlist": false
+      }
     },
     "tap1to7TestLowRatio": 9.246808510638298,
     "tap8Ratio": 7.8,
@@ -456,34 +629,58 @@
     "inductorEnergyAt80A20uH_J": 0.064,
     "sc2x100uFMin160uFIdealEnergyRiseFrom19_6V": 34.41162594240499
   },
+  "busfixModel": {
+    "inputPath": "仿真/输入/V1.6-BUSFIX/model_input.json",
+    "inputSha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3",
+    "seriesCells": 8,
+    "parallelCellsPerGroup": 1,
+    "cellCount": 8,
+    "cellMpn": "SC0350-270-RSS",
+    "cellCapacitanceNominalF": 350.0,
+    "cellCapacitanceEolF": 280.0,
+    "seriesCapacitanceEolF": 35.0,
+    "normalMeasuredCellFloorV": 2.2,
+    "candidateAfeTakeoverBoundaryV": 2.05,
+    "testCount": "27/27",
+    "status": "MODEL_ONLY_NOT_HARDWARE_QUALIFICATION",
+    "qualificationGates": {
+      "end_to_end_E100mV_validated": false,
+      "80A_maximum_charge_current_validated": false,
+      "trip_to_zero_current_T50ms_validated": false,
+      "local_firmware_implementation_verified": false
+    },
+    "lifetimeEsrSensitivity_mOhm": 44.8,
+    "stressEsrSensitivity_mOhm": 63.24,
+    "esrUsedInIdealEnergyModel": false
+  },
   "busProtectionReuseScreen": {
     "asOf": "2026-10-21",
     "centralIndex": {
       "path": "元件封装库/索引/元件总表.json",
-      "sha256": "415d7933ff885105c5ea5ace8155a3a873720cec1324f64060f4d1731f5c3496",
+      "sha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
       "sourceFreshness": {
         "BMS模块": {
           "path": "BMS模块/sch/Schematic1/P1.esch2",
-          "indexedSha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef",
-          "currentSha256": "d5dd4abfa3a8d54e6f483762df253f43eb6df7e4e74cf1cd0b300220b76c60ef",
+          "indexedSha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
+          "currentSha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
           "match": true
         },
         "FOC驱动模块": {
           "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
-          "indexedSha256": "1b0236c2760177bbe8619cc8fabb9257e040224d713285b8932b6c40d5a345f1",
-          "currentSha256": "1b0236c2760177bbe8619cc8fabb9257e040224d713285b8932b6c40d5a345f1",
+          "indexedSha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+          "currentSha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
           "match": true
         },
         "稳压模块": {
           "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
-          "indexedSha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
-          "currentSha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
+          "indexedSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+          "currentSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
           "match": true
         },
         "水泵驱动模块": {
           "path": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
-          "indexedSha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
-          "currentSha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
+          "indexedSha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+          "currentSha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
           "match": true
         }
       },
@@ -661,22 +858,1133 @@
     ]
   },
   "api": {
-    "currentSessions": {
-      "cfd5e69b-2fa1-432d-bb45-4c0475dc67ea": "closed",
-      "ad3ea307-cf30-49e4-9e7d-c17e6a699232": "closed"
+    "status": "FORMAL_SAVE_REOPEN_READBACK",
+    "savedReopened": true,
+    "strictDrc": {
+      "strict": true,
+      "errors": [],
+      "warnings": [
+        {
+          "type": "warn",
+          "rule": "ATTRMATCHCODE",
+          "primitives": [
+            {
+              "primitiveId": "f3d2c59f683ac9c3",
+              "sheet": "9546dca0bc8bce7f",
+              "name": "TH_SC($1I734)"
+            },
+            {
+              "primitiveId": "023d9c577403cea1",
+              "sheet": "9546dca0bc8bce7f",
+              "name": "TH_MAIN($1I735)"
+            }
+          ]
+        }
+      ]
     },
-    "readOpenDocument": "REQUEST_TIMEOUT",
-    "ownedSessionsClosed": true,
-    "nativeSchematicShaUnchanged": false,
-    "changeScope": "Only 48 selected ATTR values; all other native records byte-identical",
-    "topologyAndGeometryRecordsByteUnchanged": true,
-    "newDrcStatus": "NOT_VERIFIED",
-    "newDrcOrNetlistClaimed": false
+    "ownedSessionClosed": true,
+    "rawOfficialEvidence": [
+      {
+        "archivePath": "检查/统一审查/跨板并料_API原始输出.zip",
+        "archiveSha256": "1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb",
+        "archiveBytes": 3743236,
+        "rawResponseMember": "REG/formal-check.json",
+        "rawResponseSha256": "a771f35558be30d55b75cdb6b2768583d29ed7bcc250a760baf235e241165f56",
+        "rawEnetUtf8ByteArraySha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70",
+        "rawEnetUtf8ByteArrayMatchesOfficialEnetByteForByte": true,
+        "rawBomFileBytesSha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+        "rawBomFileBytesMatchesOfficialCadBomByteForByte": true,
+        "rawBomFileEncoding": "UTF-16LE BOM",
+        "officialCadBom": {
+          "path": "检查/统一审查/REG_跨板并料_CAD_BOM.csv",
+          "sha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+          "bytes": 14206
+        },
+        "customProcurementBomNtcRefs": {
+          "TH_SC": {
+            "quantity": 1,
+            "groupQuantity": 1,
+            "references": [
+              "TH_SC"
+            ],
+            "manufacturerPart": "MF52A103F3950(A1)",
+            "supplierPart": "C13879",
+            "convertToPcb": "No"
+          },
+          "TH_MAIN": {
+            "quantity": 1,
+            "groupQuantity": 1,
+            "references": [
+              "TH_MAIN"
+            ],
+            "manufacturerPart": "MF52A103F3950(A1)",
+            "supplierPart": "C13879",
+            "convertToPcb": "No"
+          }
+        },
+        "rawEnetTextTransport": {
+          "fieldPresent": true,
+          "matchesUtf8ByteArray": true,
+          "replacementCharacterCount": 0,
+          "note": "When text differs, UTF-8 byte arrays are authoritative; replacement characters in the text serialization are a transport artifact."
+        },
+        "rawDrcArray": [
+          {
+            "type": "warn",
+            "rule": "ATTRMATCHCODE",
+            "primitives": [
+              {
+                "primitiveId": "f3d2c59f683ac9c3",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_SC($1I734)"
+              },
+              {
+                "primitiveId": "023d9c577403cea1",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_MAIN($1I735)"
+              }
+            ]
+          }
+        ],
+        "recomputedDrcErrors": [],
+        "recomputedDrcWarnings": [
+          {
+            "type": "warn",
+            "rule": "ATTRMATCHCODE",
+            "primitives": [
+              {
+                "primitiveId": "f3d2c59f683ac9c3",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_SC($1I734)"
+              },
+              {
+                "primitiveId": "023d9c577403cea1",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_MAIN($1I735)"
+              }
+            ]
+          }
+        ],
+        "rawBridgeResponse": {
+          "archiveMember": "REG/bridge.json",
+          "sha256": "8077ec0ee124781ab6021cd741cdc6a7b542094682ea04c5b7e652a65b378c4c",
+          "value": {
+            "bridges": [
+              {
+                "ref": "TH_SC",
+                "no": "1",
+                "net": "NTC_SC",
+                "from": [
+                  110,
+                  169.99999999999997
+                ],
+                "to": [
+                  109.99999999999999,
+                  180
+                ],
+                "id": "08875f3373572335"
+              },
+              {
+                "ref": "TH_SC",
+                "no": "2",
+                "net": "GND_SYS",
+                "from": [
+                  110,
+                  129.99999999999997
+                ],
+                "to": [
+                  109.99999999999997,
+                  120
+                ],
+                "id": "c86821377ffedcee"
+              },
+              {
+                "ref": "TH_MAIN",
+                "no": "1",
+                "net": "NTC_MAIN",
+                "from": [
+                  440,
+                  170
+                ],
+                "to": [
+                  440,
+                  180
+                ],
+                "id": "df16a487efc8b418"
+              },
+              {
+                "ref": "TH_MAIN",
+                "no": "2",
+                "net": "GND_SYS",
+                "from": [
+                  440,
+                  130
+                ],
+                "to": [
+                  440,
+                  120
+                ],
+                "id": "70943590b7356668"
+              }
+            ]
+          },
+          "wirePersistence": {
+            "baselineLinePrimitives": 1136,
+            "currentLinePrimitives": 1136,
+            "addedLinePrimitives": 0,
+            "deletedLinePrimitives": 0,
+            "changedLinePrimitives": 0,
+            "existingConnectionSegmentsVerified": 4,
+            "schematicUnitMm": 0.254
+          }
+        },
+        "recomputedContract": {
+          "components": 167,
+          "pins": 452,
+          "netMismatches": [],
+          "liveMismatches": [],
+          "identityRefs": [
+            "TH_MAIN",
+            "TH_SC"
+          ],
+          "pinNetChanges": [],
+          "geometryBridges": [
+            {
+              "ref": "TH_SC",
+              "pin": "1",
+              "net": "NTC_SC",
+              "wireGroup": "08875f3373572335",
+              "lineId": "e2ae87e588efd777",
+              "from": [
+                110,
+                169.99999999999997
+              ],
+              "to": [
+                109.99999999999999,
+                180
+              ],
+              "lengthSchematicUnits": 10.000000000000028,
+              "lengthMm": 2.540000000000007,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "bf123c3fbd350e29"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_SC",
+              "pin": "2",
+              "net": "GND_SYS",
+              "wireGroup": "c86821377ffedcee",
+              "lineId": "a34466eb3195d502",
+              "from": [
+                110,
+                129.99999999999997
+              ],
+              "to": [
+                109.99999999999997,
+                120
+              ],
+              "lengthSchematicUnits": 9.999999999999972,
+              "lengthMm": 2.539999999999993,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "26d5233b169583e9",
+                "7decc3643192d969"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_MAIN",
+              "pin": "1",
+              "net": "NTC_MAIN",
+              "wireGroup": "df16a487efc8b418",
+              "lineId": "303b4319fa2305f2",
+              "from": [
+                440,
+                170
+              ],
+              "to": [
+                440,
+                180
+              ],
+              "lengthSchematicUnits": 10.0,
+              "lengthMm": 2.54,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "6e1c400a5902a3c4"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_MAIN",
+              "pin": "2",
+              "net": "GND_SYS",
+              "wireGroup": "70943590b7356668",
+              "lineId": "cb2047b20677ec95",
+              "from": [
+                440,
+                130
+              ],
+              "to": [
+                440,
+                120
+              ],
+              "lengthSchematicUnits": 10.0,
+              "lengthMm": 2.54,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "86483b9fd9fa46ea",
+                "26d76bda01a1d7bc"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            }
+          ]
+        },
+        "saveCloseReopenClose": {
+          "saveResult": true,
+          "preReopenStatus": "closed",
+          "reopenPath": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\eda工程文件\\sc-regulator\\sc-regulator.eprj3",
+          "finalSessionStatus": "closed",
+          "rawMemberSha256": "a771f35558be30d55b75cdb6b2768583d29ed7bcc250a760baf235e241165f56"
+        }
+      }
+    ],
+    "rawDrcWarningCount": 1
   },
-  "materialMetadataUpdate": {
+  "bomVerification": {
+    "customProcurementBom": {
+      "path": "稳压模块/原理图准备/BOM.csv",
+      "sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+      "ntcRefs": {
+        "TH_SC": {
+          "quantity": 1,
+          "groupQuantity": 1,
+          "references": [
+            "TH_SC"
+          ],
+          "manufacturerPart": "MF52A103F3950(A1)",
+          "supplierPart": "C13879",
+          "convertToPcb": "No"
+        },
+        "TH_MAIN": {
+          "quantity": 1,
+          "groupQuantity": 1,
+          "references": [
+            "TH_MAIN"
+          ],
+          "manufacturerPart": "MF52A103F3950(A1)",
+          "supplierPart": "C13879",
+          "convertToPcb": "No"
+        }
+      }
+    },
+    "officialCadBomFile": {
+      "path": "检查/统一审查/REG_跨板并料_CAD_BOM.csv",
+      "sha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+      "bytes": 14206,
+      "encoding": "UTF-16LE BOM",
+      "rawApiBytesMatchExactly": true
+    }
+  },
+  "ad01DividerProof": {
+    "proofPath": "检查/原理整改/AD01_分压修正.json",
+    "proofSha256": "7af5c3698b22c974635ee4af815def6663c7f9afb7b5f765df400dd107a9c674",
+    "baseline": {
+      "nativeSha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
+      "bomSha256": "5eb712d38f48b24ec8a799cadc06f9b62a36ecd181956c031763c3ecb1b6c562",
+      "designPlanSha256": "88110f27f146cb8434bba8cdf675e5e6caf149f5d27e278bc24df0d9ec86ad05",
+      "sourceZip": {
+        "path": "检查/原理整改/AD01_修改前源.zip",
+        "sha256": "e4905f56b3df359ab8f53639cd66ab7be93cc435516fbec723eb701efdf8b286",
+        "nativeEntry": "eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2"
+      }
+    },
+    "after": {
+      "nativeSha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+      "bomSha256": "f266d9dadf49b7c9827a9b779ac40b02c85d6c7695f64146536147dcc68af6ae",
+      "designPlanSha256": "d7d29c56dcc6599140d1a4d52bb2f5b186065ccbc688ac6794cc4e3f7f0d1773"
+    },
+    "sourceZipSha256": "e4905f56b3df359ab8f53639cd66ab7be93cc435516fbec723eb701efdf8b286",
+    "verifiedBaselineArchiveFiles": {
+      "原理图准备/BOM.csv": {
+        "archiveEntry": "原理图准备/BOM.csv",
+        "sha256": "5eb712d38f48b24ec8a799cadc06f9b62a36ecd181956c031763c3ecb1b6c562",
+        "bytes": 295142
+      },
+      "原理图准备/design-plan.json": {
+        "archiveEntry": "原理图准备/design-plan.json",
+        "sha256": "88110f27f146cb8434bba8cdf675e5e6caf149f5d27e278bc24df0d9ec86ad05",
+        "bytes": 358556
+      }
+    },
+    "changeProof": {
+      "addedComponents": [
+        "R_BUS_HI2"
+      ],
+      "deletedComponents": [],
+      "pinNetChanges": [
+        {
+          "ref": "R_BUS_HI",
+          "pin": "1",
+          "before": "BUS_EXT",
+          "after": "BUS_HI_MID"
+        }
+      ],
+      "otherExistingPinNetChanges": 0,
+      "channelIdMetadataReindexCount": 9,
+      "metadataDeltas": [
+        {
+          "ref": "SYS_BAT_BUS",
+          "key": "Channel ID",
+          "before": "$1I721",
+          "after": "$1I720"
+        },
+        {
+          "ref": "SC1",
+          "key": "Channel ID",
+          "before": "$1I722",
+          "after": "$1I721"
+        },
+        {
+          "ref": "SC2",
+          "key": "Channel ID",
+          "before": "$1I723",
+          "after": "$1I722"
+        },
+        {
+          "ref": "SC3",
+          "key": "Channel ID",
+          "before": "$1I724",
+          "after": "$1I723"
+        },
+        {
+          "ref": "SC4",
+          "key": "Channel ID",
+          "before": "$1I725",
+          "after": "$1I724"
+        },
+        {
+          "ref": "SC5",
+          "key": "Channel ID",
+          "before": "$1I726",
+          "after": "$1I725"
+        },
+        {
+          "ref": "SC6",
+          "key": "Channel ID",
+          "before": "$1I727",
+          "after": "$1I726"
+        },
+        {
+          "ref": "SC7",
+          "key": "Channel ID",
+          "before": "$1I728",
+          "after": "$1I727"
+        },
+        {
+          "ref": "SC8",
+          "key": "Channel ID",
+          "before": "$1I729",
+          "after": "$1I728"
+        }
+      ],
+      "netPortProcurementFlagCorrections": [
+        {
+          "id": "2c7521a9d3e5cc3e",
+          "name": "BUS_EXT",
+          "Add into BOM": "no",
+          "Convert to PCB": "no"
+        },
+        {
+          "id": "9bf1e83f75207044",
+          "name": "BUS_HI_MID",
+          "Add into BOM": "no",
+          "Convert to PCB": "no"
+        },
+        {
+          "id": "f556102b6b742cb0",
+          "name": "BUS_HI_MID",
+          "Add into BOM": "no",
+          "Convert to PCB": "no"
+        }
+      ],
+      "netPortFlagCorrectionBasis": "Official API exact-ID/name/library assertions and saved false flags; original createNetPort defaults explicitly yes. Three schematic-only labels are excluded from procurement/PCB conversion; electrical components and all 452 pin nets are unchanged. Pre-correction proof preserved inside rawResponseZip/before-port-flags."
+    },
+    "officialVerification": {
+      "enetPath": "检查/当前官方网表.enet",
+      "enetSha256": "4a06bbc212bda909eb44dbdfd95a26dc0949099348caccf88577e935c32c6ae9",
+      "componentCount": 167,
+      "pinCount": 452,
+      "drc": {
+        "strict": true,
+        "errors": [],
+        "warnings": [],
+        "rawResponsePath": "检查/原理整改/AD01_API原始输出.zip!/ad01-formal-reopen-verification.json"
+      },
+      "savedReopened": true,
+      "sourceNativeSha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+      "liveApiComponentCount": 167,
+      "liveApiPinCount": 452,
+      "liveApiMismatches": [],
+      "contractMismatches": [],
+      "projectUuid": "6952cb7cd390b897fd299007b770cc00ec05841d5ba0ccdd665403876694f1b0",
+      "pageUuid": "9546dca0bc8bce7f",
+      "rawResponseZip": {
+        "path": "检查/原理整改/AD01_API原始输出.zip",
+        "sha256": "ac411c821d758fe0e4e659f555bd39a0e2d8a27a9b0ccaf3d61a7b910bfec44a"
+      },
+      "sessionClosed": true
+    },
+    "rawOfficialEvidence": [
+      {
+        "archivePath": "检查/原理整改/AD01_API原始输出.zip",
+        "archiveSha256": "ac411c821d758fe0e4e659f555bd39a0e2d8a27a9b0ccaf3d61a7b910bfec44a",
+        "archiveBytes": 99416,
+        "rawResponseMember": "ad01-formal-reopen-verification.json",
+        "rawResponseSha256": "9527d5eaad8a3cd84fb6de438c092658c1d5c7ea262e082c6e51cba99b9e5001",
+        "historicalEnetReconstructedFromRawVerificationText": true,
+        "historicalEnetSha256": "4a06bbc212bda909eb44dbdfd95a26dc0949099348caccf88577e935c32c6ae9",
+        "historicalEnetExportPath": "检查/当前官方网表.enet",
+        "historicalEnetPathCurrentSha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70",
+        "historicalEnetPathStillMatchesProof": false,
+        "rawDrc": {
+          "strict": true,
+          "userInterface": false,
+          "includeVerboseError": true,
+          "errors": []
+        },
+        "warningFieldPresentInRawDrc": false,
+        "saveCloseReopenClose": {
+          "saveResult": true,
+          "preReopenStatus": "closed",
+          "reopenPath": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\eda工程文件\\sc-regulator\\sc-regulator.eprj3",
+          "finalSessionStatus": "closed",
+          "rawMemberSha256": "9527d5eaad8a3cd84fb6de438c092658c1d5c7ea262e082c6e51cba99b9e5001"
+        }
+      }
+    ]
+  },
+  "crossBoardCostProof": {
+    "proofPath": "检查/统一审查/跨板并料复核.json",
+    "proofSha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "sourceZip": {
+      "path": "检查/统一审查/跨板并料_修改前源.zip",
+      "sha256": "85223e5fe84fc3c1f783797715339c1832cd4683c113ab49a7517d3c0ba03b0a",
+      "baselineArchiveNativeEntry": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+      "verifiedBaselineFiles": {
+        "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": {
+          "archiveEntry": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+          "sha256": "afa608f43c8ca3991cf06a5b93b8e83dde05e7c02880feaceb7e38f9f6889d24",
+          "bytes": 2077
+        },
+        "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2": {
+          "archiveEntry": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+          "sha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+          "bytes": 4020487
+        },
+        "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg": {
+          "archiveEntry": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg",
+          "sha256": "8df8037ae27a2aae55bdaba53d79e7f98f6f086bc3a9ff0ea228732cd1d15149",
+          "bytes": 818
+        },
+        "稳压模块/原理图准备/BOM.csv": {
+          "archiveEntry": "稳压模块/原理图准备/BOM.csv",
+          "sha256": "f266d9dadf49b7c9827a9b779ac40b02c85d6c7695f64146536147dcc68af6ae",
+          "bytes": 296707
+        },
+        "稳压模块/原理图准备/design-plan.json": {
+          "archiveEntry": "稳压模块/原理图准备/design-plan.json",
+          "sha256": "d7d29c56dcc6599140d1a4d52bb2f5b186065ccbc688ac6794cc4e3f7f0d1773",
+          "bytes": 359304
+        }
+      }
+    },
+    "rawResponseZip": {
+      "path": "检查/统一审查/跨板并料_API原始输出.zip",
+      "sha256": "1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb",
+      "bytes": 3743236
+    },
+    "baseline": {
+      "files": [
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+          "bytes": 2077,
+          "sha256": "afa608f43c8ca3991cf06a5b93b8e83dde05e7c02880feaceb7e38f9f6889d24"
+        },
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+          "bytes": 4020487,
+          "sha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164"
+        },
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg",
+          "bytes": 818,
+          "sha256": "8df8037ae27a2aae55bdaba53d79e7f98f6f086bc3a9ff0ea228732cd1d15149"
+        },
+        {
+          "path": "稳压模块/原理图准备/BOM.csv",
+          "bytes": 296707,
+          "sha256": "f266d9dadf49b7c9827a9b779ac40b02c85d6c7695f64146536147dcc68af6ae"
+        },
+        {
+          "path": "稳压模块/原理图准备/design-plan.json",
+          "bytes": 359304,
+          "sha256": "d7d29c56dcc6599140d1a4d52bb2f5b186065ccbc688ac6794cc4e3f7f0d1773"
+        }
+      ],
+      "nativeSha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+      "bomSha256": "f266d9dadf49b7c9827a9b779ac40b02c85d6c7695f64146536147dcc68af6ae",
+      "designPlanSha256": "d7d29c56dcc6599140d1a4d52bb2f5b186065ccbc688ac6794cc4e3f7f0d1773"
+    },
+    "after": {
+      "files": [
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+          "sha256": "aca7c3a4f5977859bac49031dd8480a0f32856f998db86d9e400a1fc13e68f4b",
+          "bytes": 2077
+        },
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+          "sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+          "bytes": 4058908
+        },
+        {
+          "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/sc-regulator.ecfg",
+          "sha256": "8df8037ae27a2aae55bdaba53d79e7f98f6f086bc3a9ff0ea228732cd1d15149",
+          "bytes": 818
+        },
+        {
+          "path": "稳压模块/原理图准备/BOM.csv",
+          "sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+          "bytes": 301073
+        },
+        {
+          "path": "稳压模块/原理图准备/design-plan.json",
+          "sha256": "bd8d5d336373735283c7f6cad2fa106103be759ab5efc423adfdddae0ccd9d0e",
+          "bytes": 370258
+        }
+      ],
+      "nativeSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+      "bomSha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+      "designPlanSha256": "bd8d5d336373735283c7f6cad2fa106103be759ab5efc423adfdddae0ccd9d0e"
+    },
+    "changeProof": {
+      "identityRefs": [
+        "TH_SC",
+        "TH_MAIN"
+      ],
+      "pinNetChanges": [],
+      "unintendedPinNetChanges": 0,
+      "netLabelFix": null,
+      "geometryBridgeCount": 4,
+      "geometryChanges": [
+        {
+          "ref": "TH_SC",
+          "pin": "1",
+          "before": [
+            110,
+            169.99999999999997
+          ],
+          "after": [
+            110,
+            179.99999999999997
+          ]
+        },
+        {
+          "ref": "TH_SC",
+          "pin": "2",
+          "before": [
+            110,
+            129.99999999999997
+          ],
+          "after": [
+            110,
+            119.99999999999997
+          ]
+        },
+        {
+          "ref": "TH_MAIN",
+          "pin": "1",
+          "before": [
+            440,
+            170
+          ],
+          "after": [
+            440,
+            180
+          ]
+        },
+        {
+          "ref": "TH_MAIN",
+          "pin": "2",
+          "before": [
+            440,
+            130
+          ],
+          "after": [
+            440,
+            120
+          ]
+        }
+      ],
+      "bridgeRawEntry": "REG/bridge.json",
+      "otherPropertyChanges": [],
+      "serializationMetadataChanges": 84,
+      "PCBUnchanged": [],
+      "geometryBridgeMeaning": "Count of exact old-pin to new-pin connection segments verified / API wire-create calls; overlapping existing conductors may be normalized, so this is not a count of additional persisted LINE primitives.",
+      "schematicCoordinateUnit": "0.01 inch (0.254mm); 10 units = 2.54mm",
+      "wirePersistence": {
+        "baselineLinePrimitives": 1136,
+        "currentLinePrimitives": 1136,
+        "addedLinePrimitives": 0,
+        "deletedLinePrimitives": 0,
+        "changedLinePrimitives": 0,
+        "existingConnectionSegmentsVerified": 4,
+        "reason": "New NTC pins lie on existing conductors; overlapping supplemental API segments normalized by official save."
+      },
+      "mpnSpellingNormalization": {
+        "manufacturer": "时恒",
+        "supplierPart": "C13879",
+        "sourceLibraryTitle": "MF52A103F3950 (A1)",
+        "canonicalMpn": "MF52A103F3950(A1)",
+        "refs": [
+          "TH_SC",
+          "TH_MAIN"
+        ],
+        "electricalChange": false
+      }
+    },
+    "computedProof": {
+      "identityRefs": [
+        "TH_MAIN",
+        "TH_SC"
+      ],
+      "pinNetChanges": [],
+      "geometryBridges": [
+        {
+          "ref": "TH_SC",
+          "pin": "1",
+          "net": "NTC_SC",
+          "wireGroup": "08875f3373572335",
+          "lineId": "e2ae87e588efd777",
+          "from": [
+            110,
+            169.99999999999997
+          ],
+          "to": [
+            109.99999999999999,
+            180
+          ],
+          "lengthSchematicUnits": 10.000000000000028,
+          "lengthMm": 2.540000000000007,
+          "currentPinNetMatchesBridge": true,
+          "networkContactLineIds": [
+            "bf123c3fbd350e29"
+          ],
+          "segmentAlreadyPresentInBaseline": true
+        },
+        {
+          "ref": "TH_SC",
+          "pin": "2",
+          "net": "GND_SYS",
+          "wireGroup": "c86821377ffedcee",
+          "lineId": "a34466eb3195d502",
+          "from": [
+            110,
+            129.99999999999997
+          ],
+          "to": [
+            109.99999999999997,
+            120
+          ],
+          "lengthSchematicUnits": 9.999999999999972,
+          "lengthMm": 2.539999999999993,
+          "currentPinNetMatchesBridge": true,
+          "networkContactLineIds": [
+            "26d5233b169583e9",
+            "7decc3643192d969"
+          ],
+          "segmentAlreadyPresentInBaseline": true
+        },
+        {
+          "ref": "TH_MAIN",
+          "pin": "1",
+          "net": "NTC_MAIN",
+          "wireGroup": "df16a487efc8b418",
+          "lineId": "303b4319fa2305f2",
+          "from": [
+            440,
+            170
+          ],
+          "to": [
+            440,
+            180
+          ],
+          "lengthSchematicUnits": 10.0,
+          "lengthMm": 2.54,
+          "currentPinNetMatchesBridge": true,
+          "networkContactLineIds": [
+            "6e1c400a5902a3c4"
+          ],
+          "segmentAlreadyPresentInBaseline": true
+        },
+        {
+          "ref": "TH_MAIN",
+          "pin": "2",
+          "net": "GND_SYS",
+          "wireGroup": "70943590b7356668",
+          "lineId": "cb2047b20677ec95",
+          "from": [
+            440,
+            130
+          ],
+          "to": [
+            440,
+            120
+          ],
+          "lengthSchematicUnits": 10.0,
+          "lengthMm": 2.54,
+          "currentPinNetMatchesBridge": true,
+          "networkContactLineIds": [
+            "86483b9fd9fa46ea",
+            "26d76bda01a1d7bc"
+          ],
+          "segmentAlreadyPresentInBaseline": true
+        }
+      ],
+      "wirePersistence": {
+        "baselineLinePrimitives": 1136,
+        "currentLinePrimitives": 1136,
+        "addedLinePrimitives": 0,
+        "deletedLinePrimitives": 0,
+        "changedLinePrimitives": 0,
+        "existingConnectionSegmentsVerified": 4,
+        "schematicUnitMm": 0.254
+      },
+      "netMismatches": [],
+      "liveMismatches": [],
+      "nativeGeometryMismatches": []
+    },
+    "officialVerification": {
+      "enetPath": "稳压模块/检查/当前官方网表.enet",
+      "enetSha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70",
+      "enetEncoding": "UTF-8",
+      "enetTransport": "enetUtf8Bytes; direct File.arrayBuffer, lossless ASCII number-array transport",
+      "cadBomPath": "检查/统一审查/REG_跨板并料_CAD_BOM.csv",
+      "cadBomSha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+      "cadBomEncoding": "UTF-16LE BOM original File bytes; procurement BOM is separate",
+      "verificationEntry": "REG/formal-check.json",
+      "saveEntry": "REG/formal-save.json",
+      "closeEntry": "REG/formal-close.json",
+      "reopenEntry": "REG/formal-reopen.json",
+      "finalCloseEntry": "REG/formal-final-close.json",
+      "componentCount": 167,
+      "pinCount": 452,
+      "projectUuid": "6952cb7cd390b897fd299007b770cc00ec05841d5ba0ccdd665403876694f1b0",
+      "pageUuid": "9546dca0bc8bce7f",
+      "savedReopened": true,
+      "sessionClosed": true,
+      "netMismatches": [],
+      "liveMismatches": [],
+      "drc": {
+        "strict": true,
+        "errors": [],
+        "warnings": [
+          {
+            "type": "warn",
+            "rule": "ATTRMATCHCODE",
+            "primitives": [
+              {
+                "primitiveId": "f3d2c59f683ac9c3",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_SC($1I734)"
+              },
+              {
+                "primitiveId": "023d9c577403cea1",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_MAIN($1I735)"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "rawOfficialEvidence": [
+      {
+        "archivePath": "检查/统一审查/跨板并料_API原始输出.zip",
+        "archiveSha256": "1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb",
+        "archiveBytes": 3743236,
+        "rawResponseMember": "REG/formal-check.json",
+        "rawResponseSha256": "a771f35558be30d55b75cdb6b2768583d29ed7bcc250a760baf235e241165f56",
+        "rawEnetUtf8ByteArraySha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70",
+        "rawEnetUtf8ByteArrayMatchesOfficialEnetByteForByte": true,
+        "rawBomFileBytesSha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+        "rawBomFileBytesMatchesOfficialCadBomByteForByte": true,
+        "rawBomFileEncoding": "UTF-16LE BOM",
+        "officialCadBom": {
+          "path": "检查/统一审查/REG_跨板并料_CAD_BOM.csv",
+          "sha256": "8d78f45274926485bf0aa959a1fc31d438b0a167c73eb71f1802448964ebaa68",
+          "bytes": 14206
+        },
+        "customProcurementBomNtcRefs": {
+          "TH_SC": {
+            "quantity": 1,
+            "groupQuantity": 1,
+            "references": [
+              "TH_SC"
+            ],
+            "manufacturerPart": "MF52A103F3950(A1)",
+            "supplierPart": "C13879",
+            "convertToPcb": "No"
+          },
+          "TH_MAIN": {
+            "quantity": 1,
+            "groupQuantity": 1,
+            "references": [
+              "TH_MAIN"
+            ],
+            "manufacturerPart": "MF52A103F3950(A1)",
+            "supplierPart": "C13879",
+            "convertToPcb": "No"
+          }
+        },
+        "rawEnetTextTransport": {
+          "fieldPresent": true,
+          "matchesUtf8ByteArray": true,
+          "replacementCharacterCount": 0,
+          "note": "When text differs, UTF-8 byte arrays are authoritative; replacement characters in the text serialization are a transport artifact."
+        },
+        "rawDrcArray": [
+          {
+            "type": "warn",
+            "rule": "ATTRMATCHCODE",
+            "primitives": [
+              {
+                "primitiveId": "f3d2c59f683ac9c3",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_SC($1I734)"
+              },
+              {
+                "primitiveId": "023d9c577403cea1",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_MAIN($1I735)"
+              }
+            ]
+          }
+        ],
+        "recomputedDrcErrors": [],
+        "recomputedDrcWarnings": [
+          {
+            "type": "warn",
+            "rule": "ATTRMATCHCODE",
+            "primitives": [
+              {
+                "primitiveId": "f3d2c59f683ac9c3",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_SC($1I734)"
+              },
+              {
+                "primitiveId": "023d9c577403cea1",
+                "sheet": "9546dca0bc8bce7f",
+                "name": "TH_MAIN($1I735)"
+              }
+            ]
+          }
+        ],
+        "rawBridgeResponse": {
+          "archiveMember": "REG/bridge.json",
+          "sha256": "8077ec0ee124781ab6021cd741cdc6a7b542094682ea04c5b7e652a65b378c4c",
+          "value": {
+            "bridges": [
+              {
+                "ref": "TH_SC",
+                "no": "1",
+                "net": "NTC_SC",
+                "from": [
+                  110,
+                  169.99999999999997
+                ],
+                "to": [
+                  109.99999999999999,
+                  180
+                ],
+                "id": "08875f3373572335"
+              },
+              {
+                "ref": "TH_SC",
+                "no": "2",
+                "net": "GND_SYS",
+                "from": [
+                  110,
+                  129.99999999999997
+                ],
+                "to": [
+                  109.99999999999997,
+                  120
+                ],
+                "id": "c86821377ffedcee"
+              },
+              {
+                "ref": "TH_MAIN",
+                "no": "1",
+                "net": "NTC_MAIN",
+                "from": [
+                  440,
+                  170
+                ],
+                "to": [
+                  440,
+                  180
+                ],
+                "id": "df16a487efc8b418"
+              },
+              {
+                "ref": "TH_MAIN",
+                "no": "2",
+                "net": "GND_SYS",
+                "from": [
+                  440,
+                  130
+                ],
+                "to": [
+                  440,
+                  120
+                ],
+                "id": "70943590b7356668"
+              }
+            ]
+          },
+          "wirePersistence": {
+            "baselineLinePrimitives": 1136,
+            "currentLinePrimitives": 1136,
+            "addedLinePrimitives": 0,
+            "deletedLinePrimitives": 0,
+            "changedLinePrimitives": 0,
+            "existingConnectionSegmentsVerified": 4,
+            "schematicUnitMm": 0.254
+          }
+        },
+        "recomputedContract": {
+          "components": 167,
+          "pins": 452,
+          "netMismatches": [],
+          "liveMismatches": [],
+          "identityRefs": [
+            "TH_MAIN",
+            "TH_SC"
+          ],
+          "pinNetChanges": [],
+          "geometryBridges": [
+            {
+              "ref": "TH_SC",
+              "pin": "1",
+              "net": "NTC_SC",
+              "wireGroup": "08875f3373572335",
+              "lineId": "e2ae87e588efd777",
+              "from": [
+                110,
+                169.99999999999997
+              ],
+              "to": [
+                109.99999999999999,
+                180
+              ],
+              "lengthSchematicUnits": 10.000000000000028,
+              "lengthMm": 2.540000000000007,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "bf123c3fbd350e29"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_SC",
+              "pin": "2",
+              "net": "GND_SYS",
+              "wireGroup": "c86821377ffedcee",
+              "lineId": "a34466eb3195d502",
+              "from": [
+                110,
+                129.99999999999997
+              ],
+              "to": [
+                109.99999999999997,
+                120
+              ],
+              "lengthSchematicUnits": 9.999999999999972,
+              "lengthMm": 2.539999999999993,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "26d5233b169583e9",
+                "7decc3643192d969"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_MAIN",
+              "pin": "1",
+              "net": "NTC_MAIN",
+              "wireGroup": "df16a487efc8b418",
+              "lineId": "303b4319fa2305f2",
+              "from": [
+                440,
+                170
+              ],
+              "to": [
+                440,
+                180
+              ],
+              "lengthSchematicUnits": 10.0,
+              "lengthMm": 2.54,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "6e1c400a5902a3c4"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            },
+            {
+              "ref": "TH_MAIN",
+              "pin": "2",
+              "net": "GND_SYS",
+              "wireGroup": "70943590b7356668",
+              "lineId": "cb2047b20677ec95",
+              "from": [
+                440,
+                130
+              ],
+              "to": [
+                440,
+                120
+              ],
+              "lengthSchematicUnits": 10.0,
+              "lengthMm": 2.54,
+              "currentPinNetMatchesBridge": true,
+              "networkContactLineIds": [
+                "86483b9fd9fa46ea",
+                "26d76bda01a1d7bc"
+              ],
+              "segmentAlreadyPresentInBaseline": true
+            }
+          ]
+        },
+        "saveCloseReopenClose": {
+          "saveResult": true,
+          "preReopenStatus": "closed",
+          "reopenPath": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\eda工程文件\\sc-regulator\\sc-regulator.eprj3",
+          "finalSessionStatus": "closed",
+          "rawMemberSha256": "a771f35558be30d55b75cdb6b2768583d29ed7bcc250a760baf235e241165f56"
+        }
+      }
+    ]
+  },
+  "peh226IntermediateProof": {
     "proofPath": "检查/原理整改/PEH226NL80V_变更证明.json",
     "proofSha256": "66a68582f7901db1e4faedaae7b3814b187effcef447646c3a1494e20b64893c",
     "verifiedChangedAttributeRecords": 48,
+    "intermediateNativeSha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
+    "currentNativeSha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+    "note": "48项PEH属性证明绑定AD01修改前的中间基线，不代表当前native SHA。",
     "selectedPart": {
       "manufacturer": "KEMET",
       "mpn": "PEH226NL3900QE4",
@@ -706,6 +2014,20 @@
       "newOfficialEnet": "NOT_EXPORTED",
       "freshDRC": "NOT_VERIFIED"
     }
+  },
+  "historicalPeHBackup": {
+    "path": "检查/原理整改/PEH226NL80V_修改前源.zip",
+    "sha256": "dd886059291545c057856b95da5e53025c2e4bc407c4a99be332e387fd9135a7",
+    "p1BaselineSha256": "b3e59ef0ae3aad47eb9a4ffc69ac7cf055c8ec021d21c5916cad92e7418a0e42"
+  },
+  "busDividerContract": {
+    "topology": "BUS_EXT -> R_BUS_HI2 -> BUS_HI_MID -> R_BUS_HI -> BUS_ADC; R_BUS_LO from BUS_ADC to GND_SYS",
+    "ratioDerivedFromPlan": 31.0,
+    "ratioToleranceRange": [
+      30.940059940059946,
+      31.060060060060053
+    ],
+    "tmuxRatio37_386Status": "UNIMPLEMENTED_CANDIDATE_ONLY"
   },
   "pinMatrix": [
     {
@@ -2765,22 +4087,6 @@
       "status": "PASS"
     },
     {
-      "ref": "TH_SC",
-      "pin": "1",
-      "name": "1",
-      "expectedNet": "NTC_SC",
-      "actualNet": "NTC_SC",
-      "status": "PASS"
-    },
-    {
-      "ref": "TH_SC",
-      "pin": "2",
-      "name": "2",
-      "expectedNet": "GND_SYS",
-      "actualNet": "GND_SYS",
-      "status": "PASS"
-    },
-    {
       "ref": "J_NTC_SC",
       "pin": "1",
       "name": "1",
@@ -2822,22 +4128,6 @@
     },
     {
       "ref": "C_NTC_MAIN",
-      "pin": "2",
-      "name": "2",
-      "expectedNet": "GND_SYS",
-      "actualNet": "GND_SYS",
-      "status": "PASS"
-    },
-    {
-      "ref": "TH_MAIN",
-      "pin": "1",
-      "name": "1",
-      "expectedNet": "NTC_MAIN",
-      "actualNet": "NTC_MAIN",
-      "status": "PASS"
-    },
-    {
-      "ref": "TH_MAIN",
       "pin": "2",
       "name": "2",
       "expectedNet": "GND_SYS",
@@ -2928,8 +4218,8 @@
       "ref": "R_BUS_HI",
       "pin": "1",
       "name": "1",
-      "expectedNet": "BUS_EXT",
-      "actualNet": "BUS_EXT",
+      "expectedNet": "BUS_HI_MID",
+      "actualNet": "BUS_HI_MID",
       "status": "PASS"
     },
     {
@@ -4307,8 +5597,57 @@
       "expectedNet": "T7",
       "actualNet": "T7",
       "status": "PASS"
+    },
+    {
+      "ref": "R_BUS_HI2",
+      "pin": "1",
+      "name": "1",
+      "expectedNet": "BUS_EXT",
+      "actualNet": "BUS_EXT",
+      "status": "PASS"
+    },
+    {
+      "ref": "R_BUS_HI2",
+      "pin": "2",
+      "name": "2",
+      "expectedNet": "BUS_HI_MID",
+      "actualNet": "BUS_HI_MID",
+      "status": "PASS"
+    },
+    {
+      "ref": "TH_SC",
+      "pin": "1",
+      "name": "1",
+      "expectedNet": "NTC_SC",
+      "actualNet": "NTC_SC",
+      "status": "PASS"
+    },
+    {
+      "ref": "TH_SC",
+      "pin": "2",
+      "name": "2",
+      "expectedNet": "GND_SYS",
+      "actualNet": "GND_SYS",
+      "status": "PASS"
+    },
+    {
+      "ref": "TH_MAIN",
+      "pin": "1",
+      "name": "1",
+      "expectedNet": "NTC_MAIN",
+      "actualNet": "NTC_MAIN",
+      "status": "PASS"
+    },
+    {
+      "ref": "TH_MAIN",
+      "pin": "2",
+      "name": "2",
+      "expectedNet": "GND_SYS",
+      "actualNet": "GND_SYS",
+      "status": "PASS"
     }
   ],
+  "csvPath": "检查/全部引脚合同核对.csv",
   "manufacturerDocuments": [
     {
       "manufacturer": "HiLink",
@@ -4334,73 +5673,5 @@
     "https://www.littelfuse.com/~/media/electronics/datasheets/tvs_diodes/littelfuse_tvs_diode_smcj_datasheet.pdf.pdf",
     "https://content.kemet.com/datasheets/KEM_A4034_PEH200.pdf",
     "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf"
-  ],
-  "currentModelFollowup": {
-    "date": "2026-10-21",
-    "scope": "BUSFIX normal-charge low-voltage state-machine model only; not hardware or physical qualification",
-    "source": {
-      "path": "仿真/源码/V1.6-BUSFIX/cell_protection_qualification.py",
-      "sha256": "efa95844c51f52273e094086412702115c9174e1af1dd82663a93c5ebe1a9572"
-    },
-    "input": {
-      "path": "仿真/输入/V1.6-BUSFIX/model_input.json",
-      "sha256": "0c2eed8322f4306f0c9146685ce3eb1c1234696be7c9ca21d4399f4d9df6f3a3"
-    },
-    "result": {
-      "path": "仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
-      "sha256": "f01a62daea8d270b0d3c87eca92a2c34f868d57492d15601d6b111650d7a3d30",
-      "status": "MODEL_ONLY_PARTIAL_PASS_PHYSICAL_QUALIFICATION_FAIL",
-      "stateMachineTests": {
-        "pass": 27,
-        "fail": 0
-      }
-    },
-    "capacitorModel": {
-      "mpn": "LICAP SC0350-270-RSS",
-      "topology": "8S1P",
-      "cellCount": 8,
-      "nominalCapacitance_F_perCell": 350,
-      "minimumEOLCapacitance_F_perCell": 280,
-      "seriesEquivalentCapacitance_F": 35,
-      "esrScreening_mOhm": {
-        "lifetimeSensitivity": 44.8,
-        "stress": 63.24,
-        "qualification": "not measured; these screening values are excluded from BUSFIX ideal-energy result"
-      }
-    },
-    "normalChargeLowVoltage": {
-      "minimumMeasuredCellVoltage_V": 2.2,
-      "afeTakeoverBoundaryTest_V": 2.05,
-      "afeBoundaryIsNormalHighPowerPermission": false,
-      "inclusiveFloorRequiresExplicitLocalRequest": true,
-      "modelOutcome": "PASS_MODEL_ONLY",
-      "coveredCases": [
-        "all-zero cells rejected",
-        "any one cell at zero rejected",
-        "2.05 V AFE takeover test rejected for normal charging",
-        "any cell below 2.2 V rejected",
-        "exact 2.2 V requires explicit request",
-        "low voltage immediately revokes request",
-        "healthy samples after low voltage do not auto-rearm",
-        "forced request cannot bypass final output voltage gate"
-      ]
-    },
-    "persistedQualificationGates": {
-      "end_to_end_E100mV_validated": false,
-      "80A_maximum_charge_current_validated": false,
-      "trip_to_zero_current_T50ms_validated": false,
-      "local_firmware_implementation_verified": false,
-      "defaultOutput": "inhibited"
-    },
-    "controlledInitialChargeFrom0V": "NOT_IMPLEMENTED_OR_QUALIFIED",
-    "otherOpenItems": [
-      "hardware 0 V current-limited startup and per-cell protection",
-      "independent shutdown for arbitrary MCU failure",
-      "core-board power-off backfeed",
-      "end-to-end measurement accuracy and response qualification",
-      "actual startup power gap and duration"
-    ],
-    "oneSecondRequirement": "cancelled; 800-1000 W x 1 s is historical sensitivity only, not a release gate",
-    "designRelease": "HOLD"
-  }
+  ]
 }

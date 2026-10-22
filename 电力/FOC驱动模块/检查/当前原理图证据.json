@@ -1,26 +1,35 @@
 {
   "document": "2026-10-21 FOC P1 current saved source review: TLV6700 internal-reference BUS_OV implemented; raw official exports and geometry bound; reopen NOT_VERIFIED.",
-  "status": "PASS_STATIC_ENET_GEOMETRY_PIN_CONTRACT_REOPEN_NOT_VERIFIED_DRC_AND_HARDWARE_OPEN",
+  "status": "PASS_OFFICIAL_SAVED_REOPENED_PIN_NET_CONTRACT_DRC_WARNINGS_OPEN_HARDWARE_HOLD",
   "native_source": {
-    "project_sha256": "114CAF88E36C054FBB5E58921A47038DBD0FDA3F24884050CC6529190578B5E5",
-    "page_sha256": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
-    "config_sha256": "331CDEE9347659004EC337A2F9230C684E82E9FC97380E19E241F4B754F8EFE9",
-    "pcb_sha256": "602A48835A0A37C5E8C57E8221C2F420429A30FF1EBAD2DD87488CBDF8D94D53",
+    "project_sha256": "3f18ba53557afd944fc87ddfa32e714280d10767f222612a505f273a8bbfa1a3",
+    "page_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+    "config_sha256": "331cdee9347659004ec337a2f9230c684e82e9fc97380e19e241f4b754f8efe9",
+    "pcb_sha256": "602a48835a0a37c5e8c57e8221c2f420429a30ff1ebad2dd87488cbdf8d94d53",
     "pcb_status": "PCB1 source hash unchanged; no placement or routing update.",
-    "save_status": "Official native save returned true; current source hashes recorded.",
-    "page_sha256_note": "Native P1 RSO_W Temperature Coefficient remains ±100ppm/℃; the native source contains no U+FFFD."
+    "save_status": "Official save and close/reopen verified for this exact source; see the final cross-module proof.",
+    "page_sha256_note": "Native P1 RSO_W Temperature Coefficient remains ±100ppm/℃; the final official UTF-8 ENET also contains the exact attribute and no U+FFFD."
   },
   "official_headless_reopen": {
-    "status": "NOT_VERIFIED",
+    "status": "VERIFIED_SAVED_CLOSED_REOPENED",
     "pageUuid": "90aa6c46493624cf",
     "pageName": "P1",
     "components": 169,
     "pins": 506,
-    "attempt": "After save, new-session project API timed out twice (REQUEST_TIMEOUT); return ping worked; root closed session sid20.",
-    "previous_reopen_evidence": "Prior 170-component/504-pin close record is stale for current source and is not claimed as current validation."
+    "savedReopened": true,
+    "sessionClosed": true,
+    "netMismatches": [],
+    "liveMismatches": [],
+    "verificationEntry": "FOC/formal-check.json",
+    "reopenEntry": "FOC/formal-reopen.json",
+    "finalCloseEntry": "FOC/formal-final-close.json",
+    "rawResponseZip": "检查/统一审查/跨板并料_API原始输出.zip",
+    "rawResponseZipSha256": "1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb",
+    "finalProof": "检查/统一审查/跨板并料复核.json",
+    "finalProofSha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
   },
   "net_contract": {
-    "status": "PASS_STATIC_ENET_GEOMETRY_PIN_CONTRACT_REOPEN_NOT_VERIFIED",
+    "status": "PASS_OFFICIAL_SAVED_REOPENED_PIN_NET_CONTRACT",
     "scope": "Saved native P1 bytes, current raw official ENET pin maps, API geometry, and expected pin/population contract; excludes DRC warning semantics, attributes affected by the export defect, component thermal qualification, dynamic behavior, firmware and hardware acceptance.",
     "components": 169,
     "pinsChecked": 506,
@@ -33,29 +42,39 @@
       ]
     },
     "failures": [],
-    "exportAttributeDefect": "RSO_W Temperature Coefficient is ±100ppm/℃ in native P1 but ��100ppm/℃ (two U+FFFD) in raw ENET. Pin mappings match; attribute text is not identical."
+    "exportAttributeDefect": "None in final UTF-8 ENET: native and exported RSO_W Temperature Coefficient are ±100ppm/℃; no U+FFFD was found."
   },
   "official_drc": {
     "errors": 0,
     "warnings": 6,
     "status": "OPEN",
-    "detailsAvailable": false,
-    "result": "Current official export returns only [{\"type\":\"warn\",\"count\":6}]; no per-warning records were returned.",
+    "detailsAvailable": true,
+    "result": "Strict official DRC returned 0 errors and 6 warning groups. Raw findings and primitive IDs are bound in the final cross-module proof; warnings remain open.",
     "rawExportFile": "检查/当前源/当前整改官方导出.json",
     "rawExportSha256": "CC783118354C3ADFF40CA377F1A5726423A3A6DC6161716D4C9FA559B8C21816",
-    "evidenceSha256": "9F614088269C999282245E64DAD32C62A8A07E8EBE7FCA1342577BD30D63F798"
+    "evidenceSha256": "9F614088269C999282245E64DAD32C62A8A07E8EBE7FCA1342577BD30D63F798",
+    "proofFile": "检查/统一审查/跨板并料复核.json",
+    "proofSha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
   },
   "current_single_board_bom": {
     "officialExport": true,
     "dataRows": 91,
     "quantityTotal": 156,
-    "path": "eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-    "sha256": "7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
+    "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+    "sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
     "R_LOAD_VALID_BIAS": {
       "value": "1kΩ",
       "mpn": "RC0603FR-071KL",
       "supplierPart": "C22548",
       "population": "FOC-A INSTALL; FOC-B DNP"
+    },
+    "Samsung_1uF": "Five installed positions per board, all CL10B105KA8NNNC / C29936. FOC-A+B quantity 10; BMS 11 + PUMP 2; vehicle total 23.",
+    "D_BUSADC_CLAMP": {
+      "manufacturer": "ElecSuper(静芯)",
+      "mpn": "BZT52C3V6",
+      "supplierPart": "C5334032",
+      "package": "SOD-123",
+      "pinMap": "pin1=C=cathode to BUS_ADC; pin2=A=anode to GND_SYS."
     }
   },
   "dump_rail": {
@@ -299,14 +318,33 @@
   },
   "sharedLibrarySync": {
     "status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
+    "evidencePath": "../检查/统一审查/全库同步与只读校验.json",
+    "evidenceSha256": "55769ed1631cf9513a1c037ca15d60bbaea2e6897d0074269cc7d09aeedc7b92",
     "executionRecord": "../检查/统一审查/最终同步执行记录.json",
-    "executionRecordSha256": "75e9d6384c6ebe6f1e648811209cbda34a3901639f36924a4795699724be305d",
-    "indexSha256": "415d7933ff885105c5ea5ace8155a3a873720cec1324f64060f4d1731f5c3496",
+    "executionRecordSha256": "3850ac4ab8742a3d4638b27b6299aa05e4bd24aac8fde78cd143d106702eebb0",
+    "readOnlyCheckExecutionRecord": "../检查/统一审查/最终只读校验执行记录.json",
+    "readOnlyCheckExecutionRecordSha256": "724eb777c9a6df809c56d5612bd5cd996bde96f94e9cdc19221ff213b44ceffd",
+    "indexPath": "../元件封装库/索引/元件总表.json",
+    "indexSha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
     "exitCodes": [
       0,
       0
     ],
-    "electricalOrHardwareRelease": false
+    "summary": {
+      "nativeInstances": 580,
+      "models": 201,
+      "missingDeviceSymbolFootprintBindings": [
+        0,
+        0,
+        0
+      ],
+      "assetReferences": 480,
+      "assetFiles": 4278,
+      "verifiedElibs": 8
+    },
+    "completedAtUtc": "2026-10-21T18:51:33.183638+00:00",
+    "electricalOrHardwareRelease": false,
+    "projectStageDocumentationCheckCompletedAtUtc": "2026-10-22T02:16:52.514333+00:00"
   },
   "old_evidence_preserved": {
     "path": "检查/当前原理图证据_20261015工程历史.json",
@@ -314,32 +352,35 @@
     "status": "Historical 2026-10-15 verification only. The old archive path remains missing; the newly created BOV-before snapshot is not a restoration of that archive."
   },
   "currentEvidenceHashes": {
-    "eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3": "114CAF88E36C054FBB5E58921A47038DBD0FDA3F24884050CC6529190578B5E5",
-    "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
-    "eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg": "331CDEE9347659004EC337A2F9230C684E82E9FC97380E19E241F4B754F8EFE9",
-    "eda工程文件/FOC_G431_Driver/pcb/PCB1.epcb2": "602A48835A0A37C5E8C57E8221C2F420429A30FF1EBAD2DD87488CBDF8D94D53",
-    "检查/当前源/当前整改官方导出.json": "CC783118354C3ADFF40CA377F1A5726423A3A6DC6161716D4C9FA559B8C21816",
-    "检查/当前源/当前整改几何.json": "BA7057E36D2BF72DC9F0178A6C36E2641E4E12257C7512A768FAEAD3D11674FF",
-    "检查/当前源/FOC_G431_P1_drc_final.json": "9F614088269C999282245E64DAD32C62A8A07E8EBE7FCA1342577BD30D63F798",
-    "检查/当前源/FOC_G431_P1_pdf_qa_final.json": "1D50B0B0B6ADE8923421FFFB6DCB87D2846526EEFEC01D852C67D1316EA9845A",
-    "eda工程文件/导出/当前交付/FOC_G431_P1.enet": "F9A60EFEDE72D927B34456F352788A91807FF69765CD438DE8322D637DB91284",
-    "eda工程文件/导出/当前交付/FOC_G431_BOM.csv": "7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43",
-    "eda工程文件/导出/当前交付/FOC_G431_单页原理图.pdf": "8C1C1EE086EFEE02D9F8537CA44D32EEF0F2EFD1F8C79E22057F11BDA4FEC8E2",
-    "原理图准备/当前原理图连接.json": "EB7747FDAD9C00536AAE7713D01425AF8B729E250131CADC9C8A1CED8EDE89FA",
-    "原理图准备/外围选型依据.md": "04B9E390FB2358160D70F033D6509B1950A7C8269D7F9C422951499EF57955D2",
-    "原理图准备/外围选型候选.json": "FDD67D6E01698FDC8BE9A811832BC7450D87D052D937058655EBBAA270619BD3",
-    "检查/原理图电气复核结论.md": "2399339CB5514A4072B55AE208CFAD7BFF25573C3C87FBC3EEB1EB1A57C65116",
-    "检查/当前源/当前整改备份.json": "91C48BDED0DD5DFE3BAD63D2C4A5590011322383BD9867F2940F29D24D0AFA31",
-    "归档/历史与调试.zip": "EB999AFD510971D78786376A86A100BA2A5CD21BE116E0CA7A780DCE6911EE99",
-    "README.md": "7C35ABC7F687F5B9A50665DBEC3A33BFCBB9C3684744144FD1A1B5DD34414A30",
-    "交付说明.md": "4B64F81B7D042D7B0575B3DC4ADFB7CBFC34F153646F8A197A11DA56BA03A626",
-    "保护与固件约束.md": "6B50C8F4536B885FC5874C77B26D781A23DC61C524D4A9109D44E259FA20D4B0",
-    "FOC驱动设计构想.md": "7FD413BA95CBF4513680F7D59106421FF6D4404C24A35861C261C07DF9CDE36E",
-    "参考资料/电机资料/N5065参数证据.md": "B39466641E45C81BC37331D21E3A52AE902C2D77B93124EF0F5EB171C1D840D8",
-    "检查/当前源/FOC_G431_P1_contract_verify_final.json": "1829A28A41BE48EDE078CE41E2A6A0BDD3DB05B3241865DA436FE28D1F9DC47A"
+    "eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3": "3f18ba53557afd944fc87ddfa32e714280d10767f222612a505f273a8bbfa1a3",
+    "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+    "eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg": "331cdee9347659004ec337a2f9230c684e82e9fc97380e19e241f4b754f8efe9",
+    "eda工程文件/FOC_G431_Driver/pcb/PCB1.epcb2": "602a48835a0a37c5e8c57e8221c2f420429a30ff1ebad2dd87488cbdf8d94d53",
+    "检查/当前源/当前整改官方导出.json": "cc783118354c3adff40ca377f1a5726423a3a6dc6161716d4c9fa559b8c21816",
+    "检查/当前源/当前整改几何.json": "ba7057e36d2bf72dc9f0178a6c36e2641e4e12257c7512a768faead3d11674ff",
+    "检查/当前源/FOC_G431_P1_drc_final.json": "9f614088269c999282245e64dad32c62a8a07e8ebe7fca1342577bd30d63f798",
+    "检查/当前源/FOC_G431_P1_pdf_qa_final.json": "1d50b0b0b6ade8923421fffb6dcb87d2846526eefec01d852c67d1316ea9845a",
+    "eda工程文件/导出/当前交付/FOC_G431_P1.enet": "461d100605ab9d8f7056879b8286c6d30f78488053b80a88886beb9d31f6e8e6",
+    "eda工程文件/导出/当前交付/FOC_G431_BOM.csv": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+    "eda工程文件/导出/当前交付/FOC_G431_单页原理图.pdf": "8c1c1ee086efee02d9f8537ca44d32eef0f2efd1f8c79e22057f11bda4fec8e2",
+    "原理图准备/当前原理图连接.json": "f5d21775d41ec1b4b9aac0dbfe697e62e62f6ee521b83f483e4f2a9264904a16",
+    "原理图准备/外围选型依据.md": "04b9e390fb2358160d70f033d6509b1950a7c8269d7f9c422951499ef57955d2",
+    "原理图准备/外围选型候选.json": "a9d6370989c6b59b30bb08baf7a0897e70f4f8fc843bc4a5629b1d9f2ee7ba51",
+    "检查/原理图电气复核结论.md": "823fa91af86f809bf5b1902dd51123ae16447201d06a580d8b3551efe4e59c15",
+    "检查/当前源/当前整改备份.json": "91c48bded0dd5dfe3bad63d2c4a5590011322383bd9867f2940f29d24d0afa31",
+    "归档/历史与调试.zip": "eb999afd510971d78786376a86a100ba2a5cd21be116e0ca7a780dce6911ee99",
+    "README.md": "335cc7676dc1086fba69b9c90170bd14631965d048b4115ddd64179cb02b6b97",
+    "交付说明.md": "7bb00d3adc205dce6aa3c90405eb78e889290150db62c4f06a14801355be6c2b",
+    "保护与固件约束.md": "6b50c8f4536b885fc5874c77b26d781a23dc61c524d4a9109d44e259fa20d4b0",
+    "FOC驱动设计构想.md": "3e6d532de4b6286c4b0c80859eadba5558d702553656a396d76d1fee83abd866",
+    "参考资料/电机资料/N5065参数证据.md": "b39466641e45c81bc37331d21e3a52ae902c2d77b93124ef0f5eb171c1d840d8",
+    "检查/当前源/FOC_G431_P1_contract_verify_final.json": "1829a28a41be48ede078ce41e2a6a0bdd3db05b3241865da436fe28d1f9dc47a",
+    "../检查/统一审查/跨板并料复核.json": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "../检查/统一审查/跨板并料_API原始输出.zip": "1acad083beca8d0b75e966760734da69ab140dd190c4c39f631f3eb76c57c6fb",
+    "检查/当前源/C5334032_替换复核.json": "afe5d3c02e06f0ef3f17c521fc5dbcb292c13e039d18a0674226126532836292"
   },
   "qualificationLimits": [
-    "Official DRC has 6 warnings with no detail; static pin-contract pass is not an electrical qualification.",
+    "Official strict DRC has 6 warning groups with raw details in the final cross-module proof; warnings remain open and static pin-contract pass is not electrical qualification.",
     "TPS7A4001 line regulation and output at actual high BUS/load, 127mV UCC UVLO margin, and effective CIN/COUT capacitances need measurement.",
     "TLV6700 BOV resistor/reference screen is 39.209–41.724V ON and 38.318–41.311V release; independent corners, not full guarantees or paired values. Rdump bank is only 1.522–1.758kW/board over the ON screen, below the 1.8kW/1s paper target; actual regen envelope must define the requirement.",
     "VO617A CTR/VCEsat and BC847C saturation are not guaranteed over this exact low-current operating point and full temperature; Buck RT/SD below 0.4V requires bench verification.",
@@ -351,7 +392,7 @@
     "SMCJ40A min breakdown is 44.4V vs 41.724V maximum static BOV screen (2.676V gap); dynamic waveform, source accuracy and TVS pulse energy still require qualification.",
     "KOA 0.5 mOhm shunts are rated 5 W / 100 A. At 100 A continuous each reaches rated power; higher phase-current duty requires a lower limit or thermal redesign.",
     "Hard BOV still has single points: BUS absent, U6/U3/U4/Q7 failed, or thermal contact/wiring open prevents dump; Q7 short cannot be interrupted by its gate.",
-    "Full schematic coverage and source/export/hash binding are in 检查/原理图电气复核结论.md; current new-session reopen status is NOT_VERIFIED.",
+    "Full schematic coverage and source/export/hash binding are in 检查/原理图电气复核结论.md; final official save/close/reopen is verified in the final cross-module proof; hardware qualification remains HOLD.",
     "TI TPS7A4001 Rev.B Table 6.5 line-regulation unit is %VOUT: over VIN=7–100 V the typical value is 0.03% VOUT, with MIN/MAX blank, not 0.03%/V; ±2.5% overall accuracy is specified only through VIN=24 V. The 4.7771–5.1983 V high-BUS range and BOV threshold corners are assumption-only screens, not guarantees. Any per-volt multiplication is a user-defined assumption, not a manufacturer limit."
   ],
   "q_bov_pnp_metadata": {
@@ -393,6 +434,131 @@
     "IPT015N10N5": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipt015n10n5-datasheet-en.pdf",
     "TLV6700": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf"
   },
+  "cross_module_1uF_source_screen": {
+    "review_date": "2026-10-22",
+    "status": "SELECTED_IN_CURRENT_SOURCE_BOM_HARDWARE_HOLD",
+    "source_binding": "Official source and BOM are now verified against 检查/统一审查/跨板并料复核.json (SHA256 cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09); FOC P1 bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7, BOM 07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04. Saved, closed and reopened; net mismatches 0. Effective-capacitance, ripple, transient and hardware qualification remain open.",
+    "target_part": {
+      "manufacturer": "Samsung Electro-Mechanics",
+      "manufacturer_part_number": "CL10B105KA8NNNC",
+      "supplier": "LCSC",
+      "supplier_part_number": "C29936",
+      "value": "1uF",
+      "tolerance": "±10%",
+      "rated_voltage": "25VDC",
+      "temperature_characteristic": "X7R, -55..+125°C",
+      "package": "0603 / C0603"
+    },
+    "approved_refs": {
+      "FOC_per_board": [
+        "U1_DVDD_C",
+        "U1_VCP_C",
+        "U1_VGLS_C",
+        "U3_C2",
+        "U4_C2"
+      ],
+      "FOC_two_board_quantity": 10,
+      "pump": [
+        "C_DRV_DVDD",
+        "C_DRV_VCP"
+      ],
+      "pump_quantity": 2,
+      "BMS": [
+        "C_BAL_CELL1",
+        "C_BAL_CELL2",
+        "C_BAL_CELL3",
+        "C_BAL_CELL4",
+        "C_BAL_CELL5",
+        "C_BAL_CELL6",
+        "C_BAL_CELL7",
+        "C_BAL_CELL8",
+        "C_BAL_CELL9",
+        "C_CAN_VCC2_2",
+        "C_REG1"
+      ],
+      "BMS_quantity": 11,
+      "total_vehicle_quantity": 23,
+      "status": "Imported in current official BOM and source; vehicle quantity 23 verified in cross-module selection/procurement evidence."
+    },
+    "official_source_data": [
+      {
+        "part": "CL10B105KA8NNNC",
+        "url": "https://product.samsungsem.com/cn/mlcc/CL10B105KA8NNN.do",
+        "manufacturer_status": "Mass Production",
+        "page_created": "2026-10-22 02:49:15 KST",
+        "properties": "1.0uF, ±10%, 25VDC, X7R (-55..+125°C), 0603 (1.60×0.80×0.80mm); suffix C is listed as an available package code.",
+        "dc_bias_plot_condition": "LCR meter, 1kHz, 1Vrms",
+        "data_qualification": "Samsung page explicitly labels plotted values typical and for design reference only."
+      },
+      {
+        "part": "C1608X7R1C105K080AC",
+        "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+        "curve_pdf": "https://product.tdk.com/en/system/files/dam/doc/product/capacitor/ceramic/mlcc/charasheet/c1608x7r1c105k080ac.pdf",
+        "properties": "1uF, ±10%, 16VDC, X7R (-55..+125°C), 0603; product status Production.",
+        "qualification": "Published characteristic graph is a typical/reference curve, not a guaranteed minimum-effective-capacitance limit."
+      },
+      {
+        "part": "GRM188R71E105KA12D",
+        "url": "https://ds.murata.com/simsurfing/mlcc.html?oripartnumbers=%5B%22GRM188R71E105KA12D%22%5D&partnumbers=%5B%22GRM188R71E105KA12%22%5D&rgear=jomoqke&rgearinfo=cn",
+        "observation": "Murata SimSurfing listed the GRM188R71E105KA12 family as planned discontinuation in its current table. Quantitative curve access presented a software-license agreement, which was not accepted; no curve values were read."
+      }
+    ],
+    "typical_dc_bias_visual_screen": {
+      "method": "Approximate visual reading from the public Samsung manufacturer graph and TDK manufacturer graph for the exact parts; no CSV or tabulated point export was obtained.",
+      "reading_uncertainty_uF": 0.05,
+      "points": [
+        {
+          "voltage_v": 5,
+          "samsung_typical_uF_approx": 0.9,
+          "tdk_typical_uF_approx": 0.85
+        },
+        {
+          "voltage_v": 10,
+          "samsung_typical_uF_approx": 0.75,
+          "tdk_typical_uF_approx": 0.5
+        },
+        {
+          "voltage_v": 12,
+          "samsung_typical_uF_approx": 0.65,
+          "tdk_typical_uF_approx": 0.4
+        }
+      ],
+      "interpretation": "The public typical curves suggest approximately 0.25..0.30uF more capacitance per part at 10..12V for Samsung versus the current TDK 16V part. These graph-read values are not guarantees and must not be described as a guaranteed effective-C, ripple, lifetime, or transient improvement.",
+      "scope_limit": "No like-for-like DC-bias curve comparison was made against the existing BMS FH and Murata capacitors. Therefore no performance improvement is asserted for the 11 BMS positions."
+    },
+    "selection_basis": [
+      "Samsung is listed as Mass Production for the exact 1uF/25V/X7R/0603 family, while Murata SimSurfing currently lists the existing GRM188R71E105KA12 family as planned discontinuation.",
+      "The target preserves nominal capacitance, tolerance, X7R, temperature range and package; 25V rated voltage improves rated-voltage margin versus the 16V TDK parts. This does not itself prove improved effective capacitance or service life.",
+      "Final native source and official procurement BOM are implemented and bound by the final proof; hardware effective-C and dynamic qualification remain open."
+    ],
+    "qualification_open": [
+      "Minimum effective capacitance under actual DC bias, AC ripple and temperature for DRV835x VCP/VGLS and the BMS cell/REG1 networks.",
+      "Transient response, ripple-current heating, lifetime and assembly reliability on the actual PCB.",
+      "Measure actual effective capacitance/ripple/transient behavior and confirm procurement availability; typical bias curves are not minimum guarantees."
+    ],
+    "actual_module_quantities": {
+      "BMS": 11,
+      "FOC_A_and_B": 10,
+      "PUMP": 2,
+      "vehicle_total": 23
+    },
+    "final_source_proof": {
+      "path": "检查/统一审查/跨板并料复核.json",
+      "sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+      "native_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+      "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+      "plan_sha256": "f5d21775d41ec1b4b9aac0dbfe697e62e62f6ee521b83f483e4f2a9264904a16",
+      "official_enet_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+      "official_enet_sha256": "461d100605ab9d8f7056879b8286c6d30f78488053b80a88886beb9d31f6e8e6",
+      "component_count": 169,
+      "pin_count": 506,
+      "saved_reopened": true,
+      "session_closed": true,
+      "net_mismatches": [],
+      "drc_errors": 0,
+      "drc_warning_groups": 6
+    }
+  },
   "archive_snapshot": {
     "path": "归档/历史与调试.zip",
     "sha256": "E3BAC443CA7DFDA992D7BB61638649257ADBC5DD521DCDDAEB3EA7BD4B51FC50",
@@ -400,5 +566,71 @@
     "manifest_sha256": "91C48BDED0DD5DFE3BAD63D2C4A5590011322383BD9867F2940F29D24D0AFA31",
     "created_new_archive": true,
     "scope": "2026-10-21 BOV-reference-before snapshot of listed source/planning/current delivery files; does not restore or replace the previously missing historical archive."
+  },
+  "c5334032_clamp_replacement": {
+    "status": "FORMALLY_IMPORTED_IN_CURRENT_SOURCE_BOM_HARDWARE_HOLD",
+    "ref": "D_BUSADC_CLAMP",
+    "per_board_quantity": 1,
+    "vehicle_quantity": 2,
+    "old": {
+      "manufacturer": "Nexperia",
+      "mpn": "BZT52H-C3V6,115",
+      "supplierPart": "C550347",
+      "package": "SOD-123F"
+    },
+    "new": {
+      "manufacturer": "ElecSuper(静芯)",
+      "mpn": "BZT52C3V6",
+      "supplierPart": "C5334032",
+      "librarySearchUuid": "95bd0d08a1f14a3988e6a20daaa7fb38",
+      "embeddedDeviceUuid": "73086efa705a82c9",
+      "package": "SOD-123",
+      "pin1": "C=cathode to BUS_ADC",
+      "pin2": "A=anode to GND_SYS"
+    },
+    "pin_map": "C=cathode to BUS_ADC; A=anode to GND_SYS",
+    "gross_added_models": 1,
+    "retired_models": 1,
+    "net_project_model_count_change": 0,
+    "final_source_and_bom_verified": true,
+    "zener_voltage_at_5mA_V": [
+      3.4,
+      3.8
+    ],
+    "reverse_leakage_at_1V_uA_max": 5,
+    "dynamic_resistance_at_5mA_ohm_max": 90,
+    "dynamic_resistance_at_1mA_ohm_max": 600,
+    "old_dynamic_resistance_at_1mA_ohm_max": 500,
+    "power_ratings_mW_and_mounting_conditions": {
+      "oldStandardFr4_mW": 375,
+      "old1cm2CathodeCopper_mW": 830,
+      "new25mm2CeramicMount_mW": 500
+    },
+    "source_resistance_nominal_ohm": 10473.684210526315,
+    "80V_assumption_clamp_current_uA_unqualified": [
+      46.55,
+      84.47
+    ],
+    "low_current_voltage_all_temperature_and_power_off_injection": "OPEN; do not extrapolate 5mA zener/impedance/leakage specifications to the tens-of-uA operating estimate.",
+    "historical_detailed_proof_path": "检查/当前源/C5334032_替换复核.json",
+    "historical_detailed_proof_sha256": "afe5d3c02e06f0ef3f17c521fc5dbcb292c13e039d18a0674226126532836292",
+    "final_current_source_proof_path": "检查/统一审查/跨板并料复核.json",
+    "final_current_source_proof_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09"
+  },
+  "cross_board_source_verification": {
+    "path": "检查/统一审查/跨板并料复核.json",
+    "sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "native_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+    "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+    "plan_sha256": "f5d21775d41ec1b4b9aac0dbfe697e62e62f6ee521b83f483e4f2a9264904a16",
+    "official_enet_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+    "official_enet_sha256": "461d100605ab9d8f7056879b8286c6d30f78488053b80a88886beb9d31f6e8e6",
+    "component_count": 169,
+    "pin_count": 506,
+    "saved_reopened": true,
+    "session_closed": true,
+    "net_mismatches": [],
+    "drc_errors": 0,
+    "drc_warning_groups": 6
   }
 }
