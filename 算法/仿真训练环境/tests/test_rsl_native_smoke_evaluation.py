@@ -11,12 +11,15 @@ import pytest
 import scripts.evaluate_fast_stop_mastery as evaluator
 
 
-def _contract():
+def _contract(profile="fast_stop_v1", *, remaining=None):
     from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
     from scripts import train_isaac_foundation_fresh as fresh
 
     task = fresh._config_dict()
     task.update(fresh.FAST_STOP_CONFIG)
+    task["goto_reward_profile"] = profile
+    if remaining is not None:
+        task["fast_stop_failure_remaining_time_cost"] = remaining
     task.update(max_time=60.0, input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA, rock_density=0.0)
     guides, stability = fresh._rough_profile_components(fresh.PROFILE_RANDOM_ROUGH_FAST_STOP)
     return {
@@ -52,6 +55,41 @@ def test_checkpoint_task_reconstruction_rejects_incomplete_or_drifted_metadata()
         evaluator._validate_rsl_task_contract(broken_task)
 
 
+def test_historical_v1_contract_without_remaining_time_flag_stays_v1():
+    contract = _contract()
+    contract["task_config"].pop("fast_stop_failure_remaining_time_cost")
+
+    task, _, _ = evaluator._validate_rsl_task_contract(contract)
+
+    assert task.goto_reward_profile == "fast_stop_v1"
+    assert task.fast_stop_failure_remaining_time_cost is False
+
+
+def test_v2_contract_requires_and_preserves_remaining_time_flag():
+    contract = _contract("fast_stop_v2", remaining=True)
+
+    task, _, _ = evaluator._validate_rsl_task_contract(contract)
+
+    assert task.goto_reward_profile == "fast_stop_v2"
+    assert task.fast_stop_failure_remaining_time_cost is True
+
+
+@pytest.mark.parametrize("profile", ["legacy", "fast_stop_v3", "", None])
+def test_unsupported_task_profiles_are_rejected(profile):
+    contract = _contract(profile)
+
+    with pytest.raises(ValueError, match="unsupported fast-stop reward profile"):
+        evaluator._validate_rsl_task_contract(contract)
+
+
+@pytest.mark.parametrize("remaining", [False, None])
+def test_v2_without_true_remaining_time_flag_is_rejected(remaining):
+    contract = _contract("fast_stop_v2", remaining=remaining)
+
+    with pytest.raises(ValueError, match="fast_stop_v2 requires.*fast_stop_failure_remaining_time_cost=True"):
+        evaluator._validate_rsl_task_contract(contract)
+
+
 def test_factory_uses_checkpoint_task_guide_and_stability_without_native_sim(monkeypatch):
     contract = _contract()
     captured = {}
@@ -83,10 +121,11 @@ def test_factory_uses_checkpoint_task_guide_and_stability_without_native_sim(mon
     assert captured["body_stability_config"].tilt_weight == 0.0
 
 
-def test_short_native_report_never_claims_success_rate_or_competence(tmp_path, monkeypatch):
+@pytest.mark.parametrize("profile", ["fast_stop_v1", "fast_stop_v2"])
+def test_short_native_report_never_claims_success_rate_or_competence(tmp_path, monkeypatch, profile):
     checkpoint = tmp_path / "field.pt"
     checkpoint.write_bytes(b"RSL checkpoint test fixture")
-    contract = _contract()
+    contract = _contract(profile, remaining=True if profile == "fast_stop_v2" else None)
     closed = []
     engine = SimpleNamespace(close=lambda: closed.append(True))
     adapter = object()
@@ -122,6 +161,7 @@ def test_short_native_report_never_claims_success_rate_or_competence(tmp_path, m
     assert "99.0" not in str(result)
     assert result["scenario_seeds"] == [87_001, 87_002]
     assert result["checkpoint_sha256"] == "fixture-sha256"
+    assert result["task_profile"] == profile
     assert closed == [True]
 
 

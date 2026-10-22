@@ -133,6 +133,18 @@ def _normalized_gaussian_config(value: Any) -> dict[str, Any]:
     """Validate the supported Gaussian semantics across dot/colon class paths."""
     if not isinstance(value, Mapping):
         raise ValueError("field actor must use a Gaussian distribution config")
+    init_std = value.get("init_std")
+    try:
+        normalized_init_std = float(init_std)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("field Gaussian init_std must be finite and positive") from exc
+    if (
+        isinstance(init_std, bool)
+        or not isinstance(init_std, (int, float))
+        or not math.isfinite(normalized_init_std)
+        or normalized_init_std <= 0.0
+    ):
+        raise ValueError("field Gaussian init_std must be finite and positive")
     config = _json_safe(value)
     class_name = config.get("class_name")
     if not isinstance(class_name, str):
@@ -140,21 +152,17 @@ def _normalized_gaussian_config(value: Any) -> dict[str, Any]:
     class_name = class_name.replace(":", ".")
     if class_name != FIELD_GAUSSIAN_CLASS:
         raise ValueError("field actor distribution must be RSL-RL GaussianDistribution")
-    init_std = config.get("init_std")
     std_type = config.get("std_type")
     std_range = config.get("std_range", list(FIELD_GAUSSIAN_STD_RANGE))
     if (
-        isinstance(init_std, bool)
-        or not isinstance(init_std, (int, float))
-        or float(init_std) != FIELD_GAUSSIAN_INIT_STD
-        or std_type != "log"
+        std_type != "log"
         or std_range != list(FIELD_GAUSSIAN_STD_RANGE)
         or set(config) - {"class_name", "init_std", "std_type", "std_range"}
     ):
-        raise ValueError("field Gaussian distribution must keep log_std=-2 and the default std_range")
+        raise ValueError("field Gaussian init_std must be finite and positive, with the default log std range")
     return {
         "class_name": FIELD_GAUSSIAN_CLASS,
-        "init_std": FIELD_GAUSSIAN_INIT_STD,
+        "init_std": normalized_init_std,
         "std_type": "log",
         "std_range": list(FIELD_GAUSSIAN_STD_RANGE),
     }
@@ -532,6 +540,19 @@ def validate_field_policy_contract(
         for key in _RUNTIME_CONTRACT_KEYS:
             safe.pop(key, None)
             expected_safe.pop(key, None)
+        # Contracts predating the failure-time-cost flag omitted it. This is
+        # equivalent only to a live False setting; explicit True and every
+        # other missing/changed task field remain a contract mismatch.
+        actual_task = safe.get("task_config")
+        expected_task = expected_safe.get("task_config")
+        legacy_flag = "fast_stop_failure_remaining_time_cost"
+        if (
+            isinstance(actual_task, dict)
+            and isinstance(expected_task, dict)
+            and legacy_flag not in actual_task
+            and expected_task.get(legacy_flag) is False
+        ):
+            actual_task[legacy_flag] = False
         if safe != expected_safe:
             raise ValueError("checkpoint field_policy_contract differs from the live field environment/model")
     return safe

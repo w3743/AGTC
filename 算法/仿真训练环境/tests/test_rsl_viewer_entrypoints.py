@@ -1,6 +1,7 @@
 """CPU checks for native RSL checkpoints through the existing viewer entrypoints."""
 from __future__ import annotations
 
+import copy
 import json
 import sys
 import types
@@ -63,7 +64,10 @@ def _native_checkpoint(path):
         action_config=action_config(),
         drive_config={"interface": "fixture-track-speed", "velocity_gain": 0.04},
         damage_config={"metric": "stem-contact-v2", "plants": 0},
-        field_cfg=Config(plants=0, terrain_enabled=False, rock_density=0.0),
+        field_cfg=Config(
+            plants=0, terrain_enabled=False, rock_density=0.0,
+            input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
+        ),
         front_guide_spec=FrontGuideSpec(x_m=0.43, radius_m=0.047),
         body_stability_config=BodyStabilityConfig(tilt_weight=3.0),
     )
@@ -230,6 +234,61 @@ def test_check_loads_and_validates_native_rsl_on_cpu_without_ports_or_output(
     assert response["checkpoint"]["contract_sha256"] == goal_viewer._stable_hash(contract)
     assert response["checkpoint"]["field_policy_contract"]["task_config"]["plants"] == 0
     assert not output.exists()
+
+
+def test_old_512_rsl_checkpoint_reconstructs_missing_failure_cost_on_cpu(checkpoint, tmp_path):
+    path, _observation_config, contract = checkpoint
+    assert contract["lstm"]["hidden_dim"] == 512
+
+    from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+    from scripts.lassc_replay import _policy_env, _rsl_config_from_contract
+
+    payload = load_rsl_checkpoint_payload(path, map_location="cpu")
+    old_contract = copy.deepcopy(payload["field_policy_contract"])
+    old_contract["task_config"].pop("fast_stop_failure_remaining_time_cost")
+    old_path = tmp_path / "legacy_512_without_failure_cost.pt"
+    payload["field_policy_contract"] = old_contract
+    torch.save(payload, old_path)
+
+    loaded = load_rsl_checkpoint_payload(old_path, map_location="cpu")
+    loaded_contract = loaded["field_policy_contract"]
+    assert "fast_stop_failure_remaining_time_cost" not in loaded_contract["task_config"]
+
+    record = goal_viewer._rsl_checkpoint_record(old_path)
+    viewer_cfg, _guide, _stability = goal_viewer._rsl_environment_configs(
+        record["field_policy_contract"]
+    )
+    replay_cfg = _rsl_config_from_contract(loaded_contract)
+    assert viewer_cfg.fast_stop_failure_remaining_time_cost is False
+    assert replay_cfg.fast_stop_failure_remaining_time_cost is False
+    assert loaded_contract["task_config"] == old_contract["task_config"]
+
+    replay_env = _policy_env(old_path)
+    try:
+        assert replay_env.field_policy_contract["task_config"] == old_contract["task_config"]
+        assert "fast_stop_failure_remaining_time_cost" not in replay_env.task_config
+    finally:
+        replay_env.close()
+
+    explicit_true = copy.deepcopy(loaded_contract)
+    explicit_true["task_config"]["fast_stop_failure_remaining_time_cost"] = True
+    assert goal_viewer._rsl_environment_configs(explicit_true)[0].fast_stop_failure_remaining_time_cost is True
+    assert _rsl_config_from_contract(explicit_true).fast_stop_failure_remaining_time_cost is True
+
+    for bad_config in (
+        {key: value for key, value in old_contract["task_config"].items() if key != "max_time"},
+        dict(old_contract["task_config"], unexpected_setting=1),
+    ):
+        invalid = copy.deepcopy(loaded_contract)
+        invalid["task_config"] = bad_config
+        with pytest.raises(ValueError, match="task_config|complete"):
+            goal_viewer._rsl_environment_configs({
+                **invalid,
+                "front_guide_spec": loaded_contract["front_guide_spec"],
+                "body_stability_config": loaded_contract["body_stability_config"],
+            })
+        with pytest.raises(ValueError, match="task_config|complete"):
+            _rsl_config_from_contract(invalid)
 
 
 def test_rsl_launch_dispatches_without_legacy_trial_gate(checkpoint, tmp_path, monkeypatch, capsys):

@@ -1,5 +1,15 @@
 # Isaac Lab 项目状态
 
+2026-10-22 当前控制修复在 `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`、`fix/rsl-goal-convergence`，基于 main `28bca570`。本轮既有实验使用 Newton MJWarp；用户已明确授权后续训练与仿真全部迁入 Isaac Sim。当前无 Newton 仿真运行，后续不追加 Newton 训练段；独立环境兼容性准备尚未迁移或通过。首轮正式 RSL 实验 `results/isaac_field_improvement/rsl_goal_convergence_20261022_attempt1/` 已完成 16×128×128=262144 步，训练与完整开发评估均真实 exit 0；模型 `model_127.pt` SHA `2c0041a23b0227d15db792fed4682b77cc539a2597c6fa1cc6b51f661d65d902`，37 个 Adam 状态均 step 2560，全部参数有限。固定近距开发集 87010–87025 为 0/16 干净成功、15 次超时、1 次 `outside_or_overturned`，左右履带换向总计 577 次，平均终距 10.7826m。零损伤、零碰撞来自空场，不构成安全导航改善；课程控制器已记录未通过、未晋级，不继续沿用这个失败方案。
+
+该轮 57 源快照、协议、零步模型与所有检查点/原始成绩保持原字节。协议 SHA `5865c4f9e286bbee81e7547b6d32f0e586f51e5bd1584abe7399891c2f4f6953`；真实零步模型 SHA `6a846568fb7947aa1e85ee1f37dc39c65eec18db40ca12485e1b50f5acc848e6`。先前 512 步模型仅为迁移烟测；用户后续实测转圈的 frame1203 原始观测、循环状态与动作已保存，CPU 重放误差为 0。独立 CPU 回归为 635 passed/23 skipped，真实 exit 0，属于接口回归而非控制验收。
+
+同配置原生动作/停稳探针通过；同步 IMU 探针与 60 秒偏转云台差速探针均 exit 0，未发现固定 90° 坐标错接，长探针末 0.5 秒航向 RMSE 为 0.0563rad。运动中加速度波动与初始化姿态误差仍有模型限制，简单加速度模长门控的配对离线重放反而变差，因此没有修改 IMU 生成器或用物理真航向替代估计值。具体证据集中在 `results/isaac_field_diagnosis/rsl_goal_convergence_20261022_attempt1/`。8783/8784 预览已结束供 GPU 串行训练/评估；两项自动化继续 PAUSED。第十九批 5/5 已完成范围内整理：旧合同回放兼容与离散时域边界修复、复用官方 learn(0) 保存基线、评估入口复用共同环境构造并移除二次模型加载。整理后完整 CPU 回归 636 passed/23 skipped/55 warnings，31.97s，真实 exit 0；真实旧512模型 SHA 前后不变，缺省字段正确重建为 False。整理结束时第二十批为 0/5；后续 v2 状态见下一段。
+
+第二十批第 1 项仍为显式 fast_stop_v2 奖励与实验。当前 v2 训练已自然完成 196608 步（model_93.pt），真实 exit 0；最近一次正常完成的开发评估 dev002 为 4/16 严格停稳成功，真实 exit 0，未通过门槛。dev003 报告 6/16，但 wrapper 实际 exit 1、Python 子进程 exit 未知，不列为正常完成验收。58 源、协议、旧原始成绩保持原字节。用户已明确授权后续训练和仿真全部迁入 Isaac Sim；当前没有 Newton 仿真运行，不再追加 Newton 段；独立环境兼容性准备尚未迁移或通过。训练与评估身份见 `results/isaac_field_improvement/rsl_goal_convergence_20261022_attempt2/` 及对应 diagnosis 记录。当前分支不变，第二十批仍第 1 项；Isaac Sim 迁移尚未实施，不提前计为完成。
+
+以下迁移、预览和旧实验叙述是各自当时的历史记录；当前行为与成绩以上述新记录和对应原始 trial 为准。
+
 2026-10-22 RSL-RL全链迁移：独立worktree `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，分支`feat/rsl-rl-completion`，基于首轮迁移合入后的main `bb54e169`。新训练/续训调用固定Isaac Lab官方`run_train_cli`，默认任务`Isaac-Field-FastStop-Rsl-Direct`；复用官方wrapper、OnPolicyRunner、PPO更新/存储、RNN、Gaussian及日志。新模型活动入口包含训练/续训、完整评估与显式smoke、LASSC消费/回放、全图点选/跟随预览、真实网络检查和JIT/ONNX导出，没有新增训练器、生命周期管理或Tracking服务。
 
 输入为`sensor-absolute-goal-v1`/encoder v4，五路形状为LiDAR[1,400]、depth[1,160,88]、detections[16,8]、state[33]、feedback[37]，内容与轴不变；仅RSL任务边界将policy下五路提升为根级tensor以适配官方存储。复用原192维编码器，actor/critic各512×1 LSTM、64/Tanh头，共享encoder只在actor注册，PPO优化器和裁剪不重复计算该参数。四维动作顺序及单位继续由action_contract定义。fast_stop_v1/0.4m/真实XY<0.05m/s/完整角速度模长<0.1rad/s/连续0.5s保留；全场随机起终点，flat、plants0、rocks0、原联动导向轮及零稳定奖励。60s有限horizon失败不bootstrap，关闭随机episode_length_buf偏移。未把未完成的v2奖励混入迁移。
@@ -31,7 +41,7 @@ CPU全套pytest真实exit0：585 passed、23 skipped、55 warnings、31.52s（CU
 
 ## 当前车辆与控制链
 
-项目使用本地 Isaac Lab、Newton MJWarp 和 SB3-Contrib RecurrentPPO。车体、轮子和云台使用轻量代理，原14个负重轮执行器各保持2 Nm限幅；没有车体速度伺服或手写规划器替代策略。物理步长1 ms，每50个子步执行一次策略，摩擦系数0.8，P=0.04、侧积分Ki=0.1。以上参数仍需实车标定。
+项目活动训练使用本地 Isaac Lab、Newton MJWarp 和官方 RSL-RL；SB3-Contrib RecurrentPPO 仅保留历史兼容。车体、轮子和云台使用轻量代理，原14个负重轮执行器各保持2 Nm限幅；没有车体速度伺服或手写规划器替代策略。物理步长1 ms，每50个子步执行一次策略，摩擦系数0.8，P=0.04、侧积分Ki=0.1。以上参数仍需实车标定。
 
 用户要求的抬高前导向轮已经接入：左右各一只，半径45 mm、宽60 mm，轮心在车体中心前方420 mm，比支撑轮轴高50 mm。两只轮的质量从车体扣除，整车仍为30 kg。启用 `--front-guides` 时，导向轮通过Newton公开mimic/equality接口跟随本侧轮0；同侧其余负重轮也跟随轮0。
 

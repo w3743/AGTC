@@ -858,13 +858,15 @@ def test_native_two_environment_partial_reset_preserves_other_pi_state_and_feedf
         env.close()
 
 
-def test_native_fast_stop_uses_root_com_xy_and_partial_reset_clears_only_selected_sample():
+@pytest.mark.parametrize("profile", ["fast_stop_v1", "fast_stop_v2"])
+def test_native_fast_stop_uses_root_com_xy_and_partial_reset_clears_only_selected_sample(profile):
     import torch
 
     env = _make_env(
         plants=0, max_time=8.0, num_envs=2, mode="goto", seed=90241,
         config_overrides={
-            "goto_reward_profile": "fast_stop_v1",
+            "goto_reward_profile": profile,
+            "fast_stop_failure_remaining_time_cost": profile == "fast_stop_v2",
             "goal_progress_budget": 5.0,
             "goal_stop_speed": 0.05,
             "goal_stop_angular_speed": 0.1,
@@ -904,13 +906,15 @@ def test_native_fast_stop_uses_root_com_xy_and_partial_reset_clears_only_selecte
         env.close()
 
 
-def test_native_fast_stop_timeout_keeps_terminal_goal_stop_info_across_autoreset():
+@pytest.mark.parametrize("profile", ["fast_stop_v1", "fast_stop_v2"])
+def test_native_fast_stop_timeout_keeps_terminal_goal_stop_info_across_autoreset(profile):
     from isaac_field.training import _sb3_wrapper
 
     env = _make_env(
         plants=0, max_time=0.05, mode="goto", auto_reset=True, seed=90242,
         config_overrides={
-            "goto_reward_profile": "fast_stop_v1",
+            "goto_reward_profile": profile,
+            "fast_stop_failure_remaining_time_cost": profile == "fast_stop_v2",
             "goal_progress_budget": 5.0,
             "goal_stop_speed": 0.05,
             "goal_stop_angular_speed": 0.1,
@@ -927,7 +931,7 @@ def test_native_fast_stop_timeout_keeps_terminal_goal_stop_info_across_autoreset
         assert bool(dones[0])
         assert not infos[0]["TimeLimit.truncated"]
         assert info["reason"] == "time_limit"
-        assert info["goal_stop"]["profile"] == "fast_stop_v1"
+        assert info["goal_stop"]["profile"] == profile
         assert info["goal_stop"]["speed_source"] == "root_com_vel_w"
         assert np.isfinite(info["goal_stop"]["linear_speed_m_s"])
         assert np.isfinite(info["goal_stop"]["angular_speed_rad_s"])

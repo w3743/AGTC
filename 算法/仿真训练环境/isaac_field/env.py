@@ -54,6 +54,7 @@ from .layouts import generate_layout
 from .task import (
     Config,
     EpisodePoseSamplingError,
+    FAST_STOP_REWARD_PROFILES,
     FieldTask,
     Scene,
     sample_episode_start_goal,
@@ -683,7 +684,10 @@ class IsaacFieldEnv(DirectRLEnv):
             boundary=bool(np.any(t.robot[:2]<0.) or np.any(t.robot[:2]>self.field_cfg.size))
             overtilt_roll = abs(t.body_pose[2]) > 1.2
             overtilt_pitch = abs(t.body_pose[1]) > 1.2
-            fast_stop = self.field_cfg.goto_reward_profile == 'fast_stop_v1' and t.mode == 'goto'
+            fast_stop = (
+                self.field_cfg.goto_reward_profile in FAST_STOP_REWARD_PROFILES
+                and t.mode == 'goto'
+            )
             rock=False
             terrain=t.scene.terrain
             if terrain is not None and np.any(terrain.rock_blocking):
