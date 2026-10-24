@@ -109,3 +109,30 @@ python3.12 -m venv /opt/venv && /opt/venv/bin/pip install torch --index-url http
 - 修复：provider 的 state 语义（last_action 用 slew 后命令、云台 delta 置 0）对齐 reference；warp lidar origin 广播 bug（曾导致全部 miss）。
 - 产物：`proto/m1_lidar.py`、`proto/m1_state_feedback.py`、`proto/run_m1_verify.py`、`proto/m1_verification.json`；`observation_contract.json` 新增 `verification` 字段，train 时自动嵌入。
 - 剩余阻塞：VQF 姿态未移植（需评估用 Python `vqf` 包旁路或重写数值版本）；M2（spawn 接触、reset 语义、reward/termination、timeout bootstrap）进行中。
+
+## 11. M2 任务等价与 VQF 旁路（2026-10-25 07:30，CPU-only）
+
+- **spawn 接触**：修正此前“ncon=0 滑行”的误判——零动作下 `ncon` 均值 28、z 稳定 0.149957 m；原 ncon=0 是 2 Nm/轮 + action 0.5 的激进驱动把代理车抬翻（z→1.38 m）。环境已改为 Isaac 式 +1 cm clearance，1 s 漂移 <1e-5。
+- **reset**：复用 reference `sample_episode_start_goal`；纯地形场景 3/3 `pose_clear+connected` 通过；400 株场景 pose_clear 5/5 通过，但场景本身 202/965,849 格不可达（场景属性，不是 reset bug）。已加 `reset_with_poses()`。
+- **奖励/终止**：`FastStopV2Adapter` 与 `tensor_task.fast_stop_v2_step` **逐位相等**（rewards + 12 分量）；env 集成 reward 与同状态重算全等。
+- **60 s 超时**：reference 语义为 terminal failure（`done/terminated=True`、`truncated=False`、`reason=3`、失败+剩余时间惩罚）→ **无需 bootstrap**，现有 GAE done 掩码正确。
+- **VQF**：可直接复用 WSL 内 python `vqf==2.1.2`（与 reference 同包）；两条独立 estimator 路径残差 **0.0**，relative 直通姿态误差 0.977 → 0。成本 **1.264 ms/env/update**（64 env × 20 Hz ≈ 1.62 CPU 核；32 env ≈ 0.81 核）。接入 0.5 人日；全速 torch 批处理移植 2–4 人日；折中降频 5–10 Hz 可到 0.4–0.8 核（需重新标注姿态延迟）。
+
+### 等价性总表（详见 `C:/pioneer/wsl-native/proto/EQUIVALENCE_REPORT.md`）
+
+| 通道 | 状态 |
+|---|---|
+| lidar numpy | 逐位精确（6400 射线，0 差异） |
+| lidar Warp CUDA | hit-id 一致；2/6400 掠射光线差 3.35e-4 m |
+| state 33 | max 4.05e-7 |
+| feedback 37（直通姿态） | max 2.9e-8 |
+| feedback 37（VQF） | 未接入原生栈，姿态差 0.976967（旁路已验证 0 残差，接入 ≈0.5 人日） |
+| depth 160×88 / detections 16×8 | **仍占位** |
+
+→ `capability_metrics_allowed=false`；M0/M3 吞吐结论不受影响。
+
+### 能力验收剩余缺口（按优先级）
+
+1. feedback VQF 旁路接入（0.5 人日，CPU 成本 ~1.6 核@64env）；
+2. depth 160×88：Warp raycast 替代 RTX，需与 Isaac RTX 做域差登记；
+3. detections 16×8：从解析场景几何推导，需与 reference 逐元素对照。
