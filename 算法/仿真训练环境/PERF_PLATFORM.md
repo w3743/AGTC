@@ -44,8 +44,23 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 设计预算：96 iterations × 4096 = 393216 transitions（基线为 196608）。
 - 预计 ~107–113 s/iteration；`launch.json` 记录启动时间、命令与环境变量。
 
-## 5. 待验证
+## 5. WSL2 ARM64 原生栈（2026-10-25，已就绪，GPU 基准待训练空闲）
+
+- 发行版：`Ubuntu-24.04-Arm64`，用官方 rootfs（341,871,845 B）`wsl --import` 导入，无提权、未 `wsl --install`、未重启。
+- WSL 内网络直连可用（apt/pypi/pytorch 4–10 MB/s）；GPU 可见：`/usr/lib/wsl/lib/nvidia-smi` 报 RTX Spark N1X 98304 MiB / CUDA UMD 13.4。
+- 已装 aarch64 官方 wheel：python 3.12.3、torch 2.14.1+cu130、triton 3.8.0、warp-lang 1.18.0、mujoco 3.17.0 + mujoco-warp 3.17.0、newton 1.7.0、ovphysx 0.7.0、ovstage 0.3.0；CPU-only import 全部通过。
+- CPU-only 基准（GPU 隐藏）：torch CPU fp32 2048³ 294.7 ms ≈ 0.058 TFLOPS；MuJoCo CPU 64 env × 18 joints **28,668 env-steps/s**（0.112 s/50 步，约 57× 实时）；mujoco-warp CPU 回退 4,744 env-steps/s（仅对照）。
+- 接入评估结论（详见 `C:/pioneer/wsl-native/INTEGRATION_ASSESSMENT.md`）：
+  - 传感器编码器、PPO 接口、驱动控制、batched 奖励/终止在纯 torch 层，可近乎零改动复用；
+  - 轮系/前导轮 mimic 在 `newton_drive.py` 已有实现可复用；
+  - **主要风险是五路传感器**：现有 reference 后端是解析 raycast（`task.py:431–499`），可移植为 Warp kernel；CPU 实测约 1.4–1.55 M rays/s，64 env 的 depth 901k rays/次在 CPU 不可行，必须 GPU；GPU 数字待实测；
+  - 接触/摩擦不能照抄 PhysX（40 pos-iter/μ0.8）到 MuJoCo/Newton，需重标定；
+  - 关节口径：14 轮 + 2 云台 + 2 前导 = 18 actuated joints，另有 6-DOF 浮动基座（“19-DOF”是 body 数误称）。
+- 工作量粗估：奖励/编码器/PPO 接口 1–2 人日；物理底座/接触标定/mimic 重接 3–5 人日；LiDAR+depth+detections 的 Warp 重建与逐元素对照 1–2 周。
+
+## 6. 待验证
 
 - dt=5 ms 与 dt=1 ms 的固定动作轨迹/接触保真对比（未做，不做等价性声明）。
 - 训练后策略在 dt=1 ms（默认协议）下的评估与基线对比。
-- WSL2 ARM64 原生栈（Newton/OvPhysX + Warp 传感器）的吞吐基准（外部进行中；GPU 基准需等训练结束）。
+- WSL2 原生栈的 GPU 基准（matmul、Warp raycast、64 env × 18 joints 仿真 steps/s、GPU util/功耗），需在 Isaac 训练暂停后执行。
+- 原生栈最小训练闭环的原型吞吐（解析 raycast 替代 RTX 传感器），用于决定是否迁移。
