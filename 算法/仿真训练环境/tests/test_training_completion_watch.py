@@ -7,6 +7,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+if os.name != "nt":
+    raise unittest.SkipTest("Windows completion watcher")
+
 SCRIPT = Path(__file__).parents[1] / "scripts" / "watch_training_completion.py"
 spec = importlib.util.spec_from_file_location("training_completion_watch", SCRIPT)
 watcher = importlib.util.module_from_spec(spec)
