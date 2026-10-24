@@ -71,3 +71,25 @@ python3.12 -m venv /opt/venv && /opt/venv/bin/pip install torch --index-url http
 4. WSL2 小批量 GPU launch 开销（mujoco-warp 8,028 env-steps/s）→ 原型默认 newton XPBD 或 CPU。
 5. 宿主物理内存 32 GiB、WSL 默认上限 15 GiB；64 env 原型需监控内存，必要时调 `.wslconfig`（需用户确认）。
 6. GPU 时钟/功耗墙（约 690 MHz）→ 任何原生栈也无法突破该上限，只能减少同步与 Kit 开销。
+
+## 8. M0/M3 实测结果（2026-10-25，WSL2 原型，非等价观测）
+
+同口径定义：1 sample = 一个 env 的一个 policy step；M0 原型 iteration = 64 env × 16 steps = 1024 samples。
+
+| 配置 | 端到端 iteration | samples/s（稳态） | 相对 Isaac 42.65 samples/s |
+|---|---|---|---|
+| M0 CPU（mujoco_cpu + numpy lidar + CPU 编码器/PPO） | 12.3–12.7 s | 80.4–83.1 | 1.9× |
+| M3a（CPU 物理 + GPU 编码器/PPO + warp lidar） | 4.154 s | 246.5 | 5.8× |
+| M3b（newton XPBD GPU 物理 + GPU 编码器/PPO + warp lidar） | 3.417 s（复测 3.243 s） | 299.6（复测 315.7） | 7.0–7.4× |
+
+- 首 iteration 含 19–25 s 一次性 CUDA warmup；2-iteration 平均口径为 1.7–2.1×，不达 5×。**门禁按稳态判定通过（M3a 5.8×、M3b 7.0–7.4×）**，报告同时给出两种口径。
+- M3b 分项：env_step 2.556 s（≈18,900 env-steps/s，纯物理基准 33,244）、policy_act 0.094 s、learning 0.523 s；RSS 2.8 GB。
+- 观测等价性：**未完成**——lidar、state/feedback 未与 Isaac 逐元素对照，depth/detections 为占位；`observation_contract.json` 5 通道 `usable_for_capability=false`，stdout 打印 `PROTOTYPE_THROUGHPUT_ONLY`。
+- 已知问题：newton XPBD 只跑 2 iteration，长期稳定性未验证；物理/观测均不等价；`spawn` 高度与接触（ncon=0 滑行）疑点；M3a 已接近 CPU 物理天花板。
+- 产物：`C:/pioneer/wsl-native/proto/REPORT.md` §5/§8、`proto/runs/m0_rep_{a,b}/`、`proto/runs/m3_{a,b}_20261025_070929/`、`runs/gpu_samples_m3_{a,b,clock}.csv`。
+
+## 9. 决策建议（待用户确认）
+
+- 吞吐门禁已过：原生栈稳态 7.0–7.4×（M3b），但仅限**吞吐**；能力评估不可用。
+- 继续迁移需要 M1（观测等价 1.5–2 人日）+ M2（任务/reset/奖励等价 1–1.5 人日），共 2.5–3.5 人日；完成后需用真观测重跑 M3 确认吞吐不退化。
+- 在那之前，正式训练仍建议留在已验证的 Isaac perf 配置（19.6×）；原生栈只用于吞吐实验/超参搜索。
