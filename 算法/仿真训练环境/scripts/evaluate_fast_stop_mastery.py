@@ -12,6 +12,7 @@ from pathlib import Path
 import sys
 import zipfile
 from typing import Any
+from functools import wraps
 
 ROOT = Path(__file__).resolve().parents[1]
 TRIAL = ROOT / "results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2"
@@ -21,6 +22,17 @@ FAST_STOP_SMOKE_MAX_SCENARIOS = 2
 FAST_STOP_SMOKE_MAX_STEPS = 2
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+
+def _with_runtime(function):
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        from isaac_field.runtime import launch_app
+
+        with launch_app(device="cuda:0", headless=True):
+            return function(*args, **kwargs)
+
+    return wrapped
 
 from scripts import evaluate_fast_stop_resume as trajectory_runner
 from scripts import train_isaac_mastery as mastery
@@ -99,10 +111,11 @@ def _validate_rsl_task_contract(contract: dict[str, Any]):
 
 def _create_rsl_evaluation_adapter(contract: dict[str, Any], seed: int):
     """Create a one-environment task from checkpoint metadata, without SB3 fallback."""
-    from isaac_field.env import SingleFieldAdapter, make_env
+    from isaac_field.env import SingleFieldAdapter
+    from isaac_field.runtime import create_env
 
     task, front_guides, body_stability = _validate_rsl_task_contract(contract)
-    engine = make_env(
+    engine = create_env(
         cfg=task,
         mode="goto",
         num_envs=1,
@@ -113,6 +126,7 @@ def _create_rsl_evaluation_adapter(contract: dict[str, Any], seed: int):
         distance_cost=0.0,
         front_guide_spec=front_guides,
         body_stability_config=body_stability,
+        rsl=True,
     )
     return engine, SingleFieldAdapter(engine)
 
@@ -192,6 +206,7 @@ def _evaluate_rsl_checkpoint(
     return evaluated, contract, path, seeds
 
 
+@_with_runtime
 def run_rsl_evaluation(
     checkpoint: str | Path,
     *,
@@ -211,6 +226,7 @@ def run_rsl_evaluation(
     return evaluated
 
 
+@_with_runtime
 def run_rsl_smoke(
     checkpoint: str | Path,
     *,
@@ -469,11 +485,27 @@ def run(trial: str | Path = TRIAL, output: str | Path = DEFAULT_OUTPUT, *,
                 "trajectory_runner_sha256": goal_viewer._sha256(Path(trajectory_runner.__file__).resolve()),
                 "claim_limit": "Process diagnosis on development transfer seeds; no capability-improvement claim."}
     _write(output / "run_manifest.json", manifest)
+    from isaac_field.policy_contract import BACKEND_IDENTITY
+    model_identity = {
+        key: (protocol.get(key) if isinstance(protocol.get(key), str) and protocol.get(key).strip()
+              else "legacy_unrecorded")
+        for key in ("simulator", "physics_backend", "learning_backend")
+    }
+    manifest.update({
+        "model_backend": "sb3_legacy",
+        "model_backend_identity": model_identity,
+        "environment_backend_identity": dict(BACKEND_IDENTITY),
+        "cross_backend_evaluation": model_identity != BACKEND_IDENTITY,
+    })
+    _write(output / "run_manifest.json", manifest)
     try:
-        for member in protocol["transfer_probe"]["members"]:
-            report = _evaluate_member(context, output, member, device)
-            _validate_report(report, context, member)
-            _write(output / f"evaluation_{member['name']}.json", report)
+        from isaac_field.runtime import launch_app
+
+        with launch_app(device="cuda:0", headless=True):
+            for member in protocol["transfer_probe"]["members"]:
+                report = _evaluate_member(context, output, member, device)
+                _validate_report(report, context, member)
+                _write(output / f"evaluation_{member['name']}.json", report)
         manifest.update(status="completed", completed_at_utc=datetime.now(timezone.utc).isoformat())
         _write(output / "run_manifest.json", manifest)
         return {"status": "completed", "output": str(output),

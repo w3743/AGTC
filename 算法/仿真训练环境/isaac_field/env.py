@@ -17,34 +17,35 @@ wp.config.enable_backward = False
 
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg, IdealPDActuatorCfg
-from isaaclab.assets import AssetBaseCfg
+from isaaclab.assets import AssetBaseCfg, RigidObjectCfg, RigidObjectCollectionCfg
 from isaaclab.envs import DirectRLEnv, DirectRLEnvCfg
 from isaaclab.scene import InteractiveSceneCfg
-from isaaclab.sensors import CameraCfg, RayCasterCfg, ImuCfg, patterns
+from isaaclab.sensors import CameraCfg, MultiMeshRayCasterCfg, ImuCfg, patterns
 from isaaclab.utils import configclass
 from isaaclab.utils.math import euler_xyz_from_quat, matrix_from_quat, quat_from_matrix
-from isaaclab_newton.cloner import newton_builder_world_hook
-from isaaclab_newton.physics import NewtonCfg, NewtonShapeCfg, MJWarpSolverCfg
-from isaaclab_newton.renderers import NewtonWarpRendererCfg
+from isaaclab_physx.physics import PhysxCfg
+from isaaclab_physx.renderers import IsaacRtxRendererCfg
+from isaaclab_physx.sim.schemas import PhysxCollisionCfg
+from isaaclab_physx.sim.spawners.materials import PhysxRigidBodyMaterialCfg
 
 from .assets import (
     ROBOT_SPEC,
     FrontGuideSpec,
     GIMBAL_YAW_JOINT,
     GIMBAL_PITCH_JOINT,
-    ensure_robot_asset,
     robot_articulation_cfg,
     robot_asset_spec_sha256,
 )
 from .body_stability import BodyStabilityAccumulator, BodyStabilityConfig, body_stability_sample
 from .action_contract import ACTION_COMPONENTS, action_config as policy_action_config
 from .drive_control import SideIntegralDriveController
-from .newton_drive import (
-    SameSideMimicBuilderHook,
-    audit_same_side_mimic_model,
+from .physx_drive import (
+    ensure_physx_robot_asset,
+    audit_physx_coupling,
     build_physics_contact_metadata,
     same_side_wheel_coupling_metadata,
 )
+from .runtime import ensure_runtime, simulator_identity
 from .feedback import (
     ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, STATE_DIM, FeedbackSample,
     feedback_config,
@@ -66,6 +67,21 @@ from .terrain import Terrain
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def ray_ranges(data):
+    """Metric ranges from public PhysX hit points; these patterns start at the sensor origin."""
+    return torch.linalg.vector_norm(data.ray_hits_w.torch - data.pos_w.torch[:, None, :], dim=-1)
+
+
+@configclass
+class FieldSceneCfg(InteractiveSceneCfg):
+    # The official launcher scans config before IsaacFieldEnv builds geometry.
+    # Declare camera intent here so its normal scan selects the RTX experience;
+    # the constructor replaces this with the task's calibrated camera config.
+    depth = CameraCfg(prim_path='{ENV_REGEX_NS}/Robot/gimbal_yaw_link/gimbal_pitch_link/Stereo',
+        width=88, height=160, data_types=['distance_to_image_plane'],
+        renderer_cfg=IsaacRtxRendererCfg(), spawn=None)
+
+
 @configclass
 class FieldEnvCfg(DirectRLEnvCfg):
     task: Config = Config()
@@ -84,7 +100,7 @@ class FieldEnvCfg(DirectRLEnvCfg):
     drive_effort_limit: float = 2.0
     couple_same_side_wheels: bool = True
     # Optional pair of passive front-guide rollers. These are asset/contact
-    # geometry only and never enter the 14-joint drive or mimic contracts.
+    # geometry only and never enter the 14-joint drive actuator contract.
     # configclass recursively walks dataclasses, so keep the frozen geometry
     # object serialized until IsaacFieldEnv restores it after config wrapping.
     front_guide_spec: dict | None = None
@@ -98,16 +114,14 @@ class FieldEnvCfg(DirectRLEnvCfg):
     drive_efficiency_assumption: float = 1.0
     imu_offset_pos: tuple[float, float, float] = (0.0, 0.0, 0.0)
     imu_offset_rot_xyzw: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 1.0)
-    scene = InteractiveSceneCfg(num_envs=4, env_spacing=110., replicate_physics=True)
+    scene = FieldSceneCfg(num_envs=4, env_spacing=110., replicate_physics=True)
     sim = sim_utils.SimulationCfg(
         dt=.001, render_interval=50,
-        physics=NewtonCfg(
-            solver_cfg=MJWarpSolverCfg(njmax=256, nconmax=128, iterations=40, ls_iterations=30,
-                                      cone='elliptic', impratio=1.0, integrator='implicitfast',
-                                      use_mujoco_contacts=False),
-            default_shape_cfg=NewtonShapeCfg(margin=.002, gap=.005, mu=.8),
-            load_visual_shapes=True, use_cuda_graph=True,
-        ),
+        physics=PhysxCfg(solver_type=1, min_position_iteration_count=40,
+                         max_position_iteration_count=40, min_velocity_iteration_count=1,
+                         max_velocity_iteration_count=1),
+        physics_material=PhysxRigidBodyMaterialCfg(static_friction=.8, dynamic_friction=.8,
+            restitution=0., friction_combine_mode='average', restitution_combine_mode='average'),
     )
     decimation = 50
     episode_length_s = 900.
@@ -131,6 +145,9 @@ class IsaacFieldEnv(DirectRLEnv):
 
     def __init__(self, cfg: FieldEnvCfg | None = None, render_mode=None, **kwargs):
         cfg = cfg or FieldEnvCfg()
+        if not isinstance(cfg.sim.physics, PhysxCfg):
+            raise ValueError('IsaacFieldEnv requires the Isaac Sim PhysX backend')
+        ensure_runtime(cfg, device=cfg.sim.device)
         self.front_guide_spec = (
             None if cfg.front_guide_spec is None else FrontGuideSpec(**cfg.front_guide_spec)
         )
@@ -185,7 +202,8 @@ class IsaacFieldEnv(DirectRLEnv):
         if dry_count:
             self._targets[np.random.default_rng(self._geometry_seed).choice(c.plants,dry_count,replace=False)]=True
         template = Scene(c, prototype_scene.xy, self._targets, np.random.default_rng(self._geometry_seed), terrain=self.terrain)
-        asset_fingerprint = {'config': asdict(c), 'seed': cfg.seed, 'asset_revision': 8}
+        asset_fingerprint = {'config': asdict(c), 'seed': cfg.seed, 'asset_revision': 9,
+                             'physics_backend': 'physx'}
         if self.front_guide_spec is not None:
             asset_fingerprint['robot_asset_spec_sha256'] = robot_asset_spec_sha256(
                 ROBOT_SPEC, self.front_guide_spec,
@@ -198,19 +216,21 @@ class IsaacFieldEnv(DirectRLEnv):
             terrain_asset(self.terrain, terrain_path)
         crop_path=asset_dir/'crop.usda'
         if c.plants and not crop_path.exists():
-            crop_asset(template,asset_dir)
+            crop_asset(template,asset_dir, physics_backend='physx')
         cfg.scene.field = AssetBaseCfg(prim_path='{ENV_REGEX_NS}/Field',
-                                      spawn=sim_utils.UsdFileCfg(usd_path=str(terrain_path)))
-        robot_asset = ensure_robot_asset(
+            spawn=sim_utils.UsdFileCfg(usd_path=str(terrain_path),
+                physics_material=cfg.sim.physics_material,
+                collision_props=[PhysxCollisionCfg(contact_offset=.005, rest_offset=0.)]))
+        robot_asset = ensure_physx_robot_asset(
             ROOT / 'results/isaac_field/assets', front_guide_spec=self.front_guide_spec,
+            couple_support_wheels=cfg.couple_same_side_wheels,
         )
         robot = robot_articulation_cfg(robot_asset, front_guide_spec=self.front_guide_spec)
         robot.prim_path = '{ENV_REGEX_NS}/Robot'
         robot.init_state.pos = (2., 2., .3)
         robot.actuators = {
-            # The Newton-native explicit actuator consumes feedforward and PD
-            # together. `joint_effort_limit` alone does not clamp that output;
-            # `actuator_effort_limit` authors the native max-effort clamp.
+            # The shared explicit-actuator adapter clamps the combined PD and
+            # feedforward effort before writing it to the PhysX joint view.
             'drive': IdealPDActuatorCfg(joint_names_expr=['.*_wheel_joint'], stiffness=0., damping=cfg.drive_velocity_gain,
                                         actuator_effort_limit=cfg.drive_effort_limit,
                                         joint_effort_limit=cfg.drive_effort_limit, joint_velocity_limit=110.),
@@ -218,23 +238,39 @@ class IsaacFieldEnv(DirectRLEnv):
                                          joint_effort_limit=1., joint_velocity_limit=3.),
         }
         cfg.scene.robot = robot
+        cfg.scene.light = AssetBaseCfg(prim_path='/World/FieldLight',
+            spawn=sim_utils.DomeLightCfg(intensity=2000., color=(.75, .75, .75)))
         if c.plants:
-            cfg.scene.corn = AssetBaseCfg(prim_path='{ENV_REGEX_NS}/Plants',
-                                        spawn=sim_utils.UsdFileCfg(usd_path=str(crop_path)))
+            cfg.scene.corn = RigidObjectCollectionCfg(rigid_objects={
+                f'Corn_{i}': RigidObjectCfg(prim_path=f'{{ENV_REGEX_NS}}/Plants/Corn_{i}',
+                    spawn=sim_utils.UsdFileCfg(usd_path=str(asset_dir / 'corn' / f'corn_{i:04}.usda')),
+                    init_state=RigidObjectCfg.InitialStateCfg(
+                        pos=(*map(float, template.xy[i]), float(template.root_z[i]))))
+                for i in range(c.plants)})
         mount = '{ENV_REGEX_NS}/Robot/gimbal_yaw_link/gimbal_pitch_link'
         cfg.scene.imu = ImuCfg(prim_path=mount, update_period=0.,
             offset=ImuCfg.OffsetCfg(pos=cfg.imu_offset_pos, rot=cfg.imu_offset_rot_xyzw))
-        cfg.scene.lidar = RayCasterCfg(prim_path=mount, update_period=0., mesh_prim_paths=[],
+        ray_targets = [MultiMeshRayCasterCfg.RaycastTargetCfg(
+            prim_expr='{ENV_REGEX_NS}/Field', is_shared=True, track_mesh_transforms=False)]
+        if c.plants:
+            # Include visual leaf meshes and stem geometry; collision masks do
+            # not make plants transparent to the physical range sensors.
+            # One body expression per target also keeps PhysX's body-major
+            # view order aligned with the caster's environment-major table.
+            ray_targets.extend(MultiMeshRayCasterCfg.RaycastTargetCfg(
+                prim_expr=f'{{ENV_REGEX_NS}}/Plants/Corn_{i}', is_shared=True,
+                track_mesh_transforms=True) for i in range(c.plants))
+        cfg.scene.lidar = MultiMeshRayCasterCfg(prim_path=mount, update_period=0., mesh_prim_paths=ray_targets,
             pattern_cfg=patterns.LidarPatternCfg(channels=1, vertical_fov_range=(0., 0.),
                 horizontal_fov_range=(-180., 180.), horizontal_res=360./c.lidar_rays),
             ray_alignment='base', max_distance=c.lidar_range)
-        cfg.scene.rangefinder = RayCasterCfg(prim_path=mount, update_period=0., mesh_prim_paths=[],
+        cfg.scene.rangefinder = MultiMeshRayCasterCfg(prim_path=mount, update_period=0., mesh_prim_paths=ray_targets,
             pattern_cfg=patterns.LidarPatternCfg(channels=1, vertical_fov_range=(0., 0.),
                 horizontal_fov_range=(0., 0.), horizontal_res=1.),
             ray_alignment='base', max_distance=c.camera_range)
         cfg.scene.depth = CameraCfg(prim_path=mount+'/Stereo', width=c.depth_width, height=c.depth_height,
             offset=CameraCfg.OffsetCfg(convention='world'), update_period=0., update_latest_camera_pose=True,
-            data_types=['distance_to_image_plane'], renderer_cfg=NewtonWarpRendererCfg(),
+            data_types=['distance_to_image_plane'], renderer_cfg=IsaacRtxRendererCfg(),
             spawn=sim_utils.PinholeCameraCfg.from_intrinsic_matrix(prototype.depth_intrinsics.ravel().tolist(),
                 c.depth_width, c.depth_height, clipping_range=(c.depth_min_range,c.depth_range)))
         detector_width = 64
@@ -243,7 +279,7 @@ class IsaacFieldEnv(DirectRLEnv):
         cfg.scene.detector = CameraCfg(prim_path=mount+'/Detector', width=detector_width, height=detector_width,
             offset=CameraCfg.OffsetCfg(convention='world'), update_period=0.,
             data_types=['instance_segmentation','distance_to_image_plane'],
-            renderer_cfg=NewtonWarpRendererCfg(colorize_instance_segmentation=False),
+            renderer_cfg=IsaacRtxRendererCfg(colorize_instance_segmentation=False),
             spawn=sim_utils.PinholeCameraCfg.from_intrinsic_matrix(detector_k,64,64,
                 clipping_range=(.12,c.camera_range)))
         self.tasks = [FieldTask(c, 'goto') for _ in range(cfg.scene.num_envs)]
@@ -253,40 +289,12 @@ class IsaacFieldEnv(DirectRLEnv):
             task.root_com_velocity_xy = np.zeros(2, dtype=np.float64)
             task.body_stability_sample = None
             task.body_stability_stats = BodyStabilityAccumulator()
-        self._same_side_mimic_hook = None
-        wheel_names_by_side = {
-            side: [f'{wheel.name}_wheel_joint' for wheel in ROBOT_SPEC.wheel_specs if wheel.side == side]
-            for side in ('left', 'right')
-        }
         guide_coupling_enabled = (
             self.front_guide_spec is not None
             and self.front_guide_spec.rotation_coupling == 'same_side_track_speed'
         )
-        if cfg.couple_same_side_wheels or guide_coupling_enabled:
-            guide_names_by_side = None
-            guide_ratio_by_side = None
-            if guide_coupling_enabled:
-                guide_wheels = self.front_guide_spec.wheel_specs(ROBOT_SPEC)
-                guide_names_by_side = {wheel.side: wheel.joint_name for wheel in guide_wheels}
-                guide_ratio = ROBOT_SPEC.wheel_radius_m / self.front_guide_spec.radius_m
-                guide_ratio_by_side = {side: guide_ratio for side in ('left', 'right')}
-            self._same_side_mimic_hook = SameSideMimicBuilderHook(
-                wheel_names_by_side,
-                expected_world_count=cfg.scene.num_envs,
-                couple_support_wheels=cfg.couple_same_side_wheels,
-                guide_joint_names_by_side=guide_names_by_side,
-                guide_ratio_by_side=guide_ratio_by_side,
-            )
-            # The public callback registry is process-global; scope it to the
-            # model-construction call and remove it before stepping or resets.
-            with newton_builder_world_hook(self._same_side_mimic_hook):
-                super().__init__(cfg, render_mode, **kwargs)
-            self._same_side_mimic_model_audit = audit_same_side_mimic_model(
-                self._same_side_mimic_hook, self.sim.physics_manager.get_model(),
-            )
-        else:
-            super().__init__(cfg, render_mode, **kwargs)
-            self._same_side_mimic_model_audit = None
+        super().__init__(cfg, render_mode, **kwargs)
+        self._same_side_mimic_model_audit = audit_physx_coupling(self)
         self._same_side_wheel_coupling_metadata = same_side_wheel_coupling_metadata(
             cfg.couple_same_side_wheels,
             guide_relations_per_world=(
@@ -318,18 +326,8 @@ class IsaacFieldEnv(DirectRLEnv):
         self.gimbal_target = torch.zeros_like(self.command)
         self._reward = torch.zeros(self.num_envs,device=self.device)
         self._last_results = [None] * self.num_envs
-        # Static kinematic roots intentionally have no articulation/DOFs. Use
-        # Newton's public state buffers for their episode-only pose updates.
-        model=self.sim.physics_manager.get_model()
-        indices=np.full((self.num_envs,c.plants),-1,np.int64)
-        for j,label in enumerate(model.body_label):
-            match=re.search(r'/env_(\d+)/Plants/Corn_(\d+)$',label)
-            if match:
-                env_id,plant_id=map(int,match.groups())
-                indices[env_id,plant_id]=j
-        if np.any(indices<0):
-            raise RuntimeError('not all authored plant bodies were imported by Newton')
-        self._plant_body_ids=torch.as_tensor(indices,device=self.device)
+        # Kinematic plant roots use the backend-neutral public collection API.
+        self.plants = self.scene['corn'] if c.plants else None
         for i,t in enumerate(self.tasks):
             t.attach_sensors(lambda kind, i=i: self._capture(i,kind))
 
@@ -471,12 +469,9 @@ class IsaacFieldEnv(DirectRLEnv):
         if self.field_cfg.plants:
             pp=torch.as_tensor(np.stack(plant_poses),device=self.device)
             pp[:,:,:3]+=self.scene.env_origins[env_ids,None,:]
-            body_ids=self._plant_body_ids[env_ids]
-            manager=self.sim.physics_manager
-            for state in (manager.get_state_0(),manager.get_state_1()):
-                wp.to_torch(state.body_q)[body_ids]=pp
-                wp.to_torch(state.body_qd)[body_ids]=0
-            manager.invalidate_body_state(env_ids=wp.from_torch(env_ids.to(torch.int32)))
+            self.plants.write_body_pose_to_sim_index(body_poses=pp, env_ids=env_ids)
+            self.plants.write_body_velocity_to_sim_index(
+                body_velocities=torch.zeros((*pp.shape[:2], 6), device=self.device), env_ids=env_ids)
         self.command[env_ids]=0
         self.track_command[env_ids]=0
         self.wheel_target_velocity[env_ids]=0
@@ -527,7 +522,7 @@ class IsaacFieldEnv(DirectRLEnv):
         angles=torch.stack(euler_xyz_from_quat(poses[:,3:]),-1).detach().cpu().numpy()
         rotation=matrix_from_quat(poses[:,3:])
         forward_speed=(velocities[:,:3]*rotation[:,:,0]).sum(-1).detach().cpu().numpy()
-        # Simulator truth for chassis stability: Newton supplies angular
+        # Simulator truth for chassis stability: PhysX supplies angular
         # velocity in world axes; rotate it into body axes. The moving-gimbal
         # IMU and commanded rates are not substitutes for this signal.
         body_angular_velocity = torch.bmm(
@@ -553,7 +548,7 @@ class IsaacFieldEnv(DirectRLEnv):
         """Sample physical signals once; observation reads never advance the filter.
 
         Explicit PD drive effort is the post-limit torque actually written into
-        Newton. Its conversion to an equivalent motor Iq is an uncalibrated
+        PhysX. Its conversion to an equivalent motor Iq is an uncalibrated
         drivetrain model, not a measurement of hardware phase current.
         """
         imu = self.scene['imu'].data
@@ -603,7 +598,7 @@ class IsaacFieldEnv(DirectRLEnv):
         if kind not in self._sensor_cache:
             if kind=='lidar':
                 sensor=self.scene['lidar'].data
-                self._sensor_cache[kind]=sensor.ray_distances.torch.detach().cpu().numpy().copy()
+                self._sensor_cache[kind]=ray_ranges(sensor).detach().cpu().numpy().copy()
             elif kind=='depth':
                 data=self.scene['depth'].data
                 self._sensor_cache[kind]=(data.output['distance_to_image_plane'].torch.detach().cpu().numpy()[...,0].copy(),
@@ -613,7 +608,7 @@ class IsaacFieldEnv(DirectRLEnv):
                 self._sensor_cache[kind]=(
                     sensor.output['instance_segmentation'].torch.detach().cpu().numpy()[...,0].copy(),
                     sensor.info['instance_segmentation'],
-                    self.scene['rangefinder'].data.ray_distances.torch.detach().cpu().numpy().copy())
+                    ray_ranges(self.scene['rangefinder'].data).detach().cpu().numpy().copy())
         if kind=='lidar':
             ideal=self._sensor_cache[kind][i]
             valid=np.isfinite(ideal)&(ideal>=c.lidar_min_range)&(ideal<c.lidar_range)
@@ -632,7 +627,7 @@ class IsaacFieldEnv(DirectRLEnv):
                     'calibration_source':'Isaac Lab Camera.data.intrinsic_matrices; scaled native focal length, centered principal point'}
         masks,metadata,laser=self._sensor_cache[kind]
         image=masks[i]
-        labels=metadata.get('idToLabels',{})
+        labels=(metadata or {}).get('idToLabels',{})
         detections=[]
         yy,xx=np.indices(image.shape)
         cone=(xx-31.5)**2+(yy-31.5)**2<=32**2
@@ -761,6 +756,7 @@ class IsaacFieldEnv(DirectRLEnv):
             # Both explicit and same-step autoresets must render the new poses.
             self.scene.write_data_to_sim()
             self.sim.forward()
+            self.sim.render()
             for name in ('lidar','rangefinder','depth','detector'):
                 self.scene[name].update(0.,force_recompute=True)
         self._refresh_state()
@@ -777,8 +773,10 @@ class IsaacFieldEnv(DirectRLEnv):
                           for key in observations[0]}}
 
     def plant_positions(self):
-        """Actual Newton plant poses, in stable plant-index order (debug/tests)."""
-        return wp.to_torch(self.sim.physics_manager.get_state_0().body_q)[self._plant_body_ids,:3]
+        """Actual PhysX plant poses, in stable plant-index order (debug/tests)."""
+        if self.plants is None:
+            return torch.empty((self.num_envs, 0, 3), device=self.device)
+        return self.plants.data.body_link_pose_w.torch[..., :3]
 
     @property
     def drive_config(self):
@@ -803,7 +801,7 @@ class IsaacFieldEnv(DirectRLEnv):
             actuator_model='explicit_IdealPD_velocity_servo',
             controller='native_per_wheel_P_plus_two_state_side_integral_feedforward',
             motor_torque_constant_nm_per_a=self.cfg.motor_torque_constant_nm_per_a,
-            current_feedback_source='equivalent_from_newton_native_post_clamp_applied_effort; model_not_measured',
+            current_feedback_source='equivalent_from_physx_post_clamp_applied_effort; model_not_measured',
             max_track_speed_mps=max_track_speed_mps,
             track_acceleration_mps2=self.field_cfg.acceleration,
             velocity_gain=self.cfg.drive_velocity_gain,
@@ -817,16 +815,16 @@ class IsaacFieldEnv(DirectRLEnv):
             integral_broadcast='same_side_integral_ff_to_each_of_7_proxy_wheels',
             integral_limit_nm_per_proxy_wheel=per_wheel_effort_nm,
             integral_antiwindup=(
-                'conditional_on_side_mean_P_estimate; final_safety_is_Newton_native_per_wheel_clamp'
+                'conditional_on_side_mean_P_estimate; final_safety_is_explicit_actuator_per_wheel_clamp'
             ),
             integral_gain_status='uncalibrated simulation candidate; not real motor/controller calibration',
             wheel_effort_limit_nm=per_wheel_effort_nm,
             actuator_effort_limit_nm=per_wheel_effort_nm,
             joint_effort_limit_nm=per_wheel_effort_nm,
-            effort_clamp_source='NewtonMaxEffortClampingAPI_after_combined_PD_and_feedforward',
-            wheel_effort_limit_basis='actual_Newton_native_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque',
+            effort_clamp_source='explicit_actuator_adapter_after_combined_PD_and_feedforward',
+            wheel_effort_limit_basis='actual_PhysX_adapter_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque',
             gimbal_solver_joint_effort_limit_nm=1.0,
-            gimbal_effort_limit_basis='implicit_Newton_MJWarp_joint_effort_limit_to_actuator_force_range',
+            gimbal_effort_limit_basis='implicit_PhysX_joint_effort_limit',
             drive_sprocket_radius_m=spec.drive_sprocket_radius_m,
             drive_sprocket_diameter_m=spec.drive_sprocket_diameter_m,
             drive_reduction_ratio=spec.drive_reduction_ratio,
@@ -941,6 +939,10 @@ class IsaacFieldEnv(DirectRLEnv):
         return contract
 
     @property
+    def backend_identity(self):
+        return simulator_identity()
+
+    @property
     def action_config(self):
         return policy_action_config()
 
@@ -953,7 +955,7 @@ class IsaacFieldEnv(DirectRLEnv):
 def make_env(cfg=None, mode='mixed', num_envs=1, seed=7, auto_reset=True, *,
              goal_distance=None, goal_angle=math.pi, distance_cost=0., viewer_port=None,
              couple_same_side_wheels=True, front_guide_spec=None,
-             body_stability_config=None):
+             body_stability_config=None, rsl=False):
     if front_guide_spec is not None:
         if not isinstance(front_guide_spec, FrontGuideSpec):
             raise TypeError("front_guide_spec must be FrontGuideSpec or None")
@@ -972,6 +974,9 @@ def make_env(cfg=None, mode='mixed', num_envs=1, seed=7, auto_reset=True, *,
         from isaaclab_visualizers.viser import ViserVisualizerCfg
         env_cfg.sim.visualizer_cfgs=[ViserVisualizerCfg(port=viewer_port,bind_address='127.0.0.1',
             display_address='localhost',eye=(4.,-4.,3.),lookat=(2.,2.,0.),open_browser=False)]
+    if rsl:
+        from .rsl_rl_env import IsaacFieldRslEnv
+        return IsaacFieldRslEnv(env_cfg)
     return IsaacFieldEnv(env_cfg)
 
 
@@ -983,7 +988,8 @@ class SingleFieldAdapter(gym.Env):
             raise ValueError('SingleFieldAdapter requires num_envs=1')
         self.engine=env
         self.cfg=env.field_cfg
-        self.observation_space=env.single_observation_space['policy']
+        space = env.single_observation_space
+        self.observation_space = space['policy'] if 'policy' in space.spaces else space
         self.action_space=env.single_action_space
 
     @property
@@ -1008,7 +1014,7 @@ class SingleFieldAdapter(gym.Env):
     def scene_payload(self):return self.task.scene_payload()
     def state_payload(self):
         state=self.task.state_payload()
-        state.update(backend='Isaac Lab / Newton MJWarp',drive='14 driven rollers',
+        state.update(backend='Isaac Sim / Isaac Lab / PhysX',drive='14 driven rollers',
                      collision_metric='geometric footprint overlap with blocking rocks')
         return state
     def close(self):self.engine.close()

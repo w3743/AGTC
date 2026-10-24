@@ -27,9 +27,12 @@ from .action_contract import action_config
 from .feedback import INPUT_SCHEMA
 from .sensor_encoder import SensorEncoderCore as SensorEncoder
 from .policy_contract import (
+    BACKEND_IDENTITY_KEYS,
     BRANCH_DIMS,
     FEATURES_DIM,
     OBSERVATION_SHAPES,
+    validate_backend_identity,
+    recorded_backend_identity,
     _validate_observation_config,
     _encoder_schema_for_input,
     _field_encoder_config,
@@ -205,8 +208,15 @@ class RslFieldRNNModel(RNNModel):
             raise ValueError("field PPO heads must be one 64-unit tanh layer")
         if obs_normalization:
             raise ValueError("field policy requires obs_normalization=False")
-        if rnn_type.lower() != "lstm" or int(rnn_hidden_dim) != FIELD_LSTM_HIDDEN_DIM or int(rnn_num_layers) != FIELD_LSTM_NUM_LAYERS:
-            raise ValueError("field recurrent policy requires an LSTM with hidden_dim=512 and num_layers=1")
+        if (
+            rnn_type.lower() != "lstm"
+            or isinstance(rnn_hidden_dim, bool)
+            or int(rnn_hidden_dim) < 1
+            or int(rnn_hidden_dim) != rnn_hidden_dim
+            or isinstance(rnn_num_layers, bool)
+            or int(rnn_num_layers) != FIELD_LSTM_NUM_LAYERS
+        ):
+            raise ValueError("field recurrent policy requires an LSTM with a positive hidden_dim and num_layers=1")
         if obs_set == "actor" and distribution_cfg is None:
             raise ValueError("field actor requires a Gaussian distribution")
         if obs_set == "critic" and distribution_cfg is not None:
@@ -258,7 +268,7 @@ class RslFieldRNNModel(RNNModel):
         self.activation_name = activation
         self.obs_normalization = False
         self.rnn_type = "lstm"
-        self.rnn_hidden_dim = FIELD_LSTM_HIDDEN_DIM
+        self.rnn_hidden_dim = int(rnn_hidden_dim)
         self.rnn_num_layers = FIELD_LSTM_NUM_LAYERS
         self.distribution_config = distribution_config
 
@@ -374,6 +384,16 @@ def build_field_policy_contract(
     """Build the JSON-safe identity attached to every RSL field checkpoint."""
     observation_config = _resolve_env_contract_value(env, "observation_config")
     configured_action = _resolve_env_contract_value(env, "action_config", action_config())
+    backend_identity = _resolve_env_contract_value(env, "backend_identity")
+    if backend_identity is None:
+        # IsaacFieldEnv exposes the same identity in flattened attributes for
+        # config and telemetry consumers. Requiring it prevents a new RSL
+        # checkpoint from being stamped with a guessed simulator backend.
+        backend_identity = {
+            key: _resolve_env_contract_value(env, key)
+            for key in BACKEND_IDENTITY_KEYS
+        }
+    backend_identity = validate_backend_identity(backend_identity)
     if configured_action != action_config():
         raise ValueError("live environment action_config differs from the field action contract")
     encoder = actor.sensor_encoder
@@ -381,6 +401,7 @@ def build_field_policy_contract(
         raise ValueError("RSL field environments must expose a complete observation_config")
     config: dict[str, Any] = {
         "backend": "rsl_rl",
+        **backend_identity,
         "format": RSL_FIELD_CHECKPOINT_FORMAT,
         "version": RSL_FIELD_CHECKPOINT_VERSION,
         "input_schema": actor.input_schema,
@@ -440,6 +461,11 @@ def validate_field_policy_contract(
         or safe.get("version") != RSL_FIELD_CHECKPOINT_VERSION
     ):
         raise ValueError("checkpoint is not a supported AGTC RSL-RL field policy")
+    backend_values = {key: safe.get(key) for key in BACKEND_IDENTITY_KEYS}
+    # Preserve readable Newton-era RSL artifacts for explicit weights transfer
+    # and offline replay. Active evaluation and ordinary resume compare them
+    # against the live PhysX identity separately.
+    recorded_backend_identity(backend_values)
     schema = safe.get("input_schema")
     expected_encoder = _field_encoder_config(schema)
     encoder_cfg = safe.get("encoder_config")
@@ -488,6 +514,10 @@ def validate_field_policy_contract(
         raise ValueError("checkpoint field Gaussian distribution config is incompatible") from exc
     if actor_distribution != contract_distribution:
         raise ValueError("checkpoint field Gaussian distribution config is incompatible")
+    lstm_meta = safe.get("lstm")
+    hidden_dim = lstm_meta.get("hidden_dim") if isinstance(lstm_meta, dict) else None
+    if isinstance(hidden_dim, bool) or not isinstance(hidden_dim, int) or hidden_dim < 1:
+        raise ValueError("checkpoint field recurrent/head metadata is incompatible")
     for name, cfg, output_dim, obs_set in (
         ("actor", actor_cfg, FIELD_ACTION_DIM, "actor"),
         ("critic", critic_cfg, 1, "critic"),
@@ -499,7 +529,7 @@ def validate_field_policy_contract(
             or cfg.get("activation") != FIELD_HEAD_ACTIVATION
             or cfg.get("obs_normalization") is not False
             or cfg.get("rnn_type") != "lstm"
-            or cfg.get("rnn_hidden_dim") != FIELD_LSTM_HIDDEN_DIM
+            or cfg.get("rnn_hidden_dim") != hidden_dim
             or cfg.get("rnn_num_layers") != FIELD_LSTM_NUM_LAYERS
             or cfg.get("input_schema") != schema
             or cfg.get("encoder_schema") != expected_encoder["schema"]
@@ -512,7 +542,7 @@ def validate_field_policy_contract(
             raise ValueError(f"checkpoint {name} model config is incompatible")
     expected_lstm = {
         "type": "lstm",
-        "hidden_dim": FIELD_LSTM_HIDDEN_DIM,
+        "hidden_dim": hidden_dim,
         "num_layers": FIELD_LSTM_NUM_LAYERS,
         "actor_critic_separate": True,
     }

@@ -4,8 +4,8 @@ import os
 import numpy as np
 import pytest
 
-pytestmark = pytest.mark.skipif(os.environ.get("RUN_ISAAC_PHYSICS") != "1",
-                                reason="requires Isaac Lab/Newton native physics")
+pytestmark = pytest.mark.skipif(os.environ.get("RUN_LEGACY_NEWTON_PHYSICS") != "1",
+                                reason="historical Newton/SB3 check; use an archived source snapshot explicitly")
 
 
 def test_fast_sb3_wrapper_keeps_terminal_diagnostic_snapshot_through_autoreset():

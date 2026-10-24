@@ -1,8 +1,11 @@
 """Check real CLI schema propagation before any native simulation is opened."""
 from __future__ import annotations
 
+import builtins
+import os
 import sys
 import types
+from pathlib import Path
 
 import pytest
 
@@ -14,7 +17,27 @@ class _BeforePhysics(Exception):
     pass
 
 
-@pytest.mark.parametrize("command", ["viewer", "train-sb3", "evaluate"])
+def _expected_kit_args(runtime_dir: Path, user_args: str = "") -> str:
+    parts = []
+    if os.name == "nt" and "--portable" not in user_args:
+        parts.extend(("--portable-root", (runtime_dir / "kit").as_posix()))
+    if user_args:
+        parts.append(user_args)
+    if "/app/settings/fabricDefaultStageFrameHistoryCount" not in user_args:
+        parts.append("--/app/settings/fabricDefaultStageFrameHistoryCount=3")
+    return " ".join(parts)
+
+
+def _install_fake_official_entrypoint(monkeypatch, runner):
+    entrypoint = types.ModuleType("isaaclab_rl.entrypoints")
+    entrypoint.run_train_cli = runner
+    monkeypatch.setitem(sys.modules, "isaaclab_rl.entrypoints", entrypoint)
+    # The forwarding tests use only the fake module above; allow normal
+    # arguments while the parent process runs the native-runtime guard.
+    monkeypatch.delenv("ISAAC_FIELD_DISABLE_NATIVE_RUNTIME", raising=False)
+
+
+@pytest.mark.parametrize("command", ["viewer", "evaluate"])
 @pytest.mark.parametrize("schema", [INPUT_SCHEMA, ABSOLUTE_GOAL_INPUT_SCHEMA])
 def test_cli_passes_selected_schema_to_native_environment(monkeypatch, tmp_path, command, schema):
     def make_env(cfg, *_args, **_kwargs):
@@ -41,24 +64,94 @@ def test_cli_rejects_unknown_schema_before_importing_native_environment(monkeypa
     assert result.value.code == 2
 
 
-def test_new_train_delegates_to_official_rsl_cli_without_legacy_environment(monkeypatch):
+def test_new_train_delegates_to_official_rsl_cli_without_legacy_environment(monkeypatch, tmp_path):
     observed = []
-    monkeypatch.setitem(sys.modules, "isaaclab_rl.entrypoints", types.SimpleNamespace(
-        run_train_cli=lambda arguments: observed.append(arguments) or 7,
-    ))
+    runtime_dir = tmp_path / "runtime"
+    monkeypatch.setenv("ISAAC_FIELD_RUNTIME_DIR", str(runtime_dir))
+    monkeypatch.delenv("OMNI_KIT_ACCEPT_EULA", raising=False)
+    _install_fake_official_entrypoint(monkeypatch, lambda arguments: observed.append(arguments) or 7)
     monkeypatch.setattr(sys, "argv", ["isaac_field", "train", "--num_envs", "4", "--max_iterations", "384"])
     assert cli.main() == 7
     assert observed == [[
         "--rl_library", "rsl_rl", "--task", "Isaac-Field-FastStop-Rsl-Direct",
         "--num_envs", "4", "--max_iterations", "384",
+        f"--kit_args={_expected_kit_args(runtime_dir)}",
     ]]
+    assert os.environ["OMNI_KIT_ACCEPT_EULA"] == "YES"
 
 
-def test_resume_delegates_explicit_rsl_checkpoint_to_official_cli(monkeypatch):
+def test_train_merges_both_kit_args_forms_and_preserves_user_overrides(monkeypatch, tmp_path):
     observed = []
-    monkeypatch.setitem(sys.modules, "isaaclab_rl.entrypoints", types.SimpleNamespace(
-        run_train_cli=lambda arguments: observed.append(arguments) or 0,
-    ))
+    runtime_dir = tmp_path / "runtime"
+    monkeypatch.setenv("ISAAC_FIELD_RUNTIME_DIR", str(runtime_dir))
+    _install_fake_official_entrypoint(monkeypatch, lambda arguments: observed.append(arguments) or 0)
+    monkeypatch.setattr(sys, "argv", [
+        "isaac_field", "train", "--kit_args", "--portable-root C:/kit/custom",
+        "--kit_args=--/app/settings/fabricDefaultStageFrameHistoryCount=7",
+        "--num_envs", "2",
+    ])
+
+    assert cli.main() == 0
+    forwarded = observed[0]
+    kit_tokens = [token for token in forwarded if token == "--kit_args" or token.startswith("--kit_args=")]
+    assert kit_tokens == ["--kit_args=--portable-root C:/kit/custom --/app/settings/fabricDefaultStageFrameHistoryCount=7"]
+    assert forwarded[-3:] == ["--num_envs", "2", kit_tokens[0]]
+    assert "--portable-root C:/kit/custom" in kit_tokens[0]
+    assert "fabricDefaultStageFrameHistoryCount=7" in kit_tokens[0]
+    assert "fabricDefaultStageFrameHistoryCount=3" not in kit_tokens[0]
+
+
+def test_native_runtime_guard_rejects_non_help_before_importing_official_entrypoint(monkeypatch):
+    monkeypatch.setenv("ISAAC_FIELD_DISABLE_NATIVE_RUNTIME", "1")
+    monkeypatch.delenv("OMNI_KIT_ACCEPT_EULA", raising=False)
+    original_import = builtins.__import__
+
+    def reject_official_import(name, *args, **kwargs):
+        if name == "isaaclab_rl.entrypoints":
+            raise AssertionError("official entrypoint import reached under CPU-only guard")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", reject_official_import)
+    with pytest.raises(RuntimeError, match="CPU-only process"):
+        cli._run_official_rsl_cli(["--num_envs", "2"])
+    assert os.environ["OMNI_KIT_ACCEPT_EULA"] == "YES"
+
+
+def test_help_forwarding_is_fake_only_and_accepts_eula_before_entrypoint_lookup(monkeypatch, tmp_path):
+    observed = []
+    runtime_dir = tmp_path / "runtime"
+    monkeypatch.setenv("ISAAC_FIELD_DISABLE_NATIVE_RUNTIME", "1")
+    monkeypatch.setenv("ISAAC_FIELD_RUNTIME_DIR", str(runtime_dir))
+    monkeypatch.delenv("OMNI_KIT_ACCEPT_EULA", raising=False)
+    entrypoint = types.ModuleType("isaaclab_rl.entrypoints")
+
+    def __getattr__(name):
+        if name != "run_train_cli":
+            raise AttributeError(name)
+        assert os.environ.get("OMNI_KIT_ACCEPT_EULA") == "YES"
+        return lambda arguments: observed.append(arguments) or 0
+
+    entrypoint.__getattr__ = __getattr__
+    monkeypatch.setitem(sys.modules, "isaaclab_rl.entrypoints", entrypoint)
+
+    assert cli._run_official_rsl_cli(["--help"]) == 0
+    assert observed[0][:5] == ["--rl_library", "rsl_rl", "--task", "Isaac-Field-FastStop-Rsl-Direct", "--help"]
+    kit_tokens = [token for token in observed[0] if token == "--kit_args" or token.startswith("--kit_args=")]
+    assert kit_tokens == [f"--kit_args={_expected_kit_args(runtime_dir)}"]
+
+
+def test_sb3_training_command_is_explicitly_rejected(monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["isaac_field", "train-sb3"])
+    with pytest.raises(SystemExit) as result:
+        cli.main()
+    assert result.value.code == 2
+
+
+def test_resume_delegates_explicit_rsl_checkpoint_to_official_cli(monkeypatch, tmp_path):
+    observed = []
+    runtime_dir = tmp_path / "runtime"
+    monkeypatch.setenv("ISAAC_FIELD_RUNTIME_DIR", str(runtime_dir))
+    _install_fake_official_entrypoint(monkeypatch, lambda arguments: observed.append(arguments) or 0)
     monkeypatch.setattr(sys, "argv", ["isaac_field", "resume", "--checkpoint", "model_12.pt",
                                        "--max_iterations", "384"])
 
@@ -66,6 +159,7 @@ def test_resume_delegates_explicit_rsl_checkpoint_to_official_cli(monkeypatch):
     assert observed == [[
         "--rl_library", "rsl_rl", "--task", "Isaac-Field-FastStop-Rsl-Direct",
         "--checkpoint", "model_12.pt", "--max_iterations", "384",
+        f"--kit_args={_expected_kit_args(runtime_dir)}",
     ]]
 
 

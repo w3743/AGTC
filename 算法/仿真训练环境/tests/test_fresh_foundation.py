@@ -37,7 +37,7 @@ FAKE_ARCHITECTURE = {
     "input_contract": runner.INPUT_SCHEMA,
     "action_config": runner._action_config(),
     "goal_gain": 1.0,
-    "lstm_hidden_size": 128,
+    "lstm_hidden_size": 512,
     "lstm_num_layers": 1,
     "architecture_is_searched": False,
 }
@@ -63,7 +63,7 @@ def trial_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     })
     monkeypatch.setattr(
         runner, "_experiment_architecture",
-        lambda lstm_hidden_size=128: {
+        lambda lstm_hidden_size=512: {
             **copy.deepcopy(FAKE_ARCHITECTURE), "lstm_hidden_size": lstm_hidden_size,
         },
     )
@@ -81,7 +81,7 @@ def test_prepare_snapshots_sources_and_preflight_accepts_unchanged_trial(trial_r
     status = json.loads((output / "run_status.json").read_text(encoding="utf-8"))
 
     assert protocol["initialization"]["checkpoint"] is None
-    assert protocol["initialization"]["baseline_path"] == "untrained_baseline.zip"
+    assert protocol["initialization"]["baseline_path"] == "untrained_baseline.pt"
     assert protocol["profile"] == runner.PROFILE_LEGACY_FOUNDATION
     assert protocol["training"]["timesteps_total"] == 196_608
     assert protocol["training"]["stage_seeds"] == [69_001, 69_002, 69_003, 69_004]
@@ -89,7 +89,7 @@ def test_prepare_snapshots_sources_and_preflight_accepts_unchanged_trial(trial_r
     assert protocol["runtime_contract"]["action_config"] == runner._action_config()
     assert protocol["architecture"]["action_config"] == runner._action_config()
     assert protocol["architecture"]["input_contract"] == "sensor-minimal-v6"
-    assert protocol["architecture"]["lstm_hidden_size"] == 128
+    assert protocol["architecture"]["lstm_hidden_size"] == 512
     assert protocol["architecture"]["lstm_num_layers"] == 1
     assert protocol["evaluation"]["blind_seeds"] == {
         "range_label": "830xx", "used": False, "observed": False,
@@ -145,7 +145,7 @@ def test_random_rough_profile_freezes_global_goals_terrain_and_physics_contract(
     assert protocol["profile"] == runner.PROFILE_RANDOM_ROUGH
     assert result["timesteps_total"] == 196_608
     assert protocol["initialization"] == {
-        "checkpoint": None, "baseline_path": "untrained_baseline.zip",
+        "checkpoint": None, "baseline_path": "untrained_baseline.pt",
         "baseline_num_timesteps": 0, "weight_transfer": False,
     }
     assert protocol["config"]["plants"] == 0
@@ -237,9 +237,9 @@ def test_fast_stop_profile_freezes_objective_gamma_zero_stability_and_512_width(
     assert runner.preflight(output)["profile"] == runner.PROFILE_RANDOM_ROUGH_FAST_STOP
 
 
-def test_fast_stop_profile_uses_a_generic_default_output_name() -> None:
+def test_fast_stop_profile_uses_new_isaacsim_physx_output_namespace() -> None:
     assert runner._default_output_for_profile(runner.PROFILE_RANDOM_ROUGH_FAST_STOP).name == (
-        "random_global_rough_fast_stop_20261020"
+        "isaacsim_physx_rsl_rough_fast_stop_20261024"
     )
 
 
@@ -259,7 +259,7 @@ def test_cli_prepare_defaults_to_coupled_rough_output(
 ) -> None:
     default_output = trial_root / "random_global_rough_coupled_guides"
     monkeypatch.setattr(runner, "DEFAULT_RANDOM_ROUGH_COUPLED_GUIDES_OUTPUT", default_output)
-    assert runner.DEFAULT_RANDOM_ROUGH_OUTPUT.name == "random_global_rough_20261020"
+    assert runner.DEFAULT_RANDOM_ROUGH_OUTPUT.name == "isaacsim_physx_rsl_rough_20261024"
     assert runner.main(["--prepare"]) == 0
     capsys.readouterr()
     protocol = json.loads((default_output / "protocol.json").read_text(encoding="utf-8"))
@@ -421,7 +421,7 @@ def test_evaluate_forwards_global_goal_and_environment_seed_without_changing_def
     cfg = ConfigForEval()
     kwargs = {} if distance == "default" else {"goal_distance": distance, "environment_seed": environment_seed}
     report = runner._evaluate(
-        trial_root, cfg, trial_root / "checkpoint.zip", "test", (87001,),
+        trial_root, cfg, trial_root / "checkpoint.pt", "test", (87001,),
         0, 180.0, "cpu", **kwargs,
     )
 
@@ -473,7 +473,7 @@ def test_rough_evaluation_records_actual_terrain_config(
 
     terrain_config = dict(runner.RANDOM_ROUGH_TERRAIN_CONFIG)
     report = runner._evaluate(
-        trial_root, ConfigForEval(), trial_root / "checkpoint.zip", "rough", (87_001,),
+        trial_root, ConfigForEval(), trial_root / "checkpoint.pt", "rough", (87_001,),
         0, 180.0, "cpu", goal_distance=None, environment_seed=80_003,
         profile_physics_contract={"terrain_config": terrain_config},
     )
@@ -494,19 +494,36 @@ def test_preflight_rejects_live_source_drift(trial_root: Path) -> None:
         runner.preflight(output)
 
 
-def test_live_environment_contract_requires_coupled_pi_v7_and_fixed_physics_contract():
+def test_live_environment_contract_requires_coupled_pi_v7_and_physx_contract():
     current_drive = {
         "interface": "independent_left_right_track_speed_coupled_pi_v7",
         "same_side_wheel_coupling": {"enabled": True},
         "physics_contact": {
+            "simulator": "isaac_sim",
+            "physics_backend": "physx",
+            "learning_backend": "rsl_rl",
+            "backend": "PhysxCfg",
+            "solver": "TGS",
             "physics_dt_s": 0.001,
             "decimation": 50,
             "policy_dt_s": 0.05,
-            "cone": "elliptic",
-            "impratio": 1.0,
+            "physics_manager": "isaaclab_physx.physics_manager.PhysxManager",
+            "usd_authored_materials": {
+                "/World/envs/env_0/Field/material": {
+                    "static_friction": 0.7, "dynamic_friction": 0.6, "restitution": 0.0,
+                },
+                "/World/envs/env_0/Robot/material": {
+                    "static_friction": 0.8, "dynamic_friction": 0.7, "restitution": 0.0,
+                },
+            },
+            "contact_offset_m": 0.005,
+            "rest_offset_m": 0.0,
+            "calibrated_hardware": False,
         },
     }
     env = SimpleNamespace(
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
+        num_envs=1,
         action_config=runner._action_config(),
         drive_config=copy.deepcopy(current_drive),
         observation_config={"schema": "sensor-minimal-v6"},
@@ -516,6 +533,8 @@ def test_live_environment_contract_requires_coupled_pi_v7_and_fixed_physics_cont
     assert contract["action_config"] == runner._action_config()
     assert contract["drive_config"]["interface"] == "independent_left_right_track_speed_coupled_pi_v7"
     assert contract["observation_config"]["schema"] == "sensor-minimal-v6"
+    assert contract["backend_identity"] == env.backend_identity
+    assert contract["physics_contact"]["solver"] == "TGS"
     for old_interface in (
         "independent_left_right_track_speed_explicit_pi_v6",
         "independent_left_right_track_speed_explicit_v5",
@@ -535,13 +554,25 @@ def test_live_environment_contract_requires_coupled_pi_v7_and_fixed_physics_cont
         ("physics_dt_s", 0.002),
         ("decimation", 25),
         ("policy_dt_s", 0.04),
-        ("cone", "pyramidal"),
-        ("impratio", 2.0),
+        ("backend", "NewtonCfg"),
+        ("solver", "PGS"),
+        ("physics_manager", "isaaclab_newton.physics_manager.NewtonManager"),
+        ("contact_offset_m", 0.01),
     ):
         env.drive_config = copy.deepcopy(current_drive)
         env.drive_config["physics_contact"][key] = wrong
-        with pytest.raises(ValueError, match="unexpected live physics contact contract"):
+        with pytest.raises(ValueError, match="unexpected live"):
             runner._live_environment_contract(env)
+
+    env.drive_config = copy.deepcopy(current_drive)
+    env.drive_config["physics_contact"]["usd_authored_materials"] = {}
+    with pytest.raises(ValueError, match="USD contact materials"):
+        runner._live_environment_contract(env)
+
+    env.drive_config = copy.deepcopy(current_drive)
+    env.backend_identity = {"simulator": "isaac_sim", "physics_backend": "newton", "learning_backend": "rsl_rl"}
+    with pytest.raises(ValueError, match="backend_identity"):
+        runner._live_environment_contract(env)
 
 
 @pytest.mark.parametrize("profile", [runner.PROFILE_RANDOM_ROUGH, runner.PROFILE_RANDOM_ROUGH_FAST_STOP])
@@ -581,11 +612,24 @@ def test_rough_profile_live_contract_requires_same_side_guide_coupling(
             "hard_tilt_termination_rad": 1.2,
         },
         "physics_contact": {
+            "simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl",
+            "backend": "PhysxCfg", "solver": "TGS",
+            "physics_manager": "isaaclab_physx.physics_manager.PhysxManager",
             "physics_dt_s": 0.001, "decimation": 50, "policy_dt_s": 0.05,
-            "cone": "elliptic", "impratio": 1.0,
+            "contact_offset_m": 0.005, "rest_offset_m": 0.0, "calibrated_hardware": False,
+            "usd_authored_materials": {
+                "/World/envs/env_0/Field/material": {
+                    "static_friction": 0.7, "dynamic_friction": 0.6, "restitution": 0.0,
+                },
+                "/World/envs/env_0/Robot/material": {
+                    "static_friction": 0.8, "dynamic_friction": 0.7, "restitution": 0.0,
+                },
+            },
         },
     }
     env = SimpleNamespace(
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
+        num_envs=1,
         action_config=runner._action_config(), drive_config=drive,
         observation_config={"schema": runner.INPUT_SCHEMA},
         front_guide_spec=front_spec, body_stability_config=body_stability,
@@ -708,13 +752,14 @@ def test_checkpoint_manifest_requires_and_records_action_metadata(
     monkeypatch.setattr(runner, "_action_config", lambda: "current")
     output = tmp_path / "trial"
     output.mkdir()
-    path = output / "checkpoint.zip"
-    data = {"num_timesteps": 0}
+    path = output / "checkpoint.pt"
+    path.write_bytes(b"synthetic RSL checkpoint")
+    from isaac_field import rsl_rl_policy
+
+    payload = {"num_timesteps": 0, "field_policy_contract": {}}
     if checkpoint_action is not None:
-        data["field_action_config"] = checkpoint_action
-    with zipfile.ZipFile(path, "w") as archive:
-        archive.writestr("data", json.dumps(data))
-        archive.writestr("policy.optimizer.pth", b"optimizer")
+        payload["field_policy_contract"]["action_config"] = checkpoint_action
+    monkeypatch.setattr(rsl_rl_policy, "load_rsl_checkpoint_payload", lambda *_args, **_kwargs: payload)
 
     if accepted:
         manifest = runner._checkpoint_manifest(output)

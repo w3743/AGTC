@@ -16,15 +16,14 @@ from isaac_field.action_contract import action_config
 from isaac_field.assets import FrontGuideSpec
 from isaac_field.body_stability import BodyStabilityConfig
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
-from isaac_field.policy import OBSERVATION_SHAPES
+from isaac_field.policy_contract import OBSERVATION_SHAPES
 from isaac_field.rsl_rl_policy import RslFieldRNNModel, build_field_policy_contract
 from isaac_field.task import Config
 from isaac_field.viewer import FieldViewerControls
 import isaac_field.rsl_rl_inference as rsl_inference
-import isaac_field.policy as sb3_policy
 import isaac_field.viewer as viewer_module
 import scripts.view_fast_stop_goal as goal_viewer
-from test_absolute_goal_policy import _observation_config
+from policy_contract_helpers import observation_config as _observation_config
 
 
 def _native_checkpoint(path):
@@ -62,6 +61,7 @@ def _native_checkpoint(path):
         num_envs=1,
         observation_config=observation_config,
         action_config=action_config(),
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
         drive_config={"interface": "fixture-track-speed", "velocity_gain": 0.04},
         damage_config={"metric": "stem-contact-v2", "plants": 0},
         field_cfg=Config(
@@ -120,7 +120,9 @@ def test_viewer_routes_native_pt_to_rsl_and_zip_to_explicit_legacy(monkeypatch, 
             calls.append(("reset-sb3",))
 
     monkeypatch.setattr(rsl_inference, "RslPolicyRunner", FakeRslRunner)
-    monkeypatch.setattr(sb3_policy, "PolicyRunner", FakeSb3Runner)
+    legacy_policy = types.ModuleType("isaac_field.policy")
+    legacy_policy.PolicyRunner = FakeSb3Runner
+    monkeypatch.setitem(sys.modules, "isaac_field.policy", legacy_policy)
     adapter = SimpleNamespace(observation_config=observation_config)
 
     controls = _viewer_controls(adapter)

@@ -1,0 +1,1406 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>策略网络 · 二维展开</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10141b;
+      --panel: #171d27;
+      --panel-soft: #1d2531;
+      --border: #2a3544;
+      --text: #e7edf5;
+      --muted: #a4b0c0;
+      --cyan: #65d6df;
+      --yellow: #ffd76a;
+      --green: #66d69a;
+      --red: #ff8585;
+      --card: #1a222e;
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--text); }
+    body { min-width: 320px; }
+    button, select, input { font: inherit; color: inherit; }
+    button, select, input[type="number"] {
+      border: 1px solid var(--border); border-radius: 7px; background: #202a37; min-height: 32px;
+    }
+    button { padding: 5px 10px; cursor: pointer; white-space: nowrap; }
+    button:hover, select:hover { border-color: #4a7180; background: #263545; }
+    button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 2px solid var(--cyan); outline-offset: 2px;
+    }
+    button:disabled { opacity: .55; cursor: wait; }
+    a { color: #8bdce5; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .app { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
+    .topbar {
+      z-index: 2; flex: none; padding: 10px 14px 9px; background: rgba(20, 26, 35, .98);
+      border-bottom: 1px solid var(--border); box-shadow: 0 5px 18px #0004;
+    }
+    .heading-row, .toolbar, .status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .heading-row { justify-content: space-between; margin-bottom: 5px; }
+    h1 { margin: 0; font-size: 17px; font-weight: 650; letter-spacing: .02em; }
+    .toolbar { gap: 6px; }
+    .toolbar .separator { width: 1px; height: 22px; background: var(--border); margin: 0 3px; }
+    .toolbar label { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; }
+    .mode-indicator { padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .toolbar select { padding: 4px 8px; }
+    .scale-readout { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .scale-readout b { color: var(--text); font-weight: 600; }
+    .primary { border-color: #347c88; background: #1d5660; }
+    .primary:hover { background: #236b77; }
+    .status-row { margin-top: 8px; gap: 8px 15px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .status-item { display: inline-flex; align-items: baseline; gap: 5px; min-width: 0; }
+    .status-item b { color: var(--text); font-weight: 550; font-variant-numeric: tabular-nums; }
+    .status-item.status-text { flex: 1 1 260px; }
+    .connection { display: inline-flex; align-items: center; gap: 6px; color: var(--red); font-weight: 600; }
+    .connection::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .connection.online { color: var(--green); }
+    .connection.busy { color: var(--yellow); }
+    .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
+    .canvas-panel { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; background:
+      radial-gradient(ellipse at 50% 42%, #18212c 0, #111720 63%, #10141b 100%); }
+    #network-svg { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; }
+    .empty-state {
+      position: absolute; inset: 0; display: grid; place-content: center; padding: 20px; text-align: center;
+      color: var(--muted); pointer-events: none; line-height: 1.7;
+    }
+    .empty-state strong { color: #d8e3ee; font-size: 16px; font-weight: 600; }
+    .empty-state[hidden] { display: none; }
+    .details {
+      position: relative; flex: 0 0 320px; min-width: 0; overflow: auto; padding: 12px;
+      background: var(--panel); border-left: 1px solid var(--border); scrollbar-color: #394858 transparent;
+    }
+    .details.collapsed { display: none; }
+    .detail-heading { display: flex; align-items: start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .detail-heading h2 { margin: 0; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+    .detail-heading button { min-height: 28px; padding: 3px 8px; color: var(--muted); }
+    #layer-select { width: 100%; min-width: 0; margin-bottom: 8px; padding: 6px; }
+    .detail-placeholder { color: var(--muted); font-size: 14px; line-height: 1.65; }
+    .detail-image-wrap { min-height: 100px; max-height: 370px; overflow: auto; margin: 8px 0 10px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 8px; background: #111720; }
+    .detail-image-wrap.zoomed { max-height: min(70vh, 620px); display: block; cursor: zoom-out; }
+    #detail-image { display: block; width: 100%; max-width: 100%; max-height: 340px; object-fit: contain; image-rendering: pixelated; cursor: zoom-in; }
+    .detail-image-wrap.zoomed #detail-image { width: auto; max-width: none; max-height: none; object-fit: initial; }
+    #detail-image[hidden] { display: none; }
+    #detail-image-empty { color: var(--muted); font-size: 12px; }
+    #detail-image-empty[hidden] { display: none; }
+    .detail-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 9px 0; }
+    .detail-controls label { display: grid; gap: 4px; color: var(--muted); font-size: 14px; }
+    .detail-controls select, .detail-controls input { width: 100%; min-width: 0; padding: 4px 7px; }
+    .info-grid { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 6px 8px; margin: 8px 0 10px; font-size: 14px; line-height: 1.5; }
+    .info-grid dt { color: var(--muted); }
+    .info-grid dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .section-title { margin: 12px 0 5px; padding-top: 9px; border-top: 1px solid var(--border); color: #c9d5e1; font-size: 14px; font-weight: 650; }
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+    .stat { min-width: 0; padding: 6px; border: 1px solid #293544; border-radius: 6px; background: #131923; }
+    .stat span { display: block; color: var(--muted); font-size: 14px; }
+    .stat b { display: block; margin-top: 2px; overflow: hidden; color: var(--text); font-size: 14px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; }
+    .field-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+    .field-list li { padding: 5px 7px; border-radius: 5px; background: #121821; color: #d5deea; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+    .node-card { cursor: pointer; }
+    .node-card.related rect.card-bg { stroke: #7dcbd2; stroke-width: 2; }
+    .spectrum-key { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: 6px 0 3px; font-size: 12px; color: #b9c9d9; }
+    .spectrum-core { position: relative; display: inline-block; width: 200px; height: 22px; }
+    #spectrum-bar { display: block; width: 100%; height: 10px; border: 1px solid #607184; border-radius: 3px; }
+    .detail-scale-controls { margin-top: 10px; font-size: 12px; }
+    .detail-scale-controls label { display: flex; align-items: center; gap: 6px; }
+    .detail-color-key { margin-bottom: 10px; font-size: 11px; color: var(--muted); }
+    .detail-spectrum { display: flex; align-items: start; gap: 6px; margin-top: 5px; }
+    .detail-spectrum .spectrum-core { flex: 1; min-width: 60px; height: 22px; }
+    #detail-spectrum-bar { display: block; width: 100%; height: 10px; border: 1px solid #607184; border-radius: 3px; }
+    .zero-tick { position: absolute; left: 50%; top: 8px; padding-top: 4px; border-top: 3px solid white; transform: translateX(-50%); line-height: 10px; color: white; }
+    .node-card image { image-rendering: pixelated; }
+    .node-card rect.card-bg { fill: var(--card); stroke: #536273; stroke-width: 1.35; }
+    .node-card:hover rect.card-bg { stroke: var(--cyan); stroke-width: 2; }
+    .node-card.selected rect.card-bg { fill: #292a24; stroke: var(--yellow); stroke-width: 2.4; }
+    .svg-title { fill: #edf3f8; font-size: 12px; font-weight: 650; }
+    .svg-shape { fill: #a9b7c6; font-size: 10px; }
+    .svg-missing { fill: #8492a2; font-size: 10px; pointer-events: none; }
+    .region-label { fill: #bdcad6; font-size: 16px; font-weight: 700; letter-spacing: .02em; }
+    .partition-bg { fill: #8192a5; fill-opacity: .025; stroke: #8192a5; stroke-opacity: .15; stroke-width: 1; stroke-dasharray: 7 7; }
+    .flow-edge { fill: none; stroke: #57acb8; stroke-width: 1.7; opacity: .36; marker-end: url(#arrow); pointer-events: none; vector-effect: non-scaling-stroke; }
+    .crossing-marker { fill: #111720; stroke: #f4cf72; stroke-width: 2.3; vector-effect: non-scaling-stroke; pointer-events: none; }
+    .crossing-center { fill: #f4cf72; pointer-events: none; }
+    .empty-graph-label { fill: #92a0af; font-size: 15px; text-anchor: middle; }
+    @media (max-width: 920px) {
+      .heading-row { align-items: flex-start; }
+      .toolbar { max-width: 100%; }
+      .workspace { flex-direction: column; overflow: auto; }
+      .canvas-panel { flex: 0 0 58vh; min-height: 270px; }
+      .details { flex: 0 0 auto; max-height: 44vh; border-left: 0; border-top: 1px solid var(--border); }
+      .details.collapsed { display: none; }
+    }
+    @media (max-width: 560px) {
+      .topbar { padding: 8px; }
+      .heading-row { margin-bottom: 6px; }
+      h1 { font-size: 15px; }
+      .toolbar { gap: 5px; }
+      .toolbar button { padding: 4px 7px; font-size: 11px; }
+      .toolbar .separator { display: none; }
+      .status-row { gap: 5px 10px; }
+      .canvas-panel { flex-basis: 53vh; }
+    }
+    /* Fixed dark palette adapted from llm-viz. */
+    :root {
+      --bg: #0a1020;
+      --panel: #111a2b;
+      --panel-soft: #18243a;
+      --border: #2b3b59;
+      --text: #edf2fb;
+      --muted: #a7b4cb;
+      --cyan: #92c9f4;
+      --yellow: #f2cf83;
+      --green: #7dd6ad;
+      --red: #ff929e;
+      --card: #151f32;
+      --canvas: #0b1424;
+      color-scheme: dark;
+    }
+    html, body { background: var(--bg); color: var(--text); }
+    .topbar {
+      padding: 11px 18px 9px;
+      background: #19264f;
+      border-bottom: 1px solid #33456f;
+      box-shadow: 0 5px 18px #03071299;
+    }
+    .heading-row { margin-bottom: 8px; }
+    h1 { font-size: 18px; letter-spacing: .01em; }
+    .toolbar button, .toolbar select {
+      background: #23345e;
+      border-color: #425986;
+    }
+    .toolbar button:hover, .toolbar select:hover { background: #2b4173; border-color: #7894c5; }
+    .toolbar .primary { background: #31538e; border-color: #7395cc; }
+    .toolbar .primary:hover { background: #3a629f; }
+    .workspace { background: var(--bg); }
+    .canvas-panel {
+      background-color: var(--canvas);
+      background-image:
+        linear-gradient(#18263c44 1px, transparent 1px),
+        linear-gradient(90deg, #18263c44 1px, transparent 1px),
+        radial-gradient(ellipse at 47% 42%, #172741 0, #0e192b 62%, var(--canvas) 100%);
+      background-size: 32px 32px, 32px 32px, auto;
+    }
+    .details {
+      flex-basis: 344px;
+      background: #101a2b;
+      border-left-color: var(--border);
+      box-shadow: -5px 0 16px #03071235;
+    }
+    .detail-image-wrap { background: #0b1424; border-color: #324360; }
+    .stat { background: #121d30; border-color: #2e405e; }
+    .field-list li { background: #152239; color: #dce5f3; }
+    .node-card rect.card-bg { fill: #151f32; stroke: #60718c; }
+    .node-card.related rect.card-bg { stroke: #91c5ed; }
+    .node-card.selected rect.card-bg { fill: #39372a; stroke: #f2cf83; }
+    .region-label { fill: #d3deef; }
+    .partition-bg { fill: #6c8bb7; fill-opacity: .035; stroke: #829cbe; stroke-opacity: .23; stroke-dasharray: 8 8; }
+    .flow-edge { stroke: #8fb6dc; stroke-width: 1.5; opacity: .31; }
+    .crossing-gap { fill: none; stroke: var(--canvas); stroke-width: 7; stroke-linecap: round; pointer-events: none; vector-effect: non-scaling-stroke; }
+    .crossing-bridge { fill: none; stroke: #b8ddfb; stroke-width: 2; stroke-linecap: round; pointer-events: none; vector-effect: non-scaling-stroke; }
+    #arrow path { fill: #8fb6dc; }
+  </style>
+  <style id="network-layout-redesign">
+    :root {
+      color-scheme: dark;
+      --bg: #0a1020;
+      --canvas: #0b1424;
+      --panel: #111a2b;
+      --panel-raised: #162239;
+      --border: #2b3b59;
+      --text: #edf2fb;
+      --muted: #a7b4cb;
+      --cyan: #92c9f4;
+      --yellow: #f2cf83;
+      --green: #7dd6ad;
+      --red: #ff929e;
+      --card: #151f32;
+      --branch-lidar: #70b7ff;
+      --branch-depth: #c397ff;
+      --branch-detections: #ffbd73;
+      --branch-state: #5bd5c5;
+      --branch-feedback: #f28ec6;
+      --branch-actor: #73c9e8;
+      --branch-critic: #e6b86f;
+      --branch-output: #a9d786;
+      font-family: Inter, "Segoe UI", "Microsoft YaHei", sans-serif;
+      font-synthesis: none;
+    }
+    html, body { background: var(--bg); color: var(--text); }
+    .app { min-width: 320px; }
+    .topbar {
+      flex: 0 0 auto;
+      padding: 8px 14px 7px;
+      background: #19264f;
+      border-bottom: 1px solid #33456f;
+      box-shadow: 0 5px 18px #03071299;
+    }
+    .heading-row { min-height: 25px; margin: 0 0 5px; }
+    h1 { font-size: 17px; font-weight: 650; }
+    .topbar > .heading-row > a { color: #b9d7ff; font-size: 11px; }
+    .toolbar { min-width: 0; gap: 5px; }
+    .toolbar button, .toolbar select {
+      min-height: 30px;
+      padding: 4px 8px;
+      background: #23345e;
+      border-color: #425986;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+    .toolbar button:hover, .toolbar select:hover { background: #2b4173; border-color: #7894c5; }
+    .toolbar .primary { background: #31538e; border-color: #7395cc; }
+    .toolbar .primary:hover { background: #3a629f; }
+    .toolbar .separator { flex: 0 0 1px; height: 20px; }
+    .mode-indicator { max-width: 180px; overflow: hidden; text-overflow: ellipsis; background: #152341; }
+    .scale-readout { white-space: nowrap; font-size: 11px; }
+    .toolbar label { white-space: nowrap; font-size: 11px; }
+    .spectrum-key { align-items: center; gap: 6px; margin: 3px 0 1px; color: #d5dfef; font-size: 10px; }
+    .spectrum-core { width: 132px; height: 17px; }
+    #spectrum-bar { height: 8px; }
+    .zero-tick { top: 7px; padding-top: 3px; font-size: 10px; line-height: 7px; }
+    .status-row { margin-top: 3px; gap: 4px 12px; font-size: 10px; line-height: 1.3; }
+    .status-item.status-text { flex: 1 1 190px; }
+    .status-item b { font-weight: 600; }
+    .connection::before { width: 7px; height: 7px; }
+    .workspace { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: hidden; background: var(--bg); }
+    .canvas-panel {
+      position: relative;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      background-color: var(--canvas);
+      background-image:
+        linear-gradient(#18263c38 1px, transparent 1px),
+        linear-gradient(90deg, #18263c38 1px, transparent 1px),
+        radial-gradient(ellipse at 47% 42%, #172741 0, #0e192b 62%, var(--canvas) 100%);
+      background-size: 32px 32px, 32px 32px, auto;
+    }
+    #network-svg { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; }
+    .details {
+      position: relative;
+      flex: 0 0 344px;
+      min-width: 0;
+      overflow: auto;
+      padding: 12px;
+      background: #101a2b;
+      border-left: 1px solid var(--border);
+      box-shadow: -5px 0 16px #03071235;
+    }
+    .details.collapsed { display: none; }
+    .detail-heading h2 { font-size: 13px; }
+    .detail-heading button { min-height: 27px; font-size: 11px; }
+    .detail-controls label, .info-grid, .stat span, .stat b { font-size: 12px; }
+    .field-list li { background: #152239; color: #dce5f3; font-size: 11px; }
+    .stat { background: #121d30; border-color: #2e405e; }
+    .detail-image-wrap { background: #0b1424; border-color: #324360; }
+    .node-card { cursor: pointer; }
+    .node-card rect.card-bg { fill: #151f32; stroke: #60718c; stroke-width: 1.35; }
+    .node-card:hover rect.card-bg, .node-card.hovered rect.card-bg { stroke: #c4e3ff; stroke-width: 2.2; }
+    .node-card.related rect.card-bg { stroke: #91c5ed; stroke-width: 2; }
+    .node-card.selected rect.card-bg { fill: #39372a; stroke: var(--yellow); stroke-width: 2.4; }
+    .svg-title { fill: #edf3f8; font-size: 12px; font-weight: 650; }
+    .svg-shape { fill: #a9b7c6; font-size: 10px; }
+    .svg-missing { fill: #8492a2; font-size: 10px; }
+    .region-label { fill: #d3deef; font-size: 15px; font-weight: 700; }
+    .partition-bg { fill: #6c8bb7; fill-opacity: .035; stroke: #829cbe; stroke-opacity: .23; stroke-dasharray: 8 8; }
+    .flow-edge { fill: none; stroke: #8fb6dc; stroke-width: 1.6; opacity: .52; marker-end: url(#arrow); pointer-events: none; vector-effect: non-scaling-stroke; }
+    .flow-edge.branch-lidar { stroke: var(--branch-lidar); marker-end: url(#arrow-lidar); }
+    .flow-edge.branch-depth { stroke: var(--branch-depth); marker-end: url(#arrow-depth); }
+    .flow-edge.branch-detections { stroke: var(--branch-detections); marker-end: url(#arrow-detections); }
+    .flow-edge.branch-state { stroke: var(--branch-state); marker-end: url(#arrow-state); }
+    .flow-edge.branch-feedback { stroke: var(--branch-feedback); marker-end: url(#arrow-feedback); }
+    .flow-edge.branch-actor { stroke: var(--branch-actor); marker-end: url(#arrow-actor); }
+    .flow-edge.branch-critic { stroke: var(--branch-critic); marker-end: url(#arrow-critic); }
+    .flow-edge.branch-output { stroke: var(--branch-output); marker-end: url(#arrow-output); }
+    .crossing-gap { fill: none; stroke: var(--canvas); stroke-width: 8; stroke-linecap: round; pointer-events: none; vector-effect: non-scaling-stroke; }
+    .crossing-bridge { fill: none; stroke: #b8ddfb; stroke-width: 2.6; stroke-linecap: round; pointer-events: none; vector-effect: non-scaling-stroke; }
+    .crossing-bridge.branch-lidar { stroke: var(--branch-lidar); }
+    .crossing-bridge.branch-depth { stroke: var(--branch-depth); }
+    .crossing-bridge.branch-detections { stroke: var(--branch-detections); }
+    .crossing-bridge.branch-state { stroke: var(--branch-state); }
+    .crossing-bridge.branch-feedback { stroke: var(--branch-feedback); }
+    .crossing-bridge.branch-actor { stroke: var(--branch-actor); }
+    .crossing-bridge.branch-critic { stroke: var(--branch-critic); }
+    .crossing-bridge.branch-output { stroke: var(--branch-output); }
+    #arrow path { fill: #b3cce7; }
+    @media (max-width: 920px) {
+      .topbar {
+        display: grid;
+        grid-template-rows: 24px 32px 18px 18px;
+        gap: 3px;
+        height: 111px;
+        min-height: 111px;
+        max-height: 111px;
+        padding: 5px 9px 4px;
+        overflow: hidden;
+      }
+      .heading-row { min-height: 0; height: 24px; margin: 0; align-items: center; flex-wrap: nowrap; }
+      h1 { overflow: hidden; font-size: 15px; white-space: nowrap; text-overflow: ellipsis; }
+      .topbar > .heading-row > a { flex: 0 0 auto; font-size: 10px; }
+      .toolbar {
+        height: 32px;
+        min-height: 0;
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+      }
+      .toolbar::-webkit-scrollbar, .status-row::-webkit-scrollbar { display: none; }
+      .toolbar button, .toolbar select { flex: 0 0 auto; min-height: 26px; height: 26px; padding: 3px 7px; font-size: 10px; }
+      .toolbar label, .scale-readout { flex: 0 0 auto; font-size: 10px; }
+      .mode-indicator { flex: 0 0 auto; max-width: 142px; padding: 3px 6px; font-size: 10px; }
+      .toolbar .separator { display: none; }
+      .spectrum-key { height: 18px; min-height: 18px; margin: 0; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 9px; }
+      .spectrum-key > span:first-child, .spectrum-key > span:last-child { display: none; }
+      .spectrum-core { flex: 0 0 100px; width: 100px; height: 16px; }
+      #spectrum-bar { height: 8px; }
+      .zero-tick { top: 7px; font-size: 9px; line-height: 7px; }
+      .status-row {
+        height: 18px;
+        min-height: 18px;
+        margin: 0;
+        gap: 4px 10px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+      }
+      .status-item { flex: 0 0 auto; font-size: 9px; }
+      .status-item.status-text { flex: 0 0 auto; max-width: 200px; }
+      .status-item.status-text b { display: inline-block; max-width: 150px; overflow: hidden; vertical-align: bottom; text-overflow: ellipsis; }
+      .workspace { position: relative; display: block; overflow: hidden; }
+      .canvas-panel { position: absolute; inset: 0; width: auto; height: 100%; min-height: 0; }
+      .details {
+        position: absolute;
+        z-index: 5;
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: min(380px, calc(100% - 16px));
+        max-height: none;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        box-shadow: 0 10px 32px #0009;
+      }
+    }
+    @media (max-width: 560px) {
+      .topbar { padding-right: 6px; padding-left: 6px; }
+      h1 { font-size: 14px; }
+      .toolbar button, .toolbar select { padding-right: 6px; padding-left: 6px; }
+      .spectrum-core { flex-basis: 84px; width: 84px; }
+      .details { width: min(360px, calc(100% - 16px)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="heading-row">
+        <h1>策略网络二维展开</h1>
+        <a href="__VIEWER_URL__" target="_blank" rel="noopener">打开三维查看器 ↗</a>
+      </div>
+      <div class="toolbar" aria-label="页面操作">
+        <button class="primary" type="button" data-command="run">运行</button>
+        <button type="button" data-command="pause">暂停</button>
+        <button type="button" data-command="reset">重置回合</button>
+        <button type="button" data-command="preview">读取当前帧</button>
+        <span class="separator" aria-hidden="true"></span>
+        <span id="graph-status" class="mode-indicator" title="策略网络节点数">—</span>
+        <span id="scale-readout" class="scale-readout" title="整帧激活与全部参数共同定标；覆盖完整值域。范围增大立即生效，缩小平滑回落。">全局自适应 <b id="scale-value">±—</b></span>
+        <label title="只暂停此页刷新，不影响后端仿真"><input id="freeze-control" type="checkbox">冻结本页</label>
+        <span class="separator" aria-hidden="true"></span>
+        <button id="fit-button" type="button" title="适配全部已展开网络">适配全部</button>
+        <button id="one-to-one-button" type="button" title="恢复 100% 视图">100%</button>
+        <button id="zoom-out-button" type="button" title="缩小">−</button>
+        <button id="zoom-in-button" type="button" title="放大">＋</button>
+        <button id="detail-toggle" type="button" aria-expanded="true">收起详情</button>
+      </div>
+      <div class="spectrum-key" aria-label="全光谱伪彩色标">
+        <span>全光谱 · 低值</span><b id="legend-min">—</b>
+        <span class="spectrum-core"><i id="spectrum-bar"></i><b class="zero-tick">0</b></span>
+        <b id="legend-max">—</b><span>高值 · 未采集为灰，NaN/Inf为洋红</span>
+      </div>
+      <div class="status-row" aria-live="polite">
+        <span id="connection-status" class="connection">连接中</span>
+        <span class="status-item">帧 <b id="frame-value">—</b></span>
+        <span class="status-item">输入时刻 <b id="input-time-value">—</b></span>
+        <span class="status-item">步后时刻 <b id="output-time-value">—</b></span>
+        <span class="status-item">运行状态 <b id="runtime-value">等待首帧</b></span>
+        <span class="status-item">模型 <b id="training-value">—</b></span>
+        <span class="status-item">模式 <b id="mode-value">—</b></span>
+        <span class="status-item">价值诊断 <b id="critic-value">—</b></span>
+        <span class="status-item status-text">消息 <b id="message-value">正在连接本地查看器…</b></span>
+      </div>
+    </header>
+    <main class="workspace">
+
+      <section class="canvas-panel" aria-label="网络结构图">
+        <svg id="network-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="策略网络数据流图" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arrow" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+              <path d="M1,1 L12,6 L1,11 z" fill="#8fb6dc"></path>
+            </marker>
+            <marker id="arrow-lidar" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#70b7ff"></path></marker>
+            <marker id="arrow-depth" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#c397ff"></path></marker>
+            <marker id="arrow-detections" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#ffbd73"></marker>
+            <marker id="arrow-state" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#5bd5c5"></marker>
+            <marker id="arrow-feedback" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#f28ec6"></marker>
+            <marker id="arrow-actor" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#73c9e8"></marker>
+            <marker id="arrow-critic" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#e6b86f"></marker>
+            <marker id="arrow-output" markerWidth="14" markerHeight="12" refX="12" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L12,6 L1,11 z" fill="#a9d786"></marker>
+            <clipPath id="card-image-clip"><rect x="11" y="43" width="148" height="55" rx="3"></rect></clipPath>
+          </defs>
+          <g id="partition-layer"></g>
+          <g id="region-label-layer"></g>
+          <g id="edge-layer"></g>
+          <g id="node-layer"></g>
+        </svg>
+        <div id="empty-state" class="empty-state">
+          <div><strong>等待数据</strong></div>
+        </div>
+      </section>
+      <aside id="details-panel" class="details" aria-label="选中层详情">
+        <div class="detail-heading">
+          <h2 id="detail-title">层详情</h2>
+          <button id="focus-layer-button" type="button" title="将选中层居中并以100%大小显示">聚焦此层</button>
+          <button id="detail-collapse-button" type="button" aria-label="收起详情面板">收起</button>
+        </div>
+        <select id="layer-select" aria-label="选择网络层"></select>
+        <div id="detail-placeholder" class="detail-placeholder">选择网络层</div>
+        <div id="detail-content" hidden>
+          <div class="detail-image-wrap">
+            <img id="detail-image" alt="选中层张量完整图像" hidden>
+            <span id="detail-image-empty">该层尚未采集或没有图像</span>
+          </div>
+          <div class="detail-scale-controls">
+            <label><input id="detail-local-scale" type="checkbox" checked>单图自适应色标</label>
+          </div>
+          <div id="detail-color-key" class="detail-color-key" aria-label="单张预览色标" hidden>
+            <span id="detail-scale-readout">单图自适应 · ±—</span>
+            <div class="detail-spectrum">
+              <b id="detail-legend-min">—</b>
+              <span class="spectrum-core"><i id="detail-spectrum-bar"></i><b class="zero-tick">0</b></span>
+              <b id="detail-legend-max">—</b>
+            </div>
+          </div>
+          <dl class="info-grid">
+            <dt>形状</dt><dd id="detail-shape">—</dd>
+            <dt>元素数</dt><dd id="detail-size">—</dd>
+            <dt>来源</dt><dd id="detail-source">—</dd>
+            <dt>说明</dt><dd id="detail-description">—</dd>
+          </dl>
+          <div class="detail-controls">
+            <label>张量<select id="tensor-select" aria-label="选择激活值或参数"></select></label>
+            <label>元素索引<input id="index-input" type="number" min="0" step="1" value="0" inputmode="numeric"></label>
+          </div>
+          <div class="info-grid">
+            <dt>坐标</dt><dd id="detail-coordinate">—</dd>
+            <dt>数值</dt><dd id="detail-value">—</dd>
+          </div>
+          <div class="section-title">统计</div>
+          <div class="stats">
+            <div class="stat"><span>最小值</span><b id="stat-min">—</b></div>
+            <div class="stat"><span>最大值</span><b id="stat-max">—</b></div>
+            <div class="stat"><span>均值</span><b id="stat-mean">—</b></div>
+            <div class="stat"><span>标准差</span><b id="stat-std">—</b></div>
+            <div class="stat"><span>非有限值</span><b id="stat-nonfinite">—</b></div>
+          </div>
+          <div class="section-title">字段</div>
+          <ul id="field-list" class="field-list"></ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+  <script>
+  (() => {
+    "use strict";
+
+    const POLL_MS = 250;
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const CARD_W = 170;
+    const CARD_H = 110;
+    const SENSOR_BRANCHES = new Set(["lidar", "depth", "detections", "state", "feedback"]);
+    const els = {
+      svg: document.getElementById("network-svg"),
+      partitions: document.getElementById("partition-layer"),
+      labels: document.getElementById("region-label-layer"),
+      edgeLayer: document.getElementById("edge-layer"),
+      nodeLayer: document.getElementById("node-layer"),
+      empty: document.getElementById("empty-state"),
+      connection: document.getElementById("connection-status"),
+      frame: document.getElementById("frame-value"),
+      inputTime: document.getElementById("input-time-value"),
+      outputTime: document.getElementById("output-time-value"),
+      runtime: document.getElementById("runtime-value"),
+      training: document.getElementById("training-value"),
+      mode: document.getElementById("mode-value"),
+      critic: document.getElementById("critic-value"),
+      graphStatus: document.getElementById("graph-status"),
+      message: document.getElementById("message-value"),
+      scaleReadout: document.getElementById("scale-readout"),
+      scaleValue: document.getElementById("scale-value"),
+      freeze: document.getElementById("freeze-control"),
+      detailPanel: document.getElementById("details-panel"),
+      detailToggle: document.getElementById("detail-toggle"),
+      detailCollapse: document.getElementById("detail-collapse-button"),
+      detailTitle: document.getElementById("detail-title"),
+      detailPlaceholder: document.getElementById("detail-placeholder"),
+      detailContent: document.getElementById("detail-content"),
+      detailImage: document.getElementById("detail-image"),
+      detailImageEmpty: document.getElementById("detail-image-empty"),
+      detailLocalScale: document.getElementById("detail-local-scale"),
+      detailColorKey: document.getElementById("detail-color-key"),
+      detailScaleReadout: document.getElementById("detail-scale-readout"),
+      tensor: document.getElementById("tensor-select"),
+      index: document.getElementById("index-input"),
+      fieldList: document.getElementById("field-list")
+    };
+    const scaleReadoutBaseTitle = els.scaleReadout.title;
+
+    let selectedKey = null;
+    let tensorName = "激活值";
+    let elementIndex = 0;
+    let frozen = false;
+    let fetching = false;
+    let controlBusy = false;
+    let requestTimer = 0;
+    let lastFrame = null;
+    let renderedKeys = new Map();
+    let graphEdgeElements = [];
+    let graphCrossingElements = [];
+    let topologySignature = "";
+    let currentBounds = null;
+    let hasInitialFit = false;
+    let viewBox = { x: 0, y: 0, width: 1000, height: 700 };
+    let pan = null;
+    let suppressClickUntil = 0;
+    let detailVisible = true;
+    let hoveredKey = null;
+    let parameterOptions = [];
+    let layerOptionsSignature = "";
+    let legendSignature = "";
+
+    const fmt = (value, digits = 3) => {
+      if (value === null || value === undefined || value === "") return "—";
+      if (typeof value === "number") return Number.isFinite(value) ? value.toFixed(digits) : String(value);
+      if (Array.isArray(value)) return "[" + value.map(item => fmt(item, digits)).join(", ") + "]";
+      if (typeof value === "object") {
+        try { return JSON.stringify(value); } catch (_) { return String(value); }
+      }
+      return String(value);
+    };
+    const legendNumber = value => typeof value === "number" && Number.isFinite(value) ? Number(Math.abs(value).toPrecision(6)).toString() : "—";
+    const signedLegendNumber = value => {
+      if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+      return value < 0 ? "−" + legendNumber(value) : (value > 0 ? "+" + legendNumber(value) : "0");
+    };
+    const asText = value => value === null || value === undefined ? "" : String(value);
+    const shapeText = value => Array.isArray(value) ? "(" + value.join(" × ") + ")" : asText(value || "形状待定");
+    const safeImageUri = value => typeof value === "string" && /^data:image\/png;base64,[A-Za-z0-9+/=\s]+$/.test(value) ? value : "";
+    const clearChildren = element => { while (element.firstChild) element.removeChild(element.firstChild); };
+    const svgElement = (name, attrs = {}) => {
+      const node = document.createElementNS(SVG_NS, name);
+      for (const [key, value] of Object.entries(attrs)) node.setAttribute(key, String(value));
+      return node;
+    };
+    const setText = (id, value) => { document.getElementById(id).textContent = fmt(value); };
+    function setViewBox(next) {
+      viewBox = { x: next.x, y: next.y, width: Math.max(1, next.width), height: Math.max(1, next.height) };
+      els.svg.setAttribute("viewBox", [viewBox.x, viewBox.y, viewBox.width, viewBox.height].map(v => Number(v.toFixed(3))).join(" "));
+      updateCrossingGeometry();
+    }
+
+    function viewportSize() {
+      const rect = els.svg.getBoundingClientRect();
+      return { width: Math.max(1, rect.width), height: Math.max(1, rect.height), rect };
+    }
+
+    function fitBounds(bounds, padding = 55) {
+      if (!bounds) return;
+      const { width: pxW, height: pxH } = viewportSize();
+      let w = Math.max(1, bounds.maxX - bounds.minX + padding * 2);
+      let h = Math.max(1, bounds.maxY - bounds.minY + padding * 2);
+      const aspect = pxW / pxH;
+      if (w / h < aspect) w = h * aspect;
+      else h = w / aspect;
+      const cx = (bounds.minX + bounds.maxX) / 2;
+      const cy = (bounds.minY + bounds.maxY) / 2;
+      setViewBox({ x: cx - w / 2, y: cy - h / 2, width: w, height: h });
+    }
+
+    function fitAll() {
+      if (currentBounds) {
+        fitBounds(currentBounds);
+        hasInitialFit = true;
+      }
+    }
+
+
+    function edgeBranch(source, target, branchByKey) {
+      const sourceBranch = branchByKey.get(source) || "";
+      const targetBranch = branchByKey.get(target) || "";
+      if (SENSOR_BRANCHES.has(sourceBranch)) return sourceBranch;
+      if (SENSOR_BRANCHES.has(targetBranch)) return targetBranch;
+      if ([sourceBranch, targetBranch].some(branch => branch === "critic" || branch === "critic_memory" || branch === "value")) return "critic";
+      if ([sourceBranch, targetBranch].some(branch => branch === "actor" || branch === "actor_memory")) return "actor";
+      if (sourceBranch === "output" || targetBranch === "output") return "output";
+      return targetBranch || sourceBranch || "actor";
+    }
+
+    function updateCrossingGeometry() {
+      if (!graphCrossingElements.length) return;
+      const { width: viewportWidth, height: viewportHeight } = viewportSize();
+      const unitsPerPixel = Math.max(viewBox.width / viewportWidth, viewBox.height / viewportHeight);
+      const pixelsPerUnit = 1 / unitsPerPixel;
+      const lowZoom = pixelsPerUnit < 0.45;
+      for (const item of graphCrossingElements) {
+        const crossing = item.crossing;
+        const underTangent = crossing.under_tangent;
+        const overTangent = crossing.over_tangent;
+        if (!underTangent || !overTangent) continue;
+        const underHalf = unitsPerPixel * (lowZoom ? 4.8 : 5.5);
+        const gapStart = [crossing.x - underTangent[0] * underHalf, crossing.y - underTangent[1] * underHalf];
+        const gapEnd = [crossing.x + underTangent[0] * underHalf, crossing.y + underTangent[1] * underHalf];
+        item.gapElement.setAttribute("d", `M ${gapStart[0]} ${gapStart[1]} L ${gapEnd[0]} ${gapEnd[1]}`);
+
+        const tangent = overTangent;
+        const normal = [-tangent[1], tangent[0]];
+        if (normal[1] > 0) { normal[0] *= -1; normal[1] *= -1; }
+        const half = unitsPerPixel * (lowZoom ? 3.3 : 4.8);
+        const height = unitsPerPixel * (lowZoom ? 1.25 : 2.4);
+        const start = [crossing.x - tangent[0] * half, crossing.y - tangent[1] * half];
+        const peak = [crossing.x + normal[0] * height, crossing.y + normal[1] * height];
+        const end = [crossing.x + tangent[0] * half, crossing.y + tangent[1] * half];
+        const firstC1 = [start[0] + tangent[0] * (half * 2 / 3), start[1] + tangent[1] * (half * 2 / 3)];
+        const firstC2 = [peak[0] - normal[0] * (height * .55), peak[1] - normal[1] * (height * .55)];
+        const secondC1 = [peak[0] + normal[0] * (height * .55), peak[1] + normal[1] * (height * .55)];
+        const secondC2 = [end[0] - tangent[0] * (half * 2 / 3), end[1] - tangent[1] * (half * 2 / 3)];
+        item.element.setAttribute("d", `M ${start[0]} ${start[1]} C ${firstC1[0]} ${firstC1[1]} ${firstC2[0]} ${firstC2[1]} ${peak[0]} ${peak[1]} C ${secondC1[0]} ${secondC1[1]} ${secondC2[0]} ${secondC2[1]} ${end[0]} ${end[1]}`);
+      }
+    }
+
+    function setZoom(factor, centerX = null, centerY = null) {
+      const { width: pxW, height: pxH } = viewportSize();
+      const cx = centerX === null ? pxW / 2 : centerX;
+      const cy = centerY === null ? pxH / 2 : centerY;
+      const worldX = viewBox.x + (cx / pxW) * viewBox.width;
+      const worldY = viewBox.y + (cy / pxH) * viewBox.height;
+      const nextW = Math.max(80, Math.min(100000, viewBox.width * factor));
+      const nextH = Math.max(60, Math.min(100000, viewBox.height * factor));
+      setViewBox({
+        x: worldX - (cx / pxW) * nextW,
+        y: worldY - (cy / pxH) * nextH,
+        width: nextW,
+        height: nextH
+      });
+    }
+
+    function set100Percent() {
+      const { width, height } = viewportSize();
+      const cx = currentBounds ? (currentBounds.minX + currentBounds.maxX) / 2 : 0;
+      const cy = currentBounds ? (currentBounds.minY + currentBounds.maxY) / 2 : 0;
+      setViewBox({ x: cx - width / 2, y: cy - height / 2, width, height });
+    }
+
+    function normalizeNodes(nodes) {
+      if (!Array.isArray(nodes)) return [];
+      return nodes.filter(item => item && typeof item === "object" && item.key !== null && item.key !== undefined)
+        .map(item => ({ ...item, key: String(item.key), branch: String(item.branch || ""), parents: Array.isArray(item.parents) ? item.parents.map(String) : [] }));
+    }
+
+    function fusionLabel(node) {
+      if (!node) return "融合";
+      const shape = Array.isArray(node.shape) ? node.shape : null;
+      if (shape && shape.length && shape.every(value => Number.isInteger(value) && value > 0)) {
+        const width = shape.reduce((product, value) => product * value, 1);
+        if (Number.isSafeInteger(width) && width > 0) return "融合 · " + width + "维";
+      }
+      const match = asText(node.title).match(/(\d+)维/);
+      return match ? "融合 · " + match[1] + "维" : "融合";
+    }
+
+    function graphFromLayout(nodes, layout) {
+      const positions = new Map(Object.entries(layout && layout.positions || {}));
+      const visible = nodes.filter(node => positions.has(node.key));
+      const keys = new Set(visible.map(node => node.key));
+      const branchByKey = new Map(visible.map(node => [node.key, node.branch]));
+      const edges = (layout && Array.isArray(layout.edges) ? layout.edges : [])
+        .filter(edge => edge && keys.has(String(edge.source)) && keys.has(String(edge.target)) && typeof edge.path === "string")
+        .map(edge => {
+          const source = String(edge.source);
+          const target = String(edge.target);
+          return { source, target, id: `${source}→${target}`, branch: edgeBranch(source, target, branchByKey), path: edge.path };
+        });
+      const bounds = layout && layout.bounds;
+      return {
+        nodes: visible,
+        positions,
+        edges,
+        regions: layout && Array.isArray(layout.regions) ? layout.regions : [],
+        crossings: layout && Array.isArray(layout.crossings) ? layout.crossings : [],
+        edgePairs: edges.map(edge => [edge.source, edge.target]),
+        bounds: bounds && [bounds.minX, bounds.minY, bounds.maxX, bounds.maxY].every(Number.isFinite)
+          ? { minX: bounds.minX, minY: bounds.minY, maxX: bounds.maxX, maxY: bounds.maxY }
+          : null,
+        layoutStatus: layout && layout.status || "missing",
+        layoutEngine: layout && layout.engine || "布局数据缺失",
+        layoutReason: layout && layout.reason || "",
+        diagnostics: layout && layout.diagnostics || {}
+      };
+    }
+
+    function textNode(x, y, className, text) {
+      const node = svgElement("text", { x, y, class: className });
+      node.textContent = text;
+      return node;
+    }
+
+    function shortTitle(node) {
+      const key = asText(node.key);
+      const branch = asText(node.branch);
+      const inputLabels = { lidar: "雷达输入", depth: "深度输入", detections: "检测输入", state: "状态输入", feedback: "惯性与驱动反馈" };
+      const encodedLabels = { lidar: "雷达编码", depth: "深度编码", detections: "检测编码", state: "状态编码", feedback: "反馈编码" };
+      if (key.startsWith("input.")) return inputLabels[branch] || "输入";
+      if (key === "features_extractor") return fusionLabel(node);
+      if (key === "lstm_actor") return "驾驶记忆 LSTM";
+      if (key === "action.applied" || key === "action_net") return "左右履带＋云台";
+      const text = asText(node.title || key || "未命名层");
+      const max = 18;
+      return text.length > max ? text.slice(0, max - 1) + "…" : text;
+    }
+
+    function createCard(node, position) {
+      const group = svgElement("g", {
+        class: "node-card",
+        transform: "translate(" + position.x + " " + position.y + ")",
+        tabindex: "0",
+        role: "button"
+      });
+      group.dataset.nodeKey = node.key;
+      group.setAttribute("aria-label", nodeDescription(node) + "，" + shapeText(node.shape));
+      group.setAttribute("title", nodeDescription(node));
+      const background = svgElement("rect", { class: "card-bg", x: 0, y: 0, width: CARD_W, height: CARD_H, rx: 9 });
+      const title = textNode(10, 18, "svg-title", "");
+      const shape = textNode(10, 35, "svg-shape", "");
+      const image = svgElement("image", { x: 11, y: 43, width: 148, height: 55, preserveAspectRatio: "xMidYMid meet", "clip-path": "url(#card-image-clip)" });
+      const missing = textNode(CARD_W / 2, 75, "svg-missing", "尚未采集");
+      missing.setAttribute("text-anchor", "middle");
+      group.append(background, title, shape, image, missing);
+      group.addEventListener("click", event => {
+        event.stopPropagation();
+        if (performance.now() < suppressClickUntil) return;
+        chooseNode(node.key);
+      });
+      group.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); chooseNode(node.key); }
+      });
+      const setHovered = () => {
+        if (hoveredKey === node.key) return;
+        hoveredKey = node.key;
+        updateSelectionStyle();
+      };
+      const clearHovered = () => {
+        if (document.activeElement === group || hoveredKey !== node.key) return;
+        hoveredKey = null;
+        updateSelectionStyle();
+      };
+      group.addEventListener("pointerenter", setHovered);
+      group.addEventListener("pointerleave", clearHovered);
+      group.addEventListener("focus", setHovered);
+      group.addEventListener("blur", clearHovered);
+      els.nodeLayer.appendChild(group);
+      return { group, title, shape, image, missing, node };
+    }
+
+    function nodeDescription(node) {
+      const title = asText(node.title || node.key);
+      const description = asText(node.description);
+      return description ? title + "；" + description : title;
+    }
+
+    function updateCard(record, node, position) {
+      record.node = node;
+      record.position = position;
+      record.group.setAttribute("transform", "translate(" + position.x + " " + position.y + ")");
+      record.group.setAttribute("aria-label", nodeDescription(node) + "，" + shapeText(node.shape));
+      record.group.setAttribute("title", nodeDescription(node));
+      record.title.textContent = shortTitle(node);
+      record.shape.textContent = shapeText(node.shape);
+      const uri = safeImageUri(node.image);
+      if (uri) {
+        if (record.image.getAttribute("href") !== uri) record.image.setAttribute("href", uri);
+        record.image.style.display = "";
+        record.missing.style.display = "none";
+      } else {
+        record.image.removeAttribute("href");
+        record.image.style.display = "none";
+        record.missing.style.display = "";
+        record.missing.textContent = "未采集 / 暂无图像";
+      }
+      record.group.classList.toggle("selected", node.key === selectedKey);
+    }
+
+    function renderLabels(graph) {
+      clearChildren(els.labels);
+      for (const region of graph.regions) {
+        const text = textNode(region.x + 10, region.y + 25, "region-label", region.label);
+        els.labels.appendChild(text);
+      }
+    }
+
+    function renderPartitions(graph) {
+      clearChildren(els.partitions);
+      for (const region of graph.regions) {
+        const box = svgElement("rect", {
+          class: "partition-bg", x: region.x, y: region.y,
+          width: region.width, height: region.height, rx: 16
+        });
+        els.partitions.appendChild(box);
+      }
+    }
+
+    function renderEdges(graph) {
+      clearChildren(els.edgeLayer);
+      graph.edgeElements = [];
+      graph.crossingElements = [];
+      for (const edge of graph.edges) {
+        const path = svgElement("path", {
+          class: `flow-edge branch-${edge.branch}`,
+          d: edge.path,
+          "data-source": edge.source,
+          "data-target": edge.target,
+          "aria-hidden": "true"
+        });
+        els.edgeLayer.appendChild(path);
+        graph.edgeElements.push({ edge, element: path });
+      }
+      const crossings = graph.crossings.filter(crossing =>
+        Array.isArray(crossing.under_tangent) && crossing.under_tangent.length === 2 &&
+        Array.isArray(crossing.over_tangent) && crossing.over_tangent.length === 2 &&
+        crossing.under && crossing.over
+      );
+      const edgeById = new Map(graph.edges.map(edge => [edge.id, edge]));
+      for (const crossing of crossings) {
+        const gap = svgElement("path", {
+          class: "crossing-gap",
+          d: "",
+          "aria-hidden": "true"
+        });
+        els.edgeLayer.appendChild(gap);
+        const overEdge = edgeById.get(crossing.over);
+        const bridge = svgElement("path", {
+          class: `crossing-bridge branch-${overEdge ? overEdge.branch : "actor"}`,
+          d: "",
+          "data-under": crossing.under,
+          "data-over": crossing.over,
+          "aria-hidden": "true"
+        });
+        const title = svgElement("title");
+        title.textContent = `跨线弧：${crossing.over} 跨过 ${crossing.under}；两条边都是真实数据依赖`;
+        bridge.appendChild(title);
+        els.edgeLayer.appendChild(bridge);
+        graph.crossingElements.push({ under: crossing.under, over: crossing.over, crossing, gapElement: gap, element: bridge });
+      }
+    }
+
+    function updateSelectionStyle() {
+      const activeKey = hoveredKey && renderedKeys.has(hoveredKey) ? hoveredKey : selectedKey;
+      const related = new Set();
+      for (const item of graphEdgeElements) {
+        const { source, target } = item.edge;
+        if (source === activeKey || target === activeKey) {
+          related.add(source);
+          related.add(target);
+        }
+      }
+      for (const [key, record] of renderedKeys) {
+        record.group.classList.toggle("selected", key === selectedKey);
+        record.group.classList.toggle("hovered", key === hoveredKey);
+        record.group.classList.toggle("related", key !== activeKey && related.has(key));
+      }
+    }
+
+    function drawGraph(rawNodes, layoutData) {
+      const nodes = normalizeNodes(rawNodes);
+      const layerSelect = document.getElementById("layer-select");
+      const choices = nodes.map(node => [node.key, node.title || node.key]);
+      if (selectedKey !== null && !choices.some(([key]) => key === selectedKey)) {
+        choices.push([selectedKey, selectedKey]);
+      }
+      const choicesSignature = JSON.stringify(choices);
+      if (choicesSignature !== layerOptionsSignature) {
+        clearChildren(layerSelect);
+        for (const [key, title] of choices) addOption(layerSelect, key, title + " · " + key);
+        layerOptionsSignature = choicesSignature;
+      }
+      layerSelect.value = selectedKey ?? "";
+      const graph = graphFromLayout(nodes, layoutData);
+      const signature = asText(layoutData && layoutData.topology) || JSON.stringify(graph.edgePairs);
+      const topologyChanged = signature !== topologySignature;
+      if (graph.bounds) currentBounds = graph.bounds;
+      els.empty.hidden = graph.nodes.length > 0;
+      els.graphStatus.textContent = `${graph.nodes.length} 个节点`;
+      els.graphStatus.title = `策略网络节点数：${graph.nodes.length}`;
+
+      if (topologyChanged) {
+        clearChildren(els.nodeLayer);
+        renderedKeys = new Map();
+        graphEdgeElements = [];
+        graphCrossingElements = [];
+        if (hoveredKey && !graph.nodes.some(node => node.key === hoveredKey)) hoveredKey = null;
+        renderPartitions(graph);
+        renderLabels(graph);
+        renderEdges(graph);
+        for (const node of graph.nodes) {
+          const position = graph.positions.get(node.key);
+          if (!position) continue;
+          const record = createCard(node, position);
+          renderedKeys.set(node.key, record);
+          updateCard(record, node, position);
+        }
+        graphEdgeElements = graph.edgeElements || [];
+        graphCrossingElements = graph.crossingElements || [];
+        topologySignature = signature;
+      } else {
+        const current = new Map(graph.nodes.map(node => [node.key, node]));
+        for (const [key, record] of renderedKeys) {
+          const node = current.get(key);
+          if (node) updateCard(record, node, graph.positions.get(key));
+        }
+      }
+      if (!hasInitialFit && currentBounds) fitAll();
+      updateCrossingGeometry();
+      updateSelectionStyle();
+      lastFrame = lastFrame || {};
+      lastFrame.nodes = nodes;
+    }
+
+    function addOption(select, value, label) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+
+    function updateParameterOptions(parameters) {
+      const names = Array.isArray(parameters) ? parameters.map(asText).filter(Boolean) : [];
+      const next = ["激活值", ...names];
+      if (JSON.stringify(next) === JSON.stringify(parameterOptions)) return;
+      parameterOptions = next;
+      clearChildren(els.tensor);
+      for (const item of next) addOption(els.tensor, item, item === "激活值" ? "激活值" : "参数：" + item);
+      if (!next.includes(tensorName)) tensorName = "激活值";
+      els.tensor.value = tensorName;
+    }
+
+    function renderFields(fields) {
+      clearChildren(els.fieldList);
+      const items = Array.isArray(fields) ? fields : [];
+      if (!items.length) {
+        const li = document.createElement("li");
+        li.textContent = "该层没有单独字段说明。";
+        els.fieldList.appendChild(li);
+        return;
+      }
+      for (const field of items) {
+        const li = document.createElement("li");
+        li.textContent = asText(field);
+        els.fieldList.appendChild(li);
+      }
+    }
+
+    function renderDetail(detail) {
+      if (!detail || typeof detail !== "object") {
+        els.detailTitle.textContent = "尚未选中网络层";
+        els.detailPlaceholder.hidden = false;
+        els.detailContent.hidden = true;
+        return;
+      }
+      if (detail.key !== undefined && String(detail.key) !== selectedKey) return;
+      els.detailTitle.textContent = asText(detail.title || detail.key || selectedKey);
+      els.detailPlaceholder.hidden = true;
+      els.detailContent.hidden = false;
+      const uri = safeImageUri(detail.image);
+      if (uri) {
+        if (els.detailImage.getAttribute("src") !== uri) els.detailImage.src = uri;
+        els.detailImage.hidden = false;
+        els.detailImageEmpty.hidden = true;
+        if (!els.detailImage.parentElement.classList.contains("zoomed")) els.detailImage.title = "点击查看原图";
+      } else {
+        els.detailImage.removeAttribute("src");
+        els.detailImage.hidden = true;
+        els.detailImageEmpty.textContent = "未采集激活或当前没有可显示图像";
+        els.detailImageEmpty.hidden = false;
+      }
+      const legend = detail.legend || {};
+      const validLegend = typeof legend.scale === "number" && Number.isFinite(legend.scale) && legend.scale > 0;
+      els.detailColorKey.hidden = !validLegend || !uri;
+      if (validLegend) {
+        const local = legend.mode === "adaptive-local";
+        els.detailScaleReadout.textContent = (local ? "单图自适应" : "全局统一") + " · ±" + legendNumber(legend.scale);
+        els.detailScaleReadout.title = "当前所选张量的预览范围：±" + String(legend.scale) + "；0始终同色，完整覆盖有限值。";
+        document.getElementById("detail-legend-min").textContent = signedLegendNumber(legend.minimum);
+        document.getElementById("detail-legend-max").textContent = signedLegendNumber(legend.maximum);
+        if (Array.isArray(legend.colors)) {
+          const colors = legend.colors.filter(rgb => Array.isArray(rgb) && rgb.length === 3 && rgb.every(n => Number.isFinite(n) && n >= 0 && n <= 255));
+          if (colors.length >= 2) document.getElementById("detail-spectrum-bar").style.background = "linear-gradient(90deg," + colors.map(rgb => "rgb(" + rgb.join(",") + ")").join(",") + ")";
+        }
+      }
+      setText("detail-shape", shapeText(detail.shape));
+      document.getElementById("detail-size").textContent = detail.size === null ? "—" : String(detail.size);
+      setText("detail-source", tensorName === "激活值" ? detail.source : "检查点参数（只读）");
+      setText("detail-description", detail.description);
+      document.getElementById("detail-coordinate").textContent = Array.isArray(detail.coordinate) ? "[" + detail.coordinate.join(", ") + "]" : "—";
+      document.getElementById("detail-value").textContent = typeof detail.value === "number" ? detail.value.toPrecision(9) : fmt(detail.value);
+      setText("stat-min", detail.min);
+      setText("stat-max", detail.max);
+      setText("stat-mean", detail.mean);
+      setText("stat-std", detail.std);
+      document.getElementById("stat-nonfinite").textContent = detail.nonfinite === null ? "—" : String(detail.nonfinite);
+      renderFields(detail.fields);
+      updateParameterOptions(detail.parameters);
+      if (detail.index !== undefined && document.activeElement !== els.index) {
+        const index = Number(detail.index);
+        if (Number.isFinite(index) && index >= 0) { elementIndex = Math.floor(index); els.index.value = String(elementIndex); }
+      }
+    }
+
+    function displayTime(value) {
+      return value === null || value === undefined ? "—" : fmt(value, 3) + " s";
+    }
+
+    function updateHeader(frame) {
+      const legend = frame.legend || {};
+      const minimum = legend.minimum;
+      const maximum = legend.maximum;
+      if (typeof minimum === "number" && Number.isFinite(minimum) && typeof maximum === "number" && Number.isFinite(maximum)) {
+        const sharedMagnitude = Math.max(Math.abs(minimum), Math.abs(maximum));
+        els.scaleValue.textContent = "±" + legendNumber(sharedMagnitude);
+        els.scaleReadout.title = scaleReadoutBaseTitle + " 后端完整精度范围：±" + String(sharedMagnitude) + "。";
+        document.getElementById("legend-min").textContent = signedLegendNumber(minimum);
+        document.getElementById("legend-max").textContent = signedLegendNumber(maximum);
+      } else {
+        els.scaleValue.textContent = "±—";
+        els.scaleReadout.title = scaleReadoutBaseTitle;
+        document.getElementById("legend-min").textContent = "—";
+        document.getElementById("legend-max").textContent = "—";
+      }
+      if (Array.isArray(legend.colors) && legend.colors.length >= 2) {
+        const colors = legend.colors.filter(rgb => Array.isArray(rgb) && rgb.length === 3 && rgb.every(n => Number.isFinite(n) && n >= 0 && n <= 255));
+        const signature = JSON.stringify(colors);
+        if (signature !== legendSignature && colors.length >= 2) {
+          document.getElementById("spectrum-bar").style.background = "linear-gradient(90deg," + colors.map(rgb => "rgb(" + rgb.join(",") + ")").join(",") + ")";
+          document.getElementById("spectrum-bar").title = asText(legend.name);
+          legendSignature = signature;
+        }
+      }
+      els.frame.textContent = frame.sequence === null || frame.sequence === undefined ? "—" : String(frame.sequence);
+      els.inputTime.textContent = displayTime(frame.sim_time);
+      els.outputTime.textContent = displayTime(frame.output_time);
+      els.mode.textContent = asText(frame.mode || "—");
+      const criticDescription = asText(frame.critic);
+      els.critic.textContent = criticDescription ? "独立只读" : "—";
+      els.critic.title = criticDescription;
+      const state = frame.state && typeof frame.state === "object" ? frame.state : {};
+      const running = state.running === true;
+      let runtime = state.done ? "回合结束" : (running ? "运行中" : "已暂停");
+      if (state.time !== undefined) runtime += " · " + fmt(state.time, 2) + " s";
+      els.runtime.textContent = runtime;
+      els.runtime.title = asText(state.status);
+      els.training.textContent = Number.isInteger(state.training_steps)
+        ? (state.training_steps === 0 ? "未训练 · 随机初始化" : state.training_steps.toLocaleString() + " 步")
+        : "训练步数未记录";
+      const errors = Array.isArray(frame.errors) ? frame.errors.filter(Boolean).map(asText) : (frame.errors ? [asText(frame.errors)] : []);
+      const robot = state.robot && typeof state.robot === "object" ? state.robot : null;
+      const robotText = robot ? Object.entries(robot).slice(0, 4).map(([key, value]) => key + " " + fmt(value, 2)).join(" · ") : "";
+      const commandError = asText(state.status).startsWith("请求失败") ? asText(state.status) : "";
+      els.message.textContent = [...errors, commandError, robotText].filter(Boolean).join(" · ") || "实时帧已更新";
+      els.connection.textContent = "已连接";
+      els.connection.classList.remove("busy");
+      els.connection.classList.add("online");
+    }
+
+    function setConnection(connected, message = "") {
+      els.connection.classList.toggle("online", connected);
+      els.connection.classList.toggle("busy", !connected && fetching);
+      els.connection.textContent = connected ? "已连接" : (fetching ? "连接中" : "已断开");
+      if (message) els.message.textContent = message;
+    }
+
+    function resetDetailCursor() {
+      tensorName = "激活值";
+      elementIndex = 0;
+      els.detailImage.parentElement.classList.remove("zoomed");
+      els.detailImage.title = "点击查看原图";
+      els.tensor.value = tensorName;
+      els.index.value = "0";
+    }
+
+    function queryUrl({ includeSelected = true } = {}) {
+      const query = new URLSearchParams({
+        detail: "1",
+        tensor: tensorName,
+        index: String(Math.max(0, elementIndex)),
+        scale: "auto",
+        detail_scale: els.detailLocalScale.checked ? "local" : "global"
+      });
+      if (includeSelected && selectedKey !== null) query.set("selected", selectedKey);
+      return "/api/frame?" + query.toString();
+    }
+
+    async function responseErrorMessage(response) {
+      try {
+        const payload = await response.json();
+        return payload && typeof payload.error === "string" ? payload.error : "";
+      } catch (_) {
+        return "";
+      }
+    }
+
+    async function fetchFrameResponse(requestOptions, requestedKey) {
+      let response = await fetch(queryUrl(), requestOptions);
+      let retriedWithoutSelected = false;
+      if (response.status === 400 && requestedKey !== null) {
+        const errorMessage = await responseErrorMessage(response);
+        if (errorMessage === "selected layer is unknown" && selectedKey === requestedKey) {
+          // Only a confirmed stale layer key justifies dropping the selection.
+          // Reset detail cursors for the newly selected layer; keep user input
+          // intact for every other 400 response.
+          resetDetailCursor();
+          response = await fetch(queryUrl({ includeSelected: false }), requestOptions);
+          retriedWithoutSelected = true;
+        } else {
+          throw new Error(errorMessage || "HTTP " + response.status);
+        }
+      }
+      if (!response.ok) {
+        const errorMessage = await responseErrorMessage(response);
+        throw new Error(errorMessage || "HTTP " + response.status);
+      }
+      return { frame: await response.json(), retriedWithoutSelected };
+    }
+
+    async function pollOnce() {
+      if (fetching || frozen || document.visibilityState === "hidden") return;
+      fetching = true;
+      if (!els.connection.classList.contains("online")) setConnection(false);
+      const requestedKey = selectedKey;
+      const requestedTensor = tensorName;
+      const requestedLocalScale = els.detailLocalScale.checked;
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 4000);
+      try {
+        const requestOptions = { method: "GET", cache: "no-store", headers: { "Accept": "application/json" }, signal: controller.signal };
+        const { frame, retriedWithoutSelected } = await fetchFrameResponse(requestOptions, requestedKey);
+        if (!frame || typeof frame !== "object") throw new Error("帧数据格式无效");
+        const frameNodes = normalizeNodes(frame.nodes);
+        const frameKeys = new Set(frameNodes.map(node => node.key));
+        const detailKey = frame.detail && frame.detail.key;
+        let selectionAdopted = false;
+        if (selectedKey === null || !frameKeys.has(selectedKey)) {
+          const nextKey = frameKeys.has(detailKey) ? detailKey : (frameNodes[0]?.key ?? null);
+          selectionAdopted = nextKey !== selectedKey;
+          selectedKey = nextKey;
+          if (selectionAdopted) resetDetailCursor();
+        }
+        lastFrame = frame;
+        updateHeader(frame);
+        drawGraph(frame.nodes, frame.layout);
+        const detailMatchesSelection = frame.detail
+          && String(frame.detail.key ?? "") === String(selectedKey ?? "");
+        if ((requestedKey === selectedKey && requestedTensor === tensorName
+             && requestedLocalScale === els.detailLocalScale.checked)
+            || selectionAdopted || (retriedWithoutSelected && detailMatchesSelection)) {
+          renderDetail(frame.detail);
+        }
+      } catch (error) {
+        setConnection(false, "等待本地服务恢复：" + asText(error && error.message || error));
+      } finally {
+        window.clearTimeout(timeout);
+        fetching = false;
+        if (!els.connection.classList.contains("online")) {
+          els.connection.textContent = "已断开";
+          els.connection.classList.remove("busy");
+        }
+      }
+    }
+
+    function schedulePoll(delay = POLL_MS) {
+      window.clearTimeout(requestTimer);
+      requestTimer = window.setTimeout(async () => {
+        await pollOnce();
+        schedulePoll(POLL_MS);
+      }, delay);
+    }
+
+    function requestRefresh() {
+      if (frozen) return;
+      if (!fetching) {
+        window.clearTimeout(requestTimer);
+        schedulePoll(0);
+      }
+    }
+
+    async function sendCommand(command) {
+      if (controlBusy) return;
+      controlBusy = true;
+      const buttons = document.querySelectorAll("[data-command]");
+      buttons.forEach(button => { button.disabled = true; });
+      els.message.textContent = "已发送命令：" + command;
+      try {
+        const response = await fetch("/api/control", {
+          method: "POST",
+          cache: "no-store",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({ command })
+        });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        let result = null;
+        try { result = await response.json(); } catch (_) { /* empty response is valid */ }
+        if (result && result.message) els.message.textContent = asText(result.message);
+        else els.message.textContent = "命令已接受：" + command;
+      } catch (error) {
+        els.message.textContent = "命令发送失败：" + asText(error && error.message || error);
+        setConnection(false);
+      } finally {
+        buttons.forEach(button => { button.disabled = false; });
+        controlBusy = false;
+        requestRefresh();
+      }
+    }
+
+    function chooseNode(key) {
+      setDetailsVisible(true);
+      if (key === selectedKey) {
+        requestRefresh();
+        return;
+      }
+      selectedKey = key;
+      document.getElementById("layer-select").value = key;
+      resetDetailCursor();
+      updateSelectionStyle();
+      requestRefresh();
+    }
+
+    function setDetailsVisible(visible) {
+      detailVisible = visible;
+      els.detailPanel.classList.toggle("collapsed", !visible);
+      els.detailToggle.textContent = visible ? "收起详情" : "详情";
+      els.detailToggle.setAttribute("aria-expanded", String(visible));
+      els.detailToggle.setAttribute("title", visible ? "收起张量与层信息" : "展开张量与层信息");
+      els.detailCollapse.textContent = "收起";
+    }
+
+    document.querySelectorAll("[data-command]").forEach(button => {
+      button.addEventListener("click", () => sendCommand(button.dataset.command));
+    });
+    els.freeze.addEventListener("change", () => {
+      frozen = els.freeze.checked;
+      if (frozen) {
+        els.message.textContent = "本页刷新已冻结；仿真和后端命令仍可继续。";
+        els.connection.textContent = "画面冻结";
+        els.connection.classList.remove("busy");
+      } else {
+        els.message.textContent = "恢复本页实时刷新。";
+        requestRefresh();
+      }
+    });
+    els.tensor.addEventListener("change", () => {
+      tensorName = els.tensor.value || "激活值";
+      els.detailImage.parentElement.classList.remove("zoomed");
+      els.detailImage.title = "点击查看原图";
+      requestRefresh();
+    });
+    els.detailLocalScale.addEventListener("change", () => {
+      els.detailColorKey.hidden = true;
+      els.detailImage.hidden = true;
+      els.detailImageEmpty.textContent = "正在更新预览色标…";
+      els.detailImageEmpty.hidden = false;
+      requestRefresh();
+    });
+    els.detailImage.addEventListener("click", () => {
+      if (els.detailImage.hidden) return;
+      const zoomed = els.detailImage.parentElement.classList.toggle("zoomed");
+      els.detailImage.title = zoomed ? "点击缩回适配视图" : "点击查看原图";
+    });
+    els.index.addEventListener("change", () => {
+      const value = Number(els.index.value);
+      elementIndex = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+      els.index.value = String(elementIndex);
+      requestRefresh();
+    });
+    document.getElementById("fit-button").addEventListener("click", fitAll);
+    document.getElementById("layer-select").addEventListener("change", event => chooseNode(event.target.value));
+    document.getElementById("focus-layer-button").addEventListener("click", () => {
+      const record = renderedKeys.get(selectedKey);
+      if (!record || !record.position) return;
+      const { width, height } = viewportSize();
+      setViewBox({ x: record.position.x + CARD_W / 2 - width / 2,
+                   y: record.position.y + CARD_H / 2 - height / 2, width, height });
+    });
+    document.getElementById("one-to-one-button").addEventListener("click", set100Percent);
+    document.getElementById("zoom-in-button").addEventListener("click", () => setZoom(0.82));
+    document.getElementById("zoom-out-button").addEventListener("click", () => setZoom(1.22));
+    els.detailToggle.addEventListener("click", () => setDetailsVisible(!detailVisible));
+    els.detailCollapse.addEventListener("click", () => setDetailsVisible(false));
+
+    els.svg.addEventListener("wheel", event => {
+      event.preventDefault();
+      const rect = els.svg.getBoundingClientRect();
+      setZoom(event.deltaY < 0 ? 0.88 : 1.14, event.clientX - rect.left, event.clientY - rect.top);
+    }, { passive: false });
+    els.svg.addEventListener("pointerdown", event => {
+      if (event.button !== 0 || event.target.closest?.(".node-card")) return;
+      const rect = els.svg.getBoundingClientRect();
+      pan = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, rect, moved: false };
+      els.svg.setPointerCapture(event.pointerId);
+      els.svg.style.cursor = "grabbing";
+    });
+    els.svg.addEventListener("pointermove", event => {
+      if (!pan || event.pointerId !== pan.pointerId) return;
+      const dx = event.clientX - pan.x, dy = event.clientY - pan.y;
+      if (Math.abs(dx) + Math.abs(dy) > 2) pan.moved = true;
+      const rect = els.svg.getBoundingClientRect();
+      setViewBox({
+        x: viewBox.x - dx * viewBox.width / Math.max(1, rect.width),
+        y: viewBox.y - dy * viewBox.height / Math.max(1, rect.height),
+        width: viewBox.width, height: viewBox.height
+      });
+      pan.x = event.clientX; pan.y = event.clientY;
+    });
+    const endPan = event => {
+      if (!pan || event.pointerId !== pan.pointerId) return;
+      if (pan.moved) suppressClickUntil = performance.now() + 80;
+      pan = null;
+      els.svg.style.cursor = "";
+      if (els.svg.hasPointerCapture(event.pointerId)) els.svg.releasePointerCapture(event.pointerId);
+    };
+    els.svg.addEventListener("pointerup", endPan);
+    els.svg.addEventListener("pointercancel", endPan);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && !frozen) requestRefresh(); });
+    window.addEventListener("resize", () => {
+      updateCrossingGeometry();
+      if (window.matchMedia("(max-width: 920px)").matches && detailVisible) setDetailsVisible(false);
+    });
+
+    updateParameterOptions([]);
+    setDetailsVisible(false);
+    setViewBox(viewBox);
+    schedulePoll(0);
+  })();
+  </script>
+</body>
+</html>

@@ -41,6 +41,11 @@ class SyntheticFieldEnv:
     num_envs = 2
     num_actions = 4
     device = "cpu"
+    backend_identity = {
+        "simulator": "isaac_sim",
+        "physics_backend": "physx",
+        "learning_backend": "rsl_rl",
+    }
     observation_config = {
         "schema": ABSOLUTE_GOAL_INPUT_SCHEMA,
         "state_dim": 33,

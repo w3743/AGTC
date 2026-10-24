@@ -11,7 +11,7 @@ def _field_model():
     pytest.importorskip("rsl_rl")
     from tensordict import TensorDict
 
-    from isaac_field.policy import OBSERVATION_SHAPES
+    from isaac_field.policy_contract import OBSERVATION_SHAPES
     from isaac_field.rsl_rl_policy import RslFieldRNNModel
 
     torch.manual_seed(731)
@@ -63,6 +63,45 @@ def _actor_mean_and_state(actor, observation: dict[str, torch.Tensor]):
     return mean, hidden, cell
 
 
+def test_export_driver_sequence_verification_resets_scripted_model():
+    from pathlib import Path
+
+    project_root = Path(__file__).resolve().parents[1]
+    script_path = project_root / "scripts" / "export_rsl_policy.py"
+    spec = importlib.util.spec_from_file_location("export_rsl_policy_driver_test", script_path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+
+    class FakeModel:
+        def __init__(self):
+            self.steps = 0
+
+        def predict(self, observation, *, state, episode_start, deterministic):
+            assert deterministic is True
+            self.steps += 1
+            return torch.zeros((1, 4)).numpy(), self.steps
+
+    class FakeScripted:
+        def __init__(self):
+            self.reset_count = 0
+
+        def reset(self):
+            self.reset_count += 1
+
+        def __call__(self, *inputs):
+            assert len(inputs) == 5
+            return torch.zeros((1, 4))
+
+    model = FakeModel()
+    scripted = FakeScripted()
+    result = module._verify_sequence(model, scripted)
+
+    assert result == {"sequence_steps": 4, "max_abs_error": 0.0}
+    assert scripted.reset_count == 1
+    assert model.steps == 4
+
+
 def test_field_jit_export_scripts_saves_resets_and_matches_actor(tmp_path):
     from isaac_field.rsl_rl_export import field_model_as_jit
 
@@ -98,7 +137,7 @@ def test_field_jit_export_scripts_saves_resets_and_matches_actor(tmp_path):
 
 
 def test_field_export_rejects_critic_model():
-    from isaac_field.policy import OBSERVATION_SHAPES
+    from isaac_field.policy_contract import OBSERVATION_SHAPES
     from isaac_field.rsl_rl_export import field_model_as_jit
     from isaac_field.rsl_rl_policy import RslFieldRNNModel
     from tensordict import TensorDict

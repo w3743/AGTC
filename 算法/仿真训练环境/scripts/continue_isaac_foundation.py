@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
 
 from scripts import train_isaac_foundation_fresh as fresh
 
-PARENT = fresh.DEFAULT_OUTPUT
+PARENT = ROOT / "results/isaac_field_improvement/fresh_coupled_tracks_20261020"
 DEFAULT_OUTPUT = ROOT / "results/isaac_field_improvement/continue_coupled_tracks_20261020"
 RUNNER = "scripts/continue_isaac_foundation.py"
 SCHEMA = "isaac-field-coupled-track-continuation-v1"
@@ -149,6 +149,10 @@ def _parent_audit(parent: Path) -> tuple[dict, Path, dict]:
 
 
 def prepare(parent: Path, output: Path, max_time: float = 20.0) -> dict:
+    raise RuntimeError(
+        "this frozen continuation is pinned to an SB3/Newton .zip parent; it cannot be relabeled as PhysX RSL-RL. "
+        "Use an explicit weights-transfer workflow from a compatible RSL .pt checkpoint."
+    )
     parent, output = parent.resolve(), output.resolve()
     if max_time not in (20.0, 60.0):
         raise ValueError("max_time must be 20 or 60 seconds")
@@ -369,6 +373,9 @@ def _status(output: Path, runtime: dict, status: str = "running", **extra) -> No
 
 
 def launch(output: Path, device: str = "cuda:0") -> dict:
+    raise RuntimeError(
+        "this frozen continuation requires the Newton/SB3 optimizer and cannot resume with the PhysX RSL runner"
+    )
     protocol = preflight(output)
     output = output.resolve()
     lock = output / "launch.lock"

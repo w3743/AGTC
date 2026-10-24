@@ -150,6 +150,10 @@ def compare_initial_conditions(before: dict, after: dict) -> dict:
     }
 
 def run(protocol: dict) -> dict:
+    raise RuntimeError(
+        "this one-off recovery protocol is pinned to Newton/SB3 .zip checkpoints and is legacy-only; "
+        "it cannot train or evaluate as Isaac Sim PhysX RSL-RL"
+    )
     from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
     from isaac_field.env import make_env
     from isaac_field.learning import train_stage

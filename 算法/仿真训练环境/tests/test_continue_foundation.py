@@ -127,35 +127,82 @@ def parent_trial(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> tuple[Path,
     return root, parent
 
 
+def _prepared_legacy_child(root: Path, parent: Path) -> Path:
+    """Build a frozen historical child fixture without invoking disabled prepare."""
+    output = root / "child"
+    output.mkdir()
+    parent_protocol = json.loads((parent / "protocol.json").read_text(encoding="utf-8"))
+    rows = []
+    for relative in (*fresh._source_paths(), runner.RUNNER):
+        source = root / relative
+        snapshot_relative = f"source_snapshot/{relative}"
+        snapshot = output / snapshot_relative
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        snapshot.write_bytes(source.read_bytes())
+        rows.append({"path": relative, "snapshot_path": snapshot_relative,
+                     "sha256": fresh._sha256(source)})
+
+    baseline = output / "parent_final_baseline.zip"
+    parent_checkpoint = parent / "stage_04_turn90.zip"
+    baseline.write_bytes(parent_checkpoint.read_bytes())
+    protocol = {
+        "schema": runner.SCHEMA,
+        "status": "prepared",
+        "parent": {
+            "path": str(parent),
+            "protocol_sha256": runner.PARENT_PROTOCOL_SHA256,
+            "checkpoint": parent_checkpoint.name,
+            "checkpoint_sha256": runner.PARENT_CHECKPOINT_SHA256,
+            "num_timesteps": runner.PARENT_TIMESTEPS,
+            "optimizer": runner.EXPECTED_ADAM,
+        },
+        "architecture": parent_protocol["architecture"],
+        "action_config": parent_protocol["action_config"],
+        "runtime_contract": parent_protocol["runtime_contract"],
+        "config": {**CONFIG, "max_time": 20.0},
+        "robot_geometry": parent_protocol["robot_geometry"],
+        "training": {
+            **copy.deepcopy(TRAINING),
+            "training_seed": runner.TRAIN_SEED,
+            "stage_seeds": [runner.TRAIN_SEED + i for i in range(len(fresh.STAGES))],
+        },
+        "initialization": {
+            "baseline_path": baseline.name,
+            "baseline_sha256": runner.PARENT_CHECKPOINT_SHA256,
+            "expected_final_num_timesteps": runner.FINAL_TIMESTEPS,
+        },
+        "source_snapshot": {"files": rows},
+    }
+    protocol_path = output / "protocol.json"
+    protocol_path.write_text(json.dumps(protocol), encoding="utf-8")
+    (output / "run_status.json").write_text(json.dumps({
+        "status": "prepared", "protocol_sha256": fresh._protocol_sha(protocol_path),
+    }), encoding="utf-8")
+    return output
+
+
 @pytest.mark.parametrize("max_time", [20.0, 60.0])
-def test_prepare_freezes_sources_and_copies_parent_final_unchanged(parent_trial, max_time):
+def test_prepare_refuses_to_relabel_a_historical_newton_parent(parent_trial, max_time):
     root, parent = parent_trial
     output = root / "child"
     parent_bytes = (parent / "stage_04_turn90.zip").read_bytes()
-    result = runner.prepare(parent, output, max_time)
-    protocol = json.loads((output / "protocol.json").read_text(encoding="utf-8"))
-    assert result["source_count"] == len(FILES) + 1
-    assert result["expected_final_num_timesteps"] == 393216
-    assert protocol["config"]["max_time"] == max_time
-    assert protocol["training"]["stage_seeds"] == [69005, 69006, 69007, 69008]
-    assert protocol["initialization"]["loads_adam_optimizer_state"] is True
-    assert protocol["initialization"]["continuation_semantics"]["bitwise_resume"] is False
-    assert (output / "parent_final_baseline.zip").read_bytes() == parent_bytes
-    assert runner.preflight(output)["schema"] == runner.SCHEMA
+    with pytest.raises(RuntimeError, match="pinned to an SB3/Newton .zip parent"):
+        runner.prepare(parent, output, max_time)
+    assert not output.exists()
+    assert (parent / "stage_04_turn90.zip").read_bytes() == parent_bytes
 
 
 def test_prepare_rejects_unapproved_parent_drift(parent_trial):
     root, parent = parent_trial
     (root / FILES[0]).write_text("unexpected training drift\n", encoding="utf-8")
     with pytest.raises(ValueError, match="unexpected current source drift"):
-        runner.prepare(parent, root / "child")
+        runner._parent_audit(parent)
 
 
 @pytest.mark.parametrize("tamper", ["baseline", "runner_source"])
-def test_preflight_rejects_tampered_child_artifacts_and_unprepared_launch(parent_trial, tamper):
+def test_preflight_rejects_tampered_child_artifacts_and_launch_stays_legacy_only(parent_trial, tamper):
     root, parent = parent_trial
-    output = root / "child"
-    runner.prepare(parent, output)
+    output = _prepared_legacy_child(root, parent)
     if tamper == "baseline":
         with (output / "parent_final_baseline.zip").open("ab") as stream:
             stream.write(b"tamper")
@@ -169,18 +216,19 @@ def test_preflight_rejects_tampered_child_artifacts_and_unprepared_launch(parent
     status = json.loads(status_path.read_text(encoding="utf-8"))
     status["status"] = "running"
     status_path.write_text(json.dumps(status), encoding="utf-8")
-    with pytest.raises(ValueError, match="unchanged, not-yet-launched"):
+    with pytest.raises(RuntimeError, match="requires the Newton/SB3 optimizer"):
         runner.launch(output)
     assert not (output / "launch.lock").exists()
 
 
 def test_launch_refuses_existing_claim_before_starting_simulator(parent_trial):
     root, parent = parent_trial
-    output = root / "child"
-    runner.prepare(parent, output)
-    (output / "launch.lock").write_text("claimed\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="already been launched or claimed"):
+    output = _prepared_legacy_child(root, parent)
+    lock = output / "launch.lock"
+    lock.write_text("claimed\n", encoding="utf-8")
+    with pytest.raises(RuntimeError, match="requires the Newton/SB3 optimizer"):
         runner.launch(output)
+    assert lock.read_text(encoding="utf-8") == "claimed\n"
 
 
 def test_checkpoint_state_load_does_not_advance_torch_rng(tmp_path: Path):

@@ -147,7 +147,7 @@ def test_checkpoint_space_adapter_matches_saved_bounds_without_fake_steps():
 
 
 def test_rsl_checkpoint_contract_rebuilds_read_only_spaces():
-    from test_absolute_goal_policy import _observation_config
+    from policy_contract_helpers import observation_config as _observation_config
 
     observation_config = _observation_config(ABSOLUTE_GOAL_INPUT_SCHEMA)
     contract = {
@@ -214,7 +214,7 @@ def test_native_rsl_checkpoint_runs_cpu_lassc_replay(tmp_path):
     from isaac_field.assets import FrontGuideSpec
     from isaac_field.body_stability import BodyStabilityConfig
     from isaac_field.rsl_rl_policy import RslFieldRNNModel, build_field_policy_contract
-    from test_absolute_goal_policy import _observation_config
+    from policy_contract_helpers import observation_config as _observation_config
 
     torch.set_num_threads(1)
     task_cfg = Config(size=20.0, input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA)
@@ -241,6 +241,7 @@ def test_native_rsl_checkpoint_runs_cpu_lassc_replay(tmp_path):
         num_envs=1,
         observation_config=observation_config,
         action_config=action_config(),
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
         field_cfg=task_cfg,
         front_guide_spec=FrontGuideSpec(),
         body_stability_config=BodyStabilityConfig(),

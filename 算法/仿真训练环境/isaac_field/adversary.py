@@ -1,4 +1,4 @@
-"""A Gymnasium map designer trained with ordinary Stable-Baselines3 PPO.
+"""A Gymnasium map designer trained with the official RSL-RL PPO runner.
 
 This is a one-sided, naive minimax teacher: its terminal reward is the negative
 student score supplied by ``evaluator``. It does not implement PAIRED.
@@ -22,6 +22,18 @@ from isaac_field.layouts import row_positions, scatter_positions
 from isaac_field.task import Config, Scene, _make_terrain
 
 
+TEACHER_RUNTIME_IDENTITY = {
+    "simulator": "gymnasium",
+    "physics_backend": "none",
+    "learning_backend": "rsl_rl",
+}
+TARGET_STUDENT_BACKEND_IDENTITY = {
+    "simulator": "isaac_sim",
+    "physics_backend": "physx",
+    "learning_backend": "rsl_rl",
+}
+
+
 @dataclass(frozen=True)
 class DesignerTrainingResult:
     model: Any
@@ -29,6 +41,7 @@ class DesignerTrainingResult:
     summary_path: Path
     episodes_path: Path
     summary: dict[str, Any]
+    actual_timesteps: int = 0
 
 
 class MapDesignerEnv(gym.Env):
@@ -59,6 +72,8 @@ class MapDesignerEnv(gym.Env):
         invalid_penalty: float = 1.0,
         max_layout_attempts: int = 64,
         max_episode_records: int = 128,
+        evaluator_kind: str = "score_callback",
+        student_physx_evaluated: bool = False,
     ):
         super().__init__()
         if not callable(evaluator):
@@ -71,11 +86,17 @@ class MapDesignerEnv(gym.Env):
             raise ValueError("invalid_penalty must be finite and positive")
         if max_layout_attempts < 1 or max_episode_records < 1:
             raise ValueError("layout attempts and episode record limits must be positive")
+        if not isinstance(evaluator_kind, str) or not evaluator_kind.strip():
+            raise ValueError("evaluator_kind must be a non-empty string")
+        if type(student_physx_evaluated) is not bool:
+            raise ValueError("student_physx_evaluated must be boolean")
         if cfg.plants < 1:
             raise ValueError("MapDesignerEnv requires at least one plant")
 
         self.cfg = cfg
         self.evaluator = evaluator
+        self.evaluator_kind = evaluator_kind
+        self.student_physx_evaluated = student_physx_evaluated
         self.seed_value = int(seed)
         self.edit_budget = int(edit_budget)
         self.invalid_penalty = float(invalid_penalty)
@@ -469,7 +490,11 @@ class MapDesignerEnv(gym.Env):
         records = list(self._episode_records)
         scores = [record["student_score"] for record in records if record["student_score"] is not None]
         return {
-            "algorithm": "SB3 PPO MlpPolicy",
+            "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner PPO with MLPModel",
+            "teacher_runtime_identity": dict(TEACHER_RUNTIME_IDENTITY),
+            "target_student_backend_identity": dict(TARGET_STUDENT_BACKEND_IDENTITY),
+            "evaluator_kind": self.evaluator_kind,
+            "student_physx_evaluated": self.student_physx_evaluated,
             "teacher_objective": "naive_minimax: teacher_reward = -student_score",
             "paired": False,
             "episodes_recorded": len(records),
@@ -517,39 +542,209 @@ def train_designer(
     device: str = "cpu",
     ppo_kwargs: Mapping[str, Any] | None = None,
 ) -> DesignerTrainingResult:
-    """Learn the map designer with SB3's standard PPO implementation."""
-    from stable_baselines3 import PPO
+    """Train the existing naive-minimax map designer with official RSL-RL PPO."""
+    if not isinstance(env, MapDesignerEnv):
+        raise TypeError("train_designer requires the existing MapDesignerEnv")
+    if isinstance(timesteps, bool) or int(timesteps) != timesteps or int(timesteps) < 1:
+        raise ValueError("timesteps must be a positive integer")
+    if isinstance(seed, bool) or int(seed) != seed or int(seed) < 0:
+        raise ValueError("seed must be a non-negative integer")
 
-    if int(timesteps) < 1:
-        raise ValueError("timesteps must be positive")
-    output_path = Path(output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    kwargs: dict[str, Any] = {
-        "seed": seed,
-        "device": device,
+    settings = {
         "n_steps": 64,
         "batch_size": 32,
         "n_epochs": 3,
         "learning_rate": 3e-4,
         "gamma": 0.99,
+        "gae_lambda": 0.95,
+        "clip_param": 0.2,
+        "value_loss_coef": 0.5,
+        "entropy_coef": 0.0,
+        "max_grad_norm": 0.5,
+        "log_std_init": 0.0,
+        "hidden_dims": (64, 64),
+        "activation": "tanh",
         "verbose": 0,
+        "target_kl": None,
     }
     if ppo_kwargs:
-        kwargs.update(dict(ppo_kwargs))
-    model = PPO("MlpPolicy", env, **kwargs)
+        unknown = set(ppo_kwargs) - set(settings)
+        if unknown:
+            raise ValueError(f"unsupported RSL-RL map-designer settings: {sorted(unknown)}")
+        settings.update(dict(ppo_kwargs))
+    if int(settings["verbose"]) != 0:
+        raise ValueError("verbose is an SB3-only option; RSL-RL logging is handled by OnPolicyRunner")
+    n_steps = int(settings["n_steps"])
+    batch_size = int(settings["batch_size"])
+    n_epochs = int(settings["n_epochs"])
+    total_timesteps = int(timesteps)
+    if n_steps < 1 or batch_size < 1 or n_epochs < 1:
+        raise ValueError("n_steps, batch_size, and n_epochs must be positive")
+    if total_timesteps % n_steps:
+        raise ValueError("timesteps must be divisible by RSL-RL n_steps for exact teacher updates")
+    if n_steps % batch_size:
+        raise ValueError("RSL-RL rollout length must be divisible by batch_size")
+    hidden_dims = tuple(int(value) for value in settings["hidden_dims"])
+    if not hidden_dims or any(value < 1 for value in hidden_dims):
+        raise ValueError("hidden_dims must contain positive layer widths")
+    if not math.isfinite(float(settings["learning_rate"])) or float(settings["learning_rate"]) <= 0:
+        raise ValueError("learning_rate must be finite and positive")
+    if not math.isfinite(float(settings["gamma"])) or not 0 <= float(settings["gamma"]) <= 1:
+        raise ValueError("gamma must be finite and in [0, 1]")
+    if not math.isfinite(float(settings["gae_lambda"])) or not 0 <= float(settings["gae_lambda"]) <= 1:
+        raise ValueError("gae_lambda must be finite and in [0, 1]")
+
+    import torch
+    from rsl_rl.runners import OnPolicyRunner
+
+    output_base = Path(output)
+    checkpoint = output_base if output_base.suffix.lower() == ".pt" else Path(f"{output_base}.pt")
+    summary_path = Path(f"{output_base}.summary.json")
+    episodes_path = Path(f"{output_base}.episodes.json")
+    for path in (checkpoint, summary_path, episodes_path):
+        if path.exists():
+            raise FileExistsError(f"refusing to overwrite map-designer artifact: {path}")
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+
+    cfg = {
+        "seed": int(seed),
+        "num_steps_per_env": n_steps,
+        "max_iterations": total_timesteps // n_steps,
+        "save_interval": total_timesteps // n_steps + 1,
+        "experiment_name": "isaac_field_map_designer_rsl",
+        "run_name": checkpoint.stem,
+        "obs_groups": {"actor": ["obs"], "critic": ["obs"]},
+        "check_for_nan": True,
+        "actor": {
+            "class_name": "rsl_rl.models.mlp_model:MLPModel",
+            "hidden_dims": list(hidden_dims),
+            "activation": str(settings["activation"]),
+            "obs_normalization": False,
+            "distribution_cfg": {
+                "class_name": "rsl_rl.modules.distribution.GaussianDistribution",
+                "init_std": math.exp(float(settings["log_std_init"])),
+                "std_type": "log",
+            },
+        },
+        "critic": {
+            "class_name": "rsl_rl.models.mlp_model:MLPModel",
+            "hidden_dims": list(hidden_dims),
+            "activation": str(settings["activation"]),
+            "obs_normalization": False,
+        },
+        "algorithm": {
+            "class_name": "rsl_rl.algorithms.ppo:PPO",
+            "num_learning_epochs": n_epochs,
+            "num_mini_batches": n_steps // batch_size,
+            "clip_param": float(settings["clip_param"]),
+            "gamma": float(settings["gamma"]),
+            "lam": float(settings["gae_lambda"]),
+            "value_loss_coef": float(settings["value_loss_coef"]),
+            "entropy_coef": float(settings["entropy_coef"]),
+            "learning_rate": float(settings["learning_rate"]),
+            "max_grad_norm": float(settings["max_grad_norm"]),
+            "schedule": "fixed",
+            "desired_kl": settings["target_kl"],
+            "use_clipped_value_loss": False,
+        },
+    }
+
+    from rsl_rl.env import VecEnv
+    from tensordict import TensorDict
+
+    class _MapDesignerRslVecEnv(VecEnv):
+        def __init__(self, source: MapDesignerEnv):
+            self.env = source
+            self.num_envs = 1
+            self.num_actions = 3
+            self.device = torch.device(device)
+            self.max_episode_length = int(source.edit_budget)
+            self.episode_length_buf = torch.zeros(1, dtype=torch.long, device=self.device)
+            self.cfg = {"name": "MapDesignerEnv", "edit_budget": int(source.edit_budget)}
+            self._observation, _ = source.reset(seed=int(seed))
+
+        def get_observations(self):
+            observation = torch.as_tensor(self._observation, dtype=torch.float32, device=self.device)
+            return TensorDict({"obs": observation.unsqueeze(0)}, batch_size=[1])
+
+        def step(self, actions):
+            if not isinstance(actions, torch.Tensor) or tuple(actions.shape) != (1, self.num_actions):
+                raise ValueError("RSL map-designer actions must have shape (1, 3)")
+            action = actions.detach().to(device="cpu", dtype=torch.float32).numpy()[0]
+            self._observation, reward, terminated, truncated, info = self.env.step(
+                np.clip(action, -1.0, 1.0).astype(np.float32, copy=False)
+            )
+            done = bool(terminated or truncated)
+            self.episode_length_buf.add_(1)
+            logs = {}
+            if done:
+                episode = info.get("episode_summary", {})
+                for source_key, log_key in (
+                    ("student_score", "/map_designer/student_score"),
+                    ("teacher_reward", "/map_designer/teacher_reward"),
+                    ("valid_edits", "/map_designer/valid_edits"),
+                    ("invalid_edits", "/map_designer/invalid_edits"),
+                ):
+                    value = episode.get(source_key)
+                    if value is not None:
+                        logs[log_key] = torch.tensor(float(value), device=self.device)
+                self._observation, _ = self.env.reset()
+                self.episode_length_buf.zero_()
+            extras = {
+                "time_outs": torch.tensor([bool(truncated and not terminated)], device=self.device),
+                "log": logs,
+            }
+            observation = torch.as_tensor(self._observation, dtype=torch.float32, device=self.device)
+            return (
+                TensorDict({"obs": observation.unsqueeze(0)}, batch_size=[1]),
+                torch.tensor([float(reward)], dtype=torch.float32, device=self.device),
+                torch.tensor([done], dtype=torch.long, device=self.device),
+                extras,
+            )
+
+        def close(self):
+            close = getattr(self.env, "close", None)
+            if callable(close):
+                close()
+
+    vec_env = _MapDesignerRslVecEnv(env)
+    torch.manual_seed(int(seed))
+    if str(device).startswith("cuda") and torch.cuda.is_available():
+        torch.cuda.manual_seed_all(int(seed))
+    runner = OnPolicyRunner(vec_env, cfg, log_dir=None, device=str(device))
     started = time.perf_counter()
-    model.learn(total_timesteps=int(timesteps))
+    runner.learn(num_learning_iterations=total_timesteps // n_steps, init_at_random_ep_len=False)
     learn_wall = time.perf_counter() - started
-    model.save(str(output_path))
-    checkpoint = output_path if output_path.suffix == ".zip" else Path(f"{output_path}.zip")
+    actual_timesteps = n_steps * (total_timesteps // n_steps)
+    model = runner.alg.get_policy()
+    model.num_timesteps = actual_timesteps
+    runner.save(str(checkpoint), infos={
+        "teacher_runtime_identity": dict(TEACHER_RUNTIME_IDENTITY),
+        "target_student_backend_identity": dict(TARGET_STUDENT_BACKEND_IDENTITY),
+        "evaluator_kind": env.evaluator_kind,
+        "student_physx_evaluated": env.student_physx_evaluated,
+        "policy_contract": {
+            "observation": "flattened_map_layout_v1",
+            "action": "plant_index_x_y_clipped_minus1_plus1_v1",
+            "objective": "naive_minimax_teacher_reward_equals_negative_student_score",
+            "paired": False,
+            "actor_hidden_dims": list(hidden_dims),
+        },
+    })
     summary_path, episodes_path = env.save_artifacts(
-        output_path,
+        output_base,
         extra_summary={
-            "requested_timesteps": int(timesteps),
-            "actual_timesteps": int(model.num_timesteps),
+            "requested_timesteps": total_timesteps,
+            "actual_timesteps": actual_timesteps,
             "learn_wall_seconds": float(learn_wall),
             "checkpoint": str(checkpoint),
             "scorer": getattr(env.evaluator, "__qualname__", type(env.evaluator).__name__),
+            "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner PPO with MLPModel",
+            "teacher_runtime_identity": dict(TEACHER_RUNTIME_IDENTITY),
+            "target_student_backend_identity": dict(TARGET_STUDENT_BACKEND_IDENTITY),
+            "evaluator_kind": env.evaluator_kind,
+            "student_physx_evaluated": env.student_physx_evaluated,
+            "optimizer": "RSL-RL PPO Adam",
         },
     )
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -559,4 +754,5 @@ def train_designer(
         summary_path=summary_path,
         episodes_path=episodes_path,
         summary=summary,
+        actual_timesteps=actual_timesteps,
     )

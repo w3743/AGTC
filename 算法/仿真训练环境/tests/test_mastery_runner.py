@@ -7,7 +7,8 @@ are faked, so no training or physics simulation is started.
 """
 from __future__ import annotations
 
-from dataclasses import replace
+from dataclasses import asdict, replace
+from contextlib import nullcontext
 import hashlib
 import json
 from pathlib import Path
@@ -174,7 +175,8 @@ class _FakeModel:
 
 class _FakeEnv:
     def __init__(self, *, cfg, mode, num_envs, seed, auto_reset, goal_distance, goal_angle,
-                 distance_cost, opened, mismatch=False):
+                 distance_cost, opened, rsl=True, mismatch=False):
+        assert rsl is True
         self.training = bool(auto_reset)
         self.seed = int(seed)
         self.num_envs = int(num_envs)
@@ -206,39 +208,57 @@ class _FakeDiagnosticsCallback:
 
 
 def _install_launch_fakes(monkeypatch, *, mismatch=False, actual_sampling_drift=False, train_error=None):
+    from isaac_field import runtime as isaac_runtime
+    from isaac_field import rsl_rl_policy
+
+    # The workflow is exercised with fake environments and policies; own a
+    # no-op outer runtime so the CPU test cannot start Isaac Sim.
+    monkeypatch.setattr(isaac_runtime, "launch_app", lambda *args, **kwargs: nullcontext())
     opened = []
     train_calls = []
     eval_calls = []
     events = []
-    callback_calls = []
-    trained_total = {"steps": 0}
+    checkpoint_payloads = {}
 
     def make_env(**kwargs):
         return _FakeEnv(**kwargs, opened=opened, mismatch=mismatch)
 
-    def make_model(env, **kwargs):
+    def train_stage(env, checkpoint, timesteps, output, *, seed, device, **kwargs):
         assert env in opened
-        return _FakeModel()
-
-    def train_stage(env, checkpoint, timesteps, output, *, seed, device, callback, **kwargs):
-        assert env in opened
-        assert callback.info_provider() == env.diagnostic_step_infos
-        train_calls.append({"seed": seed, "timesteps": timesteps, "callback": callback,
-                            "output": Path(output)})
-        events.append({"kind": "train", "timesteps": timesteps})
+        call = {"seed": seed, "timesteps": timesteps, "output": Path(output), **kwargs}
+        train_calls.append(call)
+        events.append({"kind": "initialization" if int(timesteps) == 0 else "train",
+                       "timesteps": int(timesteps)})
         if train_error is not None:
             raise train_error
         target = Path(output)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(f"fake checkpoint {len(train_calls)}".encode("utf-8"))
+        previous_steps = 0
+        if checkpoint is not None:
+            previous = checkpoint_payloads[Path(checkpoint)]
+            previous_steps = (0 if kwargs.get("weights_transfer")
+                              else int(previous.get("num_timesteps", 0)))
+        total_steps = previous_steps + int(timesteps)
+        target.write_bytes(f"fake RSL checkpoint {len(train_calls)}".encode("utf-8"))
         if actual_sampling_drift:
             # Model a runtime change after _open_env validated the frozen task.
             env.cfg.goal_angle += 0.01
-        trained_total["steps"] += int(timesteps)
+        contract = {
+            "task_config": asdict(env.field_cfg),
+            "simulator": "isaac_sim",
+            "physics_backend": "physx",
+            "learning_backend": "rsl_rl",
+        }
+        checkpoint_payloads[target] = {
+            "field_policy_contract": contract,
+            "num_timesteps": total_steps,
+            "optimizer_state_dict": {},
+        }
         return SimpleNamespace(
             checkpoint=target,
             trained_timesteps=int(timesteps),
-            total_timesteps=trained_total["steps"],
+            total_timesteps=total_steps,
+            model=SimpleNamespace(field_policy_contract=contract),
         )
 
     def evaluate_model(adapter, checkpoint, seeds, *, goal_distance, goal_angle, mode,
@@ -276,30 +296,19 @@ def _install_launch_fakes(monkeypatch, *, mismatch=False, actual_sampling_drift=
             "rows": rows,
         }
 
-    def diagnostics_callback(path, *, stage, info_provider):
-        callback = _FakeDiagnosticsCallback(path, stage, info_provider)
-        callback_calls.append(callback)
-        return callback
-
     fake_env = ModuleType("isaac_field.env")
     fake_env.make_env = make_env
     fake_env.SingleFieldAdapter = lambda env: env
-    fake_policy = ModuleType("isaac_field.policy")
-    fake_policy.make_model = make_model
-    fake_training = ModuleType("isaac_field.training")
-    fake_training._sb3_wrapper = lambda env: env
     fake_learning = ModuleType("isaac_field.learning")
-    fake_learning.DEFAULT_INITIAL_CHECKPOINT = Path("fake-initial-checkpoint.zip")
+    fake_learning.DEFAULT_INITIAL_CHECKPOINT = Path("fake-initial-checkpoint.pt")
     fake_learning.train_stage = train_stage
     fake_learning.evaluate_model = evaluate_model
-    fake_diagnostics = ModuleType("isaac_field.training_diagnostics")
-    fake_diagnostics.make_sb3_diagnostics_callback = diagnostics_callback
+    fake_rsl_policy = ModuleType("isaac_field.rsl_rl_policy")
+    fake_rsl_policy.load_rsl_checkpoint_payload = lambda path, **kwargs: checkpoint_payloads[Path(path)]
     for name, module in (
         ("isaac_field.env", fake_env),
-        ("isaac_field.policy", fake_policy),
-        ("isaac_field.training", fake_training),
         ("isaac_field.learning", fake_learning),
-        ("isaac_field.training_diagnostics", fake_diagnostics),
+        ("isaac_field.rsl_rl_policy", fake_rsl_policy),
     ):
         monkeypatch.setitem(sys.modules, name, module)
     monkeypatch.setattr(runner.foundation, "_live_environment_contract", lambda env: {})
@@ -309,7 +318,6 @@ def _install_launch_fakes(monkeypatch, *, mismatch=False, actual_sampling_drift=
         train_calls=train_calls,
         eval_calls=eval_calls,
         events=events,
-        callback_calls=callback_calls,
     )
 
 
@@ -325,15 +333,14 @@ def test_launch_uses_real_context_helpers_runs_to_budget_and_keeps_baseline_best
     assert summary["num_timesteps"] == summary["budget"] == 512
     assert summary["training_finished"] is True
     assert summary["capability_improvement_established"] is False
-    assert len(fakes.train_calls) == 1
-    assert fakes.train_calls[0]["timesteps"] == 512
-    assert (output / "untrained_baseline.zip").is_file()
+    assert len(fakes.train_calls) == 2
+    assert fakes.train_calls[-1]["timesteps"] == 512
+    assert fakes.train_calls[0]["timesteps"] == 0
+    assert (output / "untrained_baseline.pt").is_file()
     manifest = json.loads((output / "checkpoint_manifest.json").read_text(encoding="utf-8"))
-    assert Path(manifest["best_checkpoint"]) == output / "untrained_baseline.zip"
-    assert Path(manifest["latest_checkpoint"]) == fakes.train_calls[0]["output"]
-    assert Path(summary["best_checkpoint"]) == output / "untrained_baseline.zip"
-    assert len(fakes.callback_calls) == 1
-    assert fakes.callback_calls[0].stage == "near"
+    assert Path(manifest["best_checkpoint"]) == output / "untrained_baseline.pt"
+    assert Path(manifest["latest_checkpoint"]) == fakes.train_calls[-1]["output"]
+    assert Path(summary["best_checkpoint"]) == output / "untrained_baseline.pt"
 
     # The baseline global suite must be evaluated through evaluate_model before
     # the fake training call, with every configured selection seed bank.
@@ -341,7 +348,7 @@ def test_launch_uses_real_context_helpers_runs_to_budget_and_keeps_baseline_best
     baseline_selection_positions = [
         index for index, event in enumerate(fakes.events)
         if event["kind"] == "evaluate"
-        and event["checkpoint"] == output / "untrained_baseline.zip"
+        and event["checkpoint"] == output / "untrained_baseline.pt"
         and event["seeds"] in selection_banks
     ]
     assert len(baseline_selection_positions) == len(selection_banks)
@@ -386,7 +393,8 @@ def test_launch_rejects_actual_sampling_mismatch_after_closing_training_context(
     with pytest.raises(ValueError, match="actual environment sampling values differ"):
         runner.launch(output, device="cpu")
 
-    assert len(fakes.train_calls) == 1
+    assert len(fakes.train_calls) == 2
+    assert fakes.train_calls[-1]["timesteps"] == 512
     assert all(env.closed for env in fakes.opened)
     status = json.loads((output / "run_status.json").read_text(encoding="utf-8"))
     process_exit = json.loads((output / "python_outcome.json").read_text(encoding="utf-8"))

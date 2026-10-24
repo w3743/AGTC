@@ -12,9 +12,10 @@ from tensordict import TensorDict
 from isaac_field.action_contract import action_config
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
 from isaac_field.learning import _model_or_checkpoint
+from isaac_field.policy_contract import BACKEND_IDENTITY
 from isaac_field.rsl_rl_inference import RslPolicyRunner, RslPredictionModel
 from isaac_field.rsl_rl_policy import RslFieldRNNModel, build_field_policy_contract
-from test_absolute_goal_policy import _observation_config
+from policy_contract_helpers import observation_config as _observation_config
 
 
 @pytest.fixture
@@ -28,7 +29,12 @@ def rsl_checkpoint(tmp_path):
         distribution_cfg={"class_name": "rsl_rl.modules.distribution:GaussianDistribution", "init_std": np.exp(-2), "std_type": "log"},
     )
     critic = RslFieldRNNModel(obs, groups, "critic", 1, cnns=actor.cnns, input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA)
-    env = SimpleNamespace(num_envs=2, observation_config=config, action_config=action_config())
+    env = SimpleNamespace(
+        num_envs=2,
+        observation_config=config,
+        action_config=action_config(),
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
+    )
     contract = build_field_policy_contract(actor, critic, obs_groups=groups, env=env, num_steps_per_env=128)
     path = tmp_path / "model.pt"
     torch.save({"field_policy_contract": contract, "actor_state_dict": actor.state_dict(), "critic_state_dict": critic.state_dict(), "iter": 0}, path)
@@ -170,12 +176,14 @@ def test_existing_evaluator_dispatches_native_checkpoint(rsl_checkpoint):
     model, selected = _model_or_checkpoint(
         path, device="cpu", input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
         expected_observation_config=config,
+        expected_backend_identity=BACKEND_IDENTITY, legacy_sb3=False,
     )
     assert isinstance(model, RslPredictionModel)
     assert selected == path
     same, _ = _model_or_checkpoint(
         model, device="cpu", input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
         expected_observation_config=config,
+        expected_backend_identity=BACKEND_IDENTITY, legacy_sb3=False,
     )
     assert same is model
 

@@ -1,16 +1,18 @@
-"""Run reproducible smoke or staged-goto RecurrentPPO fine-tuning checks.
+"""Run reproducible smoke or staged-goto RSL-RL fine-tuning checks.
 
-These are ability checks, not benchmarks. Each Isaac SimulationContext is
-closed before the next one is created so evaluation and training do not overlap.
+These are ability checks, not benchmarks. One Isaac Sim Kit runtime is reused
+across paired evaluations and training stages.
 """
 from __future__ import annotations
 
 import argparse
 from datetime import datetime
 from dataclasses import asdict
+import hashlib
 import json
 from pathlib import Path
 import math
+from functools import wraps
 
 from isaac_field.learning import DEFAULT_INITIAL_CHECKPOINT, evaluate_model, train_stage
 from isaac_field.task import (
@@ -18,6 +20,17 @@ from isaac_field.task import (
     DAMAGE_METRIC_ROOT_PROTECTION_V1,
     DAMAGE_METRIC_STEM_CONTACT_V2,
 )
+
+
+def _with_runtime(function):
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        from isaac_field.runtime import launch_app
+
+        with launch_app(device=kwargs.get("device", "cuda:0"), headless=True):
+            return function(*args, **kwargs)
+
+    return wrapped
 
 
 def _evaluate(
@@ -30,9 +43,12 @@ def _evaluate(
     goal_angle: float = math.radians(30),
     record_trajectories: bool = False,
 ):
-    from isaac_field.env import SingleFieldAdapter, make_env
+    from isaac_field.env import SingleFieldAdapter
+    from isaac_field.runtime import create_env
+    from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+    from isaac_field.policy_contract import recorded_backend_identity
 
-    engine = make_env(
+    engine = create_env(
         cfg=cfg,
         mode="goto",
         num_envs=1,
@@ -41,6 +57,7 @@ def _evaluate(
         goal_distance=goal_distance,
         goal_angle=goal_angle,
         distance_cost=0.0,
+        rsl=True,
     )
     try:
         adapter = SingleFieldAdapter(engine)
@@ -59,6 +76,7 @@ def _evaluate(
         engine.close()
 
 
+@_with_runtime
 def run_comparison(
     *,
     checkpoint: str | Path = DEFAULT_INITIAL_CHECKPOINT,
@@ -73,8 +91,19 @@ def run_comparison(
     checkpoint = Path(checkpoint).resolve()
     if not checkpoint.is_file():
         raise FileNotFoundError(checkpoint)
-    if timesteps < 128 or timesteps % 128:
-        raise ValueError("timesteps must be a positive multiple of the saved 128-step rollout")
+    if checkpoint.suffix.lower() != ".pt":
+        raise ValueError("new RSL fine-tuning requires an Isaac Sim PhysX RSL .pt checkpoint; SB3 .zip is legacy-only")
+    from isaac_field.policy_contract import recorded_backend_identity
+    from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+    parent_checkpoint = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")
+    parent_contract = parent_checkpoint["field_policy_contract"]
+    parent_backend_identity = recorded_backend_identity({
+        key: parent_contract.get(key)
+        for key in ("simulator", "physics_backend", "learning_backend")
+    })
+    if timesteps < 256 or timesteps % 256:
+        raise ValueError("timesteps must be divisible by num_envs * num_steps_per_env (2 * 128)")
     if eval_episodes < 1:
         raise ValueError("eval_episodes must be positive")
 
@@ -87,7 +116,7 @@ def run_comparison(
     ) / f"short_goto_{stamp}"
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    final_checkpoint = output / "field_policy_after.zip"
+    final_checkpoint = output / "field_policy_after.pt"
 
     # Keep engine/observation geometry constant while making this a fast,
     # flat-terrain navigation check representative of the agreed crop spacing.
@@ -125,10 +154,10 @@ def run_comparison(
         json.dumps(before, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    from isaac_field.env import make_env
+    from isaac_field.runtime import create_env
 
     print("Starting short fine-tuning", flush=True)
-    train_env = make_env(
+    train_env = create_env(
         cfg=cfg,
         mode="goto",
         num_envs=2,
@@ -137,8 +166,14 @@ def run_comparison(
         goal_distance=(0.6, 1.2),
         goal_angle=math.radians(30),
         distance_cost=1.0,
+        rsl=True,
     )
     try:
+        parent_contract = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")["field_policy_contract"]
+        parent_backend_identity = recorded_backend_identity({
+            key: parent_contract.get(key)
+            for key in ("simulator", "physics_backend", "learning_backend")
+        })
         stage = train_stage(
             train_env,
             checkpoint,
@@ -146,11 +181,13 @@ def run_comparison(
             final_checkpoint,
             seed=training_seed,
             device=device,
-            goal_gain=100.0,
+            goal_gain=1.0,
             n_steps=128,
             batch_size=128,
             n_epochs=5,
             verbose=1,
+            lstm_hidden_size=int(parent_contract["lstm"]["hidden_dim"]),
+            weights_transfer=True,
         )
     finally:
         train_env.close()
@@ -165,7 +202,15 @@ def run_comparison(
     )
     summary = {
         "schema": "isaac-field-short-policy-improvement-v1",
-        "algorithm": "SB3-Contrib RecurrentPPO",
+        "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner",
+        "backend_identity": {"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
+        "initialization": {
+            "mode": "explicit_weights_transfer",
+            "parent_checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
+            "parent_backend_identity": parent_backend_identity,
+            "optimizer": "reinitialized",
+            "global_timestep": "reset in this new trial",
+        },
         "checkpoint_before": str(checkpoint),
         "checkpoint_after": str(stage.checkpoint),
         "evaluation": evaluation,
@@ -196,62 +241,6 @@ def run_comparison(
                       "after": after["summary"], "summary": str(summary_path)},
                      ensure_ascii=False, indent=2), flush=True)
     return summary
-
-
-def _make_progress_callback(num_envs: int, native_env, interval: int = 2048):
-    """Print sparse task outcomes in aggregate transitions, without FPS timing."""
-    from stable_baselines3.common.callbacks import BaseCallback
-
-    class AggregateProgressCallback(BaseCallback):
-        def __init__(self):
-            super().__init__(verbose=0)
-            self.recent_episodes = []
-            self.log_rows = []
-
-        def _on_step(self) -> bool:
-            calls_per_log = max(1, int(interval) // int(num_envs))
-            if self.n_calls % calls_per_log == 0:
-                self._refresh_episodes()
-                recent = self.recent_episodes[-10:]
-                row = {
-                    "timesteps": int(self.num_timesteps),
-                    "recent_episode_count": len(recent),
-                    "recent_successes": sum(int(item["success"]) for item in recent),
-                    "recent_mean_damage": (
-                        None if not recent else
-                        sum(item["damage"] for item in recent) / len(recent)
-                    ),
-                }
-                self.log_rows.append(row)
-                success_text = (
-                    "n/a" if not recent else
-                    f"{row['recent_successes']}/{len(recent)}"
-                )
-                damage_text = (
-                    "n/a" if row["recent_mean_damage"] is None else
-                    f"{row['recent_mean_damage']:.2f}"
-                )
-                print(
-                    f"[staged-goto] timesteps={row['timesteps']} "
-                    f"recent_success={success_text} recent_mean_damage={damage_text}",
-                    flush=True,
-                )
-            return True
-
-        def _refresh_episodes(self):
-            # The official fast SB3 wrapper deliberately omits custom task info.
-            # Read the native task's completed episodes instead of treating
-            # missing wrapper keys as zero successes.
-            self.recent_episodes = [
-                {"success": bool(info.get("is_success", False)),
-                 "damage": int(info.get("damage", 0))}
-                for info in native_env.episode_results[-10:]
-            ]
-
-        def _on_training_end(self):
-            self._refresh_episodes()
-
-    return AggregateProgressCallback()
 
 
 def _add_safety_summary(report: dict) -> dict:
@@ -366,6 +355,7 @@ def _safe_goto_assessment(before: dict, after: dict) -> str:
     return "no_improvement"
 
 
+@_with_runtime
 def run_staged_goto(
     *,
     checkpoint: str | Path = DEFAULT_INITIAL_CHECKPOINT,
@@ -380,6 +370,8 @@ def run_staged_goto(
     checkpoint = Path(checkpoint).resolve()
     if not checkpoint.is_file():
         raise FileNotFoundError(checkpoint)
+    if checkpoint.suffix.lower() != ".pt":
+        raise ValueError("new RSL fine-tuning requires an Isaac Sim PhysX RSL .pt checkpoint; SB3 .zip is legacy-only")
     if reward_profile not in ("legacy", "protect_plants"):
         raise ValueError("reward_profile must be 'legacy' or 'protect_plants'")
     safe_profile = reward_profile == "protect_plants"
@@ -438,22 +430,28 @@ def run_staged_goto(
         "n_epochs": 5,
         "gamma": 0.995,
         "target_kl": 0.03,
-        "log_std_init_if_fresh": -2.0,
-        "warm_start_exploration": "preserved from the loaded checkpoint",
+        "log_std_init": -2.0,
+        "exploration": "RSL-RL diagonal Gaussian distribution",
         "verbose": 0,
         "distance_cost": training_distance_cost,
-        "goal_gain": 100.0,
-        "algorithm": "SB3-Contrib RecurrentPPO",
+        "goal_gain": 1.0,
+        "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner",
         "device": device,
         "checkpoint_aggregate_interval": 4096,
         "progress_aggregate_interval": 2048,
-        "checkpoint_callback_save_freq_calls": 4096 // num_envs,
+        "checkpoint_interval_transitions": 4096,
     }
     protocol = {
-        "schema": "isaac-field-staged-goto-protocol-v1",
+        "schema": "isaac-field-staged-goto-protocol-v2",
+        "simulator": "isaac_sim",
+        "physics_backend": "physx",
+        "learning_backend": "rsl_rl",
         "protocol": "safe-goto" if safe_profile else "staged-goto",
         "reward_profile": reward_profile,
         "model_source": str(checkpoint),
+        "parent_checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
+        "parent_backend_identity": parent_backend_identity,
+        "initialization": "explicit RSL weights transfer; optimizer and trial timestep reset",
         "total_timesteps": int(timesteps),
         "stage_count": len(stages),
         "config": asdict(cfg),
@@ -504,7 +502,7 @@ def run_staged_goto(
                 **stage,
                 "checkpoint_source": (
                     str(checkpoint) if index == 0 else
-                    str(output / "stage_01_near" / "field_policy_near.zip")
+                    str(output / "stage_01_near" / "field_policy_near.pt")
                 ),
                 "goal_angle_rad": math.radians(stage["goal_angle_deg"]),
                 "hyperparameters": stage_hyperparameters,
@@ -530,8 +528,7 @@ def run_staged_goto(
         json.dumps(before, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback
-    from isaac_field.env import make_env
+    from isaac_field.runtime import create_env
 
     stage_reports = []
     active_checkpoint = checkpoint
@@ -540,12 +537,12 @@ def run_staged_goto(
         checkpoint_dir = stage_dir / "checkpoints"
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         stage_checkpoint = (
-            output / "field_policy_after.zip"
+            output / "field_policy_after.pt"
             if index == len(stages) - 1
-            else stage_dir / f"field_policy_{stage_spec['name']}.zip"
+            else stage_dir / f"field_policy_{stage_spec['name']}.pt"
         )
         goal_angle = math.radians(stage_spec["goal_angle_deg"])
-        train_env = make_env(
+        train_env = create_env(
             cfg=cfg,
             mode="goto",
             num_envs=num_envs,
@@ -554,13 +551,7 @@ def run_staged_goto(
             goal_distance=tuple(stage_spec["goal_distance_m"]),
             goal_angle=goal_angle,
             distance_cost=training_distance_cost,
-        )
-        progress_callback = _make_progress_callback(num_envs=num_envs, native_env=train_env, interval=2048)
-        checkpoint_callback = CheckpointCallback(
-            save_freq=4096 // num_envs,
-            save_path=str(checkpoint_dir),
-            name_prefix=f"field_policy_{stage_spec['name']}",
-            verbose=0,
+            rsl=True,
         )
         try:
             print(f"Starting staged-goto stage {stage_spec['name']}", flush=True)
@@ -569,10 +560,9 @@ def run_staged_goto(
                 active_checkpoint,
                 stage_timesteps,
                 stage_checkpoint,
-                callback=CallbackList([checkpoint_callback, progress_callback]),
                 seed=stage_spec["seed"],
                 device=device,
-                goal_gain=100.0,
+                goal_gain=1.0,
                 n_steps=128,
                 batch_size=128,
                 n_epochs=5,
@@ -580,6 +570,8 @@ def run_staged_goto(
                 gamma=0.995,
                 target_kl=0.03,
                 verbose=0,
+                lstm_hidden_size=int(parent_contract["lstm"]["hidden_dim"]),
+                weights_transfer=(index == 0),
             )
         finally:
             train_env.close()
@@ -593,10 +585,9 @@ def run_staged_goto(
             "checkpoint_out": str(result.checkpoint),
             "requested_timesteps": int(result.requested_timesteps),
             "trained_timesteps": int(result.trained_timesteps),
-            "aggregate_progress": progress_callback.log_rows,
-            "last_completed_episodes": progress_callback.recent_episodes[-10:],
+            "progress_source": "RSL-RL OnPolicyRunner TensorBoard logs",
             "periodic_checkpoints": sorted(
-                str(path) for path in checkpoint_dir.glob("*.zip")
+                str(path) for path in stage_dir.rglob("*.pt") if path != result.checkpoint
             ),
         })
 
@@ -621,6 +612,9 @@ def run_staged_goto(
     )
     summary = {
         "schema": "isaac-field-staged-goto-comparison-v1",
+        "backend_identity": {"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
+        "parent_checkpoint_sha256": protocol["parent_checkpoint_sha256"],
+        "parent_backend_identity": protocol["parent_backend_identity"],
         "protocol": str(protocol_path),
         "checkpoint_before": str(checkpoint),
         "checkpoint_after": str(final_checkpoint),

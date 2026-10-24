@@ -58,7 +58,7 @@ class MetadataRslRunner(FakeRslRunner):
 
     def __init__(self, task_cfg):
         super().__init__()
-        from test_absolute_goal_policy import _observation_config
+        from policy_contract_helpers import observation_config as _observation_config
 
         self.input_schema = task_cfg.input_schema
         self.observation_config = _observation_config(task_cfg.input_schema)

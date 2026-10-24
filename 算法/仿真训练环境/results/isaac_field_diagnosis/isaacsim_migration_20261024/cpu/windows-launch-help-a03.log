@@ -1,0 +1,149 @@
+usage: __main__.py [-h] [--video] [--video_length VIDEO_LENGTH]
+                   [--video_interval VIDEO_INTERVAL] [--num_envs NUM_ENVS]
+                   [--task TASK] [--frontend {torch,warp}] [--agent AGENT]
+                   [--seed SEED] [--distributed]
+                   [--run_timestamp RUN_TIMESTAMP]
+                   [--max_iterations MAX_ITERATIONS] [--export_io_descriptors]
+                   [--ray-proc-id RAY_PROC_ID]
+                   [--capture_env_sensors CAPTURE_ENV_SENSORS]
+                   [--capture_env_sensors_length CAPTURE_ENV_SENSORS_LENGTH]
+                   [--capture_env_sensors_interval CAPTURE_ENV_SENSORS_INTERVAL]
+                   [--capture_env_sensors_format {tensorboard,file}]
+                   [--external_callback EXTERNAL_CALLBACK]
+                   [--resume_optimizer_state | --no-resume_optimizer_state]
+                   [--experiment_name EXPERIMENT_NAME] [--run_name RUN_NAME]
+                   [--checkpoint CHECKPOINT]
+                   [--logger {tensorboard,wandb,neptune}]
+                   [--log_project_name LOG_PROJECT_NAME]
+                   [--livestream {0,1,2}] [--xr] [--device DEVICE]
+                   [--visualizer VISUALIZER] [--verbose] [--info]
+                   [--experience EXPERIENCE] [--deterministic]
+                   [--kit_args KIT_ARGS] [--anim_recording_enabled]
+                   [--anim_recording_start_time ANIM_RECORDING_START_TIME]
+                   [--anim_recording_stop_time ANIM_RECORDING_STOP_TIME]
+                   [--max_visible_envs MAX_VISIBLE_ENVS]
+
+Train an RL agent with RSL-RL.
+
+options:
+  -h, --help            show this help message and exit
+  --video               Record videos during training.
+  --video_length VIDEO_LENGTH
+                        Length of each recorded video clip in env steps.
+                        Overrides the value in VideoRecorderCfg.
+  --video_interval VIDEO_INTERVAL
+                        Interval between video clips in env steps. Overrides
+                        the value in VideoRecorderCfg.
+  --num_envs NUM_ENVS   Number of environments to simulate.
+  --task TASK           Name of the task.
+  --frontend {torch,warp}
+                        Runtime that constructs the environment. 'torch' uses
+                        the registered stable environment via gym.make. 'warp'
+                        (experimental) adapts a manager-based task config onto
+                        the Warp runtime, or dispatches a direct task to its
+                        registered Warp environment; requires
+                        isaaclab_experimental and `physics=newton_mjwarp`.
+  --agent AGENT         Name of the RL agent configuration entry point.
+  --seed SEED           Seed used for the environment.
+  --distributed         Run training with multiple GPUs or nodes.
+  --run_timestamp RUN_TIMESTAMP
+                        Timestamp naming the run folder; train_multigpu passes
+                        one so that every rank shares the folder.
+  --max_iterations MAX_ITERATIONS
+                        RL Policy training iterations.
+  --export_io_descriptors
+                        Deprecated: export IO descriptors (removed in Isaac
+                        Lab 3.2).
+  --ray-proc-id RAY_PROC_ID, -rid RAY_PROC_ID
+                        Automatically configured by Ray integration, otherwise
+                        None.
+  --capture_env_sensors CAPTURE_ENV_SENSORS
+                        Number of environment views to capture from each
+                        image-like scene sensor.
+  --capture_env_sensors_length CAPTURE_ENV_SENSORS_LENGTH
+                        Length of each captured sensor frame window (in
+                        steps).
+  --capture_env_sensors_interval CAPTURE_ENV_SENSORS_INTERVAL
+                        Interval between captured sensor frame windows (in
+                        steps).
+  --capture_env_sensors_format {tensorboard,file}
+                        Format used to save the captured sensor frames.
+  --external_callback EXTERNAL_CALLBACK
+                        Fully qualified path to an externally defined
+                        callback.
+  --resume_optimizer_state, --no-resume_optimizer_state
+                        Restore the policy optimizer; disable to keep a fresh
+                        optimizer and configured learning rate.
+
+rsl_rl:
+  Arguments for RSL-RL agent.
+
+  --experiment_name EXPERIMENT_NAME
+                        Name of the experiment folder where logs will be
+                        stored.
+  --run_name RUN_NAME   Run name suffix to the log directory.
+  --checkpoint CHECKPOINT
+                        Checkpoint path, latest/best, pretrained for play, or
+                        a Weights & Biases run
+                        (https://wandb.ai/<entity>/<project>/runs/<run_id>,
+                        optionally with a '?checkpoint=<iteration>' query, or
+                        the wandb:<entity>/<project>/<run_id> shorthand).
+  --logger {tensorboard,wandb,neptune}
+                        Logger module to use.
+  --log_project_name LOG_PROJECT_NAME
+                        Name of the logging project when using wandb or
+                        neptune.
+
+launcher arguments:
+  Arguments for the KitLauncher. For more details, please check the
+  documentation.
+
+  --livestream {0,1,2}  Force enable livestreaming. Mapping corresponds to
+                        that for the `LIVESTREAM` environment variable.
+  --xr                  Enable XR mode for VR/AR applications.
+  --device DEVICE       The device to run the simulation on. Can be "cpu",
+                        "cuda", "cuda:N", where N is the device ID
+  --visualizer VISUALIZER, --viz VISUALIZER
+                        Visualizer backends to enable as CSV (e.g.,
+                        kit,newton,rerun,viser).
+  --verbose             Enable verbose-level log output from the
+                        SimulationApp.
+  --info                Enable info-level log output from the SimulationApp.
+  --experience EXPERIENCE
+                        The experience file to load when launching the
+                        SimulationApp. If an empty string is provided, the
+                        experience file is determined from the resolved
+                        visualizer and XR settings. If a relative path is
+                        provided, it is resolved relative to the `apps` folder
+                        in Isaac Sim and Isaac Lab (in that order).
+  --deterministic       Request reproducible rendering (see KitLauncher docs).
+  --kit_args KIT_ARGS   Command line arguments for Omniverse Kit as a string
+                        separated by a space delimiter. Example usage:
+                        --kit_args "--ext-folder=/path/to/ext1 --ext-
+                        folder=/path/to/ext2". A single Kit argument works in
+                        both forms: --kit_args "--ext-folder=/path/to/ext1" or
+                        --kit_args=--ext-folder=/path/to/ext1.
+  --anim_recording_enabled
+                        Enable recording time-sampled USD animations from
+                        IsaacLab PhysX simulations.
+  --anim_recording_start_time ANIM_RECORDING_START_TIME
+                        Set time that animation recording begins playing. If
+                        not set, the recording will start from the beginning.
+  --anim_recording_stop_time ANIM_RECORDING_STOP_TIME
+                        Set time that animation recording stops playing. If
+                        the process is shutdown before the stop time is
+                        exceeded, then the animation is not recorded.
+  --max_visible_envs MAX_VISIBLE_ENVS
+                        When set, caps the nums of envs shown in the launched
+                        visualizers.
+
+preset selection:
+  Select named PresetCfg alternatives via Hydra-style overrides (key=value, no leading dashes):
+      physics=NAME              (typed) selects a physics backend
+      renderer=NAME             (typed) selects a renderer backend
+      presets=NAME[,NAME,...]   broadcast: applied to every matching PresetCfg
+
+  Pass `--task=X` along with `--help` to see preset variants available for
+  that task.
+
+  Hydra also accepts path-targeted overrides like env.sim.physics=NAME.

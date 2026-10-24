@@ -17,6 +17,10 @@
 
 ## 当前批次与运行状态
 
+- 2026-10-24 当前分支 `feat/isaacsim-training` 基于 main `a9b78d25`。用户授权将全部新训练迁至 Isaac Sim；本机 Windows 11 ARM64 / N1X 以 x64 CPython 运行 Isaac Sim 6.2.0.0，官方不支持 Windows ARM 且 CPU vendor checker 失败，当前兼容路径属于实验性质、非认证。迁移验收小流程已完成：CPU回归431 passed/4 skipped/47 warnings、38.42s、exit 0（4个 skip 包含 native/legacy gating，不算通过）；官方CLI与Kitless camera专项分别28、26项，真实exit 0。PhysX原生耦合、RSL训练/续训/导出烟测及零迭代官方CLI证据见 `ISAAC_LAB.md`；这些不等于全规模训练或整车控制验收。第二十批计数由1/5更新为2/5，整体迁移验收作为一项feature；旧Newton/SB3冻结源码、协议、模型和成绩保留原字节，新训练入口拒绝Newton/SB3，旧SB3 ZIP只用于显式历史读取、不转成RSL。自动化仍PAUSED，不作FPS声明。
+
+### 历史快照（以下条目保留各自日期的原始数据）
+
 - 2026-10-22 当前分支 `fix/rsl-goal-convergence` 基于 main `28bca570`，第二十批仍第 1 项。fast_stop_v2 训练至 196608 步（`model_93.pt`）自然 exit 0；最近一次可验收开发评估 dev002 为 4/16 严格停稳成功、exit 0，未通过门槛。dev003 报告 6/16，但外层 wrapper 实际 exit 1、Python 子进程 exit 未知，不能作为正常完成验收。58 源、协议和旧原始记录保留。用户已明确授权后续训练与仿真全部迁入 Isaac Sim；当前无 Newton 仿真运行，后续不追加 Newton 段；独立环境兼容性准备尚未迁移或通过。当前动态记录见 ISAAC_LAB.md 和 trial/run_status.json。
 
 - 2026-10-22迁移阶段历史：本worktree `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，分支`feat/rsl-rl-completion`，基于已合入PR18的main `bb54e169`。新训练/续训、完整评估与显式smoke、LASSC消费/回放、暂停全图点选/跟随预览、真实网络检查及导出均接RSL `.pt`；旧SB3入口显式legacy，历史协议/快照/模型原字节保留，未引入v2奖励。纯Torch encoder保持旧SB3类路径/键兼容，SB3依赖可选。第十九批当前1/5：全链迁移作为一项功能，含范围内整理。全CPU585 passed/23 skipped/55 warnings、31.52s、exit0；后续仅HTML首帧选层修复专项19 passed，静态检查通过。训练时56源快照保留，其后模型卡/HTML补丁单独存身份。唯一原生4×128×1=512步训练exit0、同checkpoint1场景2步评估exit0；Adam保存step20/权重及状态有限，LASSC回放18检查通过，JIT/ONNX核验通过。当时8783/8784真实RSL预览暂停/time0，模型明确smoke未控制验收，全图/点选/跟随/reset/真实61节点网络已浏览器验证。证据在`results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/`与`results/isaac_field_viewer/rsl_completion_smoke_20261022_attempt3/`；早期CPU/audit/UI失败原记录保留，退出口径见ISAAC_LAB.md，不以marker推断未实测退出。未启动完整训练、未宣称控制改善；硬件只有CAD/原理图，无实车验收；两automation保持PAUSED。
@@ -51,7 +55,7 @@
 
 ## 任务边界与验收
 
-- 后端仅发展Isaac Lab + Newton MJWarp；新训练复用本地固定Isaac Lab官方RSL-RL入口、wrapper和runner，SB3-Contrib用于历史训练/回放兼容。项目适配只处理五路观测、共享编码器、模型身份和既有评估接口；不另造通用训练器。模型自己学，连续四维动作，无Nav2或手写规划器替代策略。
+- 当前迁移目标为 Isaac Lab + Isaac Sim PhysX；新训练复用本地固定 Isaac Lab 官方 RSL-RL 入口、wrapper 和 runner，SB3-Contrib 仅用于显式历史兼容。保留五路观测、共享编码器、模型身份和既有评估接口，不另造通用训练器。模型自己学，连续四维动作，无 Nav2 或手写规划器替代策略。冻结 Newton 实验只保留复现证据，不追加旧后端训练。
 - 不做训练速度/FPS基准。必要的物理正确性、学习效果、PC负载和UI核验仍做；逻辑20Hz配置不冒充实测帧率。
 - 优先不压苗，允许更慢或超时。历史/通用默认到点为0.4m位置范围、低速hold0.3s；用户最新fast_stop_v1实验为位置≤0.4m、真实水平XY速度<0.05m/s、完整车体角速度模长<0.1rad/s持续0.5s，优先成功并尽量缩短用时，不要求终态朝向。不同成功判据的报告不得混算。
 - 安全验收必须同配置/同初态配对：clean成功增加，且损伤episode数、平均损伤、碰撞不恶化；不能把成功/损伤权衡称能力提升。旧权重可在当前物理重评，但不同规则/几何/驱动/观测下的旧报告不混算，不重贴metadata。

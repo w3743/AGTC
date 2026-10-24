@@ -1,0 +1,505 @@
+{
+  "passed": true,
+  "probe": "field",
+  "task_config": {
+    "size": 12.0,
+    "cell": 0.5,
+    "plants": 2,
+    "dry_fraction": 0.25,
+    "leaves_per_plant": 8,
+    "layout": "rows",
+    "row_spacing": 0.8,
+    "plant_spacing": 0.3,
+    "plant_height": 1.0,
+    "plant_height_spread": 0.05,
+    "stem_radius": 0.012,
+    "robot_length": 0.8,
+    "robot_width": 0.47,
+    "max_speed": 4.166666666666667,
+    "max_turn_rate": 1.5,
+    "acceleration": 1.5,
+    "angular_acceleration": 4.0,
+    "camera_height": 0.4,
+    "pitch_min": -0.4363323129985824,
+    "pitch_max": 1.0471975511965976,
+    "gimbal_yaw_rate": 1.8,
+    "gimbal_pitch_rate": 1.2,
+    "dt": 0.05,
+    "max_time": 8.0,
+    "lidar_model": "X2",
+    "lidar_rays": 400,
+    "lidar_range": 8.0,
+    "lidar_min_range": 0.12,
+    "lidar_relative_error": 0.05,
+    "lidar_period": 0.1,
+    "lidar_latency": 0.03,
+    "depth_height": 160,
+    "depth_width": 88,
+    "depth_min_range": 0.3,
+    "depth_range": 5.0,
+    "depth_period": 0.4,
+    "depth_latency": 0.3,
+    "camera_range": 7.0,
+    "camera_period": 0.2,
+    "camera_latency": 0.12,
+    "max_detections": 16,
+    "position_noise": 0.025,
+    "range_noise": 0.01,
+    "detection_drop": 0.08,
+    "class_error": 0.015,
+    "goal_tolerance": 0.4,
+    "goal_hold": 0.3,
+    "damage_penalty": 4.0,
+    "collision_penalty": 0.1,
+    "time_penalty": 0.01,
+    "progress_weight": 0.15,
+    "stop_on_damage": false,
+    "validate_scene": false,
+    "terrain_enabled": false,
+    "terrain_amplitude": 0.35,
+    "terrain_wavelength_min": 4.0,
+    "terrain_wavelength_max": 10.0,
+    "rock_density": 0.01,
+    "large_rock_fraction": 0.2,
+    "terrain_seed": null,
+    "goal_progress_budget": null,
+    "damage_metric": "stem-contact-v2",
+    "goto_reward_profile": "legacy",
+    "goal_stop_speed": 0.2,
+    "goal_stop_angular_speed": 0.3,
+    "input_schema": "sensor-absolute-goal-v1",
+    "fast_stop_failure_remaining_time_cost": false
+  },
+  "checks": {
+    "five_live_observation_streams_finite": true,
+    "mass_30kg_per_world": true,
+    "wheel_and_passive_guide_contract": true,
+    "visual_plant_remains_range_visible_after_pose_write": true,
+    "visible_leaf_detection_from_rtx_instance_ids": true,
+    "partial_reset_world_isolation": true,
+    "actual_2nm_actuator_clamp_under_stress": true,
+    "mimic_position_and_control_interval_kinematics": true
+  },
+  "motion_coupling_max_velocity_residual_rad_s": 1.8098230361938477,
+  "motion_coupling_velocity_residual_by_step_rad_s": [
+    0.2869611978530884,
+    0.3059404492378235,
+    0.3128112554550171,
+    0.05725657939910889,
+    0.0591275691986084,
+    1.8098230361938477,
+    0.1386265754699707,
+    0.1848137378692627,
+    1.099457859992981,
+    0.17838001251220703,
+    0.14350485801696777,
+    0.14617609977722168,
+    0.15662479400634766,
+    1.0552940368652344,
+    0.5436280965805054,
+    0.2028956413269043,
+    0.13604068756103516,
+    1.2795684337615967,
+    0.16997599601745605,
+    0.06155586242675781,
+    0.9757204055786133,
+    0.15052056312561035,
+    0.6090888977050781,
+    0.313762903213501,
+    0.03695821762084961,
+    0.024050474166870117,
+    0.10288476943969727,
+    0.11278867721557617,
+    0.046895742416381836,
+    0.3384890556335449,
+    0.5037814378738403,
+    0.38457632064819336,
+    0.14318490028381348,
+    0.5487978458404541,
+    0.3286747932434082,
+    0.08696985244750977,
+    0.06244707107543945,
+    0.3979039192199707,
+    0.09669733047485352,
+    0.07188940048217773,
+    0.15587162971496582,
+    0.7565909624099731,
+    0.3762505054473877,
+    0.17816543579101562,
+    0.5555660724639893,
+    1.149446964263916,
+    0.7675533294677734,
+    0.10161137580871582,
+    0.09207320213317871,
+    0.07170724868774414,
+    0.4487568140029907,
+    0.08899569511413574,
+    0.43817138671875,
+    0.7540018558502197,
+    0.3988795280456543,
+    0.13098597526550293,
+    0.08515405654907227,
+    0.07687115669250488,
+    0.21811366081237793,
+    0.03625965118408203,
+    0.1114959716796875,
+    0.16049766540527344,
+    0.5653815269470215,
+    0.11691856384277344
+  ],
+  "motion_coupling_max_position_residual_rad": 0.00019222497940063477,
+  "motion_coupling_control_interval_velocity_residual_rad_s": 0.0039064884185791016,
+  "max_post_clamp_wheel_effort_nm": 0.443618506193161,
+  "coupling_import_audit": {
+    "status": "passed",
+    "mechanism": "PhysxMimicJointAPI",
+    "worlds_checked": 2,
+    "relations_per_world": 14,
+    "wheel_relations_per_world": 12,
+    "guide_relations_per_world": 2,
+    "total_mimic_rows": 28,
+    "cross_world_pairs": 0,
+    "audit_scope": "USD relations and imported native joint names; motion residuals tested separately"
+  },
+  "observations": {
+    "lidar": {
+      "shape": [
+        2,
+        1,
+        400
+      ],
+      "min": 0.0,
+      "max": 0.32128798961639404
+    },
+    "depth": {
+      "shape": [
+        2,
+        1,
+        160,
+        88
+      ],
+      "min": 0.0,
+      "max": 0.9336609840393066
+    },
+    "detections": {
+      "shape": [
+        2,
+        16,
+        8
+      ],
+      "min": 0.0,
+      "max": 0.0
+    },
+    "state": {
+      "shape": [
+        2,
+        33
+      ],
+      "min": -0.9013791680335999,
+      "max": 1.0
+    },
+    "feedback": {
+      "shape": [
+        2,
+        37
+      ],
+      "min": -0.44956743717193604,
+      "max": 1.152907133102417
+    }
+  },
+  "drive_config": {
+    "interface": "independent_left_right_track_speed_coupled_pi_v7",
+    "actuator_model": "explicit_IdealPD_velocity_servo",
+    "controller": "native_per_wheel_P_plus_two_state_side_integral_feedforward",
+    "motor_torque_constant_nm_per_a": 0.035,
+    "current_feedback_source": "equivalent_from_physx_post_clamp_applied_effort; model_not_measured",
+    "max_track_speed_mps": 4.166666666666667,
+    "track_acceleration_mps2": 1.5,
+    "velocity_gain": 0.04,
+    "integral_gain_nm_per_proxy_wheel_per_rad_s_s": 0.1,
+    "integral_update_period_s": 0.05,
+    "integral_state_count_per_env": 2,
+    "integral_state_unit": "Nm_per_proxy_wheel",
+    "integral_error_source": "per_side_mean_target_minus_actual_wheel_qd_rad_s",
+    "integral_broadcast": "same_side_integral_ff_to_each_of_7_proxy_wheels",
+    "integral_limit_nm_per_proxy_wheel": 2.0,
+    "integral_antiwindup": "conditional_on_side_mean_P_estimate; final_safety_is_explicit_actuator_per_wheel_clamp",
+    "integral_gain_status": "uncalibrated simulation candidate; not real motor/controller calibration",
+    "wheel_effort_limit_nm": 2.0,
+    "actuator_effort_limit_nm": 2.0,
+    "joint_effort_limit_nm": 2.0,
+    "effort_clamp_source": "explicit_actuator_adapter_after_combined_PD_and_feedforward",
+    "wheel_effort_limit_basis": "actual_PhysX_adapter_actuator_output_clamp_per_proxy_wheel_joint; not measured motor torque",
+    "gimbal_solver_joint_effort_limit_nm": 1.0,
+    "gimbal_effort_limit_basis": "implicit_PhysX_joint_effort_limit",
+    "drive_sprocket_radius_m": 0.03,
+    "drive_sprocket_diameter_m": 0.06,
+    "drive_reduction_ratio": 4.0,
+    "proxy_wheel_radius_m": 0.045,
+    "proxy_wheel_count_per_side": 7,
+    "track_ground_contact_length_m": 0.595,
+    "robot_asset_spec_sha256": "b381e579e3d80259c6fd8a953907f35e866dd2df74bebd5cab4e0205df794718",
+    "drive_efficiency_assumption": 1.0,
+    "equivalent_motor_torque_per_side_nm": 2.3333333333333335,
+    "max_motor_rpm_at_max_track_speed": 5305.164769729846,
+    "drivetrain_note": "Torque and RPM are idealized proxy-equivalent values: one motor per side, unit efficiency, 60 mm active sprocket, and 45 mm proxy support rollers. The 2 Nm per-wheel effort cap is not a measured motor rating.",
+    "same_side_wheel_coupling": {
+      "enabled": true,
+      "mechanism": "PhysxMimicJointAPI",
+      "relation": "q_follower = ratio * q_same_side_wheel0",
+      "relations_per_world": 14,
+      "wheel_relations_per_world": 12,
+      "guide_relations_per_world": 2,
+      "front_guide_relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+      "leader_wheel_index_per_side": 0,
+      "follower_wheel_indices_per_side": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "source_usd_changed": false,
+      "physx_variant_authored": true,
+      "execution": "retain per-wheel actuators, PI state and configured effort limits"
+    },
+    "physics_contact": {
+      "simulator": "isaac_sim",
+      "physics_backend": "physx",
+      "learning_backend": "rsl_rl",
+      "backend": "PhysxCfg",
+      "solver": "TGS",
+      "physics_manager": "isaaclab_physx.physics.physx_manager.PhysxManager",
+      "solver_position_iteration_range": [
+        40,
+        40
+      ],
+      "solver_velocity_iteration_range": [
+        1,
+        1
+      ],
+      "physics_dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "usd_authored_materials": {
+        "/World/envs/env_0/Field/material": {
+          "static_friction": 0.800000011920929,
+          "dynamic_friction": 0.800000011920929,
+          "restitution": 0.0
+        },
+        "/World/envs/env_0/Robot/material": {
+          "static_friction": 0.800000011920929,
+          "dynamic_friction": 0.800000011920929,
+          "restitution": 0.0
+        },
+        "/World/envs/env_1/Field/material": {
+          "static_friction": 0.800000011920929,
+          "dynamic_friction": 0.800000011920929,
+          "restitution": 0.0
+        },
+        "/World/envs/env_1/Robot/material": {
+          "static_friction": 0.800000011920929,
+          "dynamic_friction": 0.800000011920929,
+          "restitution": 0.0
+        }
+      },
+      "contact_offset_m": 0.005,
+      "rest_offset_m": 0.0,
+      "calibrated_hardware": false
+    },
+    "front_guide": {
+      "enabled": true,
+      "model": "same_side_track_speed_coupled_front_guides_separate_proxy_not_continuous_track",
+      "wheels": [
+        {
+          "name": "left_front_guide",
+          "side": "left",
+          "x_m": 0.42,
+          "y_m": 0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        },
+        {
+          "name": "right_front_guide",
+          "side": "right",
+          "x_m": 0.42,
+          "y_m": -0.205,
+          "z_m": -0.05499999999999999,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_kg": 0.25
+        }
+      ],
+      "drive_motor_count": 0,
+      "added_drive_torque_nm": 0.0,
+      "rotation_coupling": "same_side_track_speed",
+      "coupling": {
+        "enabled": true,
+        "relation": "q_guide = (R_main/R_guide)*q_same_side_wheel0",
+        "relations_per_world": 2,
+        "leader_joint_by_side": {
+          "left": "left_wheel_0_wheel_joint",
+          "right": "right_wheel_0_wheel_joint"
+        },
+        "ratio_by_side": {
+          "left": 1.0,
+          "right": 1.0
+        },
+        "guide_actuator_count": 0,
+        "added_pid_count": 0
+      }
+    }
+  },
+  "visual_plant_range_m": 1.4878230094909668,
+  "targeted_leaf_detections": [
+    {
+      "box": [
+        0.5,
+        0.1953125,
+        0.03125,
+        0.171875
+      ],
+      "class_id": 0,
+      "confidence": 0.9725857214521622,
+      "range": null,
+      "plant": 0,
+      "leaf": 6
+    },
+    {
+      "box": [
+        0.5234375,
+        0.34375,
+        0.078125,
+        0.125
+      ],
+      "class_id": 0,
+      "confidence": 0.9611641668720943,
+      "range": null,
+      "plant": 0,
+      "leaf": 4
+    },
+    {
+      "box": [
+        0.515625,
+        0.6796875,
+        0.03125,
+        0.046875
+      ],
+      "class_id": 0,
+      "confidence": 0.756031145919971,
+      "range": null,
+      "plant": 0,
+      "leaf": 0
+    },
+    {
+      "box": [
+        0.4765625,
+        0.578125,
+        0.046875,
+        0.03125
+      ],
+      "class_id": 0,
+      "confidence": 0.7328596484194366,
+      "range": null,
+      "plant": 0,
+      "leaf": 1
+    },
+    {
+      "box": [
+        0.484375,
+        0.4609375,
+        0.03125,
+        0.015625
+      ],
+      "class_id": 0,
+      "confidence": 0.7254591123808939,
+      "range": null,
+      "plant": 0,
+      "leaf": 3
+    },
+    {
+      "box": [
+        0.5,
+        0.5234375,
+        0.03125,
+        0.015625
+      ],
+      "class_id": 0,
+      "confidence": 0.7189596952080048,
+      "range": null,
+      "plant": 0,
+      "leaf": 2
+    }
+  ],
+  "targeted_instance_metadata": {
+    "idToLabels": {
+      "0": "BACKGROUND",
+      "1": "UNLABELLED",
+      "3": "/World/envs/env_0/Plants/Corn_0/Leaf_1",
+      "4": "/World/envs/env_0/Plants/Corn_0/Leaf_2",
+      "5": "/World/envs/env_0/Plants/Corn_0/Leaf_3",
+      "6": "/World/envs/env_0/Plants/Corn_0/Leaf_4",
+      "8": "/World/envs/env_0/Plants/Corn_0/Leaf_6",
+      "33": "/World/envs/env_0/Plants/Corn_0/Leaf_0"
+    },
+    "idToSemantics": {
+      "0": {
+        "class": "BACKGROUND"
+      },
+      "1": {
+        "class": "UNLABELLED"
+      },
+      "3": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_1",
+        "plant_id": "plant_0"
+      },
+      "4": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_2",
+        "plant_id": "plant_0"
+      },
+      "5": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_3",
+        "plant_id": "plant_0"
+      },
+      "6": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_4",
+        "plant_id": "plant_0"
+      },
+      "8": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_6",
+        "plant_id": "plant_0"
+      },
+      "33": {
+        "class": "corn_leaf_healthy",
+        "leaf_id": "leaf_0",
+        "plant_id": "plant_0"
+      }
+    }
+  },
+  "stress_post_clamp_wheel_effort_nm": 2.0,
+  "backend_identity": {
+    "simulator": "isaac_sim",
+    "physics_backend": "physx",
+    "learning_backend": "rsl_rl"
+  },
+  "steps": 64,
+  "mimic_acceptance": {
+    "position_residual_limit_rad": 0.002,
+    "control_interval_velocity_residual_limit_rad_s": 0.05,
+    "control_interval_s": 0.05,
+    "instantaneous_solver_velocity": "reported separately; raw training feedback remains unchanged"
+  },
+  "simulator": "isaac_sim",
+  "physics_backend": "physx",
+  "learning_backend": "rsl_rl",
+  "cuda_computation": true,
+  "torch": "2.11.0+cu130"
+}

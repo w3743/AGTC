@@ -1,4 +1,4 @@
-"""Short native Newton A/B/C ground and wheel-spin diagnostic; no training or FPS."""
+"""Legacy Isaac Lab Newton ground/wheel diagnostic; no training or FPS benchmark."""
 from __future__ import annotations
 
 import json
@@ -237,11 +237,20 @@ def run_case(case: str) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--case", choices=("A", "B", "C", "D"), help="run one case only")
+    parser.add_argument("--legacy-newton", action="store_true",
+                        help="explicitly run this historical Newton-only diagnostic")
     args = parser.parse_args()
+    if not args.legacy_newton:
+        parser.error(
+            "this diagnostic uses Isaac Lab NewtonManager and is not a PhysX check; "
+            "pass --legacy-newton only when reproducing its historical Newton cases"
+        )
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     cases = [args.case] if args.case else ["A", "B", "C", "D"]
     output = OUT_DIR / f"ground_contact_ab_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    doc = {"schema": "isaac-field-newton-ground-contact-ab-v1", "setup": {
+    doc = {"schema": "isaac-field-newton-ground-contact-ab-v1", "legacy_entrypoint": True,
+        "backend_identity": {"simulator": "isaac_sim", "physics_backend": "newton", "learning_backend": "none"},
+        "setup": {
         "physics": "Isaac Lab Newton MJWarp, use_mujoco_contacts=False", "plants": 0, "seed": SEED,
         "control_dt_s": DT, "settle_zero_steps": 20, "phase_steps": 40,
         "phases": [{"name": n, "command": list(a)} for n, a in PHASES],

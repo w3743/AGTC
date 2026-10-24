@@ -998,6 +998,10 @@ def _launch_training(output: Path, device: str) -> dict[str, Any]:
 def launch(output: Path, device: str = "cuda:0") -> dict[str, Any]:
     output = output.resolve()
     preflight(output)
+    raise RuntimeError(
+        "this pinned continuation consumes a Newton-era SB3 .zip plus its Adam state; "
+        "it cannot be resumed as a PhysX RSL run. Start a new RSL protocol or explicitly transfer a compatible RSL .pt."
+    )
     lock = output / "launch.lock"
     try:
         with lock.open("x", encoding="utf-8") as stream:

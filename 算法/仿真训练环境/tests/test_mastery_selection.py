@@ -12,7 +12,7 @@ def _protocol_and_report(workspace, monkeypatch, *, budget=24_576):
     output = _prepared(workspace, budget=budget)
     protocol = runner.preflight(output)
     protocol["device"] = "cpu"
-    baseline = output / "untrained_baseline.zip"
+    baseline = output / "untrained_baseline.pt"
     baseline.write_bytes(b"test baseline")
     return output, protocol, runner._global_probe(output, protocol, baseline)
 

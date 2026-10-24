@@ -84,7 +84,7 @@ def test_prepare_and_cli_freeze_absolute_schema_without_starting_training(worksp
         "goal_world_x_normalized", "goal_world_y_normalized"
     ]
     assert mastery.preflight(output)["input_schema"] == ABSOLUTE_GOAL_INPUT_SCHEMA
-    assert not (output / "untrained_baseline.zip").exists()
+    assert not (output / "untrained_baseline.pt").exists()
 
 
 def test_absolute_fast_stop_transfer_protocol_keeps_same_schema(workspace, monkeypatch):
@@ -230,7 +230,38 @@ def _absolute_env():
         observation_space=object(),
         action_space=object(),
         num_envs=4,
-        drive_config={},
+        backend_identity={
+            "simulator": "isaac_sim",
+            "physics_backend": "physx",
+            "learning_backend": "rsl_rl",
+        },
+        drive_config={
+            "interface": "independent_left_right_track_speed_coupled_pi_v7",
+            "same_side_wheel_coupling": {"enabled": True},
+            "physics_contact": {
+                "simulator": "isaac_sim",
+                "physics_backend": "physx",
+                "learning_backend": "rsl_rl",
+                "backend": "PhysxCfg",
+                "solver": "TGS",
+                "physics_manager": "isaaclab_physx.SomePhysicsManager",
+                "physics_dt_s": 0.001,
+                "decimation": 50,
+                "policy_dt_s": 0.05,
+                "contact_offset_m": 0.005,
+                "rest_offset_m": 0.0,
+                "calibrated_hardware": False,
+                "usd_authored_materials": {
+                    f"/World/envs/env_{index}/{surface}/material": {
+                        "static_friction": 0.8,
+                        "dynamic_friction": 0.7,
+                        "restitution": 0.0,
+                    }
+                    for index in range(4)
+                    for surface in ("Field", "Robot")
+                },
+            },
+        },
         damage_config={"metric": "stem-contact-v2"},
     )
 
@@ -243,11 +274,27 @@ def test_live_environment_contract_accepts_absolute_schema_without_mocking_helpe
         "interface": "independent_left_right_track_speed_coupled_pi_v7",
         "same_side_wheel_coupling": {"enabled": True},
         "physics_contact": {
+            "simulator": "isaac_sim",
+            "physics_backend": "physx",
+            "learning_backend": "rsl_rl",
+            "backend": "PhysxCfg",
+            "solver": "TGS",
+            "physics_manager": "isaaclab_physx.SomePhysicsManager",
             "physics_dt_s": 0.001,
             "decimation": 50,
             "policy_dt_s": 0.05,
-            "cone": "elliptic",
-            "impratio": 1.0,
+            "contact_offset_m": 0.005,
+            "rest_offset_m": 0.0,
+            "calibrated_hardware": False,
+            "usd_authored_materials": {
+                f"/World/envs/env_{index}/{surface}/material": {
+                    "static_friction": 0.8,
+                    "dynamic_friction": 0.7,
+                    "restitution": 0.0,
+                }
+                for index in range(4)
+                for surface in ("Field", "Robot")
+            },
         },
     }
 
@@ -283,60 +330,50 @@ def test_rough_profile_environment_forwards_absolute_schema(monkeypatch):
     assert observed["input_schema"] == ABSOLUTE_GOAL_INPUT_SCHEMA
 
 
-def test_train_stage_forwards_absolute_schema_and_full_contract_to_fresh_policy(tmp_path, monkeypatch):
-    from isaac_field import policy, training
+def test_public_training_helper_delegates_to_official_rsl_and_defaults_to_512(tmp_path, monkeypatch):
+    from isaac_field import training
 
-    fake_sb3 = ModuleType("sb3_contrib")
-    fake_sb3.RecurrentPPO = object
-    monkeypatch.setitem(sys.modules, "sb3_contrib", fake_sb3)
     env = _absolute_env()
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    monkeypatch.setattr(policy, "validate_policy_spaces", lambda *_args, **_kwargs: None)
     calls = {}
 
-    class StopBeforeLearning(Exception):
-        pass
-
-    def make_model(_env, **kwargs):
-        calls.update(kwargs)
-        raise StopBeforeLearning
-
-    monkeypatch.setattr(policy, "make_model", make_model)
-    with pytest.raises(StopBeforeLearning):
-        learning.train_stage(
-            env, None, 1, tmp_path / "fresh", device="cpu",
-            n_steps=128, batch_size=128, n_epochs=1,
+    def fake_train_stage(environment, checkpoint, timesteps, output, callback=None, **kwargs):
+        calls.update(
+            env=environment,
+            checkpoint=checkpoint,
+            timesteps=timesteps,
+            output=Path(output),
+            callback=callback,
+            kwargs=kwargs,
+        )
+        return SimpleNamespace(
+            model=object(),
+            checkpoint=Path(output),
+            trained_timesteps=timesteps,
         )
 
-    assert calls["input_schema"] == ABSOLUTE_GOAL_INPUT_SCHEMA
-    assert calls["observation_config"] == env.observation_config
+    monkeypatch.setattr(learning, "train_stage", fake_train_stage)
+    result = training.train(env, tmp_path / "fresh", timesteps=256, device="cpu")
+
+    assert calls["env"] is env
+    assert calls["checkpoint"] is None
+    assert calls["timesteps"] == 256
+    assert calls["output"] == tmp_path / "fresh.pt"
+    assert calls["kwargs"]["n_steps"] == 128
+    assert calls["kwargs"]["batch_size"] == 128
+    assert calls["kwargs"]["n_epochs"] == 5
+    assert calls["kwargs"]["lstm_hidden_size"] == 512
+    assert result.actual_timesteps == 256
+    assert result.checkpoint == tmp_path / "fresh.pt"
 
 
 @pytest.mark.parametrize("entrypoint", ["train_path", "evaluate_path"])
-def test_resume_and_evaluate_reject_missing_absolute_metadata_before_sb3_load(
-    tmp_path, monkeypatch, entrypoint,
-):
-    from isaac_field import policy, training
-
+def test_legacy_zip_is_rejected_from_rsl_resume_and_default_evaluation(tmp_path, entrypoint):
     path = tmp_path / "old-v6.zip"
-    _install_encoder_checkpoint(path)
-    loads = []
-
-    class NeverLoad:
-        @staticmethod
-        def load(*_args, **_kwargs):
-            loads.append(True)
-            raise AssertionError("metadata must be checked before SB3 load")
-
-    fake_sb3 = ModuleType("sb3_contrib")
-    fake_sb3.RecurrentPPO = NeverLoad
-    monkeypatch.setitem(sys.modules, "sb3_contrib", fake_sb3)
+    path.write_bytes(b"legacy SB3 checkpoint")
     env = _absolute_env()
 
     if entrypoint == "train_path":
-        monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-        monkeypatch.setattr(policy, "validate_policy_spaces", lambda *_args, **_kwargs: None)
-        with pytest.raises(ValueError, match="sensor encoder schema is missing or incompatible"):
+        with pytest.raises(ValueError, match="SB3 checkpoints are legacy-only"):
             learning.train_stage(
                 env, path, 128, tmp_path / "resumed", device="cpu",
                 n_steps=128, batch_size=128, n_epochs=1,
@@ -347,20 +384,17 @@ def test_resume_and_evaluate_reject_missing_absolute_metadata_before_sb3_load(
             cfg=SimpleNamespace(dt=0.05, max_time=1.0),
             task=None,
         )
-        with pytest.raises(ValueError, match="sensor encoder schema is missing or incompatible"):
+        with pytest.raises(ValueError, match="SB3 policy loading is legacy-only"):
             learning.evaluate_model(
                 adapter, path, (5,), device="cpu", input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
                 expected_observation_config=env.observation_config,
             )
-    assert loads == []
 
 
 @pytest.mark.parametrize("entrypoint", ["train_object", "evaluate_object"])
 def test_resume_and_evaluate_reject_metadata_free_absolute_objects_before_use(
     tmp_path, monkeypatch, entrypoint,
 ):
-    from isaac_field import policy, training
-
     env = _absolute_env()
     touched = []
 
@@ -376,19 +410,14 @@ def test_resume_and_evaluate_reject_metadata_free_absolute_objects_before_use(
             raise AssertionError("set_env must not run")
 
     if entrypoint == "train_object":
-        fake_sb3 = ModuleType("sb3_contrib")
-        fake_sb3.RecurrentPPO = object
-        monkeypatch.setitem(sys.modules, "sb3_contrib", fake_sb3)
-        monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-        monkeypatch.setattr(policy, "validate_policy_spaces", lambda *_args, **_kwargs: None)
-        with pytest.raises(ValueError, match="Checkpoint sensor encoder is missing"):
+        with pytest.raises(TypeError, match="RSL stage resume requires an explicit .pt"):
             learning.train_stage(
                 env, OldModel(), 128, tmp_path / "resume-object", device="cpu",
                 n_steps=128, batch_size=128, n_epochs=1,
             )
     else:
         adapter = SimpleNamespace(engine=env, cfg=SimpleNamespace(dt=0.05, max_time=1.0), task=None)
-        with pytest.raises(ValueError, match="Checkpoint sensor encoder is missing"):
+        with pytest.raises(ValueError, match="absolute-goal evaluation requires a native RSL-RL .pt"):
             learning.evaluate_model(
                 adapter, OldModel(), (5,), device="cpu", input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
                 expected_observation_config=env.observation_config,

@@ -704,7 +704,8 @@ def robot_articulation_cfg(
     gimbal drive gains should be configured by the task's actuator policy so
     they can be tuned without regenerating geometry.
     """
-    from isaaclab_newton.sim.schemas import NewtonArticulationCfg  # noqa: PLC0415
+    from isaaclab_physx.sim.schemas import PhysxArticulationCfg, PhysxCollisionCfg  # noqa: PLC0415
+    from isaaclab_physx.sim.spawners.materials import PhysxRigidBodyMaterialCfg  # noqa: PLC0415
     import isaaclab.sim as sim_utils  # noqa: PLC0415
     from isaaclab.assets import ArticulationCfg  # noqa: PLC0415
 
@@ -715,7 +716,11 @@ def robot_articulation_cfg(
     return ArticulationCfg(
         spawn=sim_utils.UsdFileCfg(
             usd_path=str(Path(asset_path).resolve()),
-            articulation_props=[NewtonArticulationCfg(self_collision_enabled=False)],
+            articulation_props=[PhysxArticulationCfg(enabled_self_collisions=False,
+                solver_position_iteration_count=40, solver_velocity_iteration_count=1)],
+            collision_props=[PhysxCollisionCfg(contact_offset=.005, rest_offset=0.)],
+            physics_material=PhysxRigidBodyMaterialCfg(static_friction=.8, dynamic_friction=.8,
+                restitution=0., friction_combine_mode='average', restitution_combine_mode='average'),
             fix_root_link=False,
         ),
         init_state=ArticulationCfg.InitialStateCfg(

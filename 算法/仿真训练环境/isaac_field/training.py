@@ -1,7 +1,6 @@
-"""SB3 training and performance measurements for batched Isaac Lab envs."""
+"""Official RSL-RL training and policy timing for Isaac Lab environments."""
 from __future__ import annotations
 
-import math
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,31 +9,25 @@ from typing import Any
 import numpy as np
 import torch
 
-from isaac_field.action_contract import action_config
-from isaac_field.policy import (
-    _validate_model_action_contract,
-    make_model,
-    validate_policy_spaces,
-)
-
 
 @dataclass(frozen=True)
 class TrainingConfig:
     """Small, configurable defaults for checking the Isaac Lab training path."""
 
     seed: int = 7
-    n_steps: int = 32
-    batch_size: int = 32
-    n_epochs: int = 1
+    n_steps: int = 128
+    batch_size: int = 128
+    n_epochs: int = 5
     learning_rate: float = 3e-4
     gamma: float = 0.995
+    gae_lambda: float = 0.95
     goal_gain: float = 1.0
     use_sde: bool = False
     sde_sample_freq: int = -1
     log_std_init: float = 0.0
     squash_output: bool = False
     target_kl: float | None = 0.03
-    lstm_hidden_size: int = 128
+    lstm_hidden_size: int = 512
     n_lstm_layers: int = 1
     net_arch: tuple[tuple[str, tuple[int, ...]], ...] = (("pi", (64,)), ("vf", (64,)))
     verbose: int = 0
@@ -59,7 +52,7 @@ class TrainingResult:
 
 
 def _sb3_wrapper(env):
-    """Wrap a native batched DirectRLEnv once with Isaac Lab's official adapter."""
+    """Legacy SB3 wrapper used only by explicitly selected archived benchmarks."""
     from stable_baselines3.common.vec_env import VecEnv
     from isaaclab_rl.sb3 import Sb3VecEnvWrapper
 
@@ -93,117 +86,67 @@ def _sync_devices(*devices: Any) -> None:
 
 def _saved_checkpoint_path(path: str | Path) -> Path:
     path = Path(path)
-    return path if path.suffix == ".zip" else Path(f"{path}.zip")
+    return path if path.suffix == ".pt" else Path(f"{path}.pt")
 
 
 def train(
     env,
     output: str | Path,
-    timesteps: int = 256,
+    timesteps: int = 512,
     device: str | torch.device = "cpu",
     *,
     config: TrainingConfig | None = None,
 ) -> TrainingResult:
-    """Train RecurrentPPO on one native, batched DirectRLEnv instance.
+    """Train through Isaac Lab's official RSL-RL ``OnPolicyRunner``.
 
-    The returned ``learn_wall_seconds`` measures SB3's ``learn`` call, including
-    rollout simulation and optimization, and excludes wrapper/model setup and
-    checkpoint serialization.
+    The input must be constructed with ``runtime.create_env(..., rsl=True)``;
+    this utility preserves the old result shape while returning an RSL ``.pt``.
     """
-    if int(timesteps) < 1:
-        raise ValueError("timesteps must be positive")
+    if isinstance(timesteps, bool) or int(timesteps) != timesteps or int(timesteps) < 1:
+        raise ValueError("timesteps must be a positive integer")
     config = config or TrainingConfig()
     total_start = time.perf_counter()
+    unsupported = []
+    if config.use_sde:
+        unsupported.append("use_sde")
+    if int(config.sde_sample_freq) != -1:
+        unsupported.append("sde_sample_freq")
+    if config.squash_output:
+        unsupported.append("squash_output")
+    if int(config.n_lstm_layers) != 1:
+        unsupported.append("n_lstm_layers")
+    if config.policy_architecture() != {"pi": [64], "vf": [64]}:
+        unsupported.append("net_arch")
+    if config.progress_bar or config.verbose:
+        unsupported.append("SB3 progress_bar/verbose")
+    if config.tensorboard_log is not None:
+        unsupported.append("tensorboard_log (RSL logs are colocated with the checkpoint)")
+    if unsupported:
+        raise ValueError(f"unsupported legacy SB3 training settings: {unsupported}")
 
-    wrap_start = time.perf_counter()
-    vec_env = _sb3_wrapper(env)
-    wrapper_wall = time.perf_counter() - wrap_start
-    validate_policy_spaces(vec_env.observation_space, vec_env.action_space)
-    action_source = env
-    live_action_config = None
-    while action_source is not None:
-        live_action_config = getattr(action_source, "action_config", None)
-        if live_action_config is not None:
-            break
-        action_source = getattr(action_source, "env", None)
-    if live_action_config != action_config():
-        raise ValueError(
-            "training environment action_config is missing or differs from the "
-            f"current action contract: {live_action_config!r}"
-        )
+    from isaac_field.learning import train_stage
 
-    n_envs = int(vec_env.num_envs)
-    rollout_size = int(config.n_steps) * n_envs
-    if config.n_steps < 2 or config.batch_size < 1 or config.batch_size > rollout_size:
-        raise ValueError(
-            f"invalid rollout settings: n_steps={config.n_steps}, batch_size={config.batch_size}, "
-            f"num_envs={n_envs} (require 1 <= batch_size <= n_steps * num_envs and n_steps >= 2)"
-        )
-    if config.n_epochs < 1:
-        raise ValueError("n_epochs must be positive")
-    if not math.isfinite(config.learning_rate) or config.learning_rate <= 0:
-        raise ValueError("learning_rate must be finite and positive")
-    if not math.isfinite(config.gamma) or not 0.0 <= config.gamma <= 1.0:
-        raise ValueError("gamma must be finite and in [0, 1]")
-
-    model_start = time.perf_counter()
-    model = make_model(
-        vec_env,
-        seed=config.seed,
-        n_steps=config.n_steps,
-        batch_size=config.batch_size,
-        n_epochs=config.n_epochs,
-        learning_rate=config.learning_rate,
-        gamma=config.gamma,
-        goal_gain=config.goal_gain,
-        use_sde=config.use_sde,
-        sde_sample_freq=config.sde_sample_freq,
-        log_std_init=config.log_std_init,
-        squash_output=config.squash_output,
-        target_kl=config.target_kl,
-        lstm_hidden_size=config.lstm_hidden_size,
-        n_lstm_layers=config.n_lstm_layers,
-        net_arch=config.policy_architecture(),
-        verbose=config.verbose,
-        device=device,
-        tensorboard_log=config.tensorboard_log,
+    output_path = _saved_checkpoint_path(output)
+    result = train_stage(
+        env, None, int(timesteps), output_path,
+        seed=int(config.seed), device=str(device),
+        goal_gain=float(config.goal_gain), n_steps=config.n_steps,
+        batch_size=int(config.batch_size), n_epochs=int(config.n_epochs),
+        learning_rate=float(config.learning_rate), gamma=float(config.gamma),
+        gae_lambda=float(config.gae_lambda), log_std_init=float(config.log_std_init),
+        target_kl=config.target_kl, lstm_hidden_size=int(config.lstm_hidden_size),
     )
-    _validate_model_action_contract(model)
-    # Preserve the simulator and observation contracts in the saved checkpoint.
-    # Current checkpoints use single-channel LiDAR/depth, 33 task and 37 feedback fields.
-    # Older input dimensions are rejected rather than silently adapted.
-    if hasattr(env, "drive_config"):
-        model.field_drive_config = dict(env.drive_config)
-    if hasattr(env, "observation_config"):
-        model.field_observation_config = dict(env.observation_config)
-    damage_config = getattr(env, "damage_config", None)
-    if isinstance(damage_config, dict):
-        model.field_damage_config = dict(damage_config)
-    model_setup_wall = time.perf_counter() - model_start
-
-    sim_device = getattr(vec_env, "sim_device", "cpu")
-    _sync_devices(model.device, sim_device)
-    learn_start = time.perf_counter()
-    model.learn(total_timesteps=int(timesteps), progress_bar=config.progress_bar)
-    _sync_devices(model.device, sim_device)
-    learn_wall = time.perf_counter() - learn_start
-
-    output_path = Path(output)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    _sync_device(model.device)
-    save_start = time.perf_counter()
-    model.save(str(output_path))
-    save_wall = time.perf_counter() - save_start
-    saved_path = _saved_checkpoint_path(output_path)
+    model = result.model
+    saved_path = result.checkpoint
     return TrainingResult(
         model=model,
         checkpoint=saved_path,
         requested_timesteps=int(timesteps),
-        actual_timesteps=int(model.num_timesteps),
-        wrapper_wall_seconds=wrapper_wall,
-        model_setup_wall_seconds=model_setup_wall,
-        learn_wall_seconds=learn_wall,
-        save_wall_seconds=save_wall,
+        actual_timesteps=int(result.trained_timesteps),
+        wrapper_wall_seconds=0.0,
+        model_setup_wall_seconds=0.0,
+        learn_wall_seconds=time.perf_counter() - total_start,
+        save_wall_seconds=0.0,
         total_wall_seconds=time.perf_counter() - total_start,
     )
 
@@ -221,7 +164,9 @@ def _single_observation(observation: dict[str, np.ndarray]) -> dict[str, np.ndar
     return {key: value[:1] for key, value in observation.items()}
 
 
-def benchmark(env, model, steps: int, *, warmup_steps: int = 4) -> dict[str, Any]:
+def benchmark(
+    env, model, steps: int, *, warmup_steps: int = 4, legacy_sb3: bool = False,
+) -> dict[str, Any]:
     """Measure one-row policy latency and native batched control throughput.
 
     The one-row latency times only ``model.predict`` on the first row. Batched
@@ -233,6 +178,10 @@ def benchmark(env, model, steps: int, *, warmup_steps: int = 4) -> dict[str, Any
         raise ValueError("steps must be positive")
     if int(warmup_steps) < 0:
         raise ValueError("warmup_steps cannot be negative")
+    if legacy_sb3 is not True:
+        raise ValueError("SB3 policy benchmarking is legacy-only; pass legacy_sb3=True explicitly")
+    from isaac_field.policy import validate_policy_spaces
+
     vec_env = _sb3_wrapper(env)
     validate_policy_spaces(vec_env.observation_space, vec_env.action_space)
     num_envs = int(vec_env.num_envs)

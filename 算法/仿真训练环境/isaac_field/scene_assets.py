@@ -1,4 +1,4 @@
-"""Author task geometry once as standard USD, consumed by Isaac Lab/Newton."""
+"""Author task geometry as standard USD with explicit plant backend variants."""
 from pathlib import Path
 import numpy as np
 
@@ -62,7 +62,7 @@ def terrain_asset(terrain, output: Path, *, spacing=.25):
     return output
 
 
-def plant_assets(scene, output_dir: Path):
+def plant_assets(scene, output_dir: Path, *, physics_backend='newton'):
     """Fixed per-plant shapes; episode randomization moves their kinematic roots."""
     from pxr import Gf, Usd, UsdGeom, UsdPhysics
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -81,8 +81,11 @@ def plant_assets(scene, output_dir: Path):
         mass.CreateDiagonalInertiaAttr(Gf.Vec3f(.001, .001, .001))
         # A world-fixed kinematic root becomes a MuJoCo mocap body. A free
         # kinematic root instead adds six locked DOFs per plant to the solver.
-        anchor = UsdPhysics.FixedJoint.Define(stage, '/Corn/Anchor')
-        anchor.CreateBody1Rel().SetTargets(['/Corn'])
+        if physics_backend == 'newton':
+            anchor = UsdPhysics.FixedJoint.Define(stage, '/Corn/Anchor')
+            anchor.CreateBody1Rel().SetTargets(['/Corn'])
+        elif physics_backend != 'physx':
+            raise ValueError('unsupported plant physics backend')
         stem = UsdGeom.Cylinder.Define(stage, '/Corn/Stem')
         stem.CreateRadiusAttr(float(scene.stem_radius[plant]))
         stem.CreateHeightAttr(float(scene.height[plant]))
@@ -117,10 +120,10 @@ def plant_assets(scene, output_dir: Path):
     return outputs
 
 
-def crop_asset(scene, output_dir: Path):
+def crop_asset(scene, output_dir: Path, *, physics_backend='newton'):
     """One USD source for all fixed kinematic plants, without dynamic joints."""
     from pxr import Usd, UsdGeom
-    paths=plant_assets(scene,output_dir/'corn')
+    paths=plant_assets(scene,output_dir/'corn', physics_backend=physics_backend)
     output=output_dir/'crop.usda'
     stage=Usd.Stage.CreateNew(str(output))
     root=UsdGeom.Xform.Define(stage,'/Plants').GetPrim()

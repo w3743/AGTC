@@ -56,7 +56,7 @@ actual_commit="$(git -C "$ISAACLAB_ROOT" rev-parse HEAD)"
 
 mkdir -p "$UV_CACHE_DIR" "$WARP_CACHE_PATH" "$(dirname "$UV_PROJECT_ENVIRONMENT")"
 cd "$ISAACLAB_ROOT"
-ISAACLAB_EXTRAS=(--extra rsl-rl --extra viser --extra test)
+ISAACLAB_EXTRAS=(--extra rsl-rl --extra viser --extra test --extra isaacsim)
 if [[ "$INSTALL_LEGACY_SB3" == "1" ]]; then
     ISAACLAB_EXTRAS+=(--extra sb3)
 fi
