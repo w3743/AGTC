@@ -1,8 +1,17 @@
 # Isaac Lab 项目状态
 
-## 2026-10-24：Isaac Sim 迁移验收小流程完成
+## 2026-10-24：12m平地全图随机定点移动（a02训练中）
 
-当前工作区为 Windows 11 ARM64 / NVIDIA N1X，分支 `feat/isaacsim-training`，基于 main `a9b78d25`。用户授权将所有新训练迁至 Isaac Sim。此平台不在官方支持范围内；官方CPU vendor checker失败。本机以 CPython 3.12.14 的 x64 ABI 模拟运行，属于实验兼容路径，不是认证兼容性或受支持配置。
+PR22 已合入 `main` (`b3fd9cab`)，当前分支为 `chore/physx-pointmove-training`。用户授权在本机 Windows ARM64/N1X 上执行一次正式Isaac Sim定点移动训练及配对开发评估。冻结任务为 `Isaac-Field-FastStop-Rsl-Direct`：12×12m平地、plants=0、rocks=0、60s、全图随机起终点、`fast_stop_v2`、`sensor-absolute-goal-v1`、actor/critic各512×1 LSTM；成功条件为目标0.4m内、真实XY速度<0.05m/s、完整车体角速度<0.1rad/s并连续保持0.5s。4环境×128步×384迭代为196608 transitions。
+
+- a01 的一次性流程把 `scene.env_spacing` 设为20m，但生产 `env.py:177` 按场地尺寸+10m生成22m；协议门禁因此拒绝正式训练。a01全部输出原样保留，不作正式成绩。
+- 正式trial为 `results/isaac_field_improvement/physx_pointmove_flat12_20261024_a02/`。a02已将CLI和guard统一为22m spacing；protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`，冻结76个来源文件（含 `run_pipeline.py`），未改生产源码。0步baseline进程真实exit 0，CPU检查通过：`num_timesteps=0`、iteration=0、Adam为空、参数有限；baseline SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`。
+- `run_status.json`记录`resume_training_cli`仍在运行。12:18:46+08进程审计确认controller PID 7316、wrapper PID 22492和训练Python PID 7520；首个完整检查点于12:22:14+08落盘，CPU审计通过：512 transitions、Adam step20、参数有限且权重已变化；76源及协议/基线SHA未变，详见`first_checkpoint_cpu.json`。编排进程通过Windows线程级 `SetThreadExecutionState` 在本轮运行期间请求阻止系统空闲睡眠，未改全局电源计划。训练完成前不宣称训练成功或能力提升；动态状态以trial的status、实际进程和完整checkpoint/OS退出为准。
+- 自然完成后同配置串行评估baseline和终局模型，各跑16个完整60s全图开发场景seed 87010–87025，不设max-steps上限并保存轨迹、停稳状态、损伤和碰撞。验收沿用16场中clean success至少13场、damage/collision/unsafe均为0，并要求终局clean成功增加且安全指标不恶化。830xx及held-out不使用；结果不代表避苗、粗糙地形或实车能力。单次训练和记录不另计功能，第二十批仍2/5；周期自动化保持PAUSED。
+
+## 2026-10-24：Isaac Sim迁移验收小流程完成（历史快照）
+
+迁移验收记录创建时，工作区为 Windows 11 ARM64 / NVIDIA N1X，分支 `feat/isaacsim-training`，基于 main `a9b78d25`。用户授权将所有新训练迁至 Isaac Sim。此平台不在官方支持范围内；官方CPU vendor checker失败。本机以 CPython 3.12.14 的 x64 ABI 模拟运行，属于实验兼容路径，不是认证兼容性或受支持配置。
 
 运行环境已安装在 `C:/pioneer/isaac-training/.venv`，`pip check`真实exit 0。Isaac Lab源码固定在 `5870804e4f6aee57bdef68d59f67d328b990d1e1`；实际发行包版本为 `isaaclab 28.0.0`、`isaaclab_physx 8.0.0`、`rsl-rl-lib 5.5.1`、`isaacsim 6.2.0.0`、`torch 2.11.0+cu130`。Windows安装与启动脚本已就绪；上游源码和锁文件未修改。
 
