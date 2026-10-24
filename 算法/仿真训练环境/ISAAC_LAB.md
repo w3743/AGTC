@@ -1,5 +1,13 @@
 # Isaac Lab 项目状态
 
+## 2026-10-24：采样优化与实时GUI续训交接
+
+用户已授权在保留物理精度的前提下优化拷贝/重复计算，再从最近完整检查点恢复并打开训练实时画面。生产 `env.py` 将小型state/feedback张量合并为一次host采样，缓存固定旋转/轮侧掩码/换算系数，复用同一步的state；reset和首帧渲染后强制失效。保留五路传感器、原更新调度、物理dt=.001/decimation=50/位置迭代40、原奖励/终止/RNG路径。CPU采样/partial-reset测试及a02冻结实现的非零姿态/IMU偏置对照各2项通过；37模块整合CPU回归实际436 passed/4 skipped/47上游warnings、exit0，生产env/rsl配置测试前后SHA一致；第二十批5/5范围整理已完成，验证记录见 `results/isaac_field_diagnosis/sampling_live_handoff_20261024/cpu_regression/`。未做训练速度/FPS基准，也未据此宣称提速倍数。
+
+a02 protocol、source_snapshot和检查点保持原字节；新的生产源码是授权修改，不再与a02的旧源快照宣称相等。普通checkpoint恢复保留模型/Adam/累计步数，重建仿真环境；不恢复现场物理、未落盘rollout、RNG或在途LSTM隐状态。新续训将使用独立trial和新源快照，并继承196608累计transition目标和原baseline配对评估。
+
+实时GUI使用官方 `--visualizer kit`，视口跟随环境0的实际robot；所有4个训练环境均保留可见，未使用会隐藏其它环境的 `--max_visible_envs`。`default_visualizer_cfg`只提供相机默认值，不自动开启GUI。机制澄清：旧protocol关于wrapper强制headless的文字仅保留历史；当前wrapper只转交kit_args，实际默认headless由官方KitLauncher在未请求Kit visualizer时决定。新可视化运行不是独立静态预览，也不会额外创建策略回放环境。
+
 ## 2026-10-24：12m平地全图随机定点移动（a02训练中）
 
 PR22 已合入 `main` (`b3fd9cab`)，当前分支为 `chore/physx-pointmove-training`。用户授权在本机 Windows ARM64/N1X 上执行一次正式Isaac Sim定点移动训练及配对开发评估。冻结任务为 `Isaac-Field-FastStop-Rsl-Direct`：12×12m平地、plants=0、rocks=0、60s、全图随机起终点、`fast_stop_v2`、`sensor-absolute-goal-v1`、actor/critic各512×1 LSTM；成功条件为目标0.4m内、真实XY速度<0.05m/s、完整车体角速度<0.1rad/s并连续保持0.5s。4环境×128步×384迭代为196608 transitions。

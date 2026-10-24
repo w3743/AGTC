@@ -307,9 +307,22 @@ class IsaacFieldEnv(DirectRLEnv):
         self._wheel_ids = torch.tensor([self.rover.joint_names.index(n) for n in self._wheel_names], device=self.device)
         self._wheel_sides = torch.tensor([-1. if w.side=='left' else 1. for w in ROBOT_SPEC.wheel_specs],device=self.device)
         self._wheel_track_ids = (self._wheel_sides > 0).long()
+        wheel_track_ids = self._wheel_track_ids.detach().cpu().numpy()
+        self._wheel_side_masks = (wheel_track_ids == 0, wheel_track_ids == 1)
         self._gimbal_ids = torch.tensor([self.rover.joint_names.index(n) for n in
                                         (GIMBAL_YAW_JOINT,GIMBAL_PITCH_JOINT)],device=self.device)
         self._mount_id = self.rover.body_names.index('gimbal_pitch_link')
+        self._imu_offset_rotation = matrix_from_quat(torch.as_tensor(
+            self.cfg.imu_offset_rot_xyzw, device=self.device, dtype=torch.float32
+        )[None]).detach().cpu().numpy()[0].copy()
+        spec = ROBOT_SPEC
+        self._torque_to_iq = (spec.drive_sprocket_radius_m / (spec.wheel_radius_m
+            * spec.drive_reduction_ratio * self.cfg.drive_efficiency_assumption
+            * self.cfg.motor_torque_constant_nm_per_a))
+        self._omega_to_motor_rpm = (spec.wheel_radius_m / spec.drive_sprocket_radius_m
+            * spec.drive_reduction_ratio * 60. / (2. * math.pi))
+        self._state_observation_fresh = False
+        self._feedback_host_cache = None
         self.actions = torch.zeros((self.num_envs,4),device=self.device)
         self.command = torch.zeros((self.num_envs,2),device=self.device)
         self.track_command = torch.zeros_like(self.command)
@@ -338,6 +351,7 @@ class IsaacFieldEnv(DirectRLEnv):
         return super().reset(seed=seed, options=options)
 
     def _reset_idx(self, env_ids):
+        self._invalidate_cached_samples()
         ids = [int(i) for i in env_ids.tolist()]
         super()._reset_idx(env_ids)
         poses = self.rover.data.default_root_pose.torch[env_ids].clone()
@@ -516,33 +530,94 @@ class IsaacFieldEnv(DirectRLEnv):
             joint_ids=self._wheel_ids,
         )
 
-    def _refresh_state(self):
+    def _invalidate_cached_samples(self):
+        """Force the next observation to sample state after reset or rendering."""
+        self._state_observation_fresh = False
+        self._feedback_host_cache = None
+
+    def _collect_sim_cpu_samples(self, *, include_feedback=False):
+        """Move the current small state/feedback sample to host memory once."""
         poses=self.rover.data.root_link_pose_w.torch
         velocities=self.rover.data.root_com_vel_w.torch
-        angles=torch.stack(euler_xyz_from_quat(poses[:,3:]),-1).detach().cpu().numpy()
+        angles=torch.stack(euler_xyz_from_quat(poses[:,3:]),-1)
         rotation=matrix_from_quat(poses[:,3:])
-        forward_speed=(velocities[:,:3]*rotation[:,:,0]).sum(-1).detach().cpu().numpy()
+        forward_speed=(velocities[:,:3]*rotation[:,:,0]).sum(-1, keepdim=True)
         # Simulator truth for chassis stability: PhysX supplies angular
         # velocity in world axes; rotate it into body axes. The moving-gimbal
         # IMU and commanded rates are not substitutes for this signal.
         body_angular_velocity = torch.bmm(
             rotation.transpose(1, 2), velocities[:, 3:6].unsqueeze(-1),
-        ).squeeze(-1).detach().cpu().numpy()
-        root=poses.detach().cpu().numpy()
-        origin_offsets=self.scene.env_origins.detach().cpu().numpy()
+        ).squeeze(-1)
+        origin_offsets=self.scene.env_origins
         mount=self.rover.data.body_link_pose_w.torch[:,self._mount_id]
-        mount_rotation=matrix_from_quat(mount[:,3:]).detach().cpu().numpy()
-        mount_pose=mount.detach().cpu().numpy()
-        joints=self.rover.data.joint_pos.torch[:,self._gimbal_ids].detach().cpu().numpy()
-        angular=velocities[:,5].detach().cpu().numpy()
+        mount_rotation=matrix_from_quat(mount[:,3:])
+        joints=self.rover.data.joint_pos.torch[:,self._gimbal_ids]
+        state_tensors = {
+            'angles': angles,
+            'forward_speed': forward_speed,
+            'body_angular_velocity': body_angular_velocity,
+            'root': poses,
+            'origin_offsets': origin_offsets,
+            'mount_rotation': mount_rotation.reshape(mount_rotation.shape[0], 9),
+            'mount_pose': mount,
+            'joints': joints,
+            'angular': velocities[:,5:6],
+            'root_com_velocity_xy': velocities[:,:2],
+        }
+        feedback_tensors = None
+        if include_feedback:
+            imu = self.scene['imu'].data
+            feedback_tensors = {
+                'acceleration': imu.lin_acc_b.torch,
+                'angular_velocity': imu.ang_vel_b.torch,
+                'gimbal_qd': self.rover.data.joint_vel.torch[:,self._gimbal_ids],
+                'wheel_qd': self.rover.data.joint_vel.torch[:,self._wheel_ids],
+                'wheel_torque': self.rover.actuators.applied_effort.torch[:,self._wheel_ids],
+            }
+        tensors = [*state_tensors.values()]
+        if feedback_tensors is not None:
+            tensors.extend(feedback_tensors.values())
+        flat_tensors = [value.reshape(value.shape[0], -1) for value in tensors]
+        packed = torch.cat(flat_tensors, dim=1).detach().cpu().numpy()
+        cursor = 0
+
+        def unpack(values):
+            nonlocal cursor
+            result = {}
+            for name, value in values.items():
+                width = value.numel() // value.shape[0]
+                shape = tuple(value.shape[1:])
+                result[name] = packed[:, cursor:cursor + width].reshape(
+                    (packed.shape[0], *shape)
+                )
+                cursor += width
+            return result
+
+        state = unpack(state_tensors)
+        state['mount_rotation'] = state['mount_rotation'].reshape(-1, 3, 3)
+        feedback = None if feedback_tensors is None else unpack(feedback_tensors)
+        if feedback is not None:
+            feedback['gimbal_q'] = state['joints']
+            feedback['mount_rotation'] = state['mount_rotation']
+        return state, feedback
+
+    def _refresh_state(self, *, include_feedback=False):
+        state, feedback = self._collect_sim_cpu_samples(include_feedback=include_feedback)
+        self._feedback_host_cache = feedback
         for i,t in enumerate(self.tasks):
-            t.robot[:]=[*list(root[i,:2]-origin_offsets[i,:2]),wrap(float(angles[i,2])),float(forward_speed[i]),float(angular[i])]
-            t.gimbal[:]=joints[i]
-            t.body_pose=(float(root[i,2]-origin_offsets[i,2]),float(angles[i,1]),float(angles[i,0]))
-            t.root_com_velocity_xy = velocities[i, :2].detach().cpu().numpy().copy()
-            t.body_angular_velocity = body_angular_velocity[i].copy()
-            t.view_origin=(mount_pose[i,:3]-origin_offsets[i]).astype(np.float32)
-            t.view_basis=(mount_rotation[i,:,0],-mount_rotation[i,:,1],mount_rotation[i,:,2])
+            t.robot[:]=[*list(state['root'][i,:2]-state['origin_offsets'][i,:2]),
+                        wrap(float(state['angles'][i,2])),float(state['forward_speed'][i,0]),
+                        float(state['angular'][i,0])]
+            t.gimbal[:]=state['joints'][i]
+            t.body_pose=(float(state['root'][i,2]-state['origin_offsets'][i,2]),
+                         float(state['angles'][i,1]),float(state['angles'][i,0]))
+            t.root_com_velocity_xy = state['root_com_velocity_xy'][i].copy()
+            t.body_angular_velocity = state['body_angular_velocity'][i].copy()
+            t.view_origin=(state['mount_pose'][i,:3]-state['origin_offsets'][i]).astype(np.float32)
+            mount_rotation = state['mount_rotation'][i]
+            t.view_basis=(mount_rotation[:,0].copy(),-mount_rotation[:,1].copy(),
+                          mount_rotation[:,2].copy())
+        self._state_observation_fresh = True
 
     def _refresh_feedback(self, *, after_step: bool) -> None:
         """Sample physical signals once; observation reads never advance the filter.
@@ -551,33 +626,27 @@ class IsaacFieldEnv(DirectRLEnv):
         PhysX. Its conversion to an equivalent motor Iq is an uncalibrated
         drivetrain model, not a measurement of hardware phase current.
         """
-        imu = self.scene['imu'].data
-        acceleration = imu.lin_acc_b.torch.detach().cpu().numpy()
-        angular_velocity = imu.ang_vel_b.torch.detach().cpu().numpy()
-        q = self.rover.data.joint_pos.torch[:, self._gimbal_ids].detach().cpu().numpy()
-        qd = self.rover.data.joint_vel.torch[:, self._gimbal_ids].detach().cpu().numpy()
-        wheel_qd = self.rover.data.joint_vel.torch[:, self._wheel_ids].detach().cpu().numpy()
-        wheel_torque = self.rover.actuators.applied_effort.torch[:, self._wheel_ids].detach().cpu().numpy()
-        mount_q = self.rover.data.body_link_pose_w.torch[:, self._mount_id, 3:]
-        mount_rotation = matrix_from_quat(mount_q).detach().cpu().numpy()
+        if self._feedback_host_cache is None:
+            _, self._feedback_host_cache = self._collect_sim_cpu_samples(include_feedback=True)
+        sample = self._feedback_host_cache
+        acceleration = sample['acceleration']
+        angular_velocity = sample['angular_velocity']
+        q = sample['gimbal_q']
+        qd = sample['gimbal_qd']
+        wheel_qd = sample['wheel_qd']
+        wheel_torque = sample['wheel_torque']
+        # The mount rotation is included in the packed host sample and reused
+        # for the virtual magnetometer, alongside the immutable configured offset.
+        mount_rotation = sample['mount_rotation']
         # Virtual magnetometer signal only. This world field is an explicit
         # assumed ENU reference; orientation is estimated from noisy sensors.
-        offset_rotation = matrix_from_quat(torch.as_tensor(
-            self.cfg.imu_offset_rot_xyzw, device=self.device, dtype=torch.float32
-        )[None]).detach().cpu().numpy()[0]
+        offset_rotation = self._imu_offset_rotation
         sensor_rotation = mount_rotation @ offset_rotation
         mag = np.einsum('nji,j->ni', sensor_rotation, np.array([0., 3000., -6000.]))
-        sides = self._wheel_track_ids.detach().cpu().numpy()
-        spec = ROBOT_SPEC
-        torque_to_iq = (spec.drive_sprocket_radius_m / (spec.wheel_radius_m
-            * spec.drive_reduction_ratio * self.cfg.drive_efficiency_assumption
-            * self.cfg.motor_torque_constant_nm_per_a))
-        omega_to_motor_rpm = (spec.wheel_radius_m / spec.drive_sprocket_radius_m
-            * spec.drive_reduction_ratio * 60. / (2. * math.pi))
-        iq = np.stack([wheel_torque[:, sides == side].sum(axis=1) * torque_to_iq
-                       for side in (0, 1)], axis=1)
-        rpm = np.stack([wheel_qd[:, sides == side].mean(axis=1) * omega_to_motor_rpm
-                        for side in (0, 1)], axis=1)
+        iq = np.stack([wheel_torque[:, mask].sum(axis=1) * self._torque_to_iq
+                       for mask in self._wheel_side_masks], axis=1)
+        rpm = np.stack([wheel_qd[:, mask].mean(axis=1) * self._omega_to_motor_rpm
+                        for mask in self._wheel_side_masks], axis=1)
         for i, task in enumerate(self.tasks):
             if task.done and after_step and not self.cfg.auto_reset:
                 continue
@@ -592,6 +661,7 @@ class IsaacFieldEnv(DirectRLEnv):
                 motor_iq_a=iq[i] if after_step else np.zeros(2),
                 motor_rpm=rpm[i] if after_step else np.zeros(2),
             ))
+        self._feedback_host_cache = None
 
     def _capture(self,i,kind):
         t,c=self.tasks[i],self.field_cfg
@@ -657,7 +727,7 @@ class IsaacFieldEnv(DirectRLEnv):
         return {'detections':detections[:c.max_detections]}
 
     def _get_dones(self):
-        self._refresh_state()
+        self._refresh_state(include_feedback=True)
         self._refresh_feedback(after_step=True)
         actions=self.actions.detach().cpu().numpy()
         rewards=[]; terminated=[]; truncated=[]; diagnostic_infos=[]
@@ -752,15 +822,20 @@ class IsaacFieldEnv(DirectRLEnv):
         return self._reward
 
     def _get_observations(self):
-        if any(not t.frames for t in self.tasks):
+        initialize_sensors = any(not t.frames for t in self.tasks)
+        if initialize_sensors:
+            # Reset poses are written before the explicit render/forward. Drop
+            # any pre-reset sample so the state below matches those sensors.
+            self._invalidate_cached_samples()
             # Both explicit and same-step autoresets must render the new poses.
             self.scene.write_data_to_sim()
             self.sim.forward()
             self.sim.render()
             for name in ('lidar','rangefinder','depth','detector'):
                 self.scene[name].update(0.,force_recompute=True)
-        self._refresh_state()
-        if any(not t.frames for t in self.tasks):
+        if not self._state_observation_fresh:
+            self._refresh_state(include_feedback=initialize_sensors)
+        if initialize_sensors:
             self._refresh_feedback(after_step=False)
         observations=[]
         for t in self.tasks:
@@ -769,6 +844,7 @@ class IsaacFieldEnv(DirectRLEnv):
             else:
                 obs=t._observation()
             observations.append(obs)
+        self._state_observation_fresh = False
         return {'policy':{key:torch.as_tensor(np.stack([o[key] for o in observations]),device=self.device)
                           for key in observations[0]}}
 
