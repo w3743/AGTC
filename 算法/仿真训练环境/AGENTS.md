@@ -17,7 +17,13 @@
 
 ## 当前批次与运行状态
 
+- 2026-10-24 可视化续训已实际启动，第二十一批1/5。新trial为 `results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/`，protocol SHA `3ff3b1ac0c228be857af0e6dd50f73c4050e1b4c0265d1389185cf7a3600c75a`、81源快照冻结；从a02 `model_32.pt` 的16896累计步/Adam660恢复，剩余351更新，总目标仍196608，预期最终payload iter382/Adam7680。首个新checkpoint CPU审计通过：累计17408、新增512、Adam680、33张actor/critic张量更新、完整policy contract相同、checkpoint原字节未改。37模块回归436 passed/4 skipped及续训入口12专项通过；未做FPS基准或宣称提速倍数。
+
+- 实际训练进程29076、controller34644的原生 `Isaac Lab 3.0.0` 视口已通过两次Computer Use观察，并以HWND724194核对同一训练PID：车辆姿态持续变化，地面及其它并行环境可见；跟随env0但不隐藏其它3环境，不是静态USD或额外回放。物理dt=.001/decimation50/位置求解40、完整task和五种sensor配置核对相同；唯一兼容差异为官方PhysxManager因GUI自动将嵌套 `physics.enable_scene_query_support` false→true（查询manager，非积分/接触精度变更），报告明确保留。旧a02训练/父流程/监听及静态GUI均按真实argv/ctime核对后停止，a02记superseded，原protocol/source_snapshot/checkpoint/log保留。完成监听已迁移至仓库外 `C:/pioneer/isaac-training/watchers/pointmove-live-a03/`（当前native watcher18132），每30秒普通程序检查、去重通知；旧周期自动化仍PAUSED。训练自然结束后继续原baseline/final各16场配对评估，不能提前称能力提升。
+
 - 2026-10-24 用户明确授权优化采样数据拷贝/重复计算，物理精度不变，再从完整检查点恢复并开启训练进程的实时GUI。生产 `env.py` 已合并小型state/feedback张量的host传输、缓存固定旋转/轮侧掩码/换算系数、复用同一步state，reset/首帧渲染后强制失效；未改物理dt=.001、decimation=50、求解位置迭代40、传感器规格/更新调度、奖励或终止。新增采样/partial-reset与冻结实现CPU等价测试各2项通过；37模块整合回归实际436 passed/4 skipped/47上游warnings，exit0，两生产源测试前后SHA一致。第二十批5/5后的范围整理已完成：缓存/失效接口统一、常量移出采样路径、冻结实现对照与partial-reset验证、文档同步、diff-check通过，无冻结源/原成绩/模型改写，无FPS基准；证据在 `results/isaac_field_diagnosis/sampling_live_handoff_20261024/cpu_regression/`。后续可视化续训交接记第二十一批第1项。a02原protocol/source_snapshot/checkpoint原始字节保留，新生产源与旧快照差异属于用户授权的新版本，不能覆盖旧快照或继续冒称旧冻结源一致。
+
+### 2026-10-24交接前记录（历史状态，不代表仍运行）
 
 - 2026-10-24 PR22 已合入 `main` (`b3fd9cab`)，当前分支 `chore/physx-pointmove-training`。用户授权本机一次 12×12m 平地、零植物/石块、全图随机起终点、60s 的 fast_stop_v2/absolute-goal 定点移动训练：512×1 LSTM、0.4m、XY速度<0.05m/s、全角速度<0.1rad/s并连续保持0.5s；4×128×384=196608 transitions。a01 的20m spacing guard与生产 `env.py:177` 实际22m不符，未通过协议门禁，试验原样保留；a02已修正为22m spacing，76源哈希及protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`冻结，零步baseline真实exit 0并通过检查（0步/0迭代、Adam空、参数有限，SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`）。a02处于`resume_training_cli`运行中；首个完整checkpoint已通过CPU审计，512 transitions、Adam step20、参数有限且权重真实变化，76源及协议/基线SHA未变（见`first_checkpoint_cpu.json`）；未完成训练或能力改善不得提前宣称。自然结束后按同配置配对评估baseline与终局模型，各跑16个60s全图开发场景seed87010–87025；不用830xx/held-out，不据此宣称避苗、粗糙地形或实车能力。当前动态证据及流程边界见 `ISAAC_LAB.md`；第二十批为4/5（含完成事件监听和原生GUI预览），训练/记录不另计独立功能，自动化保持PAUSED。
 
