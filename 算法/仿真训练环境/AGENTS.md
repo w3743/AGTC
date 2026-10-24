@@ -17,6 +17,8 @@
 
 ## 当前批次与运行状态
 
+- 2026-10-24 用户进一步质疑不必要计算；在a03保存25600步/Adam1000并交接停止后、新a04冻结前补入两项等价去重：持久target buffer使3个setter由每控制步150次减为3次，每个物理子步的PD/implicit compute和PhysX submit保持；正常4环境复用finish已有obs，一次性mask严格在reset/state或feedback刷新/下个控制步失效，partial reset全批重算，inactive旧result不复用。真实SDK Warp CPU target buffers经历50次动态qd计算仍保持目标，partial reset/下一步写入及obs缓存边界通过；44模块最终回归483 passed/4 skipped/47 warnings、exit0、源SHA前后同，既有观测mock仅对齐已存在的include_feedback签名。此去重为第二十一批第3项。无GPU/FPS基准，不称150→3等于总速度提升50倍；Detector空场景裁剪与info/deepcopy仅审计未改，传感器/奖励/VQF/物理精度保持。
+
 - 2026-10-24 用户确认原生训练窗口连旋转视角/界面操作也卡，明确选择独立观察窗口优先交互流畅，并授权在下一完整checkpoint切换。已准备默认关闭的 `--live-state-file`：复用同一次CPU pack导出真实root/body world poses、xyzw、origin/goal、物理时钟及来源/序号，原子latest文件，OSError保留last-good并限频告警；不改物理/传感器/RNG。独立render-only Kit窗口不加载策略、不建训练环境、不推进timeline，按最新真实状态更新，用户相机视角独立保留；数据过期保留最后pose并标明age，无插值冒充物理更新。当前a03仍运行，准备在下一 `model_48.pt` 完整落盘后切换到a04；新功能为第二十一批第2项，尚未部署，不提前称实际交互验收通过。41模块CPU回归468 passed/4 skipped/47 warnings、源SHA前后相同，证据 `results/isaac_field_diagnosis/live_state_mirror_handoff_20261024/cpu_gate.json`。不做FPS基准、不承诺提高训练吞吐。
 
 - 2026-10-24 可视化续训已实际启动，第二十一批1/5。新trial为 `results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/`，protocol SHA `3ff3b1ac0c228be857af0e6dd50f73c4050e1b4c0265d1389185cf7a3600c75a`、81源快照冻结；从a02 `model_32.pt` 的16896累计步/Adam660恢复，剩余351更新，总目标仍196608，预期最终payload iter382/Adam7680。首个新checkpoint CPU审计通过：累计17408、新增512、Adam680、33张actor/critic张量更新、完整policy contract相同、checkpoint原字节未改。37模块回归436 passed/4 skipped及续训入口12专项通过；未做FPS基准或宣称提速倍数。

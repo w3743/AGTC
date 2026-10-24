@@ -198,7 +198,7 @@ def test_absolute_goal_terminal_snapshot_and_single_adapter_share_the_task_obser
         _get_dones = IsaacFieldEnv._get_dones
         observation_config = _observation_config(cfg)
 
-        def _refresh_state(self):
+        def _refresh_state(self, *, include_feedback=False):
             pass
 
         def _refresh_feedback(self, *, after_step):

@@ -334,6 +334,7 @@ class IsaacFieldEnv(DirectRLEnv):
             * spec.drive_reduction_ratio * 60. / (2. * math.pi))
         self._state_observation_fresh = False
         self._feedback_host_cache = None
+        self._finished_observation_cache_mask = None
         self.actions = torch.zeros((self.num_envs,4),device=self.device)
         self.command = torch.zeros((self.num_envs,2),device=self.device)
         self.track_command = torch.zeros_like(self.command)
@@ -515,6 +516,7 @@ class IsaacFieldEnv(DirectRLEnv):
     def _pre_physics_step(self, actions):
         if not torch.isfinite(actions).all():
             raise ValueError('actions must be finite')
+        self._finished_observation_cache_mask = None
         self.actions = actions.clamp(-1.,1.)
         self._before = [t.robot.copy() for t in self.tasks]
         self._old_distance = [float(np.linalg.norm(t.goal-t.robot[:2])) for t in self.tasks]
@@ -533,18 +535,25 @@ class IsaacFieldEnv(DirectRLEnv):
         self.gimbal_target[:,1].clamp_(self.field_cfg.pitch_min,self.field_cfg.pitch_max)
         self._sensor_cache.clear()
 
+        # The target buffers persist across physics steps. This action is held
+        # for the full decimation window, so write them once per policy step;
+        # actuator computation and PhysX submission still run on every substep.
+        target_command = self.rover.actuators.target_command
+        target_command.set_velocity_index(value=self.wheel_target_velocity, joint_ids=self._wheel_ids)
+        target_command.set_position_index(value=self.gimbal_target, joint_ids=self._gimbal_ids)
+        target_command.set_effort_index(value=self._drive_pi.feedforward, joint_ids=self._wheel_ids)
+
     def _apply_action(self):
-        self.rover.actuators.target_command.set_velocity_index(value=self.wheel_target_velocity,joint_ids=self._wheel_ids)
-        self.rover.actuators.target_command.set_position_index(value=self.gimbal_target,joint_ids=self._gimbal_ids)
-        self.rover.actuators.target_command.set_effort_index(
-            value=self._drive_pi.feedforward,
-            joint_ids=self._wheel_ids,
-        )
+        # Isaac Lab invokes this once per physics substep. The persistent target
+        # buffers are written in _pre_physics_step; per-substep actuator compute
+        # and scene.write_data_to_sim remain responsible for applying them.
+        pass
 
     def _invalidate_cached_samples(self):
         """Force the next observation to sample state after reset or rendering."""
         self._state_observation_fresh = False
         self._feedback_host_cache = None
+        self._finished_observation_cache_mask = None
 
     def _collect_sim_cpu_samples(self, *, include_feedback=False):
         """Move the current small state/feedback sample to host memory once."""
@@ -625,6 +634,7 @@ class IsaacFieldEnv(DirectRLEnv):
         return state, feedback
 
     def _refresh_state(self, *, include_feedback=False):
+        self._finished_observation_cache_mask = None
         state, feedback = self._collect_sim_cpu_samples(include_feedback=include_feedback)
         self._feedback_host_cache = feedback
         for i,t in enumerate(self.tasks):
@@ -649,6 +659,7 @@ class IsaacFieldEnv(DirectRLEnv):
         PhysX. Its conversion to an equivalent motor Iq is an uncalibrated
         drivetrain model, not a measurement of hardware phase current.
         """
+        self._finished_observation_cache_mask = None
         if self._feedback_host_cache is None:
             _, self._feedback_host_cache = self._collect_sim_cpu_samples(include_feedback=True)
         sample = self._feedback_host_cache
@@ -750,10 +761,12 @@ class IsaacFieldEnv(DirectRLEnv):
         return {'detections':detections[:c.max_detections]}
 
     def _get_dones(self):
+        self._finished_observation_cache_mask = None
         self._refresh_state(include_feedback=True)
         self._refresh_feedback(after_step=True)
         actions=self.actions.detach().cpu().numpy()
         rewards=[]; terminated=[]; truncated=[]; diagnostic_infos=[]
+        finished_observation_cache_mask = [False] * len(self.tasks)
         for i,t in enumerate(self.tasks):
             if t.done and not self.cfg.auto_reset:
                 rewards.append(0.);terminated.append(False);truncated.append(False)
@@ -794,6 +807,7 @@ class IsaacFieldEnv(DirectRLEnv):
                 # Keep the legacy call shape and scoring order untouched.
                 result=t.finish(actions[i],self._before[i],self._old_distance[i],rock,boundary)
             obs,reward,term,trunc,info=result
+            finished_observation_cache_mask[i] = True
             if t.mode=='goto' and not fast_stop:
                 shaping=self.cfg.distance_cost*info['distance']*self.step_dt
                 reward-=shaping
@@ -839,6 +853,7 @@ class IsaacFieldEnv(DirectRLEnv):
         # immutable transition snapshots here for an opt-in diagnostics callback,
         # including terminal steps before DirectRLEnv performs same-step reset.
         self.diagnostic_step_infos=tuple(diagnostic_infos)
+        self._finished_observation_cache_mask = tuple(finished_observation_cache_mask)
         return torch.tensor(terminated,device=self.device),torch.tensor(truncated,device=self.device)
 
     def _get_rewards(self):
@@ -846,6 +861,14 @@ class IsaacFieldEnv(DirectRLEnv):
 
     def _get_observations(self):
         initialize_sensors = any(not t.frames for t in self.tasks)
+        pending_cache_mask = getattr(self, '_finished_observation_cache_mask', None)
+        self._finished_observation_cache_mask = None
+        reuse_finished_observations = (
+            pending_cache_mask is not None
+            and len(pending_cache_mask) == len(self.tasks)
+            and not initialize_sensors
+            and self._state_observation_fresh
+        )
         if initialize_sensors:
             # Reset poses are written before the explicit render/forward. Drop
             # any pre-reset sample so the state below matches those sensors.
@@ -861,9 +884,12 @@ class IsaacFieldEnv(DirectRLEnv):
         if initialize_sensors:
             self._refresh_feedback(after_step=False)
         observations=[]
-        for t in self.tasks:
+        for i,t in enumerate(self.tasks):
             if not t.frames:
                 obs,_=t.initialize_sensors()
+            elif (reuse_finished_observations and pending_cache_mask[i]
+                  and self._last_results[i] is not None):
+                obs=self._last_results[i][0]
             else:
                 obs=t._observation()
             observations.append(obs)

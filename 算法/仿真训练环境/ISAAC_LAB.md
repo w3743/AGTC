@@ -2,6 +2,8 @@
 
 ## 2026-10-24：独立实时观察窗口（准备切换）
 
+用户进一步要求检查不必要计算，已在下一完整a03检查点25600步/Adam1000交接后、a04冻结前修正两处明确冗余。SDK target buffer跨子步持久，控制目标在50子步内不变，因此将3个Warp scatter setter移至每控制步末尾一次提交，静态调用数150→3；每个1ms子步的PD/implicit计算和PhysX命令提交仍执行，未改动力学精度。观测以一次性mask复用当步finish生成的结果，正常4环境由8份task observation变4份；任何reset/state或feedback刷新均使缓存失效，保留VQF/RNG/时序和完整诊断。真实SDK CPU缓冲/50次动态qd/partial-reset测试及缓存4边界通过，最终44模块整合483 passed/4 skipped/47 warnings。没有测训练FPS或给出速度倍数。空场景Detector/rangefinder及未消费的depth AOV是后续候选，本轮没有取消传感器；info/deepcopy诊断也未删除。
+
 用户确认原生训练窗口的旋转视角/界面操作也卡，选择将观察窗口独立，并授权在下一完整checkpoint切换。现有日志每128个控制步耗时约213–223秒；Kit事件处理与控制步绑定，因此UI也会等待采样。本次保持原物理精度、五路观测、传感器更新调度及奖励/终止，将渲染/鼠标操作从训练进程移出；真实车辆状态仍按训练推进速度到达，不插值冒充更多物理样本。
 
 新入口 `--live-state-file <绝对路径>` 默认关闭，启用时只在原GPU→CPU pack里增加body poses。原子latest JSON带明确xyzw、env origin、global sim time、packet timestamp/sequence和来源，暂停/文件写失败不清空旧画面、不影响策略；观察端显示数据年龄，超过5秒标记过期。观察程序 `scripts/view_training_state.py` 独立运行Kit、timeline保持停止，不构造Isaac Lab env或加载checkpoint/策略；只展示选中环境的真实位姿。相机只初始化一次，随后保留用户操作，地面保持环境局部坐标，嵌套body只扣除一次origin。
