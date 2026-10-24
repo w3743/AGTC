@@ -16,7 +16,15 @@ from tensordict import TensorDict
 
 from .action_contract import action_config
 from .feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
-from .policy_contract import _field_encoder_config, _json_safe, _validate_observation_config
+from .policy_contract import (
+    BACKEND_IDENTITY,
+    BACKEND_IDENTITY_KEYS,
+    _field_encoder_config,
+    _json_safe,
+    _validate_observation_config,
+    recorded_backend_identity,
+    validate_backend_identity,
+)
 
 
 def _checkpoint_sha(path):
@@ -40,6 +48,8 @@ class RslPredictionModel:
         device: str | torch.device = "cpu",
         input_schema: str = ABSOLUTE_GOAL_INPUT_SCHEMA,
         expected_observation_config: Mapping[str, Any] | None = None,
+        expected_backend_identity: Mapping[str, Any] | None = None,
+        allow_backend_transfer: bool = False,
     ):
         from .rsl_rl_policy import RslFieldRNNModel, load_rsl_checkpoint_payload
 
@@ -50,7 +60,15 @@ class RslPredictionModel:
         if _checkpoint_sha(self.checkpoint) != self.checkpoint_sha256:
             raise ValueError("RSL checkpoint changed while loading")
         self.contract = payload["field_policy_contract"]
-        self.validate_contract(input_schema, expected_observation_config)
+        if type(allow_backend_transfer) is not bool:
+            raise ValueError("allow_backend_transfer must be boolean")
+        self.allow_backend_transfer = allow_backend_transfer
+        self.validate_contract(
+            input_schema,
+            expected_observation_config,
+            expected_backend_identity,
+            allow_backend_transfer=allow_backend_transfer,
+        )
         self.input_schema = input_schema
         self.field_observation_config = _json_safe(self.contract["observation_config"])
         self.field_action_config = _json_safe(self.contract["action_config"])
@@ -111,6 +129,8 @@ class RslPredictionModel:
 
     def validate_contract(
         self, input_schema: str, expected_observation_config: Mapping[str, Any] | None,
+        expected_backend_identity: Mapping[str, Any] | None = None,
+        *, allow_backend_transfer: bool = False,
     ) -> None:
         if self.contract.get("backend") != "rsl_rl":
             raise ValueError("checkpoint does not identify the RSL-RL backend")
@@ -122,6 +142,20 @@ class RslPredictionModel:
         )
         if self.contract.get("action_config") != action_config():
             raise ValueError("RSL checkpoint action contract differs from direct-track-speed-v1")
+        actual_backend_identity = {
+            key: self.contract.get(key) for key in BACKEND_IDENTITY_KEYS
+        }
+        if any(value is not None for value in actual_backend_identity.values()):
+            if allow_backend_transfer:
+                recorded_backend_identity(actual_backend_identity)
+            else:
+                validate_backend_identity(actual_backend_identity)
+        if expected_backend_identity is not None:
+            expected = validate_backend_identity(expected_backend_identity)
+            if actual_backend_identity != expected and not allow_backend_transfer:
+                raise ValueError(
+                    "RSL checkpoint simulator/physics identity differs from the live environment"
+                )
 
     def _predict(self, model, observation, state=None, episode_start=None, *, deterministic=True, clip=False):
         if not isinstance(observation, Mapping) or set(observation) != set(self.shapes):
@@ -186,14 +220,16 @@ class RslPolicyRunner:
     backend = 'rsl_rl'
 
     def __init__(self, env, checkpoint, *, device='cpu', input_schema=ABSOLUTE_GOAL_INPUT_SCHEMA,
-                 expected_observation_config=None):
+                 expected_observation_config=None, allow_backend_transfer=False):
         if checkpoint is None:
             raise ValueError('RSL inference requires an explicit .pt checkpoint')
         expected = expected_observation_config
         if expected is None:
             expected = getattr(env, 'observation_config', None)
         self.model = RslPredictionModel(checkpoint, device=device, input_schema=input_schema,
-                                        expected_observation_config=expected)
+                                        expected_observation_config=expected,
+                                        expected_backend_identity=BACKEND_IDENTITY,
+                                        allow_backend_transfer=allow_backend_transfer)
         self.input_schema = input_schema
         self.observation_config = self.model.field_observation_config
         self.num_envs = int(getattr(env, 'num_envs', 1))

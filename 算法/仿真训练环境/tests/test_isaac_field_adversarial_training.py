@@ -1,5 +1,6 @@
 """Closed-loop orchestration tests with fake simulator and trainer dependencies."""
 from types import SimpleNamespace
+import json
 
 import numpy as np
 
@@ -127,3 +128,13 @@ def test_round_scores_teacher_layout_then_trains_student_and_saves_summary(tmp_p
     assert result["teacher_rollouts"][0]["final_distance"] == 0.75
     assert result["student_episodes"] == [{"mode": "goto", "return": 3.0}]
     assert (tmp_path / "round_summary.json").is_file()
+    protocol = json.loads((tmp_path / "protocol.json").read_text(encoding="utf-8"))
+    assert protocol["target_student_backend_identity"] == {
+        "simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl",
+    }
+    assert protocol["teacher"]["runtime_identity"] == {
+        "simulator": "gymnasium", "physics_backend": "none", "learning_backend": "rsl_rl",
+    }
+    assert protocol["teacher"]["evaluator_kind"] == "test_or_custom_score_callback"
+    assert protocol["teacher"]["student_physx_evaluated"] is False
+    assert result["student_physx_evaluated"] is False

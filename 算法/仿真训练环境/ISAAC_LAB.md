@@ -1,5 +1,21 @@
 # Isaac Lab 项目状态
 
+## 2026-10-24：Isaac Sim 迁移验收小流程完成
+
+当前工作区为 Windows 11 ARM64 / NVIDIA N1X，分支 `feat/isaacsim-training`，基于 main `a9b78d25`。用户授权将所有新训练迁至 Isaac Sim。此平台不在官方支持范围内；官方CPU vendor checker失败。本机以 CPython 3.12.14 的 x64 ABI 模拟运行，属于实验兼容路径，不是认证兼容性或受支持配置。
+
+运行环境已安装在 `C:/pioneer/isaac-training/.venv`，`pip check`真实exit 0。Isaac Lab源码固定在 `5870804e4f6aee57bdef68d59f67d328b990d1e1`；实际发行包版本为 `isaaclab 28.0.0`、`isaaclab_physx 8.0.0`、`rsl-rl-lib 5.5.1`、`isaacsim 6.2.0.0`、`torch 2.11.0+cu130`。Windows安装与启动脚本已就绪；上游源码和锁文件未修改。
+
+本轮CPU回归为431 passed、4 skipped、47 warnings、38.42秒、真实exit 0；4项skip包含native/legacy gating，不能算作通过。官方CLI专项28项与Kitless camera专项26项均真实exit 0。完整日志在 `C:\pioneer\isaac-training\logs\cpu_union_final_cli_20261024\stdout.txt`；退出码在同目录 `exit_code.txt`。
+
+[native field-a10](results/isaac_field_diagnosis/isaacsim_migration_20261024/native/field-a10.json)以2个环境、每场2株植物运行64步，五路传感流均有效；每world有12条负重轮及2条导向轮PhysX mimic关系，共14条。实测约束位置残差最大0.000192225 rad，50 ms控制间隔平均角速度残差0.00390649 rad/s；瞬时角速度残差峰值1.809823 rad/s仍按原始观测记录、未校准。车轮执行器受2 Nm限幅。该小场景不代表完整连续履带、土壤接触或控制性能通过。
+
+[native training-a02](results/isaac_field_improvement/isaacsim_migration_20261024_smoke_a02/result.json)使用2环境、512维LSTM及16步rollout，仅为流程烟测：fresh运行32 transitions/Adam step 2，严格续训累计64 transitions/Adam step 4，显式`weights_transfer`新任务重置为32 transitions/Adam step 2；4步eager、scripted和保存重载序列输出误差为0。注册默认rollout仍为128步。[官方CLI零迭代验证](results/isaac_field_diagnosis/isaacsim_migration_20261024/native/official-cli-a01-process.json)使用100 m默认场景、2环境和RTX camera启动并保存`model_0.pt`，真实exit 0；CPU安全读回确认`num_timesteps=0`，没有梯度更新。
+
+MapDesigner的官方RSL teacher已在CPU上验证64 transitions、8 episodes，并有fixture evaluator；真实PhysX student闭环尚未验证，实现支持接入真实student。未跑196608步完整训练、400 plants或rough-terrain规模；不宣称整田导航、实车控制效果或FPS。所有新训练身份为`isaac_sim/physx/rsl_rl`；Newton/SB3新训练入口拒绝旧后端，历史SB3 ZIP仅保留显式读取、不转为RSL检查点。历史协议、源码快照、模型与成绩保持原字节。原automation继续PAUSED。第二十批从1/5推进至2/5：本次迁移验收小流程计一项feature。
+
+## 历史状态（截至 2026-10-22；以下各节保留其当时数据）
+
 2026-10-22 当前控制修复在 `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`、`fix/rsl-goal-convergence`，基于 main `28bca570`。本轮既有实验使用 Newton MJWarp；用户已明确授权后续训练与仿真全部迁入 Isaac Sim。当前无 Newton 仿真运行，后续不追加 Newton 训练段；独立环境兼容性准备尚未迁移或通过。首轮正式 RSL 实验 `results/isaac_field_improvement/rsl_goal_convergence_20261022_attempt1/` 已完成 16×128×128=262144 步，训练与完整开发评估均真实 exit 0；模型 `model_127.pt` SHA `2c0041a23b0227d15db792fed4682b77cc539a2597c6fa1cc6b51f661d65d902`，37 个 Adam 状态均 step 2560，全部参数有限。固定近距开发集 87010–87025 为 0/16 干净成功、15 次超时、1 次 `outside_or_overturned`，左右履带换向总计 577 次，平均终距 10.7826m。零损伤、零碰撞来自空场，不构成安全导航改善；课程控制器已记录未通过、未晋级，不继续沿用这个失败方案。
 
 该轮 57 源快照、协议、零步模型与所有检查点/原始成绩保持原字节。协议 SHA `5865c4f9e286bbee81e7547b6d32f0e586f51e5bd1584abe7399891c2f4f6953`；真实零步模型 SHA `6a846568fb7947aa1e85ee1f37dc39c65eec18db40ca12485e1b50f5acc848e6`。先前 512 步模型仅为迁移烟测；用户后续实测转圈的 frame1203 原始观测、循环状态与动作已保存，CPU 重放误差为 0。独立 CPU 回归为 635 passed/23 skipped，真实 exit 0，属于接口回归而非控制验收。
@@ -39,7 +55,7 @@ CPU全套pytest真实exit0：585 passed、23 skipped、55 warnings、31.52s（CU
 
 旧奖励512实验的原始启动、源码、测试和首检查点记录保存在 `results/project_history/lstm512_experiment_20261020/`，真实停止及末检查点CPU记录在 `results/project_history/fast_stop_objective_20261020/`。当前新实验不迁移旧权重，两种奖励/停车规则的成绩不得混算。自动定时任务继续暂停。
 
-## 当前车辆与控制链
+## 历史车辆与控制链（Newton MJWarp快照）
 
 项目活动训练使用本地 Isaac Lab、Newton MJWarp 和官方 RSL-RL；SB3-Contrib RecurrentPPO 仅保留历史兼容。车体、轮子和云台使用轻量代理，原14个负重轮执行器各保持2 Nm限幅；没有车体速度伺服或手写规划器替代策略。物理步长1 ms，每50个子步执行一次策略，摩擦系数0.8，P=0.04、侧积分Ki=0.1。以上参数仍需实车标定。
 
@@ -58,7 +74,7 @@ CPU全套pytest真实exit0：585 passed、23 skipped、55 warnings、31.52s（CU
 
 这是带抬高轮的离散接触代理，还没有连续履带斜段、张紧机构、土壤变形或完整实车单电机传动模型。不能把“导向轮会转、能够碰到台阶”直接等同于已经具备真实履带的翻越能力。
 
-## 当前任务与网络
+## 历史任务与网络（Newton MJWarp快照）
 
 当前新任务是：零植物、零独立岩石、崎岖连续地形、全场随机起点/朝向/目标，训练安全到点和车身稳定。`random_rough` 配置100×100 m、地形幅值预算0.35 m、波长4–10 m、60秒回合、4环境、seed69009、新初始化196608步。每次运行固定一份物理地形，每回合重新采样起点、朝向和目标；开发配对分别使用80003/80004两份地形和87001–4/82001–4开发种子。830xx仍未观察。
 
@@ -92,7 +108,7 @@ CPU全套pytest真实exit0：585 passed、23 skipped、55 warnings、31.52s（CU
 
 用户已关闭定时任务，原生automation保持PAUSED。更早运行日志、逐批整理和旧命令仍保存在results及归档；本轮整理前的三份主文档原字节及SHA清单在 [docs_before](results/project_history/front_guide_coupled_cleanup_20261020/docs_before/manifest.json)，历史“正在运行/当前”等描述仅属于当时时点。
 
-## TRAIN-01：感知契约升级与训练验收方案
+## 历史 TRAIN-01：感知契约升级与训练验收方案
 
 状态：前期离线方案已落实为生产消费桥、真实检查点CPU回放及独立QA门槛，通过后按新授权恢复原仿真控制组。用户确认位置范围保留0.4 m，先严格停稳：真实水平XY速度<0.05 m/s、完整车体角速度模长<0.1 rad/s，连续0.5 s，最终朝向不限。LSTM保持512维。下文保留旧基线与后续新观测实验的差异，当前实现与命令见本节末“已落地与运行证据”。整车指标由项目根README维护，组织状态由项目根项目协作.md维护。
 

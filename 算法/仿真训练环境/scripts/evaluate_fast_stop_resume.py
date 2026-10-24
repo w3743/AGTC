@@ -438,7 +438,8 @@ def _evaluate_checkpoint(output: Path, cfg, checkpoint: Path, label: str,
                          profile_physics_contract: dict,
                          goal_objective_contract: dict) -> dict[str, Any]:
     """Use fresh's real evaluator with a local adapter for per-step root speeds."""
-    from isaac_field.env import SingleFieldAdapter, make_env
+    from isaac_field.env import SingleFieldAdapter
+    from isaac_field.runtime import create_env
     from isaac_field.learning import evaluate_model
     from scripts import improve_isaac_policy as improve
     from scripts import train_isaac_foundation_fresh as fresh
@@ -493,7 +494,7 @@ def _evaluate_checkpoint(output: Path, cfg, checkpoint: Path, label: str,
     front_guide_spec, body_stability_config = fresh._rough_profile_components(
         fresh.PROFILE_RANDOM_ROUGH_FAST_STOP
     )
-    engine = make_env(
+    engine = create_env(
         cfg=eval_cfg, mode="goto", num_envs=1, seed=environment_seed,
         auto_reset=False, goal_distance=None, goal_angle=angle, distance_cost=0.0,
         front_guide_spec=front_guide_spec,
@@ -506,6 +507,7 @@ def _evaluate_checkpoint(output: Path, cfg, checkpoint: Path, label: str,
         report = evaluate_model(
             adapter, checkpoint, seeds, goal_distance=None, goal_angle=angle,
             mode="goto", deterministic=True, device=device, record_trajectories=True,
+            legacy_sb3=Path(checkpoint).suffix.lower() == ".zip",
         )
         traces = adapter.finish_traces()
     finally:
@@ -541,6 +543,13 @@ def run_evaluation(control: Path, output: Path, *, device: str = "cuda:0") -> di
     if output.exists():
         raise FileExistsError(f"refusing to overwrite evaluation output: {output}")
     verified = validate_completed_trial(control)
+    if (Path(verified["baseline"]["path"]).suffix.lower() == ".zip"
+            or Path(verified["final"]["path"]).suffix.lower() == ".zip"):
+        raise RuntimeError(
+            "this frozen evaluation is pinned to Newton-era SB3 ZIP checkpoints; "
+            "it cannot sample them in the current Isaac Sim PhysX environment without "
+            "creating a new, explicitly identified cross-simulator evaluation protocol"
+        )
     control = verified["control"]
     output = _workspace_path(output, label="evaluation output")
     if output.exists():

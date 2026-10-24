@@ -50,7 +50,7 @@ def test_launch_preflight_refuses_nonprepared_status(tmp_path):
     (tmp_path / "run_status.json").write_text('{"status":"running"}', encoding="utf-8")
     try:
         preflight(tmp_path)
-    except FileExistsError as exc:
-        assert "refusing to launch" in str(exc)
+    except ValueError as exc:
+        assert "unchanged prepared run" in str(exc)
     else:
         raise AssertionError("launch must refuse an already-started output directory")

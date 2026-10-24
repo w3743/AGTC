@@ -1,8 +1,7 @@
-"""Freeze and run controlled, instrumented foundation experiments.
+"""Freeze and run controlled, instrumented Isaac Sim RSL-RL experiments.
 
-One native SimulationContext is open at a time. Training, mastery probes and
-the fixed global selection suite use separate contexts and explicit seeds.
-No scheduler, viewer deployment, reward shaping or privileged actor inputs.
+One Kit runtime is held across stages, mastery probes, and selection suites.
+Training updates use Isaac Lab's official RSL-RL ``OnPolicyRunner``.
 """
 from __future__ import annotations
 
@@ -31,13 +30,13 @@ from isaac_field.curriculum_control import (
 )
 from isaac_field.task import Config, state_fields_for_schema
 
-SCHEMA = "isaac-field-mastery-experiment-v1"
+SCHEMA = "isaac-field-mastery-experiment-v2"
 CONTRACT_KEYS = (
     "action_config", "drive_config", "observation_config", "damage_config",
     "damage_metric", "distance_cost", "goal_distance", "goal_angle_rad",
     "mode", "deterministic", "evaluation_config",
 )
-DEFAULT_OUTPUT = ROOT / "results/isaac_field_improvement/mastery_method_20261020"
+DEFAULT_OUTPUT = ROOT / "results/isaac_field_improvement/isaacsim_physx_rsl_mastery_20261024"
 PROFILE_LEGACY = "legacy"
 PROFILE_FAST_STOP_512 = "fast_stop_512"
 PROFILES = (PROFILE_LEGACY, PROFILE_FAST_STOP_512)
@@ -72,6 +71,10 @@ def _append(path: Path, value: dict) -> None:
 def _sources() -> tuple[str, ...]:
     return tuple(sorted(set(foundation._source_paths()) | {
         "scripts/train_isaac_mastery.py", "scripts/run_isaac_mastery.sh",
+        "isaac_field/runtime.py", "isaac_field/env.py", "isaac_field/assets.py",
+        "isaac_field/scene_assets.py", "isaac_field/physx_drive.py",
+        "isaac_field/learning.py", "isaac_field/policy_contract.py",
+        "isaac_field/rsl_rl_cfg.py", "isaac_field/rsl_rl_policy.py", "isaac_field/rsl_rl_inference.py",
     }))
 
 
@@ -100,7 +103,7 @@ def _policy_architecture(profile: str, input_schema: str) -> dict | None:
     """
     if input_schema == INPUT_SCHEMA:
         return dict(FAST_STOP_512_ARCHITECTURE) if profile == PROFILE_FAST_STOP_512 else None
-    from isaac_field.policy import _encoder_schema_for_input
+    from isaac_field.policy_contract import _encoder_schema_for_input
 
     architecture = (
         dict(FAST_STOP_512_ARCHITECTURE)
@@ -346,7 +349,8 @@ def prepare(output: Path, *, method: str = "mastery", profile: str = PROFILE_LEG
         "input_schema": input_schema, "config": asdict(cfg),
         "stages": stages, "budget": budget, "block_steps": block_steps,
         "initialization": {"seed": 96_001, "num_timesteps": 0,
-                           "source": "new random policy and Adam; no trained checkpoint"},
+                           "source": "new random RSL-RL actor/critic and optimizer; no trained checkpoint",
+                           "cross_task_checkpoint_policy": "weights transfer with reset optimizer and local timestep count; parent contract/hash recorded"},
         "hyperparameters": {"n_steps": 128, "batch_size": 128, "n_epochs": 5,
                             "learning_rate": 3e-4, "gamma": gamma, "gae_lambda": gae_lambda,
                             "log_std_init": -2.0, "target_kl": 0.03,
@@ -383,6 +387,9 @@ def prepare(output: Path, *, method: str = "mastery", profile: str = PROFILE_LEG
         _validate_profile_protocol(protocol)
     elif input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
         _validate_profile_protocol(protocol)
+    from isaac_field.policy_contract import stamp_backend_identity
+
+    stamp_backend_identity(protocol)
     _json(output / "protocol.json", protocol)
     _json(output / "run_status.json", {"status": "prepared", "num_timesteps": 0,
           "protocol_sha256": foundation._sha256(output / "protocol.json")})
@@ -398,6 +405,9 @@ def preflight(output: Path) -> dict:
         raise ValueError("only a prepared, never-launched mastery experiment may launch")
     if status["protocol_sha256"] != foundation._sha256(output / "protocol.json"):
         raise ValueError("prepared protocol hash changed")
+    from isaac_field.policy_contract import require_backend_identity
+
+    require_backend_identity(protocol)
     _validate_profile_protocol(protocol)
     verify_sources(output, protocol)
     if protocol["action_config"] != foundation._action_config():
@@ -431,7 +441,7 @@ def _attach_probe(report: dict, *, purpose: str, stage: str) -> dict:
 
 def _open_env(output: Path, protocol: dict, stage: dict, *, training: bool, seed: int,
               task_config: dict | None = None):
-    from isaac_field.env import make_env
+    from isaac_field.runtime import create_env
 
     verify_sources(output, protocol)
     input_schema = protocol.get("input_schema", protocol["config"].get("input_schema", INPUT_SCHEMA))
@@ -450,12 +460,12 @@ def _open_env(output: Path, protocol: dict, stage: dict, *, training: bool, seed
             foundation.PROFILE_RANDOM_ROUGH_FAST_STOP)
         physical_kwargs.update(front_guide_spec=front_guide_spec,
                                body_stability_config=body_stability_config)
-    engine = make_env(cfg=cfg, mode=stage["mode"], num_envs=4 if training else 1,
+    engine = create_env(cfg=cfg, mode=stage["mode"], num_envs=4 if training else 1,
                       seed=seed, auto_reset=training,
                       goal_distance=(None if stage["goal_distance"] is None
                                      else tuple(stage["goal_distance"])),
                       goal_angle=stage["goal_angle"], distance_cost=0.0,
-                      **physical_kwargs)
+                      rsl=True, **physical_kwargs)
     try:
         if input_schema == INPUT_SCHEMA:
             foundation._live_environment_contract(engine)
@@ -656,6 +666,13 @@ def _select_best(protocol: dict, candidate: dict, best: dict) -> dict:
 
 
 def launch(output: Path, *, device: str = "cuda:0") -> dict:
+    from isaac_field.runtime import launch_app
+
+    with launch_app(device=device, headless=True):
+        return _launch_workflow(output, device=device)
+
+
+def _launch_workflow(output: Path, *, device: str = "cuda:0") -> dict:
     protocol = preflight(output)
     # Runtime-only device is recorded separately, never mutate the frozen file.
     protocol["device"] = device
@@ -668,49 +685,36 @@ def launch(output: Path, *, device: str = "cuda:0") -> dict:
 
     status("initializing")
     try:
-        from isaac_field.policy import make_model
-        from isaac_field.training import _sb3_wrapper
         from isaac_field.learning import train_stage
-        from isaac_field.training_diagnostics import make_sb3_diagnostics_callback
+        from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
 
         stages = protocol["stages"]
         hp = protocol["hyperparameters"]
-        baseline = output / "untrained_baseline.zip"
+        baseline = output / "untrained_baseline.pt"
         env = _open_env(output, protocol, stages[0], training=True,
                         seed=protocol["initialization"]["seed"])
         try:
-            architecture = protocol.get("policy_architecture", {})
-            architecture_kwargs = {
-                key: architecture[key]
-                for key in ("lstm_hidden_size", "n_lstm_layers")
-                if key in architecture
-            }
             input_schema = protocol.get("input_schema", INPUT_SCHEMA)
             observation_config = env.observation_config
             if input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA and not _complete_observation_config(observation_config):
                 raise ValueError("absolute-goal initialization requires a complete observation_config")
             if not _complete_observation_config(observation_config):
                 observation_config = None
-            model_kwargs = {
-                "seed": protocol["initialization"]["seed"],
-                "device": device,
-                "input_schema": input_schema,
-                **hp,
-                **architecture_kwargs,
-            }
-            if observation_config is not None:
-                model_kwargs["observation_config"] = observation_config
-            model = make_model(_sb3_wrapper(env), **model_kwargs)
-            model.field_drive_config = dict(env.drive_config)
-            model.field_observation_config = dict(env.observation_config)
-            model.field_damage_config = dict(env.tasks[0].damage_config)
-            model.save(str(baseline))
-            _json(output / "initialization.json", {"num_timesteps": model.num_timesteps,
-                  "policy_tensor_sha256": _policy_digest(model),
-                  "checkpoint_sha256": foundation._sha256(baseline),
-                  "optimizer_state_entries": len(model.policy.optimizer.state),
-                  "initialization_seed": protocol["initialization"]["seed"]})
-            del model
+            initialized = train_stage(
+                env, None, 0, baseline,
+                seed=protocol["initialization"]["seed"], device=device,
+                input_schema=input_schema, **hp,
+            )
+            contract = initialized.model.field_policy_contract
+            _json(output / "initialization.json", {
+                "num_timesteps": 0,
+                "checkpoint_sha256": foundation._sha256(baseline),
+                "initialization_seed": protocol["initialization"]["seed"],
+                "field_policy_contract": contract,
+                "optimizer_state_present": "optimizer_state_dict" in load_rsl_checkpoint_payload(baseline),
+                "backend_identity": {key: contract[key] for key in
+                                     ("simulator", "physics_backend", "learning_backend")},
+            })
         finally:
             env.close()
         status("initial_probes")
@@ -741,20 +745,24 @@ def launch(output: Path, *, device: str = "cuda:0") -> dict:
             status("training", sampled_stage=stage["name"], planned_timesteps=block_steps)
             env = _open_env(output, protocol, stage, training=True,
                             seed=protocol["training_seed_base"] + block_index)
+            source_checkpoint_sha256 = foundation._sha256(checkpoint)
             try:
-                callback = make_sb3_diagnostics_callback(output / "diagnostics.jsonl", stage=stage["name"],
-                              info_provider=lambda: env.diagnostic_step_infos)
+                source_payload = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")
+                source_steps = int(source_payload.get("num_timesteps", 0))
+                weights_transfer = source_payload["field_policy_contract"].get("task_config") != asdict(env.field_cfg)
                 result = train_stage(env, checkpoint, block_steps,
-                    output / "checkpoints" / f"steps_{consumed + block_steps:07d}_{stage['name']}.zip",
+                    output / "checkpoints" / f"steps_{consumed + block_steps:07d}_{stage['name']}.pt",
                     seed=protocol["training_seed_base"] + block_index,
-                    device=device, callback=callback, input_schema=input_schema, **hp)
+                    device=device, input_schema=input_schema,
+                    weights_transfer=weights_transfer, **hp)
                 actual_sampling = {"mode": env.cfg.mode,
                     "goal_distance": list(env.cfg.goal_distance), "goal_angle": env.cfg.goal_angle,
                     "plants": env.field_cfg.plants}
             finally:
                 env.close()
-            if result.trained_timesteps != block_steps or result.total_timesteps != consumed + block_steps:
-                raise RuntimeError("actual SB3 timestep count differs from the frozen global budget")
+            expected_segment_steps = (block_steps if weights_transfer else source_steps + block_steps)
+            if result.trained_timesteps != block_steps or result.total_timesteps != expected_segment_steps:
+                raise RuntimeError("actual RSL timestep count differs from the stage's continuation/transfer contract")
             consumed += result.trained_timesteps
             checkpoint = result.checkpoint
             if protocol["method"] == "mastery":
@@ -764,7 +772,11 @@ def launch(output: Path, *, device: str = "cuda:0") -> dict:
                 decision = {"probe_due": True, "active_stage": stage, "active_stage_index": stages.index(stage)}
             blocks.append({"plan": plan, "actual_sampling": actual_sampling,
                            "checkpoint": str(checkpoint), "sha256": foundation._sha256(checkpoint),
-                           "num_timesteps": consumed})
+                           "num_timesteps": consumed,
+                           "checkpoint_segment_timesteps": result.total_timesteps,
+                           "weights_transfer": weights_transfer,
+                           "parent_checkpoint_sha256": source_checkpoint_sha256,
+                           "optimizer_state": "reinitialized" if weights_transfer else "resumed"})
             promoted = False
             did_probe = decision["probe_due"]
             if decision["probe_due"]:
@@ -798,6 +810,8 @@ def launch(output: Path, *, device: str = "cuda:0") -> dict:
                 break
         summary = {"schema": SCHEMA, "method": protocol["method"],
             "profile": protocol.get("profile", PROFILE_LEGACY), "num_timesteps": consumed,
+            "simulator": protocol["simulator"], "physics_backend": protocol["physics_backend"],
+            "learning_backend": protocol["learning_backend"],
             "input_schema": protocol.get("input_schema", INPUT_SCHEMA),
             "budget": protocol["budget"], "latest_checkpoint": str(checkpoint),
             "best_checkpoint": str(best_checkpoint), "best_checkpoint_sha256": foundation._sha256(best_checkpoint),

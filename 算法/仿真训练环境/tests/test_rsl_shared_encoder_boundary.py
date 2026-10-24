@@ -7,9 +7,9 @@ import sys
 from pathlib import Path
 
 import gymnasium as gym
+import pytest
 import torch
 
-from isaac_field.policy import SensorEncoder as LegacySensorEncoder
 from isaac_field.policy_contract import OBSERVATION_SHAPES
 from isaac_field.sensor_encoder import SensorEncoderCore
 
@@ -37,6 +37,12 @@ def _observation(batch: int = 2) -> dict[str, torch.Tensor]:
 
 
 def test_torch_core_loads_legacy_encoder_tensors_and_matches_outputs():
+    pytest.importorskip(
+        "stable_baselines3",
+        reason="the compatibility side of this encoder test requires the optional legacy SB3 extra",
+    )
+    from isaac_field.policy import SensorEncoder as LegacySensorEncoder
+
     space = _observation_space()
     legacy = LegacySensorEncoder(space, cache_inference=False).cpu().eval()
     core = SensorEncoderCore(space, cache_inference=False).cpu().eval()

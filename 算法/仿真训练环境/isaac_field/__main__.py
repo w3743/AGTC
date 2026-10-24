@@ -1,6 +1,7 @@
 """One Isaac Lab backend, with task-specific train/evaluate/view commands."""
 import argparse
 import importlib
+import os
 import sys
 from dataclasses import asdict
 import json
@@ -26,25 +27,35 @@ def _checkpoint_argument(argv: list[str]) -> str | None:
 
 def _reject_zip_for_rsl(argv: list[str], *, command: str) -> None:
     checkpoint = _checkpoint_argument(argv)
-    if checkpoint and Path(checkpoint).suffix.lower() == ".zip":
+    if checkpoint and Path(checkpoint).suffix.lower() != ".pt":
         raise SystemExit(
-            f"{command} uses the official RSL-RL backend and cannot load an SB3 .zip; "
-            "use the explicit train-sb3/evaluate --legacy-sb3 path for legacy checkpoints"
+            f"{command} uses the official RSL-RL backend and requires a native .pt checkpoint; "
+            "legacy SB3 .zip checkpoints are replay/evaluation artifacts only"
         )
 
 
 def _run_official_rsl_cli(arguments: list[str]) -> int:
+    # isaaclab_rl imports KitLauncher, which bootstraps Isaac Sim during module
+    # import. Accept the upstream EULA before importing that entrypoint.
+    os.environ.setdefault("OMNI_KIT_ACCEPT_EULA", "YES")
+    is_help = any(token in ("-h", "--help") for token in arguments)
+    if os.environ.get("ISAAC_FIELD_DISABLE_NATIVE_RUNTIME") == "1" and not is_help:
+        raise RuntimeError("native runtime is disabled for this CPU-only process")
+
+    from .runtime import _prepare_official_rsl_cli_arguments
+
+    prepared_arguments = _prepare_official_rsl_cli_arguments(arguments)
     from isaaclab_rl.entrypoints import run_train_cli
 
-    return run_train_cli(["--rl_library", "rsl_rl", "--task", RSL_TASK, *arguments])
+    return run_train_cli(["--rl_library", "rsl_rl", "--task", RSL_TASK, *prepared_arguments])
 
 
 def _run_official_rsl_resume(arguments: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="isaac_field resume", add_help=False)
     parser.add_argument("--checkpoint", required=True)
     parsed, remaining = parser.parse_known_args(arguments)
-    if Path(parsed.checkpoint).suffix.lower() == ".zip":
-        parser.error("SB3 .zip checkpoints require the explicit train-sb3 legacy command")
+    if Path(parsed.checkpoint).suffix.lower() != ".pt":
+        parser.error("resume requires a native RSL-RL .pt checkpoint; SB3 .zip is legacy-only")
     return _run_official_rsl_cli(["--checkpoint", parsed.checkpoint, *remaining])
 
 
@@ -163,7 +174,7 @@ def main():
         return _run_official_rsl_resume(sys.argv[2:])
     parser=argparse.ArgumentParser(description='Isaac Lab agricultural robot')
     parser.add_argument('command',choices=['viewer','smoke','train','resume','train-sb3',
-                                           'evaluate','adversary-sb3'])
+                                           'evaluate','adversary','adversary-sb3'])
     parser.add_argument('--seed',type=int,default=None)
     parser.add_argument('--episode-seed',type=int,default=None,
                         help='Viewer reset seed, independent of --seed; explicit values repeat the same episode on Reset')
@@ -186,6 +197,8 @@ def main():
     parser.add_argument('--checkpoint')
     parser.add_argument('--legacy-sb3',action='store_true',
                         help='explicitly enable an SB3 .zip viewer/evaluation path')
+    parser.add_argument('--weights-transfer', action='store_true',
+                        help='explicitly initialize a new RSL trial from compatible checkpoint weights')
     parser.add_argument('--launch',action='store_true',
                         help='launch a checkpoint viewer after its preflight check')
     parser.add_argument('--smoke', action='store_true',
@@ -201,6 +214,13 @@ def main():
     parser.add_argument('--goal-distance',type=float,nargs=2)
     parser.add_argument('--goal-angle',type=float,default=180.,help='Goal bearing range in degrees')
     args=parser.parse_args()
+    if args.command in ('train-sb3', 'adversary-sb3'):
+        parser.error(
+            "new training is available only through the official Isaac Lab RSL-RL runner; "
+            "SB3 .zip artifacts remain legacy-only for explicitly requested replay/evaluation"
+        )
+    if args.weights_transfer and args.command != 'adversary':
+        parser.error('--weights-transfer is only valid for adversary checkpoint initialization')
     if args.command == 'viewer' and args.checkpoint:
         extension = Path(args.checkpoint).suffix.lower()
         if extension == '.pt':
@@ -224,11 +244,6 @@ def main():
             args.command == 'viewer' and args.checkpoint
             and Path(args.checkpoint).suffix.lower() == '.zip'):
         parser.error('--legacy-sb3 is only valid with viewer/evaluate checkpoint commands')
-    if args.command == 'adversary-sb3' and (
-            not args.checkpoint or Path(args.checkpoint).suffix.lower() != '.zip'):
-        parser.error('adversary-sb3 requires an explicit SB3 .zip checkpoint')
-    if args.command == 'train-sb3' and args.checkpoint and Path(args.checkpoint).suffix.lower() != '.zip':
-        parser.error('train-sb3 accepts only an SB3 .zip checkpoint; RSL resume uses the resume command')
     if args.launch and args.command != 'viewer':
         parser.error('--launch is only valid with viewer')
     if args.smoke and args.command != 'evaluate':
@@ -263,6 +278,45 @@ def main():
     if args.body_stability:
         from .body_stability import BodyStabilityConfig
         body_stability_config = BodyStabilityConfig()
+    if args.command == 'adversary':
+        if not args.checkpoint:
+            parser.error('adversary requires --checkpoint <Isaac Sim PhysX RSL .pt student policy>')
+        if Path(args.checkpoint).suffix.lower() != '.pt':
+            parser.error('adversary accepts only an RSL .pt student checkpoint; SB3 .zip is legacy-only')
+        from .runtime import create_env, launch_app
+        from .adversarial_training import run_round
+
+        with launch_app(device='cuda:0', headless=True):
+            env = create_env(
+                cfg=cfg,
+                mode=args.mode,
+                num_envs=1,
+                seed=args.seed,
+                auto_reset=False,
+                goal_distance=tuple(args.goal_distance) if args.goal_distance else None,
+                goal_angle=np.deg2rad(args.goal_angle),
+                distance_cost=0.0,
+                front_guide_spec=front_guide_spec,
+                body_stability_config=body_stability_config,
+                rsl=True,
+            )
+            try:
+                result = run_round(
+                    env,
+                    args.checkpoint,
+                    output,
+                    teacher_steps=args.teacher_steps,
+                    student_steps=args.steps,
+                    seed=args.seed,
+                    goal_distance=tuple(args.goal_distance) if args.goal_distance else (1.0, 3.0),
+                    goal_angle=np.deg2rad(args.goal_angle),
+                    student_device=args.policy_device,
+                    weights_transfer=args.weights_transfer,
+                )
+            finally:
+                env.close()
+        print(json.dumps(_json_safe(result), indent=2), flush=True)
+        return 0
     single=args.command in ('viewer','evaluate','adversary-sb3')
     env=make_env(cfg,args.mode,1 if single else args.envs,args.seed,not single,
                  goal_distance=tuple(args.goal_distance) if args.goal_distance else None,
@@ -334,7 +388,8 @@ def main():
             from .learning import evaluate_model
             result=evaluate_model(SingleFieldAdapter(env),args.checkpoint,list(range(100007,100017)),
                 goal_distance=tuple(args.goal_distance) if args.goal_distance else None,
-                goal_angle=np.deg2rad(args.goal_angle),mode=args.mode,device=args.policy_device)
+                goal_angle=np.deg2rad(args.goal_angle),mode=args.mode,device=args.policy_device,
+                legacy_sb3=bool(args.legacy_sb3))
             (output/'evaluation.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
             print(json.dumps(result,indent=2))
         else:

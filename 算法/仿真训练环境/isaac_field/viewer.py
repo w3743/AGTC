@@ -1,7 +1,7 @@
 """Task controls and policy monitoring for Isaac Lab's official Viser viewer.
 
 This module extends the Viser sidebar and adds a separate policy-layer display;
-Isaac Lab/Newton remains responsible for rendering the scene and robot. GUI callbacks enqueue requests because Viser
+Isaac Lab remains responsible for rendering the scene and robot. GUI callbacks enqueue requests because Viser
 callbacks run outside the simulation-owner thread. Call ``process_pending`` and
 ``step_once`` (or ``run``) from the thread that owns the environment.
 """

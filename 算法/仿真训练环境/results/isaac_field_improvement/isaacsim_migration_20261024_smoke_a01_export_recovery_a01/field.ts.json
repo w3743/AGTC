@@ -1,0 +1,400 @@
+{
+  "schema": "isaac-field-rsl-torchscript-export-v1",
+  "simulator": "isaac_sim",
+  "physics_backend": "physx",
+  "learning_backend": "rsl_rl",
+  "source_checkpoint": "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\isaacsim_migration_20261024_smoke_a01\\stage_03.pt",
+  "source_checkpoint_sha256": "824b9c5f1386642b1de93fa4185e773c429f93ba1f1be7c253ef81377d37e4c7",
+  "field_policy_contract": {
+    "format": "agtc.rsl_rl.field_policy",
+    "version": 1,
+    "input_schema": "sensor-absolute-goal-v1",
+    "lstm": {
+      "type": "lstm",
+      "hidden_dim": 512,
+      "num_layers": 1,
+      "actor_critic_separate": true
+    },
+    "action_config": {
+      "schema": "direct-track-speed-v1",
+      "components": [
+        "left_track_speed",
+        "right_track_speed",
+        "gimbal_yaw_rate",
+        "gimbal_pitch_rate"
+      ],
+      "normalized_range": [
+        -1.0,
+        1.0
+      ]
+    },
+    "observation_config": {
+      "schema": "sensor-absolute-goal-v1",
+      "state_dim": 33,
+      "state_fields": [
+        "mode_0_search_1_goto",
+        "goal_world_x_normalized",
+        "goal_world_y_normalized",
+        "estimated_x_normalized",
+        "estimated_y_normalized",
+        "heading_sin",
+        "heading_cos",
+        "previous_left_track_speed",
+        "previous_right_track_speed",
+        "previous_gimbal_yaw_rate",
+        "previous_gimbal_pitch_rate",
+        "episode_time_ratio",
+        "lidar_age_ratio",
+        "lidar_new_frame",
+        "lidar_motion_dx_over_lidar_range",
+        "lidar_motion_dy_over_lidar_range",
+        "lidar_heading_delta_over_pi",
+        "lidar_gimbal_yaw_delta_over_pi",
+        "lidar_gimbal_pitch_delta_over_pi",
+        "depth_age_ratio",
+        "depth_new_frame",
+        "depth_motion_dx_over_lidar_range",
+        "depth_motion_dy_over_lidar_range",
+        "depth_heading_delta_over_pi",
+        "depth_gimbal_yaw_delta_over_pi",
+        "depth_gimbal_pitch_delta_over_pi",
+        "camera_age_ratio",
+        "camera_new_frame",
+        "camera_motion_dx_over_lidar_range",
+        "camera_motion_dy_over_lidar_range",
+        "camera_heading_delta_over_pi",
+        "camera_gimbal_yaw_delta_over_pi",
+        "camera_gimbal_pitch_delta_over_pi"
+      ],
+      "observation_shapes": {
+        "lidar": [
+          1,
+          400
+        ],
+        "depth": [
+          1,
+          160,
+          88
+        ],
+        "detections": [
+          16,
+          8
+        ],
+        "state": [
+          33
+        ],
+        "feedback": [
+          37
+        ]
+      },
+      "lidar_fields": [
+        "normalized_range"
+      ],
+      "lidar_invalid_value": 0.0,
+      "detection_fields": [
+        "cx",
+        "cy",
+        "width",
+        "height",
+        "class_id",
+        "confidence",
+        "range",
+        "range_valid"
+      ],
+      "detection_presence": "positive width and height",
+      "feedback": {
+        "input_schema": "sensor-absolute-goal-v1",
+        "state_dim": 33,
+        "schema": "gimbal-imu-drive-feedback-v2",
+        "dimension": 37,
+        "value_dimension": 21,
+        "value_order": [
+          "云台IMU加速度X / 9.80665（g）",
+          "云台IMU加速度Y / 9.80665（g）",
+          "云台IMU加速度Z / 9.80665（g）",
+          "云台IMU角速度X / π（rad/s）",
+          "云台IMU角速度Y / π（rad/s）",
+          "云台IMU角速度Z / π（rad/s）",
+          "磁场X计数 / 32768",
+          "磁场Y计数 / 32768",
+          "磁场Z计数 / 32768",
+          "云台IMU姿态四元数X",
+          "云台IMU姿态四元数Y",
+          "云台IMU姿态四元数Z",
+          "云台IMU姿态四元数W",
+          "云台偏航关节角 / π（rad）",
+          "云台偏航关节速率 / π（rad/s）",
+          "云台俯仰关节角 / π（rad）",
+          "云台俯仰关节速率 / π（rad/s）",
+          "左侧等效Iq / 100（A）",
+          "左侧机械转速 / 10000（rpm）",
+          "右侧等效Iq / 100（A）",
+          "右侧机械转速 / 10000（rpm）"
+        ],
+        "valid_order": [
+          "accel",
+          "gyro",
+          "mag",
+          "attitude",
+          "gimbal_yaw",
+          "gimbal_pitch",
+          "motor_left",
+          "motor_right"
+        ],
+        "age_order": [
+          "accel",
+          "gyro",
+          "mag",
+          "attitude",
+          "gimbal_yaw",
+          "gimbal_pitch",
+          "motor_left",
+          "motor_right"
+        ],
+        "group_slices": {
+          "accel": {
+            "start": 0,
+            "stop": 3
+          },
+          "gyro": {
+            "start": 3,
+            "stop": 6
+          },
+          "mag": {
+            "start": 6,
+            "stop": 9
+          },
+          "attitude": {
+            "start": 9,
+            "stop": 13
+          },
+          "gimbal_yaw": {
+            "start": 13,
+            "stop": 15
+          },
+          "gimbal_pitch": {
+            "start": 15,
+            "stop": 17
+          },
+          "motor_left": {
+            "start": 17,
+            "stop": 19
+          },
+          "motor_right": {
+            "start": 19,
+            "stop": 21
+          }
+        },
+        "valid_slice": {
+          "start": 21,
+          "stop": 29
+        },
+        "age_slice": {
+          "start": 29,
+          "stop": 37
+        },
+        "labels": [
+          "云台IMU加速度X / 9.80665（g）",
+          "云台IMU加速度Y / 9.80665（g）",
+          "云台IMU加速度Z / 9.80665（g）",
+          "云台IMU角速度X / π（rad/s）",
+          "云台IMU角速度Y / π（rad/s）",
+          "云台IMU角速度Z / π（rad/s）",
+          "磁场X计数 / 32768",
+          "磁场Y计数 / 32768",
+          "磁场Z计数 / 32768",
+          "云台IMU姿态四元数X",
+          "云台IMU姿态四元数Y",
+          "云台IMU姿态四元数Z",
+          "云台IMU姿态四元数W",
+          "云台偏航关节角 / π（rad）",
+          "云台偏航关节速率 / π（rad/s）",
+          "云台俯仰关节角 / π（rad）",
+          "云台俯仰关节速率 / π（rad/s）",
+          "左侧等效Iq / 100（A）",
+          "左侧机械转速 / 10000（rpm）",
+          "右侧等效Iq / 100（A）",
+          "右侧机械转速 / 10000（rpm）",
+          "有效标记：accel",
+          "有效标记：gyro",
+          "有效标记：mag",
+          "有效标记：attitude",
+          "有效标记：gimbal_yaw",
+          "有效标记：gimbal_pitch",
+          "有效标记：motor_left",
+          "有效标记：motor_right",
+          "数据年龄 / 2秒：accel",
+          "数据年龄 / 2秒：gyro",
+          "数据年龄 / 2秒：mag",
+          "数据年龄 / 2秒：attitude",
+          "数据年龄 / 2秒：gimbal_yaw",
+          "数据年龄 / 2秒：gimbal_pitch",
+          "数据年龄 / 2秒：motor_left",
+          "数据年龄 / 2秒：motor_right"
+        ],
+        "simulation_assumptions": {
+          "name": "simulated-gimbal-imu-drive-feedback-v1",
+          "dt_s": 0.05,
+          "filter_rate_hz": 20.0,
+          "filter": "VQF 2.1.2 online VQF; uses only accelerometer, gyroscope, magnetometer",
+          "acceleration_semantics": "proper acceleration in sensor body frame, m/s^2; zero is valid free-fall data",
+          "magnetometer_semantics": "raw signed counts divided by 32768 for storage/VQF; no uT calibration evidence",
+          "magnetic_reference": "ENU with magnetic north along +Y",
+          "sensor_mount_assumption": "IMU axes aligned with pitch_link; no mount rotation or bias calibration available",
+          "sensor_mount_rot_xyzw": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "gimbal_kinematics": "R_body_sensor = Rz(yaw) * Ry(-pitch); pitch joint positive direction is local -Y",
+          "attitude_source_simulation": "VQF 2.1.2 estimated from noisy accel/gyro/magnetometer only",
+          "attitude_source_hardware": "ATK-IMU901 firmware quaternion is passed through; Euler remains diagnostic-only",
+          "accel_white_noise_std_mps2": 0.025,
+          "accel_episode_bias_std_mps2": 0.05,
+          "gyro_white_noise_std_rad_s": 0.0015,
+          "gyro_episode_bias_std_rad_s": 0.003,
+          "mag_white_noise_std_counts": 12.0,
+          "mag_episode_bias_std_counts": 24.0,
+          "temperature_semantics": "decoded for diagnostics only; excluded from the policy vector and VQF fusion",
+          "gimbal_position_white_noise_std_rad": 0.0005,
+          "gimbal_rate_white_noise_std_rad_s": 0.003,
+          "motor_iq_white_noise_std_A": 0.02,
+          "motor_rpm_white_noise_std_rpm": 1.0,
+          "motor_iq_semantics": "simulation equivalent Iq only when supplied by the explicit actuator-effort model; assumed Kt=0.035 Nm/A and efficiency=1, uncalibrated and not measured current",
+          "timeout_s": 0.25,
+          "age_max_s": 2.0,
+          "value_scaling": {
+            "accel": {
+              "factor": 0.10197162129779283,
+              "unit": "g (m/s^2 divided by 9.80665)"
+            },
+            "gyro": {
+              "factor": 0.3183098861837907,
+              "unit": "rad/s divided by pi"
+            },
+            "mag_counts": {
+              "factor": 3.0517578125e-05,
+              "unit": "raw signed counts / 32768"
+            },
+            "attitude_quaternion": {
+              "factor": 1.0,
+              "unit": "unitless xyzw"
+            },
+            "gimbal_position": {
+              "factor": 0.3183098861837907,
+              "unit": "rad / pi"
+            },
+            "gimbal_rate": {
+              "factor": 0.3183098861837907,
+              "unit": "rad/s / pi"
+            },
+            "motor_iq": {
+              "factor": 0.01,
+              "unit": "A / 100; simulation value is model-equivalent"
+            },
+            "motor_rpm": {
+              "factor": 0.0001,
+              "unit": "mechanical rpm / 10000"
+            },
+            "age": {
+              "factor": 0.5,
+              "unit": "s / age_max_s; bounded, not signal-clipped"
+            }
+          }
+        },
+        "missing_or_expired": "group values are zero and its valid flag is zero; age is bounded"
+      },
+      "feedback_dim": 37,
+      "estimated_pose": {
+        "position_source": "simulated UWB position measurement from plant pose plus Gaussian noise",
+        "position_noise_std_m": 0.025,
+        "sampling": "one independent measurement per unique FieldTask.time using a dedicated episode-seeded RNG",
+        "heading_source": "feedback attitude with measured gimbal inverse kinematics; zero when invalid",
+        "gimbal_source": "feedback measured joint positions; zero when invalid"
+      },
+      "imu_mount_body": "gimbal_pitch_link",
+      "imu_offset_pos_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "imu_offset_rot_xyzw": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "depth_channels": 1,
+      "depth_invalid_value": 0.0,
+      "depth_value_range": [
+        0.0,
+        1.0
+      ],
+      "depth_space_bounds": [
+        -1.0,
+        1.0
+      ],
+      "measured_velocity_indices": [],
+      "heading_source": "sensor_fusion_head_attitude_and_measured_gimbal_inverse",
+      "previous_command_indices": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "previous_command_semantics": "normalized_direct_track_speed_policy_command",
+      "action_components": [
+        "left_track_speed",
+        "right_track_speed",
+        "gimbal_yaw_rate",
+        "gimbal_pitch_rate"
+      ],
+      "absolute_goal_coordinates": {
+        "source": "task.goal",
+        "coordinate_frame": "field_world_xy",
+        "origin_xy_m": [
+          0.0,
+          0.0
+        ],
+        "unit": "m",
+        "field_size_m": 12.0,
+        "normalization": "world_xy / field_size_m * 2 - 1",
+        "state_clip": [
+          -1.0,
+          1.0
+        ]
+      }
+    },
+    "simulator": "isaac_sim",
+    "physics_backend": "physx",
+    "learning_backend": "rsl_rl"
+  },
+  "format": "stateful TorchScript .pt",
+  "inputs": [
+    "lidar",
+    "depth",
+    "detections",
+    "state",
+    "feedback"
+  ],
+  "output": "four clipped normalized direct-track-speed-v1 actions",
+  "reset_method": "reset() clears the single deployed environment's LSTM state",
+  "torch_version": "2.11.0+cu130",
+  "verification": {
+    "tolerance": {
+      "rtol": 2e-05,
+      "atol": 2e-06
+    },
+    "eager_vs_scripted": {
+      "sequence_steps": 4,
+      "max_abs_error": 0.0
+    },
+    "saved_vs_scripted": {
+      "sequence_steps": 4,
+      "max_abs_error": 0.0
+    }
+  },
+  "artifact_bytes": 6404417,
+  "artifact_sha256": "854e5aa43680030c5653578b787b4369b4c0492498a0aaa2b6e02a900e907dac"
+}

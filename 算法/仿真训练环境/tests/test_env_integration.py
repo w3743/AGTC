@@ -1,8 +1,9 @@
-"""Opt-in Isaac Lab/Newton integration checks for the live field task.
+"""Historical Isaac Lab/Newton integration checks for a frozen Newton checkout.
 
-These tests allocate a real SimulationContext and GPU sensors.  They are kept
+These tests inspect Newton internals. Current PhysX native acceptance uses
+``scripts/verify_isaacsim_environment.py`` and records actual process receipts.  They are kept
 out of normal unit runs and should only be enabled deliberately with
-``RUN_ISAAC_PHYSICS=1`` in the Isaac Lab runtime.
+``RUN_LEGACY_NEWTON_PHYSICS=1`` in the Isaac Lab runtime.
 """
 
 from __future__ import annotations
@@ -15,8 +16,8 @@ import pytest
 
 
 pytestmark = pytest.mark.skipif(
-    os.environ.get("RUN_ISAAC_PHYSICS") != "1",
-    reason="requires an explicit RUN_ISAAC_PHYSICS=1 Isaac Lab/Newton run",
+    os.environ.get("RUN_LEGACY_NEWTON_PHYSICS") != "1",
+    reason="requires an explicit RUN_LEGACY_NEWTON_PHYSICS=1 Isaac Lab/Newton run",
 )
 
 

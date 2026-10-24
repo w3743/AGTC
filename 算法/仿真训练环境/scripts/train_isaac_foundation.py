@@ -16,7 +16,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.compare_isaac_exploration import (
-    SOURCE_FILES as RUNTIME_FILES,
+    LEGACY_FOUNDATION_SOURCE_FILES as RUNTIME_FILES,
     _json,
     _pair_initial_conditions,
     _sha256,
@@ -258,7 +258,7 @@ def _validate_resume_parent(parent: Path, checkpoint: Path) -> dict:
 
 
 def _snapshot(output: Path) -> dict:
-    manifest = _source_manifest(output, copy_files=True)
+    manifest = _source_manifest(output, copy_files=True, source_files=RUNTIME_FILES)
     source = ROOT / RUNNER
     relative = f"source_snapshot/{RUNNER}"
     target = output / relative
@@ -274,6 +274,10 @@ def prepare(
     resume_parent: Path | None = None,
     resume_checkpoint: Path | None = None,
 ) -> dict:
+    raise RuntimeError(
+        "this frozen entrypoint creates Newton/SB3 protocols and is disabled for new runs; "
+        "use scripts/train_isaac_foundation_fresh.py to prepare an Isaac Sim PhysX RSL-RL trial"
+    )
     from isaac_field.task import Config
     from scripts.compare_isaac_exploration import _checkpoint_steps
 
@@ -470,6 +474,10 @@ def _evaluate(output: Path, cfg, checkpoint: Path, label: str, seeds: tuple[int,
 
 
 def launch(output: Path, device: str) -> dict:
+    raise RuntimeError(
+        "this frozen entrypoint resumes/trains SB3 .zip checkpoints and cannot create a PhysX RSL run; "
+        "use scripts/train_isaac_foundation_fresh.py with a new protocol"
+    )
     protocol = preflight(output)
     output = output.resolve()
     _json(output / "run_status.json", {"status": "running", "phase": "initializing"})

@@ -15,10 +15,22 @@ import os
 from pathlib import Path
 import sys
 from typing import Any
+from functools import wraps
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+
+def _with_runtime(function):
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        from isaac_field.runtime import launch_app
+
+        with launch_app(device="cuda:0", headless=True):
+            return function(*args, **kwargs)
+
+    return wrapped
 
 DEFAULT_SEED_START = 87_010
 DEFAULT_SCENARIO_COUNT = 16
@@ -272,6 +284,7 @@ def _finalize_episode_rows(
     return evaluated
 
 
+@_with_runtime
 def run_evaluation(
     checkpoint: str | Path,
     output: str | Path,

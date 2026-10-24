@@ -24,6 +24,71 @@ ABSOLUTE_GOAL_ENCODER_SCHEMA = "depth64-lidar-single1d-absolute-goal-v4"
 BRANCH_DIMS = {"lidar": 32, "depth": 64, "detections": 32, "state": 32, "feedback": 32}
 FEATURES_DIM = sum(BRANCH_DIMS.values())
 
+# New protocol/checkpoint identities.  Historical RSL checkpoints predate
+# these fields and remain readable as historical artifacts; active PhysX
+# evaluation must compare all three fields before it uses a policy.
+BACKEND_IDENTITY = {
+    "simulator": "isaac_sim",
+    "physics_backend": "physx",
+    "learning_backend": "rsl_rl",
+}
+BACKEND_IDENTITY_KEYS = tuple(BACKEND_IDENTITY)
+
+
+def validate_backend_identity(value: Mapping[str, Any], *, allow_legacy: bool = False) -> dict[str, str] | None:
+    """Validate the explicit simulator/physics/learner identity in new artifacts."""
+    if value is None and allow_legacy:
+        return None
+    if not isinstance(value, Mapping):
+        raise ValueError("backend_identity must be a mapping")
+    identity = {key: value.get(key) for key in BACKEND_IDENTITY_KEYS}
+    if identity != BACKEND_IDENTITY:
+        raise ValueError(
+            "backend_identity must identify Isaac Sim + PhysX + RSL-RL; "
+            f"got {identity!r}"
+        )
+    return identity
+
+
+def recorded_backend_identity(value: Mapping[str, Any]) -> dict[str, str]:
+    """Read a historical identity for explicit lineage without endorsing it.
+
+    New active artifacts must use :func:`validate_backend_identity`. This helper
+    is only for recording the source side of an explicit weights transfer.
+    """
+    if not isinstance(value, Mapping):
+        raise ValueError("recorded backend identity must be a mapping")
+    present = [value.get(key) is not None for key in BACKEND_IDENTITY_KEYS]
+    if not any(present):
+        return {
+            "simulator": "legacy_unrecorded",
+            "physics_backend": "legacy_unrecorded",
+            "learning_backend": "legacy_unrecorded",
+        }
+    identity = {key: value.get(key) for key in BACKEND_IDENTITY_KEYS}
+    if not all(present) or any(not isinstance(item, str) or not item.strip() for item in identity.values()):
+        raise ValueError("recorded backend identity must have three non-empty string fields")
+    return identity
+
+
+def stamp_backend_identity(value: dict[str, Any]) -> dict[str, Any]:
+    """Add the active backend identity to a newly prepared artifact in place."""
+    if not isinstance(value, dict):
+        raise TypeError("new protocol must be a dictionary")
+    existing = {key: value[key] for key in BACKEND_IDENTITY_KEYS if key in value}
+    if existing and existing != BACKEND_IDENTITY:
+        raise ValueError(f"cannot relabel an artifact prepared for another backend: {existing!r}")
+    value.update(BACKEND_IDENTITY)
+    return value
+
+
+def require_backend_identity(value: Mapping[str, Any]) -> dict[str, str]:
+    """Reject legacy or differently targeted protocol files before launch."""
+    if not isinstance(value, Mapping):
+        raise TypeError("protocol must be a mapping")
+    identity = {key: value.get(key) for key in BACKEND_IDENTITY_KEYS}
+    return validate_backend_identity(identity)
+
 
 def _encoder_schema_for_input(input_schema: str) -> str:
     if input_schema == INPUT_SCHEMA:

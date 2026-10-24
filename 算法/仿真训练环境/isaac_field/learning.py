@@ -1,14 +1,17 @@
-"""Sequential recurrent-policy curriculum training and held-out evaluation.
+"""Sequential RSL-RL curriculum training and held-out evaluation.
 
-Training uses Isaac Lab's official SB3 vector-environment wrapper. Each stage
-owns one SimulationContext at a time; evaluation always uses the unshaped task
-reward (``distance_cost=0``) and records per-seed rows for reproducibility.
+Training delegates rollout collection, PPO, and checkpoint handling to Isaac
+Lab's official RSL-RL ``OnPolicyRunner``. Each stage closes its environment
+while the workflow keeps one Isaac Sim Kit runtime open; evaluation records
+per-seed rows using the unshaped task reward (``distance_cost=0``).
 """
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 from dataclasses import asdict, dataclass
+from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -21,8 +24,9 @@ from isaac_field.task import Config
 DEFAULT_INITIAL_CHECKPOINT = (
     Path(__file__).resolve().parents[1]
     / "results"
-    / "isaac_field_migration"
-    / "field_policy_16384_latest.zip"
+    / "isaac_field_improvement"
+    / "isaacsim_physx_rsl_foundation_20261024"
+    / "stage_04_turn90.pt"
 )
 DEFAULT_HELDOUT_SEEDS = tuple(range(10_001, 10_011))
 
@@ -65,9 +69,9 @@ class CurriculumResult:
 
 
 def _make_env_factory():
-    from isaac_field.env import make_env
+    from isaac_field.runtime import create_env
 
-    return make_env
+    return create_env
 
 
 def _make_adapter_factory():
@@ -76,9 +80,21 @@ def _make_adapter_factory():
     return SingleFieldAdapter
 
 
+def _keep_runtime_for_workflow(function):
+    """Hold one Isaac Sim Kit context across all stages and paired evaluations."""
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        from .runtime import launch_app
+
+        with launch_app(device=kwargs.get("device", "cuda:0"), headless=True):
+            return function(*args, **kwargs)
+
+    return wrapped
+
+
 def _saved_checkpoint_path(path: str | Path) -> Path:
     path = Path(path)
-    return path if path.suffix == ".zip" else Path(f"{path}.zip")
+    return path if path.suffix == ".pt" else Path(f"{path}.pt")
 
 
 def _existing_checkpoint_path(path: str | Path) -> Path:
@@ -180,6 +196,54 @@ def _live_input_schema(source) -> str | None:
     return None
 
 
+def _live_backend_identity(source) -> dict[str, str] | None:
+    """Resolve the simulator identity through adapters and Gym wrappers."""
+    from .policy_contract import BACKEND_IDENTITY_KEYS
+
+    pending = [source]
+    visited: set[int] = set()
+    while pending:
+        candidate = pending.pop(0)
+        if candidate is None or id(candidate) in visited:
+            continue
+        visited.add(id(candidate))
+        value = getattr(candidate, "backend_identity", None)
+        if callable(value):
+            value = value()
+        if isinstance(value, Mapping):
+            return {key: value.get(key) for key in BACKEND_IDENTITY_KEYS}
+        flattened = {key: getattr(candidate, key, None) for key in BACKEND_IDENTITY_KEYS}
+        if all(item is not None for item in flattened.values()):
+            return flattened
+        for name in ("engine", "env", "unwrapped"):
+            child = getattr(candidate, name, None)
+            if child is not None and child is not candidate:
+                pending.append(child)
+    return None
+
+
+def _model_backend_identity(model) -> dict[str, str]:
+    """Return checkpoint provenance separately from the active eval backend."""
+    from isaac_field.policy_contract import recorded_backend_identity
+
+    contract = getattr(model, "contract", None)
+    if isinstance(contract, Mapping):
+        return recorded_backend_identity({
+            key: contract.get(key)
+            for key in ("simulator", "physics_backend", "learning_backend")
+        })
+    return recorded_backend_identity({})
+
+
+def _model_backend_name(model) -> str:
+    if getattr(model, "backend", None) == "rsl_rl":
+        return "rsl_rl"
+    module = type(model).__module__
+    if module.startswith(("stable_baselines3", "sb3_contrib")):
+        return "sb3_legacy"
+    return "custom_or_test_model"
+
+
 def _observation_config_is_complete(config: Mapping[str, Any] | None) -> bool:
     if not isinstance(config, Mapping):
         return False
@@ -250,11 +314,15 @@ def _model_or_checkpoint(
     device: str,
     input_schema: str,
     expected_observation_config: Mapping[str, Any] | None,
+    expected_backend_identity: Mapping[str, Any] | None,
+    legacy_sb3: bool,
 ):
     # RSL checkpoints retain their own model/metadata format. Adapt prediction
     # only, so both backends use the same episode and physical-trace evaluator.
     if getattr(model_or_checkpoint, "backend", None) == "rsl_rl":
-        model_or_checkpoint.validate_contract(input_schema, expected_observation_config)
+        model_or_checkpoint.validate_contract(
+            input_schema, expected_observation_config, expected_backend_identity,
+        )
         return model_or_checkpoint, getattr(model_or_checkpoint, "checkpoint", None)
     if isinstance(model_or_checkpoint, (str, Path)) and Path(model_or_checkpoint).suffix.lower() in (".pt", ".pth"):
         from isaac_field.rsl_rl_inference import RslPredictionModel
@@ -263,8 +331,26 @@ def _model_or_checkpoint(
         model = RslPredictionModel(
             path, device=device, input_schema=input_schema,
             expected_observation_config=expected_observation_config,
+            expected_backend_identity=expected_backend_identity,
         )
         return model, path
+    if isinstance(model_or_checkpoint, (str, Path)) and not legacy_sb3:
+        raise ValueError("SB3 policy loading is legacy-only; pass legacy_sb3=True explicitly")
+    if hasattr(model_or_checkpoint, "predict") and not legacy_sb3:
+        module = type(model_or_checkpoint).__module__
+        if module.startswith(("stable_baselines3", "sb3_contrib")):
+            raise ValueError("SB3 policy evaluation is legacy-only; pass legacy_sb3=True explicitly")
+        if input_schema != INPUT_SCHEMA and getattr(model_or_checkpoint, "backend", None) != "rsl_rl":
+            raise ValueError("absolute-goal evaluation requires a native RSL-RL .pt checkpoint")
+        if not hasattr(model_or_checkpoint, "policy"):
+            from isaac_field.action_contract import action_config
+
+            if getattr(model_or_checkpoint, "field_action_config", None) != action_config():
+                raise ValueError("Checkpoint action contract is missing or incompatible")
+            # Lightweight prediction doubles and simple policy adapters do not
+            # depend on the optional SB3 package. Real SB3 policy objects have
+            # a `policy` member and use the explicit legacy validator below.
+            return model_or_checkpoint, None
     from isaac_field.policy import (
         _validate_checkpoint_action_metadata,
         _validate_checkpoint_encoder_metadata,
@@ -284,6 +370,8 @@ def _model_or_checkpoint(
                 expected_observation_config=expected_observation_config,
             )
         return model_or_checkpoint, None
+    if not legacy_sb3:
+        raise ValueError("SB3 policy loading is legacy-only; pass legacy_sb3=True explicitly")
     from sb3_contrib import RecurrentPPO
 
     path = _existing_checkpoint_path(model_or_checkpoint)
@@ -428,6 +516,7 @@ def evaluate_model(
     record_initial_conditions: bool = False,
     input_schema: str | None = None,
     expected_observation_config: Mapping[str, Any] | None = None,
+    legacy_sb3: bool = False,
 ) -> dict[str, Any]:
     """Evaluate complete episodes on fixed seeds and return JSON-safe rows.
 
@@ -476,6 +565,8 @@ def evaluate_model(
         device=device,
         input_schema=policy_input_schema,
         expected_observation_config=current_observation_config,
+        expected_backend_identity=_live_backend_identity(engine),
+        legacy_sb3=legacy_sb3,
     )
     current_damage_config = _damage_config(adapter)
     current_damage_metric = (
@@ -621,6 +712,14 @@ def evaluate_model(
         "reward": "raw_task_reward_distance_cost_zero",
         "distance_cost": 0.0,
         "checkpoint": None if checkpoint_path is None else str(checkpoint_path),
+        # `backend_identity` historically identifies the environment used for
+        # this evaluation. Keep it and spell out the two sides so a Newton-era
+        # checkpoint evaluated in a PhysX environment cannot inherit PhysX
+        # provenance by implication.
+        "backend_identity": _live_backend_identity(engine),
+        "environment_backend_identity": _live_backend_identity(engine),
+        "model_backend": _model_backend_name(model),
+        "model_backend_identity": _model_backend_identity(model),
         "model_class": type(model).__name__,
         "action_config": current_action_config,
         "input_schema": policy_input_schema,
@@ -689,7 +788,7 @@ def _validate_model_lstm_hidden_size(model, expected: int | None) -> None:
             )
 
 
-def train_stage(
+def _train_stage_sb3_legacy(
     env,
     checkpoint: str | Path | Any | None,
     timesteps: int,
@@ -711,12 +810,15 @@ def train_stage(
     lstm_hidden_size: int | None = None,
     input_schema: str | None = None,
 ) -> StageTrainingResult:
-    """Continue or initialize RecurrentPPO on the official Isaac Lab wrapper.
+    """Frozen historical SB3 implementation retained for forensic reference.
 
     ``log_std_init`` applies only when creating a fresh policy. Loading a model
     keeps its learned distribution parameters while the stage-level optimizer
     and discount settings are explicitly overridden.
     """
+    raise RuntimeError(
+        "SB3 training is disabled after the Isaac Sim migration; use the official RSL-RL train_stage adapter"
+    )
     if isinstance(timesteps, bool) or int(timesteps) != timesteps or int(timesteps) < 1:
         raise ValueError("timesteps must be a positive integer")
     lstm_hidden_size = _validate_lstm_hidden_size(lstm_hidden_size)
@@ -917,6 +1019,287 @@ def train_stage(
     )
 
 
+def train_stage(
+    env,
+    checkpoint: str | Path | Any | None,
+    timesteps: int,
+    output: str | Path,
+    callback=None,
+    *,
+    seed: int = 7,
+    device: str = "cuda:0",
+    goal_gain: float = 1.0,
+    n_steps: int = 128,
+    batch_size: int = 128,
+    n_epochs: int = 5,
+    learning_rate: float = 3e-4,
+    gamma: float = 0.995,
+    gae_lambda: float = 0.95,
+    log_std_init: float = -2.0,
+    target_kl: float | None = 0.03,
+    verbose: int = 0,
+    lstm_hidden_size: int | None = None,
+    input_schema: str | None = None,
+    resume_optimizer_state: bool = True,
+    weights_transfer: bool = False,
+) -> StageTrainingResult:
+    """Train a stage with Isaac Lab's official RSL-RL ``OnPolicyRunner``.
+
+    This adapter only builds the supported field runner config and delegates
+    rollout collection, PPO updates, checkpoint loading, and saving to the
+    upstream runner. SB3 callbacks and ZIP checkpoints are rejected because
+    they cannot be applied to the native RSL path. ``log_std_init`` applies
+    only to a fresh model; checkpoint workflows retain the parent's recorded
+    Gaussian construction config and restore its learned state.
+    """
+    if callback is not None:
+        raise TypeError("RSL-RL training does not accept SB3 callbacks; use runner save_interval/logging")
+    if isinstance(timesteps, bool) or int(timesteps) != timesteps or int(timesteps) < 0:
+        raise ValueError("timesteps must be a non-negative integer")
+    if type(resume_optimizer_state) is not bool:
+        raise ValueError("resume_optimizer_state must be boolean")
+    if type(weights_transfer) is not bool:
+        raise ValueError("weights_transfer must be boolean")
+    if weights_transfer and checkpoint is None:
+        raise ValueError("weights_transfer requires an explicit RSL .pt parent checkpoint")
+    if checkpoint is not None:
+        checkpoint_path = Path(checkpoint) if isinstance(checkpoint, (str, Path)) else None
+        if checkpoint_path is None:
+            raise TypeError("RSL stage resume requires an explicit .pt checkpoint path")
+        if checkpoint_path.suffix.lower() in (".zip", ".pkl"):
+            raise ValueError("SB3 checkpoints are legacy-only and cannot train an Isaac Sim RSL stage")
+        checkpoint = _existing_checkpoint_path(checkpoint_path)
+    checkpoint_payload = None
+    if checkpoint is not None:
+        from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+        checkpoint_payload = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")
+    if isinstance(seed, bool) or int(seed) != seed or int(seed) < 0:
+        raise ValueError("seed must be a non-negative integer")
+    if isinstance(n_steps, bool) or int(n_steps) != n_steps or int(n_steps) < 1:
+        raise ValueError("n_steps must be a positive integer")
+    n_steps = int(n_steps)
+    lstm_hidden_size = _validate_lstm_hidden_size(lstm_hidden_size)
+    if not math.isfinite(float(goal_gain)) or float(goal_gain) != 1.0:
+        raise ValueError("goal_gain must be 1.0: extra goal-input scaling has been removed")
+    if not math.isfinite(float(learning_rate)) or float(learning_rate) <= 0:
+        raise ValueError("learning_rate must be finite and positive")
+    if not math.isfinite(float(gamma)) or not 0.0 <= float(gamma) <= 1.0:
+        raise ValueError("gamma must be finite and in [0, 1]")
+    if not math.isfinite(float(gae_lambda)) or not 0.0 <= float(gae_lambda) <= 1.0:
+        raise ValueError("gae_lambda must be finite and in [0, 1]")
+    if target_kl is not None and (
+        not math.isfinite(float(target_kl)) or float(target_kl) <= 0.0
+    ):
+        raise ValueError("target_kl must be finite and positive when provided")
+    if (
+        isinstance(batch_size, bool)
+        or int(batch_size) != batch_size
+        or int(batch_size) < 1
+        or isinstance(n_epochs, bool)
+        or int(n_epochs) != n_epochs
+        or int(n_epochs) < 1
+    ):
+        raise ValueError("batch_size and num_learning_epochs must be positive integers")
+    batch_size = int(batch_size)
+    n_epochs = int(n_epochs)
+
+    from isaac_field.policy_contract import BACKEND_IDENTITY, _encoder_schema_for_input
+    from isaac_field.rsl_rl_cfg import FieldFastStopRslRunnerCfg
+    from isaaclab_rl.entrypoints.backends.cli_args_rsl_rl import checkpoint_load_cfg
+    from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper, handle_deprecated_rsl_rl_cfg
+    from importlib.metadata import version as package_version
+    from rsl_rl.runners import OnPolicyRunner
+
+    if hasattr(env, "engine"):
+        raise TypeError("train_stage requires a native Isaac Lab batched environment, not SingleFieldAdapter")
+    engine = getattr(env, "unwrapped", env)
+    identity = getattr(engine, "backend_identity", None)
+    if callable(identity):
+        identity = identity()
+    if identity != BACKEND_IDENTITY:
+        raise ValueError(
+            "training requires an IsaacFieldRslEnv with backend_identity="
+            f"{BACKEND_IDENTITY!r}; got {identity!r}"
+        )
+    expected_observation_keys = {"lidar", "depth", "detections", "state", "feedback"}
+    observation_buffer = getattr(engine, "obs_buf", None)
+    observation_space = getattr(engine, "single_observation_space", None)
+    observation_leaves = getattr(observation_space, "spaces", None)
+    has_initialized_observations = (
+        isinstance(observation_buffer, Mapping)
+        and set(observation_buffer) == expected_observation_keys
+    )
+    has_root_observation_space = (
+        isinstance(observation_leaves, Mapping)
+        and set(observation_leaves) == expected_observation_keys
+    )
+    if not (has_initialized_observations or has_root_observation_space):
+        raise TypeError(
+            "training environment must expose the five root RSL observation leaves in "
+            "obs_buf or single_observation_space"
+        )
+    policy_input_schema, observation_config = _policy_contract(env, input_schema=input_schema)
+    if not _observation_config_is_complete(observation_config):
+        raise ValueError("RSL training requires a complete observation_config")
+    if getattr(env, "num_envs", None) is None or int(env.num_envs) < 1:
+        raise ValueError("RSL training environment must expose a positive num_envs")
+
+    output_path = Path(output)
+    if output_path.suffix.lower() != ".pt":
+        raise ValueError("native RSL checkpoints must use the .pt extension")
+    log_dir = output_path.parent / f"{output_path.stem}_logs"
+    if output_path.exists() or log_dir.exists():
+        raise FileExistsError(
+            f"refusing to overwrite an existing RSL checkpoint or log directory: {output_path}"
+        )
+    if lstm_hidden_size is None:
+        if checkpoint is None:
+            lstm_hidden_size = 512
+        else:
+            recorded_hidden = checkpoint_payload["field_policy_contract"]["lstm"]["hidden_dim"]
+            lstm_hidden_size = _validate_lstm_hidden_size(recorded_hidden)
+
+    rollout_transitions = int(env.num_envs) * int(n_steps)
+    if int(timesteps) % rollout_transitions:
+        raise ValueError(
+            f"timesteps={timesteps} must be divisible by num_envs*num_steps_per_env={rollout_transitions}"
+        )
+    iterations = int(timesteps) // rollout_transitions
+    if int(batch_size) > rollout_transitions:
+        raise ValueError(
+            f"batch_size={batch_size} cannot exceed rollout transitions={rollout_transitions}"
+        )
+    if rollout_transitions % int(batch_size):
+        raise ValueError(
+            f"rollout transitions={rollout_transitions} must be divisible by batch_size={batch_size}"
+        )
+    from isaac_field.runtime import simulator_identity
+
+    if simulator_identity() != BACKEND_IDENTITY:
+        raise RuntimeError("runtime simulator identity differs from the supported PhysX RSL backend")
+    runner_cfg = FieldFastStopRslRunnerCfg()
+    runner_cfg.seed = int(seed)
+    runner_cfg.num_steps_per_env = int(n_steps)
+    runner_cfg.max_iterations = int(iterations)
+    num_mini_batches = max(1, rollout_transitions // int(batch_size))
+    runner_cfg.save_interval = max(1, min(int(getattr(runner_cfg, "save_interval", 16)), iterations or 1))
+    runner_cfg.device = str(device)
+    runner_cfg.run_name = output_path.stem
+    runner_cfg.actor.input_schema = policy_input_schema
+    runner_cfg.critic.input_schema = policy_input_schema
+    runner_cfg.actor.encoder_schema = _encoder_schema_for_input(policy_input_schema)
+    runner_cfg.critic.encoder_schema = _encoder_schema_for_input(policy_input_schema)
+    runner_cfg.actor.observation_shapes = {
+        key: list(value) for key, value in observation_config["observation_shapes"].items()
+    }
+    runner_cfg.critic.observation_shapes = dict(runner_cfg.actor.observation_shapes)
+    runner_cfg.actor.rnn_hidden_dim = int(lstm_hidden_size)
+    runner_cfg.critic.rnn_hidden_dim = int(lstm_hidden_size)
+    runner_cfg.algorithm.num_learning_epochs = int(n_epochs)
+    runner_cfg.algorithm.num_mini_batches = int(num_mini_batches)
+    runner_cfg.algorithm.learning_rate = float(learning_rate)
+    runner_cfg.algorithm.gamma = float(gamma)
+    runner_cfg.algorithm.lam = float(gae_lambda)
+    runner_cfg.algorithm.desired_kl = target_kl
+    if log_std_init is not None and not math.isfinite(float(log_std_init)):
+        raise ValueError("log_std_init must be finite")
+    if checkpoint_payload is not None:
+        # Constructor metadata must match the parent contract for strict resume
+        # and explicit weights transfer. The checkpoint state restores the
+        # learned standard deviation; this only preserves its initial config.
+        runner_cfg.actor.distribution_cfg.init_std = float(
+            checkpoint_payload["field_policy_contract"]["distribution"]["init_std"]
+        )
+    elif log_std_init is not None:
+        # RSL-RL records standard deviation in linear space; retain the public
+        # parameter's log-space meaning when creating a fresh model.
+        runner_cfg.actor.distribution_cfg.init_std = math.exp(float(log_std_init))
+    runner_cfg = handle_deprecated_rsl_rl_cfg(runner_cfg, package_version("rsl-rl-lib"))
+
+    wrapped_env = RslRlVecEnvWrapper(env, clip_actions=runner_cfg.clip_actions)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    runner = OnPolicyRunner(wrapped_env, runner_cfg.to_dict(), log_dir=str(log_dir), device=str(device))
+    transfer_record = None
+    if checkpoint is not None:
+        if weights_transfer:
+            from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+            from isaac_field.policy_contract import (
+                recorded_backend_identity,
+                require_backend_identity,
+            )
+
+            payload = load_rsl_checkpoint_payload(checkpoint, map_location="cpu")
+            source_contract = payload["field_policy_contract"]
+            target_contract = runner.alg.field_policy_contract
+            source_backend_identity = recorded_backend_identity({
+                key: source_contract.get(key) for key in BACKEND_IDENTITY
+            })
+            target_backend_identity = require_backend_identity(target_contract)
+            compatible_keys = (
+                "input_schema", "encoder_config", "observation_shapes", "observation_config",
+                "action_config", "actor_config", "critic_config", "obs_groups", "lstm",
+                "heads", "distribution", "action_dim",
+            )
+            differences = [
+                key for key in compatible_keys if source_contract.get(key) != target_contract.get(key)
+            ]
+            if differences:
+                raise ValueError(
+                    "weights transfer source model structure differs from the target; "
+                    f"mismatched contract fields: {differences}"
+                )
+            runner.alg._raw_actor.load_state_dict(payload["actor_state_dict"], strict=True)
+            runner.alg._raw_critic.load_state_dict(payload["critic_state_dict"], strict=True)
+            runner.alg.optimizer.state.clear()
+            runner.alg.num_timesteps = 0
+            with Path(checkpoint).open("rb") as stream:
+                parent_checkpoint_sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
+            transfer_record = {
+                "mode": "weights_transfer",
+                "parent_checkpoint_sha256": parent_checkpoint_sha256,
+                "parent_backend_identity": source_backend_identity,
+                "target_backend_identity": target_backend_identity,
+                "parent_task_config": source_contract.get("task_config"),
+                "optimizer": "reinitialized",
+                "timestep_counter": "reset_to_zero",
+            }
+        else:
+            runner.load(
+                str(checkpoint),
+                load_cfg=checkpoint_load_cfg(
+                    bool(resume_optimizer_state), runner_class=runner_cfg.class_name,
+                ),
+                map_location=str(device),
+            )
+    before = int(getattr(runner.alg, "num_timesteps", 0))
+    runner.learn(num_learning_iterations=iterations, init_at_random_ep_len=False)
+    after = int(getattr(runner.alg, "num_timesteps", before))
+    if after - before != int(timesteps):
+        raise RuntimeError(
+            f"official RSL runner trained {after - before} transitions; expected {timesteps}"
+        )
+    runner.save(str(output_path))
+    if transfer_record is not None:
+        import torch
+
+        payload = torch.load(output_path, map_location="cpu", weights_only=True)
+        payload["training_initialization"] = transfer_record
+        torch.save(payload, output_path)
+    return StageTrainingResult(
+        model=runner.alg,
+        checkpoint=output_path,
+        requested_timesteps=int(timesteps),
+        trained_timesteps=after - before,
+        total_timesteps=after,
+        seed=int(seed),
+        goal_gain=float(goal_gain),
+        n_steps=int(n_steps),
+        batch_size=int(batch_size),
+        n_epochs=int(n_epochs),
+    )
+
+
 def _default_factory_kwargs(
     cfg: Config,
     *,
@@ -932,6 +1315,7 @@ def _default_factory_kwargs(
         "num_envs": 1,
         "seed": int(seed),
         "auto_reset": auto_reset,
+        "rsl": True,
         "goal_distance": goal_distance,
         "goal_angle": float(goal_angle),
         "distance_cost": 0.0,
@@ -989,6 +1373,7 @@ def _summary_result(result: StageTrainingResult, stage: CurriculumStage) -> dict
     }
 
 
+@_keep_runtime_for_workflow
 def train_curriculum(
     cfg: Config,
     output_dir: str | Path,
@@ -1020,6 +1405,8 @@ def train_curriculum(
     lstm_hidden_size = _validate_lstm_hidden_size(lstm_hidden_size)
     if not stages:
         raise ValueError("stages must contain at least one curriculum stage")
+    if callback_factory is not None:
+        raise TypeError("SB3 callback_factory is not supported by RSL-RL; use runner save_interval/logging")
     if isinstance(training_seed, bool) or int(training_seed) != training_seed or int(training_seed) < 0:
         raise ValueError("training_seed must be a non-negative integer")
     heldout = _validate_seeds(heldout_seeds, name="heldout_seeds")
@@ -1054,6 +1441,35 @@ def train_curriculum(
 
     evaluation_context_seed = max((*heldout, *training_seeds), default=0) + 1_000_003
     initial_evaluation: dict[str, Any] | None = None
+    if active_checkpoint is None:
+        baseline_env = env_factory(
+            **_default_factory_kwargs(
+                cfg,
+                mode="mixed",
+                seed=evaluation_context_seed,
+                goal_distance=None,
+                goal_angle=math.pi,
+                auto_reset=False,
+            )
+        )
+        try:
+            initialized = train_stage(
+                baseline_env,
+                None,
+                0,
+                output / "untrained_baseline.pt",
+                seed=int(training_seed),
+                device=device,
+                goal_gain=goal_gain,
+                gamma=float(gamma),
+                n_epochs=n_epochs,
+                batch_size=batch_size,
+                lstm_hidden_size=lstm_hidden_size,
+                input_schema=cfg.input_schema,
+            )
+            active_checkpoint = initialized.checkpoint
+        finally:
+            _close_context(baseline_env)
     if evaluate_before_after:
         adapter, engine = _open_evaluation_adapter(
             cfg,
@@ -1062,33 +1478,6 @@ def train_curriculum(
             seed=evaluation_context_seed,
         )
         try:
-            if active_checkpoint is None:
-                from isaac_field.policy import make_model
-                from isaac_field.training import _sb3_wrapper
-
-                model_kwargs = {
-                    "seed": int(training_seed),
-                    "n_steps": 128,
-                    "batch_size": int(batch_size),
-                    "n_epochs": int(n_epochs),
-                    "gamma": float(gamma),
-                    "goal_gain": float(goal_gain),
-                    "device": device,
-                    "input_schema": cfg.input_schema,
-                }
-                observation_config = _live_observation_config(engine)
-                if cfg.input_schema == ABSOLUTE_GOAL_INPUT_SCHEMA:
-                    if not _observation_config_is_complete(observation_config):
-                        raise ValueError(
-                            "absolute-goal curriculum requires the complete live observation_config"
-                        )
-                    model_kwargs["observation_config"] = observation_config
-                elif _observation_config_is_complete(observation_config):
-                    model_kwargs["observation_config"] = observation_config
-                if lstm_hidden_size is not None:
-                    model_kwargs["lstm_hidden_size"] = lstm_hidden_size
-                active_checkpoint = make_model(_sb3_wrapper(engine), **model_kwargs)
-                _validate_model_lstm_hidden_size(active_checkpoint, lstm_hidden_size)
             initial_evaluation = evaluate_model(
                 adapter,
                 active_checkpoint,
@@ -1115,11 +1504,9 @@ def train_curriculum(
                 auto_reset=True,
             )
         )
-        stage_output = output / f"stage_{index + 1:02d}_{stage.name}"
-        callback = None if callback_factory is None else callback_factory(stage)
+        stage_output = output / f"stage_{index + 1:02d}_{stage.name}.pt"
         try:
             stage_kwargs = {
-                "callback": callback,
                 "seed": stage_seed,
                 "device": device,
                 "goal_gain": goal_gain,
@@ -1168,7 +1555,10 @@ def train_curriculum(
 
     summary: dict[str, Any] = {
         "schema": "isaac-field-curriculum-v1",
-        "algorithm": "SB3-Contrib RecurrentPPO",
+        "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner",
+        "backend_identity": {
+            "simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl",
+        },
         "input_schema": cfg.input_schema,
         "checkpoint_start": None if checkpoint is None else str(checkpoint),
         "checkpoint_final": str(final_checkpoint),

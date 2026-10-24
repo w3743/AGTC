@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from contextlib import nullcontext
 import hashlib
 import json
 from pathlib import Path
@@ -11,6 +12,16 @@ from types import ModuleType, SimpleNamespace
 import pytest
 
 import scripts.evaluate_rsl_curriculum as evaluator
+
+
+@pytest.fixture(autouse=True)
+def _keep_evaluator_tests_cpu_only(monkeypatch):
+    from contextlib import nullcontext
+    from isaac_field import runtime as isaac_runtime
+
+    # Every test in this module uses fake checkpoint/environment/evaluation
+    # components. Exercise workflow behavior without launching Isaac Sim.
+    monkeypatch.setattr(isaac_runtime, "launch_app", lambda *args, **kwargs: nullcontext())
 
 
 def _full_contract():
@@ -44,10 +55,14 @@ def _full_contract():
 def _install_fake_runtime(monkeypatch, checkpoint: Path, *, success_count=13,
                           damage_at=None, collision_at=None):
     from isaac_field import learning
+    from isaac_field import runtime as isaac_runtime
     from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
     from scripts import evaluate_fast_stop_mastery, view_fast_stop_goal
 
     contract = _full_contract()
+    # This CPU test substitutes the simulator, environment, policy loader, and
+    # evaluator below. Keep the workflow lifecycle in-process and never launch Kit.
+    monkeypatch.setattr(isaac_runtime, "launch_app", lambda *args, **kwargs: nullcontext())
     cfg, guide, stability = view_fast_stop_goal._rsl_environment_configs(contract)
     opened = []
     env_calls = []

@@ -1,4 +1,4 @@
-"""Prepare and run a fresh, frozen RecurrentPPO foundation curriculum."""
+"""Prepare and run a fresh, frozen Isaac Lab RSL-RL foundation curriculum."""
 from __future__ import annotations
 
 import argparse
@@ -21,16 +21,16 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-DEFAULT_OUTPUT = ROOT / "results/isaac_field_improvement/fresh_coupled_tracks_20261020"
-DEFAULT_RANDOM_ROUGH_OUTPUT = ROOT / "results/isaac_field_improvement/random_global_rough_20261020"
+DEFAULT_OUTPUT = ROOT / "results/isaac_field_improvement/isaacsim_physx_rsl_foundation_20261024"
+DEFAULT_RANDOM_ROUGH_OUTPUT = ROOT / "results/isaac_field_improvement/isaacsim_physx_rsl_rough_20261024"
 DEFAULT_RANDOM_ROUGH_COUPLED_GUIDES_OUTPUT = ROOT / (
-    "results/isaac_field_improvement/random_global_rough_coupled_guides_20261020"
+    "results/isaac_field_improvement/isaacsim_physx_rsl_rough_guides_20261024"
 )
 DEFAULT_RANDOM_ROUGH_FAST_STOP_OUTPUT = ROOT / (
-    "results/isaac_field_improvement/random_global_rough_fast_stop_20261020"
+    "results/isaac_field_improvement/isaacsim_physx_rsl_rough_fast_stop_20261024"
 )
-DEFAULT_LEGACY_OUTPUT = ROOT / "results/isaac_field_improvement/fresh_foundation_legacy_20261020"
-SCHEMA = "isaac-field-fresh-foundation-v1"
+DEFAULT_LEGACY_OUTPUT = ROOT / "results/isaac_field_improvement/isaacsim_physx_rsl_legacy_20261024"
+SCHEMA = "isaac-field-fresh-foundation-v2"
 ENCODER_SCHEMA = "depth64-lidar-single1d-minimal-v3"
 INPUT_SCHEMA = "sensor-minimal-v6"
 PROFILE_LEGACY_FOUNDATION = "legacy_foundation"
@@ -95,24 +95,30 @@ STAGES = (
     {"name": "turn90", "goal_distance_m": [1.0, 3.0], "goal_angle_deg": 90.0, "timesteps": 65_536},
 )
 TRAINING = {
-    "algorithm": "SB3-Contrib RecurrentPPO", "mode": "goto", "num_envs": 4,
+    "algorithm": "Isaac Lab official RSL-RL OnPolicyRunner", "mode": "goto", "num_envs": 4,
     "training_seed": TRAIN_SEED,
     "stage_seeds": [TRAIN_SEED + i for i in range(len(STAGES))],
     "stages": [dict(stage) for stage in STAGES],
     "timesteps_total": sum(stage["timesteps"] for stage in STAGES),
     "goal_gain": 1.0, "n_steps": 128, "batch_size": 128, "n_epochs": 5,
     "learning_rate": 3e-4, "gamma": 0.995, "gae_lambda": 0.95,
-    "target_kl": 0.03, "log_std_init": -2.0, "use_sde": False,
+    "target_kl": 0.03, "log_std_init": -2.0,
+    "exploration": "RSL-RL diagonal Gaussian distribution; no SB3 gSDE path",
     "checkpoint_interval_transitions": 8192,
-    "initialization": "new random RecurrentPPO; no old checkpoint or weight transfer",
+    "initialization": "new random RSL-RL policy and optimizer; no old checkpoint or weight transfer",
 }
 SOURCE_HELPERS = (
     "scripts/train_isaac_foundation.py",
     "scripts/improve_isaac_policy.py",
     "scripts/compare_isaac_exploration.py",
 )
-FIXED_SOURCES = ("scripts/isaaclab_python.sh", *SOURCE_HELPERS,
+FIXED_SOURCES = ("scripts/isaaclab_python.sh", "scripts/isaaclab_python.ps1",
+                 "scripts/install_isaaclab_windows.ps1", *SOURCE_HELPERS,
                  "scripts/train_isaac_foundation_fresh.py", "scripts/install_isaaclab.sh", "pyproject.toml",
+                 "isaac_field/runtime.py", "isaac_field/env.py", "isaac_field/assets.py",
+                 "isaac_field/scene_assets.py", "isaac_field/physx_drive.py", "isaac_field/learning.py",
+                 "isaac_field/policy_contract.py", "isaac_field/rsl_rl_cfg.py",
+                 "isaac_field/rsl_rl_policy.py", "isaac_field/rsl_rl_inference.py",
                  "isaac_field/visualization/THIRD_PARTY_NOTICES.md",
                  "external/llm-viz/LICENSE", "external/llm-viz/src/utils/bezier.ts",
                  "external/llm-viz/src/llm/Sidebar.tsx", "external/llm-viz/src/llm/Sidebar.module.scss",
@@ -144,12 +150,9 @@ def _protocol_sha(path: Path) -> str:
 
 
 def _field_encoder_config() -> dict:
-    from isaac_field import policy
+    from isaac_field.policy_contract import _field_encoder_config
 
-    describe = getattr(policy, "_field_encoder_config", None)
-    if not callable(describe):
-        raise ValueError("policy does not expose its saved field_encoder_config")
-    return dict(describe())
+    return dict(_field_encoder_config())
 
 
 def _action_config() -> dict:
@@ -171,6 +174,7 @@ def _live_action_config(env) -> dict:
 
 def _live_environment_contract(env, *, input_schema: str = INPUT_SCHEMA) -> dict:
     from isaac_field.feedback import SUPPORTED_INPUT_SCHEMAS
+    from isaac_field.policy_contract import BACKEND_IDENTITY, validate_backend_identity
 
     if not isinstance(input_schema, str) or input_schema not in SUPPORTED_INPUT_SCHEMAS:
         raise ValueError(
@@ -188,28 +192,64 @@ def _live_environment_contract(env, *, input_schema: str = INPUT_SCHEMA) -> dict
     physics_contact = drive.get("physics_contact")
     if not isinstance(physics_contact, dict):
         raise ValueError(f"unexpected live physics contact contract: {physics_contact!r}")
-    expected_physics_contact = {
+    environment_identity = getattr(env, "backend_identity", None)
+    if callable(environment_identity):
+        environment_identity = environment_identity()
+    if validate_backend_identity(environment_identity) != BACKEND_IDENTITY:
+        raise ValueError(f"unexpected live backend identity: {environment_identity!r}")
+    contact_identity = {
+        key: physics_contact.get(key)
+        for key in ("simulator", "physics_backend", "learning_backend")
+    }
+    if validate_backend_identity(contact_identity) != BACKEND_IDENTITY:
+        raise ValueError(f"unexpected live contact backend identity: {physics_contact!r}")
+    expected_contact_values = {
+        "backend": "PhysxCfg",
+        "solver": "TGS",
         "physics_dt_s": 0.001,
         "decimation": 50,
         "policy_dt_s": 0.05,
-        "cone": "elliptic",
-        "impratio": 1.0,
+        "contact_offset_m": 0.005,
+        "rest_offset_m": 0.0,
+        "calibrated_hardware": False,
     }
-    for key, expected in expected_physics_contact.items():
+    for key, expected in expected_contact_values.items():
         observed = physics_contact.get(key)
-        if isinstance(expected, (int, float)):
+        if isinstance(expected, float):
             if (isinstance(observed, bool) or not isinstance(observed, (int, float))
                     or not math.isfinite(float(observed))
-                    or not math.isclose(float(observed), float(expected), rel_tol=0.0, abs_tol=1e-9)):
-                raise ValueError(f"unexpected live physics contact contract: {physics_contact!r}")
+                    or not math.isclose(float(observed), expected, rel_tol=0.0, abs_tol=1e-9)):
+                raise ValueError(f"unexpected live PhysX contact contract: {physics_contact!r}")
         elif observed != expected:
-            raise ValueError(f"unexpected live physics contact contract: {physics_contact!r}")
+            raise ValueError(f"unexpected live PhysX contact contract: {physics_contact!r}")
+    physics_manager = physics_contact.get("physics_manager")
+    if not isinstance(physics_manager, str) or not physics_manager.startswith("isaaclab_physx."):
+        raise ValueError(f"unexpected live PhysX manager: {physics_contact!r}")
+    materials = physics_contact.get("usd_authored_materials")
+    expected_material_count = 2 * int(getattr(env, "num_envs", 1))
+    if not isinstance(materials, dict) or len(materials) != expected_material_count:
+        raise ValueError(f"unexpected live USD contact materials: {physics_contact!r}")
+    for prim_path, material in materials.items():
+        if (not isinstance(prim_path, str)
+                or not (prim_path.endswith("/Field/material") or prim_path.endswith("/Robot/material"))
+                or not isinstance(material, dict)
+                or set(material) != {"static_friction", "dynamic_friction", "restitution"}):
+            raise ValueError(f"unexpected live USD contact material: {prim_path!r}={material!r}")
+        static_friction = material["static_friction"]
+        dynamic_friction = material["dynamic_friction"]
+        restitution = material["restitution"]
+        if (any(isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(float(value)) for value in (static_friction, dynamic_friction, restitution))
+                or static_friction < 0 or dynamic_friction < 0 or not 0 <= restitution <= 1):
+            raise ValueError(f"invalid live USD contact material: {prim_path!r}={material!r}")
     if not isinstance(observation, dict) or observation.get("schema") != input_schema:
         raise ValueError(
             f"unexpected live observation contract for expected schema {input_schema!r}: "
             f"{observation!r}"
         )
     return {
+        "backend_identity": BACKEND_IDENTITY,
+        "physics_contact": dict(physics_contact),
         "action_config": action,
         "drive_config": dict(drive),
         "observation_config": dict(observation),
@@ -278,8 +318,8 @@ def _validated_lstm_hidden_size(value: object) -> int:
     return value
 
 
-def _experiment_architecture(lstm_hidden_size: int = 128) -> dict:
-    from isaac_field import policy
+def _experiment_architecture(lstm_hidden_size: int = 512) -> dict:
+    from isaac_field.policy_contract import ACTION_SHAPE, OBSERVATION_SHAPES
 
     lstm_hidden_size = _validated_lstm_hidden_size(lstm_hidden_size)
     return {
@@ -287,8 +327,8 @@ def _experiment_architecture(lstm_hidden_size: int = 128) -> dict:
         "depth_value_range": [0.0, 1.0],
         "depth_space_bounds": [-1.0, 1.0],
         "input_contract": INPUT_SCHEMA,
-        "observation_shapes": {key: list(value) for key, value in policy.OBSERVATION_SHAPES.items()},
-        "action_shape": list(policy.ACTION_SHAPE),
+        "observation_shapes": {key: list(value) for key, value in OBSERVATION_SHAPES.items()},
+        "action_shape": list(ACTION_SHAPE),
         "action_config": _action_config(),
         "goal_gain": 1.0,
         "lstm_hidden_size": lstm_hidden_size,
@@ -298,15 +338,19 @@ def _experiment_architecture(lstm_hidden_size: int = 128) -> dict:
 
 
 def _runtime_contract() -> dict:
-    from isaac_field import policy
     from isaac_field.action_contract import ACTION_COMPONENTS, ACTION_SCHEMA
+    from isaac_field.policy_contract import (
+        ACTION_SHAPE as POLICY_ACTION_SHAPE,
+        ENCODER_SCHEMA as POLICY_ENCODER_SCHEMA,
+        OBSERVATION_SHAPES as POLICY_OBSERVATION_SHAPES,
+    )
 
-    actual_schema = getattr(policy, "ENCODER_SCHEMA", None)
-    actual_shapes = getattr(policy, "OBSERVATION_SHAPES", None)
+    actual_schema = POLICY_ENCODER_SCHEMA
+    actual_shapes = POLICY_OBSERVATION_SHAPES
     expected_shapes = {key: tuple(value) for key, value in OBSERVATION_SHAPES.items() if key != "action"}
     if actual_schema != ENCODER_SCHEMA:
         raise ValueError(f"expected encoder {ENCODER_SCHEMA!r}, found {actual_schema!r}")
-    if actual_shapes != expected_shapes or tuple(getattr(policy, "ACTION_SHAPE", ())) != (4,):
+    if actual_shapes != expected_shapes or tuple(POLICY_ACTION_SHAPE) != (4,):
         raise ValueError(f"observation/action contract mismatch: {actual_shapes!r}")
     action = _action_config()
     expected_action = {
@@ -410,9 +454,9 @@ def _profile_training(profile: str) -> dict:
                 "goal_objective_contract": _fast_stop_objective_contract(_profile_config(profile)),
                 "diagnostics": {
                     "enabled": True,
-                    "callback": "isaac_field.training_diagnostics.make_sb3_diagnostics_callback",
-                    "path": "stage_{one_based_index}_{name}/training_diagnostics.jsonl",
-                    "info_source": "latest_environment.diagnostic_step_infos",
+                    "logger": "RSL-RL OnPolicyRunner TensorBoard writer",
+                    "path": "stage_{one_based_index}_{name}_logs",
+                    "metrics_source": "official_runner",
                 },
             })
         return training
@@ -766,7 +810,11 @@ def _verify_sources(output: Path, manifest: dict) -> None:
 
 
 def _package_versions() -> dict:
-    names = ("torch", "stable-baselines3", "sb3-contrib", "gymnasium", "numpy", "scipy", "warp-lang", "vqf")
+    names = (
+        "torch", "stable-baselines3", "sb3-contrib", "gymnasium", "numpy", "scipy", "warp-lang", "vqf",
+        "isaacsim", "isaacsim-app", "isaacsim-kernel", "isaaclab", "isaaclab-physx",
+        "isaaclab-rl", "isaaclab-tasks", "rsl-rl-lib",
+    )
     versions = {name: None for name in names}
     for name in names:
         try:
@@ -793,7 +841,7 @@ def prepare(
     if profile not in PROFILES:
         raise ValueError(f"profile must be one of {PROFILES}")
     if lstm_hidden_size is None:
-        lstm_hidden_size = 128
+        lstm_hidden_size = 512
     lstm_hidden_size = _validated_lstm_hidden_size(lstm_hidden_size)
     runtime_contract = _runtime_contract()
     config = _profile_config(profile)
@@ -826,7 +874,7 @@ def prepare(
         "robot_geometry": robot_geometry,
         "profile_physics_contract": _profile_physics_contract(profile, config, robot_geometry),
         "training": _profile_training(profile),
-        "initialization": {"checkpoint": None, "baseline_path": "untrained_baseline.zip",
+        "initialization": {"checkpoint": None, "baseline_path": "untrained_baseline.pt",
                            "baseline_num_timesteps": 0, "weight_transfer": False},
         "evaluation": _profile_evaluation(profile),
         "runtime": {"versions": _package_versions(), "isaaclab_commit": _isaac_commit()},
@@ -834,6 +882,9 @@ def prepare(
     }
     if _is_fast_stop_profile(profile):
         protocol["goal_objective_contract"] = _fast_stop_objective_contract(config)
+    from isaac_field.policy_contract import stamp_backend_identity
+
+    stamp_backend_identity(protocol)
     _json(output / "protocol.json", protocol)
     digest = _protocol_sha(output / "protocol.json")
     _json(output / "run_status.json", {
@@ -857,6 +908,9 @@ def preflight(output: Path) -> dict:
         raise ValueError("fresh trial is not an unchanged prepared experiment")
     if protocol.get("schema") != SCHEMA:
         raise ValueError("unsupported fresh protocol schema")
+    from isaac_field.policy_contract import require_backend_identity
+
+    require_backend_identity(protocol)
     profile = protocol.get("profile", PROFILE_LEGACY_FOUNDATION)
     if profile not in PROFILES:
         raise ValueError("prepared trial has an unknown training profile")
@@ -971,6 +1025,11 @@ def _profile_physics_contract(profile: str, config: dict, robot_geometry: dict) 
 
 
 def _checkpoint_steps(path: Path) -> int:
+    if path.suffix.lower() == ".pt":
+        from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+        payload = load_rsl_checkpoint_payload(path, map_location="cpu")
+        return int(payload["num_timesteps"])
     with zipfile.ZipFile(path) as archive:
         return int(json.loads(archive.read("data"))["num_timesteps"])
 
@@ -978,21 +1037,62 @@ def _checkpoint_steps(path: Path) -> int:
 def _checkpoint_manifest(output: Path) -> list[dict]:
     expected_action_config = _action_config()
     rows = []
-    for path in sorted(output.rglob("*.zip")):
-        with zipfile.ZipFile(path) as archive:
-            names = set(archive.namelist())
-            data = json.loads(archive.read("data"))
-        checkpoint_action_config = data.get("field_action_config")
+    for path in sorted(output.rglob("*.pt")):
+        from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+        data = load_rsl_checkpoint_payload(path, map_location="cpu")
+        checkpoint_action_config = data["field_policy_contract"].get("action_config")
         if checkpoint_action_config != expected_action_config:
             raise ValueError(
                 f"checkpoint action contract is missing or incompatible: {path}"
             )
         rows.append({"path": path.relative_to(output).as_posix(),
                      "sha256": _sha256(path), "num_timesteps": _checkpoint_steps(path),
-                     "adam_optimizer_state_present": "policy.optimizer.pth" in names,
+                     "optimizer_state_present": "optimizer_state_dict" in data,
+                     "adam_optimizer_state_present": "optimizer_state_dict" in data,
+                     "backend_identity": {
+                         key: data["field_policy_contract"].get(key)
+                         for key in ("simulator", "physics_backend", "learning_backend")
+                     },
                      "action_config": checkpoint_action_config})
     _json(output / "checkpoint_manifest.json", {"checkpoints": rows})
     return rows
+
+
+def _record_rsl_initialization(output: Path, protocol: dict, runtime: dict, baseline: Path) -> None:
+    from isaac_field.policy_contract import require_backend_identity
+    from isaac_field.rsl_rl_policy import load_rsl_checkpoint_payload
+
+    if baseline.is_file() is False or _checkpoint_steps(baseline) != 0:
+        raise RuntimeError("fresh RSL baseline must be a saved zero-transition checkpoint")
+    payload = load_rsl_checkpoint_payload(baseline, map_location="cpu")
+    contract = payload["field_policy_contract"]
+    require_backend_identity(contract)
+    hidden_size = int(contract["lstm"]["hidden_dim"])
+    initialization = {
+        "checkpoint": baseline.name,
+        "sha256": _sha256(baseline),
+        "num_timesteps": 0,
+        "protocol_sha256": runtime["protocol_sha256"],
+        "field_encoder_config": contract["encoder_config"],
+        "field_action_config": contract["action_config"],
+        "protocol_action_config": protocol["action_config"],
+        "drive_config": contract.get("drive_config"),
+        "observation_config": contract["observation_config"],
+        "protocol_architecture": protocol["architecture"],
+        "policy_lstm_architecture": {
+            "actor": {"hidden_size": hidden_size, "num_layers": contract["lstm"]["num_layers"]},
+            "critic": {"hidden_size": hidden_size, "num_layers": contract["lstm"]["num_layers"]},
+        },
+        "parameter_counts": {
+            "actor": sum(int(value.numel()) for value in payload["actor_state_dict"].values()),
+            "critic": sum(int(value.numel()) for value in payload["critic_state_dict"].values()),
+        },
+        "source_initialization": "fresh random RSL-RL actor/critic and optimizer; no old checkpoint loaded",
+        "backend_identity": {key: contract[key] for key in ("simulator", "physics_backend", "learning_backend")},
+        "optimizer_state_present": "optimizer_state_dict" in payload,
+    }
+    _json(output / "initialization.json", initialization)
 
 
 def _status(output: Path, runtime: dict, status: str = "running", **extra) -> None:
@@ -1027,8 +1127,9 @@ def _evaluate(output: Path, cfg, checkpoint: Path, label: str, seeds: tuple[int,
               front_guide_spec=None, body_stability_config=None,
               profile_physics_contract: dict | None = None,
               goal_objective_contract: dict | None = None) -> dict:
-    from isaac_field.env import SingleFieldAdapter, make_env
+    from isaac_field.env import SingleFieldAdapter
     from isaac_field.learning import evaluate_model
+    from isaac_field.runtime import create_env
     from scripts.improve_isaac_policy import _add_safety_summary
 
     eval_cfg = replace(cfg, plants=plants)
@@ -1038,15 +1139,15 @@ def _evaluate(output: Path, cfg, checkpoint: Path, label: str, seeds: tuple[int,
         physical_kwargs["front_guide_spec"] = front_guide_spec
     if body_stability_config is not None:
         physical_kwargs["body_stability_config"] = body_stability_config
-    engine = make_env(cfg=eval_cfg, mode="goto", num_envs=1, seed=environment_seed,
+    engine = create_env(cfg=eval_cfg, mode="goto", num_envs=1, seed=environment_seed,
                       auto_reset=False, goal_distance=goal_distance,
-                      goal_angle=angle, distance_cost=0.0, **physical_kwargs)
+                      goal_angle=angle, distance_cost=0.0, rsl=True, **physical_kwargs)
     adapter = SingleFieldAdapter(engine)
     try:
         if profile_physics_contract is None:
-            _live_environment_contract(engine)
+            runtime_contract = _live_environment_contract(engine)
         else:
-            _validate_rough_profile_environment(engine, profile_physics_contract)
+            runtime_contract = _validate_rough_profile_environment(engine, profile_physics_contract)
         assets = _runtime_assets(engine)
         report = evaluate_model(adapter, checkpoint, seeds,
                                 goal_distance=goal_distance, goal_angle=angle,
@@ -1055,6 +1156,7 @@ def _evaluate(output: Path, cfg, checkpoint: Path, label: str, seeds: tuple[int,
     finally:
         adapter.close()
     report = _add_safety_summary(report)
+    report["runtime_contract"] = runtime_contract
     if profile_physics_contract is not None:
         report = _add_rough_evaluation_summaries(report)
     if goal_objective_contract is not None:
@@ -1196,16 +1298,22 @@ def _paired_dev_conditions(
 
 
 def launch(output: Path, device: str = "cuda:0") -> dict:
+    from isaac_field.runtime import launch_app
+
+    with launch_app(device=device, headless=True):
+        return _launch_workflow(output, device)
+
+
+def _launch_workflow(output: Path, device: str = "cuda:0") -> dict:
     protocol = preflight(output)
     output = output.resolve()
     runtime = {"protocol_sha256": _protocol_sha(output / "protocol.json"), "num_timesteps": 0}
     _status(output, runtime, phase="initializing")
     try:
-        from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
-        from isaac_field.env import make_env
+        from isaac_field.runtime import create_env
         from isaac_field.learning import CurriculumStage, train_curriculum
         from isaac_field.task import Config
-        from scripts.improve_isaac_policy import _make_progress_callback, _safe_goto_assessment
+        from scripts.improve_isaac_policy import _safe_goto_assessment
 
         cfg = Config(**protocol["config"])
         profile = protocol.get("profile", PROFILE_LEGACY_FOUNDATION)
@@ -1224,9 +1332,7 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
             None if row.get("goal_distance_m") is None else tuple(row["goal_distance_m"]),
             math.radians(row["goal_angle_deg"]),
         ) for row in training["stages"])
-        latest = {"env": None}
         runtime_asset_records = []
-        progress_by_stage = {}
         baseline_path = output / protocol["initialization"]["baseline_path"]
 
         def env_factory(**kwargs):
@@ -1235,144 +1341,22 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
             if front_guide_spec is not None:
                 kwargs["front_guide_spec"] = front_guide_spec
                 kwargs["body_stability_config"] = body_stability_config
-            env = make_env(**kwargs)
+            env = create_env(**kwargs, rsl=True)
             try:
                 if is_rough_profile(profile):
-                    _validate_rough_profile_environment(env, protocol["profile_physics_contract"])
+                    runtime_contract = _validate_rough_profile_environment(
+                        env, protocol["profile_physics_contract"]
+                    )
                 else:
-                    _live_environment_contract(env)
+                    runtime_contract = _live_environment_contract(env)
                 runtime_asset_records.append({"environment_index": len(runtime_asset_records),
-                    "seed": kwargs.get("seed"), "assets": _runtime_assets(env)})
+                    "seed": kwargs.get("seed"), "runtime_contract": runtime_contract,
+                    "assets": _runtime_assets(env)})
                 _json(output / "runtime_assets.json", {"environments": runtime_asset_records})
             except BaseException:
                 env.close()
                 raise
-            latest["env"] = env
             return env
-
-        def callback_factory(stage):
-            index = next(i for i, item in enumerate(stages) if item.name == stage.name)
-            stage_dir = output / f"stage_{index + 1}_{stage.name}"
-            checkpoint_dir = stage_dir / "checkpoints"
-            checkpoint_dir.mkdir(parents=True, exist_ok=True)
-            _verify_sources(output, protocol["source_snapshot"])
-            progress = _make_progress_callback(4, latest["env"], interval=8192)
-            progress_by_stage[stage.name] = progress
-            checkpoint = CheckpointCallback(save_freq=8192 // 4,
-                                            save_path=str(checkpoint_dir),
-                                            name_prefix=f"field_policy_{stage.name}", verbose=0)
-
-            class InitialBaselineCallback(BaseCallback):
-                def _on_training_start(self):
-                    if baseline_path.exists():
-                        raise FileExistsError(f"refusing to replace initial model: {baseline_path}")
-                    if int(self.model.num_timesteps) != 0:
-                        raise RuntimeError("new foundation model must start at zero timesteps")
-                    extractor = self.model.policy.features_extractor
-                    actor_lstm = getattr(self.model.policy, "lstm_actor", None)
-                    critic_lstm = getattr(self.model.policy, "lstm_critic", None)
-                    if int(getattr(extractor, "features_dim", -1)) != 192:
-                        raise ValueError("live encoder fusion dimension is not 192")
-                    if float(getattr(extractor, "goal_gain", math.nan)) != 1.0:
-                        raise ValueError("live encoder goal_gain is not 1.0")
-                    live_contract = (
-                        _validate_rough_profile_environment(latest["env"], protocol["profile_physics_contract"])
-                        if is_rough_profile(profile) else _live_environment_contract(latest["env"])
-                    )
-                    expected_hidden_size = protocol["architecture"]["lstm_hidden_size"]
-                    expected_num_layers = protocol["architecture"]["lstm_num_layers"]
-                    lstm_modules = {"actor": actor_lstm, "critic": critic_lstm}
-                    lstm_architecture = {}
-                    for name, module in lstm_modules.items():
-                        if module is None:
-                            raise ValueError(f"live recurrent policy is missing its {name} LSTM")
-                        actual_hidden_size = int(getattr(module, "hidden_size", -1))
-                        actual_num_layers = int(getattr(module, "num_layers", -1))
-                        if (actual_hidden_size != expected_hidden_size
-                                or actual_num_layers != expected_num_layers):
-                            raise ValueError(
-                                f"live {name} LSTM architecture differs from the frozen protocol: "
-                                f"hidden_size={actual_hidden_size}, num_layers={actual_num_layers}"
-                            )
-                        lstm_architecture[name] = {
-                            "hidden_size": actual_hidden_size,
-                            "num_layers": actual_num_layers,
-                        }
-                    from isaac_field.policy import _validate_model_action_contract
-
-                    _validate_model_action_contract(self.model)
-                    field_encoder_config = _field_encoder_config()
-                    if getattr(self.model, "field_encoder_config", None) != field_encoder_config:
-                        raise ValueError("new model field_encoder_config differs from the current policy")
-                    self.model.save(str(baseline_path.with_suffix("")))
-                    if _checkpoint_steps(baseline_path) != 0:
-                        raise RuntimeError("untrained baseline checkpoint is not at zero steps")
-                    from isaac_field.policy import _validate_checkpoint_action_metadata
-
-                    _validate_checkpoint_action_metadata(baseline_path)
-                    parameter_counts = {
-                        "policy_total": sum(int(parameter.numel()) for parameter in self.model.policy.parameters()),
-                        "actor_lstm": sum(int(parameter.numel()) for parameter in actor_lstm.parameters()),
-                        "critic_lstm": sum(int(parameter.numel()) for parameter in critic_lstm.parameters()),
-                    }
-                    _json(output / "initialization.json", {
-                        "checkpoint": baseline_path.name, "sha256": _sha256(baseline_path),
-                        "num_timesteps": 0, "protocol_sha256": runtime["protocol_sha256"],
-                        "field_encoder_config": field_encoder_config,
-                        "field_action_config": self.model.field_action_config,
-                        "protocol_action_config": protocol["action_config"],
-                        "drive_config": live_contract["drive_config"],
-                        "observation_config": live_contract["observation_config"],
-                        "protocol_architecture": protocol["architecture"],
-                        "policy_lstm_architecture": lstm_architecture,
-                        "parameter_counts": parameter_counts,
-                        "source_initialization": "new RecurrentPPO, no old checkpoint loaded",
-                    })
-                    _checkpoint_manifest(output)
-
-                def _on_step(self):
-                    return True
-
-            class PersistStageProgress(BaseCallback):
-                def _on_training_start(self):
-                    self.stage_start = int(self.model.num_timesteps)
-                    runtime["num_timesteps"] = self.stage_start
-                    _status(output, runtime, phase=f"training_{stage.name}", stage=stage.name)
-
-                def _on_step(self):
-                    runtime["num_timesteps"] = int(self.num_timesteps)
-                    if (runtime["num_timesteps"] - self.stage_start) % 8192 == 0:
-                        _checkpoint_manifest(output)
-                        _status(output, runtime, phase=f"training_{stage.name}", stage=stage.name)
-                    return True
-
-                def _on_training_end(self):
-                    progress._refresh_episodes()
-                    runtime["num_timesteps"] = int(self.model.num_timesteps)
-                    _json(stage_dir / "progress.json", {
-                        "stage": stage.name, "start_num_timesteps": self.stage_start,
-                        "end_num_timesteps": runtime["num_timesteps"],
-                        "aggregate_rows": progress.log_rows,
-                        "last_completed_episodes": progress.recent_episodes[-10:],
-                    })
-                    _status(output, runtime, phase=f"completed_{stage.name}", stage=stage.name)
-
-            callbacks = [checkpoint, progress, PersistStageProgress()]
-            if _is_fast_stop_profile(profile):
-                from isaac_field.training_diagnostics import make_sb3_diagnostics_callback
-
-                def diagnostic_info_provider():
-                    active_env = latest.get("env")
-                    return getattr(active_env, "diagnostic_step_infos", ()) if active_env is not None else ()
-
-                callbacks.append(make_sb3_diagnostics_callback(
-                    stage_dir / "training_diagnostics.jsonl",
-                    stage=stage.name,
-                    info_provider=diagnostic_info_provider,
-                ))
-            if index == 0:
-                callbacks.insert(0, InitialBaselineCallback())
-            return CallbackList(callbacks)
 
         curriculum = train_curriculum(
             cfg, output, checkpoint=None,
@@ -1381,7 +1365,7 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
             heldout_seeds=tuple(evaluation[_evaluation_names(profile)[1]]["seeds"]),
             stages=stages, evaluate_before_after=False, goal_gain=1.0,
             gamma=float(training["gamma"]), device=device, n_epochs=5, batch_size=128,
-            callback_factory=callback_factory, env_factory=env_factory,
+            env_factory=env_factory,
             lstm_hidden_size=protocol["architecture"]["lstm_hidden_size"],
         )
         runtime["num_timesteps"] = int(curriculum.summary["stages"][-1]["total_timesteps"])
@@ -1389,7 +1373,8 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
         if runtime["num_timesteps"] != training["timesteps_total"]:
             raise RuntimeError(f"expected {training['timesteps_total']} steps, got {runtime['num_timesteps']}")
         if not baseline_path.is_file():
-            raise RuntimeError("the untrained baseline was not saved by the first-stage callback")
+            raise RuntimeError("the untrained RSL baseline checkpoint was not saved")
+        _record_rsl_initialization(output, protocol, runtime, baseline_path)
         checkpoints = _checkpoint_manifest(output)
         paired_results, evaluation_reports = {}, []
         for split in _evaluation_names(profile):
@@ -1446,6 +1431,10 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
         if profile == PROFILE_LEGACY_FOUNDATION:
             summary = {
                 "schema": "isaac-field-fresh-foundation-development-summary-v1",
+                "simulator": protocol["simulator"],
+                "physics_backend": protocol["physics_backend"],
+                "learning_backend": protocol["learning_backend"],
+                "algorithm": training["algorithm"],
                 "action_config": protocol["action_config"],
                 "checkpoint_initial": str(baseline_path), "checkpoint_final": str(final_checkpoint),
                 "actual_final_num_timesteps": runtime["num_timesteps"],
@@ -1461,6 +1450,10 @@ def launch(output: Path, device: str = "cuda:0") -> dict:
         else:
             summary = {
                 "schema": "isaac-field-fresh-foundation-development-summary-v1",
+                "simulator": protocol["simulator"],
+                "physics_backend": protocol["physics_backend"],
+                "learning_backend": protocol["learning_backend"],
+                "algorithm": training["algorithm"],
                 "profile": profile, "action_config": protocol["action_config"],
                 "checkpoint_initial": str(baseline_path), "checkpoint_final": str(final_checkpoint),
                 "actual_final_num_timesteps": runtime["num_timesteps"],
@@ -1505,7 +1498,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--lstm-hidden-size", type=int, default=None,
-                        help="positive LSTM hidden width; valid only with --prepare (default: 128)")
+                        help="positive LSTM hidden width; valid only with --prepare (default: 512)")
     args = parser.parse_args(argv)
     if args.lstm_hidden_size is not None and not args.prepare:
         parser.error("--lstm-hidden-size is only valid with --prepare")

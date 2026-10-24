@@ -2,8 +2,8 @@
 
 import hashlib
 import json
-import sys
-from types import ModuleType, SimpleNamespace
+from contextlib import nullcontext
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -359,7 +359,7 @@ def test_heldout_eval_rejects_checkpoint_with_old_action_semantics():
         learning.evaluate_model(_FakeAdapter(engine), model, (5,))
 
 
-def test_heldout_eval_rejects_old_action_metadata_before_sb3_load(tmp_path):
+def test_heldout_eval_requires_explicit_legacy_switch_for_sb3_zip(tmp_path):
     import zipfile
 
     engine = SimpleNamespace(
@@ -370,12 +370,15 @@ def test_heldout_eval_rejects_old_action_metadata_before_sb3_load(tmp_path):
     with zipfile.ZipFile(checkpoint, "w") as archive:
         archive.writestr("data", json.dumps({"field_action_config": {"schema": "forward-differential-v2"}}))
 
-    with pytest.raises(ValueError, match="action contract is missing or incompatible"):
+    with pytest.raises(ValueError, match="SB3 policy loading is legacy-only"):
         learning.evaluate_model(_FakeAdapter(engine), checkpoint, (5,))
 
 
 @pytest.mark.parametrize("gamma", [0.995, 1.0])
 def test_train_curriculum_uses_disjoint_seeds_and_closes_contexts_sequentially(tmp_path, monkeypatch, gamma):
+    from isaac_field import runtime
+
+    monkeypatch.setattr(runtime, "launch_app", lambda **_kwargs: nullcontext())
     active = {"engine": None}
     created = []
     stage_calls = []
@@ -466,7 +469,10 @@ def test_train_curriculum_uses_disjoint_seeds_and_closes_contexts_sequentially(t
     )
 
 
-def test_train_curriculum_rejects_training_heldout_seed_overlap(tmp_path):
+def test_train_curriculum_rejects_training_heldout_seed_overlap(tmp_path, monkeypatch):
+    from isaac_field import runtime
+
+    monkeypatch.setattr(runtime, "launch_app", lambda **_kwargs: nullcontext())
     with pytest.raises(ValueError, match="overlap training seeds"):
         learning.train_curriculum(
             learning.Config(size=12, plants=4, terrain_enabled=False),
@@ -528,278 +534,78 @@ class _TinyRecurrentPolicyEnv:
         return Env()
 
 
-@pytest.mark.parametrize("pass_loaded_model", [False, True], ids=["checkpoint", "existing-model"])
-def test_train_stage_overrides_loaded_sb3_hyperparameters_and_trains(
-    tmp_path, monkeypatch, pass_loaded_model
-):
-    """Stage overrides must affect both zip-loaded and already-created models."""
-    import torch
-    from sb3_contrib import RecurrentPPO
-    from stable_baselines3.common.vec_env import DummyVecEnv
-
-    from isaac_field.policy import make_model
-
-    env = DummyVecEnv([_TinyRecurrentPolicyEnv])
-    env.action_config = action_config()
-    env.drive_config = {"interface": "independent_left_right_track_speed_coupled_pi_v7", "velocity_gain": 20.0}
-    env.observation_config = {
-        "schema": "sensor-minimal-v6",
-        "state_dim": 33,
-        "depth_channels": 1,
-        "depth_invalid_value": 0.0,
-        "previous_command_semantics": "normalized_direct_track_speed_policy_command",
-        "previous_command_indices": [13, 14, 15, 16],
-    }
-    env.damage_config = {
-        "metric": "stem-contact-v2",
-        "track_geometry": "seven-rollers-per-side",
-    }
-    monkeypatch.setattr(learning, "_make_adapter_factory", lambda: None)
-    from isaac_field import training
-
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    source = make_model(
-        env,
-        seed=29,
-        n_steps=128,
-        batch_size=128,
-        n_epochs=1,
-        learning_rate=7e-3,
-        gamma=0.91,
-        goal_gain=1.0,
-        log_std_init=-1.25,
-        target_kl=0.005,
-        lstm_hidden_size=16,
-        net_arch={"pi": [16], "vf": [16]},
-        device="cpu",
-    )
-    source_path = tmp_path / "source.zip"
-    source.save(str(source_path))
-    original_parameters = {
-        name: value.detach().clone() for name, value in source.policy.state_dict().items()
-    }
-    cnn_parameter_names = [
-        name
-        for name in original_parameters
-        if name.startswith("features_extractor.laser.") or name.startswith("features_extractor.depth.")
-    ]
-    assert cnn_parameter_names
-    original_log_std = source.policy.log_std.detach().clone()
-    loaded = RecurrentPPO.load(str(source_path), env=env, device="cpu")
-
-    # Capture the distribution parameter at the first update boundary. A stage
-    # override must not reinitialize the learned log_std from log_std_init.
-    observed_initial_log_std = []
-    original_learn = RecurrentPPO.learn
-
-    def capture_log_std(model, *args, **kwargs):
-        observed_initial_log_std.append(model.policy.log_std.detach().clone())
-        return original_learn(model, *args, **kwargs)
-
-    monkeypatch.setattr(RecurrentPPO, "learn", capture_log_std)
-    checkpoint_arg = loaded if pass_loaded_model else source_path
-    result = learning.train_stage(
-        env,
-        checkpoint_arg,
-        128,
-        tmp_path / f"trained-{pass_loaded_model}",
-        seed=41,
-        device="cpu",
-        goal_gain=1.0,
-        n_steps=128,
-        batch_size=128,
-        n_epochs=1,
-        learning_rate=2.5e-4,
-        gamma=0.83,
-        target_kl=0.025,
-        log_std_init=-8.0,
-        lstm_hidden_size=16,
-    )
-
-    assert result.trained_timesteps == 128
-    assert result.model.policy.lstm_actor.hidden_size == 16
-    assert result.model.policy.lstm_critic.hidden_size == 16
-    assert len(observed_initial_log_std) == 1
-    torch.testing.assert_close(observed_initial_log_std[0], original_log_std)
-    trained = RecurrentPPO.load(str(result.checkpoint), env=env, device="cpu")
-    assert trained.field_drive_config == env.drive_config
-    assert trained.field_action_config == action_config()
-    assert trained.field_observation_config == env.observation_config
-    assert trained.field_damage_config == env.damage_config
-    assert trained.learning_rate == pytest.approx(2.5e-4)
-    assert trained.lr_schedule(1.0) == pytest.approx(2.5e-4)
-    assert trained.gamma == pytest.approx(0.83)
-    assert trained.rollout_buffer.gamma == pytest.approx(0.83)
-    assert trained.target_kl == pytest.approx(0.025)
-    assert trained.policy.optimizer.param_groups[0]["lr"] == pytest.approx(2.5e-4)
-    assert any(
-        not torch.equal(original_parameters[name], value)
-        for name, value in trained.policy.state_dict().items()
-    )
-    trained_parameters = trained.policy.state_dict()
-    assert any(
-        not torch.equal(original_parameters[name], trained_parameters[name])
-        for name in cnn_parameter_names
-    )
-
-    # Loading for a stage is copy-on-load: it must leave the old candidate intact.
-    unchanged = RecurrentPPO.load(str(source_path), env=env, device="cpu")
-    assert unchanged.learning_rate == pytest.approx(7e-3)
-    assert unchanged.gamma == pytest.approx(0.91)
-    assert unchanged.target_kl == pytest.approx(0.005)
-    for name, value in unchanged.policy.state_dict().items():
-        torch.testing.assert_close(value, original_parameters[name])
-    env.close()
-
-
-def test_train_stage_forwards_requested_lstm_width_to_make_model(tmp_path, monkeypatch):
-    from isaac_field import policy, training
-
-    fake_sb3 = ModuleType("sb3_contrib")
-    fake_sb3.RecurrentPPO = object
-    monkeypatch.setitem(sys.modules, "sb3_contrib", fake_sb3)
-    env = SimpleNamespace(
-        action_config=action_config(), observation_space=object(), action_space=object(),
-    )
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    monkeypatch.setattr(policy, "validate_policy_spaces", lambda *_args: None)
-    calls = {}
-
-    class StopBeforeTraining(Exception):
-        pass
-
-    def capture_make_model(_env, **kwargs):
-        calls.update(kwargs)
-        raise StopBeforeTraining
-
-    monkeypatch.setattr(policy, "make_model", capture_make_model)
-    with pytest.raises(StopBeforeTraining):
-        learning.train_stage(
-            env, None, 1, tmp_path / "new-model", device="cpu",
-            n_steps=128, batch_size=128, n_epochs=1, lstm_hidden_size=512,
-        )
-
-    assert calls["lstm_hidden_size"] == 512
-
-
-def test_train_stage_rejects_existing_model_with_wrong_lstm_width(tmp_path, monkeypatch):
-    from isaac_field import policy, training
-
-    fake_sb3 = ModuleType("sb3_contrib")
-    fake_sb3.RecurrentPPO = object
-    monkeypatch.setitem(sys.modules, "sb3_contrib", fake_sb3)
-    env = SimpleNamespace(
-        action_config=action_config(), observation_space=object(), action_space=object(),
-    )
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    monkeypatch.setattr(policy, "validate_policy_spaces", lambda *_args: None)
-    monkeypatch.setattr(policy, "_validate_model_action_contract", lambda _model: None)
-
-    class ExistingModel:
-        policy = SimpleNamespace(
-            lstm_actor=SimpleNamespace(hidden_size=128),
-            lstm_critic=SimpleNamespace(hidden_size=128),
-        )
-
-        def predict(self, *_args, **_kwargs):
-            return None
-
-        def set_env(self, _env):
-            raise AssertionError("width mismatch must be rejected before mutating the model")
-
-    with pytest.raises(ValueError, match="requested lstm_hidden_size=512"):
-        learning.train_stage(
-            env, ExistingModel(), 1, tmp_path / "wrong-width", device="cpu",
-            n_steps=128, batch_size=128, n_epochs=1, lstm_hidden_size=512,
-        )
-
-
-@pytest.mark.parametrize("checkpoint_kind", ["path", "model"])
-def test_train_stage_rejects_old_action_semantics_before_training(
-    tmp_path, monkeypatch, checkpoint_kind,
-):
-    from sb3_contrib import RecurrentPPO
-    from stable_baselines3.common.vec_env import DummyVecEnv
-
-    from isaac_field.policy import make_model
-    from isaac_field import training
-
-    env = DummyVecEnv([_TinyRecurrentPolicyEnv])
-    env.action_config = action_config()
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    model = make_model(
-        env, seed=13, n_steps=128, batch_size=128, n_epochs=1, device="cpu",
-    )
-    model.field_action_config = {"schema": "forward-differential-v2"}
-    if checkpoint_kind == "path":
-        checkpoint = tmp_path / "old-action.zip"
-        model.save(str(checkpoint))
+@pytest.mark.parametrize("checkpoint_kind", ["zip", "model"])
+def test_rsl_train_stage_rejects_legacy_checkpoint_or_model_object(tmp_path, checkpoint_kind):
+    if checkpoint_kind == "zip":
+        checkpoint = tmp_path / "legacy.zip"
+        checkpoint.write_bytes(b"legacy SB3 archive")
+        expected = ValueError
     else:
-        checkpoint = model
+        checkpoint = SimpleNamespace()
+        expected = TypeError
 
-    with pytest.raises(ValueError, match="action contract is missing or incompatible"):
+    with pytest.raises(expected, match=r"legacy-only|explicit \.pt checkpoint path"):
         learning.train_stage(
-            env, checkpoint, 128, tmp_path / f"rejected-{checkpoint_kind}",
-            device="cpu", n_steps=128, batch_size=128, n_epochs=1,
+            object(), checkpoint, 128, tmp_path / "new-stage.pt", device="cpu",
+            n_steps=128, batch_size=128, n_epochs=1,
         )
-    env.close()
+
+
+def test_default_training_configuration_keeps_512_recurrent_width():
+    from isaac_field.training import TrainingConfig
+
+    assert TrainingConfig().lstm_hidden_size == 512
+
+
+def test_rsl_train_stage_rejects_legacy_pickle_checkpoint(tmp_path):
+    checkpoint = tmp_path / "legacy.pkl"
+    checkpoint.write_bytes(b"legacy SB3 pickle")
+    with pytest.raises(ValueError, match="legacy-only"):
+        learning.train_stage(
+            object(), checkpoint, 128, tmp_path / "new-stage.pt", device="cpu",
+            n_steps=128, batch_size=128, n_epochs=1,
+        )
 
 
 def test_public_training_path_saves_damage_metric_metadata(tmp_path, monkeypatch):
-    import sys
+    from isaac_field import training
+    calls = {}
 
-    fake_policy = ModuleType("isaac_field.policy")
-    fake_policy.make_model = lambda *_args, **_kwargs: None
-    fake_policy.validate_policy_spaces = lambda *_args: None
-    fake_policy._validate_model_action_contract = lambda model: (
-        None if getattr(model, "field_action_config", None) == action_config()
-        else (_ for _ in ()).throw(ValueError("invalid action contract"))
+    def fake_train_stage(env, checkpoint, timesteps, output, callback=None, **kwargs):
+        calls.update(env=env, checkpoint=checkpoint, timesteps=timesteps, output=output, kwargs=kwargs)
+        return SimpleNamespace(model=object(), checkpoint=output, trained_timesteps=timesteps)
+
+    monkeypatch.setattr(learning, "train_stage", fake_train_stage)
+    result = training.train(
+        object(), tmp_path / "native-training", timesteps=256, device="cpu",
+        config=training.TrainingConfig(n_epochs=1),
     )
-    monkeypatch.setitem(sys.modules, "isaac_field.policy", fake_policy)
+
+    assert calls["checkpoint"] is None
+    assert calls["timesteps"] == 256
+    assert calls["output"] == tmp_path / "native-training.pt"
+    assert calls["kwargs"]["lstm_hidden_size"] == 512
+    assert result.actual_timesteps == 256
+
+
+def test_public_training_helper_forwards_configured_rollout_length(tmp_path, monkeypatch):
     from isaac_field import training
 
-    damage_config = {"metric": "stem-contact-v2", "track_geometry": "seven-rollers-per-side"}
-    env = SimpleNamespace(
-        num_envs=1,
-        action_config=action_config(),
-        drive_config={"interface": "track-v2"},
-        observation_config={"schema": "state-last-command-v2"},
-        damage_config=damage_config,
-        observation_space=object(),
-        action_space=object(),
-    )
+    calls = {}
 
-    class Model:
-        device = "cpu"
-        num_timesteps = 0
-        field_action_config = action_config()
+    def fake_train_stage(env, checkpoint, timesteps, output, callback=None, **kwargs):
+        calls.update(checkpoint=checkpoint, timesteps=timesteps, output=output, kwargs=kwargs)
+        return SimpleNamespace(model=object(), checkpoint=output, trained_timesteps=timesteps)
 
-        def learn(self, *, total_timesteps, **_):
-            self.num_timesteps += int(total_timesteps)
-
-        def save(self, path):
-            self.saved_damage_config = dict(self.field_damage_config)
-            self.saved_action_config = dict(self.field_action_config)
-            from pathlib import Path
-
-            Path(f"{path}.zip").write_bytes(b"checkpoint")
-
-    model = Model()
-    monkeypatch.setattr(training, "_sb3_wrapper", lambda value: value)
-    monkeypatch.setattr(training, "validate_policy_spaces", lambda *_: None)
-    monkeypatch.setattr(training, "make_model", lambda *_args, **_kwargs: model)
-
+    monkeypatch.setattr(learning, "train_stage", fake_train_stage)
     result = training.train(
-        env,
-        tmp_path / "native-training",
-        timesteps=4,
-        device="cpu",
-        config=training.TrainingConfig(n_steps=2, batch_size=2, n_epochs=1),
+        object(), tmp_path / "short-rollout", timesteps=32, device="cpu",
+        config=training.TrainingConfig(n_steps=16, batch_size=32, n_epochs=1),
     )
 
-    assert result.actual_timesteps == 4
-    assert model.field_damage_config == damage_config
-    assert model.saved_damage_config == damage_config
-    assert model.field_action_config == action_config()
-    assert model.saved_action_config == action_config()
+    assert calls["checkpoint"] is None
+    assert calls["timesteps"] == 32
+    assert calls["kwargs"]["n_steps"] == 16
+    assert calls["kwargs"]["batch_size"] == 32
+    assert result.actual_timesteps == 32
 

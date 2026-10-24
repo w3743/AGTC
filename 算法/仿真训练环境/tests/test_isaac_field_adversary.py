@@ -81,7 +81,16 @@ def test_teacher_rolls_back_invalid_layout_and_scores_final_map_once():
     assert final_info["spawn_pose"] is not None
     assert len(final_info["positions"]) == _cfg().plants
     assert len(final_info["checkpoints"]) == env._valid_edits + 1
-    assert env.summary()["episodes_recorded"] == 1
+    summary = env.summary()
+    assert summary["episodes_recorded"] == 1
+    assert summary["teacher_runtime_identity"] == {
+        "simulator": "gymnasium", "physics_backend": "none", "learning_backend": "rsl_rl",
+    }
+    assert summary["target_student_backend_identity"] == {
+        "simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl",
+    }
+    assert summary["evaluator_kind"] == "score_callback"
+    assert summary["student_physx_evaluated"] is False
 
 
 def test_layout_edits_keep_scene_geometry_shape_and_targets_fixed():

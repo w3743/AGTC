@@ -14,12 +14,12 @@ torch.set_num_threads(1)
 
 from isaac_field.action_contract import action_config
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
-from isaac_field.policy import OBSERVATION_SHAPES
+from isaac_field.policy_contract import OBSERVATION_SHAPES
 from isaac_field.rsl_rl_inference import RslPolicyRunner
 from isaac_field.rsl_rl_policy import RslFieldRNNModel, build_field_policy_contract
 from isaac_field.visualization.inspection import PolicyInspector
 from isaac_field.visualization.network_panel import PolicyNetworkPanel
-from test_absolute_goal_policy import _observation_config
+from policy_contract_helpers import observation_config as _observation_config
 
 
 def _make_checkpoint(path: Path):
@@ -55,6 +55,7 @@ def _make_checkpoint(path: Path):
         num_envs=1,
         observation_config=config,
         action_config=action_config(),
+        backend_identity={"simulator": "isaac_sim", "physics_backend": "physx", "learning_backend": "rsl_rl"},
         drive_config={"cpu_fixture": True},
         damage_config={"cpu_fixture": True},
     )

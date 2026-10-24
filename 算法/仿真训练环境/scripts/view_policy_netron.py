@@ -349,7 +349,9 @@ def _load_or_export(checkpoint: Path, output: Path, checkpoint_sha: str):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", required=True, type=Path, help="SB3-Contrib RecurrentPPO checkpoint .zip")
+    parser.add_argument("--checkpoint", required=True, type=Path, help="legacy SB3 RecurrentPPO checkpoint .zip")
+    parser.add_argument("--legacy-sb3", action="store_true",
+                        help="explicitly enable the historical SB3 checkpoint exporter")
     parser.add_argument("--output", type=Path, help="TorchScript output path; default uses checkpoint stem and SHA-8")
     parser.add_argument("--export-only", action="store_true", help="Export and validate without starting Netron")
     parser.add_argument("--port", type=int, default=8081, help="Netron loopback port (default: 8081; 0 chooses a free port)")
@@ -358,6 +360,10 @@ def main(argv=None):
     checkpoint = args.checkpoint.expanduser().resolve()
     if not checkpoint.is_file():
         parser.error(f"checkpoint does not exist: {checkpoint}")
+    if not args.legacy_sb3:
+        parser.error("this exporter is SB3 legacy-only; pass --legacy-sb3 or use scripts/export_rsl_policy.py")
+    if checkpoint.suffix.lower() != ".zip":
+        parser.error("--legacy-sb3 requires an SB3 .zip checkpoint; native RSL export uses scripts/export_rsl_policy.py")
     checkpoint_sha = _sha256(checkpoint)
     output = args.output.expanduser().resolve() if args.output else _default_output(checkpoint, checkpoint_sha).resolve()
     if output == checkpoint:
