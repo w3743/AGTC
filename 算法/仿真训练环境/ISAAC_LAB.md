@@ -7,13 +7,19 @@ PR22 已合入 `main` (`b3fd9cab`)，当前分支为 `chore/physx-pointmove-trai
 - a01 的一次性流程把 `scene.env_spacing` 设为20m，但生产 `env.py:177` 按场地尺寸+10m生成22m；协议门禁因此拒绝正式训练。a01全部输出原样保留，不作正式成绩。
 - 正式trial为 `results/isaac_field_improvement/physx_pointmove_flat12_20261024_a02/`。a02已将CLI和guard统一为22m spacing；protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`，冻结76个来源文件（含 `run_pipeline.py`），未改生产源码。0步baseline进程真实exit 0，CPU检查通过：`num_timesteps=0`、iteration=0、Adam为空、参数有限；baseline SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`。
 - `run_status.json`记录`resume_training_cli`仍在运行。12:18:46+08进程审计确认controller PID 7316、wrapper PID 22492和训练Python PID 7520；首个完整检查点于12:22:14+08落盘，CPU审计通过：512 transitions、Adam step20、参数有限且权重已变化；76源及协议/基线SHA未变，详见`first_checkpoint_cpu.json`。编排进程通过Windows线程级 `SetThreadExecutionState` 在本轮运行期间请求阻止系统空闲睡眠，未改全局电源计划。训练完成前不宣称训练成功或能力提升；动态状态以trial的status、实际进程和完整checkpoint/OS退出为准。
-- 自然完成后同配置串行评估baseline和终局模型，各跑16个完整60s全图开发场景seed 87010–87025，不设max-steps上限并保存轨迹、停稳状态、损伤和碰撞。验收沿用16场中clean success至少13场、damage/collision/unsafe均为0，并要求终局clean成功增加且安全指标不恶化。830xx及held-out不使用；结果不代表避苗、粗糙地形或实车能力。单次训练和记录不另计功能，第二十批为3/5（新增完成事件监听）；周期自动化保持PAUSED。
+- 自然完成后同配置串行评估baseline和终局模型，各跑16个完整60s全图开发场景seed 87010–87025，不设max-steps上限并保存轨迹、停稳状态、损伤和碰撞。验收沿用16场中clean success至少13场、damage/collision/unsafe均为0，并要求终局clean成功增加且安全指标不恶化。830xx及held-out不使用；结果不代表避苗、粗糙地形或实车能力。单次训练和记录不另计功能，第二十批为4/5（含完成事件监听和原生GUI预览）；周期自动化保持PAUSED。
 
 ### 本轮完成后自动唤醒当前聊天
 
 用户已明确授权完成事件唤醒。独立 `scripts/watch_training_completion.py` 已在后台启动，每30秒读取a02状态；等待期间不调用模型。训练子进程exit 0且终局检查通过后通知一次，父流程仍负责自动串行评估；最终评估完成或异常再通知，禁止重复启动GPU、修改冻结源或恢复旧周期任务。使用官方 `codex queue --thread <当前聊天ID> --message <固定核查指令>`，不改模型、权限或API配置。
 
 14项CPU测试通过，含去重、异常/不完整JSON、可选导出、真实Windows进程创建时间和单实例锁；真实连通测试已获队列确认。该测试不代表训练完成。当前监听PID与最近轮询、投递去重状态分别在仓库外 `C:/pioneer/isaac-training/watchers/pointmove-a02/watch_status.json` 和 `delivery.json`。同一事件先持久化再投递；不确定结果保留为uncertain，不盲目重投。监听在最终完成/失败后退出。电脑与Codex需保持运行；原周期自动化保持PAUSED。
+
+### 原生GUI场景预览已验证
+
+`results/isaac_field_viewer/physx_pointmove_flat12_gui_20261024_a03/`通过原生Isaac Sim窗口验证：车辆盒体、两侧滚轮和地面已可见，`viewport_status.json`显示句柄有效，timeline保持暂停。窗口显示一份引用本轮真实地面/机器人USD资产的同配置静态场景，初始摆放是示意，未加载执行训练模型，也不是训练进程的实时视图。
+
+a01的启动空模板覆盖了场景；a02纠正场景后仍停在hydraCreate等待句柄；a03改用异步资源加载、默认16线程上限和显式实时光照模式后实际画面通过。旧源码与失败日志原字节保留；原始训练资产、76份冻结源和协议SHA均未变。训练及完成事件监听未停，详见a03/ui_verification.json。当前窗口可用鼠标查看；关闭此独立预览不结束后台训练。
 
 ## 2026-10-24：Isaac Sim迁移验收小流程完成（历史快照）
 
