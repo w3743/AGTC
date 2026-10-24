@@ -17,7 +17,9 @@
 
 ## 当前批次与运行状态
 
-- 2026-10-24 PR22 已合入 `main` (`b3fd9cab`)，当前分支 `chore/physx-pointmove-training`。用户授权本机一次 12×12m 平地、零植物/石块、全图随机起终点、60s 的 fast_stop_v2/absolute-goal 定点移动训练：512×1 LSTM、0.4m、XY速度<0.05m/s、全角速度<0.1rad/s并连续保持0.5s；4×128×384=196608 transitions。a01 的20m spacing guard与生产 `env.py:177` 实际22m不符，未通过协议门禁，试验原样保留；a02已修正为22m spacing，76源哈希及protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`冻结，零步baseline真实exit 0并通过检查（0步/0迭代、Adam空、参数有限，SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`）。a02处于`resume_training_cli`运行中；首个完整checkpoint已通过CPU审计，512 transitions、Adam step20、参数有限且权重真实变化，76源及协议/基线SHA未变（见`first_checkpoint_cpu.json`）；未完成训练或能力改善不得提前宣称。自然结束后按同配置配对评估baseline与终局模型，各跑16个60s全图开发场景seed87010–87025；不用830xx/held-out，不据此宣称避苗、粗糙地形或实车能力。当前动态证据及流程边界见 `ISAAC_LAB.md`；第二十批仍2/5，训练/记录不另计独立功能，自动化保持PAUSED。
+- 2026-10-24 PR22 已合入 `main` (`b3fd9cab`)，当前分支 `chore/physx-pointmove-training`。用户授权本机一次 12×12m 平地、零植物/石块、全图随机起终点、60s 的 fast_stop_v2/absolute-goal 定点移动训练：512×1 LSTM、0.4m、XY速度<0.05m/s、全角速度<0.1rad/s并连续保持0.5s；4×128×384=196608 transitions。a01 的20m spacing guard与生产 `env.py:177` 实际22m不符，未通过协议门禁，试验原样保留；a02已修正为22m spacing，76源哈希及protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`冻结，零步baseline真实exit 0并通过检查（0步/0迭代、Adam空、参数有限，SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`）。a02处于`resume_training_cli`运行中；首个完整checkpoint已通过CPU审计，512 transitions、Adam step20、参数有限且权重真实变化，76源及协议/基线SHA未变（见`first_checkpoint_cpu.json`）；未完成训练或能力改善不得提前宣称。自然结束后按同配置配对评估baseline与终局模型，各跑16个60s全图开发场景seed87010–87025；不用830xx/held-out，不据此宣称避苗、粗糙地形或实车能力。当前动态证据及流程边界见 `ISAAC_LAB.md`；第二十批为3/5（含完成事件监听），训练/记录不另计独立功能，自动化保持PAUSED。
+
+- 2026-10-24 按用户明确要求新增 `scripts/watch_training_completion.py` 并部署到本机后台：每30秒用普通程序检查a02状态，训练完成并通过终局检查、评估完成或异常时，通过官方 `codex queue` 向当前聊天排队一次；事件持久化去重，最终结束后退出，不重复启动GPU流程。14项CPU单元测试通过；真实队列连通测试exit0并返回确认，测试消息不是完成信号。当前训练仍运行、尚无真实完成事件；76冻结源与协议SHA未变，旧周期自动化未修改。状态/去重记录在仓库外 `C:/pioneer/isaac-training/watchers/pointmove-a02/`，验证证据见 `results/isaac_field_diagnosis/training_completion_wake_20261024/`。
 
 ### 历史快照（以下条目保留各自日期的原始数据）
 
