@@ -800,6 +800,9 @@ class FieldTask:
         self.feedback_model_config: dict[str, Any] = {}
         self._feedback_estimator: SimFeedbackEstimator | None = None
         self._feedback_snapshot: FeedbackSnapshot | None = None
+        # Monotonic across prepare()/reset() calls; sensor serials and episode
+        # capture time intentionally restart with each prepared episode.
+        self._episode_generation = -1
 
     @property
     def estimated_pose_config(self) -> dict[str, Any]:
@@ -976,6 +979,7 @@ class FieldTask:
         self.view_origin = np.asarray([self.robot[0], self.robot[1], z + c.camera_height], dtype=np.float32)
         self.view_basis = self._flat_basis()
         self._counts = (0, 0, 0)
+        self._episode_generation += 1
         return self.scene
 
     def update_feedback(self, sample: FeedbackSample) -> FeedbackSnapshot:
@@ -1054,6 +1058,7 @@ class FieldTask:
             raise TypeError(f"capture({kind!r}) must return a frame dictionary")
         frame = dict(result)
         tensor_sensor_frame = frame.get("_tensor_sensor_frame") is True
+        frame["episode_generation"] = int(self._episode_generation)
         self._serial[kind] += 1
         z, pitch, roll = self._body_pose()
         frame.setdefault("seq", self._serial[kind])
@@ -1078,6 +1083,18 @@ class FieldTask:
                         or tuple(ranges.shape) != (self.cfg.lidar_rays,)
                         or tuple(valid.shape) != (self.cfg.lidar_rays,)):
                     raise ValueError("device LiDAR frame must contain tensor ranges and valid mask with configured shape")
+                if "sensor_origin_w" in frame:
+                    frame["sensor_origin_w"] = np.asarray(
+                        frame["sensor_origin_w"], dtype=np.float32
+                    ).reshape(3).copy()
+                if "sensor_quat_w_xyzw" in frame:
+                    frame["sensor_quat_w_xyzw"] = np.asarray(
+                        frame["sensor_quat_w_xyzw"], dtype=np.float32
+                    ).reshape(4).copy()
+                if "ray_directions_local" in frame:
+                    frame["ray_directions_local"] = np.asarray(
+                        frame["ray_directions_local"], dtype=np.float32
+                    ).reshape(self.cfg.lidar_rays, 3).copy()
                 frame["hit_kind"] = np.zeros(self.cfg.lidar_rays, dtype=np.uint8)
                 forward, right, _ = self._basis()
                 frame.setdefault(
@@ -1122,6 +1139,14 @@ class FieldTask:
                         or tuple(values.shape) != expected_shape
                         or tuple(valid.shape) != expected_shape):
                     raise ValueError("device depth frame must contain tensor values and valid mask with configured shape")
+                if "sensor_origin_w" in frame:
+                    frame["sensor_origin_w"] = np.asarray(
+                        frame["sensor_origin_w"], dtype=np.float32
+                    ).reshape(3).copy()
+                if "sensor_quat_w_ros_xyzw" in frame:
+                    frame["sensor_quat_w_ros_xyzw"] = np.asarray(
+                        frame["sensor_quat_w_ros_xyzw"], dtype=np.float32
+                    ).reshape(4).copy()
                 frame.setdefault("unit", "m")
                 frame.setdefault("convention", "camera_z")
                 frame.setdefault("projection", "pinhole")

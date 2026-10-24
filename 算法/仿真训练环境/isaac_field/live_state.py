@@ -2,13 +2,56 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import logging
 import os
 from pathlib import Path
+import sys
 import time
 import uuid
 
 import numpy as np
+
+
+def create_sensor_sample_exporter_from_environment(
+    *, run_id, num_envs, lidar_rays, depth_height, depth_width,
+):
+    """Load the optional pure-CPU sensor sidecar exporter when configured."""
+    if not os.environ.get("ISAAC_FIELD_SENSOR_SAMPLES_FILE"):
+        return None
+
+    explicit_module = os.environ.get("ISAAC_FIELD_SENSOR_EXPORT_MODULE")
+    candidates = [Path(explicit_module).expanduser().resolve()] if explicit_module else []
+    if not candidates:
+        for ancestor in Path(__file__).resolve().parents:
+            candidates.append(ancestor / "tools" / "live_training_observer" / "sensor_export.py")
+    module_path = next((path for path in candidates if path.is_file()), None)
+    if module_path is None:
+        raise FileNotFoundError(
+            "ISAAC_FIELD_SENSOR_SAMPLES_FILE is set, but tools/live_training_observer/sensor_export.py "
+            "could not be located; set ISAAC_FIELD_SENSOR_EXPORT_MODULE to its absolute path"
+        )
+
+    module_name = "_isaac_field_sensor_export_v1"
+    module = sys.modules.get(module_name)
+    if module is None or Path(getattr(module, "__file__", "")).resolve() != module_path.resolve():
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"cannot load sensor exporter from {module_path}")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        try:
+            spec.loader.exec_module(module)
+        except BaseException:
+            sys.modules.pop(module_name, None)
+            raise
+    return module.create_sensor_sample_exporter_from_environment(
+        run_id=run_id,
+        num_envs=num_envs,
+        lidar_rays=lidar_rays,
+        depth_height=depth_height,
+        depth_width=depth_width,
+    )
 
 
 class LiveStateExporter:

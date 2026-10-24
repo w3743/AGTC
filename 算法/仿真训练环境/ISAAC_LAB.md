@@ -1,6 +1,28 @@
 # Isaac Lab 项目状态
 
-## 2026-10-24：GPU批处理、轻量观察端与驱动控制器去重（当前；第二十二批2/5，a06训练运行中）
+## 2026-10-25：第二十三批范围整理与当前运行状态（最新）
+
+第二十三批五项已完成并整理（5/5）：真实 PhysX CUDA 刚体变换经 Isaac Lab 转换发布到 Fabric，修正相机实际捕获位姿；headless 隐藏默认 viewport 停止更新，但相机 render products 保持工作；8个云台转轴补齐 angular force DriveAPI，配置gain/torque及物理精度不变；观察器现绑定训练产生的LiDAR/depth样点，显示青色LiDAR圆点（0.045m）和橙色depth方块（0.05m）；a07从a06已审计checkpoint恢复训练并迁移8791观察器与完成watcher。旧相机像素与之前未启用DriveAPI时的云台轨迹不声称数值等价。
+
+native `attempt13` baseline实际exit 0：4环境×16步，camera pose、sensor axes、partial reset及sidecar验收通过。该正确性fixture的LiDAR valid points为`[165,160,167,178]`、depth valid points为`[6336,2062,2728,2178]`；它们只是诊断数据，不代表训练成绩。真实训练观察器的a07 `viewer_status.json`记录source PID18100、run id匹配、sidecar可用、8个云层句柄及世界坐标点云；最新只读记录sequence383、sidecar sequence237，均`stale=false`。这证明数据源绑定和数据新鲜度，不替代浏览器截图验收。native报告、日志和process receipt保留在`results/isaac_field_diagnosis/performance_all_envs_20261024/native_matrix_attempt13/`。
+
+a07 protocol SHA为`1a0c3bcbf6b67ab6a3409569a818fa57feb83efa465e40c234151fb551bea6ed`，从a06完整`model_64.pt`（34816 transitions、Adam1360）恢复，4环境目标196608 transitions（316次新iteration，预期最终payload iter379/Adam7680）。a06 source97与a07新source snapshot均完整冻结。物理dt=.001、decimation=50、position iterations=40、velocity iterations=1，以及传感器分辨率/频率保持不变。`run_status.json`仍为`running`/`resume_training_cli`。最新可读训练日志记录iteration64/380、Total steps 512、Collection 272.720s、Learning 10.574s；采集依然慢，GPU kernel瓶颈未知，没有FPS基准，也未证明所有性能问题解决。
+
+首个恢复checkpoint的独立CPU审计于2026-10-24T17:35:26Z通过，returncode 0：a06父checkpoint SHA `dc4dd92d633777bb8115021f89309dcd88865798c2e7e800ed1e794681146c36`（34816 transitions、Adam1360）→a07 model_64 SHA `28a45d02ab70d6933911c0fe9c807a7bb5585ea6cf2fda49f1b7f30f831d9540`（36,853,539 bytes、iter64、35328 transitions、Adam1380、37个optimizer states，tensor均有限）。Actor/critic分别25/8项权重变化，policy contract SHA保持`f7a46a6f6da7ea7a1dd8da09f29a31feee9989f60dc226e59b6574ed4d75f785`。物理、decimation、环境数、task、depth/LiDAR/rangefinder/IMU配置一致；detector只允许`update_latest_camera_pose`从false变true，未比较渲染像素。200项manifest的84个project live源、116个trial源和200个source snapshot哈希全部通过，继承a06 source97快照完整。CPU `weights_only`审计无CUDA初始化；当时sidecar sequence223、runID/source PID匹配，世界点均有限，四环境LiDAR有效点`[175,145,173,170]`、depth有效点`[10296,8079,10296,10296]`。报告、审计源码、日志和process receipt在`results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a07/diagnosis/checkpoint_audit/`。原冻结入口报告`RuntimeError: a07 is not an unchanged prepared trial`仍原样保留：它只拒绝真实`running`状态，不代表checkpoint/model错误；独立审计未修改该入口、protocol或run_status。
+
+53模块CPU gate第二次运行`cpu_gate_after_points_rerun1/`：pytest stdout为622 passed、4 skipped、47 warnings、10 subtests passed；JUnit共636 tests、0 failures/errors，wrapper exit 0。首次运行`cpu_gate_after_points/`的exit 1和5个失败原样保留，没有用第二次结果覆盖。外部完成watcherlauncher PID47236、worker PID31540，parent为a07 controller PID11236，`parent_identity=match`、最近poll `2026-10-24T17:35:42Z`、`delivery.events={}`；未发送消息。浏览器截图验收仍待协调者基于实际UI补记。
+
+持久界面约束（2026-10-25）：用户喜欢当前8791观察器，保留Viser深色视觉、四环境总览和已有交互，不重设计主界面。后续小车输入及内部网络激活仅以相同视觉风格的折叠面板或独立区域扩展；激活数据应从训练已有forward中采样，不做第二次policy forward或重复推理。
+
+## 2026-10-24：第二十二批范围整理与当时运行状态（历史；已由第二十三批更新）
+
+第二十二批五项已完成并整理（5/5）：驱动控制器固定拓扑缓存与重复验证去重、a06恢复入口与评估wrapper、独立多环境按需渲染观察器、真实LiDAR/depth可选侧车导出与只读消费、简体中文界面。驱动专项28项CPU测试及小型CUDA 18步等价检查通过；观察器和导出器组合CPU测试31项通过，包含真实导出器→原子NPZ→读取器链路与reset后复合generation/frame缓存键。未修改97文件冻结训练源；这些CPU/等价检查不构成FPS、整体提速或性能倍数结论。
+
+a06已从 `model_64.pt`、34816 transitions、Adam1360完整检查点交接后停止，用于后续候选诊断；这是停止后的交接，不记作训练自然完成。native PID34280已不存在。当前独立观察器仍位于 `http://127.0.0.1:8791/`（worker PID33800），显示a06最后有效状态：4环境×19刚体、sequence2453、sim time121.85秒、`stale=true`，因此是保留的历史画面而非实时训练。根代理浏览器已确认四环境总览、中文CJK标签和数据待更新/等待采样提示可见。
+
+原生训练传感器样点仍待runtime a03实测验收：当前a06没有 `sensor_samples.npz`，真实LiDAR/depth点云未显示；CPU集成测试使用的协议fixture不是训练样点。不得提前记为通过。Viser 1.1.1没有官方设置浏览器标签页标题的server API；页面标题保持上游“Viser”，未修改第三方客户端构建或注入JavaScript。
+
+## 2026-10-24：GPU批处理、轻量观察端与驱动控制器去重（启动期历史快照；第二十二批当时2/5，a06现已停止）
 
 最新用户选择是用轻量窗口实时显示训练车辆状态、优先训练效率，并已授权从26112 transitions GPU检查点恢复。a04仍为system_reboot中断状态；a05恢复入口因新源与旧reference wrapper不匹配而deferred，没有生成新训练协议或启动恢复。a06已于2026-10-24 21:00:52+08启动：`run_status.json`为`running`/`resume_training_cli`，4环境、`cuda:0`、`torch_batched`、333 updates、`--viz none`并写入a06 live state。源checkpoint为26112 transitions/Adam1020，目标196608 transitions/final iter380/Adam7680；a06 protocol SHA为`6e2860e77bd84e6dc42466793719fd15361d835de35674c6169d42a8f8aabd72`，97个源文件已冻结。prepare/preflight及恢复接口/评估wrapper CPU专项10 passed。首个续训checkpoint已通过CPU审计：26624 transitions、Adam1040，37个Adam optimizer state条目完整且有限；actor/critic权重条目共33个变化（actor 25、critic 8），策略合同与物理/传感器配置一致；baseline/final配对评估尚未开始。a06 viewer的真实浏览器验收已通过，记录`Connected LIVE`、source PID34280与run id匹配、sequence84→91，截图为实际sequence95；车辆、地面在深色主题下清晰可见，视角旋转有效，source packet sequence57→114→121期间base pose变化。采样或PPO更新间隔超过既有5s阈值时会暂时显示STALE，后续packet恢复后自动回LIVE；未调整阈值，不报告持续高FPS。首rollout的512新增transitions记录Collection 415.597s、Learning 9.861s，等待仍未解决，不能称训练提速或已达极致。a06完成唤醒器已按此前授权部署至外部单实例state-dir `C:/pioneer/isaac-training/watchers/pointmove-gpu-a06/`，launcher PID11808、source脚本SHA `e0c26ef3...315c9`；已核验native watcher PID10728、parent PID27560、`parent_identity=match`，最近lastpoll `13:15:36Z`且`delivery.events={}`。核验快照见a06 `diagnosis/completion_watch/deployment.json`、`watch_status_snapshot.json`和`delivery_snapshot.json`，既有PAUSED automations未改。当前批次为第二十二批2/5：驱动控制器去重是第1项，GPU恢复入口与配对评估wrapper是第2项，训练执行和日志不另计功能。a04检查点、protocol和source snapshot保留原字节；当前生产源不能冒称与a04冻结源一致。
 
@@ -30,7 +52,7 @@ task_backend = "torch_batched"
 
 NVIDIA路线仍建议把物理、观测/奖励和策略尽量放到设备向量化数据流，先少量环境调试再扩展，并只请求实际消费的图像输出；相机任务不能关掉策略所需的视觉观测。[官方框架论文](https://arxiv.org/html/2511.04831v1)、[训练与回放教程](https://docs.nvidia.com/learning/physical-ai/getting-started-with-newton/latest/isaac-lab-newton/training-and-playback.html)、[Camera指南](https://isaac-sim.github.io/IsaacLab/main/source/concepts/sensors/camera.html)。教程中的数千环境示例不直接代表本项目的建议规模。系统支持表列出的aarch64组合包含DGX Spark与DGX OS 7，但没有列出此Windows ARM64组合；稳定性仍需本机单独验收，本次未更换驱动或操作系统。
 
-## 2026-10-24：系统重启中断（当前）
+## 2026-10-24：系统重启中断（历史事件）
 
 本次审计入口为 `results/isaac_field_diagnosis/reboot_20261024T1700/README.md`。系统日志确认强制重启，并有开机后的WHEA-Logger 1 / LiveKernelEvent 124线索，错误部件及冻结根因仍未定位；未找到明确OOM/TDR/磁盘错误，日志缺项不能排除相关问题。系统事件原始记录保留本地，不公开转储或WHEA原始二进制。
 

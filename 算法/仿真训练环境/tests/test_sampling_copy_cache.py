@@ -36,7 +36,11 @@ class _Task:
 
 def _bare_env(num_envs=2):
     env = env_module.IsaacFieldEnv.__new__(env_module.IsaacFieldEnv)
-    env.sim = SimpleNamespace(device=torch.device("cpu"))
+    env.sim = SimpleNamespace(
+        device=torch.device("cpu"),
+        render_context=SimpleNamespace(update_scene_state=lambda _step: None),
+        get_physics_step_count=lambda: 0,
+    )
     env._mount_id = 0
     env._gimbal_ids = torch.tensor([14, 15])
     env._wheel_ids = torch.arange(14)
@@ -162,6 +166,10 @@ def test_partial_reset_observation_invalidates_cached_state_before_sensor_render
 
     class _Sim:
         device = torch.device("cpu")
+        render_context = SimpleNamespace(update_scene_state=lambda _step: None)
+
+        def get_physics_step_count(self):
+            return 0
 
         def forward(self):
             calls.append("forward")

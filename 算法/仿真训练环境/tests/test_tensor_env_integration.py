@@ -161,6 +161,7 @@ def test_sensor_batch_preserves_due_clocks_latency_rng_and_partial_reset():
     env.field_cfg = cfg
     env.tasks = tasks
     env._sensor_cache = {}
+    env._sensor_sample_exporter = None
     env._tensor_sensor_frame_cache = {}
     env._tensor_capture_env_ids = (0, 1)
     env._tensor_capture_initial_env_ids = frozenset((0, 1))

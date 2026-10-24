@@ -47,7 +47,7 @@ from .physx_drive import (
     same_side_wheel_coupling_metadata,
 )
 from .runtime import ensure_runtime, simulator_identity
-from .live_state import LiveStateExporter
+from .live_state import LiveStateExporter, create_sensor_sample_exporter_from_environment
 from .feedback import (
     ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, STATE_DIM, FeedbackSample,
     feedback_config,
@@ -75,6 +75,85 @@ from .task import (
 from .terrain import Terrain
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def _bridge_fabric_frame_view_setting(use_fabric, settings_manager=None):
+    """Mirror SimCfg.use_fabric to the legacy setting read by FabricFrameView."""
+    if settings_manager is None:
+        from isaaclab.app.settings_manager import get_settings_manager
+        settings_manager = get_settings_manager()
+    enabled = bool(use_fabric)
+    settings_manager.set("/physics/fabricEnabled", enabled)
+    return enabled
+
+
+def _disable_default_viewport_updates_if_headless(sim):
+    """Stop only Kit's default viewport tick for headless training."""
+    if sim.has_gui:
+        return {"headless": False, "changed": False, "status": "gui_enabled"}
+    from omni.kit.viewport.utility import get_active_viewport
+    viewport = get_active_viewport()
+    if viewport is None:
+        return {"headless": True, "changed": False, "status": "no_active_viewport"}
+    before = bool(viewport.updates_enabled)
+    viewport.updates_enabled = False
+    return {
+        "headless": True,
+        "changed": before,
+        "status": "disabled",
+        "api": "omni.kit.viewport.utility.get_active_viewport",
+        "updates_enabled_before": before,
+        "updates_enabled_after": bool(viewport.updates_enabled),
+    }
+
+
+class _CameraRigidPosePublisher:
+    """Reuse upstream GPU conversion for actual PhysX rigid-body poses."""
+    def __init__(self, sim):
+        from isaaclab.scene_data.scene_data_provider import SceneDataProvider
+        from isaaclab.scene_data.scene_data_backend import SceneDataFormat
+        from isaaclab_physx.renderers.fabric import FabricBackend, FabricBackendCfg
+        backend = sim.get_scene_data_provider().backend
+
+        class TransformPublication:
+            native_transform_formats = (SceneDataFormat.Transform,)
+
+            def __getattr__(self, name):
+                return getattr(backend, name)
+
+            def get_transforms(self, output_format):
+                return backend.transforms
+
+        self.sim = sim
+        self.backend = backend
+        self.provider = SceneDataProvider(TransformPublication())
+        self.publisher = FabricBackend(FabricBackendCfg(stage=sim.stage, device=str(sim.device)))
+        self._last_timestamp = None
+        self.publication_count = 0
+
+    def publish(self):
+        stamp = (self.backend.transforms_timestamp, self.backend.geometry_timestamp)
+        if stamp == self._last_timestamp:
+            return False
+        self.sim.render_context.update_scene_state(self.sim.get_physics_step_count())
+        self.publisher.update_transforms(self.provider)
+        self._last_timestamp = (self.backend.transforms_timestamp, self.backend.geometry_timestamp)
+        self.publication_count += 1
+        return True
+
+    def close(self):
+        self.publisher.close()
+
+
+def _forward_publish_scene_and_render(sim):
+    """Forward once and publish real GPU poses before camera capture."""
+    sim.forward()
+    publisher = getattr(sim, '_agtc_camera_rigid_pose_publisher', None)
+    if publisher is None:
+        sim.render_context.update_scene_state(sim.get_physics_step_count())
+    else:
+        publisher.publish()
+    sim.render()
 
 
 def ray_ranges(data):
@@ -290,7 +369,7 @@ class IsaacFieldEnv(DirectRLEnv):
         detector_focal = detector_width / (2 * math.tan(math.pi / 6))
         detector_k = [detector_focal,0,31.5,0,detector_focal,31.5,0,0,1]
         cfg.scene.detector = CameraCfg(prim_path=mount+'/Detector', width=detector_width, height=detector_width,
-            offset=CameraCfg.OffsetCfg(convention='world'), update_period=0.,
+            offset=CameraCfg.OffsetCfg(convention='world'), update_period=0., update_latest_camera_pose=True,
             data_types=['instance_segmentation','distance_to_image_plane'],
             renderer_cfg=IsaacRtxRendererCfg(colorize_instance_segmentation=False),
             spawn=sim_utils.PinholeCameraCfg.from_intrinsic_matrix(detector_k,64,64,
@@ -306,7 +385,11 @@ class IsaacFieldEnv(DirectRLEnv):
             self.front_guide_spec is not None
             and self.front_guide_spec.rotation_coupling == 'same_side_track_speed'
         )
+        # Camera FrameView reads /physics/fabricEnabled, while current PhysX
+        # setup publishes SimCfg.use_fabric as /isaaclab/fabric_enabled.
+        _bridge_fabric_frame_view_setting(cfg.sim.use_fabric)
         super().__init__(cfg, render_mode, **kwargs)
+        self._default_viewport_updates = _disable_default_viewport_updates_if_headless(self.sim)
         self._same_side_mimic_model_audit = audit_physx_coupling(self)
         self._same_side_wheel_coupling_metadata = same_side_wheel_coupling_metadata(
             cfg.couple_same_side_wheels,
@@ -316,6 +399,8 @@ class IsaacFieldEnv(DirectRLEnv):
         )
         self._physics_contact_metadata = build_physics_contact_metadata(self)
         self.rover = self.scene['robot']
+        self._camera_rigid_pose_publisher = _CameraRigidPosePublisher(self.sim)
+        self.sim._agtc_camera_rigid_pose_publisher = self._camera_rigid_pose_publisher
         live_state_path = os.environ.get('ISAAC_FIELD_LIVE_STATE_FILE')
         self._live_state_exporter = None
         if live_state_path:
@@ -325,6 +410,14 @@ class IsaacFieldEnv(DirectRLEnv):
                 terrain_usd_path=cfg.scene.field.spawn.usd_path,
                 body_names=self.rover.body_names,
             )
+        self._sensor_sample_exporter = create_sensor_sample_exporter_from_environment(
+            run_id=(self._live_state_exporter.run_id if self._live_state_exporter is not None else None),
+            num_envs=self.num_envs,
+            lidar_rays=self.field_cfg.lidar_rays,
+            depth_height=self.field_cfg.depth_height,
+            depth_width=self.field_cfg.depth_width,
+        )
+        self._sensor_sample_lidar_directions_local = None
         self._wheel_names = [f'{w.name}_wheel_joint' for w in ROBOT_SPEC.wheel_specs]
         self._wheel_ids = torch.tensor([self.rover.joint_names.index(n) for n in self._wheel_names], device=self.device)
         self._wheel_sides = torch.tensor([-1. if w.side=='left' else 1. for w in ROBOT_SPEC.wheel_specs],device=self.device)
@@ -403,6 +496,24 @@ class IsaacFieldEnv(DirectRLEnv):
                 t._tensor_observation_callback = lambda i=i: self._tensor_observation_row(i)
                 t._tensor_state_sync_callback = lambda i=i: self._sync_tensor_task_state((i,))
 
+    def _setup_scene(self):
+        super()._setup_scene()
+        from pxr import UsdPhysics
+        actuator = self.cfg.scene.robot.actuators['gimbal']
+        self._gimbal_drive_schema = []
+        for prim in self.sim.stage.Traverse():
+            if prim.GetName() not in (GIMBAL_YAW_JOINT, GIMBAL_PITCH_JOINT):
+                continue
+            was_enabled = bool(prim.HasAPI(UsdPhysics.DriveAPI, 'angular'))
+            drive = UsdPhysics.DriveAPI.Apply(prim, 'angular')
+            drive.CreateTypeAttr('force')
+            drive.CreateStiffnessAttr(float(actuator.stiffness))
+            drive.CreateDampingAttr(float(actuator.damping))
+            drive.CreateMaxForceAttr(float(actuator.joint_effort_limit))
+            self._gimbal_drive_schema.append({
+                'path': str(prim.GetPath()), 'angular_drive_previously_authored': was_enabled,
+            })
+
     @staticmethod
     def _validate_task_backend(cfg, task_backend: str) -> None:
         if task_backend not in ('reference', 'torch_batched'):
@@ -410,6 +521,18 @@ class IsaacFieldEnv(DirectRLEnv):
         if task_backend == 'reference':
             return
         task = cfg.task
+        perf_physics = os.environ.get('ISAAC_FIELD_PERF_PHYSICS', '').strip() == '1'
+        if perf_physics:
+            policy_dt = float(cfg.sim.dt) * int(cfg.decimation)
+            if not math.isclose(policy_dt, float(task.dt), rel_tol=0.0, abs_tol=1e-9):
+                raise ValueError(
+                    'ISAAC_FIELD_PERF_PHYSICS requires sim.dt * decimation == task.dt; '
+                    f'got {cfg.sim.dt} * {cfg.decimation} != {task.dt}'
+                )
+            expected_dt = float(cfg.sim.dt)
+            expected_decimation = int(cfg.decimation)
+        else:
+            expected_dt, expected_decimation = 0.001, 50
         checks = (
             ('mode', cfg.mode, 'goto'),
             ('task.size', float(task.size), 12.0),
@@ -427,8 +550,8 @@ class IsaacFieldEnv(DirectRLEnv):
             ('task.goal_progress_budget', task.goal_progress_budget, 5.0),
             ('task.max_time', float(task.max_time), 60.0),
             ('task.dt', float(task.dt), 0.05),
-            ('sim.dt', float(cfg.sim.dt), 0.001),
-            ('decimation', int(cfg.decimation), 50),
+            ('sim.dt', float(cfg.sim.dt), expected_dt),
+            ('decimation', int(cfg.decimation), expected_decimation),
             ('sim.render_interval', int(cfg.sim.render_interval), 50),
             ('sim.physics.min_position_iteration_count',
              int(cfg.sim.physics.min_position_iteration_count), 40),
@@ -801,7 +924,19 @@ class IsaacFieldEnv(DirectRLEnv):
             feedback['mount_rotation'] = state['mount_rotation']
         return state, feedback
 
+    def close(self):
+        publisher = getattr(self, '_camera_rigid_pose_publisher', None)
+        if publisher is not None:
+            self._camera_rigid_pose_publisher = None
+            if getattr(self.sim, '_agtc_camera_rigid_pose_publisher', None) is publisher:
+                del self.sim._agtc_camera_rigid_pose_publisher
+            publisher.close()
+        super().close()
+
     def _refresh_state(self, *, include_feedback=False):
+        publisher = getattr(self, '_camera_rigid_pose_publisher', None)
+        if publisher is not None:
+            publisher.publish()
         self._finished_observation_cache_mask = None
         if getattr(self, 'task_backend', 'reference') == 'torch_batched':
             self._tensor_finished_observation_cache = None
@@ -887,17 +1022,49 @@ class IsaacFieldEnv(DirectRLEnv):
         if kind == 'lidar':
             if kind not in self._sensor_cache:
                 self._sensor_cache[kind] = ray_ranges(self.scene['lidar'].data)
-            return capture_lidar_batch(
+            sensor = self.scene['lidar']
+            sensor_pose_host = None
+            if self._sensor_sample_exporter is not None:
+                data = sensor.data
+                sensor_pose_host = torch.cat(
+                    (data.pos_w.torch.to(dtype=torch.float32), data.quat_w.torch.to(dtype=torch.float32)),
+                    dim=1,
+                ).detach().cpu().numpy().copy()
+                if self._sensor_sample_lidar_directions_local is None:
+                    self._sensor_sample_lidar_directions_local = (
+                        sensor.ray_directions.torch[0].detach().cpu().numpy().copy()
+                    )
+            frames = capture_lidar_batch(
                 self._sensor_cache[kind], due_ids,
                 [task.np_random for task in self.tasks],
                 min_range=self.field_cfg.lidar_min_range,
                 max_range=self.field_cfg.lidar_range,
                 relative_error=self.field_cfg.lidar_relative_error,
             )
+            if sensor_pose_host is not None:
+                for env_id, frame in frames.items():
+                    frame.update(
+                        sensor_origin_w=sensor_pose_host[env_id, :3].copy(),
+                        sensor_quat_w_xyzw=sensor_pose_host[env_id, 3:7].copy(),
+                        ray_directions_local=self._sensor_sample_lidar_directions_local,
+                    )
+            return frames
         if kind == 'depth':
             if kind not in self._sensor_cache:
                 data = self.scene['depth'].data
                 self._sensor_cache[kind] = data.output['distance_to_image_plane'].torch[..., 0]
+            data = self.scene['depth'].data
+            pose_intrinsics_host = None
+            if self._sensor_sample_exporter is not None:
+                pose_intrinsics_host = torch.cat(
+                    (
+                        data.pos_w.torch.to(dtype=torch.float32),
+                        data.quat_w_ros.torch.to(dtype=torch.float32),
+                        data.intrinsic_matrices.torch.reshape(self.num_envs, 9).to(dtype=torch.float32),
+                    ),
+                    dim=1,
+                ).detach().cpu().numpy().copy()
+            elif 'depth_intrinsics_host' not in self._sensor_cache:
                 self._sensor_cache['depth_intrinsics_host'] = (
                     data.intrinsic_matrices.torch.detach().cpu().numpy().copy()
                 )
@@ -908,17 +1075,26 @@ class IsaacFieldEnv(DirectRLEnv):
                 max_range=self.field_cfg.depth_range,
                 noise_std=self.field_cfg.range_noise,
             )
-            intrinsics = self._sensor_cache['depth_intrinsics_host']
             for env_id, frame in frames.items():
                 task = self.tasks[env_id]
+                metadata = None if pose_intrinsics_host is None else pose_intrinsics_host[env_id]
+                intrinsics = (
+                    self._sensor_cache['depth_intrinsics_host'][env_id].copy()
+                    if metadata is None else metadata[7:16].reshape(3, 3).copy()
+                )
                 frame.update(
-                    intrinsics=intrinsics[env_id].copy(),
+                    intrinsics=intrinsics,
                     basis=np.stack(task.view_basis).astype(np.float32, copy=True),
                     calibration_id='isaac-centered-from-' + str(task.depth_intrinsics[0, 0]),
                     calibration_source=(
                         'Isaac Lab Camera.data.intrinsic_matrices; scaled native focal length, centered principal point'
                     ),
                 )
+                if metadata is not None:
+                    frame.update(
+                        sensor_origin_w=metadata[0:3].copy(),
+                        sensor_quat_w_ros_xyzw=metadata[3:7].copy(),
+                    )
             return frames
         if kind == 'camera':
             # Empty-field fastpath retains the task camera clock/latency but
@@ -1092,7 +1268,7 @@ class IsaacFieldEnv(DirectRLEnv):
         frame_new = metadata[:, 18:21].to(dtype=torch.bool)
         estimated_pose = metadata[:, 21:26]
         feedback = metadata[:, 26:63]
-        return pack_emptyfield_goto_observation(
+        observations = pack_emptyfield_goto_observation(
             lidar_ranges=self._tensor_lidar_ranges,
             lidar_valid=self._tensor_lidar_valid,
             depth_values=self._tensor_depth_values,
@@ -1114,6 +1290,17 @@ class IsaacFieldEnv(DirectRLEnv):
             max_time=self.field_cfg.max_time,
             max_detections=self.field_cfg.max_detections,
         )
+        sensor_exporter = getattr(self, '_sensor_sample_exporter', None)
+        if sensor_exporter is not None:
+            sensor_exporter.publish_if_changed(
+                lidar_frames=lidar_frames,
+                depth_frames=depth_frames,
+                lidar_ranges=self._tensor_lidar_ranges,
+                lidar_valid=self._tensor_lidar_valid,
+                depth_values=self._tensor_depth_values,
+                depth_valid=self._tensor_depth_valid,
+            )
+        return observations
 
     def _tensor_observation_row(self, env_id):
         if self._tensor_observation_cache is None:
@@ -1333,8 +1520,7 @@ class IsaacFieldEnv(DirectRLEnv):
             self._sensor_cache.clear()
             self._tensor_sensor_frame_cache.clear()
             self.scene.write_data_to_sim()
-            self.sim.forward()
-            self.sim.render()
+            _forward_publish_scene_and_render(self.sim)
             for name in ('lidar', 'rangefinder', 'depth', 'detector'):
                 self.scene[name].update(0., force_recompute=True)
         if not self._state_observation_fresh:
@@ -1498,8 +1684,7 @@ class IsaacFieldEnv(DirectRLEnv):
             self._invalidate_cached_samples()
             # Both explicit and same-step autoresets must render the new poses.
             self.scene.write_data_to_sim()
-            self.sim.forward()
-            self.sim.render()
+            _forward_publish_scene_and_render(self.sim)
             for name in ('lidar','rangefinder','depth','detector'):
                 self.scene[name].update(0.,force_recompute=True)
         if not self._state_observation_fresh:
