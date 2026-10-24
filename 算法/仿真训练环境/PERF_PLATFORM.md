@@ -73,3 +73,15 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 训练后策略在 dt=1 ms（默认协议）下的评估与基线对比。
 - WSL2 原生栈的 GPU 基准（matmul、Warp raycast、64 env × 18 joints 仿真 steps/s、GPU util/功耗），需在 Isaac 训练暂停后执行。
 - 原生栈最小训练闭环的原型吞吐（解析 raycast 替代 RTX 传感器），用于决定是否迁移。
+
+## 7. 策略评估（2026-10-25 06:34）
+
+- 严格评估器（`scripts/evaluate_rsl_curriculum.py` + a07 adapter）要求冻结的 **100 m** 全图 task profile；本 trial 用 12 m 场地（a07 口径），因此评估前对 `size` 只做“正数”检查，其余 fast-stop 语义仍校验；`drive_config.physics_contact` 因评估物理与训练不同而允许不同（本次改为同 5 ms，差异仅 env 数量等元数据）。
+- 默认 1 ms 物理的单环境评估实测过慢：一次 16 场景评估在 20 分钟内未完成一个回合的输出，已中止并保留 `eval_final_attempt*/`。改用与训练相同的 `dt=0.005/decimation=10` 物理做快速评估（`run_eval_fast.py`，通过临时替换 `FieldEnvCfg` 实现）。
+- 2 场景快速评估（seed 87010/87011，60 s 回合）：**0/2 成功**；1 个 `outside_or_overturned`（355 步）、1 个 `time_limit`（1200 步）；平均最终距离 8.94 m、无损伤/碰撞；**不具备 strict-pass 资格，不作能力结论**。证据：`eval_final_fast/evaluation.json`、`eval_summary_2scenarios.json`。
+- 16 场景完整评估若仍用 5 ms 物理，按实测约 6.5 分钟/场景，需约 1.7 小时；尚未运行。
+
+## 8. 续训（2026-10-25 06:42 起）
+
+- 由于 96 iterations 的策略尚不能到点（见 §7），从 `model_95.pt` 继续训练：`perf_20261025_n32_dt5_cont`，`--max_iterations 192`，其余配置不变（32 env、dt=5 ms、dec=10、seed 69041、resume optimizer state），预计约 4.5–5 小时。
+- 训练日志：`cont_train.log`；checkpoint 在 `logs/rsl_rl/perf_20261025_n32_dt5_cont/cont/`。
