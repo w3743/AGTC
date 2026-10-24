@@ -136,3 +136,16 @@ python3.12 -m venv /opt/venv && /opt/venv/bin/pip install torch --index-url http
 1. feedback VQF 旁路接入（0.5 人日，CPU 成本 ~1.6 核@64env）；
 2. depth 160×88：Warp raycast 替代 RTX，需与 Isaac RTX 做域差登记；
 3. detections 16×8：从解析场景几何推导，需与 reference 逐元素对照。
+
+## 12. VQF 旁路接入与能力缺口设计（2026-10-25 07:34，CPU-only）
+
+- **VQF 旁路已接入**：`ObservationProvider(feedback_backend="vqf")` 使用 `isaac_field.feedback.SimFeedbackEstimator` + python `vqf==2.1.2`，逐 env 喂 engine-truth 信号、按 episode 时间单调推进、reset 同步 estimator.reset；`direct` 仍为默认。
+- **验证**：与独立 reference estimator（noise off）对比，**attitude quaternion max abs error = 0.0，full 37 维 = 0.0**（此前直通姿态差 0.976967）。
+- **成本**：0.456 ms/env/update（noise off）/ 0.758 ms（noise on 实际路径）；64 env ≈ 48.5 ms/policy step、0.78 s/16-step iter（python 串行）。
+- **吞吐影响**（CPU 同机 64env×8step）：direct 65.9 samples/s → vqf **59.4 samples/s（-9.9%）**；推算 M0 稳态 16-step ≈ **75 samples/s（-8%）**。不建议降到 32 env（VQF 串行 + learning 固定成本占比上升，估 50–55 samples/s）。
+- **能力缺口设计**（`C:/pioneer/wsl-native/proto/CAPABILITY_GAPS.md`）：
+  - depth 160×88：Warp 解析 raycast 可行，CUDA 估 4–6 ms/帧（0.5–0.8 ms/step 摊销），CPU 1–2.5 s/帧；主要风险是光栅化 vs raycast 的边缘/遮挡域差与轴向 Z vs 径向距离换算；实现 2–3 人日 + RTX 对照 1–2 人日。
+  - detections 16×8：从解析 mask→bbox 推导，CUDA 0.4–0.6 ms/帧；语义依赖 mask→bbox/confidence 规则，需先确认 `task.py`；实现 2–3 人日 + 对照 1 人日/轮。
+  - 域差登记：contract/verification 新增 `sensor_domain_ap` 字段（isaac_source / native_source / expected_differences / edge_policy / usable_for_capability）。
+  - 合计 **6–9 人日**，建议 depth 先行。
+- 收口：`proto/` 已含吞吐原型、等价性报告、迁移评估、缺口设计；剩余 blockers 只剩 depth/detections 占位 + state 用真值位姿的 ~0.25 人日 follow-up；`capability_metrics_allowed=false` 不变。
