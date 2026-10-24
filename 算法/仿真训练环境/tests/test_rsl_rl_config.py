@@ -12,6 +12,25 @@ from isaac_field.rsl_rl_cfg import FieldFastStopRslEnvCfg, FieldFastStopRslRunne
 from isaac_field.rsl_rl_env import IsaacFieldRslEnv, expose_policy_observation_space
 
 
+def test_live_view_defaults_follow_robot_without_enabling_or_hiding_environments():
+    from isaaclab.app.sim_launcher import validate_launch
+    from isaac_field.env import FieldEnvCfg
+
+    config = FieldFastStopRslEnvCfg()
+    view = config.sim.default_visualizer_cfg
+    assert (view.origin_type, view.origin_env_index, view.origin_track_path) == ("asset", 0, "robot")
+    assert view.max_visible_envs is None
+    assert view.streaming_view is False
+    scan, _ = validate_launch(config, {})
+    assert not scan.visualizer_intent["has_kit_visualizer"]
+    live_scan, _ = validate_launch(config, {"visualizer": ["kit"]})
+    assert live_scan.visualizer_intent["has_kit_visualizer"]
+    assert FieldEnvCfg().sim.default_visualizer_cfg is None
+    assert config.sim.dt == 0.001 and config.decimation == 50
+    assert config.sim.physics.min_position_iteration_count == 40
+    assert config.sim.physics.max_position_iteration_count == 40
+
+
 def test_fast_stop_v2_rsl_configs_keep_the_strict_task_contract():
     env_cfg = FieldFastStopRslEnvCfg()
     runner_cfg = FieldFastStopRslRunnerCfg()
