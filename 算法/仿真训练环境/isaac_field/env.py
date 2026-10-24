@@ -52,6 +52,14 @@ from .feedback import (
     ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, STATE_DIM, FeedbackSample,
     feedback_config,
 )
+from .tensor_sensors import capture_depth_batch, capture_lidar_batch
+from .tensor_task import (
+    REASON_GOAL_REACHED,
+    REASON_OUTSIDE_OR_OVERTURNED,
+    REASON_TIME_LIMIT,
+    fast_stop_v2_step,
+    pack_emptyfield_goto_observation,
+)
 from .scene_assets import crop_asset, terrain_asset
 from .layouts import generate_layout
 from .task import (
@@ -88,6 +96,7 @@ class FieldSceneCfg(InteractiveSceneCfg):
 class FieldEnvCfg(DirectRLEnvCfg):
     task: Config = Config()
     mode: str = 'mixed'
+    task_backend: str = 'reference'
     auto_reset: bool = True
     # Curriculum limits affect task sampling, never replace policy control.
     goal_distance: tuple[float, float] | None = None
@@ -147,6 +156,8 @@ class IsaacFieldEnv(DirectRLEnv):
 
     def __init__(self, cfg: FieldEnvCfg | None = None, render_mode=None, **kwargs):
         cfg = cfg or FieldEnvCfg()
+        self.task_backend = getattr(cfg, 'task_backend', 'reference')
+        self._validate_task_backend(cfg, self.task_backend)
         if not isinstance(cfg.sim.physics, PhysxCfg):
             raise ValueError('IsaacFieldEnv requires the Isaac Sim PhysX backend')
         ensure_runtime(cfg, device=cfg.sim.device)
@@ -335,6 +346,12 @@ class IsaacFieldEnv(DirectRLEnv):
         self._state_observation_fresh = False
         self._feedback_host_cache = None
         self._finished_observation_cache_mask = None
+        self._sim_tensor_cache = None
+        self._tensor_finished_observation_cache = None
+        self._tensor_observation_cache = None
+        self._tensor_sensor_frame_cache = {}
+        self._tensor_capture_env_ids = None
+        self._tensor_capture_initial_env_ids = frozenset()
         self.actions = torch.zeros((self.num_envs,4),device=self.device)
         self.command = torch.zeros((self.num_envs,2),device=self.device)
         self.track_command = torch.zeros_like(self.command)
@@ -351,16 +368,139 @@ class IsaacFieldEnv(DirectRLEnv):
         self.gimbal_target = torch.zeros_like(self.command)
         self._reward = torch.zeros(self.num_envs,device=self.device)
         self._last_results = [None] * self.num_envs
+        if self.task_backend == 'torch_batched':
+            self._tensor_goal_xy = torch.zeros((self.num_envs, 2), device=self.device, dtype=torch.float64)
+            self._tensor_episode_time = torch.zeros((self.num_envs,), device=self.device, dtype=torch.float64)
+            self._tensor_hold = torch.zeros_like(self._tensor_episode_time)
+            self._tensor_initial_goal_distance = torch.zeros_like(self._tensor_episode_time)
+            self._tensor_previous_physics_failure = torch.zeros(
+                (self.num_envs,), device=self.device, dtype=torch.bool,
+            )
+            self._tensor_last_actions = torch.zeros((self.num_envs, 4), device=self.device)
+            self._tensor_old_distance = torch.zeros_like(self._tensor_episode_time)
+            self._tensor_lidar_ranges = torch.full(
+                (self.num_envs, c.lidar_rays), c.lidar_range, device=self.device, dtype=torch.float32,
+            )
+            self._tensor_lidar_valid = torch.zeros(
+                (self.num_envs, c.lidar_rays), device=self.device, dtype=torch.bool,
+            )
+            self._tensor_depth_values = torch.full(
+                (self.num_envs, c.depth_height, c.depth_width), c.depth_range,
+                device=self.device, dtype=torch.float32,
+            )
+            self._tensor_depth_valid = torch.zeros(
+                (self.num_envs, c.depth_height, c.depth_width), device=self.device, dtype=torch.bool,
+            )
+            self._tensor_lidar_frame_seq = [None] * self.num_envs
+            self._tensor_depth_frame_seq = [None] * self.num_envs
+            self._tensor_lidar_policy_cache = None
+            self._tensor_depth_policy_cache = None
         # Kinematic plant roots use the backend-neutral public collection API.
         self.plants = self.scene['corn'] if c.plants else None
         for i,t in enumerate(self.tasks):
             t.attach_sensors(lambda kind, i=i: self._capture(i,kind))
+            if self.task_backend == 'torch_batched':
+                t._tensor_observation_callback = lambda i=i: self._tensor_observation_row(i)
+                t._tensor_state_sync_callback = lambda i=i: self._sync_tensor_task_state((i,))
+
+    @staticmethod
+    def _validate_task_backend(cfg, task_backend: str) -> None:
+        if task_backend not in ('reference', 'torch_batched'):
+            raise ValueError("task_backend must be 'reference' or 'torch_batched'")
+        if task_backend == 'reference':
+            return
+        task = cfg.task
+        checks = (
+            ('mode', cfg.mode, 'goto'),
+            ('task.size', float(task.size), 12.0),
+            ('task.plants', int(task.plants), 0),
+            ('task.terrain_enabled', bool(task.terrain_enabled), False),
+            ('task.rock_density', float(task.rock_density), 0.0),
+            ('task.goto_reward_profile', task.goto_reward_profile, 'fast_stop_v2'),
+            ('task.input_schema', task.input_schema, ABSOLUTE_GOAL_INPUT_SCHEMA),
+            ('task.fast_stop_failure_remaining_time_cost',
+             task.fast_stop_failure_remaining_time_cost, True),
+            ('task.goal_tolerance', float(task.goal_tolerance), 0.4),
+            ('task.goal_stop_speed', float(task.goal_stop_speed), 0.05),
+            ('task.goal_stop_angular_speed', float(task.goal_stop_angular_speed), 0.1),
+            ('task.goal_hold', float(task.goal_hold), 0.5),
+            ('task.goal_progress_budget', task.goal_progress_budget, 5.0),
+            ('task.max_time', float(task.max_time), 60.0),
+            ('task.dt', float(task.dt), 0.05),
+            ('sim.dt', float(cfg.sim.dt), 0.001),
+            ('decimation', int(cfg.decimation), 50),
+            ('sim.render_interval', int(cfg.sim.render_interval), 50),
+            ('sim.physics.min_position_iteration_count',
+             int(cfg.sim.physics.min_position_iteration_count), 40),
+            ('sim.physics.max_position_iteration_count',
+             int(cfg.sim.physics.max_position_iteration_count), 40),
+            ('sim.physics.min_velocity_iteration_count',
+             int(cfg.sim.physics.min_velocity_iteration_count), 1),
+            ('sim.physics.max_velocity_iteration_count',
+             int(cfg.sim.physics.max_velocity_iteration_count), 1),
+            ('sim.physics.solver_type', int(cfg.sim.physics.solver_type), 1),
+        )
+        mismatches = []
+        for name, actual, expected in checks:
+            if (isinstance(actual, (int, float)) and not isinstance(actual, bool)
+                    and isinstance(expected, (int, float)) and not isinstance(expected, bool)):
+                matches = math.isclose(actual, expected, rel_tol=0.0, abs_tol=1e-9)
+            else:
+                matches = actual == expected
+            if not matches:
+                mismatches.append(f'{name}={actual!r} (requires {expected!r})')
+        if int(task.lidar_rays) != 400:
+            mismatches.append(f'task.lidar_rays={task.lidar_rays!r} (requires 400)')
+        if (int(task.depth_height), int(task.depth_width)) != (160, 88):
+            mismatches.append(
+                f'task depth shape={(task.depth_height, task.depth_width)!r} (requires (160, 88))'
+            )
+        if int(task.max_detections) != 16:
+            mismatches.append(f'task.max_detections={task.max_detections!r} (requires 16)')
+        if mismatches:
+            raise ValueError('torch_batched task backend does not support: ' + '; '.join(mismatches))
 
     def reset(self, *, seed=None, options=None):
         if seed is not None:
             self._rng = np.random.default_rng(seed)
         self._reset_options = options
         return super().reset(seed=seed, options=options)
+
+    def _sync_tensor_task_state(self, env_ids=None):
+        """Copy only small task scalars into persistent device-side buffers."""
+        if self.task_backend != 'torch_batched' or not hasattr(self, '_tensor_goal_xy'):
+            return
+        ids = list(range(self.num_envs)) if env_ids is None else [int(i) for i in env_ids]
+        if not ids:
+            return
+        index = torch.as_tensor(ids, dtype=torch.long, device=self.device)
+        selected = [self.tasks[i] for i in ids]
+        self._tensor_goal_xy[index] = torch.as_tensor(
+            np.stack([task.goal for task in selected]), dtype=torch.float64, device=self.device,
+        )
+        self._tensor_episode_time[index] = torch.as_tensor(
+            [task.time for task in selected], dtype=torch.float64, device=self.device,
+        )
+        self._tensor_hold[index] = torch.as_tensor(
+            [task._hold for task in selected], dtype=torch.float64, device=self.device,
+        )
+        self._tensor_initial_goal_distance[index] = torch.as_tensor(
+            [task._initial_goal_distance for task in selected], dtype=torch.float64, device=self.device,
+        )
+        self._tensor_previous_physics_failure[index] = torch.as_tensor(
+            [task.physics_failure for task in selected], dtype=torch.bool, device=self.device,
+        )
+        self._tensor_last_actions[index] = torch.as_tensor(
+            np.stack([task.last_action for task in selected]), dtype=torch.float32, device=self.device,
+        )
+        self._tensor_old_distance[index] = 0.0
+        for env_id in ids:
+            self._tensor_lidar_frame_seq[env_id] = None
+            self._tensor_depth_frame_seq[env_id] = None
+        self._tensor_lidar_policy_cache = None
+        self._tensor_depth_policy_cache = None
+        self._tensor_observation_cache = None
+        self._tensor_finished_observation_cache = None
 
     def _reset_idx(self, env_ids):
         self._invalidate_cached_samples()
@@ -511,15 +651,31 @@ class IsaacFieldEnv(DirectRLEnv):
         self.actions[env_ids]=0
         self._sensor_cache.clear()
         self._refresh_state()
+        self._sync_tensor_task_state(ids)
         self._reset_options=None
 
     def _pre_physics_step(self, actions):
         if not torch.isfinite(actions).all():
             raise ValueError('actions must be finite')
         self._finished_observation_cache_mask = None
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            self._tensor_finished_observation_cache = None
+            self._tensor_observation_cache = None
+            self._tensor_sensor_frame_cache.clear()
         self.actions = actions.clamp(-1.,1.)
-        self._before = [t.robot.copy() for t in self.tasks]
-        self._old_distance = [float(np.linalg.norm(t.goal-t.robot[:2])) for t in self.tasks]
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            root_xy = (
+                self.rover.data.root_link_pose_w.torch[:, :2]
+                - self.scene.env_origins[:, :2]
+            ).to(dtype=torch.float64)
+            self._tensor_old_distance = torch.linalg.vector_norm(
+                self._tensor_goal_xy - root_xy, dim=1,
+            )
+            self._before = None
+            self._old_distance = self._tensor_old_distance
+        else:
+            self._before = [t.robot.copy() for t in self.tasks]
+            self._old_distance = [float(np.linalg.norm(t.goal-t.robot[:2])) for t in self.tasks]
         desired = self.actions[:, :2] * self.field_cfg.max_speed
         change = self.field_cfg.acceleration * self.step_dt
         self.track_command += (desired - self.track_command).clamp(-change, change)
@@ -554,6 +710,14 @@ class IsaacFieldEnv(DirectRLEnv):
         self._state_observation_fresh = False
         self._feedback_host_cache = None
         self._finished_observation_cache_mask = None
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            self._tensor_finished_observation_cache = None
+            self._tensor_observation_cache = None
+            self._tensor_lidar_policy_cache = None
+            self._tensor_depth_policy_cache = None
+            sensor_frame_cache = getattr(self, '_tensor_sensor_frame_cache', None)
+            if sensor_frame_cache is not None:
+                sensor_frame_cache.clear()
 
     def _collect_sim_cpu_samples(self, *, include_feedback=False):
         """Move the current small state/feedback sample to host memory once."""
@@ -587,6 +751,10 @@ class IsaacFieldEnv(DirectRLEnv):
         live_state_exporter = getattr(self, '_live_state_exporter', None)
         if live_state_exporter is not None:
             state_tensors['body_link_pose_w'] = self.rover.data.body_link_pose_w.torch
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            # Reuse the simulator-owned device tensors for the batched task
+            # step; the packed host sample below remains the VQF/diagnostic bridge.
+            self._sim_tensor_cache = state_tensors
         feedback_tensors = None
         if include_feedback:
             imu = self.scene['imu'].data
@@ -635,6 +803,9 @@ class IsaacFieldEnv(DirectRLEnv):
 
     def _refresh_state(self, *, include_feedback=False):
         self._finished_observation_cache_mask = None
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            self._tensor_finished_observation_cache = None
+            self._tensor_observation_cache = None
         state, feedback = self._collect_sim_cpu_samples(include_feedback=include_feedback)
         self._feedback_host_cache = feedback
         for i,t in enumerate(self.tasks):
@@ -660,6 +831,9 @@ class IsaacFieldEnv(DirectRLEnv):
         drivetrain model, not a measurement of hardware phase current.
         """
         self._finished_observation_cache_mask = None
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            self._tensor_finished_observation_cache = None
+            self._tensor_observation_cache = None
         if self._feedback_host_cache is None:
             _, self._feedback_host_cache = self._collect_sim_cpu_samples(include_feedback=True)
         sample = self._feedback_host_cache
@@ -697,7 +871,84 @@ class IsaacFieldEnv(DirectRLEnv):
             ))
         self._feedback_host_cache = None
 
+    def _capture_tensor_sensor_batch(self, kind):
+        """Capture only due rows while keeping LiDAR/depth payloads on-device."""
+        scope = self._tensor_capture_env_ids
+        if scope is None:
+            scope = tuple(range(self.num_envs))
+            initial_ids = frozenset()
+        else:
+            initial_ids = self._tensor_capture_initial_env_ids
+        due_ids = [int(i) for i in scope
+                   if self.tasks[int(i)].sensor_due(kind, initial=int(i) in initial_ids)]
+        if not due_ids:
+            raise RuntimeError(f"tensor sensor callback for {kind!r} has no due environments")
+
+        if kind == 'lidar':
+            if kind not in self._sensor_cache:
+                self._sensor_cache[kind] = ray_ranges(self.scene['lidar'].data)
+            return capture_lidar_batch(
+                self._sensor_cache[kind], due_ids,
+                [task.np_random for task in self.tasks],
+                min_range=self.field_cfg.lidar_min_range,
+                max_range=self.field_cfg.lidar_range,
+                relative_error=self.field_cfg.lidar_relative_error,
+            )
+        if kind == 'depth':
+            if kind not in self._sensor_cache:
+                data = self.scene['depth'].data
+                self._sensor_cache[kind] = data.output['distance_to_image_plane'].torch[..., 0]
+                self._sensor_cache['depth_intrinsics_host'] = (
+                    data.intrinsic_matrices.torch.detach().cpu().numpy().copy()
+                )
+            frames = capture_depth_batch(
+                self._sensor_cache[kind], due_ids,
+                [task.np_random for task in self.tasks],
+                min_range=self.field_cfg.depth_min_range,
+                max_range=self.field_cfg.depth_range,
+                noise_std=self.field_cfg.range_noise,
+            )
+            intrinsics = self._sensor_cache['depth_intrinsics_host']
+            for env_id, frame in frames.items():
+                task = self.tasks[env_id]
+                frame.update(
+                    intrinsics=intrinsics[env_id].copy(),
+                    basis=np.stack(task.view_basis).astype(np.float32, copy=True),
+                    calibration_id='isaac-centered-from-' + str(task.depth_intrinsics[0, 0]),
+                    calibration_source=(
+                        'Isaac Lab Camera.data.intrinsic_matrices; scaled native focal length, centered principal point'
+                    ),
+                )
+            return frames
+        if kind == 'camera':
+            # Empty-field fastpath retains the task camera clock/latency but
+            # needs no segmentation readback or stochastic Corn detection.
+            return {env_id: {'detections': []} for env_id in due_ids}
+        raise ValueError(f"unknown sensor kind: {kind}")
+
+    def _capture_tensor_sensor(self, env_id, kind):
+        cache = self._tensor_sensor_frame_cache
+        if kind not in cache:
+            previous_scope = self._tensor_capture_env_ids
+            previous_initial = self._tensor_capture_initial_env_ids
+            if previous_scope is None:
+                self._tensor_capture_env_ids = (int(env_id),)
+                self._tensor_capture_initial_env_ids = frozenset()
+            try:
+                cache[kind] = self._capture_tensor_sensor_batch(kind)
+            finally:
+                self._tensor_capture_env_ids = previous_scope
+                self._tensor_capture_initial_env_ids = previous_initial
+        try:
+            return cache[kind][int(env_id)]
+        except KeyError as exc:
+            raise RuntimeError(
+                f"environment {env_id} requested {kind!r} outside the due capture batch"
+            ) from exc
+
     def _capture(self,i,kind):
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            return self._capture_tensor_sensor(i, kind)
         t,c=self.tasks[i],self.field_cfg
         if kind not in self._sensor_cache:
             if kind=='lidar':
@@ -760,7 +1011,377 @@ class IsaacFieldEnv(DirectRLEnv):
         detections.sort(key=lambda d:d['confidence'],reverse=True)
         return {'detections':detections[:c.max_detections]}
 
+    def _tensor_body_stability(self, angles, body_angular_velocity):
+        """Vectorized equivalent of body_stability_sample for the active batch."""
+        roll = angles[:, 0].to(dtype=torch.float64)
+        pitch = angles[:, 1].to(dtype=torch.float64)
+        angular = body_angular_velocity.to(dtype=torch.float64)
+        tilt = torch.acos(torch.clamp(torch.cos(roll) * torch.cos(pitch), min=-1.0, max=1.0))
+        config = self.body_stability_config or BodyStabilityConfig()
+        excess = torch.clamp(tilt - float(config.excess_tilt_threshold_rad), min=0.0)
+        rate_sq = angular[:, 0].square() + angular[:, 1].square()
+        if self.body_stability_config is None:
+            penalty = torch.zeros_like(tilt)
+        else:
+            penalty = self.step_dt * (
+                float(config.tilt_weight) * excess.square()
+                + float(config.angular_rate_weight) * rate_sq
+            )
+        return {
+            'roll': roll, 'pitch': pitch, 'tilt': tilt, 'excess': excess,
+            'angular': angular, 'rate_sq': rate_sq, 'penalty': penalty,
+        }
+
+    def _build_tensor_observations(self):
+        """Build the policy batch from existing task clocks and device frames."""
+        tasks = self.tasks
+        device = torch.device(self.device)
+        lidar_frames = [task.frames['lidar'] for task in tasks]
+        depth_frames = [task.frames['depth'] for task in tasks]
+        if any(frame.get('_tensor_sensor_frame') is not True
+               for frame in (*lidar_frames, *depth_frames)):
+            raise RuntimeError('torch_batched observations require device-resident LiDAR and depth frames')
+        lidar_frame_changed = False
+        depth_frame_changed = False
+        for env_id, (lidar_frame, depth_frame) in enumerate(zip(lidar_frames, depth_frames, strict=True)):
+            if lidar_frame['ranges'].device != device or depth_frame['values'].device != device:
+                raise RuntimeError('torch_batched sensor frames must remain on the environment device')
+            if self._tensor_lidar_frame_seq[env_id] != lidar_frame['seq']:
+                self._tensor_lidar_ranges[env_id].copy_(lidar_frame['ranges'])
+                self._tensor_lidar_valid[env_id].copy_(lidar_frame['valid'])
+                self._tensor_lidar_frame_seq[env_id] = lidar_frame['seq']
+                lidar_frame_changed = True
+            if self._tensor_depth_frame_seq[env_id] != depth_frame['seq']:
+                self._tensor_depth_values[env_id].copy_(depth_frame['values'])
+                self._tensor_depth_valid[env_id].copy_(depth_frame['valid'])
+                self._tensor_depth_frame_seq[env_id] = depth_frame['seq']
+                depth_frame_changed = True
+        if lidar_frame_changed or self._tensor_lidar_policy_cache is None:
+            self._tensor_lidar_policy_cache = torch.where(
+                self._tensor_lidar_valid,
+                self._tensor_lidar_ranges / self.field_cfg.lidar_range,
+                torch.zeros_like(self._tensor_lidar_ranges),
+            ).unsqueeze(1)
+        if depth_frame_changed or self._tensor_depth_policy_cache is None:
+            self._tensor_depth_policy_cache = torch.where(
+                self._tensor_depth_valid,
+                self._tensor_depth_values / self.field_cfg.depth_range,
+                torch.zeros_like(self._tensor_depth_values),
+            ).unsqueeze(1)
+
+        # VQF/UWB estimates and frame metadata are CPU-owned task state. Pack
+        # them into one small transfer; the large sensor arrays stay in their
+        # persistent device buffers and are only copied when their seq changes.
+        metadata_host = np.empty((self.num_envs, 63), dtype=np.float64)
+        for i, task in enumerate(tasks):
+            metadata_host[i, 0:3] = [task.frames[k]['capture'] for k in ('lidar', 'depth', 'camera')]
+            metadata_host[i, 3:18] = np.asarray(
+                [task.frames[k]['estimated_pose'] for k in ('lidar', 'depth', 'camera')],
+                dtype=np.float64,
+            ).reshape(15)
+            metadata_host[i, 18:21] = [task._new[k] for k in ('lidar', 'depth', 'camera')]
+            metadata_host[i, 21:26] = task._estimated_pose()
+            metadata_host[i, 26:63] = (
+                np.zeros(FEEDBACK_DIM, dtype=np.float64)
+                if task._feedback_snapshot is None
+                else np.asarray(task._feedback_snapshot.feedback, dtype=np.float64)
+            )
+        metadata = torch.as_tensor(metadata_host, dtype=torch.float64, device=device)
+        frame_capture_times = metadata[:, 0:3]
+        frame_estimated_poses = metadata[:, 3:18].reshape(self.num_envs, 3, 5)
+        frame_new = metadata[:, 18:21].to(dtype=torch.bool)
+        estimated_pose = metadata[:, 21:26]
+        feedback = metadata[:, 26:63]
+        return pack_emptyfield_goto_observation(
+            lidar_ranges=self._tensor_lidar_ranges,
+            lidar_valid=self._tensor_lidar_valid,
+            depth_values=self._tensor_depth_values,
+            depth_valid=self._tensor_depth_valid,
+            normalized_lidar=self._tensor_lidar_policy_cache,
+            normalized_depth=self._tensor_depth_policy_cache,
+            empty_detections=torch.empty((self.num_envs, 0, 8), dtype=torch.float32, device=device),
+            frame_capture_times=frame_capture_times,
+            frame_estimated_poses=frame_estimated_poses,
+            frame_new=frame_new,
+            estimated_pose=estimated_pose,
+            goal_xy=self._tensor_goal_xy,
+            last_actions=self._tensor_last_actions,
+            episode_time=self._tensor_episode_time,
+            feedback=feedback,
+            size=self.field_cfg.size,
+            lidar_range=self.field_cfg.lidar_range,
+            depth_range=self.field_cfg.depth_range,
+            max_time=self.field_cfg.max_time,
+            max_detections=self.field_cfg.max_detections,
+        )
+
+    def _tensor_observation_row(self, env_id):
+        if self._tensor_observation_cache is None:
+            self._tensor_observation_cache = self._build_tensor_observations()
+        return {key: value[int(env_id)] for key, value in self._tensor_observation_cache.items()}
+
+    def _get_tensor_batched_dones(self):
+        self._finished_observation_cache_mask = None
+        self._tensor_finished_observation_cache = None
+        self._tensor_sensor_frame_cache.clear()
+        self._sensor_cache.clear()
+        self._refresh_state(include_feedback=True)
+        self._refresh_feedback(after_step=True)
+        state = self._sim_tensor_cache
+        if not isinstance(state, dict):
+            raise RuntimeError('torch_batched state tensors were not retained for this PhysX step')
+
+        root = state['root']
+        origins = state['origin_offsets']
+        position_xy = root[:, :2] - origins[:, :2]
+        angles = state['angles']
+        body_angular_velocity = state['body_angular_velocity']
+        boundary = torch.any(
+            (position_xy < 0.0) | (position_xy > self.field_cfg.size), dim=1,
+        )
+        pitch_failure = torch.abs(angles[:, 1]) > 1.2
+        roll_failure = torch.abs(angles[:, 0]) > 1.2
+        active_host = [not (task.done and not self.cfg.auto_reset) for task in self.tasks]
+        active = torch.as_tensor(active_host, dtype=torch.bool, device=self.device)
+        zeros = torch.zeros((self.num_envs,), dtype=torch.bool, device=self.device)
+        transition = fast_stop_v2_step(
+            position_xy=position_xy,
+            old_distance=self._tensor_old_distance,
+            goal_xy=self._tensor_goal_xy,
+            root_com_velocity_xy=state['root_com_velocity_xy'],
+            body_angular_velocity=body_angular_velocity,
+            body_tilt_pitch_roll=torch.stack((angles[:, 1], angles[:, 0]), dim=1),
+            boundary=boundary,
+            physics_failure_event=zeros,
+            previous_physics_failure=self._tensor_previous_physics_failure,
+            episode_time=self._tensor_episode_time,
+            hold_elapsed=self._tensor_hold,
+            initial_goal_distance=self._tensor_initial_goal_distance,
+            active_mask=active,
+            dt=self.step_dt,
+            max_time=self.field_cfg.max_time,
+            goal_tolerance=self.field_cfg.goal_tolerance,
+            goal_hold=self.field_cfg.goal_hold,
+            goal_stop_speed=self.field_cfg.goal_stop_speed,
+            goal_stop_angular_speed=self.field_cfg.goal_stop_angular_speed,
+            time_penalty=self.field_cfg.time_penalty,
+            goal_progress_budget=self.field_cfg.goal_progress_budget,
+        )
+        stability = self._tensor_body_stability(angles, body_angular_velocity)
+        penalty = torch.where(active, stability['penalty'], torch.zeros_like(stability['penalty']))
+        reward = transition['rewards'].to(dtype=torch.float64) - penalty
+        reward = reward.to(dtype=torch.float32)
+        self._reward = reward
+        self._tensor_episode_time.copy_(transition['next_time'])
+        self._tensor_hold.copy_(transition['next_hold'])
+        self._tensor_previous_physics_failure.copy_(transition['next_physics_failure'])
+        self._tensor_last_actions.copy_(torch.where(active[:, None], self.actions, self._tensor_last_actions))
+
+        component_names = tuple(transition['components'])
+        component_batch = torch.stack(
+            [transition['components'][name].to(dtype=torch.float64) for name in component_names], dim=1,
+        )
+        stability_batch = torch.stack((
+            stability['roll'], stability['pitch'], stability['tilt'], stability['excess'],
+            stability['angular'][:, 0], stability['angular'][:, 1], stability['angular'][:, 2],
+            stability['rate_sq'], stability['penalty'],
+        ), dim=1)
+        host_columns = torch.cat((
+            component_batch,
+            reward.to(dtype=torch.float64).unsqueeze(1),
+            transition['done'].to(dtype=torch.float64).unsqueeze(1),
+            transition['truncated'].to(dtype=torch.float64).unsqueeze(1),
+            transition['reason_codes'].to(dtype=torch.float64).unsqueeze(1),
+            transition['next_time'].to(dtype=torch.float64).unsqueeze(1),
+            transition['next_hold'].to(dtype=torch.float64).unsqueeze(1),
+            transition['next_physics_failure'].to(dtype=torch.float64).unsqueeze(1),
+            boundary.to(dtype=torch.float64).unsqueeze(1),
+            pitch_failure.to(dtype=torch.float64).unsqueeze(1),
+            roll_failure.to(dtype=torch.float64).unsqueeze(1),
+            stability_batch,
+            self.actions.to(dtype=torch.float64),
+        ), dim=1).detach().cpu().numpy()
+
+        reward_column = len(component_names)
+        done_column = reward_column + 1
+        truncated_column = done_column + 1
+        reason_column = truncated_column + 1
+        time_column = reason_column + 1
+        hold_column = time_column + 1
+        physics_column = hold_column + 1
+        boundary_column = physics_column + 1
+        pitch_column = boundary_column + 1
+        roll_column = pitch_column + 1
+        stability_start = roll_column + 1
+        action_start = stability_start + 9
+        diagnostic_infos = []
+        finished_observation_cache_mask = [False] * self.num_envs
+        action_host = host_columns[:, action_start:action_start + 4]
+        for i, task in enumerate(self.tasks):
+            if not active_host[i]:
+                diagnostic_infos.append({
+                    'reward_components': {},
+                    'inactive': True,
+                    'body_stability': copy.deepcopy(task.body_stability_sample),
+                    'body_stability_summary': task.body_stability_stats.summary(),
+                    'termination_detail': {
+                        'boundary': False,
+                        'overtilt_roll': False,
+                        'overtilt_pitch': False,
+                    },
+                })
+                continue
+
+            row = host_columns[i]
+            reason_code = int(row[reason_column])
+            task.time = float(row[time_column])
+            task._hold = float(row[hold_column])
+            task.physics_failure = bool(row[physics_column])
+            task.done = bool(row[done_column])
+            task.reason = {
+                0: '',
+                REASON_GOAL_REACHED: 'goal_reached',
+                REASON_OUTSIDE_OR_OVERTURNED: 'outside_or_overturned',
+                REASON_TIME_LIMIT: 'time_limit',
+            }[reason_code]
+            task.last_action = np.asarray(action_host[i], dtype=np.float32).copy()
+            task.reward = float(row[reward_column])
+            task.total_reward += task.reward
+            task.reward_components = {
+                name: float(row[index]) for index, name in enumerate(component_names)
+            }
+            if reason_code not in (REASON_OUTSIDE_OR_OVERTURNED, REASON_TIME_LIMIT):
+                task.reward_components.pop('terminal_failure', None)
+                task.reward_components.pop('failure_remaining_time_cost', None)
+            task.trail.append(task.robot[:2].tolist())
+
+            sample = {
+                'enabled': self.body_stability_config is not None,
+                'roll_rad': float(row[stability_start]),
+                'pitch_rad': float(row[stability_start + 1]),
+                'tilt_rad': float(row[stability_start + 2]),
+                'excess_tilt_rad': float(row[stability_start + 3]),
+                'body_angular_velocity_rad_s': [
+                    float(row[stability_start + index]) for index in (4, 5, 6)
+                ],
+                'roll_pitch_rate_sq': float(row[stability_start + 7]),
+                'penalty': float(row[stability_start + 8]),
+            }
+            task.body_stability_sample = sample
+            task.body_stability_stats.update(sample, self.step_dt)
+            task.reward_components['body_stability'] = -sample['penalty']
+            info = task._info()
+            info['body_stability'] = copy.deepcopy(sample)
+            info['body_stability_summary'] = task.body_stability_stats.summary()
+            boundary_value = bool(row[boundary_column])
+            pitch_value = bool(row[pitch_column])
+            roll_value = bool(row[roll_column])
+            info['termination_detail'] = {
+                'boundary': boundary_value,
+                'overtilt_roll': roll_value,
+                'overtilt_pitch': pitch_value,
+            }
+            diagnostic_infos.append(copy.deepcopy(info))
+            finished_observation_cache_mask[i] = True
+            if task.done:
+                self.episode_results.append({'mode': task.mode, 'return': task.total_reward, **copy.deepcopy(info)})
+                self.episode_results = self.episode_results[-2000:]
+
+        sense_ids = tuple(i for i, is_active in enumerate(active_host) if is_active)
+        self._tensor_capture_env_ids = sense_ids
+        self._tensor_capture_initial_env_ids = frozenset()
+        self._tensor_sensor_frame_cache.clear()
+        for i in sense_ids:
+            self.tasks[i].update_uwb_pose_noise()
+        try:
+            for i in sense_ids:
+                self.tasks[i]._sense()
+        finally:
+            self._tensor_capture_env_ids = None
+            self._tensor_capture_initial_env_ids = frozenset()
+
+        observations = self._build_tensor_observations()
+        self._tensor_observation_cache = observations
+        self._tensor_finished_observation_cache = observations
+        for i, task in enumerate(self.tasks):
+            if not active_host[i]:
+                continue
+            obs_row = {key: value[i] for key, value in observations.items()}
+            info = diagnostic_infos[i]
+            self._last_results[i] = (
+                obs_row, task.reward, bool(row[done_column]), bool(row[truncated_column]), copy.deepcopy(info),
+            )
+        self.diagnostic_step_infos = tuple(diagnostic_infos)
+        self._finished_observation_cache_mask = tuple(finished_observation_cache_mask)
+        terminated = transition['terminated'] & bool(self.cfg.auto_reset)
+        truncated = transition['truncated'] & bool(self.cfg.auto_reset)
+        return terminated, truncated
+
+    def _get_tensor_batched_observations(self):
+        initialize_sensors = any(not task.frames for task in self.tasks)
+        pending_cache_mask = getattr(self, '_finished_observation_cache_mask', None)
+        self._finished_observation_cache_mask = None
+        reuse_finished_observations = (
+            pending_cache_mask is not None
+            and len(pending_cache_mask) == len(self.tasks)
+            and not initialize_sensors
+            and self._state_observation_fresh
+            and self._tensor_finished_observation_cache is not None
+        )
+        if initialize_sensors:
+            self._invalidate_cached_samples()
+            self._sensor_cache.clear()
+            self._tensor_sensor_frame_cache.clear()
+            self.scene.write_data_to_sim()
+            self.sim.forward()
+            self.sim.render()
+            for name in ('lidar', 'rangefinder', 'depth', 'detector'):
+                self.scene[name].update(0., force_recompute=True)
+        if not self._state_observation_fresh:
+            self._refresh_state(include_feedback=initialize_sensors)
+        if initialize_sensors:
+            self._refresh_feedback(after_step=False)
+            initial_ids = tuple(i for i, task in enumerate(self.tasks) if not task.frames)
+            self._tensor_capture_env_ids = initial_ids
+            self._tensor_capture_initial_env_ids = frozenset(initial_ids)
+            for i in initial_ids:
+                self.tasks[i].update_uwb_pose_noise()
+            try:
+                for i in initial_ids:
+                    self.tasks[i].initialize_sensors(build_observation=False)
+            finally:
+                self._tensor_capture_env_ids = None
+                self._tensor_capture_initial_env_ids = frozenset()
+
+        reuse_rows = (
+            [bool(value and self._last_results[i] is not None)
+             for i, value in enumerate(pending_cache_mask)]
+            if reuse_finished_observations else []
+        )
+        if reuse_finished_observations and all(reuse_rows):
+            observations = self._tensor_finished_observation_cache
+        elif reuse_finished_observations:
+            fresh_observations = self._build_tensor_observations()
+            reuse_mask = torch.as_tensor(
+                reuse_rows,
+                dtype=torch.bool, device=self.device,
+            )
+            observations = {
+                key: torch.where(
+                    reuse_mask.reshape((-1,) + (1,) * (fresh.ndim - 1)),
+                    self._tensor_finished_observation_cache[key], fresh,
+                )
+                for key, fresh in fresh_observations.items()
+            }
+        else:
+            observations = self._build_tensor_observations()
+        self._tensor_observation_cache = observations
+        self._state_observation_fresh = False
+        return {'policy': observations}
+
     def _get_dones(self):
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            return self._get_tensor_batched_dones()
         self._finished_observation_cache_mask = None
         self._refresh_state(include_feedback=True)
         self._refresh_feedback(after_step=True)
@@ -860,6 +1481,8 @@ class IsaacFieldEnv(DirectRLEnv):
         return self._reward
 
     def _get_observations(self):
+        if getattr(self, 'task_backend', 'reference') == 'torch_batched':
+            return self._get_tensor_batched_observations()
         initialize_sensors = any(not t.frames for t in self.tasks)
         pending_cache_mask = getattr(self, '_finished_observation_cache_mask', None)
         self._finished_observation_cache_mask = None
@@ -1080,7 +1703,7 @@ class IsaacFieldEnv(DirectRLEnv):
 def make_env(cfg=None, mode='mixed', num_envs=1, seed=7, auto_reset=True, *,
              goal_distance=None, goal_angle=math.pi, distance_cost=0., viewer_port=None,
              couple_same_side_wheels=True, front_guide_spec=None,
-             body_stability_config=None, rsl=False):
+             body_stability_config=None, task_backend='reference', rsl=False):
     if front_guide_spec is not None:
         if not isinstance(front_guide_spec, FrontGuideSpec):
             raise TypeError("front_guide_spec must be FrontGuideSpec or None")
@@ -1090,6 +1713,7 @@ def make_env(cfg=None, mode='mixed', num_envs=1, seed=7, auto_reset=True, *,
             raise TypeError("body_stability_config must be BodyStabilityConfig or None")
         body_stability_config = body_stability_config.as_dict()
     env_cfg=FieldEnvCfg(task=cfg or Config(),mode=mode,auto_reset=auto_reset,seed=seed,
+                        task_backend=task_backend,
                         goal_distance=goal_distance,goal_angle=goal_angle,distance_cost=distance_cost,
                         couple_same_side_wheels=couple_same_side_wheels,
                         front_guide_spec=front_guide_spec,

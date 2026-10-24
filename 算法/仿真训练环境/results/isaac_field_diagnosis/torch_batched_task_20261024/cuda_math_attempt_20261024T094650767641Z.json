@@ -1,0 +1,16 @@
+{
+  "attempt_policy": "one bounded invocation; no retry after CUDA errors",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "ISAAC_FIELD_DISABLE_NATIVE_RUNTIME": "1",
+    "PYTHONPATH": "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境",
+    "RUN_ISAAC_PHYSICS": "0"
+  },
+  "error": "observation.depth.cpu_cuda: values differ (max_abs=5.960464477539063e-08)",
+  "error_type": "AssertionError",
+  "native_runtime_modules_loaded": [],
+  "script": "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_diagnosis\\torch_batched_task_20261024\\verify_cuda_math.py",
+  "started_or_failed_utc": "2026-10-24T09:46:50.764Z",
+  "status": "failed",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_diagnosis\\torch_batched_task_20261024\\verify_cuda_math.py\", line 597, in main\n    result = _run()\n             ^^^^^^\n  File \"C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_diagnosis\\torch_batched_task_20261024\\verify_cuda_math.py\", line 548, in _run\n    observation_diffs = _pack_observations(tasks, torch, device)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_diagnosis\\torch_batched_task_20261024\\verify_cuda_math.py\", line 228, in _pack_observations\n    \"cpu_vs_cuda_max_abs\": _assert_array_equal(f\"observation.{key}.cpu_cuda\", cpu_array,\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_diagnosis\\torch_batched_task_20261024\\verify_cuda_math.py\", line 90, in _assert_array_equal\n    raise AssertionError(f\"{label}: values differ (max_abs={difference})\")\nAssertionError: observation.depth.cpu_cuda: values differ (max_abs=5.960464477539063e-08)\n"
+}
