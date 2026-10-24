@@ -146,6 +146,8 @@ def _build_scene(context: Any, packet: dict[str, Any],
     """Create the independent render stage once, with references to configured assets."""
     context.new_stage()
     stage = context.get_stage()
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
     world = UsdGeom.Xform.Define(stage, "/World").GetPrim()
     stage.SetDefaultPrim(world)
     env_path = f"/World/Env{env_index}"

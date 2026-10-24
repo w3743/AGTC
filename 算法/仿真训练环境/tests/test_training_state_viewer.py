@@ -146,6 +146,8 @@ def test_nonzero_env_origin_keeps_terrain_local_and_offsets_robot(tmp_path):
         "robot_usd_path": str(robot_path),
     }
     stage, robot_prim = _build_scene(Context(), packet, UsdGeom, UsdLux, 0)
+    assert UsdGeom.GetStageUpAxis(stage) == UsdGeom.Tokens.z
+    assert UsdGeom.GetStageMetersPerUnit(stage) == 1.0
     ground_prim = stage.GetPrimAtPath("/World/Env0/Terrain/Ground")
     terrain_xf = UsdGeom.XformCache().GetLocalToWorldTransform(ground_prim)
     ground_points = [terrain_xf.Transform(Gf.Vec3d(p)) for p in ground.GetPointsAttr().Get()]
