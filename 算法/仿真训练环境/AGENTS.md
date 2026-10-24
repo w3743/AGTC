@@ -17,6 +17,8 @@
 
 ## 当前批次与运行状态
 
+- 2026-10-24 用户确认原生训练窗口连旋转视角/界面操作也卡，明确选择独立观察窗口优先交互流畅，并授权在下一完整checkpoint切换。已准备默认关闭的 `--live-state-file`：复用同一次CPU pack导出真实root/body world poses、xyzw、origin/goal、物理时钟及来源/序号，原子latest文件，OSError保留last-good并限频告警；不改物理/传感器/RNG。独立render-only Kit窗口不加载策略、不建训练环境、不推进timeline，按最新真实状态更新，用户相机视角独立保留；数据过期保留最后pose并标明age，无插值冒充物理更新。当前a03仍运行，准备在下一 `model_48.pt` 完整落盘后切换到a04；新功能为第二十一批第2项，尚未部署，不提前称实际交互验收通过。41模块CPU回归468 passed/4 skipped/47 warnings、源SHA前后相同，证据 `results/isaac_field_diagnosis/live_state_mirror_handoff_20261024/cpu_gate.json`。不做FPS基准、不承诺提高训练吞吐。
+
 - 2026-10-24 可视化续训已实际启动，第二十一批1/5。新trial为 `results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/`，protocol SHA `3ff3b1ac0c228be857af0e6dd50f73c4050e1b4c0265d1389185cf7a3600c75a`、81源快照冻结；从a02 `model_32.pt` 的16896累计步/Adam660恢复，剩余351更新，总目标仍196608，预期最终payload iter382/Adam7680。首个新checkpoint CPU审计通过：累计17408、新增512、Adam680、33张actor/critic张量更新、完整policy contract相同、checkpoint原字节未改。37模块回归436 passed/4 skipped及续训入口12专项通过；未做FPS基准或宣称提速倍数。
 
 - 实际训练进程29076、controller34644的原生 `Isaac Lab 3.0.0` 视口已通过两次Computer Use观察，并以HWND724194核对同一训练PID：车辆姿态持续变化，地面及其它并行环境可见；跟随env0但不隐藏其它3环境，不是静态USD或额外回放。物理dt=.001/decimation50/位置求解40、完整task和五种sensor配置核对相同；唯一兼容差异为官方PhysxManager因GUI自动将嵌套 `physics.enable_scene_query_support` false→true（查询manager，非积分/接触精度变更），报告明确保留。旧a02训练/父流程/监听及静态GUI均按真实argv/ctime核对后停止，a02记superseded，原protocol/source_snapshot/checkpoint/log保留。完成监听已迁移至仓库外 `C:/pioneer/isaac-training/watchers/pointmove-live-a03/`（当前native watcher18132），每30秒普通程序检查、去重通知；旧周期自动化仍PAUSED。训练自然结束后继续原baseline/final各16场配对评估，不能提前称能力提升。

@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
 
@@ -46,6 +47,7 @@ from .physx_drive import (
     same_side_wheel_coupling_metadata,
 )
 from .runtime import ensure_runtime, simulator_identity
+from .live_state import LiveStateExporter
 from .feedback import (
     ABSOLUTE_GOAL_INPUT_SCHEMA, FEEDBACK_DIM, STATE_DIM, FeedbackSample,
     feedback_config,
@@ -303,6 +305,15 @@ class IsaacFieldEnv(DirectRLEnv):
         )
         self._physics_contact_metadata = build_physics_contact_metadata(self)
         self.rover = self.scene['robot']
+        live_state_path = os.environ.get('ISAAC_FIELD_LIVE_STATE_FILE')
+        self._live_state_exporter = None
+        if live_state_path:
+            self._live_state_exporter = LiveStateExporter(
+                live_state_path,
+                robot_usd_path=cfg.scene.robot.spawn.usd_path,
+                terrain_usd_path=cfg.scene.field.spawn.usd_path,
+                body_names=self.rover.body_names,
+            )
         self._wheel_names = [f'{w.name}_wheel_joint' for w in ROBOT_SPEC.wheel_specs]
         self._wheel_ids = torch.tensor([self.rover.joint_names.index(n) for n in self._wheel_names], device=self.device)
         self._wheel_sides = torch.tensor([-1. if w.side=='left' else 1. for w in ROBOT_SPEC.wheel_specs],device=self.device)
@@ -564,6 +575,9 @@ class IsaacFieldEnv(DirectRLEnv):
             'angular': velocities[:,5:6],
             'root_com_velocity_xy': velocities[:,:2],
         }
+        live_state_exporter = getattr(self, '_live_state_exporter', None)
+        if live_state_exporter is not None:
+            state_tensors['body_link_pose_w'] = self.rover.data.body_link_pose_w.torch
         feedback_tensors = None
         if include_feedback:
             imu = self.scene['imu'].data
@@ -595,6 +609,15 @@ class IsaacFieldEnv(DirectRLEnv):
 
         state = unpack(state_tensors)
         state['mount_rotation'] = state['mount_rotation'].reshape(-1, 3, 3)
+        if live_state_exporter is not None:
+            live_state_exporter.write(
+                root_link_pose_w=state['root'],
+                body_link_pose_w=state['body_link_pose_w'],
+                env_origins_w=state['origin_offsets'],
+                goals_local_xy=np.asarray([task.goal for task in self.tasks]),
+                task_times_s=np.asarray([task.time for task in self.tasks]),
+                sim_time_s=self._sim_step_counter * self.cfg.sim.dt,
+            )
         feedback = None if feedback_tensors is None else unpack(feedback_tensors)
         if feedback is not None:
             feedback['gimbal_q'] = state['joints']

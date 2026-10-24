@@ -1,5 +1,13 @@
 # Isaac Lab 项目状态
 
+## 2026-10-24：独立实时观察窗口（准备切换）
+
+用户确认原生训练窗口的旋转视角/界面操作也卡，选择将观察窗口独立，并授权在下一完整checkpoint切换。现有日志每128个控制步耗时约213–223秒；Kit事件处理与控制步绑定，因此UI也会等待采样。本次保持原物理精度、五路观测、传感器更新调度及奖励/终止，将渲染/鼠标操作从训练进程移出；真实车辆状态仍按训练推进速度到达，不插值冒充更多物理样本。
+
+新入口 `--live-state-file <绝对路径>` 默认关闭，启用时只在原GPU→CPU pack里增加body poses。原子latest JSON带明确xyzw、env origin、global sim time、packet timestamp/sequence和来源，暂停/文件写失败不清空旧画面、不影响策略；观察端显示数据年龄，超过5秒标记过期。观察程序 `scripts/view_training_state.py` 独立运行Kit、timeline保持停止，不构造Isaac Lab env或加载checkpoint/策略；只展示选中环境的真实位姿。相机只初始化一次，随后保留用户操作，地面保持环境局部坐标，嵌套body只扣除一次origin。
+
+41模块CPU回归实际468 passed/4 skipped/47 warnings，源SHA测试前后相同；还未完成新的原生观察窗口验收。准备trial `results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/` 将复用a03完整checkpoint、原a02零步baseline与原16种子配对评估，总目标仍196608累计transitions。切换前a03继续运行，不覆盖原trial/协议/源快照或成绩；只在新协议中冻结改动。本次不测训练FPS，不把30Hz界面循环目标称为实测刷新率或训练提速。
+
 ## 2026-10-24：采样优化与实时GUI续训交接
 
 可视化续训已于本机15:22启动，当前trial为 `results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/`。81源快照及protocol SHA `3ff3b1ac0c228be857af0e6dd50f73c4050e1b4c0265d1389185cf7a3600c75a`已冻结；从a02 `model_32.pt` 的16896累计transitions/Adam660恢复，4环境×128步×351剩余更新，目标仍为196608，预期最终payload iter382/Adam7680。首次新checkpoint已CPU核验：累计17408、新增512、Adam680、33张actor/critic张量真实更新、完整policy contract相同、原文件SHA前后相同，详见新trial的 `first_resumed_checkpoint_cpu.json`。RSL日志的Total steps是本进程计数，累计进度以checkpoint的num_timesteps为准。续训入口12项CPU专项及3个subtests通过，不把进程运行或权重更新称为能力改善。
