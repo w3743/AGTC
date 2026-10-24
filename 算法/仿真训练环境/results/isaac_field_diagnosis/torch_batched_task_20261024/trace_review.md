@@ -17,6 +17,8 @@
 
 `fetch_results` 是 host 侧调用耗时；这里可以称为 fetch 边界的大块主机等待/耗时，但无法拆成 PhysX GPU 计算、设备同步、线程调度或调用自身开销。两份结果是不同长度的正确性检查，不是可比的吞吐基准。
 
+后续`native_drive_final_a01.json`通过4环境×16步correctness检查，记录800次物理调用的host inclusive `physx_fetch_results`为35.8614712 s、`physx_simulate`为0.2453846 s。该结果仍是主机侧嵌套计时，不提供GPU kernel时间；这次correctness运行也没有生成CUDA activity trace。
+
 ## 具体排查线索
 
 - CPU trace 记录了 22 次 `aten::item`、22 次 `aten::is_nonzero`、22 次 `aten::_local_scalar_dense`，以及 173 次 `aten::to`、103 次 `aten::copy_`、94 次 `aten::_to_copy`。如果这些调用接收 CUDA tensor，标量取值/布尔判断可能形成同步点；trace 没有输入设备或 memcpy 事件，所以目前只是需要回到调用点核对的线索，不能断言发生了传输或同步。
@@ -41,6 +43,7 @@
 - `run_native_check.py` 记录子进程实际 return code `1`、耗时 `29.407 s`、`timed_out=false`；日志和 process receipt 已保存。日志显示 Kit 启动至环境创建阶段，`cuda:0`、4 个环境和物理场景已初始化。
 - `IsaacFieldRslEnv` 初始化触发 `SimulationContext.reset` 时，Camera 初始化请求 Replicator annotator `instance_segmentation_fast`，但 `omni.replicator.core` 的 Python extension startup 失败，随后报 `AnnotatorRegistryError: No annotator of name instance_segmentation_fast registered`。这是本次退出的直接原因。
 - 报告和 trace 均未生成。因此无法核验 camera pose、partial reset、16 步 observation 对照，无法读回四个 profiler 设置，也无法判断 CUPTI 冲突是否解除、CUDA 活动是否捕获或 fetch 等待是否变化。没有重启第二个 Kit。
+- profiler-off 命令行 flags 仅用于该次失败隔离尝试，未写入项目默认配置，也未作为训练恢复启动参数；因退出发生在首个物理 step 前，不能称为“profiler关闭后的”运行结果。
 - 六个纳入冻结的项目源文件在启动前后 SHA-256 一致；已执行脚本 SHA-256 为 `4cf22d7143d6006b399f65ec33d66b8cbf3f53cd7694c04c79bf03a39727cb37`。原始 a01/a02 trace、报告和日志未改。
 
 ## 记录范围
