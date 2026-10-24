@@ -44,6 +44,15 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 设计预算：96 iterations × 4096 = 393216 transitions（基线为 196608）。
 - 预计 ~107–113 s/iteration；`launch.json` 记录启动时间、命令与环境变量。
 
+### 正式运行结果（2026-10-25 05:37 自然结束）
+
+- 实际训练时间 **9218.8 s（2:33:19）**，96/96 iterations，无异常退出；最终 checkpoint `model_95.pt`（36,858,339 B，iter 95，393,216 timesteps，Adam step 1920）。
+- `model_95.pt` CPU 审计：actor 29 tensors / 1,587,016 参数、critic 8 tensors / 1,478,785 参数，全部有限；SHA256 `710ccb9432b8f27b8d2de6d24f2fba87ffbb54e695bdc50231e3d290f5cf03d9`；contract `num_envs=32`、`num_steps_per_env=128`、backend identity `isaac_sim/physx/rsl_rl`。
+- 每轮：collection 中位 **88.49 s**（80.68–103.55），learning 中位 **6.07 s**（5.05–17.92）。
+- 学习信号：`Train/mean_reward` -17.03 → **-15.49**；`Train/mean_episode_length` 73.8 → **1135.2**（单回合上限 1200 步）。
+- 实测吞吐：`Perf/total_fps` 34 → 45（中位 43 samples/s）；全跑平均 393216/9218.8 = **42.65 samples/s**，相对 a07 的 2.18 samples/s 约 **19.6×**。
+- 结论边界：以上是训练吞吐与训练期指标，**不是控制能力验收**；仍需在默认 1 ms 物理协议下做 16 场景评估后才能讨论策略效果。
+
 ## 5. WSL2 ARM64 原生栈（2026-10-25，已就绪，GPU 基准待训练空闲）
 
 - 发行版：`Ubuntu-24.04-Arm64`，用官方 rootfs（341,871,845 B）`wsl --import` 导入，无提权、未 `wsl --install`、未重启。

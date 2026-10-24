@@ -1,0 +1,78 @@
+{
+  "schema": "agtc-perf-training-summary-v1",
+  "run": "perf_20261025_n32_dt5",
+  "status": "completed",
+  "started_utc": "2026-10-24T19:03:00Z",
+  "finished_utc": "2026-10-24T21:37:32Z",
+  "training_time_seconds": 9218.8,
+  "config": {
+    "num_envs": 32,
+    "sim_dt_s": 0.005,
+    "decimation": 10,
+    "policy_dt_s": 0.05,
+    "num_steps_per_env": 128,
+    "max_iterations": 96,
+    "seed": 69041,
+    "task_backend": "torch_batched",
+    "isaac_field_perf_physics": true
+  },
+  "final_checkpoint": {
+    "path": "logs/rsl_rl/perf_20261025_n32_dt5/train/model_95.pt",
+    "bytes": 36858339,
+    "sha256": "710ccb9432b8f27b8d2de6d24f2fba87ffbb54e695bdc50231e3d290f5cf03d9",
+    "iter": 95,
+    "num_timesteps": 393216,
+    "adam_step": 1920,
+    "actor_tensors": 29,
+    "actor_numel": 1587016,
+    "critic_tensors": 8,
+    "critic_numel": 1478785,
+    "weights_finite": true,
+    "contract_num_envs": 32,
+    "contract_backend_identity": {
+      "simulator": "isaac_sim",
+      "physics_backend": "physx",
+      "learning_backend": "rsl_rl"
+    }
+  },
+  "metrics": {
+    "collection_time_s": {
+      "first": 100.47,
+      "median": 88.49,
+      "min": 80.68,
+      "max": 103.55
+    },
+    "learning_time_s": {
+      "first": 17.92,
+      "median": 6.07,
+      "min": 5.05,
+      "max": 17.92
+    },
+    "mean_reward": {
+      "first": -17.03,
+      "last": -15.49,
+      "max": -15.44
+    },
+    "mean_episode_length": {
+      "first": 73.8,
+      "last": 1135.17,
+      "max": 1135.73
+    },
+    "total_fps_samples_per_s": {
+      "first": 34,
+      "median": 43,
+      "last": 45
+    }
+  },
+  "throughput": {
+    "transitions": 393216,
+    "avg_samples_per_second": 42.65,
+    "baseline_a07_samples_per_second": 2.18,
+    "speedup_vs_a07": 19.6
+  },
+  "notes": [
+    "Fresh training from scratch; a07 checkpoints cannot be resumed into a different live environment because the policy contract is strict on resume.",
+    "Final policy must still be evaluated on the default 1 ms physics protocol before any capability claim.",
+    "Training-time metrics come from TensorBoard scalar events of this run; no extrapolated FPS claim is made."
+  ]
+}
