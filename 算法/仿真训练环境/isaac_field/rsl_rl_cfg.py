@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 from isaaclab.utils import configclass
+from isaaclab_visualizers.kit import KitVisualizerCfg
 from isaaclab_rl.rsl_rl import (
     RslRlMLPModelCfg,
     RslRlOnPolicyRunnerCfg,
@@ -62,6 +63,19 @@ class FieldFastStopRslEnvCfg(FieldEnvCfg):
     is_finite_horizon: bool = True
     front_guide_spec: dict | None = _FAST_STOP_FRONT_GUIDES
     body_stability_config: dict | None = _FAST_STOP_BODY_STABILITY
+
+    def __post_init__(self):
+        super().__post_init__()
+        # Defaults only customize an explicitly requested visualizer. Headless
+        # runs still create no viewport, and every training environment stays
+        # visible to its own sensors. Follow the actual first training robot.
+        if self.sim.default_visualizer_cfg is None:
+            self.sim.default_visualizer_cfg = KitVisualizerCfg(
+                origin_type="asset", origin_env_index=0,
+                origin_track_path="robot", eye=(3.0, -4.0, 2.0),
+                lookat=(0.0, 0.0, 0.15), streaming_view=False,
+                max_visible_envs=None,
+            )
 
 
 _OBSERVATION_KEYS = ["lidar", "depth", "detections", "state", "feedback"]

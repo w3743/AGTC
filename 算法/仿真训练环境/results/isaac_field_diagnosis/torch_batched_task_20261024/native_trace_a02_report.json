@@ -1,0 +1,116 @@
+{
+  "status": "passed",
+  "training_started": false,
+  "policy_loaded": false,
+  "optimizer_started": false,
+  "fps_benchmark_started": false,
+  "num_envs": 4,
+  "steps": 1,
+  "source_sha256": {
+    "isaac_field/env.py": "8bef5facd7233175c39277a1aa98c4a1b74a5103387af4bcf98d06cf9886b9a5",
+    "isaac_field/task.py": "7e68b2973d0012466614c8337448913c07b938c7f065111f06a2f1c825b83b7f",
+    "isaac_field/tensor_task.py": "e86cf0e8a3bf58d022f2a4ddc8c058d8ad37a1c3b3d4d58c116cfa4104896c7d",
+    "isaac_field/tensor_sensors.py": "0940e8d82cd8f94b64c567c4df31fd9a5c7d9b1a33589152fdc8ebbfef978f1f"
+  },
+  "physics": {
+    "dt": 0.001,
+    "decimation": 50,
+    "position_iterations": 40,
+    "task_backend": "torch_batched",
+    "device": "cuda:0",
+    "gpu_dynamics": true,
+    "broadphase": "GPU"
+  },
+  "runtime_settings": {
+    "/app/runLoops/main/rateLimitEnabled": false,
+    "/app/runLoops/main/rateLimitFrequency": 120,
+    "/physics/fabricUpdateTransformations": true,
+    "/physics/fabricUpdateVelocities": false,
+    "/physics/fabricUseGPUInterop": true,
+    "/physics/suppressReadback": true
+  },
+  "trace": "C:\\pioneer\\isaac-training\\qa\\torch-batch-native-traces\\native_trace_a02.json",
+  "max_reference_observation_error": {
+    "lidar": 0.0,
+    "depth": 5.960464477539063e-08,
+    "detections": 0.0,
+    "state": 1.1920928955078125e-07,
+    "feedback": 0.0
+  },
+  "camera_positions_checked": 0,
+  "partial_reset_checked": true,
+  "old_observation_immutable": true,
+  "output_shapes": {
+    "lidar": [
+      4,
+      1,
+      400
+    ],
+    "depth": [
+      4,
+      1,
+      160,
+      88
+    ],
+    "detections": [
+      4,
+      16,
+      8
+    ],
+    "state": [
+      4,
+      33
+    ],
+    "feedback": [
+      4,
+      37
+    ]
+  },
+  "device_frames_retained": true,
+  "source_sha256_after": {
+    "isaac_field/env.py": "8bef5facd7233175c39277a1aa98c4a1b74a5103387af4bcf98d06cf9886b9a5",
+    "isaac_field/task.py": "7e68b2973d0012466614c8337448913c07b938c7f065111f06a2f1c825b83b7f",
+    "isaac_field/tensor_task.py": "e86cf0e8a3bf58d022f2a4ddc8c058d8ad37a1c3b3d4d58c116cfa4104896c7d",
+    "isaac_field/tensor_sensors.py": "0940e8d82cd8f94b64c567c4df31fd9a5c7d9b1a33589152fdc8ebbfef978f1f"
+  },
+  "sources_unchanged": true,
+  "host_wall_phases": {
+    "scene_write": {
+      "inclusive_seconds": 0.0260339,
+      "calls": 50
+    },
+    "physx_simulate": {
+      "inclusive_seconds": 0.0151302,
+      "calls": 50
+    },
+    "physx_fetch_results": {
+      "inclusive_seconds": 1.2433515,
+      "calls": 50
+    },
+    "cuda_set_device": {
+      "inclusive_seconds": 0.0049751,
+      "calls": 50
+    },
+    "physics_step": {
+      "inclusive_seconds": 1.2691343,
+      "calls": 50
+    },
+    "scene_update": {
+      "inclusive_seconds": 0.0387666,
+      "calls": 50
+    },
+    "render_dispatch": {
+      "inclusive_seconds": 0.000111,
+      "calls": 1
+    },
+    "task_dones_inclusive": {
+      "inclusive_seconds": 0.0501617,
+      "calls": 1
+    },
+    "observations_inclusive": {
+      "inclusive_seconds": 4.59e-05,
+      "calls": 1
+    }
+  },
+  "timing_scope": "Correctness run, host wall only; nested/inclusive and startup/reset affected, not a sustained speed or FPS benchmark."
+}
