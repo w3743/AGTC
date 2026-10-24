@@ -93,3 +93,19 @@ python3.12 -m venv /opt/venv && /opt/venv/bin/pip install torch --index-url http
 - 吞吐门禁已过：原生栈稳态 7.0–7.4×（M3b），但仅限**吞吐**；能力评估不可用。
 - 继续迁移需要 M1（观测等价 1.5–2 人日）+ M2（任务/reset/奖励等价 1–1.5 人日），共 2.5–3.5 人日；完成后需用真观测重跑 M3 确认吞吐不退化。
 - 在那之前，正式训练仍建议留在已验证的 Isaac perf 配置（19.6×）；原生栈只用于吞吐实验/超参搜索。
+
+## 10. M1 观测等价进展（2026-10-25 07:21，CPU-only，RSS 213 MB）
+
+对照实现全部用仓库 reference 代码（只读）：lidar = `task.py` 的 `Scene.cast`，state = `FieldTask._observation`，feedback = `SimFeedbackEstimator(noise_enabled=False)`（为跑 VQF 在 WSL 装了 `vqf==2.1.2`）。
+
+| 通道 | 结果 |
+|---|---|
+| lidar（numpy） | 固定 scene（400 株/3200 叶/seed 77001）、16 位姿 × 400 线 = 6400 射线：**hit-id 不一致 0，距离 max diff 0.0 m**，100% ≤1e-5；terrain 分支命中 0（水平射线 0.55 m vs 地形幅值 0.35 m，已验证） |
+| lidar（warp） | 同数据：hit-id 不一致 0，距离 max diff **3.35e-4 m**（6400 中 2 条掠射光线超 1e-5，均值 6.6e-8）→ 可用，需容忍 float32 掠射差异 |
+| state 33 | 8 组随机输入逐元素对照：**max abs error 4.05e-7**（float32 舍入；age/动作/云台 delta 字段全部对齐） |
+| feedback 37 | 直通姿态模式：**37 维 max abs error 2.9e-8**；VQF 模式（Isaac 真实路径）：16 个非姿态值仍 2.9e-8，但 **attitude quaternion 最大差 0.977** → feedback 未完全等价 |
+| depth / detections | 仍占位，能力指标继续禁止 |
+
+- 修复：provider 的 state 语义（last_action 用 slew 后命令、云台 delta 置 0）对齐 reference；warp lidar origin 广播 bug（曾导致全部 miss）。
+- 产物：`proto/m1_lidar.py`、`proto/m1_state_feedback.py`、`proto/run_m1_verify.py`、`proto/m1_verification.json`；`observation_contract.json` 新增 `verification` 字段，train 时自动嵌入。
+- 剩余阻塞：VQF 姿态未移植（需评估用 Python `vqf` 包旁路或重写数值版本）；M2（spawn 接触、reset 语义、reward/termination、timeout bootstrap）进行中。
