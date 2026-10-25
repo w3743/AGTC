@@ -48,3 +48,14 @@
 - `--detections-warp` 端到端 smoke：2.948 s/iter、347.3 samples/s；与 analytic CPU detections（2.897 s、353.5）**无实质差异**。修正：此前“detections ≈1.5 s/iter 是主成本”是由微基准外推，非实测；本配置下 **physics 主导（~2.6 s/iter）**。
 - `eval_native.py` 链路已验证：pilot `checkpoint_40` 2 场景均可加载/评估，但该 40-iter 原型策略在 native 域翻车（49/182 步、flipped），**不构成能力结论**；evaluation.json 已生成。
 - 下一步（CPU-only）：provider 加 per-sensor 计时；native 物理加可配置 `--sim-dt/--decimation`（默认 1 ms/50 不变），实验 `dt=0.005/dec=10`（与 Isaac perf 同 5 ms 物理，预期 physics 成本降 ~5×）；warp detections 批量化单 launch。
+
+## 2026-10-25 11:40 现状与下一步排期
+
+- 已完成：五通道 real；depth/detections 与 reference 对照通过；`eval_native.py` 链路可用；WSL pilot（原型 MLP）49 iter 验证了训练/checkpoint/恢复；warp detections mask 单帧 0.658 ms 但逐 pose launch 42 ms/批、端到端无收益。
+- 成本定位修正：16-step 配置下 **physics 主导（~2.6 s/iter）**，不是 detections。
+- 下一步排期（队友执行，CPU 优先）：
+  1. provider per-sensor 计时（`--profile`，默认零开销）；
+  2. native 物理可配置 `--sim-dt/--decimation`（默认 1 ms/50 不变），实验 5 ms/10（预期 physics 成本 ~5× 降低）；
+  3. warp detections mask 单 launch 批量化（目标 ≤30 ms/批）；
+  4. **真实 LSTM-512 策略接入**（`wsl_train/policy_lstm.py` + `--policy lstm`，含序列化 PPO 更新）；
+  5. 之后做 GPU A/B（1 ms/50 vs 5 ms/10），冻结 native 试验协议，启动正式 WSL 训练。
