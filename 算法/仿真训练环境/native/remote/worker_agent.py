@@ -82,18 +82,38 @@ def _start(payload: dict) -> dict:
         env = dict(os.environ)
         env["SIM_DT"] = str(payload.get("sim_dt", 0.001))
         env["DECIMATION"] = str(payload.get("decimation", 50))
-        args = ["bash", "train/run_native_v1_trial.sh", tag]
         live = payload.get("live_state_file")
-        if live:
-            args += ["--live-state-file", str(live), "--live-state-interval",
-                     str(payload.get("live_state_interval", 5))]
-        args += [str(value) for value in payload.get("extra_args", [])]
+        extra = [str(value) for value in payload.get("extra_args", [])]
+        if os.name == "nt":
+            # Native Windows stack: call the PowerShell trial runner with the venv Python.
+            args = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                    "-File", str(NATIVE_DIR / "train" / "run_native_v1_trial.ps1"),
+                    "-Tag", tag,
+                    "-Python", str(payload.get("python", "python")),
+                    "-SimDt", str(payload.get("sim_dt", 0.001)),
+                    "-Decimation", str(payload.get("decimation", 50))]
+            if live:
+                args += ["-LiveStateFile", str(live),
+                         "-LiveStateInterval", str(payload.get("live_state_interval", 5))]
+            if extra:
+                args += ["-ExtraArgs"] + extra
+        else:
+            args = ["bash", "train/run_native_v1_trial.sh", tag]
+            if live:
+                args += ["--live-state-file", str(live), "--live-state-interval",
+                         str(payload.get("live_state_interval", 5))]
+            args += extra
         log_dir = NATIVE_DIR / "runs"
         log_dir.mkdir(parents=True, exist_ok=True)
         log_path = log_dir / f"worker_{tag}.log"
         log = log_path.open("w", encoding="utf-8")
-        process = subprocess.Popen(args, cwd=str(NATIVE_DIR), env=env, stdout=log,
-                                   stderr=subprocess.STDOUT, start_new_session=True)
+        if os.name == "nt":
+            process = subprocess.Popen(args, cwd=str(NATIVE_DIR), env=env, stdout=log,
+                                       stderr=subprocess.STDOUT,
+                                       creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+        else:
+            process = subprocess.Popen(args, cwd=str(NATIVE_DIR), env=env, stdout=log,
+                                       stderr=subprocess.STDOUT, start_new_session=True)
         STATE.update(process=process, pid=process.pid, tag=tag, log_path=str(log_path),
                      started_at=time.time(), live_state_file=live, finished_at=None,
                      returncode=None, trial_dir=None)
@@ -105,17 +125,20 @@ def _stop() -> dict:
         process = STATE["process"]
         if process is None or process.poll() is not None:
             return {"ok": True, "already_stopped": True}
-        try:
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
-        except ProcessLookupError:
-            pass
-        try:
-            process.wait(timeout=20)
-        except subprocess.TimeoutExpired:
+        if os.name == "nt":
+            subprocess.call(["taskkill", "/T", "/F", "/PID", str(process.pid)])
+        else:
             try:
-                os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
             except ProcessLookupError:
                 pass
+            try:
+                process.wait(timeout=20)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(os.getpgid(process.pid), signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
         STATE["finished_at"] = time.time()
         STATE["returncode"] = process.returncode
         return {"ok": True, "returncode": process.returncode}

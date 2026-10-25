@@ -56,3 +56,43 @@ python train/../viz/native_live.py --state-file /tmp/native_trial_live.json \
 ## 换机 / 远程
 
 见 `remote/README.md`：SSH + Git + rsync + SSH 端口转发即可，**不需要 A2A**。
+
+## Windows x86_64（如 Ultra 9 + RTX 5070 Ti）原生运行
+
+已验证 Windows wheel 齐全（`pip download --platform win_amd64 --python-version 312`）：
+- `newton 1.7.0`（py3-none-any）
+- `warp-lang 1.18.0`（win_amd64）
+- `ovphysx 0.7.0`（win_amd64）
+- `mujoco 3.17.0`（cp312-win_amd64）
+- PyTorch 用官方 Windows CUDA wheel（Blackwell/5070 Ti 需要 CUDA 12.8+，装 cu128 及以上的 torch）
+
+因此**第二台 Windows 机器不需要 WSL**，可直接原生运行：
+
+```powershell
+py -3.12 -m venv C:\venvs\agtc-native
+C:\venvs\agtc-native\Scripts\pip install --upgrade pip
+C:\venvs\agtc-native\Scripts\pip install torch --index-url https://download.pytorch.org/whl/cu128
+C:\venvs\agtc-native\Scripts\pip install warp-lang==1.18.0 newton==1.7.0 mujoco==3.17.0 ovphysx==0.7.0 numpy
+# 查看器依赖（可选，本机看可视化时）
+C:\venvs\agtc-native\Scripts\pip install viser==1.0.30 usd-core numpy
+
+git clone https://github.com/w3743/AGTC C:\AGTC
+cd C:\AGTC\算法\仿真训练环境\native
+
+# 冒烟（2 iter，确认 CUDA/物理/观测链路）
+C:\venvs\agtc-native\Scripts\python train\train_wsl.py --policy lstm --num-envs 64 --num-steps 32 --iterations 2 ^
+  --device cuda --physics newton_xpbd --lidar warp --feedback vqf --depth analytic --detections analytic --detections-warp ^
+  --sim-dt 0.001 --decimation 50 --out runs\smoke_win
+
+# 正式 trial（Windows 版 runner）
+powershell -NoProfile -ExecutionPolicy Bypass -File train\run_native_v1_trial.ps1 -Tag pilot02 ^
+  -Python C:\venvs\agtc-native\Scripts\python.exe -LiveStateFile C:\tmp\native_live.json
+
+# 局域网 worker（无需管理员；首次运行允许防火墙专用网络）
+C:\venvs\agtc-native\Scripts\python remote\worker_agent.py --host 0.0.0.0 --port 8790 --token <随机串>
+```
+
+注意：
+- 5070 Ti 是 Blackwell（sm_120），需要 CUDA 12.8+ 的 torch；若 `torch.cuda.is_available()` 为 False，先升级驱动/换 cu129/cu130 wheel；
+- 该机器 GPU 显存 16 GB，当前配方（64 env）约 3 GB，后续可提高 `--num-envs`；
+- Windows 上跑 `run_native_v1_trial.ps1` 与 Linux 的 `.sh` 等价（协议 SHA 校验、trial 目录、manifest 一致）。
