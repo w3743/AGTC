@@ -41,3 +41,10 @@
 - 真观测 smoke（64 env × 16 steps）：稳态 wall **2.897 s/iter**、**353.5 samples/s** 端到端；contract 五通道全 real（lidar/depth/detections analytic、state、feedback vqf）；`capability_metrics_allowed=false`，唯一 blocker 是 **RTX 域差未逐像素对照**。
 - 已启动 WSL pilot 训练（`wsl_train/runs/pilot_20261025`）：64 env × 32 steps × 300 iterations、newton_xpbd + warp lidar + vqf + analytic depth/detections，每 20 iter 存 checkpoint（训练使用原型 MLP 策略，仅验证 WSL 训练闭环/吞吐/学习信号，**不作能力结论**）。
 - 后续：detections Warp mask kernel（预期把稳态吞吐从 353 提回 550–650 samples/s）、native 评估脚本（60 s 场景/固定种子/停稳判据）、真实 LSTM 策略接入与本地协议冻结。
+
+## 2026-10-25 11:35 更新：warp detections / eval_native / 成本定位
+
+- warp detections mask GPU：64 位姿 × 4096 射线 = **0.658 ms/帧**（比 numpy 5.6 ms 快 ~8.5×），但 64 pose 逐次 kernel launch 使批成本 42 ms（未达 ≤30 ms 目标）。
+- `--detections-warp` 端到端 smoke：2.948 s/iter、347.3 samples/s；与 analytic CPU detections（2.897 s、353.5）**无实质差异**。修正：此前“detections ≈1.5 s/iter 是主成本”是由微基准外推，非实测；本配置下 **physics 主导（~2.6 s/iter）**。
+- `eval_native.py` 链路已验证：pilot `checkpoint_40` 2 场景均可加载/评估，但该 40-iter 原型策略在 native 域翻车（49/182 步、flipped），**不构成能力结论**；evaluation.json 已生成。
+- 下一步（CPU-only）：provider 加 per-sensor 计时；native 物理加可配置 `--sim-dt/--decimation`（默认 1 ms/50 不变），实验 `dt=0.005/dec=10`（与 Isaac perf 同 5 ms 物理，预期 physics 成本降 ~5×）；warp detections 批量化单 launch。
