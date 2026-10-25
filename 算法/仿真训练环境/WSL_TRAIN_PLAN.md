@@ -84,3 +84,14 @@
 - contract SHA 已改为不覆盖 `run_id/phase/note`（新增 `sha_scope`），跨目录 resume 可用；旧 pilot/smoke checkpoint 因此不兼容（已记录）。
 - 决策：5ms/10 作为 WSL **实验默认**（CLI 默认仍 1ms/50；正式训练显式传参并标 `physics_experimental=true`）。
 - 已启动 LSTM pilot：`wsl_train/runs/lstm_pilot_5ms`，64 env×32 steps×300 iter、5ms/10、全 real 观测、`--profile`；预计 13–18 分钟，跑完用 `eval_native` 评估。
+
+## 2026-10-25 12:00 LSTM pilot 崩溃与根因假设
+
+- LSTM pilot（`wsl_train/runs/lstm_pilot_5ms`）在 iter ~180 崩溃：`ValueError: xy must be finite`（detections → terrain height），随后评估同 checkpoint 在 5ms 也崩于 VQF `gyro_native must be finite`。
+- 对照证据：
+  1) **zero-action + 5ms/10 全长度 400 步稳定**（无 NaN、未翻车）；
+  2) **checkpoint_160 权重全部有限**（LSTM-512、33 tensors、SHA `7355264f…`）；
+  3) **同 checkpoint 在 1ms/50 评估不崩、无 NaN**：2 场景约 590 步后 `outside_or_overturned`（flipped=true）。
+- 根因假设：策略会主动把车开翻；**翻车/激进动作下 5ms XPBD 数值发散**，先出现 non-finite 再在传感器/地形处抛异常。不是传感器算法错误。
+- 修复要求（队友进行中）：backend 每步 finite 检查并终止/reset 失效 env；sensor 遇 non-finite 返回无效观测；train/eval 加 NaN 保护并写 `failure.json` 后安全退出；修完复跑 300-iter pilot；若 5ms 仍频繁发散，正式训练回退 1ms 或调 solver。
+- 本 pilot 为 pre-protocol 验证 run，不改变已冻结的 `PROTOCOL_NATIVE_V1`（SHA `dc5e4a00…`）。
