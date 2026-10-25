@@ -95,3 +95,19 @@
 - 根因假设：策略会主动把车开翻；**翻车/激进动作下 5ms XPBD 数值发散**，先出现 non-finite 再在传感器/地形处抛异常。不是传感器算法错误。
 - 修复要求（队友进行中）：backend 每步 finite 检查并终止/reset 失效 env；sensor 遇 non-finite 返回无效观测；train/eval 加 NaN 保护并写 `failure.json` 后安全退出；修完复跑 300-iter pilot；若 5ms 仍频繁发散，正式训练回退 1ms 或调 solver。
 - 本 pilot 为 pre-protocol 验证 run，不改变已冻结的 `PROTOCOL_NATIVE_V1`（SHA `dc5e4a00…`）。
+
+## 2026-10-25 12:10 5ms 数值发散：根因与加固
+
+- 根因（证据链）：**5 ms/10 XPBD 在激进/翻车动态接触下出现稀有数值发散**，先产生非有限 env 状态，再在 sensor（terrain marching）处抛异常；不是策略 NaN、不是传感器 bug。
+  - iter 179 正常（2.712 s/755 samples/s）→ iter 180 首次 non-finite env 状态 → detections 路径抛 `xy must be finite`；
+  - checkpoint_160 权重有限；CPU 重放动作 |a|max 0.117–0.286、无饱和；
+  - 同 ckpt 1ms GPU 评估无 NaN、干净翻车终止；zero-action 5ms 400 步稳定；
+  - CPU 复现（MuJoCo 5/1ms 各 500 步、newton XPBD 5/1ms 各 120 步）0 次 non-finite → 稀有/GPU 特定，约 5.7 万物理子步后出现一次。
+- 加固（已实现 + CPU 测试通过）：
+  1. env 每步 finite 检查（pos/quat/lin_vel/ang_vel/gimbal_q/wheel_qd/action）；训练坏 env 立即 reset，eval 标 `non_finite_state`；`nonfinite_events.jsonl` + ITER 计数；
+  2. sensors finite mask：坏 env 保留上帧并计数，state/feedback 置 0，VQF 不污染；
+  3. `train_wsl.py`：action/obs/reward/loss/参数 non-finite 或前向异常 → `failure.json` + latest + exit 3；`--nonfinite-limit 64` 预算保护；
+  4. `eval_native.py`：单 seed 记录 `non_finite_state/reward/runtime_error` 并继续其余 seed；加 `env_diagnostics`；
+  5. 顺带修复 LSTM PPO 变量遮蔽 bug。
+- 测试：`proto/test_nonfinite_guards.py` 全通过；报告 `proto/DEPTH_DETECTIONS_REPORT.md` §16。
+- 正在 GPU 复跑 300-iter LSTM pilot（5ms/10，`--nonfinite-limit 64`），验证是否不再崩溃及 non-finite 频率；结果决定正式 trial 用 5ms 还是回退 1ms。
