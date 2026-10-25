@@ -35,6 +35,7 @@ BANNER = "WSL_NATIVE_TRAINING_PREP"
 EXPECTED = {"num_envs": 64, "num_steps": 32, "device": "cuda", "physics": "newton_xpbd",
             "lidar": "warp", "feedback": "vqf", "sim_dt_s": 0.001, "decimation": 50,
             "policy_type": "lstm", "hidden_size": 512, "task_backend": "fast_stop_v2"}
+PHYSICS_CHOICES = ("newton_xpbd", "newton_mujoco_warp")
 BACKENDS = {"lidar": "warp_kernel", "depth": "analytic_warp",
             "detections": "analytic_detector_warp", "feedback": "vqf_reference"}
 CHANNELS = ("lidar", "depth", "detections", "state", "feedback")
@@ -93,6 +94,15 @@ def _relevant_source_changes(raw_sources: dict[str, bytes], tree: dict[str, str]
     return changes
 
 
+def _protocol_identity_paths(train_dir: Path) -> set[Path]:
+    """Include every frozen native protocol and sidecar checksum in source identity."""
+    if not train_dir.is_dir():
+        return set()
+    return {path.resolve() for path in train_dir.iterdir()
+            if path.is_file() and path.name.startswith("PROTOCOL_NATIVE_")
+            and path.suffix in {".md", ".sha256"}}
+
+
 def read_json(path: Path) -> Any:
     def reject(value: str):
         raise ValueError(f"non-finite JSON value {value}")
@@ -115,7 +125,7 @@ def source_identity() -> dict[str, Any]:
     if git_root is None:
         raise AuditError("Git root not found")
     ignored = {"runs", "results", "__pycache__", ".cache", "source_snapshot", "source_snapshots"}
-    paths = {Path(__file__).resolve(), TRAIN / "PROTOCOL_NATIVE_V1.1.md"}
+    paths = {Path(__file__).resolve(), *_protocol_identity_paths(TRAIN)}
     for root in (TRAIN, PROTO, PROJECT / "isaac_field"):
         if root.is_dir():
             paths.update(p.resolve() for p in root.rglob("*.py") if not ignored.intersection(p.parts))
@@ -160,7 +170,7 @@ def source_hashes(identity: dict[str, Any]) -> dict[str, str]:
 
 def versions() -> dict[str, str | None]:
     result = {"python": platform.python_version()}
-    for name in ("torch", "numpy", "warp-lang", "newton", "mujoco", "ovphysx", "vqf"):
+    for name in ("torch", "numpy", "warp-lang", "newton", "mujoco", "mujoco-warp", "ovphysx", "vqf"):
         try:
             result[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
@@ -254,15 +264,139 @@ def gpu_snapshot() -> dict[str, Any]:
             "query_errors": [gpu.stderr.strip(), apps.stderr.strip()], "processes": process_scan()}
 
 
-def train_argv(out: Path, iterations: int, seed: int, threads: int) -> list[str]:
-    return [sys.executable, str(TRAIN_SCRIPT), "--num-envs", "64", "--num-steps", "32",
+def train_argv(out: Path, iterations: int, seed: int, threads: int,
+               physics: str = EXPECTED["physics"],
+               physics_cuda_graph: bool = False) -> list[str]:
+    if physics not in PHYSICS_CHOICES:
+        raise AuditError(f"unsupported physics backend: {physics!r}")
+    if not isinstance(physics_cuda_graph, bool):
+        raise AuditError("physics_cuda_graph request must be a boolean")
+    if physics_cuda_graph and physics != "newton_mujoco_warp":
+        raise AuditError("--physics-cuda-graph requires --physics newton_mujoco_warp")
+    argv = [sys.executable, str(TRAIN_SCRIPT), "--num-envs", "64", "--num-steps", "32",
             "--iterations", str(iterations), "--seed", str(seed), "--threads", str(threads),
-            "--device", "cuda", "--physics", "newton_xpbd", "--lidar", "warp", "--feedback", "vqf",
+            "--device", "cuda", "--physics", physics, "--lidar", "warp", "--feedback", "vqf",
             "--feedback-noise", "--depth", "analytic", "--depth-noise", "--detections", "analytic",
             "--detections-warp", "--detections-noise", "--task-backend", "fast_stop_v2",
             "--sim-dt", "0.001", "--decimation", "50", "--policy", "lstm", "--lstm-hidden", "512",
             "--epochs", "4", "--lr", "0.0003", "--save-interval", "10", "--nonfinite-limit", "0",
             "--out", str(out)]
+    if physics_cuda_graph:
+        argv.append("--physics-cuda-graph")
+    return argv
+
+
+def _requested_cuda_graph(launch: dict[str, Any] | None, physics: str) -> tuple[bool, list[str]]:
+    """Resolve the launch request from its primary field and recorded target profile."""
+    errors: list[str] = []
+    if not isinstance(launch, dict):
+        return False, ["launch record is missing for CUDA Graph request audit"]
+    profile = launch.get("target_profile")
+    profile = profile if isinstance(profile, dict) else {}
+    if physics == "newton_mujoco_warp":
+        if "physics_cuda_graph_requested" not in launch:
+            errors.append("launcher.physics_cuda_graph_requested is missing")
+        if "physics_cuda_graph" not in profile:
+            errors.append("launcher.target_profile.physics_cuda_graph is missing")
+    values = []
+    if "physics_cuda_graph_requested" in launch:
+        values.append(("launcher.physics_cuda_graph_requested", launch["physics_cuda_graph_requested"]))
+    if "physics_cuda_graph" in profile:
+        values.append(("launcher.target_profile.physics_cuda_graph", profile["physics_cuda_graph"]))
+    for name, value in values:
+        if not isinstance(value, bool):
+            errors.append(f"{name} must be a boolean")
+    valid = [value for _, value in values if isinstance(value, bool)]
+    if valid and any(value != valid[0] for value in valid[1:]):
+        errors.append("launcher CUDA Graph request fields disagree")
+    requested = valid[0] if valid else False
+    if requested and physics != "newton_mujoco_warp":
+        errors.append("CUDA Graph was requested for a non-MuJoCo-Warp physics engine")
+    execution = launch.get("execution")
+    execution = execution if isinstance(execution, dict) else {}
+    command = execution.get("command_argv")
+    if physics == "newton_mujoco_warp" and not isinstance(command, list):
+        errors.append("launcher argv is missing for the MuJoCo-Warp graph request audit")
+    if isinstance(command, list) and ("--physics-cuda-graph" in command) != requested:
+        errors.append("launcher argv CUDA Graph flag differs from the recorded request")
+    return requested, errors
+
+
+def _audit_cuda_graph(launch: dict[str, Any] | None, summary: dict[str, Any],
+                      contract: dict[str, Any], identity: dict[str, Any],
+                      physics: str) -> tuple[dict[str, Any], list[str]]:
+    requested, errors = _requested_cuda_graph(launch, physics)
+    required = physics == "newton_mujoco_warp"
+    if "physics_cuda_graph" in summary:
+        if not isinstance(summary["physics_cuda_graph"], bool):
+            errors.append("summary.physics_cuda_graph must be a boolean")
+        elif summary["physics_cuda_graph"] != requested:
+            errors.append("summary CUDA Graph request differs from the launcher request")
+    elif requested or required:
+        errors.append("summary.physics_cuda_graph is missing for the MuJoCo-Warp run")
+    if "physics_cuda_graph" in identity:
+        if not isinstance(identity["physics_cuda_graph"], bool):
+            errors.append("identity.physics_cuda_graph must be a boolean")
+        elif identity["physics_cuda_graph"] != requested:
+            errors.append("identity CUDA Graph request differs from the launcher request")
+    elif required:
+        errors.append("identity.physics_cuda_graph is missing for the MuJoCo-Warp run")
+
+    contract_physics = contract.get("physics")
+    env = identity.get("env")
+    identity_physics = env.get("physics") if isinstance(env, dict) else None
+    sources = (("contract.physics", contract_physics), ("identity.env.physics", identity_physics))
+    diagnostics: list[tuple[str, dict[str, Any]]] = []
+    for name, physics_payload in sources:
+        runtime = physics_payload.get("runtime_diagnostics") if isinstance(physics_payload, dict) else None
+        if not isinstance(runtime, dict):
+            if required:
+                errors.append(f"{name}.runtime_diagnostics is missing for the MuJoCo-Warp run")
+            continue
+        if any(key in runtime for key in ("cuda_graph_requested", "cuda_graph_enabled", "cuda_graph_capture_s")):
+            diagnostics.append((name, runtime))
+        elif required:
+            errors.append(f"{name}.runtime_diagnostics CUDA Graph fields are missing")
+
+    actual_enabled_values = []
+    capture_values = []
+    for name, runtime in diagnostics:
+        runtime_requested = runtime.get("cuda_graph_requested")
+        enabled = runtime.get("cuda_graph_enabled")
+        capture_s = runtime.get("cuda_graph_capture_s")
+        if not isinstance(runtime_requested, bool):
+            errors.append(f"{name}.runtime_diagnostics.cuda_graph_requested must be a boolean")
+        elif runtime_requested != requested:
+            errors.append(f"{name}.runtime_diagnostics CUDA Graph request differs from the launcher request")
+        if not isinstance(enabled, bool):
+            errors.append(f"{name}.runtime_diagnostics.cuda_graph_enabled must be a boolean")
+        else:
+            actual_enabled_values.append((name, enabled))
+            if enabled != requested:
+                errors.append(f"{name}.runtime_diagnostics CUDA Graph enabled state differs from the request")
+        if (not isinstance(capture_s, (int, float)) or isinstance(capture_s, bool)
+                or not math.isfinite(float(capture_s)) or capture_s < 0):
+            errors.append(f"{name}.runtime_diagnostics.cuda_graph_capture_s must be finite and non-negative")
+        else:
+            capture_values.append((name, float(capture_s)))
+            if enabled is True and capture_s <= 0:
+                errors.append(f"{name}.runtime_diagnostics CUDA Graph capture time must be positive when enabled")
+            if enabled is False and capture_s != 0:
+                errors.append(f"{name}.runtime_diagnostics CUDA Graph capture time must be zero when disabled")
+    if len(actual_enabled_values) > 1 and any(value != actual_enabled_values[0][1]
+                                              for _, value in actual_enabled_values[1:]):
+        errors.append("contract and identity CUDA Graph enabled states disagree")
+    if len(capture_values) > 1 and any(
+        not math.isclose(value, capture_values[0][1], rel_tol=1e-9, abs_tol=1e-12)
+        for _, value in capture_values[1:]
+    ):
+        errors.append("contract and identity CUDA Graph capture times disagree")
+
+    enabled = actual_enabled_values[0][1] if actual_enabled_values else (False if not required else None)
+    capture_s = capture_values[0][1] if capture_values else (0.0 if not required else None)
+    return ({"requested": requested, "enabled": enabled,
+             "mode": "cuda_graph" if enabled is True else "eager" if enabled is False else "unknown",
+             "capture_s": capture_s}, errors)
 
 
 def _finite(value: Any, path: str = "$") -> list[str]:
@@ -336,6 +470,9 @@ def summarize_run(path: str | Path) -> dict[str, Any]:
         errors.append("summary is not a completed prep-phase run with capability metrics disabled")
     if contract.get("capability_metrics_allowed") is not False:
         errors.append("contract must keep capability metrics disabled")
+    physics = identity.get("physics")
+    if physics not in PHYSICS_CHOICES:
+        errors.append(f"unsupported completed physics identity: {physics!r}")
 
     channels = contract.get("channels", {})
     if not isinstance(channels, dict):
@@ -361,6 +498,8 @@ def summarize_run(path: str | Path) -> dict[str, Any]:
               "task_backend": contract.get("task_backend"),
               "detections_warp": channels.get("detections", {}).get("backend") == BACKENDS["detections"]}
     for key, expected in EXPECTED.items():
+        if key == "physics":
+            expected = physics
         value = actual.get(key)
         valid = (isinstance(value, (int, float)) and not isinstance(value, bool)
                  and math.isclose(float(value), expected, rel_tol=0, abs_tol=1e-12)) if isinstance(expected, float) else value == expected
@@ -373,10 +512,13 @@ def summarize_run(path: str | Path) -> dict[str, Any]:
         errors.append("identity.env task_backend differs from requested task")
     elif env_identity.get("physics") != contract.get("physics"):
         errors.append("identity.env physics payload differs from observation contract")
+    physics_payload = contract.get("physics")
+    if not isinstance(physics_payload, dict) or physics_payload.get("engine") != physics:
+        errors.append("identity physics engine differs from observation contract")
     if contract.get("physics_experimental") is not False or contract.get("run_id") != run.name:
         errors.append("contract run/physics identity mismatch")
     if any(summary.get(k) != v for k, v in (("num_envs", 64), ("num_steps", 32),
-                                            ("device", "cuda"), ("physics", "newton_xpbd"))):
+                                            ("device", "cuda"), ("physics", physics))):
         errors.append("summary configuration differs from requested target")
     contract_sha = contract.get("observation_contract_sha256")
     if not contract_sha or summary.get("observation_contract_sha256") != contract_sha or any(
@@ -438,6 +580,15 @@ def summarize_run(path: str | Path) -> dict[str, Any]:
     if not any(p.is_file() and p.resolve() == (run / "latest.pt").resolve() for p in refs):
         errors.append("summary final_checkpoint does not point to run/latest.pt")
     launch = _launch_record(run)
+    cuda_graph, cuda_graph_errors = _audit_cuda_graph(launch, summary, contract, identity, physics)
+    errors.extend(cuda_graph_errors)
+    if launch:
+        target_profile = launch.get("target_profile")
+        if not isinstance(target_profile, dict):
+            target_profile = {}
+        launched_physics = launch.get("physics", target_profile.get("physics", "newton_xpbd"))
+        if launched_physics != physics:
+            errors.append("launcher physics identity differs from completed run")
     if not launch or not launch.get("source_identity", {}).get("raw_source_bytes"):
         errors.append("launch-time raw source identity missing")
     if launch and launch.get("execution", {}).get("returncode") != 0:
@@ -454,7 +605,8 @@ def summarize_run(path: str | Path) -> dict[str, Any]:
               "run_dir": str(run), "status": "success" if not errors else "invalid", "success": not errors,
               "errors": errors, "iterations": iters, "warmup_iterations": warmup,
               "measured_iterations": len(measured), "seed": identity.get("seed"),
-              "observation_contract_sha256": contract_sha, "checkpoint": ck,
+              "physics": physics, "observation_contract_sha256": contract_sha, "checkpoint": ck,
+              "cuda_graph": cuda_graph,
               "task_backend": contract.get("task_backend"),
               "identity_schema_version": contract.get("identity_schema_version"),
               "task_identity_sha256": contract.get("task_identity_sha256"),
@@ -499,6 +651,12 @@ def _sample_gpu(path: Path, stop: threading.Event, count: list[int]) -> None:
 
 
 def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
+    if args.physics not in PHYSICS_CHOICES:
+        raise AuditError(f"unsupported physics backend: {args.physics!r}")
+    if not isinstance(args.physics_cuda_graph, bool):
+        raise AuditError("physics_cuda_graph request must be a boolean")
+    if args.physics_cuda_graph and args.physics != "newton_mujoco_warp":
+        raise AuditError("--physics-cuda-graph requires --physics newton_mujoco_warp")
     check_runtime()
     if not args.exclusive_window:
         raise AuditError("pass --exclusive-window to record the operator's isolation declaration")
@@ -517,12 +675,17 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
     out.mkdir(exist_ok=False)
     run, result_path = out / "run", out / "benchmark_result.json"
     total_iters = args.warmup_iterations + args.iterations
-    argv = train_argv(run, total_iters, args.seed, args.threads)
+    argv = train_argv(run, total_iters, args.seed, args.threads, args.physics,
+                      args.physics_cuda_graph)
     log_path, sample_path = out / "train.launcher.log", out / "nvidia_smi_samples.jsonl"
     result = {"schema_version": 1, "mode": "native_wsl_training_benchmark", "status": "running",
               "started_at_utc": now(), "output_dir": str(out), "seed": args.seed,
+              "physics": args.physics,
+              "physics_cuda_graph_requested": args.physics_cuda_graph,
               "warmup_iterations": args.warmup_iterations, "measured_iterations": args.iterations,
-              "child_iterations": total_iters, "target_profile": EXPECTED, "runtime": runtime(),
+              "child_iterations": total_iters,
+              "target_profile": {**EXPECTED, "physics": args.physics,
+                                 "physics_cuda_graph": args.physics_cuda_graph}, "runtime": runtime(),
               "dependency_versions": versions(), "source_identity": sources,
               "resource_contention": {"operator_statement": args.resource_contention_note,
                                        "gpu_process_snapshots": "nvidia-smi before and after",
@@ -559,6 +722,7 @@ def run_benchmark(args: argparse.Namespace) -> dict[str, Any]:
     write_json(result_path, result)
     run_report = summarize_run(run)
     result["run_audit"] = run_report
+    result["cuda_graph"] = run_report.get("cuda_graph")
     result["source_identity_still_matches_at_finish"] = source_hashes(sources) == source_hashes(source_identity())
     errors = []
     if rc != 0:
@@ -607,6 +771,24 @@ def summarize_benchmark(path: Path) -> dict[str, Any]:
         errors.extend(run.get("errors", []))
     if run.get("iterations") != record.get("child_iterations"):
         errors.append("run iteration count differs from the launcher request")
+    record_profile = record.get("target_profile")
+    if not isinstance(record_profile, dict):
+        record_profile = {}
+    record_physics = record.get("physics", record_profile.get("physics", "newton_xpbd"))
+    if run.get("physics") != record_physics:
+        errors.append("run physics differs from the launcher request")
+    graph_requested, graph_errors = _requested_cuda_graph(record, record_physics)
+    errors.extend(graph_errors)
+    graph_report = run.get("cuda_graph")
+    if not isinstance(graph_report, dict) or graph_report.get("requested") != graph_requested:
+        errors.append("run CUDA Graph request differs from the launcher request")
+    recorded_graph = record.get("cuda_graph")
+    if isinstance(recorded_graph, dict):
+        for key in ("requested", "enabled", "mode", "capture_s"):
+            if recorded_graph.get(key) != (graph_report or {}).get(key):
+                errors.append(f"recorded CUDA Graph {key} differs from the read-only run audit")
+    elif record_physics == "newton_mujoco_warp":
+        errors.append("launcher CUDA Graph actual mode/capture time is missing")
     if run.get("warmup_iterations") != record.get("warmup_iterations"):
         errors.append("run warmup split differs from the launcher request")
     if record.get("source_identity_still_matches_at_finish") is not True:
@@ -617,7 +799,9 @@ def summarize_benchmark(path: Path) -> dict[str, Any]:
             "source_identity": record.get("source_identity"), "git_identity": record.get("source_identity", {}).get("git"),
             "dependency_versions": record.get("dependency_versions"),
             "resource_contention": record.get("resource_contention"),
-            "command_and_seed": {"seed": record.get("seed"),
+            "cuda_graph": graph_report,
+            "command_and_seed": {"seed": record.get("seed"), "physics": record_physics,
+                                 "physics_cuda_graph_requested": graph_requested,
                                  "argv": record.get("execution", {}).get("command_argv"), "shell": False},
             "capability_metrics_allowed": False, "capability_claim": False,
             "timing_note": record.get("timing_note", TIMING_NOTE)}
@@ -633,6 +817,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--warmup-iterations", type=int, default=2)
     parser.add_argument("--iterations", type=int, default=5, help="measured iterations")
     parser.add_argument("--threads", type=int, default=8)
+    parser.add_argument("--physics", choices=PHYSICS_CHOICES, default=EXPECTED["physics"],
+                        help="physics backend (newton_xpbd remains the default)")
+    parser.add_argument("--physics-cuda-graph", action="store_true", default=False,
+                        help="request CUDA Graph capture (requires --physics newton_mujoco_warp)")
     parser.add_argument("--exclusive-window", action="store_true", help="record operator's exclusive GPU window")
     parser.add_argument("--resource-contention-note", default="No other known training/inference work; desktop GPU activity and aria2 downloads remain; this is not whole-system isolation.")
     args = parser.parse_args(argv)
@@ -646,9 +834,13 @@ def main(argv: list[str] | None = None) -> int:
                 raise AuditError(f"refusing to overwrite output: {out}")
             report = {"mode": "dry_run", "status": "planned", "success": False, "output_dir": str(out),
                       "child_argv": train_argv(out / "run", args.warmup_iterations + args.iterations,
-                                               args.seed, args.threads),
+                                               args.seed, args.threads, args.physics,
+                                               args.physics_cuda_graph),
                       "warmup_iterations_in_child": args.warmup_iterations,
                       "measured_iterations_in_child": args.iterations, "shell": False,
+                      "physics_cuda_graph_requested": args.physics_cuda_graph,
+                      "target_profile": {**EXPECTED, "physics": args.physics,
+                                         "physics_cuda_graph": args.physics_cuda_graph},
                       "capability_metrics_allowed": False, "capability_claim": False}
         else:
             report = run_benchmark(args)

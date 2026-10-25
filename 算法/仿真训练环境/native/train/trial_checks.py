@@ -18,6 +18,20 @@ from contract_identity import (
 
 PROTOCOL_VERSION = "V1.1"
 EXPECTED_PROTOCOL_SHA = "7ff8d6fcba79defbbc907b09527b244fb6e27134ed6c43de13ed1bdc197f2998"
+V2_PROTOCOL_SHA = None  # Set only after the new physics protocol is validated and frozen.
+V2_TASK_SHA = None  # A single validated recipe; changing physics requires a new protocol.
+PROTOCOL_PROFILES = {
+    "V1.1": {"sha": EXPECTED_PROTOCOL_SHA, "engine": "newton_xpbd", "phase": "formal_native_v1_trial"},
+    "V2": {"sha": V2_PROTOCOL_SHA, "task_sha": V2_TASK_SHA, "cuda_graph_enabled": False, "engine": "newton_mujoco_warp", "phase": "formal_native_v2_trial"},
+}
+
+
+def protocol_profile(version: str) -> dict[str, Any]:
+    profile = PROTOCOL_PROFILES.get(version)
+    if profile is None or not profile["sha"] or (version == "V2" and not profile.get("task_sha")):
+        raise ValueError(f"protocol {version!r} is unsupported or has not been frozen")
+    return profile
+
 EXPECTED_CHANNELS = {
     "lidar": "warp_kernel",
     "depth": "analytic_warp",
@@ -53,7 +67,8 @@ def require_official_physics(sim_dt: Any, decimation: Any) -> None:
         )
 
 
-def _contract_errors(contract: dict[str, Any], identity: dict[str, Any]) -> tuple[list[str], str | None]:
+def _contract_errors(contract: dict[str, Any], identity: dict[str, Any],
+                     engine: str = "newton_xpbd") -> tuple[list[str], str | None]:
     errors: list[str] = []
     try:
         canonical = canonical_contract_identity(contract)
@@ -89,7 +104,7 @@ def _contract_errors(contract: dict[str, Any], identity: dict[str, Any]) -> tupl
         errors.append("identity.env.task_identity_sha256 does not match contract")
     if env.get("identity_schema_version") != IDENTITY_SCHEMA_VERSION:
         errors.append("identity.env identity schema is missing or unsupported")
-    if identity.get("physics") != "newton_xpbd" or identity.get("device") != "cuda":
+    if identity.get("physics") != engine or identity.get("device") != "cuda":
         errors.append("identity.json does not record the formal Newton/CUDA recipe")
     policy = identity.get("policy") if isinstance(identity.get("policy"), dict) else {}
     if policy.get("policy_type") != "lstm" or int(policy.get("hidden_size", -1)) != 512:
@@ -98,8 +113,8 @@ def _contract_errors(contract: dict[str, Any], identity: dict[str, Any]) -> tupl
     physics = contract.get("physics") if isinstance(contract.get("physics"), dict) else {}
     env_physics = env.get("physics") if isinstance(env.get("physics"), dict) else {}
     for label, item in (("contract.physics", physics), ("identity.env.physics", env_physics)):
-        if item.get("engine") != "newton_xpbd":
-            errors.append(f"{label}.engine is not newton_xpbd")
+        if item.get("engine") != engine:
+            errors.append(f"{label}.engine is not {engine}")
         if str(item.get("device")) != "cuda:0":
             errors.append(f"{label}.device is not cuda:0")
         if not _same_number(item.get("dt_s"), 0.001):
@@ -133,6 +148,18 @@ def _contract_errors(contract: dict[str, Any], identity: dict[str, Any]) -> tupl
     return errors, digest
 
 
+def _execution_errors(physics_payloads: list[Any], profile: dict[str, Any]) -> list[str]:
+    expected = profile.get("cuda_graph_enabled")
+    if expected is None:
+        return []
+    for physics in physics_payloads:
+        runtime = physics.get("runtime_diagnostics", {}) if isinstance(physics, dict) else {}
+        if (not isinstance(runtime, dict) or runtime.get("cuda_graph_requested") is not expected
+                or runtime.get("cuda_graph_enabled") is not expected):
+            return ["protocol requires actual CUDA graph execution" if expected
+                    else "protocol requires eager physics execution"]
+    return []
+
 def _contains_nonfinite(value: Any) -> bool:
     if isinstance(value, float):
         return not math.isfinite(value)
@@ -143,7 +170,8 @@ def _contains_nonfinite(value: Any) -> bool:
     return False
 
 
-def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
+def _trial_evidence_errors(trial: Path, digest: str | None,
+                           engine: str = "newton_xpbd") -> list[str]:
     errors: list[str] = []
     summary_path = trial / "summary.json"
     if not summary_path.is_file():
@@ -166,7 +194,7 @@ def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
                 "num_envs": 64,
                 "num_steps": 32,
                 "device": "cuda",
-                "physics": "newton_xpbd",
+                "physics": engine,
             }
             for name, expected in expected_summary.items():
                 actual = summary.get(name)
@@ -230,6 +258,22 @@ def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
             elif value != 0:
                 errors.append(f"metrics.jsonl row {index} reports {name}={value}")
 
+    if engine == "newton_mujoco_warp":
+        expected_world_substeps = 64 * 32 * 50
+        for index, row in enumerate(rows, 1):
+            diagnostics = row.get("physics_solver_events") if isinstance(row, dict) else None
+            if not isinstance(diagnostics, dict):
+                errors.append(f"metrics.jsonl row {index} is missing physics solver diagnostics")
+                continue
+            if type(diagnostics.get("world_substeps")) is not int or diagnostics["world_substeps"] != expected_world_substeps:
+                errors.append(f"metrics.jsonl row {index} has incomplete physics solver diagnostics")
+            for name in ("capacity_overflow_substeps", "outer_iteration_limit_substeps", "line_search_limit_substeps"):
+                value = diagnostics.get(name)
+                if type(value) is not int or not 0 <= value <= expected_world_substeps:
+                    errors.append(f"metrics.jsonl row {index} has invalid {name}")
+            if diagnostics.get("capacity_overflow_substeps") != 0:
+                errors.append(f"metrics.jsonl row {index} reports physics capacity truncation")
+
     events_path = trial / "nonfinite_events.jsonl"
     if events_path.exists():
         try:
@@ -250,16 +294,24 @@ def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
     return errors
 
 
-def _protocol_sha(path: Path) -> str:
+def _protocol_sha(path: Path, version: str = PROTOCOL_VERSION) -> str:
+    from protocol_sha import compute, embedded
+    profile = protocol_profile(version)
     info = _read_json(path)
+    expected_file = f"PROTOCOL_NATIVE_{version}.md"
     digest = info.get("protocol_sha256")
-    if digest != EXPECTED_PROTOCOL_SHA:
-        raise ValueError(f"{path} does not identify frozen V1.1 protocol {EXPECTED_PROTOCOL_SHA}")
+    if digest != profile["sha"] or info.get("file") != expected_file:
+        raise ValueError(f"{path} does not identify frozen {version} protocol {profile['sha']}")
+    protocol = path.parent / expected_file
+    if not protocol.is_file() or compute(protocol) != digest or embedded(protocol) != digest:
+        raise ValueError(f"frozen protocol body does not match {expected_file} SHA")
     return str(digest)
 
 
-def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int:
-    protocol_sha = _protocol_sha(protocol_sha_path)
+def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path,
+                   version: str = PROTOCOL_VERSION) -> int:
+    profile = protocol_profile(version)
+    protocol_sha = _protocol_sha(protocol_sha_path, version)
     contract_path = trial / "observation_contract.json"
     identity_path = trial / "identity.json"
     errors: list[str] = []
@@ -275,9 +327,12 @@ def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int
         identity = _read_json(identity_path)
     digest = None
     if contract and identity:
-        contract_errors, digest = _contract_errors(contract, identity)
+        contract_errors, digest = _contract_errors(contract, identity, profile["engine"])
         errors.extend(contract_errors)
-    errors.extend(_trial_evidence_errors(trial, digest))
+    if profile.get("task_sha") is not None and digest != profile["task_sha"]:
+        errors.append("task identity differs from the frozen protocol recipe")
+    errors.extend(_execution_errors([contract.get("physics"), (identity.get("env") or {}).get("physics")], profile))
+    errors.extend(_trial_evidence_errors(trial, digest, profile["engine"]))
 
     checkpoint_names = sorted(p.name for p in trial.glob("*.pt") if p.is_file())
     if train_exit == 0 and not checkpoint_names:
@@ -289,8 +344,8 @@ def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int
     formal = train_exit == 0 and not errors and official
     manifest = {
         "protocol_sha256": protocol_sha,
-        "protocol_file": "PROTOCOL_NATIVE_V1.1.md",
-        "protocol_version": PROTOCOL_VERSION,
+        "protocol_file": f"PROTOCOL_NATIVE_{version}.md",
+        "protocol_version": version,
         "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "cli_args_file": "cli_args.txt",
         "exit_code": train_exit,
@@ -299,7 +354,7 @@ def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int
         "task_identity_sha256": digest,
         "observation_contract_sha256": contract.get("observation_contract_sha256"),
         "capability_metrics_allowed": False,
-        "phase": "formal_native_v1_trial",
+        "phase": profile["phase"],
         "formal_eligible": bool(formal),
         "validation_errors": errors,
         "physics": {
@@ -325,26 +380,31 @@ def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int
     return 3 if train_exit == 0 and not formal else 0
 
 
-def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path) -> int:
+def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path,
+                         version: str = PROTOCOL_VERSION) -> int:
+    profile = protocol_profile(version)
     checkpoint = checkpoint.resolve()
     trial = checkpoint.parent
     if not checkpoint.is_file():
         raise ValueError(f"checkpoint does not exist: {checkpoint}")
-    current_sha = _protocol_sha(protocol_sha_path)
-    trial_sha = _protocol_sha(trial / "PROTOCOL_NATIVE_V1.1.sha256")
+    current_sha = _protocol_sha(protocol_sha_path, version)
+    trial_sha = _protocol_sha(trial / f"PROTOCOL_NATIVE_{version}.sha256", version)
     if current_sha != trial_sha:
         raise ValueError("checkpoint trial uses a different frozen protocol SHA")
     contract = _read_json(trial / "observation_contract.json")
     identity = _read_json(trial / "identity.json")
-    errors, digest = _contract_errors(contract, identity)
+    errors, digest = _contract_errors(contract, identity, profile["engine"])
+    if profile.get("task_sha") is not None and digest != profile["task_sha"]:
+        errors.append("task identity differs from the frozen protocol recipe")
+    errors.extend(_execution_errors([contract.get("physics"), (identity.get("env") or {}).get("physics")], profile))
     if errors:
         raise ValueError("checkpoint sidecar contract rejected: " + "; ".join(errors))
     manifest = _read_json(trial / "trial_manifest.json")
-    if manifest.get("protocol_version") != PROTOCOL_VERSION or manifest.get("protocol_sha256") != current_sha:
+    if manifest.get("protocol_version") != version or manifest.get("protocol_sha256") != current_sha:
         raise ValueError("checkpoint trial manifest protocol identity is invalid")
     if manifest.get("exit_code") != 0 or manifest.get("formal_eligible") is not True:
-        raise ValueError("checkpoint trial is not a successful formal V1.1 trial")
-    evidence_errors = _trial_evidence_errors(trial, digest)
+        raise ValueError(f"checkpoint trial is not a successful formal {version} trial")
+    evidence_errors = _trial_evidence_errors(trial, digest, profile["engine"])
     if evidence_errors:
         raise ValueError("checkpoint trial run evidence rejected: " + "; ".join(evidence_errors))
     if manifest.get("task_backend") != "fast_stop_v2" or manifest.get("task_identity_sha256") != digest:
@@ -361,7 +421,7 @@ def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path) -
     out.mkdir(parents=True, exist_ok=True)
     proof = {
         "checkpoint": str(checkpoint),
-        "protocol_version": PROTOCOL_VERSION,
+        "protocol_version": version,
         "protocol_sha256": current_sha,
         "task_backend": "fast_stop_v2",
         "task_identity_sha256": digest,
@@ -378,9 +438,14 @@ def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path) -
 
 def check_evaluation(out: Path, expected_seeds: list[int]) -> int:
     proof = _read_json(out / "checkpoint_preflight.json")
+    profile = protocol_profile(proof.get("protocol_version", PROTOCOL_VERSION))
     evaluation = _read_json(out / "evaluation.json")
     errors: list[str] = []
     expected_sha = proof.get("task_identity_sha256")
+    if profile.get("task_sha") is not None and expected_sha != profile["task_sha"]:
+        errors.append("checkpoint proof differs from the frozen protocol task")
+    domain = evaluation.get("native_domain") or {}
+    errors.extend(_execution_errors([domain.get("physics") if isinstance(domain, dict) else None], profile))
     policy = evaluation.get("policy") if isinstance(evaluation.get("policy"), dict) else {}
     config = evaluation.get("config") if isinstance(evaluation.get("config"), dict) else {}
     physics = evaluation.get("physics") if isinstance(evaluation.get("physics"), dict) else {}
@@ -399,7 +464,7 @@ def check_evaluation(out: Path, expected_seeds: list[int]) -> int:
         errors.append("evaluation physics is marked experimental")
     if config.get("task_backend") != "fast_stop_v2":
         errors.append("evaluation config task_backend is not fast_stop_v2")
-    if config.get("physics") != "newton_xpbd" or config.get("device") != "cuda":
+    if config.get("physics") != profile["engine"] or config.get("device") != "cuda":
         errors.append("evaluation config is not Newton/CUDA")
     for key, expected in (("lidar", "warp"), ("feedback", "vqf"),
                           ("depth", "analytic"), ("detections", "analytic")):
@@ -474,14 +539,19 @@ def main(argv: list[str] | None = None) -> int:
     physics_parser = sub.add_parser("require-official-physics")
     physics_parser.add_argument("--sim-dt", required=True)
     physics_parser.add_argument("--decimation", required=True)
+    protocol_parser = sub.add_parser("check-protocol")
+    protocol_parser.add_argument("--protocol-version", choices=tuple(PROTOCOL_PROFILES), required=True)
+    protocol_parser.add_argument("--protocol-sha", type=Path, required=True)
     manifest_parser = sub.add_parser("write-manifest")
     manifest_parser.add_argument("--trial-dir", type=Path, required=True)
     manifest_parser.add_argument("--train-exit", type=int, required=True)
     manifest_parser.add_argument("--protocol-sha", type=Path, required=True)
+    manifest_parser.add_argument("--protocol-version", choices=tuple(PROTOCOL_PROFILES), default=PROTOCOL_VERSION)
     preflight_parser = sub.add_parser("preflight-checkpoint")
     preflight_parser.add_argument("--checkpoint", type=Path, required=True)
     preflight_parser.add_argument("--out", type=Path, required=True)
     preflight_parser.add_argument("--protocol-sha", type=Path, required=True)
+    preflight_parser.add_argument("--protocol-version", choices=tuple(PROTOCOL_PROFILES), default=PROTOCOL_VERSION)
     eval_parser = sub.add_parser("check-evaluation")
     eval_parser.add_argument("--out", type=Path, required=True)
     eval_parser.add_argument("--seeds", required=True)
@@ -490,10 +560,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "require-official-physics":
             require_official_physics(args.sim_dt, args.decimation)
             return 0
+        if args.command == "check-protocol":
+            digest = _protocol_sha(args.protocol_sha, args.protocol_version)
+            print("PROTOCOL_CHECK " + json.dumps({"version": args.protocol_version, "sha256": digest}))
+            return 0
         if args.command == "write-manifest":
-            return write_manifest(args.trial_dir, args.train_exit, args.protocol_sha)
+            return write_manifest(args.trial_dir, args.train_exit, args.protocol_sha, args.protocol_version)
         if args.command == "preflight-checkpoint":
-            return preflight_checkpoint(args.checkpoint, args.out, args.protocol_sha)
+            return preflight_checkpoint(args.checkpoint, args.out, args.protocol_sha, args.protocol_version)
         if args.command == "check-evaluation":
             seeds = [int(value) for value in args.seeds.split(",") if value]
             return check_evaluation(args.out, seeds)

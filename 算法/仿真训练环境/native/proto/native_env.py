@@ -38,6 +38,7 @@ class NativeFieldEnv(gym.Env):
                  dt: float = 1e-3, decimation: int = 50, episode_length_s: float = 60.0,
                  reward_progress_weight: float = 0.15, reward_time_penalty: float = 0.01,
                  physics: str = "mujoco_cpu", lidar_backend: str = "numpy",
+                 physics_cuda_graph: bool = False,
                  device: str = "cpu", task_backend: str = "simplified",
                  spawn_clearance_m: float = 0.01, feedback_backend: str = "direct",
                  feedback_noise: bool = True, depth_backend: str = "constant",
@@ -69,6 +70,8 @@ class NativeFieldEnv(gym.Env):
             raise ValueError(f"unknown task_backend {task_backend!r}")
         self.task_backend = task_backend
         self._fast_stop = None
+        if physics_cuda_graph and physics != "newton_mujoco_warp":
+            raise ValueError("physics_cuda_graph requires newton_mujoco_warp")
         if physics == "mujoco_cpu":
             self.backend = MujocoCPUBackend(nworld=self.num_envs, dt=self.dt,
                                             decimation=self.decimation, seed=seed)
@@ -77,6 +80,11 @@ class NativeFieldEnv(gym.Env):
             self.backend = NewtonXPBDGBackend(nworld=self.num_envs, dt=self.dt,
                                               decimation=self.decimation, seed=seed,
                                               device=device if device != "cpu" else "cpu")
+        elif physics == "newton_mujoco_warp":
+            from newton_mujoco_backend import NewtonMuJoCoWarpBackend
+            self.backend = NewtonMuJoCoWarpBackend(
+                nworld=self.num_envs, dt=self.dt, decimation=self.decimation,
+                seed=seed, device=device, use_cuda_graph=physics_cuda_graph)
         else:
             raise ValueError(f"unknown physics backend {physics!r}")
         self.physics_name = physics
@@ -245,6 +253,10 @@ class NativeFieldEnv(gym.Env):
             action = action.copy()
             action[act_bad] = 0.0
         self.backend.step(action)
+        physics_diagnostics = getattr(self.backend, "last_solver_diagnostics", None)
+        if isinstance(physics_diagnostics, dict):
+            physics_diagnostics = {key: value.copy() if isinstance(value, list) else value
+                                   for key, value in physics_diagnostics.items()}
         read = self.backend.read()
         bad, detail = self._nonfinite_masks(read, action)
         recovered = False
@@ -296,7 +308,8 @@ class NativeFieldEnv(gym.Env):
             info = {"success": success, "flipped": flipped, "distance": distance,
                     "lin_speed": lin_speed, "policy_step": self.step_count.copy(),
                     "reason_codes": ref["reason_codes"], "reward_components": ref["components"],
-                    "nonfinite": self._last_nonfinite.copy(), "action_nonfinite": self._last_action_nonfinite.copy()}
+                    "nonfinite": self._last_nonfinite.copy(), "action_nonfinite": self._last_action_nonfinite.copy(),
+                    "physics_solver_diagnostics": physics_diagnostics}
             return obs, reward.astype(np.float32), terminated, truncated, info
         self.prev_distance = distance
         # up-vector z from body quat -> flip / hard tilt check (1.2 rad)
@@ -327,7 +340,8 @@ class NativeFieldEnv(gym.Env):
                 "distance": distance, "lin_speed": lin_speed,
                 "policy_step": self.step_count.copy(),
                 "nonfinite": self._last_nonfinite.copy(),
-                "action_nonfinite": self._last_action_nonfinite.copy()}
+                "action_nonfinite": self._last_action_nonfinite.copy(),
+                "physics_solver_diagnostics": physics_diagnostics}
         return obs, reward.astype(np.float32), terminated, truncated, info
 
     # ------------------------------------------------------------------
@@ -393,7 +407,7 @@ class NativeFieldEnv(gym.Env):
                 "ground_friction": [float(self.backend.mu), 0.005, 0.0001],
                 "wheel_friction": [float(self.backend.mu), 0.005, 0.0001],
             }
-        else:
+        elif self.physics_name == "newton_xpbd":
             identity["solver"] = {
                 "kind": "newton_xpbd",
                 "iterations": 10,

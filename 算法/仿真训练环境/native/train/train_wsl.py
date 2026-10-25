@@ -171,7 +171,9 @@ def main() -> int:
     parser.add_argument("--threads", type=int, default=8)
     parser.add_argument("--device", type=str, default="cuda", choices=("cpu", "cuda"))
     parser.add_argument("--physics", type=str, default="newton_xpbd",
-                        choices=("mujoco_cpu", "newton_xpbd"))
+                        choices=("mujoco_cpu", "newton_xpbd", "newton_mujoco_warp"))
+    parser.add_argument("--physics-cuda-graph", action="store_true", default=False,
+                        help="experimental capture of 50 MuJoCo-Warp substeps; excluded from formal V2")
     parser.add_argument("--task-backend", type=str, default="simplified", choices=("simplified", "fast_stop_v2"))
     parser.add_argument("--lidar", type=str, default="warp", choices=("numpy", "warp"))
     parser.add_argument("--feedback", type=str, default="vqf", choices=("direct", "vqf"))
@@ -207,6 +209,8 @@ def main() -> int:
                         help="policy architecture: prototype MLP (default) or LSTM-512")
     parser.add_argument("--lstm-hidden", type=int, default=512)
     args = parser.parse_args()
+    if args.physics_cuda_graph and args.physics != "newton_mujoco_warp":
+        parser.error("--physics-cuda-graph requires --physics newton_mujoco_warp")
 
     if args.iterations < 1 or args.save_interval < 1:
         parser.error("iterations and save-interval must be positive")
@@ -230,6 +234,7 @@ def main() -> int:
         num_envs=args.num_envs,
         seed=args.seed,
         physics=args.physics,
+        physics_cuda_graph=args.physics_cuda_graph,
         task_backend=args.task_backend,
         lidar_backend=args.lidar,
         device="cuda:0" if args.device == "cuda" else "cpu",
@@ -263,6 +268,7 @@ def main() -> int:
         "num_steps": args.num_steps,
         "device": args.device,
         "physics": args.physics,
+        "physics_cuda_graph": args.physics_cuda_graph,
         "lidar": args.lidar,
         "task_backend": args.task_backend,
         "feedback": args.feedback,
@@ -296,8 +302,8 @@ def main() -> int:
             labels = [str(v) for v in backend.model.body_label]
             bodies_per_world = len(labels) // env.num_envs if env.num_envs else 0
             body_names = [_usd_name(name) for name in labels[:bodies_per_world]]
-            if args.physics != "newton_xpbd":
-                raise RuntimeError("live-state writer needs the newton_xpbd backend (state_0)")
+            if args.physics not in ("newton_xpbd", "newton_mujoco_warp"):
+                raise RuntimeError("live-state writer needs a Newton GPU backend (state_0)")
             if env.num_envs < 4:
                 raise RuntimeError("live-state viewer needs at least 4 envs")
             if len(body_names) != 19:
@@ -382,6 +388,7 @@ def main() -> int:
         buf_done_masks = []
         nf_iter = 0
         nf_action_iter = 0
+        solver_diag_totals = None
         hidden = policy.init_hidden(args.num_envs, device) if is_lstm else None
         hidden0 = None
         if is_lstm:
@@ -407,6 +414,18 @@ def main() -> int:
             t_env = time.perf_counter()
             next_obs, reward, terminated, truncated, _info = env.step(action.detach().cpu().numpy())
             env_step_s += time.perf_counter() - t_env
+            step_diagnostics = _info.get("physics_solver_diagnostics")
+            if isinstance(step_diagnostics, dict) and step_diagnostics.get("policy_step_sampled"):
+                if solver_diag_totals is None:
+                    solver_diag_totals = {"world_substeps": 0, "capacity_overflow_substeps": 0,
+                                          "outer_iteration_limit_substeps": 0, "line_search_limit_substeps": 0}
+                solver_diag_totals["world_substeps"] += args.num_envs * args.decimation
+                for name in ("capacity_overflow", "outer_iteration_limit", "line_search_limit"):
+                    values = step_diagnostics.get(name + "_substeps_by_world")
+                    if (not isinstance(values, list) or len(values) != args.num_envs
+                            or any(type(value) is not int or value < 0 for value in values)):
+                        raise RuntimeError(f"malformed physics solver diagnostics: {name}")
+                    solver_diag_totals[name + "_substeps"] += sum(values)
             step_nf = int(np.sum(_info.get("nonfinite", False)))
             step_nf_action = int(np.sum(_info.get("action_nonfinite", False)))
             nf_iter += step_nf
@@ -496,6 +515,8 @@ def main() -> int:
             "nonfinite_env_resets": int(nf_iter),
             "nonfinite_actions": int(nf_action_iter),
         }
+        if solver_diag_totals is not None:
+            record["physics_solver_events"] = solver_diag_totals
         # parameter/loss finiteness guards: a NaN update must not silently poison checkpoints
         if not np.isfinite(loss):
             fail("non_finite_loss", {"iter": iteration, "loss": float(loss)}, iteration)
@@ -536,6 +557,7 @@ def main() -> int:
         "num_steps": args.num_steps,
         "device": args.device,
         "physics": args.physics,
+        "physics_cuda_graph": args.physics_cuda_graph,
         "observation_contract_sha256": contract["observation_contract_sha256"],
         "final_checkpoint": os.path.join(out_dir, "latest.pt"),
         "rss_mb": round(rss_mb(), 1),

@@ -189,7 +189,9 @@ def main():
     parser.add_argument("--seeds", type=str, default="87010,87011")
     parser.add_argument("--max-steps", type=int, default=1200)
     parser.add_argument("--device", type=str, default="cpu", choices=("cpu", "cuda"))
-    parser.add_argument("--physics", type=str, default="mujoco_cpu", choices=("mujoco_cpu", "newton_xpbd"))
+    parser.add_argument("--physics", type=str, default="mujoco_cpu", choices=("mujoco_cpu", "newton_xpbd", "newton_mujoco_warp"))
+    parser.add_argument("--physics-cuda-graph", action="store_true", default=False,
+                        help="experimental capture of 50 MuJoCo-Warp substeps; excluded from formal V2")
     parser.add_argument("--task-backend", type=str, default=None,
                         choices=("simplified", "fast_stop_v2"),
                         help="task implementation; defaults to simplified for compatibility")
@@ -207,6 +209,8 @@ def main():
     parser.add_argument("--zero-action", action="store_true", default=False,
                         help="harness-validation mode: ignore the policy and command zero actions")
     args = parser.parse_args()
+    if args.physics_cuda_graph and args.physics != "newton_mujoco_warp":
+        parser.error("--physics-cuda-graph requires --physics newton_mujoco_warp")
     task_backend = args.task_backend or "simplified"
     task_backend_explicit = args.task_backend is not None
     if abs(args.sim_dt * args.decimation - 0.05) > 1e-9:
@@ -215,7 +219,7 @@ def main():
     checkpoint_payload = load_checkpoint_payload(args.checkpoint)
     checkpoint_contract_status = "no_checkpoint"
     if checkpoint_payload is not None:
-        physics_device = ("cuda:0" if args.physics == "newton_xpbd" and args.device == "cuda"
+        physics_device = ("cuda:0" if args.physics in ("newton_xpbd", "newton_mujoco_warp") and args.device == "cuda"
                           else "cpu")
         checkpoint_contract_status = validate_checkpoint_preflight(
             checkpoint_payload,
@@ -238,6 +242,7 @@ def main():
     print(f"{BANNER}: {len(seeds)} scenes, {args.max_steps} steps, device={args.device}")
 
     env = NativeFieldEnv(num_envs=1, seed=seeds[0], physics=args.physics,
+                         physics_cuda_graph=args.physics_cuda_graph,
                          task_backend=task_backend,
                          dt=args.sim_dt, decimation=args.decimation,
                          lidar_backend=args.lidar, device="cuda:0" if args.device == "cuda" else "cpu",
@@ -279,7 +284,7 @@ def main():
         "identity_schema_version": contract["identity_schema_version"],
         "checkpoint_contract_validation": checkpoint_contract_status,
         "native_domain": {
-            "env": "proto/native_env.py (MuJoCo CPU / Newton XPBD)",
+            "env": "proto/native_env.py (MuJoCo CPU / Newton GPU backends)",
             "task_backend": task_backend,
             "physics": env._physics_identity(),
             "observation_backends": {k: contract["channels"][k].get("backend")
@@ -307,7 +312,8 @@ def main():
                    "checkpoint_contract_validation": checkpoint_contract_status,
                    "sha_scope": contract.get("sha_scope")},
         "config": {"seeds": seeds, "max_steps": args.max_steps, "device": args.device,
-                   "physics": args.physics, "task_backend": task_backend,
+                   "physics": args.physics, "physics_cuda_graph": args.physics_cuda_graph,
+                   "task_backend": task_backend,
                    "lidar": args.lidar, "feedback": args.feedback,
                    "depth": args.depth, "detections": args.detections,
                    "detections_warp": args.detections_warp, "zero_action": args.zero_action,
