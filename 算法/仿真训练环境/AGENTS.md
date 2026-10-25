@@ -177,3 +177,12 @@
 - Windows标准库61项全过，WSL61项中2项PowerShell专用跳过；实际物理CPU10项、仓库版3world/20policy GPU门通过。Graph严格逐轨迹对照未通过；默认eager重复也分叉，RUN_TO_RUN初始化资源超限主动TERM，无policy数据，不视为通过。Windows实测可见RAM30.49GiB、WSL约14GiB，无.wslconfig，不擅自重启或增配内存。
 - 正式主线收敛为ordinary eager GPU、NOT_GUARANTEED模式，Graph不进入V2正式recipe。V2尚DRAFT，必须先取得并冻结实际64→1一致任务SHA与新协议SHA，再启动全新300轮。两轮当前eager短测已exit0：iteration-window112.036/89.540 samples/s，all-samples/full-launch84.178/78.313；加权99.533/81.139。五路real、zero nonfinite/capacity/outer-cap，policy/optimizer132张量finite；LS fresh counters非零，不作导航结论。
 - 后续第1项仅优化非fatal LS console printf：使用官方per-model warning mask，保留真实设备计数和capacity/nonfinite失败门。它是日志执行profile，不更改8次LS/40次outer等物理参数；优化前后源码/原始结果分开保留，不能伪装相同运行或隐瞒LS事件。
+
+### V2冻结与可视化真值整理（当前正式训练仍运行）
+
+- 本批后续五项已整理：LS日志策略保留设备端计数、live目标/回合时间映射、V2协议与任务SHA冻结、真实短测/恢复证据LFS归档、原生物理真值查看器。协议SHA为83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e；唯一task SHA为209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2。
+- 已通过verified-inputs 1/3/64 world各20policy物理门、Windows61项、WSL61项skip2、真实CPU10项；checkpoint7→8恢复及64→1短评估strict-match通过。正式trial native_v2_formal_v6_live_20261025_224005于22:40:05开始，source7d8a167f、raw-source manifest6026336cad5b961e2fe95885d6010781ae75e59e792d1715988bda45d35e8938；须自然完成300轮、最终审计后才称正式通过。
+- quiet两次2warm+5measured完整栈短测加权iteration-window173.258、all-samples/full-launch139.733 samples/s；正式长测带实时查看器及CPU/Git活动，最终单独报告，不能借短测率回填。旧pilot06 330.2/7.7倍仍拒绝，capability_metrics_allowed=false。
+- native查看器绕过旧Isaac USD/terrain；旧USD有4个空body导致方块fallback。新视图采用同冻结源码零step CPU导出的19个实际primitive/local transforms与平面地面，动态姿态/目标/回合时间直接来自当前训练原始packet。静态导出最终SHA为fe0f4449d5416b453664a50c67fa2c880858b842737095e340945ac80d8f2e9e；不宣称读取或逐字节比对GPU几何数组。感知通道尚未显示，来源/校准详情保留，缺几何/身份不匹配即拒绝。
+- 用户要求界面真实映射实际训练，并决定自行用SolidWorks建模；保留其原生装配体、零件和STEP，后续导入必须核对质量/惯量/关节/碰撞与显示一致，不能静默拿代理替换。现有SolidWorks模型尚未导入当前训练。
+- 用户明确选择：先让当前正式300轮完成，再改为每控制步发布画面；当前每5控制步（0.25s仿真）不热改、不为显示中断正式试验。后续启动使用--live-state-interval 1，并实测发布频率；不插值伪造训练状态。

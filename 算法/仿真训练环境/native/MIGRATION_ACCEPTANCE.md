@@ -1,110 +1,93 @@
 # RTX Spark N1X 原生训练迁移与验收
 
-> 当前状态：正式验收未通过。v3短探针/短测通过，但全新300轮在第58轮出现1个环境的非有限物理状态，严格门正确以exit3拒绝。正在定位长期稳定性；旧pilot06的330.2 samples/s和7.7倍也无效。
+> 当前状态记录（2026-10-25）：Native V2 协议已于当天冻结，SHA256 为 83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e。V6 的 1/3/64-world 物理前置门和同身份 resume / strict-eval 链路 smoke 已通过；正式 300 轮 trial 仍在运行，尚未通过最终训练门。
+>
+> 正式 run native_v2_formal_v6_live_20261025_224005 于北京时间 22:40:05 启动。23:06:51 记录的是 CPU viewer 切换，不是训练迭代采样；本说明不写动态 iteration，亦不把短基线当作正式 run 的吞吐。
 
-目标机器为Windows 11 ARM64 / RTX Spark N1X，实际验收路径为Ubuntu-24.04-Arm64 WSL2、ARM64 Python、PyTorch CUDA、Newton XPBD、Warp与VQF。训练不启动Isaac Sim/Kit；Windows ARM64原生CUDA Python路径未实测。
+## 当前身份、环境与固定配方
 
-## 当前实现与物理修复
+目标机器为 Windows 11 ARM64 / RTX Spark N1X；训练在 Ubuntu 24.04 ARM64 WSL2、ARM64 Python、PyTorch CUDA 中运行，不启动 Isaac Sim/Kit。Windows ARM64 原生 CUDA Python 尚未实测。
 
-入口为`train/train_wsl.py` → `proto/native_env.py` → Newton物理与Warp/解析传感器 → 五路编码器 → LSTM-512 → PPO。仍有主机/GPU往返；移除的是Kit/PhysX逐物理子步fetch_results路径，不宣称全流程没有同步。
+| 项目 | 身份 |
+|---|---|
+| 协议 | PROTOCOL_NATIVE_V2.md，protocol SHA256 83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e |
+| task identity | native_task_contract_v2，SHA256 209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2 |
+| 物理 | Newton MuJoCo Warp V6，revision newton_mujoco_warp_v6_deterministic_identity |
+| 启动源码 | commit 7d8a167f；raw source manifest SHA256 6026336cad5b961e2fe95885d6010781ae75e59e792d1715988bda45d35e8938 |
 
-正式配方为64 env × 32 steps × 300 iterations = 614,400 samples，seed 0，1 ms × 50（20 Hz策略），LSTM-512，显式`fast_stop_v2`。五路real观测为LiDAR `(1,400)`、depth `(1,160,88)`、detections `(16,8)`、state `(33)`、feedback `(37)`。原型CLI仍保留simplified/占位通道兼容默认值，正式复现必须使用正式runner。
+测量环境使用 Python 3.12.3、torch 2.14.1+cu130、NumPy 2.5.4、Warp 1.18.0、Newton 1.7.0、MuJoCo 3.15.0、mujoco-warp 3.15.0、VQF 2.1.2。环境位于 /opt/venv_mujoco315_smoke；requirements-native-v2.txt 记录已观察版本。它是复用原有包的隔离 overlay，尚未证明从空环境安装可完整重建；旧 /opt/venv 与 MuJoCo 3.17.0 属于 XPBD 历史环境，不可混作 V2。
 
-本轮修正：
+正式配方固定为 64 env × 32 steps × 300 iterations（614,400 samples），LSTM-512 / PPO，seed 0、threads 8、1 ms × 50、20 Hz 策略、fast_stop_v2、五路真实观测、Newton MuJoCo Warp、普通 eager GPU、NOT_GUARANTEED 数值模式。CUDA Graph 请求和实际启用均为 false。正式训练从头开始，不续训旧 XPBD checkpoint。任务和物理以冻结协议为准，不通过性能验收修改奖励或任务。
 
-- Newton每个1 ms子步实际生成contacts并传入XPBD；旧`contacts=None`跳过刚体接触，车辆可跌穿地面。
-- 按实际world/joint/coordinate映射分别控制和读取轮组、云台与车体；partial reset只写选定articulation，其他world状态/控制保持原字节。模型、状态、控制和contacts均在所请求device。
-- 每个ShapeConfig显式设摩擦0.8，身份读取模型实际mu/ke/kd；旧构造器局部默认配置使动态形状实际mu=1.0。
-- 新物理revision为`newton_xpbdg_v3_contacts_worldmap_materialcfg`。checkpoint的`native_task_contract_v2`核对任务、奖励/终止、物理和每环境拓扑；64环境训练可转1环境评估，不同revision、任务或物理步长拒绝。
-- 正式runner完整记录日志和真实退出码，固定配方不可被extra参数覆盖；使用`--nonfinite-limit 0`。验收重读完整300轮metrics、summary、异常事件与checkpoint，不能只凭exit0或目录名通过。旧manifest不回填。
-- 评估入口统一1 ms/50，核对任务SHA、检查点、每个种子及每行结果；有运行时/非有限异常则拒绝。旧checkpoint仅能显式选择legacy探索评估，不能得到strict_match。
+正式训练与评估入口：
 
-冻结V1/V1.1协议和历史模型/成绩保留原字节。冻结正文仍有旧5 ms示例与wsl_train路径，当前执行以此说明及runner为准。没有改变奖励或续训旧错误物理模型。
+~~~bash
+cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native
+PYTHON=/opt/venv_mujoco315_smoke/bin/python bash train/run_native_v2_trial.sh <unique-tag> \
+  --live-state-file /mnt/c/pioneer/agtc-native-acceptance-backup/native_v2_live/state.json \
+  --live-state-interval 5
 
-## v3接触/环境隔离修复后的实测（正式未通过）
+PYTHON=/opt/venv_mujoco315_smoke/bin/python bash train/run_eval_v2.sh <checkpoint.pt> <new-output-dir> pilot
+~~~
 
-源码提交`c94553e2b4831848b66700d4dd0d4f9e977b343d`；相关源码字节在运行前后稳定。source manifest SHA256为`dad7add0aec5e0f5d84289972ee00ec7bca8b68c34d928f5387338b6c19da9a6`，task identity SHA256为`f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329`。
+runner 校验依赖、协议 SHA 与物理参数，固定正式配方，只允许额外传递 live-state viewer 参数，并在新的带时间戳目录中保存 run。评估默认 pilot 四个开发 seed；正式训练/评估规则见冻结协议与 train/README.md。
 
-两次独立子进程使用同配置、seed 0，各连续7轮，预先固定前2轮warmup、后5轮测量（10,240 samples）。没有清空系统/Warp编译缓存。两次五路均real、非有限状态/动作/恢复计数均0，checkpoint策略与优化器共132张量均有限。Windows/WSL前后快照及GPU进程列表未发现其他训练/推理任务；桌面与下载活动保留。
+## 已通过的前置门与链路 smoke
 
-| 口径 | rep01 | rep02 |
-|---|---:|---:|
-| Collection samples/s | 317.599（32.2419 s） | 191.149（53.5707 s） |
-| PPO update samples/s | 2280.420（4.4904 s） | 1375.106（7.4467 s） |
-| Iteration window samples/s | 278.538（36.7634 s） | 167.671（61.0720 s） |
-| 完整launcher wall | 72.9202 s | 100.8975 s |
-| 全部14,336 samples / launcher wall | 196.598 samples/s | 142.085 samples/s |
+- V6 1、3、64 worlds 均通过冻结前置物理门。每项 20 policy steps / 1,000 policy physics substeps，另有诊断开销；登记的 zero、fixed、ramped 控制，逐 world 读回与 partial-reset 隔离均在通过记录中。三个 world 数量的证据在 [verified-inputs README](acceptance/20261025_v2_freeze_validation/README.md)。
+- 同身份续训 smoke 从 iteration 7 到 8，Adam step 从 28 到 32；resume 后 task SHA 不变。单环境评估报告 checkpoint_contract_validation=strict_match，并匹配 task SHA。见 [resume summary](acceptance/20261025_mjw_quiet_resume/run/summary.json) 和 [strict evaluation](acceptance/20261025_mjw_quiet_eval/evaluation.json)。该链路是 checkpoint / 评估完整性 smoke，不是导航能力结果。
+- 当前正式 run 仍须完成完整 300 轮并满足冻结协议：exit 0、metrics 迭代完整且身份一致、每轮样本数正确、非有限/capacity overflow 为零、solver event 计数完整、checkpoint policy 与 optimizer 张量有限，并完成规定的后续 checkpoint 验证。未完成 run 不记正式通过。
 
-rep02的iteration吞吐较rep01低约39.8%。这是已观察波动，原因尚未定位；不能据两次短测宣称稳定提速倍数。所有重复均保留，不挑最快值。
+## 实时状态可视化的范围
 
-原始结果位于[rep01](acceptance/20261025_v3_rep01/benchmark_result.json)、[rep02](acceptance/20261025_v3_rep02/benchmark_result.json)，以及[两轮对比](acceptance/20261025_v3_repeats_comparison.json)。相邻同名前缀文件保留Win/WSL观察、只读summary和CPU checkpoint审计。此前2+1轮scout单独存于`acceptance/20261025_v3_eager_baseline`，不混入两轮统计。
+正式 run 的 CPU viewer consumer 使用该训练进程输出的原始状态、目标与每环境任务时间，每 5 个 policy steps 发布一次；静态 19-body primitive 与 local transform 来自本次冻结 CPU 模型导出，地面按实际 flat plane 绘制。旧 Isaac USD 缺少两个云台和两个前导轮共 4 个 body 的几何，旧 viewer 方块 fallback 不再用于 Native V2；它不再作为车辆或地面的真值来源。
 
-正确性检查独立于吞吐：6项真实Newton CPU隔离测试；GPU 3 world × 1400策略步（200零动作+600固定+600随机），实际contact存在，无非有限状态，最低保守地面间隙约−0.000124 m（容差−0.015 m）；GPU 64 world × 8步，64份映射独立，contact存在且无非有限状态。短探针不代表300轮学习已完成。
+当前 viewer 不显示 LiDAR/depth/detection 图像，也没有声明 CPU 导出几何与 GPU shape arrays 逐字节相等。它用于观察训练状态，不替代物理前置门、训练数值审计或能力评估。正式长测包含 viewer、Git 和 CPU 导出活动的实际运行负载；其最终 wall 与吞吐不得用 isolated short benchmark 代替。
 
-全新正式trial `native_v1_1_fixed_physics_v3_20261025_184052_20261025_184704`使用相同v3源码，从头开始，目标300轮。北京时间18:58:07在iter58/step21出现env11非有限pos/速度/轮速，动作有限；训练按零异常门exit3，formal_eligible=false，只完成57轮，完整wrapper wall666.72 s。最后周期checkpoint_40的132个策略/优化器张量均有限，不代表物理有效。原始run、异常与检查点全部保留，不能将失败前窗口速率称为正式300轮成绩，亦不能通过扩大异常预算转为通过。
+## 独立短基线（非正式 300 轮成绩）
 
-另确认两个模型语义问题：Newton1.7 XPBD不执行joint_effort_limit，配置的2 Nm不能视为实际限幅；CHASSIS_I使用半尺寸代入全尺寸盒体公式，各轴比正确惯量小4倍。这些问题尚不能证明是NaN触发源，但必须修复/登记；v3短测仅为该实现的真实观测，不作为最终正确物理平台成绩。后续新revision与trial独立记录。
+两组均为普通 eager、64 × 32、seed 0、task SHA 209016…；每个独立进程运行 7 轮，前 2 轮 warmup，后 5 轮共 10,240 measured samples。短测源、日志与原始计时保留在各自 acceptance 目录，不能作为长测或导航能力结论。
 
-## 计时定义与历史数据
+| Warning-enabled baseline | rep01 | rep02 | 加权 |
+|---|---:|---:|---:|
+| Iteration window samples/s | 112.036 | 89.540 | 99.533 |
+| 全部 14,336 samples / 完整进程 wall samples/s | 84.178 | 78.313 | 81.139 |
 
-一次sample是一个环境完成一个0.05 s策略步。collection速率为总样本/总采集秒；PPO速率为rollout样本/更新秒（不是optimizer内部多epoch总处理量）。iteration window包含采集与PPO，在后置有限性检查/checkpoint I/O前计时。launch速率用含warmup的全部样本/完整子进程启动至退出墙钟，包含初始化、编译、检查、保存与采样收尾。它不是全新安装/首次下载耗时。
+来源 commit fce4ba90ab3f5bce15cf869cad9623334087579a，source manifest 5641d9ae5bc77c2d533a3b504fe01a5798c374e5b494565cedba84c4d284fabf。两次 exit 0，非有限 reset/action、capacity overflow、outer iteration-limit 均为 0；line-search-limit 事件仍保留报告。原始结果：[rep01](acceptance/20261025_mjw_eager_rep01/benchmark_result.json)、[rep02](acceptance/20261025_mjw_eager_rep02/benchmark_result.json)。
 
-以上使用主机`perf_counter`，没有CUDA event或专门追加显式同步，不是kernel时间。跨轮计算使用总样本/总时间加权，不能平均速率。若用只测量部分的10,240 samples除完整launcher wall，必须另标保守口径，不能称全部训练速率。
+| Quiet baseline | rep01 | rep02 | 加权 |
+|---|---:|---:|---:|
+| Iteration window samples/s | 170.946 | 175.633 | 173.258 |
+| 全部 14,336 samples / 完整进程 wall samples/s | 136.085 | 143.581 | 139.733 |
 
-历史Isaac perf为32 env、5 ms/10：393,216 / 9218.8 s = 42.65 samples/s；任务、并行数、步长及物理保真与新栈有差异，不能作为严格物理等价对照。M3b约328.2 samples/s为占位通道短原型，不能作为完整栈成绩。
+来源 commit 8903e4e91fddfce63875ae91ddc6ba765f2dadbf，source manifest 57b0d3bffe311f7633474726d2a816d9d4fa9d899bdedda1743d7bbdb686f861。两次源运行前后 raw manifest 稳定，task SHA 相同；每次 7 轮共 716,800 world-substeps，fresh line-search-limit 计数分别为 76,971 和 76,974。quiet 只改变 warning 输出处理，不改变物理 revision 或 task SHA。两组速率差异是观察结果，不能单独归因于日志静音。原始结果：[quiet rep01](acceptance/20261025_mjw_quiet_rep01/benchmark_result.json)、[quiet rep02](acceptance/20261025_mjw_quiet_rep02/benchmark_result.json)。
 
-旧`native_v1_1_pilot06_20261025_170308`虽然原始exit0、formal_eligible=true，iter185有异常恢复（world0读数广播将计数放大至64），存在NaN与约−108 m高度。该330.2 samples/s / 7.7倍无效；其4-seed结果也不能归因于策略、奖励或数据量。旧run、checkpoint和manifest原样保留，另存rejected审计。旧pilot01实际simplified、最后20轮、exit1且无完成摘要，也不记正式完成。
+加权值使用总样本除总耗时，不平均各轮速率。iteration window 只含 rollout 与 PPO 更新时间；完整进程 wall 还含启动、初始化、检查和保存。测量使用主机计时，不是 kernel time。上述 isolated baseline 没有本次正式长测的 viewer / Git / CPU 几何导出组合负载，不得用于替代 formal throughput。
 
-## 本机环境与复现
+## 保真、能力与 Git 边界
 
-实测Python为WSL `/opt/venv/bin/python`：Python3.12.3、torch2.14.1+cu130、Warp1.18.0、Newton1.7.0、MuJoCo3.17.0、NumPy2.5.4、VQF2.1.2。`requirements-native.txt`固定已观察核心版本；根项目依赖包含Isaac Lab，不用于准备native环境。本轮未重建干净环境安装，不能声称干净安装已通过。ovphysx/ovstage不是Newton必需依赖。
+代理车辆、flat-plane 接触与解析传感器不等于完整 Isaac 场景或实车。LiDAR/depth/detections 的 RTX 遮挡、薄叶边缘、材质域差尚未逐像素验收；当前 viewer 也不呈现传感器图像。吞吐和训练链路通过不代表导航、地形/植物碰撞或实车通过；capability_metrics_allowed=false 保持不变，尚无 16-seed 配对能力或实车验收结论。
 
-```bash
-# 在“算法/仿真训练环境”目录；安装示例，本轮没有重跑
-agtc_venv_dir="$HOME/venvs/agtc-native-$(date -u +%Y%m%dT%H%M%SZ)"
-python3.12 -m venv "$agtc_venv_dir"
-"$agtc_venv_dir/bin/python" -m pip install -r native/requirements-native.txt
+冻结 V1/V1.1、历史源快照、模型、日志与原始成绩按原字节保留。source manifest 只描述列出的输入文件，不能解释成整个共享工作区干净。提交与推送由总协调按 PR 约定处理；本说明不改写冻结协议。
 
-cd native
-export PATH=/usr/lib/wsl/lib:$PATH
-unset CUDA_VISIBLE_DEVICES
-# 正式300轮；tag必须全新
-PYTHON=/opt/venv/bin/python bash train/run_native_v1_trial.sh "reproduce_$(date -u +%Y%m%dT%H%M%SZ)"
+## 历史证据：Newton XPBD 与早期候选
 
-# 先停止其他训练/推理；每次输出目录必须全新
-agtc_benchmark_tag=$(date -u +%Y%m%dT%H%M%SZ)
-/opt/venv/bin/python -B tools/benchmark_training.py \
-  --out "acceptance/rep_${agtc_benchmark_tag}_01" --warmup-iterations 2 --iterations 5 \
-  --seed 0 --threads 8 --exclusive-window
-/opt/venv/bin/python -B tools/benchmark_training.py \
-  --out "acceptance/rep_${agtc_benchmark_tag}_02" --warmup-iterations 2 --iterations 5 \
-  --seed 0 --threads 8 --exclusive-window
-/opt/venv/bin/python -B tools/benchmark_training.py --summarize "acceptance/rep_${agtc_benchmark_tag}_01"
-```
+以下数据属于不同于当前 V2 的旧 Newton XPBD / 原型，不可和 V2 合并为同引擎性能、物理等价或能力结果；raw artifacts 保留在链接目录。
 
-```powershell
-wsl -d Ubuntu-24.04-Arm64 -- /opt/venv/bin/python /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/tools/benchmark_training.py --help
-```
+### XPBD 修复与短测
 
-`--exclusive-window`是操作者声明，需同时保留Win/WSL进程观察与GPU采样。benchmark是7轮性能测量，不能冒充300轮正式trial。正式runner的extra参数只允许观察器选项。
+V3 曾修正 1 ms 子步接触生成、world/joint/coordinate 映射、partial reset 隔离、设备位置与摩擦身份。旧空接触缓冲路径会跳过刚体接触；旧 world 读取/控制映射与动态 shape 局部默认材料亦有问题。此前 Newton XPBD v3 另用 task identity f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329。两个短子进程的后置 warmup iteration window 分别为 278.538 与 167.671 samples/s，完整 launcher 分别为 196.598 与 142.085 samples/s；样本量有限，波动原因未定位。原始记录：[v3 rep01](acceptance/20261025_v3_rep01/benchmark_result.json)、[rep02](acceptance/20261025_v3_rep02/benchmark_result.json)。
 
-部分原型模块仍含本机`/mnt/c/pioneer/...`路径。换机须核对路径、ARM64 CUDA wheel和验证JSON，不能把runner相对路径等同于全栈任意目录可运行。WSL系统需Git/LFS；本机补装Ubuntu包git-lfs3.4.1-1ubuntu0.4，没有更改torch或驱动。
+同一 XPBD 源码的正式 300 轮 trial 在北京时间 18:58:07、iter 58 / step 21 出现 env11 非有限位置/速度/轮速，训练按零异常门 exit 3，formal_eligible=false，只完成 57 轮，完整 wrapper wall 666.72 s。最后 checkpoint_40 的 policy 与 optimizer 张量有限不代表物理有效。目录 native_v1_1_fixed_physics_v3_20261025_184052_20261025_184704 与异常记录保留，不能扩大异常预算或把失败前速率叫作正式成绩。
 
-## 保真、能力与Git边界
+旧 pilot06 原始 exit 0、manifest formal_eligible=true，但 iter185 存在 NaN 与约 −108 m 高度，异常计数被 world0 读取广播放大；其 330.2 samples/s、7.7 倍和 4-seed 结果均拒绝，不能归因于策略或奖励。pilot01 实际使用 simplified backend，后期 exit 1、无完成摘要，同样不是正式成绩。两组原 run 与 checkpoint 保留并另存 rejected audit。
 
-Newton使用盒体/圆柱轮代理、平面接触及速度目标驱动，未实现完整Isaac场景的地形/植物物理碰撞和侧PI力矩控制。解析传感器中的地形/植物不代表已有相应物理碰撞。depth/detections有参考算法对照，但RTX遮挡、薄叶边缘和材质域差未逐像素验收。`capability_metrics_allowed=false`保持不变；平台链路/吞吐通过不能替代16-seed配对能力或实车验收。
+XPBD 中还发现过 Newton 执行器限制与预期不同、底盘惯量尺寸公式错误；这两项属于旧后端审计，不能移植成当前 V2 物理结论。
 
-延续`perf/max-throughput`和[PR #24](https://github.com/w3743/AGTC/pull/24)，通过PR保留main历史，冻结材料不改写。模型按Git LFS保存；相关源、协议、argv、包版本、真实退出、checkpoint SHA与原始计时分别保留。来源工具读取明确HEAD tree并比较实际源raw bytes，不调用全工程git status；`relevant_sources_dirty=false`只描述所列源相对提交，不声称整个共享工作区干净。正式长测另保留源文件原字节快照及wrapper/protocol SHA。
+### 早期 MuJoCo-Warp 原型与性能模式探针
 
-CPU标准库回归Windows32项全过，WSL32项中2项PowerShell专用跳过，其余通过；可选Newton实际物理6项另跑，不进入无GPU依赖的CI测试目录。Repository checks只验证仓库规则，最终状态以PR当前提交为准，不能代替本机训练验收。历史报告EOF的精确属性例外用于保留原字节，没有全局放宽检查。
-## 新候选进展（尚未正式验收）
+旧外部 v4b GPU 原型 3 world × 120 policy steps 曾报告 finite、capacity 与 reset 隔离通过，但缺启动时完整源码冻结，且不是当前 V6 final preregistered gate；原始记录与限制见 [candidate archive](acceptance/20261025_mjw_candidate/README.md)。
 
-旧XPBD的带状态快照60轮有界诊断在源码提交6e4a4382正常exit0，60行metrics/零异常，未复现第58轮故障，因此没有失败状态可单步回放。这不能推翻独立正式trial的真实失败，也不消除已确认的惯量/限幅问题；诊断同步开销不作为吞吐数据。
+旧探针 LS_ITERATIONS 曾记录 4999/4999/4699 个 flag-positive 子步，但相关位是 sticky OR、未逐步清零，不能视为真实逐步计数。当前 V6 已改为子步清零并统计 fresh solver event。CUDA Graph 对照超出状态容差，普通 eager 重复本身也分叉，因此不能把分叉单独归因于 Graph。旧 9.78 倍是隔离物理调用计时，不是训练端到端提速。RUN_TO_RUN 初始化因内存压力被 TERM，未产生 policy 数据，不是 benchmark。
 
-独立`/opt/venv_mujoco315_smoke`环境只覆盖MuJoCo/mujoco-warp为3.15.0，其余只读复用原环境；没有降级原`/opt/venv`。该版本组合符合Newton1.7要求。候选使用官方SolverMuJoCo的GPU路径、内部接触、显式zero gap/margin、正确惯量、实际执行器力矩、14个joint mimic（solref .004/1、solimp .999/.9999/.001/.5/2）及每world容量64 contacts/256 constraints。
-
-外部v4b原型3world × 120策略步（6000物理子步）及reset后首子步/完整策略步通过，exit0、stderr空，无非有限值和容量截断；轮组/云台最大实际力矩2/1Nm，连续关节坐标最大mimic残差约0.000169rad，未重置world状态/控制保持原字节。eval_ik可与真实连续qpos相差约4π，不能用其裸角差宣称十多弧度物理漂移。旧探针LS_ITERATIONS读数为4999/4999/4699个flag-positive子步采样；后续源码审计确认该位是sticky OR且原探针未逐步清零，所以不能当独立线搜索失败次数。该位表示曾触及内层线搜索8次上限，不是接触容量溢出；新实现将在每子步设备端清零后采样并累计真实新事件。outer ITERATIONS计数0，最大outer迭代4/5/10（上限40），观测最大equality efc.pos约0.000193。
-
-[候选原始证据](acceptance/20261025_mjw_candidate/README.md)同时保留失败探针。该批prototype缺启动时完整源码冻结，运行后源码复制与依赖恢复的限制已在README标明，不冒充正式可复现输入快照。仓库版正在整理/验证，CUDA Graph和完整300轮尚未验收；V2协议仍为DRAFT且正式入口被冻结SHA/任务身份门拦截。
-
-Graph尚未通过：默认NOT_GUARANTEED模式的60步对照从第25步起超出预定物理状态容差；两次普通eager执行也从第27步起分叉，因此不能将差异单独归因于Graph。诊断中的9.78倍仅是隔离物理调用计时，不是端到端训练提速，也不作为验收数据。下一步正在使用官方RUN_TO_RUN参数做独立新profile验证，不放宽既定容差；新V2仍未冻结。
+历史 Isaac 32-env / 5 ms 记录约 42.65 samples/s，早期占位 M3b 约 328.2 samples/s；任务、通道、并行数及物理保真不同，均不是当前严格对照。
