@@ -18,8 +18,8 @@
 ## 尚未就绪（训练前必须关闭）
 
 1. **depth 160×88**：✅ 已完成（2026-10-25 11:20）：Warp 解析深度与独立 numpy caster 对照 6 位姿 × 14,080 像素，**mask 不一致 0、valid ratio 0.4044/0.4044、距离 max 2.06e-4 m、100% ≤1e-3 m**；provider 集成对照 max diff 0.0；`observation_provider` 新增 `depth_backend="analytic"`，`train_wsl.py --depth analytic` 已冒烟（iter2 collection 2.06 s、496 samples/s，contract depth=real）。剩余：与 Isaac RTX 的域差登记（未逐像素对照）。
-2. **detections 16×8**：仍为占位，实现中（按 env.py 的 64×64 detector/cone/drop/confidence/box 语义）。
-3. 因此 `capability_metrics_allowed=false`：**当前 WSL 训练只能叫 throughput/learning 冒烟，不能做能力结论**。
+2. **detections 16×8**：✅ 已完成（2026-10-25 11:35）：`proto/detections_caster.py` 按 env.py 语义实现，与 `FieldTask._observation` 同输入对照 **max abs error 0.0**（7 位姿、34 条检测；字段顺序/缩放/range 分支/排序/截断全对齐），provider 集成 max diff 0.0；`train_wsl.py` 已加 `--detections analytic`。CPU 成本：mask 渲染 ≈6.0 ms/帧（64×64），需 GPU 版本进训练循环。
+3. 五通道现在全部 `mode=real`（lidar/depth/detections analytic、state 4.05e-7、feedback VQF 0.0）；`capability_metrics_allowed=false` 的剩余 blocker 只有 **RTX 域差未逐像素对照**（depth/detections 的 `sensor_domain_gap` 已登记验收建议）。
 
 ## 进入正式 WSL 训练的验收门
 
@@ -33,3 +33,11 @@
 - 原生栈物理/传感器与 Isaac RTX 存在域差（depth 为几何射线、detections 为几何推导），策略可迁移性需实车/Isaac 对照验证；
 - WSL2 非项目官方支持环境，长期稳定性需观察；
 - 训练规模化后注意宿主 32 GB 内存与 WSL 默认内存上限。
+
+## 2026-10-25 11:30 更新：五通道全 real + WSL pilot 训练
+
+- depth 已完成并接入（`depth_backend="analytic"`）：6 位姿 × 14,080 像素对照 mask 不一致 0、距离 max 2.06e-4 m；GPU 批渲染实测 **1.013 ms/帧**（比 4–6 ms 目标更快）。
+- detections 已完成并接入（按 env.py 语义）：与 `FieldTask._observation` 同输入 **max/mean abs error 0.0**；provider 集成 max diff 0.0。
+- 真观测 smoke（64 env × 16 steps）：稳态 wall **2.897 s/iter**、**353.5 samples/s** 端到端；contract 五通道全 real（lidar/depth/detections analytic、state、feedback vqf）；`capability_metrics_allowed=false`，唯一 blocker 是 **RTX 域差未逐像素对照**。
+- 已启动 WSL pilot 训练（`wsl_train/runs/pilot_20261025`）：64 env × 32 steps × 300 iterations、newton_xpbd + warp lidar + vqf + analytic depth/detections，每 20 iter 存 checkpoint（训练使用原型 MLP 策略，仅验证 WSL 训练闭环/吞吐/学习信号，**不作能力结论**）。
+- 后续：detections Warp mask kernel（预期把稳态吞吐从 353 提回 550–650 samples/s）、native 评估脚本（60 s 场景/固定种子/停稳判据）、真实 LSTM 策略接入与本地协议冻结。
