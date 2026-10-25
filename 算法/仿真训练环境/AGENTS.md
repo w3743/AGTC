@@ -139,3 +139,11 @@
 - 平台上限：96% 负载下 SM 时钟约 663–690 MHz（最大 3003）、`power.limit=N/A`、功耗读数不可信，疑似 vGPU/功耗墙；1.65 TFLOPS fp32 为真实可复现数字，不能外推到裸机。
 - 文档：`PERF_PLATFORM.md`（性能/训练/评估记录）、`NATIVE_STACK_PLAN.md`（迁移架构、基准、M0–M4 门禁、风险）；分支 `perf/max-throughput` 已推送（最新提交见 git log）。
 - 范围整理：本轮改动集中在性能相关源文件/评估脚本/文档；冻结协议、历史 results、检查点原始字节未改写；临时评估脚本保留在 trial 目录。
+
+
+### 2026-10-25 后续：放弃 Isaac 训练、转 WSL 原生栈（用户决定）
+
+- 用户明确决定：停止 Isaac 训练，以后以 WSL 原生栈为主；`cont4` 在 iter ~183 被按用户指令终止（最后完整 checkpoint `model_176`，741,376 timesteps，权重有限，SHA `a0937d36…`），不记自然完成。
+- WSL 训练准备：新增仓库外 `C:/pioneer/wsl-native/wsl_train/train_wsl.py`（GPU/newton_xpbd/warp lidar/vqf、JSONL、checkpoint/save-interval、resume + observation-contract SHA 校验），冒烟 64 env×16 steps 稳态 ~600–650 samples/s，resume 已验证。
+- 未就绪：depth 160×88（Warp 实现与 reference 对照 MISMATCH，修复中）、detections 16×8（未实现）；`capability_metrics_allowed=false`，当前 WSL 训练只能作吞吐/学习冒烟。
+- 记录：`PERF_PLATFORM.md` §20、`WSL_TRAIN_PLAN.md`；Isaac 仅保留为对照/验收工具。
