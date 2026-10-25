@@ -71,3 +71,16 @@
   - 5ms 相对 1ms 仅 **1.37×**（不是物理子步数的 5×），因为 observation 合计 ~1.5 s/iter 不随物理 dt 缩放。
 - **新瓶颈**：detections 的 ~1.0 s/iter 来自 `cast_center_distance` 的 numpy 逐 pose 地形 marching + 组装（mask 已批量到 5.66 ms/4 帧 ≈0.02 s），不是 mask 本身。
 - 下一步：detections 中心射线/组装批量化（预计 1.0 s → ~0.1 s），再复测 1ms vs 5ms；之后接 LSTM-512 策略；5ms 暂不作训练默认，复测后再定（标 experimental、与 1ms 结果分开记录）。
+
+## 2026-10-25 11:50 优化结果与 LSTM pilot 启动
+
+- detections 批量化后：**1.016 → 0.064 s/iter（16×）**；observation 合计 0.583 s/iter（lidar 0.248 / depth 0.051 / detections 0.064 / state 0.003 / feedback 0.216）。
+- A/B 复测（64 env×16 steps，iter2 稳态）：
+  | 配置 | wall | env_step | samples/s |
+  |---|---|---|---|
+  | 1 ms/50 | 2.000 s | 1.696 s | 512.1 |
+  | **5 ms/10（experimental）** | **1.156 s** | 0.895 s | **885.6** |
+- LSTM-512 已接入：参数量 1,619,913；GPU smoke iter2 0.909 s（351.2 samples/s），checkpoint/resume 正常。
+- contract SHA 已改为不覆盖 `run_id/phase/note`（新增 `sha_scope`），跨目录 resume 可用；旧 pilot/smoke checkpoint 因此不兼容（已记录）。
+- 决策：5ms/10 作为 WSL **实验默认**（CLI 默认仍 1ms/50；正式训练显式传参并标 `physics_experimental=true`）。
+- 已启动 LSTM pilot：`wsl_train/runs/lstm_pilot_5ms`，64 env×32 steps×300 iter、5ms/10、全 real 观测、`--profile`；预计 13–18 分钟，跑完用 `eval_native` 评估。
