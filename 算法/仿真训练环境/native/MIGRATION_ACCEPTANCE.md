@@ -1,6 +1,6 @@
 # RTX Spark N1X 原生训练迁移与验收
 
-> 当前状态：Newton v3物理修复及短测通过；全新300轮正式验收运行中，完成后追加结果。旧pilot06已被物理审计拒绝，330.2 samples/s和7.7倍不作为有效性能结论。
+> 当前状态：正式验收未通过。v3短探针/短测通过，但全新300轮在第58轮出现1个环境的非有限物理状态，严格门正确以exit3拒绝。正在定位长期稳定性；旧pilot06的330.2 samples/s和7.7倍也无效。
 
 目标机器为Windows 11 ARM64 / RTX Spark N1X，实际验收路径为Ubuntu-24.04-Arm64 WSL2、ARM64 Python、PyTorch CUDA、Newton XPBD、Warp与VQF。训练不启动Isaac Sim/Kit；Windows ARM64原生CUDA Python路径未实测。
 
@@ -21,7 +21,7 @@
 
 冻结V1/V1.1协议和历史模型/成绩保留原字节。冻结正文仍有旧5 ms示例与wsl_train路径，当前执行以此说明及runner为准。没有改变奖励或续训旧错误物理模型。
 
-## 正确物理底座的实测
+## v3接触/环境隔离修复后的实测（正式未通过）
 
 源码提交`c94553e2b4831848b66700d4dd0d4f9e977b343d`；相关源码字节在运行前后稳定。source manifest SHA256为`dad7add0aec5e0f5d84289972ee00ec7bca8b68c34d928f5387338b6c19da9a6`，task identity SHA256为`f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329`。
 
@@ -41,7 +41,9 @@ rep02的iteration吞吐较rep01低约39.8%。这是已观察波动，原因尚�
 
 正确性检查独立于吞吐：6项真实Newton CPU隔离测试；GPU 3 world × 1400策略步（200零动作+600固定+600随机），实际contact存在，无非有限状态，最低保守地面间隙约−0.000124 m（容差−0.015 m）；GPU 64 world × 8步，64份映射独立，contact存在且无非有限状态。短探针不代表300轮学习已完成。
 
-全新正式trial使用相同v3源码，从头开始，禁止resume旧pilot06；目标为300轮、614,400 samples、零异常与完整manifest。最终耗时和退出结果在自然结束后记录，当前不提前判通过。
+全新正式trial `native_v1_1_fixed_physics_v3_20261025_184052_20261025_184704`使用相同v3源码，从头开始，目标300轮。北京时间18:58:07在iter58/step21出现env11非有限pos/速度/轮速，动作有限；训练按零异常门exit3，formal_eligible=false，只完成57轮，完整wrapper wall666.72 s。最后周期checkpoint_40的132个策略/优化器张量均有限，不代表物理有效。原始run、异常与检查点全部保留，不能将失败前窗口速率称为正式300轮成绩，亦不能通过扩大异常预算转为通过。
+
+另确认两个模型语义问题：Newton1.7 XPBD不执行joint_effort_limit，配置的2 Nm不能视为实际限幅；CHASSIS_I使用半尺寸代入全尺寸盒体公式，各轴比正确惯量小4倍。这些问题尚不能证明是NaN触发源，但必须修复/登记；v3短测仅为该实现的真实观测，不作为最终正确物理平台成绩。后续新revision与trial独立记录。
 
 ## 计时定义与历史数据
 
@@ -94,4 +96,4 @@ Newton使用盒体/圆柱轮代理、平面接触及速度目标驱动，未实�
 
 延续`perf/max-throughput`和[PR #24](https://github.com/w3743/AGTC/pull/24)，通过PR保留main历史，冻结材料不改写。模型按Git LFS保存；相关源、协议、argv、包版本、真实退出、checkpoint SHA与原始计时分别保留。来源工具读取明确HEAD tree并比较实际源raw bytes，不调用全工程git status；`relevant_sources_dirty=false`只描述所列源相对提交，不声称整个共享工作区干净。正式长测另保留源文件原字节快照及wrapper/protocol SHA。
 
-CPU标准库回归Windows31项全过，WSL31项中2项PowerShell专用跳过，其余通过；可选Newton实际物理6项另跑，不进入无GPU依赖的CI测试目录。Repository checks只验证仓库规则，最终状态以PR当前提交为准，不能代替本机训练验收。历史报告EOF的精确属性例外用于保留原字节，没有全局放宽检查。
+CPU标准库回归Windows32项全过，WSL32项中2项PowerShell专用跳过，其余通过；可选Newton实际物理6项另跑，不进入无GPU依赖的CI测试目录。Repository checks只验证仓库规则，最终状态以PR当前提交为准，不能代替本机训练验收。历史报告EOF的精确属性例外用于保留原字节，没有全局放宽检查。

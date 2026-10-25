@@ -166,3 +166,7 @@
 - 旧pilot06虽exit0/旧formal_eligible=true，iter185有非有限恢复，缺contacts造成跌穿地面；world0广播放大计数，旧材料实际值亦不符。拒绝330.2 samples/s、7.7倍及其策略归因，保留原run/模型/manifest，另存rejected审计，不回填冻结记录。
 - 正确v3两次短测iteration window为278.538和167.671 samples/s；全进程口径196.598和142.085 samples/s。均零异常，存在约39.8%波动，原因未知，不宣称稳定提速倍数。测量源码c94553e2，完整证据见native/acceptance/20261025_v3_rep01、rep02与对比JSON。
 - 用户明确暂停DeepSeekHarness，由此对话统一修复。fixed_physics_v3全新300轮正式验收于北京时间18:47:04启动；只读监测，不改运行中源码/协议，不resume旧错误物理检查点。最终状态统一见native/MIGRATION_ACCEPTANCE.md，未完成前不称正式通过。
+
+- fixed_physics_v3正式trial于18:58:07在iter58/step21发生env11物理非有限状态，严格门自然exit3，formal_eligible=false；57完整轮、wrapper666.72s。不将短探针/短测通过写成正式稳定性通过，不加预算重启；保留原始失败证据并继续定位。
+
+- 后续第1项：修复SH命令捕获-u顺序与JSON整数类型严谨性，Windows32项通过/WSL32项skip2；原run捕获不回填。v3长期失败后再确认XPBD不执行effort限幅、车身惯量小4倍，尚不归因为NaN直接触发源；继续诊断并在新revision/trial修复，不将v3短测当最终正确物理成绩。

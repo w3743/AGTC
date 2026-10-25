@@ -2,9 +2,9 @@
 
 当前主训练路径为WSL2 ARM64的Newton XPBD + Warp + PyTorch，无需启动Isaac Sim/Kit。旧pilot06存在缺接触、world0索引复用与实际摩擦不一致，已拒绝其330.2 samples/s和7.7倍结论；旧4-seed失败也不能直接归因于策略学习。
 
-v3已修复接触、每环境状态/控制/reset隔离、请求device与实际材料身份。正确物理探针通过，两个完整栈短测已完成；新的300轮、614,400 samples正式验收正在运行。配置、证据、复现命令及最终状态统一见[迁移与验收说明](native/MIGRATION_ACCEPTANCE.md)。
+v3已修复接触、每环境状态/控制/reset隔离、请求device与实际材料身份。正确物理探针通过，两个完整栈短测已完成；新的300轮验收在iter58出现env11非有限物理状态，exit3、formal_eligible=false；正式验收未通过，继续定位长期稳定性。配置、证据、复现命令及最终状态统一见[迁移与验收说明](native/MIGRATION_ACCEPTANCE.md)。
 
-| 正确v3完整栈，64 env × 32 steps，1 ms/50，LSTM-512 | rep01 | rep02 |
+| v3实验完整栈（正式未通过），64 env × 32 steps，1 ms/50，LSTM-512 | rep01 | rep02 |
 |---|---:|---:|
 | Collection samples/s | 317.599 | 191.149 |
 | Iteration window（采集+PPO）samples/s | 278.538 | 167.671 |
