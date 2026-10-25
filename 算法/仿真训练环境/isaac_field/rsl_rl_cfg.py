@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 import math
+import os
 from pathlib import Path
 import sys
 
@@ -18,6 +19,26 @@ from isaaclab_rl.rsl_rl import (
 from .env import FieldEnvCfg
 from .feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
 from .policy_contract import ABSOLUTE_GOAL_ENCODER_SCHEMA, OBSERVATION_SHAPES
+
+
+def _env_float(name: str, default: float, *, minimum: float | None = None) -> float:
+    """Read an optional numeric experiment override; defaults keep protocol values."""
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return float(default)
+    value = float(raw)
+    if not math.isfinite(value):
+        raise ValueError(f"{name} must be finite")
+    if minimum is not None and value < minimum:
+        raise ValueError(f"{name} must be >= {minimum}")
+    return value
+
+
+# Policy-exploration experiments can override these without changing the frozen
+# defaults (0.05 / 0.0). The values are part of the policy contract, so a new
+# trial started with different values is not resumable from a default trial.
+_INIT_STD = _env_float("ISAAC_FIELD_INIT_STD", 0.05, minimum=1e-6)
+_ENTROPY_COEF = _env_float("ISAAC_FIELD_ENTROPY_COEF", 0.0, minimum=0.0)
 from .task import Config
 
 
@@ -112,7 +133,7 @@ class FieldFastStopRslRunnerCfg(RslRlOnPolicyRunnerCfg):
         obs_normalization=False,
         distribution_cfg=RslRlMLPModelCfg.GaussianDistributionCfg(
             class_name="rsl_rl.modules.distribution.GaussianDistribution",
-            init_std=0.05,
+            init_std=_INIT_STD,
             std_type="log",
         ),
         rnn_type="lstm",
@@ -144,7 +165,7 @@ class FieldFastStopRslRunnerCfg(RslRlOnPolicyRunnerCfg):
         value_loss_coef=0.5,
         use_clipped_value_loss=False,
         clip_param=0.2,
-        entropy_coef=0.0,
+        entropy_coef=_ENTROPY_COEF,
         num_learning_epochs=5,
         num_mini_batches=4,
         learning_rate=3.0e-4,

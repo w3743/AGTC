@@ -134,3 +134,11 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - `cont4` 的 iteration 170 记录 collection=4316.0 s（约 72 分钟），原因是宿主在 09:34–10:46 进入休眠，训练进程被挂起；恢复后 GPU 时钟回到 2.1–2.4 GHz，后续 iteration 恢复 ~85 s。
 - 已启动用户级 keep-awake 辅助进程（`C:/pioneer/isaac-training/tools/keep_awake.ps1`，SetThreadExecutionState），后续长训练不再受空闲休眠影响。
 - 结论：该 4316 s 是休眠墙钟，不是训练变慢；不得当作性能退化或吞吐数据。
+
+## 19. 策略探索实验（用户已同意，待 GPU 空闲后启动）
+
+- 背景：训练能跑、策略能行驶，但 4 场景 0/4（2 次越界、2 次接近后不停稳）；学习率/熵正常，`Policy/mean_std` 长期≈0.05 → 判断为探索不足 + 长时程停稳奖励难发现。
+- 代码开关（默认不变）：`isaac_field/rsl_rl_cfg.py` 新增 `ISAAC_FIELD_INIT_STD`（默认 0.05）与 `ISAAC_FIELD_ENTROPY_COEF`（默认 0.0）；已用同一 venv 验证 0.12 override 与默认 0.05 均正确导入，`py_compile` 通过。
+- 实验 1（最小单变量）：fresh training，`ISAAC_FIELD_INIT_STD=0.12`，其余与 perf 配置一致（32 env、dt=5 ms、dec=10、96 iterations、393,216 transitions）。
+- 后续实验（若 1 不足）：熵系数 >0、目标接近/停稳奖励塑形或课程；都需新 trial，不改现有协议与历史结果。
+- 评估口径沿用现成 4 场景 fast eval（5 ms 物理、12 m 场地），与 model_128 的 0/4 对比；仍非 strict-pass，不作能力结论。
