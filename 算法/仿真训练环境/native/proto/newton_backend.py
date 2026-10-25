@@ -1,12 +1,12 @@
-"""Newton XPBD GPU backend for the M3 acceptance run (same interface as MujocoCPUBackend).
+"""Newton XPBD backend with independent per-world state (same interface as MujocoCPUBackend).
 
 Model per world is identical to physics_backend.build_mjcf:
   19 bodies / 19 joints / 24 DOF (6-DOF free base + 14 wheels + 2 gimbal + 2 guides)
   + 14 mimic relations via ModelBuilder.set_joint_mimic.
 
 Drive semantics (prototype-level deviation, documented):
-  * wheel velocity servo through `control.joint_target_qd` with joint target_kd=0.04
-    (same solver path validated in scripts/bench_newton.py: 33,244 env-steps/s on GPU)
+  * wheel velocity servo through `control.joint_target_qd` with joint target_kd=0.04.
+  * collision contacts are refreshed before every XPBD physics substep.
   * gimbal position servo through `control.joint_target_q` (target_ke=1, target_kd=0.1)
   * the CPU backend's explicit per-wheel torque + side PI feed-forward is NOT applied
     here; target velocities already include the 1.5 m/s^2 slew and action mapping.
@@ -49,25 +49,26 @@ GIMBAL_I = (0.05 * (0.06 ** 2 + 0.04 ** 2) / 12.0,
 GUIDE_I = WHEEL_I
 
 
-def _robot_builder():
+def _robot_builder(mu: float = 0.8):
     import newton
     import warp as wp
 
     b = newton.ModelBuilder(gravity=(0.0, 0.0, -9.81))
-    b.default_shape_cfg.mu = 0.8
+    b.default_shape_cfg.mu = float(mu)
     b.default_shape_cfg.ke = 2.5e3
     b.default_shape_cfg.kd = 100.0
-    b.add_ground_plane(cfg=newton.ModelBuilder.ShapeConfig(mu=0.8))
+    b.add_ground_plane(cfg=newton.ModelBuilder.ShapeConfig(
+        density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)))
     base = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15), q=wp.quat_identity()),
                       mass=26.4, inertia=_diag_inertia(*CHASSIS_I), label="base")
     b.add_shape_box(base, hx=0.4, hy=0.15, hz=0.075,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0), label="chassis")
+                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="chassis")
     joints = [b.add_joint_free(child=base, label="base_free")]
     # gimbal yaw (z) -> pitch (y)
     yaw = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15 + GIMBAL_OFFSET_Z), q=wp.quat_identity()),
                      mass=0.05, inertia=_diag_inertia(*GIMBAL_I), label="gimbal_yaw")
     b.add_shape_box(yaw, hx=0.03, hy=0.03, hz=0.02,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0), label="gimbal_yaw_geom")
+                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="gimbal_yaw_geom")
     joints.append(b.add_joint_revolute(
         parent=base, child=yaw, axis=newton.Axis.Z,
         parent_xform=wp.transform(p=(0.0, 0.0, GIMBAL_OFFSET_Z), q=wp.quat_identity()),
@@ -76,7 +77,7 @@ def _robot_builder():
     pitch = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15 + GIMBAL_OFFSET_Z), q=wp.quat_identity()),
                        mass=0.05, inertia=_diag_inertia(*GIMBAL_I), label="gimbal_pitch")
     b.add_shape_box(pitch, hx=0.02, hy=0.02, hz=0.02,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0), label="gimbal_pitch_geom")
+                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="gimbal_pitch_geom")
     joints.append(b.add_joint_revolute(
         parent=yaw, child=pitch, axis=newton.Axis.Y,
         target_ke=1.0, target_kd=0.1, effort_limit=1.0,
@@ -91,7 +92,7 @@ def _robot_builder():
                               mass=WHEEL_MASS, inertia=_diag_inertia(*WHEEL_I), label=f"{side}_wheel_{i}_link")
             b.add_shape_cylinder(link, xform=wp.transform(p=(0.0, 0.0, 0.0), q=wheel_quat),
                                  radius=WHEEL_RADIUS, half_height=WHEEL_HALF_WIDTH,
-                                 cfg=newton.ModelBuilder.ShapeConfig(density=0.0),
+                                 cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)),
                                  label=f"{side}_wheel_{i}_geom")
             j = b.add_joint_revolute(parent=base, child=link, axis=newton.Axis.Y,
                                      parent_xform=wp.transform(p=(x, y, WHEEL_Z), q=wp.quat_identity()),
@@ -106,7 +107,7 @@ def _robot_builder():
                           mass=GUIDE_MASS, inertia=_diag_inertia(*GUIDE_I), label=f"{side}_front_guide_link")
         b.add_shape_cylinder(link, xform=wp.transform(p=(0.0, 0.0, 0.0), q=wheel_quat),
                              radius=GUIDE_RADIUS, half_height=WHEEL_HALF_WIDTH,
-                             cfg=newton.ModelBuilder.ShapeConfig(density=0.0),
+                             cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)),
                              label=f"{side}_front_guide_geom")
         j = b.add_joint_revolute(parent=base, child=link, axis=newton.Axis.Y,
                                  parent_xform=wp.transform(p=(GUIDE_X, y, GUIDE_Z), q=wp.quat_identity()),
@@ -128,7 +129,7 @@ def _robot_builder():
 
 
 class NewtonXPBDGBackend:
-    """64-world Newton XPBD backend; device = cuda:0 when available, else cpu."""
+    """Batched Newton XPBD backend; the requested device is used for every model buffer."""
 
     def __init__(self, nworld: int = 64, *, dt: float = 1e-3, decimation: int = 50,
                  effort_limit: float = EFFORT_LIMIT, kp: float = DRIVE_KP, ki: float = 0.1,
@@ -149,49 +150,113 @@ class NewtonXPBDGBackend:
         if device is None:
             device = "cuda:0" if wp.get_cuda_device_count() > 0 else "cpu"
         self.device = wp.get_device(device)
-        robot, wheel_joints, guide_joints, relations = _robot_builder()
+        robot, wheel_joints, guide_joints, relations = _robot_builder(mu=self.mu)
         main = newton.ModelBuilder(gravity=(0.0, 0.0, -9.81))
         main.add_world(robot, label_prefix="w0_")
         if self.nworld > 1:
             main.replicate(robot, world_count=self.nworld - 1,
                            label_prefixes=[f"w{i}_" for i in range(1, self.nworld)])
-        self.model = main.finalize()
+        self.model = main.finalize(device=self.device)
+        if str(self.model.device) != str(self.device):
+            raise RuntimeError(
+                f"requested Newton device {self.device}, but model finalized on {self.model.device}"
+            )
         self.solver = newton.solvers.SolverXPBD(self.model, iterations=10)
+        self.collision_pipeline = newton.CollisionPipeline(self.model)
+        self.contacts = self.collision_pipeline.contacts()
         self.state_0 = self.model.state()
         self.state_1 = self.model.state()
         self.control = self.model.control()
         self.joint_q = wp.zeros_like(self.model.joint_q)
         self.joint_qd = wp.zeros_like(self.model.joint_qd)
-        self.model.joint_q.assign(self.model.joint_q.numpy())
-        newton.eval_fk(self.model, self.model.joint_q, self.model.joint_qd, self.state_0)
-        newton.eval_fk(self.model, self.model.joint_q, self.model.joint_qd, self.state_1)
-        labels = [str(x) for x in self.model.joint_label]
-        self.wheel_joint_idx = {}
-        for side in ("left", "right"):
-            self.wheel_joint_idx[side] = [
-                next(i for i, lab in enumerate(labels) if lab.endswith(f"{side}_wheel_{k}_wheel_joint"))
-                for k in range(WHEELS_PER_SIDE)]
-        self.guide_joint_idx = [next(i for i, lab in enumerate(labels)
-                                     if lab.endswith(f"{s}_front_guide_wheel_joint"))
-                                for s in ("left", "right")]
-        self.gimbal_joint_idx = [next(i for i, lab in enumerate(labels) if lab.endswith(name))
-                                 for name in GIMBAL_JOINT_NAMES]
-        self.base_joint_idx = next(i for i, lab in enumerate(labels) if lab.endswith("base_free"))
-        # per-world index tables
-        self.wheel_dof = {side: [int(self.model.joint_qd_start.numpy()[j]) for j in idx]
-                          for side, idx in self.wheel_joint_idx.items()}
-        # NOTE: joint_target_qd is indexed by DOF (joint_qd_start); joint_target_q is
-        # indexed by coordinate (joint_target_q_start). Mixing them writes wheel
-        # velocity targets into gimbal/wheel position slots and destabilises the solver.
-        self.wheel_target_dof = {side: [int(self.model.joint_qd_start.numpy()[j]) for j in idx]
-                                 for side, idx in self.wheel_joint_idx.items()}
-        self.gimbal_q_coord = [int(self.model.joint_target_q_start.numpy()[j]) for j in self.gimbal_joint_idx]
-        self.base_coord = int(self.model.joint_q_start.numpy()[self.base_joint_idx])
+        self._initial_joint_q = self.model.joint_q.numpy().copy()
+        self._initial_joint_qd = self.model.joint_qd.numpy().copy()
+        self.joint_q.assign(self._initial_joint_q)
+        self.joint_qd.assign(self._initial_joint_qd)
+        newton.eval_fk(self.model, self.joint_q, self.joint_qd, self.state_0)
+        newton.eval_fk(self.model, self.joint_q, self.joint_qd, self.state_1)
+
+        joint_labels = [str(x) for x in self.model.joint_label]
+        joint_world = self.model.joint_world.numpy()
+        q_start = self.model.joint_q_start.numpy()
+        qd_start = self.model.joint_qd_start.numpy()
+        target_q_start = self.model.joint_target_q_start.numpy()
+        self.world_joint_idx = {}
+        self.world_joint_names = {}
+        self.world_joint_slices = {}
+        for w in range(self.nworld):
+            indices = np.flatnonzero(joint_world == w).tolist()
+            by_name = {}
+            for j in indices:
+                name = joint_labels[j].rsplit("/", 1)[-1]
+                if name in by_name:
+                    raise RuntimeError(f"world {w}: duplicate joint label {name!r}")
+                by_name[name] = int(j)
+            if not indices:
+                raise RuntimeError(f"world {w}: no joints found from model.joint_world")
+            self.world_joint_idx[w] = [int(j) for j in indices]
+            self.world_joint_names[w] = by_name
+            self.world_joint_slices[w] = [
+                (int(q_start[j]), int(q_start[j + 1]),
+                 int(qd_start[j]), int(qd_start[j + 1]))
+                for j in indices
+            ]
+
+        self.wheel_joint_idx = {
+            side: [[self.world_joint_names[w][f"{side}_wheel_{k}_wheel_joint"]
+                    for k in range(WHEELS_PER_SIDE)] for w in range(self.nworld)]
+            for side in ("left", "right")
+        }
+        self.guide_joint_idx = [
+            [self.world_joint_names[w][f"{side}_front_guide_wheel_joint"]
+             for side in ("left", "right")]
+            for w in range(self.nworld)
+        ]
+        self.gimbal_joint_idx = [
+            [self.world_joint_names[w][name] for name in GIMBAL_JOINT_NAMES]
+            for w in range(self.nworld)
+        ]
+        self.base_joint_idx = [self.world_joint_names[w]["base_free"] for w in range(self.nworld)]
+        self.wheel_dof = {
+            side: [[int(qd_start[j]) for j in self.wheel_joint_idx[side][w]]
+                   for w in range(self.nworld)]
+            for side in ("left", "right")
+        }
+        # Velocity targets use DOF indices; position targets use target-coordinate indices.
+        self.wheel_target_dof = {side: [indices.copy() for indices in table]
+                                 for side, table in self.wheel_dof.items()}
+        self.gimbal_q_coord = [
+            [int(q_start[j]) for j in self.gimbal_joint_idx[w]]
+            for w in range(self.nworld)
+        ]
+        self.gimbal_target_q_coord = [
+            [int(target_q_start[j]) for j in self.gimbal_joint_idx[w]]
+            for w in range(self.nworld)
+        ]
+        self.gimbal_qd_dof = [
+            [int(qd_start[j]) for j in self.gimbal_joint_idx[w]]
+            for w in range(self.nworld)
+        ]
+        self.base_coord = [int(q_start[j]) for j in self.base_joint_idx]
+
+        articulation_world = self.model.articulation_world.numpy()
+        self.world_articulation_idx = {}
+        for w in range(self.nworld):
+            indices = np.flatnonzero(articulation_world == w).tolist()
+            if len(indices) != 1:
+                raise RuntimeError(f"world {w}: expected one articulation, got {indices}")
+            self.world_articulation_idx[w] = [int(i) for i in indices]
+
         body_labels = [str(x) for x in self.model.body_label]
+        body_world = self.model.body_world.numpy()
+        self.world_body_idx = {
+            w: np.flatnonzero(body_world == w).astype(np.int64).tolist()
+            for w in range(self.nworld)
+        }
         self.base_body = []
         for w in range(self.nworld):
             matches = [i for i, lab in enumerate(body_labels)
-                       if lab.startswith(f"w{w}_") and lab.endswith("base")]
+                       if int(body_world[i]) == w and lab.rsplit("/", 1)[-1] == "base"]
             if len(matches) != 1:
                 raise RuntimeError(f"world {w}: expected one base body, got {matches}")
             self.base_body.append(matches[0])
@@ -210,25 +275,59 @@ class NewtonXPBDGBackend:
 
     # ------------------------------------------------------------------
     def reset(self, env_ids=None, poses: np.ndarray | None = None) -> None:
-        ids = np.arange(self.nworld) if env_ids is None else np.asarray(env_ids, np.int64)
+        ids = np.arange(self.nworld, dtype=np.int64) if env_ids is None else np.asarray(env_ids, np.int64)
+        if ids.ndim != 1 or np.any(ids < 0) or np.any(ids >= self.nworld):
+            raise ValueError(f"env_ids must be a one-dimensional subset of [0, {self.nworld})")
+        if len(np.unique(ids)) != len(ids):
+            raise ValueError("env_ids must not contain duplicates")
         if poses is None:
-            poses = np.zeros((len(ids), 4))
-        q = self.model.joint_q.numpy().copy()
-        qd = np.zeros(self.model.joint_qd.shape, dtype=self.model.joint_qd.dtype)
-        for row, env_id in enumerate(ids):
-            x, y, yaw = float(poses[row, 0]), float(poses[row, 1]), float(poses[row, 2])
+            poses = np.zeros((len(ids), 4), dtype=np.float64)
+        else:
+            poses = np.asarray(poses, dtype=np.float64)
+        if poses.shape != (len(ids), 4):
+            raise ValueError(f"poses must have shape ({len(ids)}, 4), got {poses.shape}")
+        if not len(ids):
+            return
+
+        # Inverse kinematics starts from the live state so untouched worlds keep their
+        # current joint values. eval_fk below writes only the selected articulations.
+        self._newton.eval_ik(self.model, self.state_0, self.joint_q, self.joint_qd)
+        q = self.joint_q.numpy().copy()
+        qd = self.joint_qd.numpy().copy()
+        target_qd = self.control.joint_target_qd.numpy().copy()
+        target_q = self.control.joint_target_q.numpy().copy()
+        articulation_ids = []
+        for row, env_id_value in enumerate(ids):
+            env_id = int(env_id_value)
+            articulation_ids.extend(self.world_articulation_idx[env_id])
+            for q0, q1, qd0, qd1 in self.world_joint_slices[env_id]:
+                q[q0:q1] = self._initial_joint_q[q0:q1]
+                qd[qd0:qd1] = self._initial_joint_qd[qd0:qd1]
+            x, y, yaw = (float(poses[row, i]) for i in range(3))
             z = 0.15 + float(poses[row, 3])
-            c = self.base_coord
+            c = self.base_coord[env_id]
             q[c:c + 7] = [x, y, z, 0.0, 0.0, math.sin(yaw / 2.0), math.cos(yaw / 2.0)]
+            for side in ("left", "right"):
+                for dof in self.wheel_target_dof[side][env_id]:
+                    target_qd[dof] = 0.0
+            for g, coord in enumerate(self.gimbal_target_q_coord[env_id]):
+                target_q[coord] = self._initial_joint_q[self.gimbal_q_coord[env_id][g]]
             self.track_command[env_id] = 0.0
             self.gimbal_target[env_id] = 0.0
             self.wheel_target_qd[env_id] = 0.0
             self.last_effort[env_id] = 0.0
             self.step_count[env_id] = 0
-        self.model.joint_q.assign(q)
-        self.model.joint_qd.assign(qd)
-        self._newton.eval_fk(self.model, self.model.joint_q, self.model.joint_qd, self.state_0)
-        self._newton.eval_fk(self.model, self.model.joint_q, self.model.joint_qd, self.state_1)
+
+        self.joint_q.assign(q)
+        self.joint_qd.assign(qd)
+        indices = self._wp.array(np.asarray(articulation_ids, dtype=np.int32),
+                                 dtype=self._wp.int32, device=self.model.device)
+        self._newton.eval_fk(self.model, self.joint_q, self.joint_qd,
+                             self.state_0, indices=indices)
+        self._newton.eval_fk(self.model, self.joint_q, self.joint_qd,
+                             self.state_1, indices=indices)
+        self.control.joint_target_qd.assign(target_qd)
+        self.control.joint_target_q.assign(target_q)
         self.pi.reset(ids)
 
     def step(self, actions: np.ndarray) -> None:
@@ -242,28 +341,28 @@ class NewtonXPBDGBackend:
         self.gimbal_target += actions[:, 2:4] * np.array([GIMBAL_YAW_RATE, GIMBAL_PITCH_RATE]) * self.policy_dt
         self.gimbal_target[:, 0] = (self.gimbal_target[:, 0] + math.pi) % (2.0 * math.pi) - math.pi
         self.gimbal_target[:, 1] = np.clip(self.gimbal_target[:, 1], PITCH_MIN, PITCH_MAX)
-        # wheel velocity targets (per world dof index)
-        qd = self.control.joint_target_qd.numpy()
-        qp = self.control.joint_target_q.numpy()
+        # Write each world's targets through its actual Newton joint/coordinate map.
+        qd_target = self.control.joint_target_qd.numpy().copy()
+        q_target = self.control.joint_target_q.numpy().copy()
         for w in range(self.nworld):
             for side in ("left", "right"):
                 base = 0 if side == "left" else WHEELS_PER_SIDE
-                for k, ti in enumerate(self.wheel_target_dof[side]):
-                    qd[ti] = self.wheel_target_qd[w, base + k]
-            for g in range(2):
-                qp[self.gimbal_q_coord[g]] = self.gimbal_target[w, g]
-        self.control.joint_target_qd.assign(qd)
-        self.control.joint_target_q.assign(qp)
-        eff_target = np.clip(self.wheel_target_qd, -1e6, 1e6)
+                for k, dof in enumerate(self.wheel_target_dof[side][w]):
+                    qd_target[dof] = self.wheel_target_qd[w, base + k]
+            for g, coord in enumerate(self.gimbal_target_q_coord[w]):
+                q_target[coord] = self.gimbal_target[w, g]
+        self.control.joint_target_qd.assign(qd_target)
+        self.control.joint_target_q.assign(q_target)
         for _ in range(self.decimation):
-            self.solver.step(self.state_0, self.state_1, self.control, None, self.dt)
+            self.state_0.clear_forces()
+            self.collision_pipeline.collide(self.state_0, self.contacts)
+            self.solver.step(self.state_0, self.state_1, self.control, self.contacts, self.dt)
             self.state_0, self.state_1 = self.state_1, self.state_0
         self.step_count += 1
         self.last_effort = ff
 
     # ------------------------------------------------------------------
     def read(self) -> dict[str, np.ndarray]:
-        wp = self._wp
         self._newton.eval_ik(self.model, self.state_0, self.joint_q, self.joint_qd)
         jq = self.joint_q.numpy()
         jqd = self.joint_qd.numpy()
@@ -285,18 +384,33 @@ class NewtonXPBDGBackend:
             lin[w] = body_qd[b, 0:3]
             ang[w] = body_qd[b, 3:6]
             for side, base in (("left", 0), ("right", WHEELS_PER_SIDE)):
-                for k, dof in enumerate(self.wheel_dof[side]):
+                for k, dof in enumerate(self.wheel_dof[side][w]):
                     wheel_qd[w, base + k] = jqd[dof]
-            for g, c in enumerate(self.gimbal_q_coord):
-                gimbal_q[w, g] = jq[c]
-            gimbal_qd[w] = 0.0
+            for g, coord in enumerate(self.gimbal_q_coord[w]):
+                gimbal_q[w, g] = jq[coord]
+                gimbal_qd[w, g] = jqd[self.gimbal_qd_dof[w][g]]
         return {"pos": pos, "quat_wxyz": quat, "lin_vel": lin, "ang_vel": ang,
                 "wheel_qd": wheel_qd, "gimbal_q": gimbal_q, "gimbal_qd": gimbal_qd,
                 "effort": self.last_effort.copy(), "step_count": self.step_count.copy(),
                 "track_command": self.track_command.copy()}
 
     def identity(self) -> dict:
-        return {"engine": "newton_xpbd", "device": str(self.device),
+        shape_world = self.model.shape_world.numpy()
+        material_arrays = {field: getattr(self.model, f"shape_material_{field}").numpy()
+                           for field in ("mu", "ke", "kd")}
+        def material_values(field: str, world: int) -> list[float]:
+            values = material_arrays[field]
+            selected = values[shape_world == world]
+            if selected.size == 0:
+                raise RuntimeError(f"world {world} has no shape material values for {field}")
+            return sorted({float(value) for value in selected})
+        materials = {field: material_values(field, 0) for field in ("mu", "ke", "kd")}
+        for world in range(1, self.nworld):
+            if any(material_values(field, world) != values
+                   for field, values in materials.items()):
+                raise RuntimeError(f"world {world} material values differ from world 0")
+        return {"engine": "newton_xpbd", "backend_revision": "newton_xpbdg_v3_contacts_worldmap_materialcfg",
+                "device": str(self.model.device),
                 "newton": getattr(self._newton, "__version__", "?"),
                 "warp": self._wp.config.version, "mujoco": None,
                 "nworld": self.nworld, "dt_s": self.dt, "decimation": self.decimation,
@@ -304,7 +418,10 @@ class NewtonXPBDGBackend:
                 "joints": int(self.model.joint_count), "bodies": int(self.model.body_count),
                 "mimic_relations_per_world": int(self._mimic_relations),
                 "effort_limit_nm": self.effort_limit, "drive_kp": self.policy_kp,
-                "drive_ki": self.policy_ki, "mu": self.mu,
+                "drive_ki": self.policy_ki, "mu_requested": self.mu,
+                "shape_material_mu_values_per_world": materials["mu"],
+                "shape_material_ke_values_per_world": materials["ke"],
+                "shape_material_kd_values_per_world": materials["kd"],
                 "max_track_speed_mps": MAX_TRACK_SPEED,
                 "drive_semantics": "velocity targets (joint_target_qd) with target_kd=0.04; side PI not applied",
-                "note": "M3 GPU backend; CPU default path does not import newton/warp"}
+                "note": "World-indexed Newton XPBD backend; model, state, controls, and contacts share the requested device"}

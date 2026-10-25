@@ -397,10 +397,12 @@ class NativeFieldEnv(gym.Env):
             identity["solver"] = {
                 "kind": "newton_xpbd",
                 "iterations": 10,
-                "shape_ke": 2500.0,
-                "shape_kd": 100.0,
+                "shape_ke_values_per_world": identity["shape_material_ke_values_per_world"],
+                "shape_kd_values_per_world": identity["shape_material_kd_values_per_world"],
             }
-            identity["contact"] = {"shape_mu": float(self.backend.mu)}
+            identity["contact"] = {
+                "shape_mu_values_per_world": identity["shape_material_mu_values_per_world"]
+            }
         return identity
 
     def observation_config(self) -> dict:
