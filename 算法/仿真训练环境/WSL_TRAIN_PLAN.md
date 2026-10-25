@@ -17,8 +17,8 @@
 
 ## 尚未就绪（训练前必须关闭）
 
-1. **depth 160×88**：Warp 解析深度实现进行中；当前与 reference 对照 `MISMATCH`（valid ratio 0.0045 vs 0.4044、mask 不一致 33787；共同有效像素 p95 3.4e-5）——数值换算基本对，问题在有效像素/遮挡/越界判定。
-2. **detections 16×8**：仍未实现。
+1. **depth 160×88**：✅ 已完成（2026-10-25 11:20）：Warp 解析深度与独立 numpy caster 对照 6 位姿 × 14,080 像素，**mask 不一致 0、valid ratio 0.4044/0.4044、距离 max 2.06e-4 m、100% ≤1e-3 m**；provider 集成对照 max diff 0.0；`observation_provider` 新增 `depth_backend="analytic"`，`train_wsl.py --depth analytic` 已冒烟（iter2 collection 2.06 s、496 samples/s，contract depth=real）。剩余：与 Isaac RTX 的域差登记（未逐像素对照）。
+2. **detections 16×8**：仍为占位，实现中（按 env.py 的 64×64 detector/cone/drop/confidence/box 语义）。
 3. 因此 `capability_metrics_allowed=false`：**当前 WSL 训练只能叫 throughput/learning 冒烟，不能做能力结论**。
 
 ## 进入正式 WSL 训练的验收门
