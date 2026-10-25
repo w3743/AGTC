@@ -1,0 +1,68 @@
+{
+  "schema": "agtc-mjw-v6-multiworld-physics-prereg-v1",
+  "state": "prepared_not_run",
+  "prepared_local": "2026-10-25 22:18:25 +08:00",
+  "source_base_commit_claim": "8903e4e9",
+  "world_counts": [
+    1,
+    3,
+    64
+  ],
+  "policy_steps_per_world_count": 20,
+  "physics_substeps_per_policy_step": 50,
+  "policy_trajectory_substeps": 1000,
+  "dt_s": 0.001,
+  "decimation": 50,
+  "seed": 20261025,
+  "execution": {
+    "mode": "ordinary eager",
+    "cuda_graph": false,
+    "deterministic_mode_requested": null,
+    "warning_mask_requested": 3071,
+    "device": "cuda:0",
+    "python_unbuffered": true
+  },
+  "control_phases": {
+    "steps_1_to_4": "zero",
+    "steps_5_to_12": "fixed per-world targets",
+    "steps_13_to_20": "seeded ramp from fixed target to its inverse with small seeded perturbation",
+    "partial_reset": "immediately before ramp step 13, selected world only; verify unchanged other worlds and continue"
+  },
+  "gates": {
+    "contact_required_in_each_world": true,
+    "maximum_penetration_m": 0.015,
+    "max_abs_continuous_mimic_residual_rad": 0.001,
+    "mimic_authority_sources": [
+      "stored Newton reduced joint_q",
+      "actual MuJoCo Warp qpos"
+    ],
+    "eval_ik_or_wrapped_residual_is_not_authority": true,
+    "capacity_overflow_substeps": 0,
+    "all_checked_state_control_contact_and_effort_fields_finite": true,
+    "wheel_actual_qfrc_actuator_clamp_nm": {
+      "target": 2.0,
+      "absolute_tolerance": 1E-05
+    },
+    "gimbal_actual_qfrc_actuator_clamp_nm": {
+      "target": 1.0,
+      "absolute_tolerance": 1E-05
+    },
+    "partial_reset_untouched_worlds_byte_identical": true,
+    "partial_reset_pose_survives_next_substep_and_policy_step": true,
+    "between_world_readback_distinction": "Required for 3 and 64 worlds; N/A for 1 world",
+    "maximum_penetration_definition": "max(0, -minimum active internal contact.dist per world); checked on zero/fixed settling trajectory, where every world must have actual contacts",
+    "partial_reset_contact_requirement": "No immediate contact requirement after reset; require finite/control-valid first substep and first ramp policy step"
+  },
+  "reporting": [
+    "actual device and package versions",
+    "actual warn_overflow mask",
+    "actual per-world contact and penetration",
+    "continuous mimic residuals from stored reduced joint_q and MuJoCo Warp qpos",
+    "capacity and LS/outer counters separately",
+    "actual actuator effort",
+    "partial-reset fields compared",
+    "source hashes",
+    "policy substeps and diagnostic overhead separately"
+  ],
+  "no_gpu_launch_occurred": true
+}
