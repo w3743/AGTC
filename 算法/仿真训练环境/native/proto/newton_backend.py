@@ -49,35 +49,46 @@ GIMBAL_I = (0.05 * (0.06 ** 2 + 0.04 ** 2) / 12.0,
 GUIDE_I = WHEEL_I
 
 
-def _robot_builder(mu: float = 0.8):
+def _robot_builder(mu: float = 0.8, *, chassis_inertia=None, pitch_inertia=None,
+                   shape_gap: float | None = None, shape_margin: float | None = None):
     import newton
     import warp as wp
 
+    chassis_inertia = CHASSIS_I if chassis_inertia is None else tuple(chassis_inertia)
+    pitch_inertia = GIMBAL_I if pitch_inertia is None else tuple(pitch_inertia)
     b = newton.ModelBuilder(gravity=(0.0, 0.0, -9.81))
     b.default_shape_cfg.mu = float(mu)
     b.default_shape_cfg.ke = 2.5e3
     b.default_shape_cfg.kd = 100.0
-    b.add_ground_plane(cfg=newton.ModelBuilder.ShapeConfig(
-        density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)))
+
+    def shape_cfg():
+        values = {"density": 0.0, "ke": 2.5e3, "kd": 100.0, "mu": float(mu)}
+        if shape_gap is not None:
+            values["gap"] = float(shape_gap)
+        if shape_margin is not None:
+            values["margin"] = float(shape_margin)
+        return newton.ModelBuilder.ShapeConfig(**values)
+
+    b.add_ground_plane(cfg=shape_cfg())
     base = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15), q=wp.quat_identity()),
-                      mass=26.4, inertia=_diag_inertia(*CHASSIS_I), label="base")
+                      mass=26.4, inertia=_diag_inertia(*chassis_inertia), label="base")
     b.add_shape_box(base, hx=0.4, hy=0.15, hz=0.075,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="chassis")
+                    cfg=shape_cfg(), label="chassis")
     joints = [b.add_joint_free(child=base, label="base_free")]
     # gimbal yaw (z) -> pitch (y)
     yaw = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15 + GIMBAL_OFFSET_Z), q=wp.quat_identity()),
                      mass=0.05, inertia=_diag_inertia(*GIMBAL_I), label="gimbal_yaw")
     b.add_shape_box(yaw, hx=0.03, hy=0.03, hz=0.02,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="gimbal_yaw_geom")
+                    cfg=shape_cfg(), label="gimbal_yaw_geom")
     joints.append(b.add_joint_revolute(
         parent=base, child=yaw, axis=newton.Axis.Z,
         parent_xform=wp.transform(p=(0.0, 0.0, GIMBAL_OFFSET_Z), q=wp.quat_identity()),
         target_ke=1.0, target_kd=0.1, effort_limit=1.0,
         limit_lower=-YAW_LIMIT, limit_upper=YAW_LIMIT, label="gimbal_yaw_joint"))
     pitch = b.add_link(xform=wp.transform(p=(0.0, 0.0, 0.15 + GIMBAL_OFFSET_Z), q=wp.quat_identity()),
-                       mass=0.05, inertia=_diag_inertia(*GIMBAL_I), label="gimbal_pitch")
+                       mass=0.05, inertia=_diag_inertia(*pitch_inertia), label="gimbal_pitch")
     b.add_shape_box(pitch, hx=0.02, hy=0.02, hz=0.02,
-                    cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)), label="gimbal_pitch_geom")
+                    cfg=shape_cfg(), label="gimbal_pitch_geom")
     joints.append(b.add_joint_revolute(
         parent=yaw, child=pitch, axis=newton.Axis.Y,
         target_ke=1.0, target_kd=0.1, effort_limit=1.0,
@@ -92,7 +103,7 @@ def _robot_builder(mu: float = 0.8):
                               mass=WHEEL_MASS, inertia=_diag_inertia(*WHEEL_I), label=f"{side}_wheel_{i}_link")
             b.add_shape_cylinder(link, xform=wp.transform(p=(0.0, 0.0, 0.0), q=wheel_quat),
                                  radius=WHEEL_RADIUS, half_height=WHEEL_HALF_WIDTH,
-                                 cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)),
+                                 cfg=shape_cfg(),
                                  label=f"{side}_wheel_{i}_geom")
             j = b.add_joint_revolute(parent=base, child=link, axis=newton.Axis.Y,
                                      parent_xform=wp.transform(p=(x, y, WHEEL_Z), q=wp.quat_identity()),
@@ -107,7 +118,7 @@ def _robot_builder(mu: float = 0.8):
                           mass=GUIDE_MASS, inertia=_diag_inertia(*GUIDE_I), label=f"{side}_front_guide_link")
         b.add_shape_cylinder(link, xform=wp.transform(p=(0.0, 0.0, 0.0), q=wheel_quat),
                              radius=GUIDE_RADIUS, half_height=WHEEL_HALF_WIDTH,
-                             cfg=newton.ModelBuilder.ShapeConfig(density=0.0, ke=2.5e3, kd=100.0, mu=float(mu)),
+                             cfg=shape_cfg(),
                              label=f"{side}_front_guide_geom")
         j = b.add_joint_revolute(parent=base, child=link, axis=newton.Axis.Y,
                                  parent_xform=wp.transform(p=(GUIDE_X, y, GUIDE_Z), q=wp.quat_identity()),
@@ -131,6 +142,31 @@ def _robot_builder(mu: float = 0.8):
 class NewtonXPBDGBackend:
     """Batched Newton XPBD backend; the requested device is used for every model buffer."""
 
+    def _robot_builder_options(self) -> dict:
+        """Return an optional model profile; the XPBD default keeps its historical parameters."""
+        return {}
+
+    def _build_model(self, newton):
+        robot, _, _, relations = _robot_builder(mu=self.mu, **self._robot_builder_options())
+        self._mimic_relations = int(relations)
+        main = newton.ModelBuilder(gravity=(0.0, 0.0, -9.81))
+        main.add_world(robot, label_prefix="w0_")
+        if self.nworld > 1:
+            main.replicate(robot, world_count=self.nworld - 1,
+                           label_prefixes=[f"w{i}_" for i in range(1, self.nworld)])
+        return main.finalize(device=self.device)
+
+    def _build_solver(self, newton):
+        return newton.solvers.SolverXPBD(self.model, iterations=10)
+
+    def _build_contact_system(self, newton):
+        pipeline = newton.CollisionPipeline(self.model)
+        return pipeline, pipeline.contacts()
+
+    def _initialize_solver_state(self) -> None:
+        """Hook for solver-specific observables initialized before the first reset."""
+        return None
+
     def __init__(self, nworld: int = 64, *, dt: float = 1e-3, decimation: int = 50,
                  effort_limit: float = EFFORT_LIMIT, kp: float = DRIVE_KP, ki: float = 0.1,
                  mu: float = 0.8, seed: int = 0, device: str | None = None):
@@ -150,20 +186,15 @@ class NewtonXPBDGBackend:
         if device is None:
             device = "cuda:0" if wp.get_cuda_device_count() > 0 else "cpu"
         self.device = wp.get_device(device)
-        robot, wheel_joints, guide_joints, relations = _robot_builder(mu=self.mu)
-        main = newton.ModelBuilder(gravity=(0.0, 0.0, -9.81))
-        main.add_world(robot, label_prefix="w0_")
-        if self.nworld > 1:
-            main.replicate(robot, world_count=self.nworld - 1,
-                           label_prefixes=[f"w{i}_" for i in range(1, self.nworld)])
-        self.model = main.finalize(device=self.device)
+
+        self.model = self._build_model(newton)
+
         if str(self.model.device) != str(self.device):
             raise RuntimeError(
                 f"requested Newton device {self.device}, but model finalized on {self.model.device}"
             )
-        self.solver = newton.solvers.SolverXPBD(self.model, iterations=10)
-        self.collision_pipeline = newton.CollisionPipeline(self.model)
-        self.contacts = self.collision_pipeline.contacts()
+        self.solver = self._build_solver(newton)
+        self.collision_pipeline, self.contacts = self._build_contact_system(newton)
         self.state_0 = self.model.state()
         self.state_1 = self.model.state()
         self.control = self.model.control()
@@ -270,8 +301,21 @@ class NewtonXPBDGBackend:
         self.wheel_target_qd = np.zeros((self.nworld, 2 * WHEELS_PER_SIDE))
         self.last_effort = np.zeros((self.nworld, 2 * WHEELS_PER_SIDE))
         self.step_count = np.zeros(self.nworld, dtype=np.int64)
-        self._mimic_relations = relations
+        self._initialize_solver_state()
         self.reset()
+
+    def _sync_reset_joint_coordinates(self, ids: np.ndarray, q: np.ndarray, qd: np.ndarray) -> None:
+        """Update only selected worlds in both reduced-coordinate ping-pong states."""
+        for state in (self.state_0, self.state_1):
+            state_q = state.joint_q.numpy().copy()
+            state_qd = state.joint_qd.numpy().copy()
+            for world_value in ids:
+                world = int(world_value)
+                for q0, q1, qd0, qd1 in self.world_joint_slices[world]:
+                    state_q[q0:q1] = q[q0:q1]
+                    state_qd[qd0:qd1] = qd[qd0:qd1]
+            state.joint_q.assign(state_q)
+            state.joint_qd.assign(state_qd)
 
     # ------------------------------------------------------------------
     def reset(self, env_ids=None, poses: np.ndarray | None = None) -> None:
@@ -326,6 +370,7 @@ class NewtonXPBDGBackend:
                              self.state_0, indices=indices)
         self._newton.eval_fk(self.model, self.joint_q, self.joint_qd,
                              self.state_1, indices=indices)
+        self._sync_reset_joint_coordinates(ids, q, qd)
         self.control.joint_target_qd.assign(target_qd)
         self.control.joint_target_q.assign(target_q)
         self.pi.reset(ids)
