@@ -127,3 +127,10 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - `Policy/mean_std` 始终在 **0.049–0.051**（init_std=0.05），`Loss/entropy` 约 -6.3 且几乎不变。
 - 结合失败模式（越界/接近后不停稳），更像**探索不足 + 长时程停止奖励难以发现**，而不是优化崩溃或平台问题。
 - 可选的下一步（需新 trial，不能覆盖现有协议）：提高 init_std/熵系数（例如 0.1–0.15）、加强目标接近/停稳奖励塑形或课程；在 19.6× 的 perf 平台上这些实验成本已大幅降低。
+
+
+## 18. 系统休眠对训练计时的干扰（2026-10-25 10:46）
+
+- `cont4` 的 iteration 170 记录 collection=4316.0 s（约 72 分钟），原因是宿主在 09:34–10:46 进入休眠，训练进程被挂起；恢复后 GPU 时钟回到 2.1–2.4 GHz，后续 iteration 恢复 ~85 s。
+- 已启动用户级 keep-awake 辅助进程（`C:/pioneer/isaac-training/tools/keep_awake.ps1`，SetThreadExecutionState），后续长训练不再受空闲休眠影响。
+- 结论：该 4316 s 是休眠墙钟，不是训练变慢；不得当作性能退化或吞吐数据。

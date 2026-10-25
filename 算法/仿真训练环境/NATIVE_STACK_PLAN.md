@@ -19,7 +19,7 @@
 - Warp：4.19M 粒子 417 G updates/s；mesh BVH raycast 25.6k/262k/901k 射线 = 3.13/9.90/34.77 ms（8.2–26.5 M rays/s）。
 - 64 env × 18 joints（14 轮 + 2 云台 + 2 前导，6-DOF base，14 mimic）物理：newton XPBD GPU **33,244 env-steps/s**；MuJoCo CPU **17,271 env-steps/s**；mujoco-warp GPU 8,028（WSL 小批量 launch-bound）；ovphysx 64 clones 62,968（样例场景，非本车）。
 - 解析 raycast CUDA（400 线 LiDAR + 160×88 depth × 64 env）：LiDAR 0.157 ms/帧、depth 1.536 ms/帧，20 Hz 摊销 **0.271 ms/策略步**；同场景 mesh BVH 约 5.9 ms/步。
-- **平台上限**：96% 负载下 SM 时钟固定在约 663–690 MHz（最大 3003 MHz、P0、无 throttle reason、`power.limit=N/A`、功耗 ~5 W），疑似 vGPU/功耗墙；1.65 TFLOPS fp32 是该平台真实可复现数字，不能外推到裸机。
+- **平台上限**：高负载（~96%）时 SM 时钟会降到约 663–690 MHz、功耗读数仅 ~5 W（`power.limit=N/A`，读数不可信）；但负载 30–50% 时实测 2.1–2.4 GHz（窗口采样 max 2385 MHz），**不是固定锁频**，更像功率/热预算限制。原生栈负载峰值 2236 MHz；软件无法突破该预算；1.65 TFLOPS fp32 是该平台真实可复现数字，不能外推到裸机。
 
 ## 3. 迁移架构（M0 目标）
 
