@@ -25,6 +25,7 @@ from view_training_state import (
 ENV_COUNT = 4
 BODY_COUNT = 19
 STALE_AFTER_S = 5.0
+_LANGUAGE = "en"
 POLL_INTERVAL_S = 0.1
 STATUS_INTERVAL_S = 1.0
 FORBIDDEN_MODULE_PREFIXES = ("isaacsim", "isaaclab", "isaac_field", "omni", "torch")
@@ -406,7 +407,7 @@ def _load_scene(server: Any, packet: Mapping[str, Any], env_index: int) -> tuple
 
     goal = server.scene.add_icosphere("/goal/marker", radius=0.14, subdivisions=2,
                                       color=(50, 210, 130), side="double")
-    goal_label = server.scene.add_label("/goal/label", "Goal", font_size_mode="scene",
+    goal_label = server.scene.add_label("/goal/label", _t("Goal", "目标"), font_size_mode="scene",
                                         font_scene_height=0.2, position=(0.0, 0.0, 0.25))
     return geometry, frames, goal, goal_label
 
@@ -433,25 +434,35 @@ def _initial_camera_pose(packet: Mapping[str, Any]) -> tuple[tuple[float, ...], 
     return position, target
 
 
+def _t(english: str, chinese: str) -> str:
+    """Return the requested UI language label (default English, unchanged behavior)."""
+    return chinese if _LANGUAGE == "zh" else english
+
+
 def _panel_text(packet: Mapping[str, Any] | None, age: float | None, stale: bool,
                 env_index: int, proxy_count: int, error: str) -> str:
     if packet is None:
-        message = "Waiting for valid state data"
+        message = _t("Waiting for valid state data", "等待有效状态数据")
         if error:
             message += f"  ·  {html.escape(error[:160])}"
-        return f"**Training state**  \n{message}"
-    state = "STALE · holding last pose" if stale else "LIVE"
+        return _t(f"**Training state**  \n{message}", f"**训练状态**  \n{message}")
+    state = _t("STALE · holding last pose", "过期 · 保持最后位姿") if stale else _t("LIVE", "实时")
     if error and not stale:
-        state = "UPDATE UNAVAILABLE · holding last pose"
-    age_text = "unknown" if age is None else f"{age:.1f} s"
-    content = (
+        state = _t("UPDATE UNAVAILABLE · holding last pose", "更新不可用 · 保持最后位姿")
+    age_text = _t("unknown", "未知") if age is None else f"{age:.1f} s"
+    content = _t(
         f"**Training source:** {html.escape(packet['source'])}  \n"
         f"**Environment:** {env_index + 1} / {ENV_COUNT}  \n"
         f"**Sequence:** {packet['sequence']}  \n"
-        f"**State age:** {age_text}  ·  **{state}**"
+        f"**State age:** {age_text}  ·  **{state}**",
+        f"**训练来源：** {html.escape(packet['source'])}  \n"
+        f"**环境：** {env_index + 1} / {ENV_COUNT}  \n"
+        f"**序列号：** {packet['sequence']}  \n"
+        f"**状态延迟：** {age_text}  ·  **{state}**",
     )
     if proxy_count:
-        content += f"  \n{proxy_count} link markers use simple geometry proxies."
+        content += _t(f"  \n{proxy_count} link markers use simple geometry proxies.",
+                      f"  \n{proxy_count} 个连杆使用简单几何代理。")
     if error and not stale:
         content += f"  \n{html.escape(error[:160])}"
     return content
@@ -491,6 +502,8 @@ def _status_record(args: argparse.Namespace, packet: Mapping[str, Any] | None,
 
 
 def run(args: argparse.Namespace) -> None:
+    global _LANGUAGE
+    _LANGUAGE = getattr(args, "language", "en")
     from viser import ViserServer
     import numpy as np
 
@@ -501,7 +514,8 @@ def run(args: argparse.Namespace) -> None:
     background = np.empty((2, 2, 3), dtype=np.uint8)
     background[:] = (18, 24, 32)
     server.scene.set_background_image(background, format="png")
-    panel = server.gui.add_markdown("**Training state**  \nWaiting for state data")
+    panel = server.gui.add_markdown(_t("**Training state**  \nWaiting for state data",
+                                        "**训练状态**  \n等待状态数据"))
 
     reader = LatestPacketReader(Path(args.state_file))
     identity = PacketIdentity(args.expected_run_id, args.expected_source_pid)
@@ -591,6 +605,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8790)
     parser.add_argument("--env-index", type=int, default=0)
+    parser.add_argument("--language", default="en", choices=("en", "zh"),
+                        help="viewer UI language for panel labels (default en)")
     return parser
 
 
