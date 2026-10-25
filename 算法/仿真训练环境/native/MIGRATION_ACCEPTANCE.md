@@ -97,3 +97,12 @@ Newton使用盒体/圆柱轮代理、平面接触及速度目标驱动，未实�
 延续`perf/max-throughput`和[PR #24](https://github.com/w3743/AGTC/pull/24)，通过PR保留main历史，冻结材料不改写。模型按Git LFS保存；相关源、协议、argv、包版本、真实退出、checkpoint SHA与原始计时分别保留。来源工具读取明确HEAD tree并比较实际源raw bytes，不调用全工程git status；`relevant_sources_dirty=false`只描述所列源相对提交，不声称整个共享工作区干净。正式长测另保留源文件原字节快照及wrapper/protocol SHA。
 
 CPU标准库回归Windows32项全过，WSL32项中2项PowerShell专用跳过，其余通过；可选Newton实际物理6项另跑，不进入无GPU依赖的CI测试目录。Repository checks只验证仓库规则，最终状态以PR当前提交为准，不能代替本机训练验收。历史报告EOF的精确属性例外用于保留原字节，没有全局放宽检查。
+## 新候选进展（尚未正式验收）
+
+旧XPBD的带状态快照60轮有界诊断在源码提交6e4a4382正常exit0，60行metrics/零异常，未复现第58轮故障，因此没有失败状态可单步回放。这不能推翻独立正式trial的真实失败，也不消除已确认的惯量/限幅问题；诊断同步开销不作为吞吐数据。
+
+独立`/opt/venv_mujoco315_smoke`环境只覆盖MuJoCo/mujoco-warp为3.15.0，其余只读复用原环境；没有降级原`/opt/venv`。该版本组合符合Newton1.7要求。候选使用官方SolverMuJoCo的GPU路径、内部接触、显式zero gap/margin、正确惯量、实际执行器力矩、14个joint mimic（solref .004/1、solimp .999/.9999/.001/.5/2）及每world容量64 contacts/256 constraints。
+
+外部v4b原型3world × 120策略步（6000物理子步）及reset后首子步/完整策略步通过，exit0、stderr空，无非有限值和容量截断；轮组/云台最大实际力矩2/1Nm，连续关节坐标最大mimic残差约0.000169rad，未重置world状态/控制保持原字节。eval_ik可与真实连续qpos相差约4π，不能用其裸角差宣称十多弧度物理漂移。LS_ITERATIONS计数分别4999/4999/4699，它表示内层线搜索用尽8次，需如实记录；不是接触容量溢出。outer ITERATIONS计数0，最大outer迭代4/5/10（上限40），观测最大equality efc.pos约0.000193。
+
+[候选原始证据](acceptance/20261025_mjw_candidate/README.md)同时保留失败探针。该批prototype缺启动时完整源码冻结，运行后源码复制与依赖恢复的限制已在README标明，不冒充正式可复现输入快照。仓库版正在整理/验证，CUDA Graph和完整300轮尚未验收；V2协议仍为DRAFT且正式入口被冻结SHA/任务身份门拦截。
