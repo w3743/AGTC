@@ -1,60 +1,75 @@
-#!/bin/bash
-# Pilot/pre-protocol 4-seed evaluation (87010-87013) with contract-SHA verification.
-# Usage: bash run_eval_pilot_4seeds.sh <checkpoint.pt> [out_dir]
-# NOTE: eval must use the SAME backends as training; defaults below mirror the
-# protocol formal recipe (5ms/10, newton_xpbd, warp lidar, vqf, analytic depth/detections).
+#!/usr/bin/env bash
+# Four-seed pilot evaluation of a validated native V1.1 checkpoint.
+# Usage: bash run_eval_pilot_4seeds.sh <checkpoint.pt> [out_dir] [87010-87013]
 set -u
-export PATH=/usr/lib/wsl/lib:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-unset CUDA_VISIBLE_DEVICES
-cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train || exit 1
-CKPT=${1:?usage: run_eval_pilot_4seeds.sh <checkpoint.pt> [out_dir]}
-OUT=${2:-runs/eval_native_pilot_$(date +%Y%m%d_%H%M%S)}
+set -o pipefail
+
+CALLER_PWD=$PWD
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+if [[ -n "${PYTHON:-}" ]]; then
+    PYTHON_CMD=("$PYTHON")
+elif [[ -x "$SCRIPT_DIR/../../.venv/bin/python" ]]; then
+    PYTHON_CMD=("$SCRIPT_DIR/../../.venv/bin/python")
+elif [[ -x /opt/venv/bin/python ]]; then
+    PYTHON_CMD=(/opt/venv/bin/python)
+elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_CMD=("$(command -v python3)")
+elif command -v python >/dev/null 2>&1; then
+    PYTHON_CMD=("$(command -v python)")
+else
+    echo "ERROR: set PYTHON or install python3" >&2
+    exit 2
+fi
+if ! command -v "${PYTHON_CMD[0]}" >/dev/null 2>&1; then
+    echo "ERROR: PYTHON is not executable: ${PYTHON_CMD[0]}" >&2
+    exit 2
+fi
+
+if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "usage: run_eval_pilot_4seeds.sh <checkpoint.pt> [out_dir] [87010-87013]" >&2
+    exit 2
+fi
+CKPT=$1
+OUT=${2:-"$SCRIPT_DIR/runs/eval_native_pilot_$(date +%Y%m%d_%H%M%S)"}
 SEEDS=${3:-87010-87013}
-mkdir -p "$OUT"
+if [[ "$SEEDS" != "87010-87013" ]]; then
+    echo "ERROR: pilot evaluation seeds are frozen at 87010-87013" >&2
+    exit 2
+fi
+case "$CKPT" in /*) ;; *) CKPT="$CALLER_PWD/$CKPT" ;; esac
+case "$OUT" in /*) ;; *) OUT="$CALLER_PWD/$OUT" ;; esac
 
-echo "=== protocol SHA check ==="
-/opt/venv/bin/python protocol_sha.py --check || { echo "PROTOCOL_SHA_MISMATCH"; exit 2; }
+cd -- "$SCRIPT_DIR" || exit 1
+export PATH="/usr/lib/wsl/lib:$PATH"
+unset CUDA_VISIBLE_DEVICES
+mkdir -p -- "$OUT" || exit 1
 
-echo "=== checkpoint identity ==="
-/opt/venv/bin/python - "$CKPT" <<'PYEOF'
-import json, sys, torch
-ck = torch.load(sys.argv[1], map_location="cpu", weights_only=False)
-meta = {"policy_type": ck.get("policy_type"), "hidden_size": ck.get("hidden_size"),
-        "iteration": ck.get("iteration"),
-        "observation_contract_sha256": ck.get("observation_contract_sha256")}
-open("pilot_checkpoint_identity.tmp.json", "w", encoding="utf-8").write(json.dumps(meta))
-print(json.dumps(meta))
-PYEOF
-
-echo "=== evaluation (4 seeds, 1200 steps, 5ms/10) ==="
-/opt/venv/bin/python -u eval_native.py \
-    --checkpoint "$CKPT" --seeds "$SEEDS" --max-steps 1200 \
-    --device cuda --physics newton_xpbd --lidar warp --feedback vqf \
-    --depth analytic --detections analytic --detections-warp \
-    --sim-dt 0.005 --decimation 10 \
-    --out "$OUT" 2>&1 | tee "$OUT/eval.log" | grep -E 'EVAL_SUMMARY|EVAL_ROWS|EVAL_OUT|Error|Traceback'
-
-echo "=== contract SHA comparison (training checkpoint vs evaluation) ==="
-/opt/venv/bin/python - "$OUT" <<'PYEOF'
-import json, sys
-from pathlib import Path
-out = Path(sys.argv[1])
-ck = json.loads(Path("pilot_checkpoint_identity.tmp.json").read_text(encoding="utf-8"))
-ev = json.loads((out / "evaluation.json").read_text(encoding="utf-8"))
-ev_sha = ev["policy"]["observation_contract_sha256"]
-match = ck.get("observation_contract_sha256") == ev_sha
-verdict = {
-    "checkpoint_sha": ck.get("observation_contract_sha256"),
-    "evaluation_sha": ev_sha,
-    "match": bool(match),
-    "policy_type": ck.get("policy_type"),
-    "evaluation_policy_type": ev["policy"].get("policy_type"),
-    "physics": ev["physics"],
-    "protocol_sha256": json.loads(Path("PROTOCOL_NATIVE_V1.sha256").read_text(encoding="utf-8"))["protocol_sha256"],
-    "capability_metrics_allowed": ev["capability_metrics_allowed"],
+echo "=== protocol SHA check (V1.1) ==="
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/protocol_sha.py" --check || {
+    echo "PROTOCOL_SHA_MISMATCH" >&2
+    exit 2
 }
-(out / "sha_check.json").write_text(json.dumps(verdict, indent=2, ensure_ascii=False), encoding="utf-8")
-print(json.dumps(verdict))
-PYEOF
-rm -f pilot_checkpoint_identity.tmp.json
-echo "EVAL_DIR=$OUT"
+echo "=== checkpoint contract preflight ==="
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/trial_checks.py" preflight-checkpoint \
+    --checkpoint "$CKPT" --out "$OUT" \
+    --protocol-sha "$SCRIPT_DIR/PROTOCOL_NATIVE_V1.1.sha256" || exit $?
+
+echo "=== evaluation (4 seeds, 1200 steps, official 1ms/50) ==="
+"${PYTHON_CMD[@]}" -u "$SCRIPT_DIR/eval_native.py" \
+    --checkpoint "$CKPT" --seeds "$SEEDS" --max-steps 1200 \
+    --device cuda --physics newton_xpbd --task-backend fast_stop_v2 \
+    --lidar warp --feedback vqf --depth analytic --detections analytic --detections-warp \
+    --sim-dt 0.001 --decimation 50 --out "$OUT" 2>&1 | tee "$OUT/eval.log"
+PIPE_STATUS=("${PIPESTATUS[@]}")
+EVAL_RC=${PIPE_STATUS[0]}
+TEE_RC=${PIPE_STATUS[1]}
+echo "EVAL_DIR=$OUT eval_exit=$EVAL_RC tee_exit=$TEE_RC"
+
+if [[ $EVAL_RC -ne 0 ]]; then
+    exit "$EVAL_RC"
+fi
+if [[ $TEE_RC -ne 0 ]]; then
+    exit 5
+fi
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/trial_checks.py" check-evaluation \
+    --out "$OUT" --seeds 87010,87011,87012,87013

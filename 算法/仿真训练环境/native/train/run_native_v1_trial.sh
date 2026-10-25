@@ -1,63 +1,106 @@
-#!/bin/bash
-# Formal native V1.1 trial runner: verifies the frozen protocol SHA (V1.1), creates the
-# trial dir, copies the protocol, runs the formal LSTM recipe on the official 1 ms/50
-# physics, and writes trial_manifest.json.
-# Usage: bash run_native_v1_trial.sh <tag> [extra train_wsl args...]
-# Optional env: SIM_DT (default 0.001), DECIMATION (default 50), PYTHON (default /opt/venv/bin/python).
+#!/usr/bin/env bash
+# Frozen native V1.1 training recipe. Runtime paths are relative to this script.
+# Optional: PYTHON, SIM_DT (must be 0.001), DECIMATION (must be 50).
 set -u
-export PATH=/usr/lib/wsl/lib:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-unset CUDA_VISIBLE_DEVICES
-cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train || exit 1
-TAG=${1:?usage: run_native_v1_trial.sh <tag> [extra args]}
-shift || true
-PYTHON=${PYTHON:-/opt/venv/bin/python}
-STAMP=$(date +%Y%m%d_%H%M%S)
-TRIAL="runs/native_v1_1_${TAG}_${STAMP}"
-mkdir -p "$TRIAL"
+set -o pipefail
 
-echo "=== protocol SHA check (V1.1) ==="
-"$PYTHON" protocol_sha.py --check || { echo "PROTOCOL_SHA_MISMATCH"; exit 2; }
-cp PROTOCOL_NATIVE_V1.1.md PROTOCOL_NATIVE_V1.1.sha256 PROTOCOL_NATIVE_V1.md PROTOCOL_NATIVE_V1.sha256 "$TRIAL/"
+CALLER_PWD=$PWD
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+if [[ -n "${PYTHON:-}" ]]; then
+    PYTHON_CMD=("$PYTHON")
+elif [[ -x "$SCRIPT_DIR/../../.venv/bin/python" ]]; then
+    PYTHON_CMD=("$SCRIPT_DIR/../../.venv/bin/python")
+elif [[ -x /opt/venv/bin/python ]]; then
+    PYTHON_CMD=(/opt/venv/bin/python)
+elif command -v python3 >/dev/null 2>&1; then
+    PYTHON_CMD=("$(command -v python3)")
+elif command -v python >/dev/null 2>&1; then
+    PYTHON_CMD=("$(command -v python)")
+else
+    echo "ERROR: set PYTHON or install python3" >&2
+    exit 2
+fi
+if ! command -v "${PYTHON_CMD[0]}" >/dev/null 2>&1; then
+    echo "ERROR: PYTHON is not executable: ${PYTHON_CMD[0]}" >&2
+    exit 2
+fi
 
+if [[ $# -lt 1 ]]; then
+    echo "usage: run_native_v1_trial.sh <tag> [--live-state-file path] [--live-state-interval n] [--live-state-spacing m]" >&2
+    exit 2
+fi
+TAG=$1
+shift
 SIM_DT=${SIM_DT:-0.001}
 DECIMATION=${DECIMATION:-50}
-ARGS=(--policy lstm --num-envs 64 --num-steps 32 --iterations 300 --seed 0 --threads 8
-      --device cuda --physics newton_xpbd --task-backend fast_stop_v2 --lidar warp --feedback vqf
-      --depth analytic --detections analytic --detections-warp
-      --sim-dt "${SIM_DT}" --decimation "${DECIMATION}" --profile --save-interval 20
-      --out "$TRIAL")
-echo "PHYSICS sim_dt=${SIM_DT} decimation=${DECIMATION}" | tee "$TRIAL/physics.txt"
-echo "$(printf '%q ' "${ARGS[@]}" "$@")" > "$TRIAL/cli_args.txt"
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/trial_checks.py" require-official-physics \
+    --sim-dt "$SIM_DT" --decimation "$DECIMATION" || exit 2
+
+EXTRA_ARGS=()
+declare -A EXTRA_SEEN=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --live-state-file|--live-state-interval|--live-state-spacing)
+            flag=$1
+            shift
+            if [[ $# -eq 0 || -z "$1" ]]; then
+                echo "ERROR: $flag requires a value" >&2
+                exit 2
+            fi
+            if [[ -n "${EXTRA_SEEN[$flag]+x}" ]]; then
+                echo "ERROR: duplicate viewer option $flag" >&2
+                exit 2
+            fi
+            EXTRA_SEEN[$flag]=1
+            EXTRA_ARGS+=("$flag" "$1")
+            shift
+            ;;
+        *)
+            echo "ERROR: unsupported extra argument: $1" >&2
+            echo "Only live-state viewer options may be added to the frozen recipe." >&2
+            exit 2
+            ;;
+    esac
+done
+
+cd -- "$SCRIPT_DIR" || exit 1
+export PATH="/usr/lib/wsl/lib:$PATH"
+unset CUDA_VISIBLE_DEVICES
+STAMP=$(date +%Y%m%d_%H%M%S)
+TRIAL="runs/native_v1_1_${TAG}_$STAMP"
+mkdir -p -- "$TRIAL" || exit 1
+
+echo "=== protocol SHA check (V1.1) ==="
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/protocol_sha.py" --check || {
+    echo "PROTOCOL_SHA_MISMATCH" >&2
+    exit 2
+}
+cp -- PROTOCOL_NATIVE_V1.1.md PROTOCOL_NATIVE_V1.1.sha256 PROTOCOL_NATIVE_V1.md PROTOCOL_NATIVE_V1.sha256 "$TRIAL/" || exit 1
+
+ARGS=(--policy lstm --lstm-hidden 512 --num-envs 64 --num-steps 32 --iterations 300
+      --seed 0 --threads 8 --device cuda --physics newton_xpbd --task-backend fast_stop_v2
+      --lidar warp --feedback vqf --depth analytic --detections analytic --detections-warp
+      --sim-dt 0.001 --decimation 50 --save-interval 20 --out "$TRIAL")
+printf 'PHYSICS sim_dt=0.001 decimation=50\n' | tee "$TRIAL/physics.txt"
+printf '%q ' "${PYTHON_CMD[@]}" "$SCRIPT_DIR/train_wsl.py" -u "${ARGS[@]}" "${EXTRA_ARGS[@]}" > "$TRIAL/cli_args.txt"
+printf '\n' >> "$TRIAL/cli_args.txt"
 
 echo "=== formal trial train: $TRIAL ==="
-"$PYTHON" -u train_wsl.py "${ARGS[@]}" "$@" > "$TRIAL/train.log" 2>&1
-RC=$?
-tail -5 "$TRIAL/train.log"
+"${PYTHON_CMD[@]}" -u "$SCRIPT_DIR/train_wsl.py" "${ARGS[@]}" "${EXTRA_ARGS[@]}" 2>&1 | tee "$TRIAL/train.log"
+PIPE_STATUS=("${PIPESTATUS[@]}")
+TRAIN_RC=${PIPE_STATUS[0]}
+TEE_RC=${PIPE_STATUS[1]}
 
-"$PYTHON" - "$TRIAL" "$RC" <<'PYEOF'
-import json, os, sys
-from datetime import datetime
-from pathlib import Path
-trial = Path(sys.argv[1]); rc = int(sys.argv[2])
-protocol = json.loads((trial / "PROTOCOL_NATIVE_V1.1.sha256").read_text(encoding="utf-8"))
-contract_path = trial / "observation_contract.json"
-contract = json.loads(contract_path.read_text(encoding="utf-8")) if contract_path.exists() else {}
-manifest = {
-    "protocol_sha256": protocol["protocol_sha256"],
-    "protocol_file": "PROTOCOL_NATIVE_V1.1.md",
-    "protocol_version": "V1.1",
-    "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
-    "cli_args_file": "cli_args.txt",
-    "exit_code": rc,
-    "observation_contract_sha256": contract.get("observation_contract_sha256"),
-    "capability_metrics_allowed": False,
-    "phase": "formal_native_v1_trial",
-    "physics": {"sim_dt": float(os.environ.get("SIM_DT", "0.001")),
-                "decimation": int(os.environ.get("DECIMATION", "50")),
-                "experimental": False},
-    "checkpoints": sorted(p.name for p in trial.glob("*.pt")),
-}
-(trial / "trial_manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
-print("TRIAL_MANIFEST " + json.dumps(manifest))
-PYEOF
-echo "TRIAL_DIR=$TRIAL exit=$RC"
+"${PYTHON_CMD[@]}" "$SCRIPT_DIR/trial_checks.py" write-manifest \
+    --trial-dir "$TRIAL" --train-exit "$TRAIN_RC" \
+    --protocol-sha "$SCRIPT_DIR/PROTOCOL_NATIVE_V1.1.sha256"
+MANIFEST_RC=$?
+echo "TRIAL_DIR=$TRIAL train_exit=$TRAIN_RC tee_exit=$TEE_RC manifest_check=$MANIFEST_RC"
+
+if [[ $TRAIN_RC -ne 0 ]]; then
+    exit "$TRAIN_RC"
+fi
+if [[ $TEE_RC -ne 0 ]]; then
+    exit 5
+fi
+exit "$MANIFEST_RC"
