@@ -129,4 +129,13 @@
 - 详细命令与流程见使用说明.md，当前项目状态见ISAAC_LAB.md；更早历史在 `results/project_history/AGENTS_before_20261017_batch8_cleanup.md` 及本批文档归档。历史PID/源码计数/“当前”只属于相应时点，不覆盖最新记录。
 
 
+## 2026-10-25 第二十四批：训练平台性能改造（实测）
 
+- 性能开关：`isaac_field/env.py` 增加 `ISAAC_FIELD_PERF_PHYSICS=1`，允许 `sim.dt*decimation==task.dt` 的任意组合（默认不设置时仍强制 1 ms/50、solver 40/1、render_interval=50，行为不变）。
+- 探针实测：32 env（dt=1 ms/dec=50）约 5.0×；32 env + dt=5 ms/dec=10 约 19×（41.7 samples/s）。
+- 正式训练：`perf_20261025_n32_dt5`，32 env × 128 steps × 96 iter = 393,216 transitions，2h33m（9218.8 s），平均 42.65 samples/s；`model_95.pt` SHA `710ccb94…`，权重有限。续训链 model_95→112→128→（cont3 目标 287）。
+- 策略评估（12 m 场地、5 ms 物理、非冻结 1 ms 协议）：model_95 2 场景 0/2；model_128 4 场景 0/4（2 个 outside_or_overturned、2 个 time_limit，平均最终距离 6.59 m）。**非 strict-pass、不构成能力结论**；平台吞吐已解决，策略质量仍需更长训练/任务调整。
+- 原生栈（WSL2 Ubuntu-24.04-Arm64）：M0 CPU 端到端 81.7 samples/s（1.9×）；M3a 246.5（5.8×）、M3b 299.6–315.7（7.0–7.4×，稳态口径）；M1 观测等价 lidar numpy 逐位一致、state 4.05e-7、feedback 直通 2.9e-8、VQF 旁路 0.0；remaining blockers 为 depth/detections 占位（估 6–9 人日）。
+- 平台上限：96% 负载下 SM 时钟约 663–690 MHz（最大 3003）、`power.limit=N/A`、功耗读数不可信，疑似 vGPU/功耗墙；1.65 TFLOPS fp32 为真实可复现数字，不能外推到裸机。
+- 文档：`PERF_PLATFORM.md`（性能/训练/评估记录）、`NATIVE_STACK_PLAN.md`（迁移架构、基准、M0–M4 门禁、风险）；分支 `perf/max-throughput` 已推送（最新提交见 git log）。
+- 范围整理：本轮改动集中在性能相关源文件/评估脚本/文档；冻结协议、历史 results、检查点原始字节未改写；临时评估脚本保留在 trial 目录。
