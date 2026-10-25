@@ -107,7 +107,8 @@ $trainArgs = @(
     "--iterations", "300", "--seed", "0", "--threads", "8", "--device", "cuda",
     "--physics", "newton_xpbd", "--task-backend", "fast_stop_v2", "--lidar", "warp",
     "--feedback", "vqf", "--depth", "analytic", "--detections", "analytic", "--detections-warp",
-    "--sim-dt", "0.001", "--decimation", "50", "--save-interval", "20", "--out", $trial
+    "--sim-dt", "0.001", "--decimation", "50", "--save-interval", "20",
+    "--nonfinite-limit", "0", "--out", $trial
 ) + $viewerArgs
 "PHYSICS sim_dt=0.001 decimation=50" | Set-Content -LiteralPath (Join-Path $trial "physics.txt") -Encoding utf8
 (($Python, "-u", (Join-Path $here "train_wsl.py")) + $trainArgs) -join " " |

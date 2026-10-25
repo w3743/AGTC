@@ -80,7 +80,7 @@ cp -- PROTOCOL_NATIVE_V1.1.md PROTOCOL_NATIVE_V1.1.sha256 PROTOCOL_NATIVE_V1.md 
 ARGS=(--policy lstm --lstm-hidden 512 --num-envs 64 --num-steps 32 --iterations 300
       --seed 0 --threads 8 --device cuda --physics newton_xpbd --task-backend fast_stop_v2
       --lidar warp --feedback vqf --depth analytic --detections analytic --detections-warp
-      --sim-dt 0.001 --decimation 50 --save-interval 20 --out "$TRIAL")
+      --sim-dt 0.001 --decimation 50 --save-interval 20 --nonfinite-limit 0 --out "$TRIAL")
 printf 'PHYSICS sim_dt=0.001 decimation=50\n' | tee "$TRIAL/physics.txt"
 printf '%q ' "${PYTHON_CMD[@]}" "$SCRIPT_DIR/train_wsl.py" -u "${ARGS[@]}" "${EXTRA_ARGS[@]}" > "$TRIAL/cli_args.txt"
 printf '\n' >> "$TRIAL/cli_args.txt"

@@ -24,6 +24,12 @@ EXPECTED_CHANNELS = {
     "detections": "analytic_detector_warp",
     "feedback": "vqf_reference",
 }
+FORMAL_ITERATIONS = 300
+FORMAL_SAMPLES = 64 * 32
+METRIC_FLOAT_FIELDS = (
+    "wall_s", "collection_s", "policy_act_s", "env_step_s", "learning_s",
+    "samples_per_s", "end_to_end_samples_per_s", "mean_reward", "ppo_loss",
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -127,6 +133,122 @@ def _contract_errors(contract: dict[str, Any], identity: dict[str, Any]) -> tupl
     return errors, digest
 
 
+def _contains_nonfinite(value: Any) -> bool:
+    if isinstance(value, float):
+        return not math.isfinite(value)
+    if isinstance(value, dict):
+        return any(_contains_nonfinite(key) or _contains_nonfinite(item) for key, item in value.items())
+    if isinstance(value, (list, tuple)):
+        return any(_contains_nonfinite(item) for item in value)
+    return False
+
+
+def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
+    errors: list[str] = []
+    summary_path = trial / "summary.json"
+    if not summary_path.is_file():
+        errors.append("summary.json is missing")
+    else:
+        summary_read = False
+        try:
+            summary = _read_json(summary_path)
+            summary_read = True
+        except (OSError, UnicodeError, ValueError, TypeError) as exc:
+            summary = {}
+            errors.append(f"summary.json is unreadable: {exc}")
+        if summary_read:
+            if _contains_nonfinite(summary):
+                errors.append("summary.json contains non-finite fields")
+            expected_summary = {
+                "iterations": FORMAL_ITERATIONS,
+                "start_iteration": 0,
+                "end_iteration": FORMAL_ITERATIONS,
+                "num_envs": 64,
+                "num_steps": 32,
+                "device": "cuda",
+                "physics": "newton_xpbd",
+            }
+            for name, expected in expected_summary.items():
+                if summary.get(name) != expected:
+                    errors.append(f"summary.json {name} is not {expected}")
+            if summary.get("observation_contract_sha256") != digest:
+                errors.append("summary.json observation contract SHA does not match the trial")
+            wall = summary.get("total_wall_s")
+            if (not isinstance(wall, (int, float)) or isinstance(wall, bool)
+                    or not math.isfinite(float(wall)) or wall <= 0):
+                errors.append("summary.json total_wall_s is missing, non-finite, or non-positive")
+
+    metrics_path = trial / "metrics.jsonl"
+    rows: list[Any] = []
+    if not metrics_path.is_file():
+        errors.append("metrics.jsonl is missing")
+    else:
+        try:
+            with metrics_path.open("r", encoding="utf-8-sig") as stream:
+                for line_number, line in enumerate(stream, 1):
+                    if not line.strip():
+                        errors.append(f"metrics.jsonl line {line_number} is blank")
+                        continue
+                    try:
+                        rows.append(json.loads(line))
+                    except (json.JSONDecodeError, TypeError) as exc:
+                        errors.append(f"metrics.jsonl line {line_number} is invalid JSON: {exc}")
+        except (OSError, UnicodeError) as exc:
+            errors.append(f"metrics.jsonl is unreadable: {exc}")
+    if len(rows) != FORMAL_ITERATIONS:
+        errors.append(f"metrics.jsonl has {len(rows)} rows; expected {FORMAL_ITERATIONS}")
+    for index, row in enumerate(rows, 1):
+        if not isinstance(row, dict):
+            errors.append(f"metrics.jsonl row {index} is not an object")
+            continue
+        if _contains_nonfinite(row):
+            errors.append(f"metrics.jsonl row {index} contains non-finite fields")
+        if row.get("iter") != index:
+            errors.append(f"metrics.jsonl row {index} has unexpected iteration {row.get('iter')!r}")
+        if type(row.get("samples")) is not int or row.get("samples") != FORMAL_SAMPLES:
+            errors.append(f"metrics.jsonl row {index} samples is not {FORMAL_SAMPLES}")
+        if row.get("observation_contract_sha256") != digest:
+            errors.append(f"metrics.jsonl row {index} observation contract SHA does not match the trial")
+        for name in METRIC_FLOAT_FIELDS:
+            value = row.get(name)
+            if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                    or not math.isfinite(float(value))):
+                errors.append(f"metrics.jsonl row {index} {name} is missing or non-finite")
+        for name in ("wall_s", "collection_s", "policy_act_s", "env_step_s", "learning_s"):
+            value = row.get(name)
+            if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(float(value)) and value < 0:
+                errors.append(f"metrics.jsonl row {index} {name} is negative")
+        for name in ("samples_per_s", "end_to_end_samples_per_s"):
+            value = row.get(name)
+            if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(float(value)) and value <= 0:
+                errors.append(f"metrics.jsonl row {index} {name} is non-positive")
+        for name in ("nonfinite_env_resets", "nonfinite_actions"):
+            value = row.get(name)
+            if type(value) is not int:
+                errors.append(f"metrics.jsonl row {index} {name} is missing or not an integer")
+            elif value != 0:
+                errors.append(f"metrics.jsonl row {index} reports {name}={value}")
+
+    events_path = trial / "nonfinite_events.jsonl"
+    if events_path.exists():
+        try:
+            event_bytes = events_path.read_bytes()
+            if event_bytes:
+                errors.append(f"nonfinite_events.jsonl is non-empty ({len(event_bytes)} bytes)")
+        except OSError as exc:
+            errors.append(f"nonfinite_events.jsonl is unreadable: {exc}")
+
+    failure_path = trial / "failure.json"
+    if failure_path.exists():
+        try:
+            failure = _read_json(failure_path)
+            reason = failure.get("reason")
+            errors.append(f"failure.json is present (reason={reason!r})")
+        except (OSError, UnicodeError, ValueError, TypeError) as exc:
+            errors.append(f"failure.json is present but unreadable: {exc}")
+    return errors
+
+
 def _protocol_sha(path: Path) -> str:
     info = _read_json(path)
     digest = info.get("protocol_sha256")
@@ -154,6 +276,7 @@ def write_manifest(trial: Path, train_exit: int, protocol_sha_path: Path) -> int
     if contract and identity:
         contract_errors, digest = _contract_errors(contract, identity)
         errors.extend(contract_errors)
+    errors.extend(_trial_evidence_errors(trial, digest))
 
     checkpoint_names = sorted(p.name for p in trial.glob("*.pt") if p.is_file())
     if train_exit == 0 and not checkpoint_names:
@@ -220,6 +343,9 @@ def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path) -
         raise ValueError("checkpoint trial manifest protocol identity is invalid")
     if manifest.get("exit_code") != 0 or manifest.get("formal_eligible") is not True:
         raise ValueError("checkpoint trial is not a successful formal V1.1 trial")
+    evidence_errors = _trial_evidence_errors(trial, digest)
+    if evidence_errors:
+        raise ValueError("checkpoint trial run evidence rejected: " + "; ".join(evidence_errors))
     if manifest.get("task_backend") != "fast_stop_v2" or manifest.get("task_identity_sha256") != digest:
         raise ValueError("checkpoint trial manifest task identity does not match its contract")
     if not _same_number((manifest.get("physics") or {}).get("sim_dt"), 0.001):
@@ -248,15 +374,6 @@ def preflight_checkpoint(checkpoint: Path, out: Path, protocol_sha_path: Path) -
     print("CHECKPOINT_PREFLIGHT " + json.dumps(proof, ensure_ascii=False, sort_keys=True))
     return 0
 
-
-def _contains_nonfinite(value: Any) -> bool:
-    if isinstance(value, float):
-        return not math.isfinite(value)
-    if isinstance(value, dict):
-        return any(_contains_nonfinite(key) or _contains_nonfinite(item) for key, item in value.items())
-    if isinstance(value, (list, tuple)):
-        return any(_contains_nonfinite(item) for item in value)
-    return False
 
 def check_evaluation(out: Path, expected_seeds: list[int]) -> int:
     proof = _read_json(out / "checkpoint_preflight.json")

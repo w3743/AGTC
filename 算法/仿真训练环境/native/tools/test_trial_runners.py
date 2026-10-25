@@ -90,13 +90,54 @@ def emit_contract(out):
     (out / "identity.json").write_text(json.dumps(identity), encoding="utf-8")
     (out / "latest.pt").write_bytes(b"mock checkpoint payload")
 
+def emit_training_evidence(out):
+    contract = json.loads((out / "observation_contract.json").read_text(encoding="utf-8"))
+    digest = contract["task_identity_sha256"]
+    reset_count = int(os.environ.get("MOCK_NONFINITE_RESET", "0"))
+    metric_rows = int(os.environ.get("MOCK_METRIC_ROWS", "300"))
+    metric_samples = int(os.environ.get("MOCK_METRIC_SAMPLE", "2048"))
+    metric_digest = os.environ.get("MOCK_METRIC_SHA", digest)
+    rows = []
+    for iteration in range(1, metric_rows + 1):
+        resets = reset_count if iteration == 185 else 0
+        mean_reward = float("nan") if os.environ.get("MOCK_METRIC_NAN") == "1" and iteration == 1 else 0.2
+        rows.append({
+            "iter": iteration, "wall_s": 0.1, "collection_s": 0.04,
+            "policy_act_s": 0.01, "env_step_s": 0.02, "learning_s": 0.05,
+            "samples": metric_samples, "samples_per_s": 51200.0,
+            "end_to_end_samples_per_s": 20480.0, "rss_mb": 128.0,
+            "mean_reward": mean_reward, "ppo_loss": 0.1,
+            "observation_contract_sha256": metric_digest, "phase": "wsl_training_prep",
+            "policy_type": "lstm", "capability_metrics_allowed": False,
+            "nonfinite_env_resets": resets, "nonfinite_actions": 0,
+        })
+    (out / "metrics.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    if reset_count:
+        (out / "nonfinite_events.jsonl").write_text(
+            json.dumps({"iter": 185, "step": 15, "env_nonfinite": reset_count,
+                        "action_nonfinite": 0}) + "\n", encoding="utf-8")
+    failure_reason = os.environ.get("MOCK_FAILURE_REASON")
+    if failure_reason:
+        (out / "failure.json").write_text(
+            json.dumps({"reason": failure_reason, "iteration": 185}), encoding="utf-8")
+    summary = {
+        "iterations": 300, "start_iteration": 0, "end_iteration": 300,
+        "num_envs": 64, "num_steps": 32, "device": "cuda",
+        "physics": "newton_xpbd", "total_wall_s": 30.0,
+        "observation_contract_sha256": digest,
+    }
+    (out / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
+
 if args and Path(args[0]).name == "trial_checks.py":
     raise SystemExit(subprocess.call([sys.executable, args[0], *args[1:]]))
 if args and Path(args[0]).name == "protocol_sha.py":
     print(json.dumps({"match": True}))
     raise SystemExit(0)
 if len(args) >= 2 and args[0] == "-u" and Path(args[1]).name == "train_wsl.py":
-    emit_contract(Path(option("--out")))
+    out = Path(option("--out"))
+    emit_contract(out)
+    emit_training_evidence(out)
     for index in range(12):
         print(f"TRAIN_LINE_{index:02d}", flush=True)
     raise SystemExit(int(os.environ.get("MOCK_TRAIN_EXIT", "0")))
@@ -192,6 +233,30 @@ def contract_fixture(backend: str = "fast_stop_v2") -> tuple[dict, dict]:
         },
     }
     return contract, identity
+
+
+def write_clean_evidence(trial: Path, digest: str) -> None:
+    rows = []
+    for iteration in range(1, 301):
+        rows.append({
+            "iter": iteration, "wall_s": 0.1, "collection_s": 0.04,
+            "policy_act_s": 0.01, "env_step_s": 0.02, "learning_s": 0.05,
+            "samples": 2048, "samples_per_s": 51200.0,
+            "end_to_end_samples_per_s": 20480.0, "rss_mb": 128.0,
+            "mean_reward": 0.2, "ppo_loss": 0.1,
+            "observation_contract_sha256": digest, "phase": "wsl_training_prep",
+            "policy_type": "lstm", "capability_metrics_allowed": False,
+            "nonfinite_env_resets": 0, "nonfinite_actions": 0,
+        })
+    (trial / "metrics.jsonl").write_text(
+        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+    summary = {
+        "iterations": 300, "start_iteration": 0, "end_iteration": 300,
+        "num_envs": 64, "num_steps": 32, "device": "cuda",
+        "physics": "newton_xpbd", "total_wall_s": 30.0,
+        "observation_contract_sha256": digest,
+    }
+    (trial / "summary.json").write_text(json.dumps(summary), encoding="utf-8")
 
 
 class TrialRunnerTests(unittest.TestCase):
@@ -295,6 +360,7 @@ class TrialRunnerTests(unittest.TestCase):
         (trial / "observation_contract.json").write_text(json.dumps(contract), encoding="utf-8")
         (trial / "identity.json").write_text(json.dumps(identity), encoding="utf-8")
         (trial / "latest.pt").write_bytes(b"mock checkpoint payload")
+        write_clean_evidence(trial, contract["task_identity_sha256"])
         manifest = {
             "protocol_version": "V1.1", "protocol_sha256": PROTOCOL_SHA,
             "phase": "formal_native_v1_trial", "exit_code": 0, "formal_eligible": True,
@@ -317,6 +383,40 @@ class TrialRunnerTests(unittest.TestCase):
         self.assertTrue(manifest["formal_eligible"])
         self.assertEqual(manifest["task_backend"], "fast_stop_v2")
         self.assertEqual(manifest["physics"], {"sim_dt": 0.001, "decimation": 50, "experimental": False})
+        self.assertIn("--nonfinite-limit 0", (trial / "cli_args.txt").read_text(encoding="utf-8"))
+
+    def test_exit_zero_with_nonfinite_resets_is_not_formal(self):
+        tag = "nonfinite reset " + os.urandom(3).hex()
+        result = self._run_shell("run_native_v1_trial.sh", [tag], {"MOCK_NONFINITE_RESET": 64})
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        trial = next((self.checkout / "runs").glob(f"native_v1_1_{tag}_*"))
+        manifest = json.loads((trial / "trial_manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["exit_code"], 0)
+        self.assertFalse(manifest["formal_eligible"])
+        self.assertTrue(any("nonfinite_events.jsonl is non-empty" in error
+                            for error in manifest["validation_errors"]))
+        metric_rows = [json.loads(line) for line in
+                       (trial / "metrics.jsonl").read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(len(metric_rows), 300)
+        self.assertEqual(metric_rows[184]["nonfinite_env_resets"], 64)
+
+    def test_manifest_rejects_incomplete_nonfinite_or_failed_training_evidence(self):
+        cases = (
+            ({"MOCK_METRIC_ROWS": 299}, "has 299 rows"),
+            ({"MOCK_METRIC_SAMPLE": 2047}, "samples is not 2048"),
+            ({"MOCK_METRIC_NAN": 1}, "contains non-finite fields"),
+            ({"MOCK_FAILURE_REASON": "synthetic_failure"}, "failure.json is present"),
+        )
+        for index, (environment, expected_error) in enumerate(cases):
+            with self.subTest(case=environment):
+                tag = f"bad evidence {index} " + os.urandom(3).hex()
+                result = self._run_shell("run_native_v1_trial.sh", [tag], environment)
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                trial = next((self.checkout / "runs").glob(f"native_v1_1_{tag}_*"))
+                manifest = json.loads((trial / "trial_manifest.json").read_text(encoding="utf-8"))
+                self.assertEqual(manifest["exit_code"], 0)
+                self.assertFalse(manifest["formal_eligible"])
+                self.assertTrue(any(expected_error in error for error in manifest["validation_errors"]))
 
     def test_shell_train_preserves_real_rc_and_rejects_physics_or_recipe_overrides(self):
         tag = "failed " + os.urandom(3).hex()
@@ -356,6 +456,17 @@ class TrialRunnerTests(unittest.TestCase):
         verdict = json.loads((out / "sha_check.json").read_text(encoding="utf-8"))
         self.assertTrue(verdict["match"])
         self.assertEqual(verdict["seeds"], [87010, 87011, 87012, 87013])
+
+    def test_eval_preflight_rejects_old_formal_manifest_with_nonfinite_events(self):
+        checkpoint = self._make_formal_trial()
+        trial = checkpoint.parent
+        manifest_before = (trial / "trial_manifest.json").read_bytes()
+        (trial / "nonfinite_events.jsonl").write_text(
+            json.dumps({"iter": 185, "env_nonfinite": 64}) + "\n", encoding="utf-8")
+        result = self._run_shell("run_eval_16seeds.sh", [checkpoint, "nonfinite legacy eval"])
+        self.assertEqual(result.returncode, 5, result.stdout + result.stderr)
+        self.assertFalse((self.caller / "nonfinite legacy eval" / "eval.log").exists())
+        self.assertEqual((trial / "trial_manifest.json").read_bytes(), manifest_before)
 
     def test_eval_rejects_sha_runtime_and_nonfinite_diagnostics(self):
         checkpoint = self._make_formal_trial()
@@ -428,6 +539,7 @@ class TrialRunnerTests(unittest.TestCase):
         manifest = json.loads((trial / "trial_manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["exit_code"], 7)
         self.assertFalse(manifest["formal_eligible"])
+        self.assertIn("--nonfinite-limit 0", (trial / "cli_args.txt").read_text(encoding="utf-8-sig"))
 
     def test_powershell_runner_rejects_experimental_physics_and_override(self):
         if os.name != "nt" or not self.pwsh:
