@@ -158,3 +158,11 @@
 - 性能数字、正式训练状态、复现命令与限制统一见 native/MIGRATION_ACCEPTANCE.md；不将早期占位原型、历史Isaac配置优化、共享负载观察与本轮正式完整栈测量混算。当前仍 capability_metrics_allowed=false，RTX域差和代理物理保真/导航能力不以吞吐替代。
 
 - 整理后的后续批次当前2/5：（1）Git来源审计改为实际训练输入raw blob与明确HEAD tree核对，避免全工程LFS索引阻塞，dirty_scope明确不覆盖无关工作区；新增原始LF/改动/未跟踪回归后Windows28项全过。（2）保留两份历史报告EOF原字节的精确.gitattributes例外，修复CI空白阻塞，不放宽其他仓库检查。新pilot06由另一入口在17:03:08启动，按新训练优先保留；禁止并跑benchmark冒称无竞争窗口，复测等待其自然退出。
+
+### 后续五项整理完成：正确物理与严格失败门
+
+- 后续批次5/5已整理：（1）Git实际源raw blob/明确HEAD审计；（2）历史报告EOF原字节精确属性例外；（3）正式零异常与完整300轮证据门；（4）Newton每子步实际contacts；（5）每world映射、partial reset、请求device与显式mu/模型材料身份。下一批从0计，不引入未经实测的CUDA Graph路径。
+- v3 revision为newton_xpbdg_v3_contacts_worldmap_materialcfg。Windows标准库31项全过，WSL31项中2项PS专用跳过；实际Newton CPU6项及GPU3world×1400步、64world×8步物理探针通过。旧v2的resume/eval冒烟仅为执行链路证据，不作为修复后物理通过。
+- 旧pilot06虽exit0/旧formal_eligible=true，iter185有非有限恢复，缺contacts造成跌穿地面；world0广播放大计数，旧材料实际值亦不符。拒绝330.2 samples/s、7.7倍及其策略归因，保留原run/模型/manifest，另存rejected审计，不回填冻结记录。
+- 正确v3两次短测iteration window为278.538和167.671 samples/s；全进程口径196.598和142.085 samples/s。均零异常，存在约39.8%波动，原因未知，不宣称稳定提速倍数。测量源码c94553e2，完整证据见native/acceptance/20261025_v3_rep01、rep02与对比JSON。
+- 用户明确暂停DeepSeekHarness，由此对话统一修复。fixed_physics_v3全新300轮正式验收于北京时间18:47:04启动；只读监测，不改运行中源码/协议，不resume旧错误物理检查点。最终状态统一见native/MIGRATION_ACCEPTANCE.md，未完成前不称正式通过。

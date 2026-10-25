@@ -1,0 +1,9 @@
+[
+  "wsl.exe",
+  "-d",
+  "Ubuntu-24.04-Arm64",
+  "--",
+  "/bin/bash",
+  "-lc",
+  "set +e; env PYTHONDONTWRITEBYTECODE=1 CUDA_VISIBLE_DEVICES= /opt/venv/bin/python -B /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/trial_checks.py preflight-checkpoint --checkpoint /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/runs/native_v1_1_pilot06_20261025_170308/latest.pt --out /mnt/c/pioneer/agtc-native-acceptance-backup/pilot06_rejected_audit_20261025_175637/preflight/rejected_output --protocol-sha /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/PROTOCOL_NATIVE_V1.1.sha256 > /mnt/c/pioneer/agtc-native-acceptance-backup/pilot06_rejected_audit_20261025_175637/preflight/preflight.stdout.txt 2> /mnt/c/pioneer/agtc-native-acceptance-backup/pilot06_rejected_audit_20261025_175637/preflight/preflight.stderr.txt; task_rc=$?; printf \"%s\\n\" \"$task_rc\" > /mnt/c/pioneer/agtc-native-acceptance-backup/pilot06_rejected_audit_20261025_175637/preflight/preflight.exit.txt; exit 0"
+]

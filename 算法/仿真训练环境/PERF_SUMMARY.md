@@ -1,25 +1,19 @@
 # 训练平台性能改造：当前入口
 
-当前主训练路径已转向 WSL2 ARM64 原生栈。实现已纳入 `native/`，无需启动 Isaac Sim/Kit。本轮配置、测量口径、原始证据与限制以 [迁移与验收说明](native/MIGRATION_ACCEPTANCE.md) 为准。
+当前主训练路径为WSL2 ARM64的Newton XPBD + Warp + PyTorch，无需启动Isaac Sim/Kit。旧pilot06存在缺接触、world0索引复用与实际摩擦不一致，已拒绝其330.2 samples/s和7.7倍结论；旧4-seed失败也不能直接归因于策略学习。
 
-## 当前实现
+v3已修复接触、每环境状态/控制/reset隔离、请求device与实际材料身份。正确物理探针通过，两个完整栈短测已完成；新的300轮、614,400 samples正式验收正在运行。配置、证据、复现命令及最终状态统一见[迁移与验收说明](native/MIGRATION_ACCEPTANCE.md)。
 
-- Newton XPBD GPU 物理；Warp LiDAR、解析 depth/detections、状态与 VQF 五路真实观测。
-- 五路编码器、LSTM-512、PPO、checkpoint/resume 和 native 评估。
-- 正式配置为 1 ms × 50；5 ms × 10 有数值失稳记录，不能用于正式训练。
-- 本轮审计发现旧 pilot01 实际使用简化任务，不能作为 V1.1 fast-stop 试验。新运行显式选择 `fast_stop_v2` 并校验任务/物理契约。
-- 解析传感器与 RTX、代理物理与完整 Isaac 场景仍有域差；`capability_metrics_allowed=false`。吞吐验收与导航、实车能力验收分别处理。
+| 正确v3完整栈，64 env × 32 steps，1 ms/50，LSTM-512 | rep01 | rep02 |
+|---|---:|---:|
+| Collection samples/s | 317.599 | 191.149 |
+| Iteration window（采集+PPO）samples/s | 278.538 | 167.671 |
+| 全部样本/完整进程墙钟 samples/s | 196.598 | 142.085 |
 
-## 历史性能参照
+两轮各2轮预热+5轮测量，五路均real、异常计数0，checkpoint策略与优化器全部finite。后者迭代吞吐低39.8%，原因尚未定位，当前不能宣称稳定提速倍数。iteration window不含后置有限性检查/模型保存，完整进程墙钟包含这些开销。
 
-| 运行 | 记录 | 使用边界 |
-|---|---|---|
-| Isaac a07，4 env、1 ms/50 | collection 约 2.18 samples/s | 历史采集速率；不是端到端速率 |
-| Isaac perf，32 env、5 ms/10 | 393216 samples / 9218.8 s = 42.65 samples/s | 改了并行数与物理步长；非物理等价对照 |
-| 原生早期 M3b，64 env、1 ms/50 | 4096 samples/iter，稳态约 328.2 samples/s | 早期短原型，depth/detections 占位；不可替代完整栈新测量 |
+历史Isaac为32 env、5 ms/10，393,216 samples / 9218.8 s = 42.65 samples/s；M3b约328.2 samples/s为占位通道短原型。这些配置/物理不同，不能充作严格等价对照或混入新栈验收。完整历史保留在[PERF_PLATFORM.md](PERF_PLATFORM.md)和[NATIVE_STACK_PLAN.md](NATIVE_STACK_PLAN.md)，其中早期实现状态与CI观察只属于当时记录。
 
-不把以上数字连乘为迁移倍数，也不把采集速率与完整训练速率混算。完整历史记录保留在 [PERF_PLATFORM.md](PERF_PLATFORM.md) 和 [NATIVE_STACK_PLAN.md](NATIVE_STACK_PLAN.md)，其中较早“尚未实现/仓库外”的描述只属于当时状态。
+当前仍为代理车辆、平面物理碰撞和速度目标驱动；解析传感器与RTX有域差，`capability_metrics_allowed=false`。平台吞吐不代表导航或实车能力。
 
-## Git
-
-延续 `perf/max-throughput` 和 [PR #24](https://github.com/w3743/AGTC/pull/24)。最新提交、检查与本轮测量见 PR 和迁移验收说明；旧文档中的“CI 已绿/mergeable”仅是历史观察。
+延续`perf/max-throughput`与[PR #24](https://github.com/w3743/AGTC/pull/24)，冻结协议、旧检查点与成绩保留原字节。最新提交、CI与正式训练状态以PR和迁移说明为准。
