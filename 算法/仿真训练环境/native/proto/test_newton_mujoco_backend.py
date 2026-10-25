@@ -35,7 +35,6 @@ class NewtonMuJoCoWarpBackendTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.backend = _new_backend()
-        cls.backend.solver.mjw_model.opt.warn_overflow = 0
         cls.backend.reset()
 
     @classmethod
@@ -43,6 +42,8 @@ class NewtonMuJoCoWarpBackendTests(unittest.TestCase):
         del cls.backend
 
     def test_identity_matches_exported_solver_and_model(self) -> None:
+        import mujoco_warp
+
         backend = self.backend
         identity = backend.identity()
         self.assertEqual(str(backend.model.device), "cpu")
@@ -91,6 +92,22 @@ class NewtonMuJoCoWarpBackendTests(unittest.TestCase):
         self.assertEqual(str(backend.solver.mjw_model.geom_gap.device), "cpu")
         self.assertEqual(str(backend.solver.mjw_data.qpos.device), "cpu")
         self.assertEqual(str(backend.solver.mjw_data.overflow.device), "cpu")
+        warning_policy = identity["runtime_diagnostics"]["solver_warning_policy"]
+        warn_mask = int(backend.solver.mjw_model.opt.warn_overflow)
+        self.assertEqual(warning_policy["actual_warn_overflow_mask"], warn_mask)
+        self.assertFalse(warn_mask & int(mujoco_warp.OverflowType.LS_ITERATIONS))
+        self.assertTrue(warn_mask & int(mujoco_warp.OverflowType.NEFC))
+        self.assertFalse(warning_policy["ls_iterations_console_warning_enabled"])
+        self.assertEqual(warning_policy["suppressed_console_warning_bits"], ["LS_ITERATIONS"])
+        self.assertTrue(warning_policy["ls_iterations_overflow_flag_preserved"])
+        self.assertEqual(
+            warning_policy["line_search_limit_reporting"],
+            "structured_counters_only",
+        )
+        self.assertEqual(
+            warning_policy["line_search_limit_counter_field"],
+            "line_search_limit_substeps_by_world",
+        )
 
     def test_deterministic_mode_is_applied_and_recorded(self) -> None:
         backend = _new_backend(nworld=1, deterministic=wp.DeterministicMode.RUN_TO_RUN)

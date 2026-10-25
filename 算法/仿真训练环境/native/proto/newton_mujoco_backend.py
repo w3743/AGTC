@@ -177,6 +177,17 @@ class NewtonMuJoCoWarpBackend(NewtonXPBDGBackend):
         return None, None
 
     def _initialize_solver_state(self) -> None:
+        import mujoco_warp
+
+        # Silence only the repeated GPU printf for line-search exhaustion. The
+        # solver still sets LS_ITERATIONS in mjw_data.overflow, which the
+        # per-substep device counters collect below.
+        self._ls_iterations_warning_bit = int(mujoco_warp.OverflowType.LS_ITERATIONS)
+        self.solver.mjw_model.opt.warn_overflow &= ~self._ls_iterations_warning_bit
+        self._solver_warn_overflow_mask = int(self.solver.mjw_model.opt.warn_overflow)
+        if self._solver_warn_overflow_mask & self._ls_iterations_warning_bit:
+            raise RuntimeError("MuJoCo-Warp LS_ITERATIONS console warning was not disabled")
+
         self._actuator_observables = self.solver.observables(
             kinds={self.solver.ObservableKind.QFRC_ACTUATOR}
         )
@@ -686,6 +697,14 @@ class NewtonMuJoCoWarpBackend(NewtonXPBDGBackend):
             },
             "runtime_diagnostics": {
                 **self.last_solver_diagnostics,
+                "solver_warning_policy": {
+                    "actual_warn_overflow_mask": self._solver_warn_overflow_mask,
+                    "ls_iterations_console_warning_enabled": False,
+                    "suppressed_console_warning_bits": ["LS_ITERATIONS"],
+                    "ls_iterations_overflow_flag_preserved": True,
+                    "line_search_limit_reporting": "structured_counters_only",
+                    "line_search_limit_counter_field": "line_search_limit_substeps_by_world",
+                },
                 "cuda_graph_requested": self.use_cuda_graph_requested,
                 "cuda_graph_enabled": self._cuda_graph_enabled,
                 "cuda_graph_capture_s": self._cuda_graph_capture_s,

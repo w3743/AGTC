@@ -170,3 +170,10 @@
 - fixed_physics_v3正式trial于18:58:07在iter58/step21发生env11物理非有限状态，严格门自然exit3，formal_eligible=false；57完整轮、wrapper666.72s。不将短探针/短测通过写成正式稳定性通过，不加预算重启；保留原始失败证据并继续定位。
 
 - 后续第1项：修复SH命令捕获-u顺序与JSON整数类型严谨性，Windows32项通过/WSL32项skip2；原run捕获不回填。v3长期失败后再确认XPBD不执行effort限幅、车身惯量小4倍，尚不归因为NaN直接触发源；继续诊断并在新revision/trial修复，不将v3短测当最终正确物理成绩。
+
+### V2改造范围整理（源码fce4ba90）
+
+- 本批5/5已整理：（1）启动命令记录与严格整数证据门；（2）官方MuJoCo-Warp后端、构造前惯量/接触修正、实际执行器力矩与reduced-state reset；（3）新engine canonical身份和可选择的完整栈benchmark；（4）V2草案/固定runner/任务与执行模式门及逐迭代physics_solver_events；（5）实验CUDA Graph与每子步设备端fresh overflow统计。V1/V1.1冻结文本/原始run不改。
+- Windows标准库61项全过，WSL61项中2项PowerShell专用跳过；实际物理CPU10项、仓库版3world/20policy GPU门通过。Graph严格逐轨迹对照未通过；默认eager重复也分叉，RUN_TO_RUN初始化资源超限主动TERM，无policy数据，不视为通过。Windows实测可见RAM30.49GiB、WSL约14GiB，无.wslconfig，不擅自重启或增配内存。
+- 正式主线收敛为ordinary eager GPU、NOT_GUARANTEED模式，Graph不进入V2正式recipe。V2尚DRAFT，必须先取得并冻结实际64→1一致任务SHA与新协议SHA，再启动全新300轮。两轮当前eager短测已exit0：iteration-window112.036/89.540 samples/s，all-samples/full-launch84.178/78.313；加权99.533/81.139。五路real、zero nonfinite/capacity/outer-cap，policy/optimizer132张量finite；LS fresh counters非零，不作导航结论。
+- 后续第1项仅优化非fatal LS console printf：使用官方per-model warning mask，保留真实设备计数和capacity/nonfinite失败门。它是日志执行profile，不更改8次LS/40次outer等物理参数；优化前后源码/原始结果分开保留，不能伪装相同运行或隐瞒LS事件。
