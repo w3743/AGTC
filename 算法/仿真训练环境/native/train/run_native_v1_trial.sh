@@ -3,35 +3,38 @@
 # trial dir, copies the protocol, runs the formal LSTM recipe on the official 1 ms/50
 # physics, and writes trial_manifest.json.
 # Usage: bash run_native_v1_trial.sh <tag> [extra train_wsl args...]
-# Optional env: SIM_DT (default 0.001), DECIMATION (default 50).
+# Optional env: SIM_DT (default 0.001), DECIMATION (default 50), PYTHON (default /opt/venv/bin/python).
 set -u
 export PATH=/usr/lib/wsl/lib:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 unset CUDA_VISIBLE_DEVICES
 cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train || exit 1
 TAG=${1:?usage: run_native_v1_trial.sh <tag> [extra args]}
 shift || true
+PYTHON=${PYTHON:-/opt/venv/bin/python}
 STAMP=$(date +%Y%m%d_%H%M%S)
 TRIAL="runs/native_v1_1_${TAG}_${STAMP}"
 mkdir -p "$TRIAL"
 
 echo "=== protocol SHA check (V1.1) ==="
-/opt/venv/bin/python protocol_sha.py --check || { echo "PROTOCOL_SHA_MISMATCH"; exit 2; }
+"$PYTHON" protocol_sha.py --check || { echo "PROTOCOL_SHA_MISMATCH"; exit 2; }
 cp PROTOCOL_NATIVE_V1.1.md PROTOCOL_NATIVE_V1.1.sha256 PROTOCOL_NATIVE_V1.md PROTOCOL_NATIVE_V1.sha256 "$TRIAL/"
 
+SIM_DT=${SIM_DT:-0.001}
+DECIMATION=${DECIMATION:-50}
 ARGS=(--policy lstm --num-envs 64 --num-steps 32 --iterations 300 --seed 0 --threads 8
-      --device cuda --physics newton_xpbd --lidar warp --feedback vqf
+      --device cuda --physics newton_xpbd --task-backend fast_stop_v2 --lidar warp --feedback vqf
       --depth analytic --detections analytic --detections-warp
-      --sim-dt "${SIM_DT:-0.001}" --decimation "${DECIMATION:-50}" --profile --save-interval 20
+      --sim-dt "${SIM_DT}" --decimation "${DECIMATION}" --profile --save-interval 20
       --out "$TRIAL")
-echo "PHYSICS sim_dt=${SIM_DT:-0.001} decimation=${DECIMATION:-50}" | tee "$TRIAL/physics.txt"
+echo "PHYSICS sim_dt=${SIM_DT} decimation=${DECIMATION}" | tee "$TRIAL/physics.txt"
 echo "$(printf '%q ' "${ARGS[@]}" "$@")" > "$TRIAL/cli_args.txt"
 
 echo "=== formal trial train: $TRIAL ==="
-/opt/venv/bin/python -u train_wsl.py "${ARGS[@]}" "$@" 2>&1 | tee "$TRIAL/train.log" \
-    | grep -E 'IDENTITY|ITER|SUMMARY|Error|Traceback' | head -8
-RC=${PIPESTATUS[0]}
+"$PYTHON" -u train_wsl.py "${ARGS[@]}" "$@" > "$TRIAL/train.log" 2>&1
+RC=$?
+tail -5 "$TRIAL/train.log"
 
-/opt/venv/bin/python - "$TRIAL" "$RC" <<'PYEOF'
+"$PYTHON" - "$TRIAL" "$RC" <<'PYEOF'
 import json, os, sys
 from datetime import datetime
 from pathlib import Path
