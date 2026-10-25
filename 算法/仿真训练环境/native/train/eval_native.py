@@ -34,6 +34,8 @@ if PROTO not in sys.path:
 from native_env import NativeFieldEnv  # noqa: E402
 from policy_m0 import ActorCritic  # noqa: E402
 from train_m0 import to_torch  # noqa: E402
+from contract_identity import (validate_checkpoint_contract,
+                               validate_checkpoint_preflight)  # noqa: E402
 
 BANNER = "NATIVE_EVAL_CPU_SMOKE"
 
@@ -64,18 +66,31 @@ def infer_yaw(quat_wxyz: np.ndarray) -> float:
     return math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
 
 
-def load_policy(checkpoint: str, observation_space):
+def load_checkpoint_payload(checkpoint: str):
+    """Load tensor-only checkpoint data on CPU before allocating a simulator."""
+    if not checkpoint:
+        return None
+    from torch.torch_version import TorchVersion
+    with torch.serialization.safe_globals([TorchVersion]):
+        payload = torch.load(checkpoint, map_location="cpu", weights_only=True)
+    if not isinstance(payload, dict):
+        raise ValueError("native checkpoint payload must be a dictionary")
+    return payload
+
+
+def load_policy(checkpoint: str, observation_space, payload=None):
     policy = ActorCritic(observation_space, action_dim=4)
     meta = {"checkpoint": None, "policy_loaded": False, "policy_type": "mlp",
             "note": "no checkpoint supplied: random policy, numbers are a harness smoke only"}
     if checkpoint:
-        payload = torch.load(checkpoint, map_location="cpu", weights_only=False)
-        policy_type = payload.get("policy_type", "mlp") if isinstance(payload, dict) else "mlp"
+        if payload is None:
+            payload = load_checkpoint_payload(checkpoint)
+        policy_type = payload.get("policy_type", "mlp")
         if policy_type == "lstm":
             from policy_lstm import LSTMActorCritic
             policy = LSTMActorCritic(observation_space, action_dim=4,
                                      hidden_size=int(payload.get("hidden_size", 512)))
-        state = payload["policy"] if isinstance(payload, dict) and "policy" in payload else payload
+        state = payload["policy"] if "policy" in payload else payload
         policy.load_state_dict(state)
         meta = {"checkpoint": checkpoint, "policy_loaded": True, "policy_type": policy_type}
     policy.eval()
@@ -184,6 +199,11 @@ def main():
     parser.add_argument("--max-steps", type=int, default=1200)
     parser.add_argument("--device", type=str, default="cpu", choices=("cpu", "cuda"))
     parser.add_argument("--physics", type=str, default="mujoco_cpu", choices=("mujoco_cpu", "newton_xpbd"))
+    parser.add_argument("--task-backend", type=str, default=None,
+                        choices=("simplified", "fast_stop_v2"),
+                        help="task implementation; defaults to simplified for compatibility")
+    parser.add_argument("--allow-legacy-checkpoint-contract", action="store_true", default=False,
+                        help="allow an unversioned checkpoint only for an explicitly selected task backend")
     parser.add_argument("--lidar", type=str, default="numpy", choices=("numpy", "warp"))
     parser.add_argument("--feedback", type=str, default="vqf", choices=("direct", "vqf"))
     parser.add_argument("--depth", type=str, default="constant", choices=("constant", "analytic"))
@@ -196,6 +216,26 @@ def main():
     parser.add_argument("--zero-action", action="store_true", default=False,
                         help="harness-validation mode: ignore the policy and command zero actions")
     args = parser.parse_args()
+    task_backend = args.task_backend or "simplified"
+    task_backend_explicit = args.task_backend is not None
+    if abs(args.sim_dt * args.decimation - 0.05) > 1e-9:
+        parser.error(f"--sim-dt*--decimation must equal 0.05 s, got {args.sim_dt * args.decimation}")
+
+    checkpoint_payload = load_checkpoint_payload(args.checkpoint)
+    checkpoint_contract_status = "no_checkpoint"
+    if checkpoint_payload is not None:
+        physics_device = ("cuda:0" if args.physics == "newton_xpbd" and args.device == "cuda"
+                          else "cpu")
+        checkpoint_contract_status = validate_checkpoint_preflight(
+            checkpoint_payload,
+            task_backend=task_backend,
+            physics=args.physics,
+            device=physics_device,
+            sim_dt=args.sim_dt,
+            decimation=args.decimation,
+            allow_legacy=args.allow_legacy_checkpoint_contract,
+            task_backend_explicit=task_backend_explicit,
+        )
 
     device = torch.device(args.device)
     if args.device == "cuda" and not torch.cuda.is_available():
@@ -206,9 +246,8 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     print(f"{BANNER}: {len(seeds)} scenes, {args.max_steps} steps, device={args.device}")
 
-    if abs(args.sim_dt * args.decimation - 0.05) > 1e-9:
-        parser.error(f"--sim-dt*--decimation must equal 0.05 s, got {args.sim_dt * args.decimation}")
     env = NativeFieldEnv(num_envs=1, seed=seeds[0], physics=args.physics,
+                         task_backend=task_backend,
                          dt=args.sim_dt, decimation=args.decimation,
                          lidar_backend=args.lidar, device="cuda:0" if args.device == "cuda" else "cpu",
                          feedback_backend=args.feedback,
@@ -217,7 +256,15 @@ def main():
                          camera_backend=("analytic_warp" if args.detections_warp else args.detections),
                          camera_device="cuda:0" if args.device == "cuda" else "cpu",
                          auto_reset=False)
-    policy, policy_meta = load_policy(args.checkpoint, env.single_observation_space)
+    from train_wsl import _contract_for
+    contract = _contract_for(env, out_dir, phase="native_eval")
+    if checkpoint_payload is not None:
+        checkpoint_contract_status = validate_checkpoint_contract(
+            checkpoint_payload, contract["task_identity_sha256"],
+            allow_legacy=args.allow_legacy_checkpoint_contract,
+        )
+    policy, policy_meta = load_policy(args.checkpoint, env.single_observation_space,
+                                      payload=checkpoint_payload)
     policy.to(device)
 
     t0 = time.perf_counter()
@@ -232,17 +279,18 @@ def main():
     for r in rows:
         reason_counts[r["reason"]] = reason_counts.get(r["reason"], 0) + 1
     env_diagnostics = env.consume_nonfinite() if hasattr(env, "consume_nonfinite") else None
-    # build the same contract as training (embedded verification + blockers) so the
-    # evaluation SHA can be compared one-to-one with the training checkpoint contract
-    from train_wsl import _contract_for  # local import: train_wsl is the training entry module
-    contract = _contract_for(env, out_dir, phase="native_eval")
     result = {
         "schema_version": "native_eval_v1",
         "banner": BANNER,
         "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "task_backend": task_backend,
+        "task_identity_sha256": contract["task_identity_sha256"],
+        "identity_schema_version": contract["identity_schema_version"],
+        "checkpoint_contract_validation": checkpoint_contract_status,
         "native_domain": {
             "env": "proto/native_env.py (MuJoCo CPU / Newton XPBD)",
-            "physics": env.backend.identity(),
+            "task_backend": task_backend,
+            "physics": env._physics_identity(),
             "observation_backends": {k: contract["channels"][k].get("backend")
                                      for k in contract["channels"]},
             "note": "native WSL stack; not Isaac Sim / PhysX / RTX domain",
@@ -263,9 +311,13 @@ def main():
                              "angular_speed_radps": SUCCESS_ANGULAR_SPEED, "hold_s": SUCCESS_HOLD_S,
                              "reasons": ["goal_stop", "time_limit", "outside_or_overturned"]},
         "policy": {**policy_meta, "observation_contract_sha256": contract["observation_contract_sha256"],
+                   "task_identity_sha256": contract["task_identity_sha256"],
+                   "identity_schema_version": contract["identity_schema_version"],
+                   "checkpoint_contract_validation": checkpoint_contract_status,
                    "sha_scope": contract.get("sha_scope")},
         "config": {"seeds": seeds, "max_steps": args.max_steps, "device": args.device,
-                   "physics": args.physics, "lidar": args.lidar, "feedback": args.feedback,
+                   "physics": args.physics, "task_backend": task_backend,
+                   "lidar": args.lidar, "feedback": args.feedback,
                    "depth": args.depth, "detections": args.detections,
                    "detections_warp": args.detections_warp, "zero_action": args.zero_action,
                    "sim_dt_s": args.sim_dt, "decimation": args.decimation,

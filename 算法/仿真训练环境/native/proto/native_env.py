@@ -344,11 +344,72 @@ class NativeFieldEnv(gym.Env):
         """Per-sensor seconds since the last call (None unless profile=True)."""
         return self.provider.consume_timings()
 
+    def task_config(self) -> dict:
+        """Describe the task implementation and every task-side parameter used by step/reset."""
+        common = {
+            "backend": self.task_backend,
+            "episode_length_s": self.episode_length_s,
+            "reset_sampling": {
+                "field_size_m": self.field_size,
+                "start_goal_margin_m": 5.0,
+                "minimum_start_goal_distance_m": 8.0,
+                "max_goal_resamples": 20,
+                "initial_yaw_range_rad": [-math.pi, math.pi],
+                "spawn_clearance_m": self.spawn_clearance_m,
+            },
+        }
+        if self.task_backend == "fast_stop_v2":
+            common["implementation"] = "isaac_field.tensor_task.fast_stop_v2_step"
+            common["reward_termination"] = dict(self._fast_stop.cfg)
+            common["reward_termination"]["timeout_behavior"] = "terminal_failure"
+        else:
+            common["implementation"] = "native_env.simplified_goto"
+            common["reward_termination"] = {
+                "progress_weight": self.reward_progress_weight,
+                "time_penalty_per_policy_second": self.reward_time_penalty,
+                "goal_tolerance_m": GOAL_TOLERANCE,
+                "goal_hold_s": GOAL_HOLD_S,
+                "goal_stop_linear_speed_mps": GOAL_STOP_LINEAR,
+                "goal_stop_angular_speed_radps": GOAL_STOP_ANGULAR,
+                "flip_tilt_limit_rad": 1.2,
+                "success_reward": 10.0,
+                "flip_penalty": -10.0,
+                "timeout_behavior": "truncated",
+            }
+        return common
+
+    def _physics_identity(self) -> dict:
+        identity = dict(self.backend.identity())
+        identity["gravity_mps2"] = [0.0, 0.0, -9.81]
+        if self.physics_name == "mujoco_cpu":
+            identity["solver"] = {
+                "kind": "mujoco_timestep_newton",
+                "iterations": 40,
+                "line_search_iterations": 8,
+                "cone": "elliptic",
+                "impratio": 10.0,
+            }
+            identity["contact"] = {
+                "ground_friction": [float(self.backend.mu), 0.005, 0.0001],
+                "wheel_friction": [float(self.backend.mu), 0.005, 0.0001],
+            }
+        else:
+            identity["solver"] = {
+                "kind": "newton_xpbd",
+                "iterations": 10,
+                "shape_ke": 2500.0,
+                "shape_kd": 100.0,
+            }
+            identity["contact"] = {"shape_mu": float(self.backend.mu)}
+        return identity
+
     def observation_config(self) -> dict:
         cfg = self.provider.contract(self.policy_dt)
         cfg["action_components"] = ["left_track_speed", "right_track_speed",
                                     "gimbal_yaw_rate", "gimbal_pitch_rate"]
-        cfg["physics"] = self.backend.identity()
+        cfg["task_backend"] = self.task_backend
+        cfg["task"] = self.task_config()
+        cfg["physics"] = self._physics_identity()
         cfg["physics_dt_s"] = self.dt
         cfg["decimation"] = self.decimation
         cfg["policy_dt_s"] = self.policy_dt
@@ -356,10 +417,7 @@ class NativeFieldEnv(gym.Env):
         cfg["physics_note"] = ("default 1 ms / decimation 50" if not self.experimental_physics
                                else "experimental configuration; results are not comparable with 1 ms/50 runs")
         cfg["profile_enabled"] = bool(self.provider.profile)
-        cfg["reward"] = {"progress_weight": self.reward_progress_weight,
-                         "time_penalty_per_s": self.reward_time_penalty,
-                         "goal_tolerance_m": GOAL_TOLERANCE, "goal_hold_s": GOAL_HOLD_S,
-                         "note": "simplified goto task for the throughput prototype; not the training task"}
+        cfg["reward"] = self.task_config()["reward_termination"]
         return cfg
 
     def identity(self) -> dict:
@@ -369,4 +427,5 @@ class NativeFieldEnv(gym.Env):
                 "episode_length_s": self.episode_length_s,
                 "obs_shapes": self.provider.observation_shapes(),
                 "action_dim": 4, "max_track_speed_mps": MAX_TRACK_SPEED,
-                "physics": self.backend.identity()}
+                "task_backend": self.task_backend, "task": self.task_config(),
+                "physics": self._physics_identity()}

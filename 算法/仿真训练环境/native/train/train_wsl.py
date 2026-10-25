@@ -93,6 +93,8 @@ def _write_live_state(exporter, env, origins, sim_time: float) -> bool:
 from native_env import NativeFieldEnv  # noqa: E402
 from policy_m0 import ActorCritic  # noqa: E402
 from train_m0 import compute_gae, ppo_update, rss_mb, to_torch  # noqa: E402
+from contract_identity import (IDENTITY_SCHEMA_VERSION, attach_contract_identity,
+                               validate_checkpoint_contract)  # noqa: E402
 
 BANNER = "WSL_NATIVE_TRAINING_PREP"
 
@@ -131,14 +133,8 @@ def _contract_for(env, out_dir: str, phase: str) -> dict:
         sha_scope=("observation channels, physics/backend identity, success/reward config and embedded "
                    "verification only; runtime metadata (run_id, phase, note) is excluded from the hash"),
     )
-    # hash only the identity fields: run_id/phase/note are per-run metadata and must not
-    # change the contract SHA (they stay in the written contract for traceability)
-    sha_meta = {"run_id", "phase", "note", "sha_scope", "observation_contract_sha256"}
-    sha_source = {k: v for k, v in contract.items() if k not in sha_meta}
-    contract["observation_contract_sha256"] = hashlib.sha256(
-        json.dumps(sha_source, sort_keys=True, ensure_ascii=False).encode("utf-8")
-    ).hexdigest()
-    return contract
+    return attach_contract_identity(contract)
+
 
 
 def _save_checkpoint(path: str, policy, optimizer, iteration: int, contract: dict, identity: dict) -> None:
@@ -149,6 +145,10 @@ def _save_checkpoint(path: str, policy, optimizer, iteration: int, contract: dic
         "policy": policy.state_dict(),
         "optimizer": optimizer.state_dict(),
         "observation_contract_sha256": contract["observation_contract_sha256"],
+        "identity_schema_version": IDENTITY_SCHEMA_VERSION,
+        "task_backend": contract["task_backend"],
+        "task_identity": contract["task_identity"],
+        "task_identity_sha256": contract["task_identity_sha256"],
         "identity": identity,
         "policy_type": identity.get("policy", {}).get("policy_type", "mlp"),
         "torch": torch.__version__,
@@ -173,6 +173,7 @@ def main() -> int:
     parser.add_argument("--device", type=str, default="cuda", choices=("cpu", "cuda"))
     parser.add_argument("--physics", type=str, default="newton_xpbd",
                         choices=("mujoco_cpu", "newton_xpbd"))
+    parser.add_argument("--task-backend", type=str, default="simplified", choices=("simplified", "fast_stop_v2"))
     parser.add_argument("--lidar", type=str, default="warp", choices=("numpy", "warp"))
     parser.add_argument("--feedback", type=str, default="vqf", choices=("direct", "vqf"))
     parser.add_argument("--feedback-noise", action="store_true", default=True)
@@ -230,6 +231,7 @@ def main() -> int:
         num_envs=args.num_envs,
         seed=args.seed,
         physics=args.physics,
+        task_backend=args.task_backend,
         lidar_backend=args.lidar,
         device="cuda:0" if args.device == "cuda" else "cpu",
         dt=args.sim_dt,
@@ -263,13 +265,20 @@ def main() -> int:
         "device": args.device,
         "physics": args.physics,
         "lidar": args.lidar,
+        "task_backend": args.task_backend,
         "feedback": args.feedback,
         "policy": policy_meta,
         "env": env.identity(),
         "torch": torch.__version__,
         "numpy": np.__version__,
         "python": sys.version.split()[0],
+        "identity_schema_version": IDENTITY_SCHEMA_VERSION,
+        "task_identity": contract["task_identity"],
+        "task_identity_sha256": contract["task_identity_sha256"],
     }
+    identity["env"]["task_backend"] = args.task_backend
+    identity["env"]["task_identity_sha256"] = contract["task_identity_sha256"]
+    identity["env"]["identity_schema_version"] = IDENTITY_SCHEMA_VERSION
     with open(os.path.join(out_dir, "observation_contract.json"), "w", encoding="utf-8") as stream:
         json.dump(contract, stream, indent=2, ensure_ascii=False)
     with open(os.path.join(out_dir, "identity.json"), "w", encoding="utf-8") as stream:
@@ -312,8 +321,10 @@ def main() -> int:
     start_iteration = 0
     if args.resume:
         checkpoint = torch.load(args.resume, map_location="cpu", weights_only=False)
-        if checkpoint.get("observation_contract_sha256") != contract["observation_contract_sha256"]:
-            raise RuntimeError("checkpoint observation contract differs from the live environment")
+        try:
+            validate_checkpoint_contract(checkpoint, contract["task_identity_sha256"])
+        except ValueError as exc:
+            raise RuntimeError(f"checkpoint task contract rejected: {exc}") from exc
         ck_type = checkpoint.get("policy_type", "mlp")
         if ck_type != args.policy:
             raise RuntimeError(f"checkpoint policy_type={ck_type!r} does not match --policy {args.policy!r}")
