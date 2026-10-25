@@ -111,3 +111,10 @@
   5. 顺带修复 LSTM PPO 变量遮蔽 bug。
 - 测试：`proto/test_nonfinite_guards.py` 全通过；报告 `proto/DEPTH_DETECTIONS_REPORT.md` §16。
 - 正在 GPU 复跑 300-iter LSTM pilot（5ms/10，`--nonfinite-limit 64`），验证是否不再崩溃及 non-finite 频率；结果决定正式 trial 用 5ms 还是回退 1ms。
+
+## 2026-10-25 12:45 代码入库与换机/远程方案
+
+- 原生栈代码已从仓库外 `C:/pioneer/wsl-native` 整理进仓库：`算法/仿真训练环境/native/`（`proto/`、`train/`、`viz/`、`remote/`），runs/checkpoint/日志由 `.gitignore` 排除；提交见 git log。
+- 路径已去硬编码：`policy_m0.py`/`native_live.py` 按 `__file__` 推导仓库位置，Viser 资产路径自动转换 WSL `/mnt/c` → Windows `C:\`；在 WSL 与 Linux 上均可直接运行。
+- 冒烟验证（仓库新路径）：CPU mujoco_cpu 1 iter、GPU newton_xpbd+全 real 观测 1 iter 均通过，协议/contract SHA 正常。
+- 换机方案：**不需要 A2A**；`native/remote/README.md` 给出 SSH + Git + rsync + SSH 端口转发（看 Viser）的最小远程流程，以及可选的 task/status/result 文件协调协议。
