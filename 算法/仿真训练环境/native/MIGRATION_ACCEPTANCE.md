@@ -103,6 +103,8 @@ CPU标准库回归Windows32项全过，WSL32项中2项PowerShell专用跳过，�
 
 独立`/opt/venv_mujoco315_smoke`环境只覆盖MuJoCo/mujoco-warp为3.15.0，其余只读复用原环境；没有降级原`/opt/venv`。该版本组合符合Newton1.7要求。候选使用官方SolverMuJoCo的GPU路径、内部接触、显式zero gap/margin、正确惯量、实际执行器力矩、14个joint mimic（solref .004/1、solimp .999/.9999/.001/.5/2）及每world容量64 contacts/256 constraints。
 
-外部v4b原型3world × 120策略步（6000物理子步）及reset后首子步/完整策略步通过，exit0、stderr空，无非有限值和容量截断；轮组/云台最大实际力矩2/1Nm，连续关节坐标最大mimic残差约0.000169rad，未重置world状态/控制保持原字节。eval_ik可与真实连续qpos相差约4π，不能用其裸角差宣称十多弧度物理漂移。LS_ITERATIONS计数分别4999/4999/4699，它表示内层线搜索用尽8次，需如实记录；不是接触容量溢出。outer ITERATIONS计数0，最大outer迭代4/5/10（上限40），观测最大equality efc.pos约0.000193。
+外部v4b原型3world × 120策略步（6000物理子步）及reset后首子步/完整策略步通过，exit0、stderr空，无非有限值和容量截断；轮组/云台最大实际力矩2/1Nm，连续关节坐标最大mimic残差约0.000169rad，未重置world状态/控制保持原字节。eval_ik可与真实连续qpos相差约4π，不能用其裸角差宣称十多弧度物理漂移。旧探针LS_ITERATIONS读数为4999/4999/4699个flag-positive子步采样；后续源码审计确认该位是sticky OR且原探针未逐步清零，所以不能当独立线搜索失败次数。该位表示曾触及内层线搜索8次上限，不是接触容量溢出；新实现将在每子步设备端清零后采样并累计真实新事件。outer ITERATIONS计数0，最大outer迭代4/5/10（上限40），观测最大equality efc.pos约0.000193。
 
 [候选原始证据](acceptance/20261025_mjw_candidate/README.md)同时保留失败探针。该批prototype缺启动时完整源码冻结，运行后源码复制与依赖恢复的限制已在README标明，不冒充正式可复现输入快照。仓库版正在整理/验证，CUDA Graph和完整300轮尚未验收；V2协议仍为DRAFT且正式入口被冻结SHA/任务身份门拦截。
+
+Graph尚未通过：默认NOT_GUARANTEED模式的60步对照从第25步起超出预定物理状态容差；两次普通eager执行也从第27步起分叉，因此不能将差异单独归因于Graph。诊断中的9.78倍仅是隔离物理调用计时，不是端到端训练提速，也不作为验收数据。下一步正在使用官方RUN_TO_RUN参数做独立新profile验证，不放宽既定容差；新V2仍未冻结。
