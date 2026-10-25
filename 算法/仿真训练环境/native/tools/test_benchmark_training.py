@@ -87,7 +87,11 @@ def _fixture(run: Path, *, reset_count: int = 0, placeholder: bool = False,
         "status": "success", "success": True, "warmup_iterations": 2, "child_iterations": 7,
         "source_identity_still_matches_at_finish": True,
         "source_identity": {"raw_source_bytes": [{"path": "train_wsl.py", "bytes": 1, "sha256": "b" * 64}],
-                            "git": {"commit": "deadbeef", "dirty": True, "status_sha256": "c" * 64}},
+                            "git": {"commit": "deadbeef", "branch": "perf/max", "object_format": "sha1",
+                                    "relevant_sources_dirty": False,
+                                    "dirty_scope": "raw_source_bytes vs HEAD only; whole workspace dirty not measured",
+                                    "modified_source_paths": [], "untracked_source_paths": [],
+                                    "relevant_source_changes": [], "relevant_source_changes_sha256": "c" * 64}},
         "execution": {"returncode": child_returncode, "launcher_wall_s": 25.0},
     }
     (run.parent / "benchmark_result.json").write_text(json.dumps(launch), encoding="utf-8")
@@ -103,6 +107,32 @@ class BenchmarkTrainingTests(unittest.TestCase):
         self.assertEqual(command[command.index("--task-backend") + 1], "fast_stop_v2")
         self.assertEqual(command[command.index("--nonfinite-limit") + 1], "0")
         self.assertNotIn("--profile", command)
+
+    def test_source_tree_comparison_uses_exact_raw_blob_bytes(self):
+        sources = {
+            "src/unchanged.py": b"print('same')\n",
+            "src/modified.py": b"print('new')\n",
+            "src/untracked.py": b"print('added')\n",
+            "src/raw_lf.txt": b"first\nsecond\n",
+        }
+        head = {
+            "src/unchanged.py": sources["src/unchanged.py"],
+            "src/modified.py": b"print('old')\n",
+            "src/raw_lf.txt": b"first\r\nsecond\r\n",
+        }
+        tree_output = b"".join(
+            b"100644 blob " + bench._git_blob_sha(raw, "sha1").encode("ascii") + b"\t" +
+            path.encode("utf-8") + b"\0" for path, raw in head.items()
+        )
+        tree = bench._parse_git_tree(tree_output)
+        changes = bench._relevant_source_changes(sources, tree, "sha1")
+        self.assertEqual({row["path"]: row["state"] for row in changes}, {
+            "src/modified.py": "modified", "src/raw_lf.txt": "modified", "src/untracked.py": "untracked",
+        })
+        self.assertNotIn("src/unchanged.py", {row["path"] for row in changes})
+        self.assertNotEqual(bench._git_blob_sha(sources["src/raw_lf.txt"], "sha1"),
+                            bench._git_blob_sha(head["src/raw_lf.txt"], "sha1"))
+        self.assertEqual(len(bench._git_blob_sha(b"raw bytes\n", "sha256")), 64)
 
     def test_process_scan_matches_known_names_not_argument_text(self):
         note_command = ["python3", "/repo/native/tools/benchmark_training.py",

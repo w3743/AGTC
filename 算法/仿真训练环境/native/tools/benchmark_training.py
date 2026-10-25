@@ -57,6 +57,42 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _parse_git_tree(output: bytes) -> dict[str, str]:
+    """Parse `git ls-tree -r -z` records without asking Git to read the index."""
+    entries = {}
+    for record in output.split(b"\0"):
+        if not record:
+            continue
+        metadata, raw_path = record.split(b"\t", 1)
+        mode, kind, object_id = metadata.split(b" ", 2)
+        if kind == b"blob":
+            entries[os.fsdecode(raw_path)] = object_id.decode("ascii")
+    return entries
+
+
+def _git_blob_sha(raw: bytes, object_format: str) -> str:
+    if object_format not in {"sha1", "sha256"}:
+        raise AuditError(f"unsupported Git object format: {object_format!r}")
+    hasher = hashlib.new(object_format)
+    hasher.update(b"blob " + str(len(raw)).encode("ascii") + b"\0")
+    hasher.update(raw)
+    return hasher.hexdigest()
+
+
+def _relevant_source_changes(raw_sources: dict[str, bytes], tree: dict[str, str],
+                             object_format: str) -> list[dict[str, str]]:
+    changes = []
+    for path, raw in sorted(raw_sources.items()):
+        raw_blob = _git_blob_sha(raw, object_format)
+        head_blob = tree.get(path)
+        if head_blob is None:
+            changes.append({"path": path, "state": "untracked", "raw_git_blob_sha": raw_blob})
+        elif head_blob != raw_blob:
+            changes.append({"path": path, "state": "modified", "head_git_blob_sha": head_blob,
+                            "raw_git_blob_sha": raw_blob})
+    return changes
+
+
 def read_json(path: Path) -> Any:
     def reject(value: str):
         raise ValueError(f"non-finite JSON value {value}")
@@ -87,21 +123,33 @@ def source_identity() -> dict[str, Any]:
               "m1_depth_verification.json", "detections_verification.json",
               "detections_warp_verification.json", "detections_batch_verification.json", "m2_verification.json"}
     paths.update(p.resolve() for p in PROTO.iterdir() if p.is_file() and p.name in verify)
-    files = []
+    files, raw_sources = [], {}
     for path in sorted(paths, key=lambda p: str(p).casefold()):
         raw = path.read_bytes()
-        files.append({"path": path.relative_to(git_root).as_posix(), "bytes": len(raw), "sha256": digest(raw)})
-    commit = subprocess.run(["git", "-C", str(git_root), "rev-parse", "HEAD"],
-                            capture_output=True, text=True, shell=False, check=False)
-    status = subprocess.run(["git", "-C", str(git_root), "status", "--porcelain=v1", "-z", "--untracked-files=all"],
-                            capture_output=True, shell=False, check=False)
-    if commit.returncode or status.returncode:
-        raise AuditError("could not capture Git commit/dirty identity")
-    dirty = status.stdout
+        relative = path.relative_to(git_root).as_posix()
+        files.append({"path": relative, "bytes": len(raw), "sha256": digest(raw)})
+        raw_sources[relative] = raw
+    details = subprocess.run(["git", "-C", str(git_root), "rev-parse", "HEAD", "--abbrev-ref", "HEAD",
+                              "--show-object-format=storage"],
+                             capture_output=True, text=True, shell=False, check=False)
+    fields = details.stdout.splitlines()
+    if details.returncode or len(fields) != 3:
+        raise AuditError("could not capture Git commit/branch and object format")
+    commit, branch, object_format = fields
+    tree = subprocess.run(["git", "-C", str(git_root), "ls-tree", "-r", "-z", commit],
+                          capture_output=True, shell=False, check=False)
+    if tree.returncode:
+        raise AuditError("could not read the captured Git commit tree identity")
+    changes = _relevant_source_changes(raw_sources, _parse_git_tree(tree.stdout), object_format)
+    change_manifest = json.dumps(changes, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
     return {"captured_at_utc": now(),
-            "git": {"commit": commit.stdout.strip(), "dirty": bool(dirty),
-                    "dirty_entries": sum(bool(x) for x in dirty.split(b"\0")),
-                    "status_sha256": digest(dirty)},
+            "git": {"commit": commit, "branch": branch, "object_format": object_format,
+                    "relevant_sources_dirty": bool(changes),
+                    "dirty_scope": "raw_source_bytes vs HEAD only; whole workspace dirty not measured",
+                    "modified_source_paths": [x["path"] for x in changes if x["state"] == "modified"],
+                    "untracked_source_paths": [x["path"] for x in changes if x["state"] == "untracked"],
+                    "relevant_source_changes": changes,
+                    "relevant_source_changes_sha256": digest(change_manifest)},
             "raw_source_bytes": files,
             "manifest_sha256": digest(json.dumps(files, sort_keys=True, ensure_ascii=False).encode())}
 
