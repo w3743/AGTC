@@ -6,13 +6,16 @@ Isaac Lab, the training environment, PyTorch, or policy/checkpoint code.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
 import json
 import math
 import os
+import shlex
 import sys
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path, PureWindowsPath
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -125,6 +128,29 @@ class RobotGeometry:
     proxy_bodies: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class NativeViewerContext:
+    """Verified static CPU geometry plus identity from its live training trial."""
+    trial_name: str
+    engine: str
+    backend_revision: str
+    task_identity_sha256: str
+    training_env_count: int
+    model_sha256: str
+    model_json_path: str
+    trial_dir: str
+    source_commit: str
+    backend_source_sha256: str
+    train_wsl_source_sha256: str
+    protocol_sha256: str
+    body_names: tuple[str, ...]
+    geometry: RobotGeometry
+    publish_interval_steps: int
+    sim_dt_s: float
+    decimation: int
+    policy_dt_s: float
+
+
 def _triangulate_face_counts(counts: Sequence[int], indices: Sequence[int]) -> tuple[tuple[int, int, int], ...]:
     faces: list[tuple[int, int, int]] = []
     cursor = 0
@@ -190,6 +216,559 @@ def _cylinder_mesh(radius: float, height: float, axis: str, matrix: Any, Gf: Any
         else:
             faces.extend(((bottom_center, lo_next, lo), (top_center, hi, hi_next)))
     return MeshData(_apply_gf_transform(points, matrix, Gf), tuple(faces), color)
+
+
+NATIVE_GROUND_DISPLAY_HALF_EXTENT_M = 200.0
+NATIVE_BODY_LABELS = (
+    "base_link",
+    "gimbal_yaw_link",
+    "gimbal_pitch_link",
+    *(f"left_wheel_{index}_wheel_link" for index in range(7)),
+    *(f"right_wheel_{index}_wheel_link" for index in range(7)),
+    "left_front_guide_link",
+    "right_front_guide_link",
+)
+
+
+def _strict_int(value: Any, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{name} must be an integer")
+    return value
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _read_json_object(path: Path, description: str) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read {description}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise ValueError(f"{description} must be a JSON object")
+    return value
+
+
+def _rotate_wxyz(vector: Sequence[float], quaternion: Sequence[float]) -> tuple[float, float, float]:
+    """Rotate a local vector by a MuJoCo scalar-first quaternion."""
+    x, y, z = _finite_vec(vector, 3, "geometry vertex")
+    w, qx, qy, qz = _finite_vec(quaternion, 4, "local_quat_wxyz")
+    norm = math.sqrt(w * w + qx * qx + qy * qy + qz * qz)
+    if norm < 1e-12:
+        raise ValueError("local_quat_wxyz must be non-zero")
+    w, qx, qy, qz = w / norm, qx / norm, qy / norm, qz / norm
+    # v' = v + 2*w*(q x v) + 2*(q x (q x v)); this preserves the wxyz order.
+    cx, cy, cz = qy * z - qz * y, qz * x - qx * z, qx * y - qy * x
+    dx, dy, dz = qy * cz - qz * cy, qz * cx - qx * cz, qx * cy - qy * cx
+    return (x + 2.0 * (w * cx + dx),
+            y + 2.0 * (w * cy + dy),
+            z + 2.0 * (w * cz + dz))
+
+
+def _native_geom_color(rgba: Any, name: str) -> tuple[int, int, int]:
+    channels = _finite_vec(rgba, 4, f"{name}.rgba")
+    if any(channel < 0.0 or channel > 1.0 for channel in channels):
+        raise ValueError(f"{name}.rgba channels must be between 0 and 1")
+    return tuple(round(channel * 255.0) for channel in channels[:3])
+
+
+def _native_geom_mesh(geom: Mapping[str, Any]) -> MeshData:
+    """Build one exact MuJoCo box or cylinder mesh in its owning body frame."""
+    name = str(geom.get("name", "geometry"))
+    shape = geom.get("type")
+    size_raw = geom.get("size_m")
+    position = _finite_vec(geom.get("local_pos_xyz_m"), 3, f"{name}.local_pos_xyz_m")
+    quaternion = _finite_vec(geom.get("local_quat_wxyz"), 4, f"{name}.local_quat_wxyz")
+    color = _native_geom_color(geom.get("rgba"), name)
+
+    if shape == "box":
+        half = _finite_vec(size_raw, 3, f"{name}.size_m")
+        if any(value <= 0.0 for value in half):
+            raise ValueError(f"{name} box half-sizes must be positive")
+        sx, sy, sz = half
+        vertices = (
+            (-sx, -sy, -sz), (sx, -sy, -sz), (sx, sy, -sz), (-sx, sy, -sz),
+            (-sx, -sy, sz), (sx, -sy, sz), (sx, sy, sz), (-sx, sy, sz),
+        )
+        faces = ((0, 2, 1), (0, 3, 2), (4, 5, 6), (4, 6, 7), (0, 1, 5), (0, 5, 4),
+                 (1, 2, 6), (1, 6, 5), (2, 3, 7), (2, 7, 6), (3, 0, 4), (3, 4, 7))
+    elif shape == "cylinder":
+        dimensions = _finite_vec(size_raw, 3, f"{name}.size_m")
+        radius, half_height = dimensions[:2]
+        if radius <= 0.0 or half_height <= 0.0:
+            raise ValueError(f"{name} cylinder radius and half-height must be positive")
+        segments = 24
+        vertices_list: list[tuple[float, float, float]] = []
+        for z in (-half_height, half_height):
+            vertices_list.extend((radius * math.cos(2.0 * math.pi * i / segments),
+                                  radius * math.sin(2.0 * math.pi * i / segments), z)
+                                 for i in range(segments))
+        bottom_center, top_center = len(vertices_list), len(vertices_list) + 1
+        vertices_list.extend(((0.0, 0.0, -half_height), (0.0, 0.0, half_height)))
+        faces_list: list[tuple[int, int, int]] = []
+        for i in range(segments):
+            nxt = (i + 1) % segments
+            lo, hi = i, segments + i
+            lo_next, hi_next = nxt, segments + nxt
+            faces_list.extend(((lo, lo_next, hi_next), (lo, hi_next, hi),
+                               (bottom_center, lo_next, lo), (top_center, hi, hi_next)))
+        vertices = tuple(vertices_list)
+        faces = tuple(faces_list)
+    else:
+        raise ValueError(f"unsupported native MuJoCo geom type {shape!r} at {name}")
+
+    transformed = []
+    for vertex in vertices:
+        rotated = _rotate_wxyz(vertex, quaternion)
+        transformed.append(tuple(rotated[index] + position[index] for index in range(3)))
+    return MeshData(tuple(transformed), tuple(faces), color)
+
+
+def _native_ground_mesh(geom: Mapping[str, Any]) -> MeshData:
+    """Render the exported horizontal z=0 physical plane with a display crop."""
+    if geom.get("type") != "plane" or geom.get("body_name") != "world":
+        raise ValueError("native ground geometry must be the exported world plane")
+    position = _finite_vec(geom.get("local_pos_xyz_m"), 3, "ground.local_pos_xyz_m")
+    quaternion = _finite_vec(geom.get("local_quat_wxyz"), 4, "ground.local_quat_wxyz")
+    if abs(position[2]) > 1e-8:
+        raise ValueError("native physical plane must lie on z=0")
+    normal = _rotate_wxyz((0.0, 0.0, 1.0), quaternion)
+    if abs(normal[0]) > 1e-8 or abs(normal[1]) > 1e-8 or abs(abs(normal[2]) - 1.0) > 1e-8:
+        raise ValueError("native physical plane must be horizontal")
+    extent = NATIVE_GROUND_DISPLAY_HALF_EXTENT_M
+    vertices = []
+    for x, y in ((-extent, -extent), (extent, -extent), (extent, extent), (-extent, extent)):
+        rotated = _rotate_wxyz((x, y, 0.0), quaternion)
+        vertices.append(tuple(rotated[index] + position[index] for index in range(3)))
+    return MeshData(tuple(vertices), ((0, 1, 2), (0, 2, 3)), _native_geom_color(geom.get("rgba"), "ground"))
+
+
+def _native_geometry_from_payload(payload: Mapping[str, Any]) -> tuple[RobotGeometry, tuple[str, ...]]:
+    """Fail closed unless the static export maps every live body to real geometry."""
+    if payload.get("schema") != "agtc.native_view_geometry.v1":
+        raise ValueError("unsupported native geometry schema")
+    model = payload.get("mujoco_static_model")
+    newton = payload.get("newton_static_model_world0")
+    if not isinstance(model, dict) or not isinstance(newton, dict):
+        raise ValueError("native geometry is missing the MuJoCo/Newton model records")
+    mapping = model.get("body_mapping_to_newton")
+    verification = model.get("body_mapping_verification")
+    if (not isinstance(mapping, list) or not isinstance(verification, dict)
+            or verification.get("one_to_one") is not True):
+        raise ValueError("native 19-body Newton/MuJoCo mapping is not verified one-to-one")
+    body_names = newton.get("viewer_body_names_live_order")
+    if (not isinstance(body_names, list) or len(body_names) != BODY_COUNT
+            or len(set(body_names)) != BODY_COUNT or any(not isinstance(name, str) or not name for name in body_names)):
+        raise ValueError("static export must provide 19 unique live viewer body names")
+    body_names_tuple = tuple(body_names)
+    if body_names_tuple != NATIVE_BODY_LABELS:
+        raise ValueError("static export live body order differs from the native trainer packet")
+    mapped_names = [entry.get("viewer_name") for entry in mapping if isinstance(entry, dict)]
+    if (len(mapping) != BODY_COUNT or len(mapped_names) != BODY_COUNT
+            or len(set(mapped_names)) != BODY_COUNT or set(mapped_names) != set(body_names_tuple)):
+        raise ValueError("static body mapping does not cover the 19 native live bodies exactly once")
+    if verification.get("mujoco_nonworld_bodies") != BODY_COUNT or verification.get("newton_bodies") != BODY_COUNT:
+        raise ValueError("static body mapping counts do not match the 19-body live topology")
+    if newton.get("body_count") != BODY_COUNT:
+        raise ValueError("Newton static export body_count does not equal 19")
+    if newton.get("shape_count") != BODY_COUNT + 1:
+        raise ValueError("Newton static export shape_count must include 19 robot geoms and the ground plane")
+
+    mapping_by_name: dict[str, Mapping[str, Any]] = {}
+    mapping_newton_ids: set[int] = set()
+    for entry in mapping:
+        body_name = entry.get("mujoco_body_name")
+        if not isinstance(body_name, str) or body_name in mapping_by_name:
+            raise ValueError("static MuJoCo-to-Newton body names must be unique")
+        newton_body_id = _strict_int(entry.get("newton_body_id"), "mapping.newton_body_id")
+        if newton_body_id in mapping_newton_ids:
+            raise ValueError("static Newton body mapping must be one-to-one")
+        mapping_newton_ids.add(newton_body_id)
+        mapping_by_name[body_name] = entry
+    if mapping_newton_ids != set(range(BODY_COUNT)):
+        raise ValueError("static Newton body IDs must cover 0 through 18 exactly once")
+
+    body_records = model.get("bodies")
+    if not isinstance(body_records, list) or len(body_records) != BODY_COUNT + 1:
+        raise ValueError("MuJoCo body records are missing")
+    body_map: dict[str, str] = {}
+    body_ids: dict[str, int] = {}
+    seen_body_ids: set[int] = set()
+    world_count = 0
+    for body in body_records:
+        if not isinstance(body, dict):
+            raise ValueError("MuJoCo body record must be an object")
+        body_id = _strict_int(body.get("mujoco_body_id"), "mujoco_body_id")
+        if body_id in seen_body_ids:
+            raise ValueError("MuJoCo body IDs must be unique")
+        seen_body_ids.add(body_id)
+        name = body.get("name")
+        if not isinstance(name, str) or not name:
+            raise ValueError("MuJoCo body name is missing")
+        if body_id == 0:
+            if name != "world":
+                raise ValueError("MuJoCo body id 0 must be world")
+            world_count += 1
+            continue
+        viewer_name = body.get("viewer_name")
+        if viewer_name not in body_names_tuple or viewer_name in body_map.values():
+            raise ValueError("MuJoCo body-to-viewer mapping is missing or duplicated")
+        mapping_entry = mapping_by_name.get(name)
+        if (mapping_entry is None or mapping_entry.get("mujoco_body_id") != body_id
+                or mapping_entry.get("viewer_name") != viewer_name):
+            raise ValueError("MuJoCo body record disagrees with the verified Newton body map")
+        body_map[name] = viewer_name
+        body_ids[name] = body_id
+    if (world_count != 1 or seen_body_ids != set(range(BODY_COUNT + 1))
+            or len(body_map) != BODY_COUNT or set(body_map.values()) != set(body_names_tuple)):
+        raise ValueError("static geometry must map all 19 non-world bodies")
+
+    all_geoms = model.get("geometries")
+    grounds = model.get("ground_plane_geometries")
+    if not isinstance(all_geoms, list) or not isinstance(grounds, list):
+        raise ValueError("MuJoCo geom arrays are missing")
+    if (_strict_int(model.get("nbody"), "mujoco_static_model.nbody") != BODY_COUNT + 1
+            or _strict_int(model.get("ngeom"), "mujoco_static_model.ngeom") != BODY_COUNT + 1):
+        raise ValueError("MuJoCo static topology must contain world + 19 bodies and 19 robot geoms + one plane")
+    if len(all_geoms) != BODY_COUNT + 1 or len(grounds) != 1:
+        raise ValueError("static export must contain 19 robot geoms and exactly one physical ground plane")
+
+    ground = grounds[0]
+    ground_id = _strict_int(ground.get("geom_id"), "ground.geom_id")
+    if (ground_id < 0 or _strict_int(ground.get("body_id"), "ground.body_id") != 0
+            or ground.get("type") != "plane"):
+        raise ValueError("ground plane record has invalid body/type identity")
+    _finite_vec(ground.get("size_m"), 3, "ground.size_m")
+    ground_mesh = _native_ground_mesh(ground)
+    seen_geom_ids: set[int] = set()
+    geometry_by_body: dict[str, list[MeshData]] = {name: [] for name in body_names_tuple}
+    for geom in all_geoms:
+        if not isinstance(geom, dict):
+            raise ValueError("MuJoCo geometry record must be an object")
+        geom_id = _strict_int(geom.get("geom_id"), "geom_id")
+        if geom_id in seen_geom_ids:
+            raise ValueError("MuJoCo geom_id values must be unique")
+        seen_geom_ids.add(geom_id)
+        if geom_id == ground_id:
+            if geom.get("type") != "plane" or geom.get("body_name") != "world":
+                raise ValueError("the exported ground plane does not match its geometry record")
+            continue
+        body_name = geom.get("body_name")
+        viewer_name = geom.get("viewer_name")
+        body_id = _strict_int(geom.get("body_id"), "geom.body_id")
+        newton_body_id = _strict_int(geom.get("newton_body_id"), "geom.newton_body_id")
+        mapping_entry = mapping_by_name.get(body_name)
+        if (body_name not in body_map or body_map[body_name] != viewer_name
+                or body_ids.get(body_name) != body_id or mapping_entry is None
+                or mapping_entry.get("newton_body_id") != newton_body_id):
+            raise ValueError(f"geometry {geom.get('name')!r} does not map to its verified Newton body")
+        geometry_by_body[viewer_name].append(_native_geom_mesh(geom))
+    if len(seen_geom_ids) != len(all_geoms):
+        raise ValueError("MuJoCo geom ids are incomplete")
+    missing_geometry = [name for name, meshes in geometry_by_body.items() if not meshes]
+    if missing_geometry:
+        raise ValueError(f"native geometry is missing for 19-body links: {missing_geometry}")
+    return RobotGeometry({name: tuple(meshes) for name, meshes in geometry_by_body.items()},
+                         ground_mesh, ()), body_names_tuple
+
+
+def _collapse_shared_values(value: Any) -> Any:
+    """Collapse arrays repeated identically for each world to their shared value."""
+    if isinstance(value, Mapping):
+        ignored = {"device", "nworld", "naconmax_total", "runtime_diagnostics"}
+        return {key: _collapse_shared_values(item) for key, item in value.items()
+                if key not in ignored and not key.endswith("_array_shape")}
+    if isinstance(value, (list, tuple)):
+        items = [_collapse_shared_values(item) for item in value]
+        if not items:
+            return []
+        if all(_same_identity_value(items[0], item) for item in items[1:]):
+            return items[0]
+        return items
+    return value
+
+
+def _same_identity_value(left: Any, right: Any) -> bool:
+    if isinstance(left, bool) or isinstance(right, bool):
+        return left is right
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        return math.isclose(float(left), float(right), rel_tol=1e-7, abs_tol=1e-8)
+    if isinstance(left, Mapping) and isinstance(right, Mapping):
+        return (left.keys() == right.keys()
+                and all(_same_identity_value(left[key], right[key]) for key in left))
+    if isinstance(left, (list, tuple)) and isinstance(right, (list, tuple)):
+        return (len(left) == len(right)
+                and all(_same_identity_value(a, b) for a, b in zip(left, right, strict=True)))
+    return left == right
+
+
+def _physics_identity_view(physics: Mapping[str, Any], world_count: int) -> dict[str, Any]:
+    result = dict(physics)
+    for key in ("dof", "joints", "bodies"):
+        value = _strict_int(result.get(key), f"physics.{key}")
+        if value % world_count:
+            raise ValueError(f"physics.{key} is not an integer per-world topology")
+        result[key] = value // world_count
+    return _collapse_shared_values(result)
+
+
+def _require_native_task_match(static: Mapping[str, Any], identity: Mapping[str, Any],
+                               contract: Mapping[str, Any]) -> tuple[str, str, float, int, float, int]:
+    """Match the static CPU export to the frozen GPU trial without equating their SHA scope."""
+    provenance = static.get("provenance")
+    backend = static.get("backend_identity_cpu")
+    if not isinstance(provenance, dict) or not isinstance(backend, dict):
+        raise ValueError("native geometry export is missing provenance/backend identity")
+    identity_env = identity.get("env")
+    identity_physics = identity_env.get("physics") if isinstance(identity_env, dict) else None
+    contract_physics = contract.get("physics")
+    if not isinstance(identity_physics, dict) or not isinstance(contract_physics, dict):
+        raise ValueError("native trial contract is missing its physics identity")
+
+    task_sha = identity.get("task_identity_sha256")
+    if (not isinstance(task_sha, str) or not task_sha
+            or contract.get("task_identity_sha256") != task_sha
+            or identity_env.get("task_identity_sha256") != task_sha
+            or provenance.get("formal_gpu_run_task_identity_sha256_read_from_run_contract") != task_sha):
+        raise ValueError("native trial and static export task contract SHA do not match")
+    if identity.get("physics") != "newton_mujoco_warp" or identity_physics.get("engine") != "newton_mujoco_warp":
+        raise ValueError("native trial task contract must use newton_mujoco_warp")
+    if contract_physics.get("engine") != "newton_mujoco_warp":
+        raise ValueError("observation contract physics engine is not newton_mujoco_warp")
+    engine = backend.get("engine")
+    revision = backend.get("backend_revision")
+    if engine != "newton_mujoco_warp" or not isinstance(revision, str) or not revision:
+        raise ValueError("static CPU model engine/revision is invalid")
+
+    trial_worlds = _strict_int(identity.get("num_envs"), "identity.num_envs")
+    cpu_worlds = _strict_int(backend.get("nworld"), "backend_identity_cpu.nworld")
+    if trial_worlds < ENV_COUNT or cpu_worlds != 1:
+        raise ValueError(f"native trial must train at least {ENV_COUNT} environments; geometry export must use one CPU world")
+    if identity_physics.get("backend_revision") != revision or contract_physics.get("backend_revision") != revision:
+        raise ValueError("native trial and CPU geometry backend revisions do not match")
+    formal_physics = provenance.get("formal_run_physics")
+    if not isinstance(formal_physics, dict):
+        raise ValueError("static export does not record the formal GPU physics identity")
+    if (formal_physics.get("engine") != engine
+            or formal_physics.get("backend_revision") != revision
+            or _strict_int(formal_physics.get("nworld"), "provenance.formal_run_physics.nworld") != trial_worlds):
+        raise ValueError("static export formal GPU engine/revision/world count differs from the trial")
+
+    cpu_physics_view = _physics_identity_view(backend, cpu_worlds)
+    live_physics_view = _physics_identity_view(identity_physics, trial_worlds)
+    # The zero-step CPU export records geometry/solver identity but not gravity;
+    # the separately frozen formal GPU identity still checks gravity below.
+    if "gravity_mps2" not in backend:
+        live_physics_view.pop("gravity_mps2", None)
+    if cpu_physics_view != live_physics_view:
+        raise ValueError("static CPU and live GPU physics topology/options differ after per-world normalization")
+    if _physics_identity_view(formal_physics, trial_worlds) != _physics_identity_view(identity_physics, trial_worlds):
+        raise ValueError("static export's recorded formal GPU physics does not match the live trial")
+
+    sim_dt = float(backend.get("dt_s"))
+    decimation = _strict_int(backend.get("decimation"), "backend_identity_cpu.decimation")
+    policy_dt = float(backend.get("policy_dt_s"))
+    if (not all(math.isfinite(v) for v in (sim_dt, policy_dt)) or sim_dt <= 0.0
+            or decimation <= 0 or not math.isclose(sim_dt * decimation, policy_dt, rel_tol=1e-7, abs_tol=1e-9)):
+        raise ValueError("native static physics/policy timestep relation is invalid")
+    for physics in (identity_physics, contract_physics):
+        if (not math.isclose(float(physics.get("dt_s")), sim_dt, rel_tol=1e-9, abs_tol=1e-12)
+                or _strict_int(physics.get("decimation"), "physics.decimation") != decimation):
+            raise ValueError("native trial timestep differs from the static CPU export")
+    if not math.isclose(float(identity_env.get("policy_dt_s")), policy_dt, rel_tol=1e-7, abs_tol=1e-9):
+        raise ValueError("native trial policy timestep differs from the static CPU export")
+    return engine, revision, sim_dt, decimation, policy_dt, trial_worlds
+
+
+def load_native_viewer_context(model_json: Path, trial_dir: Path) -> NativeViewerContext:
+    """Validate the CPU geometry snapshot, frozen source hashes, and live trial contract."""
+    model_path = model_json.resolve()
+    trial_path = trial_dir.resolve()
+    if not model_path.is_file() or not trial_path.is_dir():
+        raise ValueError("native model JSON or trial directory does not exist")
+    model = _read_json_object(model_path, "native static geometry export")
+    if model.get("schema") != "agtc.native_view_geometry.v1":
+        raise ValueError("unsupported native static geometry schema")
+    trial_name = trial_path.name
+    provenance = model.get("provenance")
+    if not isinstance(provenance, dict):
+        raise ValueError("static export provenance is missing")
+    if PureWindowsPath(str(provenance.get("formal_run_dir", ""))).name != trial_name:
+        raise ValueError("static geometry export was captured for a different training trial")
+    identity = _read_json_object(trial_path / "identity.json", "native trial identity.json")
+    contract = _read_json_object(trial_path / "observation_contract.json", "native trial observation_contract.json")
+    engine, revision, sim_dt, decimation, policy_dt, training_env_count = _require_native_task_match(
+        model, identity, contract)
+    formal_protocol_sha = provenance.get("formal_protocol_sha256")
+    protocol_file = _read_json_object(trial_path / "PROTOCOL_NATIVE_V2.sha256", "trial protocol hash")
+    if protocol_file.get("protocol_sha256") != formal_protocol_sha:
+        raise ValueError("static geometry export and training trial use different frozen V2 protocols")
+
+    source_snapshot = provenance.get("source_snapshot")
+    if not isinstance(source_snapshot, dict):
+        raise ValueError("static export source snapshot identity is missing")
+    if (source_snapshot.get("relevant_sources_dirty") is not False
+            or source_snapshot.get("missing") != [] or source_snapshot.get("mismatches") != []
+            or source_snapshot.get("native_source_count") != source_snapshot.get("native_snapshot_files_verified")):
+        raise ValueError("static export source snapshot is incomplete or dirty")
+    expected_paths = {
+        "backend_relative_path": "算法/仿真训练环境/native/proto/newton_mujoco_backend.py",
+        "train_wsl_relative_path": "算法/仿真训练环境/native/train/train_wsl.py",
+    }
+    repo_root = Path(__file__).resolve().parents[3]
+    for key, relative_path in expected_paths.items():
+        if source_snapshot.get(key) != relative_path:
+            raise ValueError(f"static export has an unexpected frozen source path: {key}")
+    for path_key, hash_key in (("backend_relative_path", "backend_sha256"),
+                               ("train_wsl_relative_path", "train_wsl_sha256")):
+        source_path = repo_root.joinpath(*source_snapshot[path_key].split("/"))
+        expected_hash = source_snapshot.get(hash_key)
+        if not isinstance(expected_hash, str) or _sha256_file(source_path) != expected_hash:
+            raise ValueError(f"current frozen source bytes do not match static export: {source_snapshot[path_key]}")
+    if provenance.get("constructed_backend_source_sha256") != source_snapshot.get("backend_sha256"):
+        raise ValueError("constructed backend source hash disagrees with the frozen snapshot")
+
+    quaternion_conventions = model.get("quaternion_conventions")
+    if (not isinstance(quaternion_conventions, dict)
+            or quaternion_conventions.get("mujoco_geom_quat_order") != "wxyz"
+            or quaternion_conventions.get("newton_live_state_body_q_order") != "xyz + xyzw"):
+        raise ValueError("static export quaternion conventions are missing or unsupported")
+
+    construction = provenance.get("construction")
+    if (not isinstance(construction, dict) or construction.get("device") != "cpu"
+            or construction.get("step_calls") != 0 or construction.get("policy_steps") != 0):
+        raise ValueError("static geometry must come from a zero-step CPU construction")
+    model_geometry, body_names = _native_geometry_from_payload(model)
+
+    cli_path = trial_path / "cli_args.txt"
+    try:
+        argv = shlex.split(cli_path.read_text(encoding="utf-8"), posix=True)
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise ValueError(f"cannot read native trial launch arguments: {exc}") from exc
+    intervals = []
+    outputs = []
+    for index, token in enumerate(argv):
+        if token == "--live-state-interval" and index + 1 < len(argv):
+            intervals.append(argv[index + 1])
+        elif token.startswith("--live-state-interval="):
+            intervals.append(token.split("=", 1)[1])
+        if token == "--out" and index + 1 < len(argv):
+            outputs.append(argv[index + 1])
+        elif token.startswith("--out="):
+            outputs.append(token.split("=", 1)[1])
+    if len(intervals) != 1 or len(outputs) != 1 or Path(outputs[0]).name != trial_name:
+        raise ValueError("trial CLI must identify this output and one live-state interval")
+    try:
+        publish_interval = int(intervals[0])
+    except ValueError as exc:
+        raise ValueError("live-state publish interval must be an integer") from exc
+    if publish_interval <= 0:
+        raise ValueError("live-state publish interval must be positive")
+
+    return NativeViewerContext(
+        trial_name=trial_name, engine=engine, backend_revision=revision,
+        task_identity_sha256=str(identity["task_identity_sha256"]), training_env_count=training_env_count,
+        model_sha256=_sha256_file(model_path),
+        model_json_path=str(model_path), trial_dir=str(trial_path),
+        source_commit=str(source_snapshot.get("git_commit", "unknown")),
+        backend_source_sha256=str(source_snapshot["backend_sha256"]),
+        train_wsl_source_sha256=str(source_snapshot["train_wsl_sha256"]),
+        protocol_sha256=str(formal_protocol_sha),
+        body_names=body_names, geometry=model_geometry,
+        publish_interval_steps=publish_interval, sim_dt_s=sim_dt,
+        decimation=decimation, policy_dt_s=policy_dt,
+    )
+
+
+def validate_native_packet(raw: Any, env_index: int,
+                           context: NativeViewerContext) -> dict[str, Any]:
+    """Select the native trainer's raw body/goal/time data without consulting USD."""
+    if isinstance(env_index, bool) or not isinstance(env_index, int) or not 0 <= env_index < ENV_COUNT:
+        raise ValueError(f"env_index must be between 0 and {ENV_COUNT - 1}")
+    if not isinstance(raw, dict) or raw.get("schema_version") != 1:
+        raise ValueError("expected native trainer live-state schema_version 1")
+    if raw.get("quaternion_order") != "xyzw":
+        raise ValueError("native trainer packet quaternion_order must be xyzw")
+    run_id = raw.get("run_id")
+    if run_id != context.trial_name:
+        raise ValueError("native live packet run_id does not match trial directory name")
+    source_pid = _strict_int(raw.get("source_pid"), "source_pid")
+    sequence = _strict_int(raw.get("sequence"), "sequence")
+    timestamp = _strict_int(raw.get("timestamp_unix_ns"), "timestamp_unix_ns")
+    monotonic_timestamp = _strict_int(raw.get("timestamp_monotonic_ns"), "timestamp_monotonic_ns")
+    source_start_time = _strict_int(raw.get("source_start_time_unix_ns"), "source_start_time_unix_ns")
+    if (source_pid <= 0 or sequence < 0 or timestamp <= 0 or monotonic_timestamp <= 0
+            or source_start_time <= 0):
+        raise ValueError("native live packet PID/sequence/timestamps are invalid")
+    if raw.get("publish_status") != "ok":
+        raise ValueError("native live packet reports a failed publish")
+    if _strict_int(raw.get("failed_publish_count"), "failed_publish_count") != 0:
+        raise ValueError("native live packet reports prior publish failures")
+    names = raw.get("body_names")
+    if not isinstance(names, list) or tuple(names) != context.body_names:
+        raise ValueError("native live packet body topology differs from the frozen geometry map")
+    if len(names) != BODY_COUNT:
+        raise ValueError(f"native live packet must contain all {BODY_COUNT} bodies")
+    nested = raw.get("body_link_pose_w")
+    if not isinstance(nested, list) or len(nested) != ENV_COUNT:
+        raise ValueError(f"body_link_pose_w must contain {ENV_COUNT} environments")
+    all_body_poses = []
+    for row_index, row in enumerate(nested):
+        if not isinstance(row, list) or len(row) != BODY_COUNT:
+            raise ValueError(f"body_link_pose_w[{row_index}] must contain {BODY_COUNT} bodies")
+        all_body_poses.append(tuple(
+            _finite_vec(pose, 7, f"body_link_pose_w[{row_index}][{body_index}]")
+            for body_index, pose in enumerate(row)
+        ))
+    body_poses = tuple(all_body_poses[env_index])
+    roots = _finite_rows(raw.get("root_link_pose_w"), ENV_COUNT, 7, "root_link_pose_w")
+    origins = _finite_rows(raw.get("env_origins_w"), ENV_COUNT, 3, "env_origins_w")
+    goals_local = _finite_rows(raw.get("goals_local_xy"), ENV_COUNT, 2, "goals_local_xy")
+    goals_world = _finite_rows(raw.get("goals_world_xy"), ENV_COUNT, 2, "goals_world_xy")
+    for index in range(ENV_COUNT):
+        expected_world = (goals_local[index][0] + origins[index][0],
+                          goals_local[index][1] + origins[index][1])
+        if any(abs(actual - expected) > 1e-4
+               for actual, expected in zip(goals_world[index], expected_world, strict=True)):
+            raise ValueError(f"native goal/world-origin mismatch for environment {index}")
+    task_times = raw.get("task_times_s")
+    if not isinstance(task_times, list) or len(task_times) != ENV_COUNT:
+        raise ValueError(f"task_times_s must contain {ENV_COUNT} values")
+    task_time = float(task_times[env_index])
+    sim_time = float(raw.get("sim_time_s"))
+    if not math.isfinite(task_time) or not math.isfinite(sim_time) or task_time < 0.0 or sim_time < 0.0:
+        raise ValueError("native sim/episode times must be finite and non-negative")
+    base_index = names.index("base_link")
+    if any(abs(a - b) > 1e-4 for a, b in zip(roots[env_index], body_poses[base_index], strict=True)):
+        raise ValueError("native root pose must match the base_link body pose")
+    packet_task_sha = raw.get("task_identity_sha256")
+    if packet_task_sha is not None and packet_task_sha != context.task_identity_sha256:
+        raise ValueError("native live packet task contract SHA does not match its trial")
+    packet_engine = raw.get("engine")
+    if packet_engine is not None and packet_engine != context.engine:
+        raise ValueError("native live packet engine differs from its trial contract")
+    packet_revision = raw.get("backend_revision")
+    if packet_revision is not None and packet_revision != context.backend_revision:
+        raise ValueError("native live packet backend revision differs from static geometry")
+    origin = origins[env_index]
+    return {
+        "source": "native Newton MuJoCo-Warp trainer",
+        "source_pid": source_pid, "source_start_time_unix_ns": source_start_time,
+        "sequence": sequence, "timestamp_unix_ns": timestamp,
+        "timestamp_monotonic_ns": monotonic_timestamp,
+        "run_id": run_id, "sim_time_s": sim_time,
+        "episode_record_time_s": task_time, "task_identity_sha256": context.task_identity_sha256,
+        "engine": context.engine, "backend_revision": context.backend_revision,
+        "body_names": tuple(names), "body_poses": body_poses,
+        "root_pose": roots[env_index], "origin": origin,
+        "goal_local_xy": goals_local[env_index],
+        "sample_phase": str(raw.get("sample_phase", "unknown")),
+    }
 
 
 def load_usd_geometry(robot_path: str, terrain_path: str, body_names: Sequence[str]) -> RobotGeometry:
@@ -337,6 +916,40 @@ class PacketIdentity:
         return True
 
 
+class NativePacketIdentity:
+    """Lock a native raw-state stream to its verified trial and static model."""
+    def __init__(self, context: NativeViewerContext, expected_source_pid: int | None = None):
+        self.context = context
+        self.expected_source_pid = expected_source_pid
+        self.source_pid: int | None = expected_source_pid
+        self.source_start_time_unix_ns: int | None = None
+        self.sequence: int | None = None
+
+    def accept(self, packet: Mapping[str, Any]) -> bool:
+        if packet["run_id"] != self.context.trial_name:
+            raise ValueError("native packet run_id changed from the locked trial")
+        if packet["task_identity_sha256"] != self.context.task_identity_sha256:
+            raise ValueError("native packet task identity changed from the locked trial")
+        if packet["engine"] != self.context.engine or packet["backend_revision"] != self.context.backend_revision:
+            raise ValueError("native packet engine/revision changed from the locked geometry")
+        if tuple(packet["body_names"]) != self.context.body_names:
+            raise ValueError("native body topology changed during the viewer session")
+        source_pid = packet["source_pid"]
+        source_start = packet["source_start_time_unix_ns"]
+        if self.source_pid is not None and source_pid != self.source_pid:
+            raise ValueError("native packet source_pid does not match the locked trainer")
+        if self.source_start_time_unix_ns is not None and source_start != self.source_start_time_unix_ns:
+            raise ValueError("native trainer process start time changed during the viewer session")
+        if self.sequence is not None and packet["sequence"] <= self.sequence:
+            if packet["sequence"] == self.sequence:
+                return False
+            raise ValueError("native source sequence moved backwards")
+        self.source_pid = source_pid
+        self.source_start_time_unix_ns = source_start
+        self.sequence = packet["sequence"]
+        return True
+
+
 def forbidden_modules_loaded(module_names: Iterable[str]) -> tuple[str, ...]:
     return tuple(sorted(name for name in module_names
                         if any(name == prefix or name.startswith(prefix + ".")
@@ -412,6 +1025,48 @@ def _load_scene(server: Any, packet: Mapping[str, Any], env_index: int) -> tuple
     return geometry, frames, goal, goal_label
 
 
+def _load_native_scene(server: Any, context: NativeViewerContext,
+                       packet: Mapping[str, Any]) -> tuple[RobotGeometry, dict[str, Any], Any, Any]:
+    """Add only the verified MuJoCo static geometry and live Newton state."""
+    import numpy as np
+
+    geometry = context.geometry
+    server.scene.add_mesh_simple(
+        "/native/physical_flat_plane_z0",
+        np.asarray(geometry.terrain.vertices, dtype=np.float32),
+        np.asarray(geometry.terrain.faces, dtype=np.uint32),
+        color=geometry.terrain.color, side="double", flat_shading=True,
+        cast_shadow=False, receive_shadow=True,
+    )
+    server.scene.add_grid(
+        "/native/grid", width=400.0, height=400.0, plane="xy",
+        position=(0.0, 0.0, 0.002), cell_size=1.0, section_size=5.0,
+        cell_color=(104, 112, 120), section_color=(144, 150, 156),
+        plane_opacity=0.0,
+    )
+    frames: dict[str, Any] = {}
+    for body_name in context.body_names:
+        frame_path = f"/native/robot/{body_name}"
+        frames[body_name] = server.scene.add_frame(frame_path, show_axes=False)
+        meshes = geometry.by_body[body_name]
+        if not meshes:
+            raise ValueError(f"native static model has no drawable geometry for {body_name}")
+        for index, mesh in enumerate(meshes):
+            server.scene.add_mesh_simple(
+                f"{frame_path}/geom_{index}",
+                np.asarray(mesh.vertices, dtype=np.float32),
+                np.asarray(mesh.faces, dtype=np.uint32),
+                color=mesh.color, side="double", flat_shading=True,
+                cast_shadow=True, receive_shadow=True,
+            )
+    goal = server.scene.add_icosphere("/native/goal/marker", radius=0.14, subdivisions=2,
+                                      color=(50, 210, 130), side="double")
+    goal_label = server.scene.add_label("/native/goal/label", _t("Trainer goal", "训练目标"),
+                                        font_size_mode="scene", font_scene_height=0.2,
+                                        position=(0.0, 0.0, 0.25))
+    return geometry, frames, goal, goal_label
+
+
 def _update_scene(packet: Mapping[str, Any], frames: Mapping[str, Any], goal: Any, goal_label: Any) -> None:
     for name, pose in zip(packet["body_names"], packet["body_poses"]):
         position, wxyz = pose_to_local_wxyz(pose, packet["origin"])
@@ -420,6 +1075,91 @@ def _update_scene(packet: Mapping[str, Any], frames: Mapping[str, Any], goal: An
     gx, gy = packet["goal_local_xy"]
     goal.position = (gx, gy, 0.08)
     goal_label.position = (gx, gy, 0.30)
+
+
+def _timestamp_utc_text(timestamp_unix_ns: int) -> str:
+    seconds, nanos = divmod(timestamp_unix_ns, 1_000_000_000)
+    stamp = datetime.fromtimestamp(seconds, tz=timezone.utc)
+    return f"{stamp.strftime('%Y-%m-%d %H:%M:%S')}.{nanos:09d}Z"
+
+
+def _native_panel_text(packet: Mapping[str, Any], age: float | None, stale: bool,
+                       env_index: int, context: NativeViewerContext, error: str) -> str:
+    state = _t("STALE · holding last pose", "过期 · 保持最后位姿") if stale else _t("LIVE", "实时")
+    if error and not stale:
+        state = _t("UPDATE UNAVAILABLE · holding last pose", "更新不可用 · 保持最后位姿")
+    age_text = _t("unknown", "未知") if age is None else f"{age:.2f} s"
+    base_index = packet["body_names"].index("base_link")
+    base_pose = packet["body_poses"][base_index]
+    local_position, body_wxyz = pose_to_local_wxyz(base_pose, packet["origin"])
+    w, x, y, z = body_wxyz
+    yaw = math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
+    gx, gy = packet["goal_local_xy"]
+    goal_distance = math.hypot(gx - local_position[0], gy - local_position[1])
+    sample_interval_s = context.publish_interval_steps * context.policy_dt_s
+    content = _t(
+        f"**Training state:** {state}  \n"
+        f"**Training environments:** {context.training_env_count} · first {ENV_COUNT} exported · viewing {env_index + 1} / {ENV_COUNT} · PID {packet['source_pid']}  \n"
+        f"**Scene sampling:** every {sample_interval_s:.2f} simulation seconds ({context.publish_interval_steps} control steps)  \n"
+        f"**State time:** {_timestamp_utc_text(packet['timestamp_unix_ns'])} · **Age:** {age_text}  \n"
+        f"**Episode time:** {packet['episode_record_time_s']:.2f} s  \n"
+        f"**Vehicle pose:** x {local_position[0]:.2f} m · y {local_position[1]:.2f} m · z {local_position[2]:.2f} m · yaw {math.degrees(yaw):.1f}°  \n"
+        f"**Distance to goal:** {goal_distance:.2f} m  \n"
+        "**Physical model:** 19 / 19 collision links mapped · flat ground at z=0  \n"
+        "**Perception:** sensor data not shown · capability metrics false.",
+        f"**训练状态：** {state}  \n"
+        f"**训练环境：** {context.training_env_count} 个 · 实时导出前 {ENV_COUNT} 个 · 当前查看第 {env_index + 1} 个（{env_index + 1}/{ENV_COUNT}）· PID {packet['source_pid']}  \n"
+        f"**画面采样步距：** {sample_interval_s:.2f} 秒仿真时间（每 {context.publish_interval_steps} 个控制步）  \n"
+        f"**状态时间：** {_timestamp_utc_text(packet['timestamp_unix_ns'])} · **延迟：** {age_text}  \n"
+        f"**本回合时间：** {packet['episode_record_time_s']:.2f} s  \n"
+        f"**车体位姿：** x {local_position[0]:.2f} m · y {local_position[1]:.2f} m · z {local_position[2]:.2f} m · yaw {math.degrees(yaw):.1f}°  \n"
+        f"**目标距离：** {goal_distance:.2f} m  \n"
+        "**物理模型：** 19 / 19 个真实碰撞几何已映射 · z=0 平面地面  \n"
+        "**感知：** 未显示传感器数据 · capability metrics=false。",
+    )
+    if error and not stale:
+        content += f"  \n{html.escape(error[:160])}"
+    return content
+
+
+def _native_details_text(packet: Mapping[str, Any] | None, age: float | None,
+                         context: NativeViewerContext) -> str:
+    if packet is None:
+        live_summary = _t("Waiting for the live trainer packet.", "等待训练进程实时数据包。")
+    else:
+        age_text = _t("unknown", "未知") if age is None else f"{age:.2f} s"
+        live_summary = _t(
+            f"Live PID {packet['source_pid']} · sequence {packet['sequence']} · {_timestamp_utc_text(packet['timestamp_unix_ns'])} · age {age_text}.",
+            f"实时 PID {packet['source_pid']} · 序号 {packet['sequence']} · {_timestamp_utc_text(packet['timestamp_unix_ns'])} · 延迟 {age_text}。",
+        )
+    return _t(
+        f"**Run:** {html.escape(context.trial_name)}  \n"
+        f"**Engine / revision:** {context.engine} / {html.escape(context.backend_revision)}  \n"
+        f"**Task identity SHA-256:** {context.task_identity_sha256}  \n"
+        f"**Packet cadence:** {context.publish_interval_steps} policy steps · physics {context.sim_dt_s:g} s × {context.decimation} = {context.policy_dt_s:g} s/policy  \n"
+        f"**Static model:** {html.escape(context.model_json_path)}  \n"
+        f"**Static model SHA-256:** {context.model_sha256}  \n"
+        f"**Verified source commit:** {context.source_commit}  \n"
+        f"**Newton backend source SHA-256:** {context.backend_source_sha256}  \n"
+        f"**train_wsl source SHA-256:** {context.train_wsl_source_sha256}  \n"
+        f"**Frozen protocol SHA-256:** {context.protocol_sha256}  \n"
+        f"**Live trainer trial:** {html.escape(context.trial_dir)}  \n"
+        f"{live_summary}  \n"
+        "Static geometry was built on CPU from the verified frozen backend source with zero simulation steps; no GPU geometry arrays were read. Dynamic body poses, goal, and episode time come from the live trainer packet. The physical plane is infinite at z=0; its viewer mesh is clipped to ±200 m. Sensor channels are not exported, capability metrics are false, and this is not RTX or real-vehicle validation.",
+        f"**训练 run：** {html.escape(context.trial_name)}  \n"
+        f"**引擎 / 版本：** {context.engine} / {html.escape(context.backend_revision)}  \n"
+        f"**Task identity SHA-256：** {context.task_identity_sha256}  \n"
+        f"**数据发布：** 每 {context.publish_interval_steps} 个 policy step · 物理 {context.sim_dt_s:g} s × {context.decimation} = {context.policy_dt_s:g} s/policy  \n"
+        f"**静态模型：** {html.escape(context.model_json_path)}  \n"
+        f"**静态模型 SHA-256：** {context.model_sha256}  \n"
+        f"**已验证源码提交：** {context.source_commit}  \n"
+        f"**Newton 后端源码 SHA-256：** {context.backend_source_sha256}  \n"
+        f"**train_wsl 源码 SHA-256：** {context.train_wsl_source_sha256}  \n"
+        f"**冻结协议 SHA-256：** {context.protocol_sha256}  \n"
+        f"**实时训练目录：** {html.escape(context.trial_dir)}  \n"
+        f"{live_summary}  \n"
+        "静态几何来自经验证冻结后端源码的 CPU 零步构建；未读取 GPU 几何数组。车体位姿、目标和 episode 时间来自训练进程实时数据包。物理平面在 z=0 无限延伸，查看器网格裁剪到 ±200 m。此视图未导出传感器数据，capability metrics=false，不代表 RTX 或实车验收。",
+    )
 
 
 def _initial_camera_pose(packet: Mapping[str, Any]) -> tuple[tuple[float, ...], tuple[float, ...]]:
@@ -440,12 +1180,30 @@ def _t(english: str, chinese: str) -> str:
 
 
 def _panel_text(packet: Mapping[str, Any] | None, age: float | None, stale: bool,
-                env_index: int, proxy_count: int, error: str) -> str:
+                env_index: int, proxy_count: int, error: str,
+                native_context: NativeViewerContext | None = None) -> str:
     if packet is None:
         message = _t("Waiting for valid state data", "等待有效状态数据")
         if error:
             message += f"  ·  {html.escape(error[:160])}"
+        if native_context is not None:
+            return _t(
+                f"**Physics-state view:** Native Newton MuJoCo-Warp  \n"
+                f"**Backend revision:** {html.escape(native_context.backend_revision)}  \n"
+                f"**Static geometry:** verified zero-step CPU export from {html.escape(native_context.source_commit[:12])}  \n"
+                f"**Trial:** {html.escape(native_context.trial_name)} · waiting for raw trainer state  \n"
+                "**Ground:** physical flat plane z=0; view clipped to ±200 m.  \n"
+                "Perception channels are not exported; capability metrics false.",
+                f"**物理状态视图：** Native Newton MuJoCo-Warp  \n"
+                f"**后端版本：** {html.escape(native_context.backend_revision)}  \n"
+                f"**静态几何：** 经验证的零步 CPU 导出，source {html.escape(native_context.source_commit[:12])}  \n"
+                f"**训练 trial：** {html.escape(native_context.trial_name)} · 等待训练原始状态  \n"
+                "**地面：** 物理平面 z=0；显示裁剪到 ±200 m。  \n"
+                "此视图未导出感知通道；capability metrics=false。",
+            )
         return _t(f"**Training state**  \n{message}", f"**训练状态**  \n{message}")
+    if native_context is not None:
+        return _native_panel_text(packet, age, stale, env_index, native_context, error)
     state = _t("STALE · holding last pose", "过期 · 保持最后位姿") if stale else _t("LIVE", "实时")
     if error and not stale:
         state = _t("UPDATE UNAVAILABLE · holding last pose", "更新不可用 · 保持最后位姿")
@@ -470,8 +1228,9 @@ def _panel_text(packet: Mapping[str, Any] | None, age: float | None, stale: bool
 
 def _status_record(args: argparse.Namespace, packet: Mapping[str, Any] | None,
                    age: float | None, stale: bool, model_loaded: bool,
-                   forbidden: tuple[str, ...], error: str, server_url: str) -> dict[str, Any]:
-    return {
+                   forbidden: tuple[str, ...], error: str, server_url: str,
+                   native_context: NativeViewerContext | None = None) -> dict[str, Any]:
+    record = {
         "server_pid": os.getpid(),
         "serverpid": os.getpid(),
         "source_pid": None if packet is None else packet["source_pid"],
@@ -499,11 +1258,38 @@ def _status_record(args: argparse.Namespace, packet: Mapping[str, Any] | None,
         "error": error[:500] or None,
         "updated_at_unix_ns": time.time_ns(),
     }
+    if native_context is not None:
+        record.update({
+            "viewer_mode": "native_physics_state",
+            "engine": native_context.engine,
+            "backend_revision": native_context.backend_revision,
+            "task_identity_sha256": native_context.task_identity_sha256,
+            "native_trial_name": native_context.trial_name,
+            "native_model_json": str(Path(args.native_model_json)),
+            "native_model_sha256": native_context.model_sha256,
+            "static_geometry_source": "verified_zero_step_cpu_export",
+            "static_source_commit": native_context.source_commit,
+            "backend_source_sha256": native_context.backend_source_sha256,
+            "train_wsl_source_sha256": native_context.train_wsl_source_sha256,
+            "protocol_sha256": native_context.protocol_sha256,
+            "publish_interval_policy_steps": native_context.publish_interval_steps,
+            "physics_dt_s": native_context.sim_dt_s,
+            "decimation": native_context.decimation,
+            "policy_dt_s": native_context.policy_dt_s,
+            "perception_channels_exported": False,
+            "capability_metrics_allowed": False,
+        })
+    return record
 
 
 def run(args: argparse.Namespace) -> None:
     global _LANGUAGE
     _LANGUAGE = getattr(args, "language", "en")
+    native_context = None
+    if getattr(args, "native_model_json", None) and getattr(args, "native_trial_dir", None):
+        native_context = load_native_viewer_context(Path(args.native_model_json), Path(args.native_trial_dir))
+        if args.expected_run_id and args.expected_run_id != native_context.trial_name:
+            raise ValueError("--expected-run-id does not match --native-trial-dir")
     from viser import ViserServer
     import numpy as np
 
@@ -514,11 +1300,23 @@ def run(args: argparse.Namespace) -> None:
     background = np.empty((2, 2, 3), dtype=np.uint8)
     background[:] = (18, 24, 32)
     server.scene.set_background_image(background, format="png")
-    panel = server.gui.add_markdown(_t("**Training state**  \nWaiting for state data",
-                                        "**训练状态**  \n等待状态数据"))
+    if native_context is None:
+        initial_panel = _t("**Training state**  \nWaiting for state data",
+                           "**训练状态**  \n等待状态数据")
+    else:
+        initial_panel = _t("**Native Newton MuJoCo-Warp physics-state view**  \nWaiting for the verified trainer packet",
+                           "**Native Newton MuJoCo-Warp 物理状态视图**  \n等待已验证的训练数据包")
+    panel = server.gui.add_markdown(initial_panel)
+    detail_panel = None
+    if native_context is not None:
+        with server.gui.add_folder(_t("Source and calibration", "来源与校准"),
+                                   expand_by_default=False):
+            detail_panel = server.gui.add_markdown(_native_details_text(None, None, native_context))
 
     reader = LatestPacketReader(Path(args.state_file))
-    identity = PacketIdentity(args.expected_run_id, args.expected_source_pid)
+    identity = (NativePacketIdentity(native_context, args.expected_source_pid)
+                if native_context is not None
+                else PacketIdentity(args.expected_run_id, args.expected_source_pid))
     packet: dict[str, Any] | None = None
     geometry: RobotGeometry | None = None
     frames: dict[str, Any] = {}
@@ -531,6 +1329,7 @@ def run(args: argparse.Namespace) -> None:
     last_panel_stale: bool | None = None
     last_panel_error: str | None = None
     last_panel_proxy_count: int | None = None
+    last_detail_panel = ""
     last_error = ""
     camera_initialized = False
     status_path = Path(args.output) / "viewer_status.json"
@@ -542,10 +1341,15 @@ def run(args: argparse.Namespace) -> None:
             raw = reader.poll()
             if raw is not None:
                 try:
-                    candidate = validate_packet(raw, args.env_index)
+                    candidate = (validate_native_packet(raw, args.env_index, native_context)
+                                 if native_context is not None else validate_packet(raw, args.env_index))
                     if identity.accept(candidate):
                         if geometry is None:
-                            geometry, frames, goal, goal_label = _load_scene(server, candidate, args.env_index)
+                            if native_context is None:
+                                geometry, frames, goal, goal_label = _load_scene(server, candidate, args.env_index)
+                            else:
+                                geometry, frames, goal, goal_label = _load_native_scene(server, native_context,
+                                                                                        candidate)
                         packet = candidate
                         _update_scene(packet, frames, goal, goal_label)
                         if not camera_initialized:
@@ -570,10 +1374,16 @@ def run(args: argparse.Namespace) -> None:
                            or last_error != last_panel_error or proxy_count != last_panel_proxy_count)
             panel_refresh_due = now_mono - last_panel_update_at >= STATUS_INTERVAL_S
             if panel_event or panel_refresh_due:
-                panel_text = _panel_text(packet, age, stale, args.env_index, proxy_count, last_error)
+                panel_text = _panel_text(packet, age, stale, args.env_index, proxy_count, last_error,
+                                         native_context)
                 if panel_text != last_panel:
                     panel.content = panel_text
                     last_panel = panel_text
+                if native_context is not None and detail_panel is not None:
+                    detail_text = _native_details_text(packet, age, native_context)
+                    if detail_text != last_detail_panel:
+                        detail_panel.content = detail_text
+                        last_detail_panel = detail_text
                 last_panel_update_at = now_mono
                 last_panel_sequence = panel_sequence
                 last_panel_stale = stale
@@ -585,7 +1395,7 @@ def run(args: argparse.Namespace) -> None:
                 try:
                     _write_status(status_path, _status_record(args, packet, age, stale,
                                                               geometry is not None, forbidden,
-                                                              last_error, server_url))
+                                                              last_error, server_url, native_context))
                 except OSError as exc:
                     print(f"viewer status write failed: {exc}", file=sys.stderr, flush=True)
                 last_status_at = now_mono
@@ -600,6 +1410,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--state-file", required=True, help="Atomic live-state JSON from the training process")
     parser.add_argument("--output", required=True, help="Directory for viewer_status.json")
+    parser.add_argument("--native-model-json", help="Verified zero-step CPU MuJoCo geometry export for native viewing")
+    parser.add_argument("--native-trial-dir", help="Identity/contract directory for the live native trainer")
     parser.add_argument("--expected-run-id", default="", help="Reject packets from other runs")
     parser.add_argument("--expected-source-pid", type=int, help="Reject packets from other source processes")
     parser.add_argument("--host", default="127.0.0.1")
@@ -612,13 +1424,18 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = _build_parser().parse_args()
+    if bool(args.native_model_json) != bool(args.native_trial_dir):
+        raise SystemExit("--native-model-json and --native-trial-dir must be supplied together")
     if not 0 <= args.env_index < ENV_COUNT:
         raise SystemExit(f"--env-index must be between 0 and {ENV_COUNT - 1}")
     if not 1 <= args.port <= 65535:
         raise SystemExit("--port must be between 1 and 65535")
     if args.expected_source_pid is not None and args.expected_source_pid <= 0:
         raise SystemExit("--expected-source-pid must be positive")
-    run(args)
+    try:
+        run(args)
+    except ValueError as exc:
+        raise SystemExit(f"viewer identity preflight failed: {exc}") from exc
 
 
 if __name__ == "__main__":
