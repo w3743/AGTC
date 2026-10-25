@@ -1,5 +1,7 @@
 # Native 训练栈（WSL2 / Linux ARM64 与 x86_64 Linux 通用）
 
+> 本机当前状态、完整训练配方、测量证据与限制见 [迁移验收说明](MIGRATION_ACCEPTANCE.md)。旧 pilot01 实际是简化任务，不能作为正式 fast_stop_v2 成绩；五路真实通道已实现，RTX 与代理物理域差仍保留。
+
 本目录把原先放在仓库外的 WSL 原生栈代码纳入版本管理，便于换机、复现和远程执行。
 Isaac Sim/Kit 训练已停止（见 `../PERF_PLATFORM.md` §20）；这里是 WSL/Linux 原生训练路径。
 

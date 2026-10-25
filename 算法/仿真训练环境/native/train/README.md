@@ -1,36 +1,21 @@
-# WSL 原生训练准备（wsl_train）
+# 原生训练与评估入口
 
-目的：用户已决定**放弃 Isaac 训练、以后以 WSL 原生栈为主**。本目录是 WSL 侧的训练骨架，复用 `../proto/` 的物理/观测/策略原型，并补上真实训练需要的 checkpoint / resume / 指标落盘。
+本目录使用 `../proto/` 的 Newton XPBD/Warp 环境、仓库五路编码器与 LSTM-512/PPO，无需 Isaac Sim/Kit。状态、证据与本机路径限制见 [迁移验收说明](../MIGRATION_ACCEPTANCE.md)。
 
-## 状态（2026-10-25 11:20）
-
-- 环境：`Ubuntu-24.04-Arm64`（WSL2），GPU 可见（RTX Spark N1X / 98304 MiB），torch 2.14.1+cu130、warp 1.18、newton 1.7、mujoco 3.17、ovphysx 0.7 全部可用；根盘约 945 GB 可用。
-- `train_wsl.py` 已冒烟验证：
-  - 2 iterations：iter2 collection 1.63 s、**628 samples/s**（64 env × 16 steps = 1024 samples/iter）、端到端 563 samples/s；
-  - `--save-interval 2` 生成 `checkpoint_2.pt` / `latest.pt`；
-  - `--resume` 从 checkpoint_2 继续到 iter 3–4，observation contract SHA 校验通过，iteration 连续。
-- **depth 已就绪**：`observation_provider.depth_backend="analytic"`（Warp），与独立 numpy caster 对照 mask 不一致 0、max 2.06e-4 m；`train_wsl.py --depth analytic` 冒烟 iter2 collection 2.06 s / 496 samples/s。
-- **仍未就绪**：`detections 16×8` 仍是占位，`capability_metrics_allowed=false`；depth 与 Isaac RTX 的域差未逐像素对照。
-
-## 用法
+正式配方为64 env×32 steps、LSTM-512、fast_stop_v2、五路真实观测、1ms/50。旧CLI默认保留原型兼容性，不能省略传感器/任务参数冒充正式配方。
 
 ```bash
-# 新训练（GPU，64 env × 16 steps/iter）
-/opt/venv/bin/python /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/train_wsl.py \
-  --num-envs 64 --num-steps 16 --iterations 100 --save-interval 10 \
-  --device cuda --physics newton_xpbd --lidar warp --feedback vqf \
-  --out /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/runs/<trial>
-
-# 从 checkpoint 继续
-/opt/venv/bin/python /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/train_wsl.py \
-  ... --out <同一目录> --resume <同一目录>/latest.pt
+cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native
+PYTHON=/opt/venv/bin/python bash train/run_native_v1_trial.sh <new-tag>
+/opt/venv/bin/python tools/benchmark_training.py --help
+PYTHON=/opt/venv/bin/python bash train/run_eval_pilot_4seeds.sh <checkpoint.pt> <new-out-dir>
+PYTHON=/opt/venv/bin/python bash train/run_eval_16seeds.sh <checkpoint.pt> <new-out-dir> 87010-87025
 ```
 
-- 产物：`metrics.jsonl`（每 iter 吞吐/奖励/loss）、`observation_contract.json`、`identity.json`、`checkpoint_{iter}.pt`、`latest.pt`、`summary.json`。
-- 约束：checkpoint 的 observation contract SHA 必须与当前环境一致，否则拒绝 resume；draft 阶段 `capability_metrics_allowed=false`，**不得据此宣称能力/避苗/实车结论**。
+产物：metrics.jsonl、identity.json、observation_contract.json、checkpoint；成功结束才有summary.json。失败记录不得用旧summary或目录名冒充完成。resume必须核对策略、任务/奖励/终止、物理、观测契约；使用新输出目录保存恢复测试。
 
-## 进入正式训练的门槛
+身份规范native_task_contract_v2排除profile、并行world数及运行元数据，规范每环境拓扑，支持训练64环境→评估1环境；不同task/物理/传感器仍拒绝。旧无版本checkpoint默认拒绝，只有eval可用显式task+legacy opt-in探索，输出不会标为strict_match。
 
-1. depth/detections 与 reference（以及登记 RTX 域差）验证通过，contract 中所有通道 `real`；
-2. 用真观测重跑 `train_wsl.py` 2 iterations，确认吞吐不退化（预计 VQF+depth 成本仍有明显余量）；
-3. 定义并冻结本地的 native trial 协议（观测/奖励/终止/种子/验收口径），再开始长训练。
+PROTOCOL_NATIVE_V1.1与V1原文及伴随SHA冻结保留。V1.1旧正文仍有5ms示例/旧wsl_train路径，执行以修正入口为准；5ms/10只属实验配置，不能作正式训练。
+
+五路传感器已有真实解析实现；RTX域差、代理物理保真、16-seed配对能力评估仍未完成。capability_metrics_allowed=false；吞吐与链路冒烟不构成导航能力结论。

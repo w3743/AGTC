@@ -1,0 +1,349 @@
+{
+  "schema": "native_gpu_chain_smoke_v1",
+  "purpose": "Sequential resume, strict eval, and preflight mismatch chain smoke; not a benchmark or capability evaluation.",
+  "created_at_utc": "2026-10-25T08:53:26.056Z",
+  "created_at_beijing": "2026-10-25T16:53:26.056+08:00",
+  "external_directory": "C:\\pioneer\\agtc-native-acceptance-backup\\gpu_chain_smoke_20261025_165003",
+  "source_revision": {
+    "requested_commit": "953b355fae4c0d6ef6429a4417db7cbe04dd92a4",
+    "current_head": "ae9c61545a4334c7b8f84b5dbcdd2dfe2967ef7f",
+    "training_source_files_match_requested_commit": true,
+    "checked_files": [
+      "native/train/train_wsl.py",
+      "native/train/eval_native.py",
+      "native/proto/native_env.py",
+      "native/train/contract_identity.py"
+    ]
+  },
+  "source_checkpoint": {
+    "path": "C:\\pioneer\\agtc-native-acceptance-backup\\gpu_preflight_20261025_164558\\latest.pt",
+    "sha256": "b07a193c21a4ad2a79da9916147462c5409560b2c6109e1fd13d22313360a2f0",
+    "iteration": 2,
+    "adam_step": 8
+  },
+  "contract": {
+    "schema": "native_task_contract_v2",
+    "task_backend": "fast_stop_v2",
+    "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c"
+  },
+  "resume_phase": {
+    "exit_code": 0,
+    "elapsed_seconds": 15.291,
+    "start_iteration": 2,
+    "end_iteration": 3,
+    "additional_iterations": 1,
+    "checkpoint_3_path": "resume_smoke/checkpoint_3.pt",
+    "latest_path": "resume_smoke/latest.pt",
+    "optimizer_step_before": 8,
+    "optimizer_step_after": 12,
+    "expected_steps_added": 4,
+    "cpu_audit": {
+      "validated_at_utc": "2026-10-25T08:51:20Z",
+      "method": "CPU-only torch.load(weights_only=True, map_location=cpu); does not query or initialize CUDA",
+      "checkpoints": [
+        {
+          "file": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_preflight_20261025_164558/latest.pt",
+          "iteration": 2,
+          "policy_type": "lstm",
+          "hidden_size": 512,
+          "identity_schema_version": "native_task_contract_v2",
+          "task_backend": "fast_stop_v2",
+          "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+          "policy_tensor_stats": {
+            "tensors": 33,
+            "elements": 1619913,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_tensor_stats": {
+            "tensors": 99,
+            "elements": 3239859,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_parameter_states": 33,
+          "adam_step_min": 8.0,
+          "adam_step_max": 8.0,
+          "adam_unique_steps": [
+            8.0
+          ],
+          "passed_finite_cpu": true
+        },
+        {
+          "file": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_chain_smoke_20261025_165003/resume_smoke/checkpoint_3.pt",
+          "iteration": 3,
+          "policy_type": "lstm",
+          "hidden_size": 512,
+          "identity_schema_version": "native_task_contract_v2",
+          "task_backend": "fast_stop_v2",
+          "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+          "policy_tensor_stats": {
+            "tensors": 33,
+            "elements": 1619913,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_tensor_stats": {
+            "tensors": 99,
+            "elements": 3239859,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_parameter_states": 33,
+          "adam_step_min": 12.0,
+          "adam_step_max": 12.0,
+          "adam_unique_steps": [
+            12.0
+          ],
+          "passed_finite_cpu": true
+        },
+        {
+          "file": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_chain_smoke_20261025_165003/resume_smoke/latest.pt",
+          "iteration": 3,
+          "policy_type": "lstm",
+          "hidden_size": 512,
+          "identity_schema_version": "native_task_contract_v2",
+          "task_backend": "fast_stop_v2",
+          "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+          "policy_tensor_stats": {
+            "tensors": 33,
+            "elements": 1619913,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_tensor_stats": {
+            "tensors": 99,
+            "elements": 3239859,
+            "nonfinite": 0,
+            "devices": [
+              "cpu"
+            ]
+          },
+          "optimizer_parameter_states": 33,
+          "adam_step_min": 12.0,
+          "adam_step_max": 12.0,
+          "adam_unique_steps": [
+            12.0
+          ],
+          "passed_finite_cpu": true
+        }
+      ],
+      "passed": true
+    },
+    "metrics": [
+      {
+        "iter": 3,
+        "wall_s": 7.1358,
+        "collection_s": 4.8963,
+        "policy_act_s": 1.0309,
+        "env_step_s": 3.7184,
+        "learning_s": 2.2282,
+        "samples": 2048,
+        "samples_per_s": 418.27,
+        "end_to_end_samples_per_s": 287.0,
+        "rss_mb": 2759.5,
+        "mean_reward": -0.01876,
+        "ppo_loss": 0.0919,
+        "observation_contract_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+        "phase": "wsl_training_prep",
+        "policy_type": "lstm",
+        "capability_metrics_allowed": false,
+        "nonfinite_env_resets": 0,
+        "nonfinite_actions": 0
+      }
+    ],
+    "nonfinite_env_resets_total": 0,
+    "nonfinite_actions_total": 0
+  },
+  "evaluation_phase": {
+    "exit_code": 0,
+    "elapsed_seconds": 8.653,
+    "checkpoint": "resume_smoke/latest.pt",
+    "checkpoint_sha256": "9bd2a586496149ef5bc6080731ed3f36974ace15d6444622164b5aaa1edab7e9",
+    "checkpoint_contract_validation": "strict_match",
+    "policy_checkpoint_contract_validation": "strict_match",
+    "checkpoint_sha256_in_policy": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+    "live_contract_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+    "checkpoint_sha_matches_live": true,
+    "task_backend": "fast_stop_v2",
+    "env_diagnostics": {
+      "count": 0,
+      "events": [],
+      "last_mask": [],
+      "sensor_frames": 0
+    },
+    "rows": [
+      {
+        "seed": 87010,
+        "success": false,
+        "clean_success": false,
+        "reason": "time_limit",
+        "steps": 32,
+        "final_distance": 34.7417,
+        "goal_stop": false,
+        "hold_s": 0.0,
+        "final_xy_speed": 0.0006,
+        "final_angular_speed": 0.0519,
+        "flipped": false
+      }
+    ],
+    "invalid_or_nonfinite_rows": 0,
+    "result_note": "One seed hit the 32-step time limit. This smoke checks the eval contract and runtime path only; success outcome/rate is not evaluated."
+  },
+  "negative_physics_phase": {
+    "exit_code": 1,
+    "requested_sim_dt_s": 0.005,
+    "requested_decimation": 10,
+    "contract_rejection_message": "checkpoint physics 0.001s/50 does not match requested 0.005s/10",
+    "rejection_before_environment_creation": true,
+    "evaluation_directory_created": false,
+    "evaluation_file_created": false,
+    "captured_contract_mismatch": true,
+    "exit_metadata": {
+      "exit_code": 1,
+      "started_at_utc": "2026-10-25T08:52:03.735Z",
+      "ended_at_utc": "2026-10-25T08:52:05.872Z",
+      "elapsed_seconds": 2.137,
+      "input_checkpoint_sha256": "9bd2a586496149ef5bc6080731ed3f36974ace15d6444622164b5aaa1edab7e9",
+      "expected_nonzero": true,
+      "observed_nonzero": true,
+      "evaluation_directory_created": false,
+      "evaluation_file_created": false,
+      "rejection_message_observed": true
+    }
+  },
+  "sequential_execution": {
+    "gpu_runs_serial": true,
+    "training_repeat_count": 1,
+    "eval_repeat_count": 1,
+    "formal_benchmark_run": false
+  },
+  "all_assertions_passed": true,
+  "artifact_inventory": [
+    {
+      "path": "baseline_checkpoint_audit.json",
+      "bytes": 1093,
+      "sha256": "8b896c77bc626eef5087419e5358ae531edf48775274de142be1bb878a4b6c4c"
+    },
+    {
+      "path": "cpu_checkpoint_audit.py",
+      "bytes": 3078,
+      "sha256": "ad8ce73becba55e24e9cc3facb9f792a70210a73b39ac7bbd7b51a9cb16a03e8"
+    },
+    {
+      "path": "source_checkpoint.json",
+      "bytes": 1772,
+      "sha256": "01dba4af00c1559fdb3d06d4135de38626dc43ca7206d75e8604ecd9227438d4"
+    },
+    {
+      "path": "eval_smoke\\argv.json",
+      "bytes": 1383,
+      "sha256": "d5228d9ac30fc7ec621b2e07e03011e9e55b66de1c3789f58b63f5419b417b10"
+    },
+    {
+      "path": "eval_smoke\\evaluation.json",
+      "bytes": 4335,
+      "sha256": "b190e65fda55c606d1436fbf2bd052b52baa1d3173c2b020d0dd7bc077c98b49"
+    },
+    {
+      "path": "eval_smoke\\exit.json",
+      "bytes": 246,
+      "sha256": "4533e7ecf9d7dcefd6005e5a78caaa10c8fae409162550a847f5baeaa180cd06"
+    },
+    {
+      "path": "eval_smoke\\rawlog.stderr.txt",
+      "bytes": 148,
+      "sha256": "54cbf66986b07c80bf2026411b2799fb4dc82c6da7ca94d20ae1b1c7c8417977"
+    },
+    {
+      "path": "eval_smoke\\rawlog.stdout.txt",
+      "bytes": 1887,
+      "sha256": "a8f0d296ae681c612accdd62064fcfb0ca10b645667ab24f27807b2c6ddeabae"
+    },
+    {
+      "path": "mismatch_smoke\\argv.json",
+      "bytes": 1600,
+      "sha256": "474919175e75700282fa8e31eeb7417c485b6d138353af832bfdc7246555cb6d"
+    },
+    {
+      "path": "mismatch_smoke\\exit.json",
+      "bytes": 422,
+      "sha256": "b73bdbf18697bb7f6e88eb98c64e8c3c52b837f112f8518d66809566265997db"
+    },
+    {
+      "path": "mismatch_smoke\\rawlog.stderr.txt",
+      "bytes": 879,
+      "sha256": "b8cb6ca1439e16be8159ea7e5441cd1b8a0fcb9652c85663de92f794b858bfbb"
+    },
+    {
+      "path": "mismatch_smoke\\rawlog.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "resume_smoke\\argv.json",
+      "bytes": 1554,
+      "sha256": "9f24c69ed1e2e817eece3b810825a6a52160580fa1fdadb0e32a5073fdf85df6"
+    },
+    {
+      "path": "resume_smoke\\checkpoint_3.pt",
+      "bytes": 19485749,
+      "sha256": "e0dd3593cf3fc6ee0ed432d561f2ca0db67acb6436b7f2ba253fc5a23296dc81"
+    },
+    {
+      "path": "resume_smoke\\checkpoint_transition_audit.json",
+      "bytes": 2925,
+      "sha256": "68ef38f56afec6e8bd4382ea2461174ab23a2abd0edbc23c64d94f8ff215a1a5"
+    },
+    {
+      "path": "resume_smoke\\exit.json",
+      "bytes": 248,
+      "sha256": "1f2c09f064ef9e30f53228ae73ed8dea8afa39dfe65b6bbd99d543d3c445d810"
+    },
+    {
+      "path": "resume_smoke\\identity.json",
+      "bytes": 8341,
+      "sha256": "193ec3acb39681c2739464192375c5a5da75e109e15cd1b4888e8c8023646479"
+    },
+    {
+      "path": "resume_smoke\\latest.pt",
+      "bytes": 19484939,
+      "sha256": "9bd2a586496149ef5bc6080731ed3f36974ace15d6444622164b5aaa1edab7e9"
+    },
+    {
+      "path": "resume_smoke\\metrics.jsonl",
+      "bytes": 502,
+      "sha256": "a91d323177fc230f6ac2a98080ac49441f1951db3ef84f969a553cc45832346c"
+    },
+    {
+      "path": "resume_smoke\\observation_contract.json",
+      "bytes": 32313,
+      "sha256": "98f103f5c7199a3ec8d18864db61a38eb7ff2162aa2c54bf08feaa6d7daa003d"
+    },
+    {
+      "path": "resume_smoke\\rawlog.stderr.txt",
+      "bytes": 148,
+      "sha256": "54cbf66986b07c80bf2026411b2799fb4dc82c6da7ca94d20ae1b1c7c8417977"
+    },
+    {
+      "path": "resume_smoke\\rawlog.stdout.txt",
+      "bytes": 3592,
+      "sha256": "57c31c27db8a93b07df5ff26024a5ae928d15a4657950b77fee2c1b710ff7f5f"
+    },
+    {
+      "path": "resume_smoke\\summary.json",
+      "bytes": 627,
+      "sha256": "21b90157cd57ce810873bb6fdb5e6c7193e327a0bb6b8668133a6f93e77c592a"
+    }
+  ]
+}

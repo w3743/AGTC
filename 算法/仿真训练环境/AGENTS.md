@@ -147,3 +147,14 @@
 - WSL 训练准备：新增仓库外 `C:/pioneer/wsl-native/wsl_train/train_wsl.py`（GPU/newton_xpbd/warp lidar/vqf、JSONL、checkpoint/save-interval、resume + observation-contract SHA 校验），冒烟 64 env×16 steps 稳态 ~600–650 samples/s，resume 已验证。
 - 未就绪：depth 160×88（Warp 实现与 reference 对照 MISMATCH，修复中）、detections 16×8（未实现）；`capability_metrics_allowed=false`，当前 WSL 训练只能作吞吐/学习冒烟。
 - 记录：`PERF_PLATFORM.md` §20、`WSL_TRAIN_PLAN.md`；Isaac 仅保留为对照/验收工具。
+
+## 2026-10-25 原生训练平台验收批次（当前入口）
+
+- 本轮五项独立改动已完成范围整理（5/5）：（1）显式任务选择与native_task_contract_v2身份；（2）正式训练启动器完整日志/真实退出码与固定配方；（3）评估入口纠正1ms/50并严格验证检查点、种子覆盖与非有限结果；（4）同进程固定预热/实测的可复现ARM64性能工具；（5）Repository checks增加无需GPU/torch的标准库CPU回归。
+- CPU范围整理实跑：Windows27项全部通过；WSL27项中2项PowerShell专用跳过，其余通过。清除旧重复SHA函数/未使用导入，统一共享契约计算。冻结V1/V1.1协议与历史模型/成绩不改。
+- GPU链路冒烟已真实exit0：64env×32step、LSTM512、五路real、fast_stop_v2、NewtonXPBD、1ms/50；resume iteration2→3、Adam8→12，policy/optimizer均finite；1env/32step eval strict_match同SHA，非能力评估；0.005/10负向请求在环境构造前exit1拒绝。
+- 旧pilot01实际simplified，目标300但最后20轮、manifest exit1、无summary；不记自然完成，不把旧数据回填为V1.1成绩。推理服务PID48968后续已不存在；桌面GPU活动和aria2仍保留，不声称整机隔离。
+- 共享目录曾发生未提交文件/修改意外回退，原因未明；本轮采用明确责任文件、直接文件写入、外部备份和分项提交。旧probe目录丢失后的恢复证据明确标记重建，不伪装原capture。
+- 性能数字、正式训练状态、复现命令与限制统一见 native/MIGRATION_ACCEPTANCE.md；不将早期占位原型、历史Isaac配置优化、共享负载观察与本轮正式完整栈测量混算。当前仍 capability_metrics_allowed=false，RTX域差和代理物理保真/导航能力不以吞吐替代。
+
+- 整理后的后续批次当前2/5：（1）Git来源审计改为实际训练输入raw blob与明确HEAD tree核对，避免全工程LFS索引阻塞，dirty_scope明确不覆盖无关工作区；新增原始LF/改动/未跟踪回归后Windows28项全过。（2）保留两份历史报告EOF原字节的精确.gitattributes例外，修复CI空白阻塞，不放宽其他仓库检查。新pilot06由另一入口在17:03:08启动，按新训练优先保留；禁止并跑benchmark冒称无竞争窗口，复测等待其自然退出。

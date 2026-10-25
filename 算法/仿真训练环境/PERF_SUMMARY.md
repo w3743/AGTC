@@ -1,29 +1,25 @@
-# 训练平台性能改造 · 执行摘要（2026-10-25）
+# 训练平台性能改造：当前入口
 
-本文件是 [PERF_PLATFORM.md](PERF_PLATFORM.md) 与 [NATIVE_STACK_PLAN.md](NATIVE_STACK_PLAN.md) 的索引式摘要；所有数字均为本机实测，未外推。
+当前主训练路径已转向 WSL2 ARM64 原生栈。实现已纳入 `native/`，无需启动 Isaac Sim/Kit。本轮配置、测量口径、原始证据与限制以 [迁移与验收说明](native/MIGRATION_ACCEPTANCE.md) 为准。
 
-## 结论
+## 当前实现
 
-| 目标 | 结果 |
-|---|---|
-| Isaac Sim/Kit 配置优化（本机可直接用） | **19.6×**：4 env/1 ms 基线 2.18 samples/s → 32 env/5 ms/dec=10 **42.65 samples/s**；96 iter / 393,216 transitions 用时 2h33m |
-| 原生 ARM64/WSL2 训练栈（同一 4096 samples/iter 口径） | 稳态 **12.48 s/iter** vs Isaac 88–96 s → **7.1–7.7×**；328.2 samples/s（steaady） |
-| 观测/任务等价性 | lidar（numpy 逐位一致；Warp 仅 2/6400 掠射差 3.35e-4 m）、state 4.05e-7、feedback 直通 2.9e-8、VQF 旁路 0.0；**depth/detections 仍占位** |
-| 策略能力 | **未达成**：model_95 0/2、model_128 0/4（非 strict-pass，仅开发口径）；失败模式为越界或接近后不满足 0.4 m/0.05 m/s 停稳条件 |
-| Git/PR | 分支 `perf/max-throughput` 已推送；草稿 PR **#24**（CI 绿灯、mergeable） |
+- Newton XPBD GPU 物理；Warp LiDAR、解析 depth/detections、状态与 VQF 五路真实观测。
+- 五路编码器、LSTM-512、PPO、checkpoint/resume 和 native 评估。
+- 正式配置为 1 ms × 50；5 ms × 10 有数值失稳记录，不能用于正式训练。
+- 本轮审计发现旧 pilot01 实际使用简化任务，不能作为 V1.1 fast-stop 试验。新运行显式选择 `fast_stop_v2` 并校验任务/物理契约。
+- 解析传感器与 RTX、代理物理与完整 Isaac 场景仍有域差；`capability_metrics_allowed=false`。吞吐验收与导航、实车能力验收分别处理。
 
-## 关键改动
+## 历史性能参照
 
-- `isaac_field/env.py`：新增 `ISAAC_FIELD_PERF_PHYSICS=1` 开关，允许 `sim.dt*decimation==task.dt`；**默认路径仍强制 1 ms/50、solver 40/1、render_interval=50**，行为不变。
-- 评估/训练记录、checkpoint 审计、fast eval 脚本保存在 `results/isaac_field_improvement/perf_20261025_n32_dt5/`。
-- 原生栈原型与基准在仓库外 `C:/pioneer/wsl-native/`（WSL2 Ubuntu 24.04 ARM64），报告见该目录 `REPORT.md`、`EQUIVALENCE_REPORT.md`、`CAPABILITY_GAPS.md`。
+| 运行 | 记录 | 使用边界 |
+|---|---|---|
+| Isaac a07，4 env、1 ms/50 | collection 约 2.18 samples/s | 历史采集速率；不是端到端速率 |
+| Isaac perf，32 env、5 ms/10 | 393216 samples / 9218.8 s = 42.65 samples/s | 改了并行数与物理步长；非物理等价对照 |
+| 原生早期 M3b，64 env、1 ms/50 | 4096 samples/iter，稳态约 328.2 samples/s | 早期短原型，depth/detections 占位；不可替代完整栈新测量 |
 
-## 平台上限
+不把以上数字连乘为迁移倍数，也不把采集速率与完整训练速率混算。完整历史记录保留在 [PERF_PLATFORM.md](PERF_PLATFORM.md) 和 [NATIVE_STACK_PLAN.md](NATIVE_STACK_PLAN.md)，其中较早“尚未实现/仓库外”的描述只属于当时状态。
 
-- 高负载（~96%）时 SM 时钟会降到约 663–690 MHz、功耗读数仅 ~5 W（`power.limit=N/A`，读数不可信）；但负载 30–50% 时实测 2.1–2.4 GHz（窗口采样 max 2385 MHz），**不是固定锁频**，更像功率/热预算限制。原生栈负载峰值 2236 MHz；软件无法突破该预算；1.65 TFLOPS fp32 为可复现平台数字，不能外推到裸机。
+## Git
 
-## 下一步建议（需用户决定）
-
-1. **策略能力**：继续训练到百万级 transitions 或调整奖励/课程；当前 606k transitions 仍未收敛。
-2. **原生栈**：完成 depth/detections（估 6–9 人日）后才可替代正式训练；当前只能用于吞吐实验。
-3. **PR**：可转 ready 合入（仅含性能开关与文档；不改变默认训练协议），或保持 draft 等待后续。
+延续 `perf/max-throughput` 和 [PR #24](https://github.com/w3743/AGTC/pull/24)。最新提交、检查与本轮测量见 PR 和迁移验收说明；旧文档中的“CI 已绿/mergeable”仅是历史观察。

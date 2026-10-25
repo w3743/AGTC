@@ -1,5 +1,7 @@
 # 原生 ARM64 训练栈迁移计划（2026-10-25）
 
+> 当前实现已入库 native/，五路真实观测与显式 fast_stop_v2 训练路径已接入。本文件保留历史阶段计划；当前配方、实测与边界以 [迁移验收说明](native/MIGRATION_ACCEPTANCE.md) 为准。
+
 目标：把训练从「Isaac Sim + Kit + x64 模拟」迁移到「WSL2 Ubuntu 24.04 ARM64 原生 + 无 Kit 的物理/传感器栈」，以消除当前每 policy step 50 次 PhysX `fetch_results()` 阻塞回读的平台瓶颈。本文只记录已实测事实与可执行计划；未执行项不写成通过。
 
 ## 1. 当前状态
