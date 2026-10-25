@@ -85,3 +85,19 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 
 - 由于 96 iterations 的策略尚不能到点（见 §7），从 `model_95.pt` 继续训练：`perf_20261025_n32_dt5_cont`，`--max_iterations 192`，其余配置不变（32 env、dt=5 ms、dec=10、seed 69041、resume optimizer state），预计约 4.5–5 小时。
 - 训练日志：`cont_train.log`；checkpoint 在 `logs/rsl_rl/perf_20261025_n32_dt5_cont/cont/`。
+
+## 13. 策略评估更新（2026-10-25 08:17，5 ms 物理、12 m 场地）
+
+| checkpoint | 场景数 | 成功 | 关键结果 |
+|---|---|---|---|
+| model_95（393,216 transitions） | 2 | 0 | 1 个 outside_or_overturned（355 步）、1 个 time_limit（1200 步），平均最终距离 8.94 m |
+| model_128（536,576 transitions） | 4 | 0 | 2 个 outside_or_overturned（284/756 步）、2 个 time_limit（1200 步），平均最终距离 6.59 m |
+
+- 两次均 `strictpass_eligible=false`，**不构成能力结论**；但趋势说明：平台吞吐问题已解决，策略质量仍是任务/算法层面的问题（536k transitions 仍未学会到点，距离从 8.94 m 降到 6.59 m）。
+- 结论口径：**本次交付的是“训练平台性能改造”，不是“策略学会导航”**；若继续提升策略，需要更长训练（百万级 transitions）或任务/奖励/课程调整，不能把吞吐提升等同于能力提升。
+
+## 14. 续训状态（2026-10-25 08:25 起）
+
+- 从 `model_128.pt` 续训 `perf_20261025_n32_dt5_cont3`，`--max_iterations 159`（目标 287），配置不变；预计约 4 小时。
+- 暂停/恢复记录：`cont_stop_record.json`、`cont2_stop_record.json`（评估窗口用）。
+- 评估产物：`eval_final_fast/`（model_95，2 场景）、`eval_model_128_fast/`（model_128，4 场景）、对应 `eval_summary_*.json`。

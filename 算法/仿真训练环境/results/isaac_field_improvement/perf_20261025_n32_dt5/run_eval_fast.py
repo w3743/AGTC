@@ -45,8 +45,15 @@ from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA  # noqa: E402
 from isaac_field.task import FAST_STOP_REWARD_PROFILES  # noqa: E402
 
 ADAPTER = r"C:\pioneer\先进通用履带底盘工程\算法\仿真训练环境\results\isaac_field_improvement\physx_pointmove_flat12_gpu_20261024_a07\evaluate_torch_batched.py"
-CHECKPOINT = r"C:\pioneer\先进通用履带底盘工程\算法\仿真训练环境\results\isaac_field_improvement\perf_20261025_n32_dt5\logs\rsl_rl\perf_20261025_n32_dt5\train\model_95.pt"
-OUTPUT = r"C:\pioneer\先进通用履带底盘工程\算法\仿真训练环境\results\isaac_field_improvement\perf_20261025_n32_dt5\eval_final_fast"
+RUN_DIR = r"C:\pioneer\先进通用履带底盘工程\算法\仿真训练环境\results\isaac_field_improvement\perf_20261025_n32_dt5"
+CHECKPOINT = os.environ.get(
+    "PERF_EVAL_CHECKPOINT",
+    RUN_DIR + r"\logs\rsl_rl\perf_20261025_n32_dt5\train\model_95.pt",
+)
+OUTPUT = os.environ.get(
+    "PERF_EVAL_OUTPUT",
+    RUN_DIR + r"\eval_final_fast",
+)
 SCENARIO_COUNT = int(os.environ.get("PERF_EVAL_SCENARIOS", "2"))
 
 
