@@ -142,3 +142,10 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 实验 1（最小单变量）：fresh training，`ISAAC_FIELD_INIT_STD=0.12`，其余与 perf 配置一致（32 env、dt=5 ms、dec=10、96 iterations、393,216 transitions）。
 - 后续实验（若 1 不足）：熵系数 >0、目标接近/停稳奖励塑形或课程；都需新 trial，不改现有协议与历史结果。
 - 评估口径沿用现成 4 场景 fast eval（5 ms 物理、12 m 场地），与 model_128 的 0/4 对比；仍非 strict-pass，不作能力结论。
+
+## 20. 训练停止记录（2026-10-25 10:58，按用户指令）
+
+- 用户指令：停止当前 Isaac 训练；`cont4` 在 iter ~183 处被终止，**不做自然完成声明**。
+- 保留最后完整 checkpoint `model_176.pt`：741,376 timesteps、权重有限、SHA `a0937d36…`（审计文件 `checkpoint_audit_model_176.json`）。
+- 停止记录：`cont4_stop_record.json`（reason=user requested, training_status=interrupted_by_user, final_eval=not_run）。
+- 后续方向（用户 2026-10-25）：**以后以 WSL 原生栈为主**；Isaac 仅保留为对照/验收工具。下一步按计划 A 实现 depth/detections，完成后正式把训练切到 WSL。
