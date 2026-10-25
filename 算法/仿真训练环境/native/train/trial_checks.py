@@ -169,7 +169,8 @@ def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
                 "physics": "newton_xpbd",
             }
             for name, expected in expected_summary.items():
-                if summary.get(name) != expected:
+                actual = summary.get(name)
+                if type(actual) is not type(expected) or actual != expected:
                     errors.append(f"summary.json {name} is not {expected}")
             if summary.get("observation_contract_sha256") != digest:
                 errors.append("summary.json observation contract SHA does not match the trial")
@@ -203,7 +204,7 @@ def _trial_evidence_errors(trial: Path, digest: str | None) -> list[str]:
             continue
         if _contains_nonfinite(row):
             errors.append(f"metrics.jsonl row {index} contains non-finite fields")
-        if row.get("iter") != index:
+        if type(row.get("iter")) is not int or row.get("iter") != index:
             errors.append(f"metrics.jsonl row {index} has unexpected iteration {row.get('iter')!r}")
         if type(row.get("samples")) is not int or row.get("samples") != FORMAL_SAMPLES:
             errors.append(f"metrics.jsonl row {index} samples is not {FORMAL_SAMPLES}")

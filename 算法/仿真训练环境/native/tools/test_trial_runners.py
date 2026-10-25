@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -377,6 +378,10 @@ class TrialRunnerTests(unittest.TestCase):
         result = self._run_shell("run_native_v1_trial.sh", [tag])
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         trial = next((self.checkout / "runs").glob(f"native_v1_1_{tag}_*"))
+        logged_command = shlex.split((trial / "cli_args.txt").read_text(encoding="utf-8"))
+        self.assertEqual(logged_command[:3], [
+            self._wsl_path(self.fake_python), "-u", self._wsl_path(self.checkout / "train_wsl.py")
+        ])
         self.assertEqual((trial / "train.log").read_text(encoding="utf-8").count("TRAIN_LINE_"), 12)
         manifest = json.loads((trial / "trial_manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["exit_code"], 0)
@@ -384,6 +389,38 @@ class TrialRunnerTests(unittest.TestCase):
         self.assertEqual(manifest["task_backend"], "fast_stop_v2")
         self.assertEqual(manifest["physics"], {"sim_dt": 0.001, "decimation": 50, "experimental": False})
         self.assertIn("--nonfinite-limit 0", (trial / "cli_args.txt").read_text(encoding="utf-8"))
+
+    def test_manifest_rejects_boolean_or_float_iteration_fields(self):
+        cases = (
+            ("metric bool", "metric", True, "unexpected iteration True"),
+            ("metric float", "metric", 1.0, "unexpected iteration 1.0"),
+            ("summary bool", "summary", False, "summary.json start_iteration is not 0"),
+            ("summary float", "summary", 0.0, "summary.json start_iteration is not 0"),
+        )
+        for name, location, value, expected_error in cases:
+            with self.subTest(case=name):
+                checkpoint = self._make_formal_trial()
+                trial = checkpoint.parent
+                if location == "metric":
+                    metrics_path = trial / "metrics.jsonl"
+                    rows = [json.loads(line) for line in metrics_path.read_text(encoding="utf-8").splitlines()]
+                    rows[0]["iter"] = value
+                    metrics_path.write_text(
+                        "".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+                else:
+                    summary_path = trial / "summary.json"
+                    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+                    summary["start_iteration"] = value
+                    summary_path.write_text(json.dumps(summary), encoding="utf-8")
+                result = subprocess.run(
+                    [sys.executable, str(TRAIN_SOURCE / "trial_checks.py"), "write-manifest",
+                     "--trial-dir", str(trial), "--train-exit", "0",
+                     "--protocol-sha", str(TRAIN_SOURCE / "PROTOCOL_NATIVE_V1.1.sha256")],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                manifest = json.loads((trial / "trial_manifest.json").read_text(encoding="utf-8"))
+                self.assertFalse(manifest["formal_eligible"])
+                self.assertTrue(any(expected_error in error for error in manifest["validation_errors"]))
 
     def test_exit_zero_with_nonfinite_resets_is_not_formal(self):
         tag = "nonfinite reset " + os.urandom(3).hex()

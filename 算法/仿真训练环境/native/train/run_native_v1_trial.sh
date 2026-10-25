@@ -82,7 +82,7 @@ ARGS=(--policy lstm --lstm-hidden 512 --num-envs 64 --num-steps 32 --iterations 
       --lidar warp --feedback vqf --depth analytic --detections analytic --detections-warp
       --sim-dt 0.001 --decimation 50 --save-interval 20 --nonfinite-limit 0 --out "$TRIAL")
 printf 'PHYSICS sim_dt=0.001 decimation=50\n' | tee "$TRIAL/physics.txt"
-printf '%q ' "${PYTHON_CMD[@]}" "$SCRIPT_DIR/train_wsl.py" -u "${ARGS[@]}" "${EXTRA_ARGS[@]}" > "$TRIAL/cli_args.txt"
+printf '%q ' "${PYTHON_CMD[@]}" -u "$SCRIPT_DIR/train_wsl.py" "${ARGS[@]}" "${EXTRA_ARGS[@]}" > "$TRIAL/cli_args.txt"
 printf '\n' >> "$TRIAL/cli_args.txt"
 
 echo "=== formal trial train: $TRIAL ==="
