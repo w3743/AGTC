@@ -149,3 +149,13 @@ python3.12 -m venv /opt/venv && /opt/venv/bin/pip install torch --index-url http
   - 域差登记：contract/verification 新增 `sensor_domain_ap` 字段（isaac_source / native_source / expected_differences / edge_policy / usable_for_capability）。
   - 合计 **6–9 人日**，建议 depth 先行。
 - 收口：`proto/` 已含吞吐原型、等价性报告、迁移评估、缺口设计；剩余 blockers 只剩 depth/detections 占位 + state 用真值位姿的 ~0.25 人日 follow-up；`capability_metrics_allowed=false` 不变。
+
+## 13. M3b-4096：与 Isaac 同样本量的 wall-clock 对比（2026-10-25 08:52，GPU 窗口 55 s）
+
+- 配置：`train_m0.py --num-envs 64 --num-steps 64 --iterations 3 --device cuda --physics newton_xpbd --lidar warp`，**4096 samples/iter**（与 Isaac 32 env × 128 steps 同样本量）。
+- 结果（iter2–3 稳态）：wall **12.48 s/iter**、collection 10.28 s、learning 2.18 s；**328.2 samples/s**（collection-only 398.4）；物理吞吐 ≈19,900 env-steps/s。
+- iter1 含一次性 CUDA/cuDNN warmup：29.696 s（policy_act 首次 11.8 s、learning 7.2 s），已单列，不计入倍数。
+- 对比 Isaac（4096 samples/iter，88–96 s）：**同样本量下原生栈约 7.1–7.7× 更快**（iter wall 12.5 vs 88–96 s）。
+- 口径限制：原生 64 env vs Isaac 32 env；Isaac 侧含 Isaac Sim/Kit 渲染与逐步 PhysX 同步开销；不是逐项受控的等工作量基准，不能外推为“训练总时长必然缩短同倍数”。
+- GPU 采样：util mean 18.4% / p95 71% / max 79%；SM clock mean 1181 MHz / max 2236 MHz（仍低于标称 3003）；mem 峰值 5396 MiB；power 读数不可信。
+- 产物：`C:/pioneer/wsl-native/proto/runs/m3b_4096/`（run.log、m0_metrics.jsonl、gpu_samples.csv、summary/identity/contract，contract SHA `452357d9…`）。
