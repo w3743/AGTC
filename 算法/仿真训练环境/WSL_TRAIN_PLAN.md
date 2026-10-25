@@ -59,3 +59,15 @@
   3. warp detections mask 单 launch 批量化（目标 ≤30 ms/批）；
   4. **真实 LSTM-512 策略接入**（`wsl_train/policy_lstm.py` + `--policy lstm`，含序列化 PPO 更新）；
   5. 之后做 GPU A/B（1 ms/50 vs 5 ms/10），冻结 native 试验协议，启动正式 WSL 训练。
+
+## 2026-10-25 11:45 A/B 与成本再定位
+
+- **batch warp detections mask**：64 poses 从 per-pose launch 52.3 ms/批 降到**单 launch 5.66 ms/批（0.0885 ms/帧，11,305 帧/s）**，≤30 ms 目标达成；与逐 pose 逐像素一致。
+- **A/B（64 env×16 steps×2 iter，全 real 观测）**：
+  | 配置 | wall | collection | env_step | samples/s |
+  |---|---|---|---|---|
+  | 1 ms/50 | 3.031 s | 2.828 s | 2.704 s | 337.9 |
+  | 5 ms/10 | 2.211 s | 1.938 s | 1.848 s | **463.1** |
+  - 5ms 相对 1ms 仅 **1.37×**（不是物理子步数的 5×），因为 observation 合计 ~1.5 s/iter 不随物理 dt 缩放。
+- **新瓶颈**：detections 的 ~1.0 s/iter 来自 `cast_center_distance` 的 numpy 逐 pose 地形 marching + 组装（mask 已批量到 5.66 ms/4 帧 ≈0.02 s），不是 mask 本身。
+- 下一步：detections 中心射线/组装批量化（预计 1.0 s → ~0.1 s），再复测 1ms vs 5ms；之后接 LSTM-512 策略；5ms 暂不作训练默认，复测后再定（标 experimental、与 1ms 结果分开记录）。
