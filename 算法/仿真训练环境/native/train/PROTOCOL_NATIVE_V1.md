@@ -4,7 +4,7 @@
 > 状态：**FROZEN**（冻结日期 2026-10-25；Lead 已确认 §10 决策）。冻结后任何修改都必须新开版本（V2），不得原地改写。
 > 适用范围：WSL2 Ubuntu-24.04-Arm64 原生栈（MuJoCo CPU / Newton XPBD + warp 传感器）的 native 训练与评估。
 > 关联文档：`proto/EQUIVALENCE_REPORT.md`、`proto/DEPTH_DETECTIONS_REPORT.md`、`proto/INTEGRATION_ASSESSMENT.md`、`proto/CAPABILITY_GAPS.md`。
-> 历史草案：`train/PROTOCOL_NATIVE_DRAFT.md`（已被本文件取代，仅留档）。
+> 历史草案：`wsl_train/PROTOCOL_NATIVE_DRAFT.md`（已被本文件取代，仅留档）。
 
 ## 1. 范围与域
 
@@ -61,18 +61,18 @@
 
 ## 6. 评估（eval_native）
 
-- 工具：`train/eval_native.py`；每 seed 一场景，`auto_reset=False`，1200 步 @20 Hz，
+- 工具：`wsl_train/eval_native.py`；每 seed 一场景，`auto_reset=False`，1200 步 @20 Hz，
   动作取均值（deterministic）。
 - **开发/pilot 评估**：先 4 seeds **87010–87013**。
 - **正式 trial 终评**：16 seeds **87010–87025**。
 - 830xx 为保留未观察数据，不做 held-out 使用；禁止用训练/评估滚动窗口冒充 held-out。
 - 命令（4 seeds，pilot）：
   ```bash
-  bash train/run_eval_pilot_4seeds.sh <checkpoint.pt> runs/eval_native_<tag>
+  bash wsl_train/run_eval_pilot_4seeds.sh <checkpoint.pt> runs/eval_native_<tag>
   ```
 - 命令（16 seeds，正式终评，加 `--formal` 标签由调用方记录）：
   ```bash
-  bash train/run_eval_16seeds.sh <checkpoint.pt> runs/eval_native_<tag> 87010-87025
+  bash wsl_train/run_eval_16seeds.sh <checkpoint.pt> runs/eval_native_<tag> 87010-87025
   ```
 - 失败原因：`goal_stop` / `time_limit` / `outside_or_overturned`（up-z < cos(1.2)）。
 - `evaluation.json` 字段：`schema_version, banner, generated_at, native_domain, domain_gap,
@@ -101,7 +101,7 @@
 
 ## 9. Trial 命名、SHA 与产物
 
-- 正式 trial 目录：`train/runs/native_v1_<tag>_<YYYYmmdd_HHMMSS>/`。
+- 正式 trial 目录：`wsl_train/runs/native_v1_<tag>_<YYYYmmdd_HHMMSS>/`。
 - 每个正式 trial 必须包含 `trial_manifest.json`：
   `{protocol_sha256, git_or_workspace_state, cli_args, observation_contract_sha256, checkpoint_files,
   eval_json_paths, created_at}`；`protocol_sha256` 必须等于本文件冻结值。
@@ -124,7 +124,7 @@
 ## 11. 冻结与 SHA
 
 - `protocol_sha256` 的计算：对本文件内容中 `> protocol_sha256: ...` 这一行做归一化（置空值）后，
-  取 UTF-8 字节的 SHA-256；脚本 `train/protocol_sha.py` 负责计算/校验/嵌入，并生成
+  取 UTF-8 字节的 SHA-256；脚本 `wsl_train/protocol_sha.py` 负责计算/校验/嵌入，并生成
   `PROTOCOL_NATIVE_V1.sha256`（含算法与范围说明）。
 - 任何对协议正文的修改都会改变 SHA；冻结后若需修改必须新建 V2，不得原地改。
 - trial 中记录协议 SHA 与协议文件副本。
@@ -133,15 +133,15 @@
 
 - 训练（5ms/10，LSTM，300 iter，正式 trial 模板）：
   ```bash
-  /opt/venv/bin/python train/train_wsl.py --policy lstm \
+  /opt/venv/bin/python wsl_train/train_wsl.py --policy lstm \
     --num-envs 64 --num-steps 32 --iterations 300 --seed 0 --threads 8 \
     --device cuda --physics newton_xpbd --lidar warp --feedback vqf \
     --depth analytic --detections analytic --detections-warp \
     --sim-dt 0.005 --decimation 10 --profile --save-interval 10 \
-    --out train/runs/native_v1_<tag>_<timestamp>
+    --out wsl_train/runs/native_v1_<tag>_<timestamp>
   ```
-- 评估（pilot 4 seeds）：`bash train/run_eval_pilot_4seeds.sh <checkpoint.pt> <out_dir>`；
-  正式 16 seeds：`bash train/run_eval_16seeds.sh <checkpoint.pt> <out_dir> 87010-87025`。
+- 评估（pilot 4 seeds）：`bash wsl_train/run_eval_pilot_4seeds.sh <checkpoint.pt> <out_dir>`；
+  正式 16 seeds：`bash wsl_train/run_eval_16seeds.sh <checkpoint.pt> <out_dir> 87010-87025`。
 - 验证数据：`proto/m1_verification.json`、`m2_verification.json`、`depth_verification.json`、
   `detections_verification.json`、`detections_warp_verification.json`、`detections_batch_verification.json`。
 
