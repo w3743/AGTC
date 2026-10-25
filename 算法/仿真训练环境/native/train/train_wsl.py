@@ -64,7 +64,7 @@ def _make_live_exporter(path: str, body_names: list[str], run_id: str):
 
 
 def _write_live_state(exporter, env, origins, sim_time: float) -> bool:
-    """Write one schema-v1 live-state packet for the first 4 envs (newton XPBD state)."""
+    """Write one schema-v1 live-state packet for the first 4 native Newton envs."""
     try:
         backend = env.backend
         body_q = backend.state_0.body_q.numpy()  # (nworld*bodies, 7) px py pz qx qy qz qw
@@ -80,10 +80,10 @@ def _write_live_state(exporter, env, origins, sim_time: float) -> bool:
             pose[:, 1] += origins[e, 1]
             body_link_pose_w[e] = pose
         root_rows = body_link_pose_w[:, base_local, :]
-        goals = np.stack([env.goal_xy[e] - origins[e, :2] for e in range(4)])
+        goals = env.goal_xy[:4].copy()  # Native goals are already env-local.
         exporter.write(root_link_pose_w=root_rows, body_link_pose_w=body_link_pose_w,
                        env_origins_w=origins, goals_local_xy=goals,
-                       task_times_s=np.full(4, sim_time), sim_time_s=sim_time)
+                       task_times_s=env.episode_time[:4].copy(), sim_time_s=sim_time)
         return True
     except Exception as exc:  # viewer must never break training
         print(f"LIVE_STATE_DISABLED reason={type(exc).__name__}: {exc}")
@@ -198,7 +198,7 @@ def main() -> int:
     parser.add_argument("--nonfinite-limit", type=int, default=64,
                         help="abort with failure.json after this many non-finite env recoveries")
     parser.add_argument("--live-state-file", type=str, default="",
-                        help="write a schema-v1 live-state packet for the Viser viewer (newton_xpbd only)")
+                        help="write a schema-v1 live-state packet for the native Newton Viser viewer")
     parser.add_argument("--live-state-interval", type=int, default=5,
                         help="write the live-state packet every N policy steps")
     parser.add_argument("--live-state-spacing", type=float, default=2.5,
