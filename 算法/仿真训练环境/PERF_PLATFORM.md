@@ -101,3 +101,9 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 从 `model_128.pt` 续训 `perf_20261025_n32_dt5_cont3`，`--max_iterations 159`（目标 287），配置不变；预计约 4 小时。
 - 暂停/恢复记录：`cont_stop_record.json`、`cont2_stop_record.json`（评估窗口用）。
 - 评估产物：`eval_final_fast/`（model_95，2 场景）、`eval_model_128_fast/`（model_128，4 场景）、对应 `eval_summary_*.json`。
+
+## 15. Git / PR 状态（2026-10-25 08:45）
+
+- 分支：`perf/max-throughput`（已推送，基于 `chore/physx-pointmove-training`）。
+- 草稿 PR：https://github.com/w3743/AGTC/pull/24（标题见 PR，内容含性能开关、19.6× 实测、评估边界、原生栈基准与限制）。
+- 说明：PR 为 draft，等待最终评估/原生栈 depth/detections 决策后再转 ready 或补充。
