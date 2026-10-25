@@ -8,15 +8,14 @@ entry adds:
     iteration, contract SHA);
   * --resume from a checkpoint with a strict observation-contract check;
   * JSONL metrics + summary.json;
-  * explicit phase banner: capability metrics stay disabled until the
-    depth/detections equivalence work is verified.
+  * explicit phase banner: native-domain capability acceptance remains disabled
+    while the registered sensor/physics domain gaps are unresolved.
 
 This is preparation infrastructure, not a capability-accepted training run.
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import importlib.util
 import json
 import os

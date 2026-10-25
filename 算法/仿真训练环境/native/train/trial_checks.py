@@ -302,6 +302,8 @@ def check_evaluation(out: Path, expected_seeds: list[int]) -> int:
     if not isinstance(rows, list):
         errors.append("evaluation rows are missing or malformed")
         rows = []
+    if [row.get("seed") for row in rows if isinstance(row, dict)] != expected_seeds:
+        errors.append("evaluation rows do not cover the required seed set exactly once in order")
     invalid_reasons = {"runtime_error", "non_finite_state", "non_finite_reward"}
     for index, row in enumerate(rows):
         if not isinstance(row, dict):

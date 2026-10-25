@@ -1,4 +1,4 @@
-"""Native-stack policy evaluation (CPU smoke now, GPU later): 60 s episodes per seed.
+"""Native-stack CPU/GPU policy evaluation: 60 s episodes per seed.
 
 Success criterion follows the reference task semantics (`tensor_task.fast_stop_v2` /
 `FieldTask`): final position within 0.4 m, world-XY speed < 0.05 m/s, full body angular
@@ -15,7 +15,6 @@ domain gap; `capability_metrics_allowed` stays false (protocol decision left to 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 import os
@@ -38,14 +37,6 @@ from contract_identity import (validate_checkpoint_contract,
                                validate_checkpoint_preflight)  # noqa: E402
 
 BANNER = "NATIVE_EVAL_CPU_SMOKE"
-
-_CONTRACT_SHA_EXCLUDE = {"run_id", "phase", "note", "sha_scope", "observation_contract_sha256"}
-
-
-def contract_sha(contract: dict) -> str:
-    """Same SHA scope as train_wsl: identity fields only, run metadata excluded."""
-    source = {k: v for k, v in contract.items() if k not in _CONTRACT_SHA_EXCLUDE}
-    return hashlib.sha256(json.dumps(source, sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 SUCCESS_POSITION_M = 0.4
 SUCCESS_XY_SPEED = 0.05

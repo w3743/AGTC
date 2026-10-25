@@ -141,6 +141,8 @@ if len(args) >= 2 and args[0] == "-u" and Path(args[1]).name == "eval_native.py"
                             "last_mask": [], "sensor_frames": 0},
         "capability_metrics_allowed": False,
     }
+    if os.environ.get("MOCK_EVAL_OMIT_ROW") == "1":
+        result["rows"] = result["rows"][:-1]
     out = Path(option("--out"))
     if int(os.environ.get("MOCK_EVAL_EXIT", "0")) == 0:
         (out / "evaluation.json").write_text(json.dumps(result), encoding="utf-8")
@@ -375,6 +377,13 @@ class TrialRunnerTests(unittest.TestCase):
                                      [checkpoint, "diagnostic"],
                                      {"MOCK_DIAG_COUNT": 1})
         self.assertEqual(diagnostic.returncode, 4, diagnostic.stdout + diagnostic.stderr)
+
+    def test_eval_rejects_incomplete_seed_rows(self):
+        checkpoint = self._make_formal_trial()
+        result = self._run_shell("run_eval_pilot_4seeds.sh",
+                                 [checkpoint, "missing seed row"],
+                                 {"MOCK_EVAL_OMIT_ROW": "1"})
+        self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
 
     def test_eval_preserves_failure_rc_full_log_and_frozen_seeds(self):
         checkpoint = self._make_formal_trial()
