@@ -107,3 +107,15 @@ C:\pioneer\isaac-training\.venv\Scripts\python.exe -B -u -m isaac_field train `
 - 分支：`perf/max-throughput`（已推送，基于 `chore/physx-pointmove-training`）。
 - 草稿 PR：https://github.com/w3743/AGTC/pull/24（标题见 PR，内容含性能开关、19.6× 实测、评估边界、原生栈基准与限制）。
 - 说明：PR 为 draft，等待最终评估/原生栈 depth/detections 决策后再转 ready 或补充。
+
+## 16. 失败模式分析（model_128，4 场景，5 ms 物理）
+
+| seed | 终止原因 | 步数 | 最终距离 | 说明 |
+|---|---|---|---|---|
+| 87010 | outside_or_overturned（boundary） | 284 | 9.85 m | 14.2 s 越出 12 m 场地边界，朝远离目标方向行驶 |
+| 87011 | outside_or_overturned（boundary） | 756 | 10.38 m | 37.8 s 越界，姿态稳定（tilt 0.002 rad） |
+| 87012 | time_limit | 1200 | 4.08 m | 接近目标但未进入 0.4 m，末速 0.14 m/s |
+| 87013 | time_limit | 1200 | 2.05 m | 最近但仍未进入 0.4 m，末速 0.16 m/s |
+
+- 结论：策略**不是静止/悬空**，而是在行驶；问题是不朝目标收敛（2 例越界）或接近后不满足停稳条件（2 例 0.4 m/0.05 m/s 未达成）。body stability 全程正常（max tilt < 0.08 rad）。
+- 这说明限制在**长时程导航/停止策略学习**，不是平台吞吐；需要更多 transitions、奖励/课程调整或更好的探索策略。不能据此归因于原生栈或性能改造。
