@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standard-library gates for the frozen native V1.1 training/evaluation runners."""
+"""Standard-library gates for frozen native training/evaluation protocols."""
 from __future__ import annotations
 
 import argparse
@@ -18,8 +18,8 @@ from contract_identity import (
 
 PROTOCOL_VERSION = "V1.1"
 EXPECTED_PROTOCOL_SHA = "7ff8d6fcba79defbbc907b09527b244fb6e27134ed6c43de13ed1bdc197f2998"
-V2_PROTOCOL_SHA = None  # Set only after the new physics protocol is validated and frozen.
-V2_TASK_SHA = None  # A single validated recipe; changing physics requires a new protocol.
+V2_PROTOCOL_SHA = "83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e"
+V2_TASK_SHA = "209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2"
 PROTOCOL_PROFILES = {
     "V1.1": {"sha": EXPECTED_PROTOCOL_SHA, "engine": "newton_xpbd", "phase": "formal_native_v1_trial"},
     "V2": {"sha": V2_PROTOCOL_SHA, "task_sha": V2_TASK_SHA, "cuda_graph_enabled": False, "engine": "newton_mujoco_warp", "phase": "formal_native_v2_trial"},
