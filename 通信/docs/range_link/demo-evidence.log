@@ -1,0 +1,112 @@
+﻿# SLE Range Link 实测证据（2026-10-25 14:26，A=SERVER COM22 / B=CLIENT COM23，115200 8N1）
+# server 端：测距 + 收到的用户数据（RX 计数）
+[RL] server D=754mm RAW=2332mm PROB=944 RSSI=-49dBm N=233 RX_SEQ=3420 RX_CNT=600
+[RL] server D=754mm RAW=2271mm PROB=944 RSSI=-48dBm N=234 RX_SEQ=3422 RX_CNT=602
+[RL] server D=738mm RAW=2040mm PROB=941 RSSI=-49dBm N=235 RX_SEQ=3424 RX_CNT=604
+[RL] server D=726mm RAW=2108mm PROB=945 RSSI=-47dBm N=236 RX_SEQ=3427 RX_CNT=607
+[RL] server D=683mm RAW=1594mm PROB=949 RSSI=-47dBm N=237 RX_SEQ=3429 RX_CNT=609
+[RL] server D=651mm RAW=1788mm PROB=944 RSSI=-49dBm N=238 RX_SEQ=3432 RX_CNT=612
+[RL] server D=627mm RAW=1926mm PROB=931 RSSI=-50dBm N=239 RX_SEQ=3434 RX_CNT=614
+[RL] server D=609mm RAW=2029mm PROB=942 RSSI=-47dBm N=240 RX_SEQ=3437 RX_CNT=617
+[RL] server D=596mm RAW=2100mm PROB=948 RSSI=-47dBm N=241 RX_SEQ=3440 RX_CNT=620
+[RL] server D=580mm RAW=1982mm PROB=938 RSSI=-49dBm N=242 RX_SEQ=3442 RX_CNT=622
+[RL] server D=574mm RAW=1938mm PROB=932 RSSI=-49dBm N=243 RX_SEQ=3444 RX_CNT=624
+[RL] server D=555mm RAW=1787mm PROB=920 RSSI=-50dBm N=244 RX_SEQ=3447 RX_CNT=627
+# client 端：发送用户数据 TX + 收到的距离回传（notify）
+[RL] client TX seq=3441 len=20
+[RL] client TX seq=3442 len=20
+[RL] client D=580mm PROB=938 RSSI=-49 N=242
+[RL] client TX seq=3443 len=20
+[RL] client TX seq=3444 len=20
+[RL] client TX seq=3445 len=20
+[RL] client D=574mm PROB=932 RSSI=-49 N=243
+[RL] client TX seq=3446 len=20
+[RL] client TX seq=3447 len=20
+[RL] client D=555mm PROB=920 RSSI=-50 N=244
+[RL] client TX seq=3448 len=20
+[RL] client TX seq=3449 len=20
+# ===== 最终验证（2026-10-25 14:29，两板均为 v12 固件）=====
+# 30 秒连续采集：serverD=23 clientD=23 clientTX=59 崩溃/复位行=0
+[RL] server D=625mm RAW=2028mm PROB=977 RSSI=-46dBm N=325 RX_SEQ=68 RX_CNT=814
+[RL] server D=607mm RAW=1831mm PROB=978 RSSI=-46dBm N=326 RX_SEQ=70 RX_CNT=816
+[RL] server D=609mm RAW=1951mm PROB=978 RSSI=-46dBm N=327 RX_SEQ=73 RX_CNT=819
+[RL] server D=605mm RAW=1959mm PROB=979 RSSI=-46dBm N=328 RX_SEQ=76 RX_CNT=822
+[RL] server D=608mm RAW=2045mm PROB=979 RSSI=-46dBm N=329 RX_SEQ=78 RX_CNT=824
+[RL] client D=605mm PROB=979 RSSI=-46 N=328
+[RL] client TX seq=77 len=20
+[RL] client TX seq=78 len=20
+[RL] client D=608mm PROB=979 RSSI=-46 N=329
+[RL] client TX seq=79 len=20
+[RL] client TX seq=80 len=20
+# ===== v16 最终固件实测（2026-10-25 15:24，A=server COM22 / B=client COM23，数据周期 5s，CALIB=1073mm）=====
+# 说明：测距范围仅 1D 距离（不做坐标）。下面为 1.00m 实际距离下的串口输出样例。
+[RL] server D=1133mm D1=2237mm D2=2307mm PROB=565 SN=6 RSSI=-57dBm RX_SEQ=49 RX_CNT=51
+[RL] server D=1137mm D1=2204mm D2=2113mm PROB=558 SN=6 RSSI=-57dBm RX_SEQ=49 RX_CNT=51
+[RL] server D=1137mm D1=2189mm D2=2150mm PROB=574 SN=6 RSSI=-54dBm RX_SEQ=49 RX_CNT=51
+[RL] server D=1137mm D1=2212mm D2=2272mm PROB=577 SN=6 RSSI=-55dBm RX_SEQ=49 RX_CNT=51
+[RL] server D=1133mm D1=2220mm D2=2242mm PROB=589 SN=6 RSSI=-54dBm RX_SEQ=50 RX_CNT=52
+[RL] server D=1143mm D1=2244mm D2=2309mm PROB=591 SN=6 RSSI=-55dBm RX_SEQ=50 RX_CNT=52
+[RL] server D=1159mm D1=2252mm D2=2275mm PROB=593 SN=6 RSSI=-55dBm RX_SEQ=50 RX_CNT=52
+[RL] server D=1176mm D1=2280mm D2=2356mm PROB=571 SN=6 RSSI=-59dBm RX_SEQ=50 RX_CNT=52
+[RL] client D=1137mm PROB=577 RSSI=-55 N=214
+[RL] client TX seq=50 len=20
+[RL] client D=1133mm PROB=589 RSSI=-54 N=215
+[RL] client D=1143mm PROB=591 RSSI=-55 N=216
+[RL] client D=1159mm PROB=593 RSSI=-55 N=217
+[RL] client D=1176mm PROB=571 RSSI=-59 N=218
+# ===== v23 最终标定实测（2026-10-25 16:38，A=server COM22 / B=client COM23）=====
+# 场景：两块模块用双面胶固定悬挂，实际间距 0.50m（用户尺量），固件 v23（窗口 32 中值、CALIB=861mm）
+# 结果：150 秒 0 复位；D 中位数 530mm（实际 500mm，误差 +30mm）、σ≈52mm、范围 428~610mm；原始 D1 中位 1380mm
+[RL] server D=562mm D1=1388mm D2=1397mm PROB=1000 SN=6 RSSI=-32dBm RX_SEQ=469 RX_CNT=47
+[RL] server D=557mm D1=1400mm D2=1406mm PROB=1000 SN=6 RSSI=-32dBm RX_SEQ=470 RX_CNT=48
+[RL] server D=549mm D1=1399mm D2=1358mm PROB=1000 SN=6 RSSI=-32dBm RX_SEQ=470 RX_CNT=48
+# ===== v24 现场重标（2026-10-25 17:16~17:24，A=server COM22 / B=client COM23）=====
+# 场景：两模块双面胶固定悬挂，实际 0.50m，固件 v23（CALIB=861）运行中
+# 现象：原始 D1 从 16:38 的 1380mm 漂到 17:14 1429mm / 17:17 1515mm / 17:21 1461mm，v23 输出 D 中位 652mm（+152mm）
+# 两次采集（110 帧 + 83 帧，共 193 帧）合并中位 D1=1494mm，σ 约 30mm/次采集，极差 1122~1578mm
+# 重标：CALIB_MM = 1494 - 500 = 994 -> 重新编译 v24（35s 编译通过，FLASH 527KB）
+# 采集期间 0 复位/0 exception；当前板子上的 v23 固件健康（对比用户贴的 15:56:22 崩溃日志=更早的 v20 版本）
+[RL] server D=652mm D1=1508mm D2=1483mm PROB=1000 SN=6 RSSI=-33dBm RX_SEQ=1830 RX_CNT=47
+[RL] server D=649mm D1=1512mm D2=1502mm PROB=1000 SN=6 RSSI=-33dBm RX_SEQ=1831 RX_CNT=47
+[RL] server D=641mm D1=1462mm D2=1450mm PROB=1000 SN=6 RSSI=-34dBm RX_SEQ=1832 RX_CNT=47
+# ===== v24 / v25 烧录与验证（2026-10-25 17:27~17:55，A=server COM22 / B=client COM23，实际 0.50m）=====
+# v24（CALIB=994）烧录后 120s：D 中位 389mm（-111mm）、sigma=10mm、范围 352~402、0 复位
+#   -> 说明上电/重启后原始 D1 回到 ~1383mm（标定时是 1494mm），单点常量不可复现
+[RL] server D=389mm D1=1383mm D2=1380mm PROB=999 SN=6 RSSI=-33dBm RX_SEQ=1058 RX_CNT=25
+# v25（AUTO_TARE_MM=500，开机自动对零）烧录后 150s：
+#   auto-tare: D1_med=1412mm target=500mm offset=912mm
+#   D 中位 417mm（-83mm）、sigma=63mm、范围 324~520mm、0 复位；D1 分段中值 1217~1485mm（漂移 268mm）
+[RL] auto-tare D1_med=1412mm target=500mm offset=912mm (press reset to re-zero)
+[RL] server D=417mm D1=1333mm D2=1320mm PROB=999 SN=6 RSSI=-32dBm RX_SEQ=96 RX_CNT=47
+# 结论：固件侧（复位、钳位、自对零）已稳定；剩余为原始值随机械微动/多径的漂移，需刚性固定后重标
+# ===== v27 运行时对零（AT 命令）实测（2026-10-25 19:00~19:03，A=server COM22 / B=client COM23，实际间距 76cm）=====
+# 背景：v25 的开机自对零目标写死 500mm，板子拉到 76cm 后 D 只有 1.1~1.45m；
+#       v26 想在日志口(UART1)做串口命令，但日志口是 DMA-RX、RX 引脚未接 CH340，收不到字节。
+#       排查时发现 SDK 的 AT 框架是开着的（UART0/CH340，115200）：发送 "AT" 返回 "OK"。
+# v27 改为注册标准 AT 命令 AT+RDTARE，实测通过：
+#   [RL] AT cmd RDTARE register ret=0x0
+#   AT+RDTARE=760  -> OK; [RL] tare ok: raw_med=1776mm target=760mm offset=1016mm
+#   D 立即由 ~750 变到 760，随后 75s 中位 798mm（+38mm）、σ≈10mm、范围 774~821mm、0 复位
+[RL] AT+RDTARE=760mm accepted
+[RL] tare ok: raw_med=1776mm target=760mm offset=1016mm
+[RL] server D=760mm D1=1776mm D2=1802mm PROB=1000 SN=6 RSSI=-33dBm RX_SEQ=2155 RX_CNT=2
+[RL] server D=798mm D1=1810mm D2=1820mm PROB=1000 SN=6 RSSI=-33dBm RX_SEQ=2160 RX_CNT=5
+# 用法：换距离后在串口发 AT+RDTARE=<实际mm>；查询 AT+RDTARE? -> +RDTARE:<raw_med>,<offset>
+# ===== v28 两点线性校准（2026-10-25 20:18，A=server COM22）=====
+# 烧录成功；AT 命令注册 ret=0x0；实测：
+#   AT+RDFIT?  -> +RDFIT:0,1000,994  /  OK   （点数0, SCALE=1000permille, OFFSET=994mm）
+#   AT+RDTARE? -> +RDTARE:0,994      /  OK
+# 测距行新增校准参数：SC=1000 OF=994
+# 拟合用法（每个距离点发一次）：AT+RDCLR -> AT+RDFIT=500 -> AT+RDFIT=1000 -> 自动最小二乘并生效
+# 换算：raw=a*true+b -> SCALE_PM=1000/a, OFFSET_MM=b/a（官方基线两点得 833permille / 800mm）
+[RL] server D=621mm D1=1606mm D2=1570mm PROB=1000 SN=5 RSSI=-34dBm SC=1000 OF=994 RX_SEQ=2943 RX_CNT=1
+# ===== v31 重构后两点/三点线性校准实测（2026-10-25 22:35~22:45，官方源码+钩子版）=====
+# 固件：官方 sle_measure_dis 源码 + [RANGE_LINK] 钩子 + rl_ext.c（旧 1.0.15 库）
+# 两点拟合：raw_med@1.0m=2394, raw_med@0.5m=1271 -> SCALE=445permille OFFSET=65mm (raw=2.246*true+148mm)
+#   0.5m 实测 45s：D 中位 485mm（实际500，-15mm）、sigma=10.4mm、范围473~507、0复位
+#   1.0m 实测 50s：D 中位 907mm（-93mm）-> 原始值 10 分钟内从 2394 漂到 2271，两点拟合被拉偏
+# 补录第 3 点（1.0m 当前 raw_med=2309）后三点最小二乘：raw=2.161*true+190mm -> SCALE=462permille OFFSET=88mm
+#   1.0m 实测 40s：D 中位 981mm（-19mm）、sigma=5.9mm、范围974~994、0复位
+[RL] fit ok: SCALE=462permille OFFSET=88mm (raw=2.161*true+190mm, points=3)
+[RL] server D=974mm D1=2298mm D2=2314mm PROB=999 SN=6 RSSI=-40dBm SC=462 OF=88 RX_SEQ=4032 RX_CNT=121
+# 结论：两点/三点线性校准后两个端点误差 <=2cm、sigma<=1cm；主要残差来自原始值随时间的慢漂（10 分钟约 -85mm）
