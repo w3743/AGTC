@@ -34,6 +34,31 @@ def _reject_zip_for_rsl(argv: list[str], *, command: str) -> None:
         )
 
 
+def _extract_live_state_file(arguments: list[str]) -> tuple[str | None, list[str]]:
+    """Remove the local opt-in path before forwarding args to Isaac Lab's CLI."""
+    path = None
+    forwarded = []
+    index = 0
+    while index < len(arguments):
+        token = arguments[index]
+        if token == "--live-state-file" or token.startswith("--live-state-file="):
+            if path is not None:
+                raise SystemExit("--live-state-file may be specified only once")
+            if token == "--live-state-file":
+                index += 1
+                if index >= len(arguments):
+                    raise SystemExit("--live-state-file requires PATH")
+                path = arguments[index]
+            else:
+                path = token.split("=", 1)[1]
+            if not path:
+                raise SystemExit("--live-state-file requires PATH")
+        else:
+            forwarded.append(token)
+        index += 1
+    return path, forwarded
+
+
 def _run_official_rsl_cli(arguments: list[str]) -> int:
     # isaaclab_rl imports KitLauncher, which bootstraps Isaac Sim during module
     # import. Accept the upstream EULA before importing that entrypoint.
@@ -42,12 +67,22 @@ def _run_official_rsl_cli(arguments: list[str]) -> int:
     if os.environ.get("ISAAC_FIELD_DISABLE_NATIVE_RUNTIME") == "1" and not is_help:
         raise RuntimeError("native runtime is disabled for this CPU-only process")
 
-    from .runtime import _prepare_official_rsl_cli_arguments
+    live_state_file, arguments = _extract_live_state_file(arguments)
+    env_name = "ISAAC_FIELD_LIVE_STATE_FILE"
+    previous_live_state_file = os.environ.pop(env_name, None)
+    try:
+        if live_state_file is not None:
+            os.environ[env_name] = str(Path(live_state_file).expanduser().resolve())
+        from .runtime import _prepare_official_rsl_cli_arguments
 
-    prepared_arguments = _prepare_official_rsl_cli_arguments(arguments)
-    from isaaclab_rl.entrypoints import run_train_cli
+        prepared_arguments = _prepare_official_rsl_cli_arguments(arguments)
+        from isaaclab_rl.entrypoints import run_train_cli
 
-    return run_train_cli(["--rl_library", "rsl_rl", "--task", RSL_TASK, *prepared_arguments])
+        return run_train_cli(["--rl_library", "rsl_rl", "--task", RSL_TASK, *prepared_arguments])
+    finally:
+        os.environ.pop(env_name, None)
+        if previous_live_state_file is not None:
+            os.environ[env_name] = previous_live_state_file
 
 
 def _run_official_rsl_resume(arguments: list[str]) -> int:

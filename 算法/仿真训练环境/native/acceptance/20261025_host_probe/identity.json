@@ -1,0 +1,77 @@
+{
+  "banner": "WSL_NATIVE_TRAINING_PREP",
+  "seed": 0,
+  "num_envs": 64,
+  "num_steps": 32,
+  "device": "cuda",
+  "physics": "newton_xpbd",
+  "lidar": "warp",
+  "feedback": "vqf",
+  "policy": {
+    "policy_type": "lstm",
+    "hidden_size": 512,
+    "num_layers": 1,
+    "features_dim": 192,
+    "init_std": 0.05000000074505806,
+    "params_total": 1619913,
+    "params_lstm": 1445888,
+    "params_encoder": 108032,
+    "params_heads": 65989
+  },
+  "env": {
+    "num_envs": 64,
+    "policy_dt_s": 0.05,
+    "sim_dt_s": 0.001,
+    "decimation": 50,
+    "experimental_physics": false,
+    "episode_length_s": 60.0,
+    "obs_shapes": {
+      "lidar": [
+        1,
+        400
+      ],
+      "depth": [
+        1,
+        160,
+        88
+      ],
+      "detections": [
+        16,
+        8
+      ],
+      "state": [
+        33
+      ],
+      "feedback": [
+        37
+      ]
+    },
+    "action_dim": 4,
+    "max_track_speed_mps": 4.166666666666667,
+    "physics": {
+      "engine": "newton_xpbd",
+      "device": "cuda:0",
+      "newton": "1.7.0",
+      "warp": "1.18.0",
+      "mujoco": null,
+      "nworld": 64,
+      "dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "dof": 1536,
+      "joints": 1216,
+      "bodies": 1216,
+      "mimic_relations_per_world": 14,
+      "effort_limit_nm": 2.0,
+      "drive_kp": 0.04,
+      "drive_ki": 0.1,
+      "mu": 0.8,
+      "max_track_speed_mps": 4.166666666666667,
+      "drive_semantics": "velocity targets (joint_target_qd) with target_kd=0.04; side PI not applied",
+      "note": "M3 GPU backend; CPU default path does not import newton/warp"
+    }
+  },
+  "torch": "2.14.1+cu130",
+  "numpy": "2.5.4",
+  "python": "3.12.3"
+}

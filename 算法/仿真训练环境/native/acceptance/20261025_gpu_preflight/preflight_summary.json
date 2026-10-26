@@ -1,0 +1,294 @@
+{
+  "schema": "native_gpu_preflight_v1",
+  "purpose": "single short GPU preflight only; not a performance benchmark or accepted throughput result",
+  "created_at_utc": "2026-10-25T08:48:01.413Z",
+  "created_at_beijing": "2026-10-25T16:48:01.413+08:00",
+  "external_directory": "C:\\pioneer\\agtc-native-acceptance-backup\\gpu_preflight_20261025_164558",
+  "command_exit_code": 0,
+  "started_at_utc": "2026-10-25T08:45:58.306Z",
+  "ended_at_utc": "2026-10-25T08:46:19.277Z",
+  "elapsed_seconds": 20.971,
+  "input_argv_file": "argv.json",
+  "argv_file_sha256": "9baf577c7e620c16e3c972880d746b272ee024dd6dd663457c22590969d177e0",
+  "run": {
+    "policy": "lstm",
+    "hidden_size": 512,
+    "seed": 0,
+    "num_envs": 64,
+    "num_steps": 32,
+    "iterations": 2,
+    "samples_per_iteration": 2048,
+    "device": "cuda",
+    "physics": "newton_xpbd",
+    "physics_device": "cuda:0",
+    "task_backend": "fast_stop_v2",
+    "identity_schema_version": "native_task_contract_v2",
+    "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+    "sim_dt_s": 0.001,
+    "decimation": 50,
+    "task_config": {
+      "backend": "fast_stop_v2",
+      "episode_length_s": 60.0,
+      "reset_sampling": {
+        "field_size_m": 100.0,
+        "start_goal_margin_m": 5.0,
+        "minimum_start_goal_distance_m": 8.0,
+        "max_goal_resamples": 20,
+        "initial_yaw_range_rad": [
+          -3.141592653589793,
+          3.141592653589793
+        ],
+        "spawn_clearance_m": 0.01
+      },
+      "implementation": "isaac_field.tensor_task.fast_stop_v2_step",
+      "reward_termination": {
+        "dt": 0.05,
+        "max_time": 60.0,
+        "goal_tolerance": 0.4,
+        "goal_hold": 0.3,
+        "goal_stop_speed": 0.2,
+        "goal_stop_angular_speed": 0.3,
+        "time_penalty": 0.01,
+        "goal_progress_budget": 1.0,
+        "timeout_behavior": "terminal_failure"
+      }
+    },
+    "observation_backends": {
+      "lidar": "warp_kernel",
+      "depth": "analytic_warp",
+      "detections": "analytic_detector_warp",
+      "feedback": "vqf_reference"
+    },
+    "capability_metrics_allowed": false,
+    "capability_blockers": [
+      "RTX domain gap not pixel-compared (depth, detections)"
+    ]
+  },
+  "training_result": {
+    "summary_iterations": 2,
+    "end_iteration": 2,
+    "metrics_rows": 2,
+    "final_metrics": {
+      "iter": 2,
+      "wall_s": 5.1987,
+      "collection_s": 4.1296,
+      "policy_act_s": 0.1502,
+      "env_step_s": 3.8287,
+      "learning_s": 1.0615,
+      "samples": 2048,
+      "samples_per_s": 495.93,
+      "end_to_end_samples_per_s": 393.94,
+      "rss_mb": 2777.4,
+      "mean_reward": -0.0005,
+      "ppo_loss": 0.0707,
+      "observation_contract_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+      "phase": "wsl_training_prep",
+      "policy_type": "lstm",
+      "capability_metrics_allowed": false,
+      "nonfinite_env_resets": 0,
+      "nonfinite_actions": 0
+    },
+    "nonfinite_env_resets_total": 0,
+    "nonfinite_actions_total": 0,
+    "summary_total_wall_s": 13.7255,
+    "smoke_samples_per_s": [
+      {
+        "iteration": 1,
+        "collection": 431.69,
+        "end_to_end": 291.92
+      },
+      {
+        "iteration": 2,
+        "collection": 495.93,
+        "end_to_end": 393.94
+      }
+    ],
+    "interpretation": "These two iterations only confirm the configured GPU training path runs and writes checkpoints. Their rates are not a benchmark or acceptance result."
+  },
+  "checkpoint_validation": {
+    "validated_at_utc": "2026-10-25T08:47:00Z",
+    "validation_mode": "CPU-only checkpoint deserialization and tensor finiteness checks; no CUDA probe",
+    "map_location": "cpu",
+    "results": [
+      {
+        "file": "checkpoint_2.pt",
+        "bytes": 19485749,
+        "sha256": "ca0d959315bbc22e350e02f40c6effa439944001aa718696e0d4c328ca33bda5",
+        "iteration": 2,
+        "policy_type": "lstm",
+        "hidden_size": 512,
+        "policy_tensor_stats": {
+          "tensor_count": 33,
+          "elements": 1619913,
+          "nonfinite_elements": 0,
+          "device_types": [
+            "cpu"
+          ]
+        },
+        "optimizer_tensor_stats": {
+          "tensor_count": 99,
+          "elements": 3239859,
+          "nonfinite_elements": 0,
+          "device_types": [
+            "cpu"
+          ]
+        },
+        "checks": {
+          "iteration_2": true,
+          "policy_type_lstm": true,
+          "hidden_size_512": true,
+          "task_backend_fast_stop_v2": true,
+          "schema_v2": true,
+          "checkpoint_sha_matches_contract": true,
+          "checkpoint_observation_alias_matches": true,
+          "identity_top_level_sha_matches": true,
+          "identity_env_backend_matches": true,
+          "identity_env_sha_matches": true,
+          "identity_file_backend_matches": true,
+          "identity_file_env_backend_matches": true,
+          "identity_file_sha_matches": true,
+          "physics_newton_cuda": true,
+          "physics_dt_decimation_match": true,
+          "env_count_64": true,
+          "policy_tensors_finite": true,
+          "optimizer_tensors_finite": true,
+          "all_loaded_checkpoint_tensors_on_cpu": true
+        },
+        "passed": true
+      },
+      {
+        "file": "latest.pt",
+        "bytes": 19484939,
+        "sha256": "b07a193c21a4ad2a79da9916147462c5409560b2c6109e1fd13d22313360a2f0",
+        "iteration": 2,
+        "policy_type": "lstm",
+        "hidden_size": 512,
+        "policy_tensor_stats": {
+          "tensor_count": 33,
+          "elements": 1619913,
+          "nonfinite_elements": 0,
+          "device_types": [
+            "cpu"
+          ]
+        },
+        "optimizer_tensor_stats": {
+          "tensor_count": 99,
+          "elements": 3239859,
+          "nonfinite_elements": 0,
+          "device_types": [
+            "cpu"
+          ]
+        },
+        "checks": {
+          "iteration_2": true,
+          "policy_type_lstm": true,
+          "hidden_size_512": true,
+          "task_backend_fast_stop_v2": true,
+          "schema_v2": true,
+          "checkpoint_sha_matches_contract": true,
+          "checkpoint_observation_alias_matches": true,
+          "identity_top_level_sha_matches": true,
+          "identity_env_backend_matches": true,
+          "identity_env_sha_matches": true,
+          "identity_file_backend_matches": true,
+          "identity_file_env_backend_matches": true,
+          "identity_file_sha_matches": true,
+          "physics_newton_cuda": true,
+          "physics_dt_decimation_match": true,
+          "env_count_64": true,
+          "policy_tensors_finite": true,
+          "optimizer_tensors_finite": true,
+          "all_loaded_checkpoint_tensors_on_cpu": true
+        },
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "artifacts": [
+    {
+      "name": "argv.json",
+      "bytes": 1412,
+      "sha256": "9baf577c7e620c16e3c972880d746b272ee024dd6dd663457c22590969d177e0"
+    },
+    {
+      "name": "checkpoint_1.pt",
+      "bytes": 19485749,
+      "sha256": "35176bbd20d7dc526873670570798c576f296b048efd59c87df90f39a5226917"
+    },
+    {
+      "name": "checkpoint_2.pt",
+      "bytes": 19485749,
+      "sha256": "ca0d959315bbc22e350e02f40c6effa439944001aa718696e0d4c328ca33bda5"
+    },
+    {
+      "name": "checkpoint_validation.json",
+      "bytes": 3088,
+      "sha256": "ca1cb6c2b86ef05f921cb5f98de4c6715746fa163e0ecb8ad3e6acaee32716e4"
+    },
+    {
+      "name": "checkpoint_validation.stderr.txt",
+      "bytes": 148,
+      "sha256": "54cbf66986b07c80bf2026411b2799fb4dc82c6da7ca94d20ae1b1c7c8417977"
+    },
+    {
+      "name": "exit.json",
+      "bytes": 252,
+      "sha256": "221084e804e87f71ff420517fd7ce3b4bb4937411c86d390350dbd2d7f8cec41"
+    },
+    {
+      "name": "identity.json",
+      "bytes": 8341,
+      "sha256": "193ec3acb39681c2739464192375c5a5da75e109e15cd1b4888e8c8023646479"
+    },
+    {
+      "name": "latest.pt",
+      "bytes": 19484939,
+      "sha256": "b07a193c21a4ad2a79da9916147462c5409560b2c6109e1fd13d22313360a2f0"
+    },
+    {
+      "name": "metrics.jsonl",
+      "bytes": 1005,
+      "sha256": "29f4fc8be4914c0dd59dec87bc3faf07c5e26148b60fb486ae264038d7be95c2"
+    },
+    {
+      "name": "observation_contract.json",
+      "bytes": 32330,
+      "sha256": "c9f809c585ff2ae0a188e46c4c953bb9c43919af394272a5144a3c9f7c15b0ec"
+    },
+    {
+      "name": "rawlog.stderr.txt",
+      "bytes": 148,
+      "sha256": "54cbf66986b07c80bf2026411b2799fb4dc82c6da7ca94d20ae1b1c7c8417977"
+    },
+    {
+      "name": "rawlog.stdout.txt",
+      "bytes": 3969,
+      "sha256": "6a861d747ecfc95c4553d5eac1afab9bb9eee2ef4a3dd8e3529b6d949e36ef88"
+    },
+    {
+      "name": "summary.json",
+      "bytes": 613,
+      "sha256": "6313819823ebdb335bfb33333edeeaaf4e40e774de013e54f8fbe5ccb0212033"
+    }
+  ],
+  "rawlog": {
+    "stdout_file": "rawlog.stdout.txt",
+    "stdout_sha256": "6a861d747ecfc95c4553d5eac1afab9bb9eee2ef4a3dd8e3529b6d949e36ef88",
+    "stderr_file": "rawlog.stderr.txt",
+    "stderr_sha256": "54cbf66986b07c80bf2026411b2799fb4dc82c6da7ca94d20ae1b1c7c8417977",
+    "stderr_bytes": 148,
+    "note": "The WSL launcher emitted a short stderr message as surfaced by Windows stream decoding; Python training exit code is recorded separately."
+  },
+  "source_revision_check": {
+    "requested_commit": "953b355fae4c0d6ef6429a4417db7cbe04dd92a4",
+    "current_head": "ae9c61545a4334c7b8f84b5dbcdd2dfe2967ef7f",
+    "files_checked": [
+      "算法/仿真训练环境/native/train/train_wsl.py",
+      "算法/仿真训练环境/native/proto/native_env.py",
+      "算法/仿真训练环境/native/train/contract_identity.py"
+    ],
+    "files_match_requested_commit": true,
+    "check_was_read_only": true
+  }
+}

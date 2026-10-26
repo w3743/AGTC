@@ -1,0 +1,13 @@
+RUN_TO_RUN eager A/B compile abort observation (read-only follow-up)
+
+Attempt: C:\pioneer\agtc-native-acceptance-backup\audit_stack\repo_integration_before\eager_repeat_run_to_run_v1_20261025_205127
+Target command verified from prior process listing: /opt/venv_mujoco315_smoke/bin/python /mnt/c/pioneer/agtc-native-acceptance-backup/audit_stack/repo_integration_before/eager_repeat_run_to_run_v1_20261025_205127/eager_repeat_run_to_run_v1.py
+PID 726 was the exact Python process; wrapper PID 638 was the corresponding run_eager_repeat_run_to_run_v1.sh.
+
+Before TERM, WSL observation at 2026-10-25 21:08:16 +08:00: PID 726 elapsed 10:07, 98.8% CPU, RSS 14,743,840 KiB. WSL memory used 14 GiB, free 116 MiB, available 123 MiB; swap used 610 MiB. Memory PSI full avg10=0.51, avg60=3.94, avg300=2.66. The attempt progress file still showed status=running with no completed policy steps; stdout/stderr were empty.
+
+TERM was sent only to PID 726 with `wsl.exe -d Ubuntu-24.04-Arm64 -- kill -TERM 726`; the kill command returned 0. Follow-up `ps -p 726,638` returned no processes. Runner exit_code.txt contains 143. The original progress.json remains untouched and says status=running; no policy step or acceptance result was produced.
+
+After termination, WSL memory observation: used 651 MiB, free 14 GiB, available 14 GiB; swap used 34 MiB. No WSL/driver restart or memory configuration change was made.
+
+Cache identification from a no-GPU Python query: uid=0, HOME=/root, Warp 1.18 warp.config.kernel_cache_dir=None, resolved default cache path /root/.cache/warp/1.18.0. Latest cached PTX mtime observed was 2026-10-25T13:03:26.321526Z (21:03:26 +08:00), path wp_ccd_kernel_builder__locals__ccd_kernel_d381461c_d381461/wp_ccd_kernel_builder__locals__ccd_kernel_d381461c_d381461.sm121.ptx. This identifies the last cached PTX artifact, not the module Python was compiling at TERM. No specific in-flight module can be proven from the unflushed stdout/stderr or progress file.

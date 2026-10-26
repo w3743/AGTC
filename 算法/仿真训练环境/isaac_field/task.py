@@ -780,6 +780,8 @@ class FieldTask:
         self.depth_camera_xy = np.stack((x.ravel(), y.ravel()), axis=-1).astype(np.float32)
         self.scene_id = 0
         self._capture_callback = None
+        self._tensor_observation_callback = None
+        self._tensor_state_sync_callback = None
         self.np_random = np.random.default_rng()
         self.robot = np.array([2.0, 2.0, math.pi / 4, 0.0, 0.0], np.float64)
         self.gimbal = np.zeros(2, dtype=np.float64)
@@ -798,6 +800,9 @@ class FieldTask:
         self.feedback_model_config: dict[str, Any] = {}
         self._feedback_estimator: SimFeedbackEstimator | None = None
         self._feedback_snapshot: FeedbackSnapshot | None = None
+        # Monotonic across prepare()/reset() calls; sensor serials and episode
+        # capture time intentionally restart with each prepared episode.
+        self._episode_generation = -1
 
     @property
     def estimated_pose_config(self) -> dict[str, Any]:
@@ -974,6 +979,7 @@ class FieldTask:
         self.view_origin = np.asarray([self.robot[0], self.robot[1], z + c.camera_height], dtype=np.float32)
         self.view_basis = self._flat_basis()
         self._counts = (0, 0, 0)
+        self._episode_generation += 1
         return self.scene
 
     def update_feedback(self, sample: FeedbackSample) -> FeedbackSnapshot:
@@ -987,12 +993,26 @@ class FieldTask:
         self._feedback_snapshot = self._feedback_estimator.update_sample(sample)
         return self._feedback_snapshot
 
-    def initialize_sensors(self):
+    def initialize_sensors(self, *, build_observation=True):
         """Capture initial engine frames and return the first policy observation."""
         if self._capture_callback is None:
             raise RuntimeError("attach_sensors(capture) must be called before initialize_sensors()")
         self._sense(initial=True)
+        if not build_observation:
+            return None, self._info()
         return self._observation(), self._info()
+
+    def update_uwb_pose_noise(self) -> None:
+        """Sample the policy-side UWB pose once for the current task time."""
+        if self._uwb_time is None or self.time > self._uwb_time + 1e-9:
+            self._pose_noise = self._uwb_rng.normal(0, self.cfg.position_noise, 2)
+            self._uwb_time = float(self.time)
+
+    def sensor_due(self, kind: str, *, initial: bool = False) -> bool:
+        """Return whether the existing absolute sensor clock captures this step."""
+        if kind not in self._SENSOR_KINDS:
+            raise ValueError(f"unknown sensor kind: {kind}")
+        return bool(initial or self.time + 1e-9 >= self._next[kind])
 
     def _body_pose(self):
         z, pitch, roll = self.body_pose
@@ -1037,6 +1057,8 @@ class FieldTask:
         if not isinstance(result, dict):
             raise TypeError(f"capture({kind!r}) must return a frame dictionary")
         frame = dict(result)
+        tensor_sensor_frame = frame.get("_tensor_sensor_frame") is True
+        frame["episode_generation"] = int(self._episode_generation)
         self._serial[kind] += 1
         z, pitch, roll = self._body_pose()
         frame.setdefault("seq", self._serial[kind])
@@ -1054,6 +1076,37 @@ class FieldTask:
         if kind == "lidar":
             if "ranges" not in frame:
                 raise ValueError("lidar engine frame requires ranges")
+            if tensor_sensor_frame:
+                ranges = frame["ranges"]
+                valid = frame.get("valid")
+                if (not hasattr(ranges, "detach") or not hasattr(valid, "detach")
+                        or tuple(ranges.shape) != (self.cfg.lidar_rays,)
+                        or tuple(valid.shape) != (self.cfg.lidar_rays,)):
+                    raise ValueError("device LiDAR frame must contain tensor ranges and valid mask with configured shape")
+                if "sensor_origin_w" in frame:
+                    frame["sensor_origin_w"] = np.asarray(
+                        frame["sensor_origin_w"], dtype=np.float32
+                    ).reshape(3).copy()
+                if "sensor_quat_w_xyzw" in frame:
+                    frame["sensor_quat_w_xyzw"] = np.asarray(
+                        frame["sensor_quat_w_xyzw"], dtype=np.float32
+                    ).reshape(4).copy()
+                if "ray_directions_local" in frame:
+                    frame["ray_directions_local"] = np.asarray(
+                        frame["ray_directions_local"], dtype=np.float32
+                    ).reshape(self.cfg.lidar_rays, 3).copy()
+                frame["hit_kind"] = np.zeros(self.cfg.lidar_rays, dtype=np.uint8)
+                forward, right, _ = self._basis()
+                frame.setdefault(
+                    "directions",
+                    self.laser_local[:, :1] * forward + self.laser_local[:, 1:2] * (-right),
+                )
+                frame["directions"] = np.asarray(
+                    frame["directions"], dtype=np.float32
+                ).reshape(self.cfg.lidar_rays, 3)
+                frame.setdefault("scan_pitch", float(math.asin(float(np.clip(forward[2], -1.0, 1.0)))))
+                frame["scan_pitch"] = float(frame["scan_pitch"])
+                return frame
             ranges = np.asarray(frame["ranges"], dtype=np.float32).reshape(-1)
             if ranges.shape != (self.cfg.lidar_rays,):
                 raise ValueError(f"lidar ranges must have shape ({self.cfg.lidar_rays},)")
@@ -1078,6 +1131,35 @@ class FieldTask:
         elif kind == "depth":
             if "values" not in frame:
                 raise ValueError("depth engine frame requires camera_z values in metres")
+            if tensor_sensor_frame:
+                values = frame["values"]
+                valid = frame.get("valid")
+                expected_shape = (self.cfg.depth_height, self.cfg.depth_width)
+                if (not hasattr(values, "detach") or not hasattr(valid, "detach")
+                        or tuple(values.shape) != expected_shape
+                        or tuple(valid.shape) != expected_shape):
+                    raise ValueError("device depth frame must contain tensor values and valid mask with configured shape")
+                if "sensor_origin_w" in frame:
+                    frame["sensor_origin_w"] = np.asarray(
+                        frame["sensor_origin_w"], dtype=np.float32
+                    ).reshape(3).copy()
+                if "sensor_quat_w_ros_xyzw" in frame:
+                    frame["sensor_quat_w_ros_xyzw"] = np.asarray(
+                        frame["sensor_quat_w_ros_xyzw"], dtype=np.float32
+                    ).reshape(4).copy()
+                frame.setdefault("unit", "m")
+                frame.setdefault("convention", "camera_z")
+                frame.setdefault("projection", "pinhole")
+                frame.setdefault("resolution", [self.cfg.depth_width, self.cfg.depth_height])
+                frame.setdefault("shape", [self.cfg.depth_height, self.cfg.depth_width])
+                frame.setdefault("native_resolution", [DEPTH_NATIVE_WIDTH, DEPTH_NATIVE_HEIGHT])
+                frame.setdefault("intrinsics", self.depth_intrinsics.copy())
+                frame.setdefault("calibration_id", DEPTH_GEOMETRY_ID)
+                frame.setdefault("calibration_source", DEPTH_GEOMETRY_SOURCE)
+                frame.setdefault("min_range", self.cfg.depth_min_range)
+                frame.setdefault("max_range", self.cfg.depth_range)
+                frame["intrinsics"] = np.asarray(frame["intrinsics"], dtype=np.float32).reshape(3, 3)
+                return frame
             values = np.asarray(frame["values"], dtype=np.float32).reshape(self.cfg.depth_height, self.cfg.depth_width)
             finite = np.isfinite(values)
             values = np.nan_to_num(values, nan=self.cfg.depth_range, posinf=self.cfg.depth_range,
@@ -1142,15 +1224,15 @@ class FieldTask:
         self._progress_reference = None
         self._initial_goal_distance = float(np.linalg.norm(self.goal - self.robot[:2]))
         self.done, self.reason = False, ""
+        if callable(self._tensor_state_sync_callback):
+            self._tensor_state_sync_callback()
 
     def _sense(self, initial=False):
         c = self.cfg
-        if self._uwb_time is None or self.time > self._uwb_time + 1e-9:
-            self._pose_noise = self._uwb_rng.normal(0, c.position_noise, 2)
-            self._uwb_time = float(self.time)
+        self.update_uwb_pose_noise()
         for kind, period, latency in (("lidar", c.lidar_period, c.lidar_latency), ("depth", c.depth_period, c.depth_latency), ("camera", c.camera_period, c.camera_latency)):
             self._new[kind] = False
-            due = initial or self.time + 1e-9 >= self._next[kind]
+            due = self.sensor_due(kind, initial=initial)
             if due:
                 frame = self._capture(kind)
                 if initial:
@@ -1453,6 +1535,13 @@ class FieldTask:
         }
 
     def _observation(self):
+        if any(frame.get("_tensor_sensor_frame") is True
+               for frame in self.frames.values() if isinstance(frame, dict)):
+            if not callable(self._tensor_observation_callback):
+                raise RuntimeError(
+                    "device-resident sensor frames require the Isaac batched observation path"
+                )
+            return self._tensor_observation_callback()
         c = self.cfg
         lf, df, cf = (self.frames[k] for k in ("lidar", "depth", "camera"))
         det = np.zeros((c.max_detections, 8), np.float32)
@@ -1576,7 +1665,8 @@ class FieldTask:
                            for i, (x, y) in enumerate(s.xy)]}
 
     def state_payload(self):
-        lf, df, cf = (self.frames[k] for k in ("lidar", "depth", "camera"))
+        lf, df, cf = (self._materialize_sensor_frame(self.frames[k])
+                      for k in ("lidar", "depth", "camera"))
         forward, _, up = self._basis()
         body_z, body_pitch, body_roll = self._body_pose()
         return {"scene_id": self.scene_id, "mode": self.mode, "time": self.time, "dt": self.cfg.dt,
@@ -1611,3 +1701,16 @@ class FieldTask:
                 "detections": [{k: d[k] for k in ("box", "class_id", "confidence", "range")} for d in cf["detections"]],
                 "metrics": self._info(), "reward": self.reward, "total_reward": self.total_reward,
                 "done": self.done, "reason": self.reason}
+
+    @staticmethod
+    def _materialize_sensor_frame(frame):
+        """Copy device frames to host only for an explicit debug payload request."""
+        if not isinstance(frame, dict) or frame.get("_tensor_sensor_frame") is not True:
+            return frame
+        materialized = dict(frame)
+        for key in ("ranges", "valid", "values"):
+            value = materialized.get(key)
+            if hasattr(value, "detach") and hasattr(value, "cpu"):
+                materialized[key] = value.detach().cpu().numpy().copy()
+        materialized.pop("_tensor_sensor_frame", None)
+        return materialized

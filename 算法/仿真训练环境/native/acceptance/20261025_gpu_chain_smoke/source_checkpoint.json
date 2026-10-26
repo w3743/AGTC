@@ -1,0 +1,48 @@
+{
+  "created_at_utc": "2026-10-25T08:50:05.407Z",
+  "source_preflight_directory": "C:\\pioneer\\agtc-native-acceptance-backup\\gpu_preflight_20261025_164558",
+  "checkpoint_path": "C:\\pioneer\\agtc-native-acceptance-backup\\gpu_preflight_20261025_164558\\latest.pt",
+  "checkpoint_wsl_path": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_preflight_20261025_164558/latest.pt",
+  "bytes": 19484939,
+  "sha256": "b07a193c21a4ad2a79da9916147462c5409560b2c6109e1fd13d22313360a2f0",
+  "baseline_cpu_audit": {
+    "validated_at_utc": "2026-10-25T08:50:04Z",
+    "method": "CPU-only torch.load(weights_only=True, map_location=cpu); does not query or initialize CUDA",
+    "checkpoints": [
+      {
+        "file": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_preflight_20261025_164558/latest.pt",
+        "iteration": 2,
+        "policy_type": "lstm",
+        "hidden_size": 512,
+        "identity_schema_version": "native_task_contract_v2",
+        "task_backend": "fast_stop_v2",
+        "task_identity_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c",
+        "policy_tensor_stats": {
+          "tensors": 33,
+          "elements": 1619913,
+          "nonfinite": 0,
+          "devices": [
+            "cpu"
+          ]
+        },
+        "optimizer_tensor_stats": {
+          "tensors": 99,
+          "elements": 3239859,
+          "nonfinite": 0,
+          "devices": [
+            "cpu"
+          ]
+        },
+        "optimizer_parameter_states": 33,
+        "adam_step_min": 8.0,
+        "adam_step_max": 8.0,
+        "adam_unique_steps": [
+          8.0
+        ],
+        "passed_finite_cpu": true
+      }
+    ],
+    "passed": true
+  },
+  "gpu_not_queried_during_baseline_audit": true
+}

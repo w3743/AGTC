@@ -1,0 +1,130 @@
+{
+  "schema": "isaac-field-one-shot-preflight-v1",
+  "status": "passed",
+  "checked_at_utc": "2026-10-24T04:17:11.934506+00:00",
+  "protocol_sha256": "8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a",
+  "git_identity": {
+    "branch": "chore/physx-pointmove-training",
+    "head": "b3fd9cab574c9630706c007db7d75f006b9b2789",
+    "isaaclab_commit": "5870804e4f6aee57bdef68d59f67d328b990d1e1"
+  },
+  "runtime_versions": {
+    "python": "3.12.14",
+    "packages": {
+      "isaacsim": "6.2.0.0",
+      "isaaclab": "28.0.0",
+      "isaaclab-physx": "8.0.0",
+      "isaaclab-rl": "1.5.1",
+      "rsl-rl-lib": "5.5.1",
+      "torch": "2.11.0+cu130"
+    }
+  },
+  "source_manifest": {
+    "valid": true,
+    "files_checked": 76,
+    "failures": []
+  },
+  "headless_cli_check": {
+    "wrapper_forces_headless": true,
+    "launcher_parser_has_removed_headless_flag": true,
+    "launcher_resolves_headless": true,
+    "cli_flag_included": false,
+    "result": "wrapper supplies headless=True; do not pass the removed --headless CLI flag",
+    "evidence_sha256": {
+      "runtime.py": "c80c1ed58f08db0b265649c41bce5fd6cf73c2ae77a67e54b2a7715d170f98c1",
+      "kit_launcher.py": "1adf70c6a1084512fca9438c0bc6d7a73beb54c2e922c64296b6eb7ccde6ac1b",
+      "test_kit_launcher.py": "eee6b754c942c60e13bae07bcf8d88cb52166ff9d18fa0b32b99a021099cba5e"
+    }
+  },
+  "all_planned_outputs_absent": true,
+  "planned_outputs": [
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\logs\\rsl_rl\\physx_pointmove_flat12_20261024_a02\\baseline_a02",
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\logs\\rsl_rl\\physx_pointmove_flat12_20261024_a02\\training_a02",
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\eval_baseline",
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\eval_final",
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\final_policy_torchscript.pt",
+    "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\final_policy_torchscript.json"
+  ],
+  "native_processes_started": false,
+  "kit_imported": false,
+  "training_started": false,
+  "train_and_resume_commands": {
+    "baseline": [
+      "C:\\pioneer\\isaac-training\\.venv\\Scripts\\python.exe",
+      "-m",
+      "isaac_field",
+      "train",
+      "--num_envs",
+      "4",
+      "--max_iterations",
+      "0",
+      "--device",
+      "cuda:0",
+      "--seed",
+      "69041",
+      "--logger",
+      "tensorboard",
+      "--experiment_name",
+      "physx_pointmove_flat12_20261024_a02",
+      "--run_timestamp",
+      "baseline_a02",
+      "env.task.size=12.0",
+      "env.scene.env_spacing=22.0"
+    ],
+    "resume_template": [
+      "C:\\pioneer\\isaac-training\\.venv\\Scripts\\python.exe",
+      "-m",
+      "isaac_field",
+      "resume",
+      "--checkpoint",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\logs\\rsl_rl\\physx_pointmove_flat12_20261024_a02\\baseline_a02\\model_0.pt",
+      "--num_envs",
+      "4",
+      "--max_iterations",
+      "384",
+      "--device",
+      "cuda:0",
+      "--seed",
+      "69041",
+      "--logger",
+      "tensorboard",
+      "--experiment_name",
+      "physx_pointmove_flat12_20261024_a02",
+      "--run_timestamp",
+      "training_a02",
+      "--resume_optimizer_state",
+      "env.task.size=12.0",
+      "env.scene.env_spacing=22.0"
+    ]
+  },
+  "eval_commands": {
+    "baseline": [
+      "C:\\pioneer\\isaac-training\\.venv\\Scripts\\python.exe",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\scripts\\evaluate_rsl_curriculum.py",
+      "--checkpoint",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\logs\\rsl_rl\\physx_pointmove_flat12_20261024_a02\\baseline_a02\\model_0.pt",
+      "--output",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\eval_baseline",
+      "--seed-start",
+      "87010",
+      "--scenario-count",
+      "16",
+      "--goal-angle-deg",
+      "180.0"
+    ],
+    "final": [
+      "C:\\pioneer\\isaac-training\\.venv\\Scripts\\python.exe",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\scripts\\evaluate_rsl_curriculum.py",
+      "--checkpoint",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\<selected-final-checkpoint>.pt",
+      "--output",
+      "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\physx_pointmove_flat12_20261024_a02\\eval_final",
+      "--seed-start",
+      "87010",
+      "--scenario-count",
+      "16",
+      "--goal-angle-deg",
+      "180.0"
+    ]
+  }
+}

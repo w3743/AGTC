@@ -1,0 +1,640 @@
+{
+  "schema_version": "native_eval_v1",
+  "banner": "NATIVE_EVAL_CPU_SMOKE",
+  "generated_at": "2026-10-25T22:20:05+08:00",
+  "task_backend": "fast_stop_v2",
+  "task_identity_sha256": "209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2",
+  "identity_schema_version": "native_task_contract_v2",
+  "checkpoint_contract_validation": "strict_match",
+  "native_domain": {
+    "env": "proto/native_env.py (MuJoCo CPU / Newton GPU backends)",
+    "task_backend": "fast_stop_v2",
+    "physics": {
+      "engine": "newton_mujoco_warp",
+      "backend_revision": "newton_mujoco_warp_v6_deterministic_identity",
+      "device": "cuda:0",
+      "newton": "1.7.0",
+      "warp": "1.18.0",
+      "mujoco": "3.15.0",
+      "mujoco_warp": "3.15.0",
+      "nworld": 1,
+      "dt_s": 0.001,
+      "decimation": 50,
+      "policy_dt_s": 0.05,
+      "dof": 24,
+      "joints": 19,
+      "bodies": 19,
+      "mimic_relations_per_world": 14,
+      "mimic_constraints": {
+        "exported_equalities_per_world": 14,
+        "eq_solref_array_shape": [
+          1,
+          14
+        ],
+        "eq_solimp_array_shape": [
+          1,
+          14
+        ],
+        "eq_solref_values_world0": [
+          [
+            0.004,
+            1.0
+          ]
+        ],
+        "eq_solimp_values_world0": [
+          [
+            0.999000013,
+            0.999899983,
+            0.001,
+            0.5,
+            2.0
+          ]
+        ],
+        "mujoco_cpu_eq_solref_values": [
+          [
+            0.004,
+            1.0
+          ]
+        ],
+        "mujoco_cpu_eq_solimp_values": [
+          [
+            0.999,
+            0.9999,
+            0.001,
+            0.5,
+            2.0
+          ]
+        ],
+        "parameter_source": "explicit post-export correction applied to MuJoCo CPU and MJWarp arrays; not Newton custom attributes",
+        "requested_cpu_proxy_solref": [
+          0.004,
+          1.0
+        ],
+        "requested_cpu_proxy_solimp": [
+          0.999,
+          0.9999,
+          0.001,
+          0.5,
+          2.0
+        ]
+      },
+      "solver": {
+        "class": "SolverMuJoCo",
+        "backend": "mujoco_warp",
+        "use_mujoco_cpu": false,
+        "use_mujoco_contacts": true,
+        "separate_worlds": true,
+        "update_data_interval": 1,
+        "deterministic_mode": "NOT_GUARANTEED",
+        "iterations_actual": 40,
+        "ls_iterations_actual": 8,
+        "solver_actual": 2,
+        "integrator_actual": 3,
+        "cone_actual": 1,
+        "impratio_invsqrt_actual": [
+          0.3162277638912201
+        ],
+        "impratio_actual": [
+          10.000000134
+        ],
+        "requested_config": {
+          "njmax": 256,
+          "nconmax": 64,
+          "iterations": 40,
+          "ls_iterations": 8,
+          "solver": "newton",
+          "integrator": "implicitfast",
+          "cone": "elliptic",
+          "impratio": 10.0
+        },
+        "requested_capacity_per_world": {
+          "nconmax": 64,
+          "njmax": 256
+        },
+        "actual_capacity_per_world": {
+          "nconmax": 64,
+          "njmax": 256
+        },
+        "exported_actuators": 16,
+        "exported_equalities": 14
+      },
+      "contact": {
+        "source": "mujoco_warp_internal",
+        "model_shape_gap_values_per_world": [
+          0.0
+        ],
+        "model_shape_margin_values_per_world": [
+          0.0
+        ],
+        "exported_geom_gap_values_per_world": [
+          0.0
+        ],
+        "exported_geom_margin_values_per_world": [
+          0.0
+        ],
+        "exported_geom_gap_array_shape": [
+          1,
+          20
+        ],
+        "exported_geom_margin_array_shape": [
+          1,
+          20
+        ]
+      },
+      "material_values_per_world": {
+        "mu": [
+          0.800000012
+        ],
+        "ke": [
+          2500.0
+        ],
+        "kd": [
+          100.0
+        ]
+      },
+      "inertia_diag_kg_m2_world0": [
+        {
+          "label": "base",
+          "diag_kg_m2": [
+            0.2475000023841858,
+            1.4574999809265137,
+            1.6059999465942383
+          ]
+        },
+        {
+          "label": "gimbal_yaw",
+          "diag_kg_m2": [
+            2.166666672565043e-05,
+            2.166666672565043e-05,
+            2.9999999242136255e-05
+          ]
+        },
+        {
+          "label": "gimbal_pitch",
+          "diag_kg_m2": [
+            1.3333333299669903e-05,
+            1.3333333299669903e-05,
+            1.3333333299669903e-05
+          ]
+        },
+        {
+          "label": "left_wheel_0_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_1_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_2_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_3_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_4_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_5_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_wheel_6_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_0_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_1_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_2_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_3_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_4_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_5_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_wheel_6_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "left_front_guide_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        },
+        {
+          "label": "right_front_guide_link",
+          "diag_kg_m2": [
+            0.00020156250684522092,
+            0.00025312500656582415,
+            0.00020156250684522092
+          ]
+        }
+      ],
+      "chassis_inertia_diag_kg_m2": [
+        0.2475000023841858,
+        1.4574999809265137,
+        1.6059999465942383
+      ],
+      "gimbal_pitch_inertia_diag_kg_m2": [
+        1.3333333299669903e-05,
+        1.3333333299669903e-05,
+        1.3333333299669903e-05
+      ],
+      "joint_dof_effort_limit_values_world0_nm": {
+        "wheel_dof": [
+          2.0
+        ],
+        "gimbal_dof": [
+          1.0
+        ]
+      },
+      "drive_semantics": {
+        "wheel": "Newton joint_target_qd velocity control; no direct side PI torque feed-forward applied",
+        "gimbal": "Newton joint_target_q position control",
+        "effort_source": "SolverMuJoCo QFRC_ACTUATOR observable mapped through joint_qd_start",
+        "side_pi_feed_forward_applied": false,
+        "effort_observation_valid_after_policy_step": true
+      },
+      "runtime_diagnostics": {
+        "policy_step_sampled": true,
+        "capacity_overflow_substeps_by_world": [
+          0
+        ],
+        "outer_iteration_limit_substeps_by_world": [
+          0
+        ],
+        "line_search_limit_substeps_by_world": [
+          0
+        ],
+        "solver_warning_policy": {
+          "actual_warn_overflow_mask": 3071,
+          "ls_iterations_console_warning_enabled": false,
+          "suppressed_console_warning_bits": [
+            "LS_ITERATIONS"
+          ],
+          "ls_iterations_overflow_flag_preserved": true,
+          "line_search_limit_reporting": "structured_counters_only",
+          "line_search_limit_counter_field": "line_search_limit_substeps_by_world"
+        },
+        "cuda_graph_requested": false,
+        "cuda_graph_enabled": false,
+        "cuda_graph_capture_s": 0.0,
+        "naconmax_total": 64,
+        "naconmax_per_world": 64,
+        "njmax_per_world": 256,
+        "determinism": {
+          "requested_mode": null,
+          "actual_solver_mode": "NOT_GUARANTEED",
+          "module_options_match_solver_mode": true,
+          "solver_max_records": 0,
+          "mujoco_warp_module_options": [
+            {
+              "module": "mujoco_warp._src.block_cholesky",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.bvh",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_convex",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_core",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_driver",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_flex",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_gjk",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_primitive",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_primitive_core",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.collision_sdf",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.constraint",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.derivative",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.forward",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.history",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.inverse",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.io",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.island",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.math",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.passive",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.ray",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.render",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.render_util",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.sensor",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.set_const",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.sleep",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.smooth",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.solver",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.support",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.types",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.util_misc",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.util_pkg",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "mujoco_warp._src.warp_util",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            },
+            {
+              "module": "newton_solver_mujoco.kernels",
+              "deterministic_mode": "NOT_GUARANTEED",
+              "deterministic_max_records": 0
+            }
+          ]
+        }
+      },
+      "naconmax_total": 64,
+      "gravity_mps2": [
+        0.0,
+        0.0,
+        -9.81
+      ]
+    },
+    "observation_backends": {
+      "lidar": "warp_kernel",
+      "depth": "analytic_warp",
+      "detections": "analytic_detector_warp",
+      "state": null,
+      "feedback": "vqf_reference"
+    },
+    "note": "native WSL stack; not Isaac Sim / PhysX / RTX domain"
+  },
+  "domain_gap": {
+    "depth": "analytic raycast vs Isaac RTX distance_to_image_plane (not pixel-compared)",
+    "detections": "analytic leaf mask vs Isaac RTX instance segmentation (not pixel-compared)",
+    "physics": "proxy MuJoCo/Newton model vs Isaac Lab PhysX; drive/COM fidelity gap documented in EQUIVALENCE_REPORT"
+  },
+  "capability_metrics_allowed": false,
+  "protocol_note": "capability decisions are left to the Lead protocol; this run only reports facts",
+  "env_diagnostics": {
+    "count": 0,
+    "events": [],
+    "last_mask": [],
+    "sensor_frames": 0
+  },
+  "physics": {
+    "dt_s": 0.001,
+    "decimation": 50,
+    "policy_dt_s": 0.05,
+    "experimental": false,
+    "note": "default 1 ms / decimation 50"
+  },
+  "success_criteria": {
+    "position_m": 0.4,
+    "xy_speed_mps": 0.05,
+    "angular_speed_radps": 0.1,
+    "hold_s": 0.5,
+    "reasons": [
+      "goal_stop",
+      "time_limit",
+      "outside_or_overturned"
+    ]
+  },
+  "policy": {
+    "checkpoint": "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_mjw_quiet_resume/run/latest.pt",
+    "policy_loaded": true,
+    "policy_type": "lstm",
+    "observation_contract_sha256": "209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2",
+    "task_identity_sha256": "209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2",
+    "identity_schema_version": "native_task_contract_v2",
+    "checkpoint_contract_validation": "strict_match",
+    "sha_scope": "native_task_contract_v2: observation channels, task/reward/termination, and normalized per-world physics; excludes profiling, world count, verification evidence, and run metadata"
+  },
+  "config": {
+    "seeds": [
+      87010
+    ],
+    "max_steps": 32,
+    "device": "cuda",
+    "physics": "newton_mujoco_warp",
+    "physics_cuda_graph": false,
+    "task_backend": "fast_stop_v2",
+    "lidar": "warp",
+    "feedback": "vqf",
+    "depth": "analytic",
+    "detections": "analytic",
+    "detections_warp": true,
+    "zero_action": false,
+    "sim_dt_s": 0.001,
+    "decimation": 50,
+    "episode_length_s": 60.0,
+    "policy_dt_s": 0.05
+  },
+  "summary": {
+    "scenes": 1,
+    "successes": 0,
+    "success_rate": 0.0,
+    "clean_successes": 0,
+    "clean_success_rate": 0.0,
+    "mean_steps": 32.0,
+    "mean_final_distance": 34.723,
+    "reasons": {
+      "time_limit": 1
+    },
+    "wall_s": 12.45
+  },
+  "rows": [
+    {
+      "seed": 87010,
+      "success": false,
+      "clean_success": false,
+      "reason": "time_limit",
+      "steps": 32,
+      "final_distance": 34.723,
+      "goal_stop": false,
+      "hold_s": 0.0,
+      "final_xy_speed": 0.0229,
+      "final_angular_speed": 0.0001,
+      "flipped": false
+    }
+  ]
+}

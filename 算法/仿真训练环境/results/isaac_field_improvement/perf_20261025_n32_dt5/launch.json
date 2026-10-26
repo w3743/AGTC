@@ -1,0 +1,26 @@
+{
+  "schema": "agtc-perf-training-launch-v1",
+  "run": "perf_20261025_n32_dt5",
+  "started_utc": "2026-10-24T19:03:00Z",
+  "host": "NVIDIA RTX Spark N1X, Windows 11 ARM64, 20 logical cores, 32 GiB RAM",
+  "command": "python -m isaac_field train --num_envs 32 --max_iterations 96 --device cuda:0 --seed 69041 --logger tensorboard --experiment_name perf_20261025_n32_dt5 --run_timestamp train env.task.size=12.0 env.scene.env_spacing=22.0 env.task_backend=torch_batched env.sim.dt=0.005 env.decimation=10",
+  "python": "C:\\pioneer\\isaac-training\\.venv\\Scripts\\python.exe",
+  "cwd": "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\results\\isaac_field_improvement\\perf_20261025_n32_dt5",
+  "environment": {
+    "ISAAC_FIELD_PERF_PHYSICS": "1",
+    "OMNI_KIT_ACCEPT_EULA": "YES",
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1",
+    "GIT_PYTHON_GIT_EXECUTABLE": "C:\\Users\\wangj\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\git\\cmd\\git.exe"
+  },
+  "notes": [
+    "First launch at ~18:57Z aborted inside Kit loading_screen with UnicodeEncodeError ('gbk' codec) because stdout was redirected; relaunched with PYTHONIOENCODING=utf-8 and PYTHONUTF8=1.",
+    "Fresh training from scratch: resuming a07 model_80 is not valid because the live 32-env environment does not match the checkpoint contract; rollout/env-count keys are intentionally strict on the resume path.",
+    "Throughput probes and measured numbers are recorded in 算法/仿真训练环境/PERF_PLATFORM.md."
+  ],
+  "budget": {
+    "iterations": 96,
+    "samples_per_iteration": 4096,
+    "total_transitions": 393216
+  }
+}

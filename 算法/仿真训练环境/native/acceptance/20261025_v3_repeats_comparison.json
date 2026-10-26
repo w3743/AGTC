@@ -1,0 +1,535 @@
+{
+  "schema_version": 1,
+  "purpose": "two v3 eager throughput repetitions; throughput only, no capability claim",
+  "generated_from_raw_artifacts": true,
+  "timing_note": "collection_s and learning_s are host perf_counter timings, not CUDA-event timings. wall_s covers rollout + PPO update but is read before finite guards/checkpoint saves. Launcher wall includes process startup, warmup, guards and checkpoint saves. No explicit CUDA synchronize is used.",
+  "runs": {
+    "20261025_v3_rep01": {
+      "output_directory": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep01",
+      "status": "success",
+      "success": true,
+      "summarize_success": true,
+      "seed": 0,
+      "warmup_iterations": 2,
+      "measured_iterations": 5,
+      "child_iterations": 7,
+      "measured_samples": 10240,
+      "warmup_samples_excluded": 4096,
+      "measured_iteration_durations_s": {
+        "collection_s": [
+          5.3162,
+          5.5072,
+          5.556,
+          6.2831,
+          9.5794
+        ],
+        "learning_s": [
+          0.703,
+          0.7377,
+          0.693,
+          0.7259,
+          1.6308
+        ],
+        "wall_s": [
+          6.0239,
+          6.2537,
+          6.2541,
+          7.0136,
+          11.2181
+        ]
+      },
+      "measured_window_wall_totals_s": {
+        "collection_s": 32.2419,
+        "learning_s": 4.4904,
+        "wall_s": 36.763400000000004
+      },
+      "throughput_samples_per_s": {
+        "measured_samples": 10240,
+        "warmup_samples_excluded": 4096,
+        "collection_samples_per_s": 317.59914893353056,
+        "ppo_update_samples_per_s": 2280.4204525209334,
+        "iteration_window_samples_per_s": 278.537893665983,
+        "launch_full_wall_s": 72.920198162,
+        "launch_full_measured_samples_per_s": 140.42748453934186,
+        "launch_full_all_samples_per_s": 196.59847835507858,
+        "launch_full_scope": "same child process; warmup excluded from numerator, included in wall denominator"
+      },
+      "timing_note": "collection_s and learning_s are host perf_counter timings, not CUDA-event timings. wall_s covers rollout + PPO update but is read before finite guards/checkpoint saves. Launcher wall includes process startup, warmup, guards and checkpoint saves. No explicit CUDA synchronize is used.",
+      "train_summary_total_wall_s": 62.5028,
+      "command_argv": [
+        "/opt/venv/bin/python",
+        "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/train_wsl.py",
+        "--num-envs",
+        "64",
+        "--num-steps",
+        "32",
+        "--iterations",
+        "7",
+        "--seed",
+        "0",
+        "--threads",
+        "8",
+        "--device",
+        "cuda",
+        "--physics",
+        "newton_xpbd",
+        "--lidar",
+        "warp",
+        "--feedback",
+        "vqf",
+        "--feedback-noise",
+        "--depth",
+        "analytic",
+        "--depth-noise",
+        "--detections",
+        "analytic",
+        "--detections-warp",
+        "--detections-noise",
+        "--task-backend",
+        "fast_stop_v2",
+        "--sim-dt",
+        "0.001",
+        "--decimation",
+        "50",
+        "--policy",
+        "lstm",
+        "--lstm-hidden",
+        "512",
+        "--epochs",
+        "4",
+        "--lr",
+        "0.0003",
+        "--save-interval",
+        "10",
+        "--nonfinite-limit",
+        "0",
+        "--out",
+        "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_rep01/run"
+      ],
+      "shell": false,
+      "task_identity_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+      "observation_contract_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+      "channels": {
+        "lidar": {
+          "mode": "real",
+          "backend": "warp_kernel",
+          "source": "analytic raycast (stem cylinders + canopy ellipsoids; terrain not intersected)"
+        },
+        "depth": {
+          "mode": "real",
+          "backend": "analytic_warp",
+          "source": "analytic raycast (leaf patches + stems + terrain heightfield), camera-axial Z, normalised where(valid,v,0)/5.0"
+        },
+        "detections": {
+          "mode": "real",
+          "backend": "analytic_detector_warp",
+          "source": "analytic 64x64 instance mask -> env.py box/confidence/class/range rules, packed per task.py"
+        },
+        "state": {
+          "mode": "real",
+          "backend": null,
+          "source": "ABSOLUTE_GOAL_INPUT_SCHEMA layout (isaac_field/task.py), computed from simulator state"
+        },
+        "feedback": {
+          "mode": "real",
+          "backend": "vqf_reference",
+          "source": "isaac_field/feedback.py SimFeedbackEstimator (vqf 2.1.2), fed with engine-truth accel/gyro/mag/gimbal/motor signals"
+        }
+      },
+      "nonfinite_events_file_bytes": 0,
+      "failure_json_present": false,
+      "source_identity": {
+        "commit": "c94553e2b4831848b66700d4dd0d4f9e977b343d",
+        "branch": "perf/max-throughput",
+        "object_format": "sha1",
+        "relevant_sources_dirty": false,
+        "dirty_scope": "raw_source_bytes vs HEAD only; whole workspace dirty not measured",
+        "modified_source_paths": [],
+        "untracked_source_paths": [],
+        "relevant_source_changes": [],
+        "relevant_source_changes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "source_manifest_sha256": "dad7add0aec5e0f5d84289972ee00ec7bca8b68c34d928f5387338b6c19da9a6",
+      "source_identity_still_matches_at_finish": true,
+      "dependency_versions": {
+        "python": "3.12.3",
+        "torch": "2.14.1+cu130",
+        "numpy": "2.5.4",
+        "warp-lang": "1.18.0",
+        "newton": "1.7.0",
+        "mujoco": "3.17.0",
+        "ovphysx": "0.7.0.74035321",
+        "vqf": "2.1.2"
+      },
+      "resource_contention": {
+        "operator_statement": "No other known training/inference work; desktop GPU activity and aria2 downloads remain; this is not whole-system isolation.",
+        "gpu_process_snapshots": "nvidia-smi before and after",
+        "host_process_snapshots": "read-only /proc scan for train/llama/Kit",
+        "telemetry": "raw 1 Hz utilization/memory/temp/SM clock/power; power is unreliable",
+        "this_tool_stops_processes": false
+      },
+      "gpu_before": {
+        "verified": true,
+        "gpu": [
+          "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU), GPU-0c39c524-d108-e516-8505-3c0a519d75e0, 617.69, 98304, 4876"
+        ],
+        "compute_apps": [],
+        "query_errors": [
+          "",
+          ""
+        ],
+        "processes": []
+      },
+      "gpu_after": {
+        "verified": true,
+        "gpu": [
+          "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU), GPU-0c39c524-d108-e516-8505-3c0a519d75e0, 617.69, 98304, 4992"
+        ],
+        "compute_apps": [],
+        "query_errors": [
+          "",
+          ""
+        ],
+        "processes": []
+      },
+      "gpu_telemetry_raw_rows": 67,
+      "gpu_telemetry_sampled_stats": {
+        "utilization.gpu": {
+          "min": 0.0,
+          "mean": 19.313432835820894,
+          "max": 63.0
+        },
+        "memory.used": {
+          "min": 4864.0,
+          "mean": 5952.6567164179105,
+          "max": 6320.0
+        },
+        "temperature.gpu": {
+          "min": 46.0,
+          "mean": 51.07462686567164,
+          "max": 57.0
+        },
+        "clocks.sm": {
+          "min": 208.0,
+          "mean": 1707.4328358208954,
+          "max": 2548.0
+        },
+        "power.draw": {
+          "min": 1.18,
+          "mean": 8.27865671641791,
+          "max": 21.35
+        }
+      },
+      "windows_before_competitor_count": 0,
+      "windows_after_competitor_count": 0,
+      "wsl_before_competitors": [],
+      "checkpoint_cpu_audit": {
+        "success": true,
+        "checkpoint_path": "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_rep01/run/latest.pt",
+        "checkpoint_bytes": 19484669,
+        "checkpoint_sha256": "c5304108cc49605d32e7d2f509a3c596ca6982a43e8911783b95b4a74cf91da5",
+        "iteration": 7,
+        "policy_type": "lstm",
+        "hidden_size": 512,
+        "task_backend": "fast_stop_v2",
+        "task_identity_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+        "policy_tensor_count": 33,
+        "optimizer_state_entries": 33,
+        "tensor_count": 132,
+        "errors": []
+      },
+      "artifacts": {
+        "benchmark_result": "benchmark_result.json",
+        "train_log": "train.launcher.log",
+        "metrics": "run/metrics.jsonl",
+        "summary": "run/summary.json",
+        "identity": "run/identity.json",
+        "contract": "run/observation_contract.json",
+        "gpu_samples": "nvidia_smi_samples.jsonl",
+        "checkpoint": "run/latest.pt",
+        "cpu_audit": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep01.checkpoint_cpu_audit.json",
+        "read_only_summarize": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep01.summary.json"
+      }
+    },
+    "20261025_v3_rep02": {
+      "output_directory": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep02",
+      "status": "success",
+      "success": true,
+      "summarize_success": true,
+      "seed": 0,
+      "warmup_iterations": 2,
+      "measured_iterations": 5,
+      "child_iterations": 7,
+      "measured_samples": 10240,
+      "warmup_samples_excluded": 4096,
+      "measured_iteration_durations_s": {
+        "collection_s": [
+          11.1454,
+          10.3571,
+          10.499,
+          10.7725,
+          10.7967
+        ],
+        "learning_s": [
+          1.5212,
+          1.3478,
+          1.4228,
+          1.4714,
+          1.6835
+        ],
+        "wall_s": [
+          12.6751,
+          11.713,
+          11.9407,
+          12.2547,
+          12.4885
+        ]
+      },
+      "measured_window_wall_totals_s": {
+        "collection_s": 53.5707,
+        "learning_s": 7.4467,
+        "wall_s": 61.072
+      },
+      "throughput_samples_per_s": {
+        "measured_samples": 10240,
+        "warmup_samples_excluded": 4096,
+        "collection_samples_per_s": 191.1492662966883,
+        "ppo_update_samples_per_s": 1375.1057515409511,
+        "iteration_window_samples_per_s": 167.67094576892848,
+        "launch_full_wall_s": 100.89748878999998,
+        "launch_full_measured_samples_per_s": 101.48914628898963,
+        "launch_full_all_samples_per_s": 142.0848048045855,
+        "launch_full_scope": "same child process; warmup excluded from numerator, included in wall denominator"
+      },
+      "timing_note": "collection_s and learning_s are host perf_counter timings, not CUDA-event timings. wall_s covers rollout + PPO update but is read before finite guards/checkpoint saves. Launcher wall includes process startup, warmup, guards and checkpoint saves. No explicit CUDA synchronize is used.",
+      "train_summary_total_wall_s": 91.8002,
+      "command_argv": [
+        "/opt/venv/bin/python",
+        "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/train_wsl.py",
+        "--num-envs",
+        "64",
+        "--num-steps",
+        "32",
+        "--iterations",
+        "7",
+        "--seed",
+        "0",
+        "--threads",
+        "8",
+        "--device",
+        "cuda",
+        "--physics",
+        "newton_xpbd",
+        "--lidar",
+        "warp",
+        "--feedback",
+        "vqf",
+        "--feedback-noise",
+        "--depth",
+        "analytic",
+        "--depth-noise",
+        "--detections",
+        "analytic",
+        "--detections-warp",
+        "--detections-noise",
+        "--task-backend",
+        "fast_stop_v2",
+        "--sim-dt",
+        "0.001",
+        "--decimation",
+        "50",
+        "--policy",
+        "lstm",
+        "--lstm-hidden",
+        "512",
+        "--epochs",
+        "4",
+        "--lr",
+        "0.0003",
+        "--save-interval",
+        "10",
+        "--nonfinite-limit",
+        "0",
+        "--out",
+        "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_rep02/run"
+      ],
+      "shell": false,
+      "task_identity_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+      "observation_contract_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+      "channels": {
+        "lidar": {
+          "mode": "real",
+          "backend": "warp_kernel",
+          "source": "analytic raycast (stem cylinders + canopy ellipsoids; terrain not intersected)"
+        },
+        "depth": {
+          "mode": "real",
+          "backend": "analytic_warp",
+          "source": "analytic raycast (leaf patches + stems + terrain heightfield), camera-axial Z, normalised where(valid,v,0)/5.0"
+        },
+        "detections": {
+          "mode": "real",
+          "backend": "analytic_detector_warp",
+          "source": "analytic 64x64 instance mask -> env.py box/confidence/class/range rules, packed per task.py"
+        },
+        "state": {
+          "mode": "real",
+          "backend": null,
+          "source": "ABSOLUTE_GOAL_INPUT_SCHEMA layout (isaac_field/task.py), computed from simulator state"
+        },
+        "feedback": {
+          "mode": "real",
+          "backend": "vqf_reference",
+          "source": "isaac_field/feedback.py SimFeedbackEstimator (vqf 2.1.2), fed with engine-truth accel/gyro/mag/gimbal/motor signals"
+        }
+      },
+      "nonfinite_events_file_bytes": 0,
+      "failure_json_present": false,
+      "source_identity": {
+        "commit": "c94553e2b4831848b66700d4dd0d4f9e977b343d",
+        "branch": "perf/max-throughput",
+        "object_format": "sha1",
+        "relevant_sources_dirty": false,
+        "dirty_scope": "raw_source_bytes vs HEAD only; whole workspace dirty not measured",
+        "modified_source_paths": [],
+        "untracked_source_paths": [],
+        "relevant_source_changes": [],
+        "relevant_source_changes_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "source_manifest_sha256": "dad7add0aec5e0f5d84289972ee00ec7bca8b68c34d928f5387338b6c19da9a6",
+      "source_identity_still_matches_at_finish": true,
+      "dependency_versions": {
+        "python": "3.12.3",
+        "torch": "2.14.1+cu130",
+        "numpy": "2.5.4",
+        "warp-lang": "1.18.0",
+        "newton": "1.7.0",
+        "mujoco": "3.17.0",
+        "ovphysx": "0.7.0.74035321",
+        "vqf": "2.1.2"
+      },
+      "resource_contention": {
+        "operator_statement": "No other known training/inference work; desktop GPU activity and aria2 downloads remain; this is not whole-system isolation.",
+        "gpu_process_snapshots": "nvidia-smi before and after",
+        "host_process_snapshots": "read-only /proc scan for train/llama/Kit",
+        "telemetry": "raw 1 Hz utilization/memory/temp/SM clock/power; power is unreliable",
+        "this_tool_stops_processes": false
+      },
+      "gpu_before": {
+        "verified": true,
+        "gpu": [
+          "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU), GPU-0c39c524-d108-e516-8505-3c0a519d75e0, 617.69, 98304, 4982"
+        ],
+        "compute_apps": [],
+        "query_errors": [
+          "",
+          ""
+        ],
+        "processes": []
+      },
+      "gpu_after": {
+        "verified": true,
+        "gpu": [
+          "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU), GPU-0c39c524-d108-e516-8505-3c0a519d75e0, 617.69, 98304, 4976"
+        ],
+        "compute_apps": [],
+        "query_errors": [
+          "",
+          ""
+        ],
+        "processes": []
+      },
+      "gpu_telemetry_raw_rows": 90,
+      "gpu_telemetry_sampled_stats": {
+        "utilization.gpu": {
+          "min": 0.0,
+          "mean": 23.288888888888888,
+          "max": 70.0
+        },
+        "memory.used": {
+          "min": 4976.0,
+          "mean": 6063.066666666667,
+          "max": 6300.0
+        },
+        "temperature.gpu": {
+          "min": 44.0,
+          "mean": 44.84444444444444,
+          "max": 46.0
+        },
+        "clocks.sm": {
+          "min": 455.0,
+          "mean": 1464.5444444444445,
+          "max": 2203.0
+        },
+        "power.draw": {
+          "min": 1.1,
+          "mean": 3.4603333333333333,
+          "max": 4.78
+        }
+      },
+      "windows_before_competitor_count": 0,
+      "windows_after_competitor_count": 0,
+      "wsl_before_competitors": [],
+      "checkpoint_cpu_audit": {
+        "success": true,
+        "checkpoint_path": "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_rep02/run/latest.pt",
+        "checkpoint_bytes": 19484669,
+        "checkpoint_sha256": "f5b333e7b305feb955c682c99426f281f551ed5b07cf574b2bb8ff35d226d736",
+        "iteration": 7,
+        "policy_type": "lstm",
+        "hidden_size": 512,
+        "task_backend": "fast_stop_v2",
+        "task_identity_sha256": "f04ab2db16e4bcfd5c5c0ade1fe3eb39687ea20c2f77440d3e9fccc71d76a329",
+        "policy_tensor_count": 33,
+        "optimizer_state_entries": 33,
+        "tensor_count": 132,
+        "errors": []
+      },
+      "artifacts": {
+        "benchmark_result": "benchmark_result.json",
+        "train_log": "train.launcher.log",
+        "metrics": "run/metrics.jsonl",
+        "summary": "run/summary.json",
+        "identity": "run/identity.json",
+        "contract": "run/observation_contract.json",
+        "gpu_samples": "nvidia_smi_samples.jsonl",
+        "checkpoint": "run/latest.pt",
+        "cpu_audit": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep02.checkpoint_cpu_audit.json",
+        "read_only_summarize": "算法\\仿真训练环境\\native\\acceptance\\20261025_v3_rep02.summary.json"
+      }
+    }
+  },
+  "comparison_rep02_vs_rep01": {
+    "collection_samples_per_s": {
+      "rep01": 317.59914893353056,
+      "rep02": 191.1492662966883,
+      "rep02_percent_change_vs_rep01": -39.81430147450005
+    },
+    "ppo_update_samples_per_s": {
+      "rep01": 2280.4204525209334,
+      "rep02": 1375.1057515409511,
+      "rep02_percent_change_vs_rep01": -39.69946419219251
+    },
+    "iteration_window_samples_per_s": {
+      "rep01": 278.537893665983,
+      "rep02": 167.67094576892848,
+      "rep02_percent_change_vs_rep01": -39.80318312811108
+    },
+    "launch_full_wall_s": {
+      "rep01": 72.920198162,
+      "rep02": 100.89748878999998,
+      "rep02_percent_change_vs_rep01": 38.36699753043106
+    },
+    "launch_full_measured_samples_per_s": {
+      "rep01": 140.42748453934186,
+      "rep02": 101.48914628898963,
+      "rep02_percent_change_vs_rep01": -27.728431067526067
+    },
+    "launch_full_all_samples_per_s": {
+      "rep01": 196.59847835507858,
+      "rep02": 142.0848048045855,
+      "rep02_percent_change_vs_rep01": -27.72843106752605
+    }
+  },
+  "power_reading_note": "nvidia-smi sampled power is retained as raw data but the benchmark tool marks it unreliable."
+}

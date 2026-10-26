@@ -1,0 +1,436 @@
+{
+  "schema": "native-v3-nonfinite-diagnostic-v1",
+  "created_at_utc": "2026-10-25T11:14:10.228590+00:00",
+  "run_out": "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_diagnostic60/run",
+  "wrapper_argv": [
+    "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_diagnostic60/diagnostic_wrapper.py",
+    "--num-envs",
+    "64",
+    "--num-steps",
+    "32",
+    "--iterations",
+    "60",
+    "--seed",
+    "0",
+    "--threads",
+    "8",
+    "--device",
+    "cuda",
+    "--physics",
+    "newton_xpbd",
+    "--task-backend",
+    "fast_stop_v2",
+    "--lidar",
+    "warp",
+    "--feedback",
+    "vqf",
+    "--depth",
+    "analytic",
+    "--detections",
+    "analytic",
+    "--detections-warp",
+    "--sim-dt",
+    "0.001",
+    "--decimation",
+    "50",
+    "--policy",
+    "lstm",
+    "--lstm-hidden",
+    "512",
+    "--nonfinite-limit",
+    "0",
+    "--save-interval",
+    "20",
+    "--out",
+    "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_diagnostic60/run"
+  ],
+  "trainer_argv": [
+    "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train/train_wsl.py",
+    "--num-envs",
+    "64",
+    "--num-steps",
+    "32",
+    "--iterations",
+    "60",
+    "--seed",
+    "0",
+    "--threads",
+    "8",
+    "--device",
+    "cuda",
+    "--physics",
+    "newton_xpbd",
+    "--task-backend",
+    "fast_stop_v2",
+    "--lidar",
+    "warp",
+    "--feedback",
+    "vqf",
+    "--depth",
+    "analytic",
+    "--detections",
+    "analytic",
+    "--detections-warp",
+    "--sim-dt",
+    "0.001",
+    "--decimation",
+    "50",
+    "--policy",
+    "lstm",
+    "--lstm-hidden",
+    "512",
+    "--nonfinite-limit",
+    "0",
+    "--save-interval",
+    "20",
+    "--out",
+    "/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/acceptance/20261025_v3_diagnostic60/run"
+  ],
+  "seed": 0,
+  "max_iterations": 60,
+  "capture_policy_frames": "last 2 full 64-world policy-step frames",
+  "capture_point": "Newton backend step return and read(), before NativeFieldEnv auto-reset",
+  "device_note": "training process requests cuda; wrapper itself does not initialize CUDA",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+  "versions": {
+    "numpy": "2.5.4",
+    "torch": "2.14.1+cu130",
+    "warp-lang": "1.18.0",
+    "newton": "1.7.0",
+    "mujoco": "3.17.0",
+    "vqf": "2.1.2"
+  },
+  "git_commit": "6e4a438285ec15d160c47bb47ce63b24f9b83477",
+  "git_branch": "perf/max-throughput",
+  "git_dirty_scope": "not measured; raw listed source bytes are recorded below",
+  "source_manifest_sha256": "0966d8d7bbab74a45f53a87e1ae1c38c3baf86b2d11e5f5b273fdbf84b4ff856",
+  "diagnostic_wrapper_sha256": "632775a61e1426ff11a18478521c383a636f07561673db3137ee687007c771c1",
+  "source_files": [
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_m1_lidar.py",
+      "bytes": 1286,
+      "sha256": "6c4b353761769aa91b244f71482651e5fce6287369a94dc2f87f0393b65d6f27"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_m1_warp.py",
+      "bytes": 1870,
+      "sha256": "c8259b28e2897e50e66879e119023ce66d5b64450af81454f6decaae53508ee4"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_m1_warp2.py",
+      "bytes": 5518,
+      "sha256": "9189246fd5a5a267b7c4abbafe06e93e7ca804f0309f7066299f4a52e04ad449"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_newton_isolation.py",
+      "bytes": 1806,
+      "sha256": "8184199c62a1eb26193473af72a4629778cd884d3dab3d065ec8253726210b24"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_newton_nan.py",
+      "bytes": 1750,
+      "sha256": "fdc486ec15d4175070f6737d88d518f045079b6e6410605b52924c8649658f85"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_newton_sizes.py",
+      "bytes": 1109,
+      "sha256": "0e2cc3919fa266dd6d2e66b7c210c340eb3a5d559a0bce9f02342ca083289bc9"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/debug_state_len.py",
+      "bytes": 3237,
+      "sha256": "c86daaf5811dc37d5c8f363100b0ce69080859075c2530d052fbd35c98671788"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/depth_caster.py",
+      "bytes": 18064,
+      "sha256": "51454db76c1d5f4bf5a2c079c76c868ae83d926cfe843c4fcd8795c2a53c0bcd"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/depth_gpu_perf.py",
+      "bytes": 2656,
+      "sha256": "a0e835d6ea9c2b353e900a82be622acbf55e7cb92c0a7f126edbfd61e2a0a1c4"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/depth_integration.json",
+      "bytes": 325,
+      "sha256": "c79345a34853f4094627201abb2a8529390e33ae1a54bfc2d40a7ea1cd19d7c1"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/depth_verification.json",
+      "bytes": 3264,
+      "sha256": "16482f2e9b7db9151ced4afac550f456b8b457385078b98099e53ffa065e9df5"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_batch_verification.json",
+      "bytes": 661,
+      "sha256": "93599156ec59cc764577c83c08c2a3bd22abc2fb9becc4d44697b819403d5829"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_caster.py",
+      "bytes": 27899,
+      "sha256": "a945f53988a5ea806274d4962e88261d8e02c007e2edbbf6df26d3f470f91506"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_gpu_perf.py",
+      "bytes": 2746,
+      "sha256": "4164e80d2b99b733f80c1db3cbfecd94e2dda3a2806b0389be89e966c159dd20"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_integration.json",
+      "bytes": 244,
+      "sha256": "f7325aadd9fd2c2c724abca74159f0b9520005b096b59ed00dc263ec77bd24f3"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_verification.json",
+      "bytes": 2762,
+      "sha256": "389ca7b89a740bd62cd38ec15a357f8f0b2e04e77a090d7a3cd5223ff4ec0960"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/detections_warp_verification.json",
+      "bytes": 970,
+      "sha256": "03e81f56551f584613d3673508c90f3c584c14843dbd1a0dd8623a9ce75bc7e3"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/diag_5ms_divergence.json",
+      "bytes": 3033,
+      "sha256": "503f6424f4122092f53e08c29093706b1f33c7c2d1019eb4daa35c47117938bd"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/diag_5ms_divergence.py",
+      "bytes": 5382,
+      "sha256": "8bf6d145da08d204fb7c554d8efacd71dfa05b14b7f6e3e5c9ce22ed44a618ea"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_depth_integration.py",
+      "bytes": 2864,
+      "sha256": "0da1b6bf0e06c1e727aec52e0312af2b4eef4205f66101a056d058a88e0f9c5f"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_depth_verification.json",
+      "bytes": 1597,
+      "sha256": "79a00beb0566e8e37e5b68f997e176f251286b2d2bd63fe645aace645da142c4"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_depth_verify.py",
+      "bytes": 6341,
+      "sha256": "22a7cf53e1adf1dbfea3669ddd874913d4ce58869c6e45f43c1c65842f118924"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_detections_batch_verify.py",
+      "bytes": 3718,
+      "sha256": "c8b37931a4916377ec19c38696f731ff971ba4dc1e479c224052eee2077216e8"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_detections_integration.py",
+      "bytes": 3162,
+      "sha256": "62ecf44a38b7ebe12ce131c906f5b824eeff327fc4283a7496f75e4d1cf0b8bb"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_detections_verify.py",
+      "bytes": 7257,
+      "sha256": "5d55071a3bd7036098960cac13c3f2f8b26255ab28f073c10b69723d6b131497"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_detections_warp_verify.py",
+      "bytes": 4717,
+      "sha256": "2d930ecf109bc3c8097cac83c735cab6d99dd9599ff2c9b0b1e4ca16138f2349"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_lidar.py",
+      "bytes": 14594,
+      "sha256": "c014d9f5059baffd51ee415b43a5abffbbffaf1120a200596a8eb102e3630aa2"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_state_feedback.py",
+      "bytes": 12435,
+      "sha256": "713c26ef65e0e86b11db4a98999c1c3ea5f20611fc3144349cec5f49ec3c2d5a"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_verification.json",
+      "bytes": 6491,
+      "sha256": "327b05c5f1854b9fa0ae4d3a5346a6a410e60f09edadbed9566077ae1ba17d62"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_vqf_verification.json",
+      "bytes": 665,
+      "sha256": "5147be52ba8fbd8056a639d14d7bdbd397909bddd0b825baafe9472c525c10dc"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m1_vqf_verify.py",
+      "bytes": 5718,
+      "sha256": "d276eb070bfd02ea058ad501921fe82ab2fa62c331984f04f48514e1c0f33497"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m2_contact_probe.py",
+      "bytes": 1492,
+      "sha256": "d441cdf9c4dd852bb77627f8221f43fc8b46175be11f49536529492fcb411b82"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m2_equivalence.py",
+      "bytes": 17324,
+      "sha256": "12303383effc9782e21ef859139b28446a7c5b845bd52cd7cb48e3e3983831ca"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m2_spawn_probe.py",
+      "bytes": 1357,
+      "sha256": "550078a8f28bdf8f36e85efe9c2be1720bbeff1fe2a5ea746872d63607e28059"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/m2_verification.json",
+      "bytes": 5073,
+      "sha256": "5408ad76504f81266e0bbbdbae4baca22a11bd3c4a298a406e0b47615c1053d8"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/merge_vqf_into_m1.py",
+      "bytes": 1551,
+      "sha256": "b12a476118c1451df5f80c9b50f7e9cebfdc8238f0109632abc5f68fb0066644"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/native_env.py",
+      "bytes": 22290,
+      "sha256": "ae2612cc87f8fd3604f548d5d257c2bf31676344b1e64067c50f6f864e67b4fc"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/newton_backend.py",
+      "bytes": 23167,
+      "sha256": "5e6375e0fdaca4d0d005877e7855088d70667e8c0b9a5f5fe778a3a2cbd06247"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/nonfinite_guard_tests.json",
+      "bytes": 1130,
+      "sha256": "1eb8ae7e611ce3c2a2046c8b765d5f435d2d5dd6d90b6388cdd6fb113e7656d8"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/observation_provider.py",
+      "bytes": 38586,
+      "sha256": "85ce43f5c298d810412602d42150359754404f2ce01d4e427257eeb8bcc1f2ad"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/physics_backend.py",
+      "bytes": 16178,
+      "sha256": "b4f2825dd1148252b5cc0e61d67859b90b356dcae36fe1bc2efde81477994088"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/policy_m0.py",
+      "bytes": 2247,
+      "sha256": "bcb521fc3f5588651963c703cad195eef1e672e7fc7322a1c8173ff77388708b"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_encoder.py",
+      "bytes": 1760,
+      "sha256": "7a67d02df73e75789cb6466f506656c0b51317f130f44e112a164da2afc42528"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_m0.py",
+      "bytes": 1683,
+      "sha256": "5f2276f41f2744b4ffd2a59ae56f71b1d957d7732802bef9ef48baed8861d893"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_ppo.py",
+      "bytes": 1453,
+      "sha256": "7d8cdef0f63291fe414c60154e5d9ba204b0a832e08667ed22fdfb5c27dc5634"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_ppo_threads.py",
+      "bytes": 1264,
+      "sha256": "a21ffb7215173bdca1625195cb55db91867ad4f86251641abc2972ae320e1fcd"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_solver.py",
+      "bytes": 1729,
+      "sha256": "e7b6076430c5f404c60a43ebdb8625f3611fc2cd5837b6b07e4c553014808c7f"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_step.py",
+      "bytes": 1025,
+      "sha256": "1b495f082711a81dad6ea815f428d5748bd74f1527b51bae99df3ee79b434ff5"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/profile_threading.py",
+      "bytes": 1429,
+      "sha256": "7f2c3aefd633716c7b26bf91103cefdcf2cf9b22831aed56bcedb57a4ba3d9ae"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/reward_fast_stop.py",
+      "bytes": 6217,
+      "sha256": "86305245cb7790c6b49435cb5c731477a8b342e26b6e29e0e1adfb529443995c"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/run_m1_verify.py",
+      "bytes": 5196,
+      "sha256": "20ba2277b1a5e23be312c5bb50f2c53b13e5e8c80a20da080306912378c2ac28"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/smoke_newton.py",
+      "bytes": 934,
+      "sha256": "69e4db6853d3575b42308ef7c3cec675719969323978d8e69292d90ef2a3616d"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/smoke_physics.py",
+      "bytes": 1356,
+      "sha256": "10eb000b6842b25a846b72c6f8e63265072067340d2159b97b30ad199c5cd858"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/test_newton_backend_isolation.py",
+      "bytes": 18425,
+      "sha256": "17eb656a3b57099dc38f799e0feac82c2bdeb6a1116ab4ffbdab038a4d84e5d3"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/test_nonfinite_guards.py",
+      "bytes": 6151,
+      "sha256": "8731eba5eec6a127c23ba0de0af582588830655b546bafcb364b98041795d9d6"
+    },
+    {
+      "path": "算法/仿真训练环境/native/proto/train_m0.py",
+      "bytes": 13028,
+      "sha256": "cd00b29809506b77cebd75f42fd05f3bb4ef3ca699f20eb941c9e5d3a9050868"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/PROTOCOL_NATIVE_V1.1.md",
+      "bytes": 12729,
+      "sha256": "6db2e977f6c35a890df64788778c106427bf673a89409b8ecd8779d67bdb26ed"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/PROTOCOL_NATIVE_V1.1.sha256",
+      "bytes": 397,
+      "sha256": "b066e308f975a8bc2b0b7d794787ab40534f25c3a3e49d2e4b3ac5b1ef5830cf"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/contract_identity.py",
+      "bytes": 11757,
+      "sha256": "2f540356fb18a91b2b4f2c7ae44f4ac094007e02769df72676ce8c33908fe46b"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/eval_native.py",
+      "bytes": 17353,
+      "sha256": "0c520c74ca455293de3f2da997e47cec68a9768a580a0a213c2f8013efabbe91"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/make_protocol_v1_1.py",
+      "bytes": 4499,
+      "sha256": "684a5617311a404fbdc350193d64576eebc2feaee062b0423e48d44785cda618"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/policy_lstm.py",
+      "bytes": 6953,
+      "sha256": "38ba061174896a4c4d47aaafbf1f3bd3f794028ca12dcefcd5874eb2b5c74e22"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/protocol_sha.py",
+      "bytes": 3266,
+      "sha256": "f98a700269e8ffedc11ae2fe1dfc284a73fe1fc5d87518d4018fc6c35f9a7d6e"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/train_wsl.py",
+      "bytes": 28537,
+      "sha256": "1b5b105518702176ca4687979e26480171aa1cfb84508e4f37de257842bd4bc0"
+    },
+    {
+      "path": "算法/仿真训练环境/native/train/trial_checks.py",
+      "bytes": 25802,
+      "sha256": "f581d46273bc1f4649a7a07d56011d2fec98327f60cbf89966fac1e6c83067ad"
+    }
+  ]
+}

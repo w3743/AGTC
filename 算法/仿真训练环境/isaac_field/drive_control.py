@@ -42,6 +42,31 @@ def broadcast_side_values(side_values: torch.Tensor, side_ids: torch.Tensor) -> 
     return side_values.index_select(1, sides)
 
 
+def _conditional_integral_step_math(
+    error: torch.Tensor,
+    integral: torch.Tensor,
+    p_estimate: torch.Tensor,
+    *,
+    ki: float,
+    dt: float,
+    limit: float,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    total = p_estimate + integral
+    blocked = ((total > limit) & (error > 0.0)) | ((total < -limit) & (error < 0.0))
+    delta = torch.where(blocked, torch.zeros_like(error), error * (ki * dt))
+    updated = torch.clamp(integral + delta, min=-limit, max=limit)
+    return updated, blocked
+
+
+def _validate_controller_parameters(*, kp: float, ki: float, dt: float, limit: float) -> None:
+    for name, value, allow_zero in (
+        ("kp", kp, False), ("ki", ki, True), ("dt", dt, False), ("limit", limit, False),
+    ):
+        if not math.isfinite(value) or (value < 0.0 if allow_zero else value <= 0.0):
+            suffix = "non-negative" if allow_zero else "positive"
+            raise ValueError(f"{name} must be finite and {suffix}")
+
+
 def conditional_integral_step(
     error: torch.Tensor,
     integral: torch.Tensor,
@@ -63,11 +88,9 @@ def conditional_integral_step(
         raise ValueError("dt must be finite and positive")
     if not math.isfinite(limit) or limit <= 0.0:
         raise ValueError("limit must be finite and positive")
-    total = p_estimate + integral
-    blocked = ((total > limit) & (error > 0.0)) | ((total < -limit) & (error < 0.0))
-    delta = torch.where(blocked, torch.zeros_like(error), error * (ki * dt))
-    updated = torch.clamp(integral + delta, min=-limit, max=limit)
-    return updated, blocked
+    return _conditional_integral_step_math(
+        error, integral, p_estimate, ki=ki, dt=dt, limit=limit,
+    )
 
 
 class SideIntegralDriveController:
@@ -86,14 +109,19 @@ class SideIntegralDriveController:
     ) -> None:
         if isinstance(num_envs, bool) or int(num_envs) != num_envs or num_envs <= 0:
             raise ValueError("num_envs must be a positive integer")
-        for name, value, allow_zero in (
-            ("kp", kp, False), ("ki", ki, True), ("dt", dt, False), ("limit", limit, False),
-        ):
-            if not math.isfinite(value) or (value < 0.0 if allow_zero else value <= 0.0):
-                suffix = "non-negative" if allow_zero else "positive"
-                raise ValueError(f"{name} must be finite and {suffix}")
+        _validate_controller_parameters(kp=kp, ki=ki, dt=dt, limit=limit)
         requested_device = torch.device(device)
-        self.side_ids = _validated_side_ids(side_ids, device=requested_device)
+        validated_side_ids = _validated_side_ids(side_ids, device=requested_device)
+        self.side_ids = validated_side_ids.clone()
+        # Private copies make the validated wheel layout fixed after construction.
+        self._wheel_side_ids = validated_side_ids.clone()
+        self._left_wheel_indices = torch.nonzero(
+            self._wheel_side_ids == 0, as_tuple=False,
+        ).flatten()
+        self._right_wheel_indices = torch.nonzero(
+            self._wheel_side_ids == 1, as_tuple=False,
+        ).flatten()
+        self._wheel_count = int(self._wheel_side_ids.numel())
         self.kp = float(kp)
         self.ki = float(ki)
         self.dt = float(dt)
@@ -107,28 +135,34 @@ class SideIntegralDriveController:
 
     @property
     def feedforward(self) -> torch.Tensor:
-        return broadcast_side_values(self.integral, self.side_ids)
+        return self.integral.index_select(1, self._wheel_side_ids)
+
+    def _side_mean(self, values: torch.Tensor) -> torch.Tensor:
+        left_mean = values.index_select(1, self._left_wheel_indices).mean(dim=1)
+        right_mean = values.index_select(1, self._right_wheel_indices).mean(dim=1)
+        return torch.stack((left_mean, right_mean), dim=1)
 
     def update(self, target_wheel_qd: torch.Tensor, actual_wheel_qd: torch.Tensor) -> None:
-        expected = (self.integral.shape[0], self.side_ids.numel())
+        _validate_controller_parameters(kp=self.kp, ki=self.ki, dt=self.dt, limit=self.limit)
+        expected = (self.integral.shape[0], self._wheel_count)
         if tuple(target_wheel_qd.shape) != expected or tuple(actual_wheel_qd.shape) != expected:
             raise ValueError(f"target and actual wheel qd must both have shape {expected}")
         if target_wheel_qd.device != self.device or actual_wheel_qd.device != self.device:
             raise ValueError("target and actual wheel qd must be on the controller device")
-        if not (torch.isfinite(target_wheel_qd).all() and torch.isfinite(actual_wheel_qd).all()):
-            raise ValueError("target and actual wheel qd must be finite")
-        self.last_error = (
-            side_mean(target_wheel_qd, self.side_ids)
-            - side_mean(actual_wheel_qd, self.side_ids)
+        finite = (
+            torch.isfinite(target_wheel_qd).all()
+            & torch.isfinite(actual_wheel_qd).all()
+            & torch.isfinite(self.integral).all()
         )
-        self.last_p_estimate = self.kp * self.last_error
-        self.integral, self.last_blocked = conditional_integral_step(
-            self.last_error,
-            self.integral,
-            self.last_p_estimate,
-            ki=self.ki,
-            dt=self.dt,
-            limit=self.limit,
+        error = self._side_mean(target_wheel_qd) - self._side_mean(actual_wheel_qd)
+        p_estimate = self.kp * error
+        finite = finite & torch.isfinite(error).all() & torch.isfinite(p_estimate).all()
+        if not bool(finite):
+            raise ValueError("PI inputs must be finite")
+        self.last_error = error
+        self.last_p_estimate = p_estimate
+        self.integral, self.last_blocked = _conditional_integral_step_math(
+            error, self.integral, p_estimate, ki=self.ki, dt=self.dt, limit=self.limit,
         )
 
     def reset(self, env_ids: torch.Tensor | None = None) -> None:

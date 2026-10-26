@@ -31,6 +31,18 @@ jobs:
           submodules: false
           persist-credentials: true
 
+      - name: Native training orchestration CPU regressions
+        shell: bash
+        run: |
+          native_checks="$RUNNER_TEMP/agtc-native-cpu-checks"
+          mkdir -p "$native_checks"
+          git archive "$HEAD_SHA" -- \
+            '算法/仿真训练环境/native/tools' \
+            '算法/仿真训练环境/native/train' | tar -x -C "$native_checks"
+          python -B -m unittest discover \
+            -s "$native_checks/算法/仿真训练环境/native/tools" \
+            -p 'test_*.py' -v
+
       - name: Check whitespace
         run: git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check "$BASE_SHA" "$HEAD_SHA"
 
