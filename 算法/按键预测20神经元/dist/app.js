@@ -28,10 +28,31 @@
     weightTable: document.getElementById("weightTable"),
     weightValues: document.getElementById("weightValues"),
     footerSession: document.getElementById("footerSession"),
+    graphStep: document.getElementById("graphStep"),
+    graphZoom: document.getElementById("graphZoom"),
+    graphCenterStep: document.getElementById("graphCenterStep"),
+    edgeThreshold: document.getElementById("edgeThreshold"),
+    edgeThresholdValue: document.getElementById("edgeThresholdValue"),
+    graphEdgeCount: document.getElementById("graphEdgeCount"),
+    neuronGraph: document.getElementById("neuronGraph"),
+    graphEdges: document.getElementById("graphEdges"),
+    graphNodes: document.getElementById("graphNodes"),
+    graphSelectionEmpty: document.getElementById("graphSelectionEmpty"),
+    graphInspector: document.getElementById("graphInspector"),
+    selectedNeuronTitle: document.getElementById("selectedNeuronTitle"),
+    selectedNeuronActivity: document.getElementById("selectedNeuronActivity"),
+    selectedIncomingCount: document.getElementById("selectedIncomingCount"),
+    selectedOutgoingCount: document.getElementById("selectedOutgoingCount"),
+    selectedIncoming: document.getElementById("selectedIncoming"),
+    selectedOutgoing: document.getElementById("selectedOutgoing"),
+    clearNeuronSelection: document.getElementById("clearNeuronSelection"),
   };
 
   let currentState = null;
   let busy = false;
+  let selectedNeuronIndex = null;
+  let stateRevision = 0;
+  let pollInFlight = false;
 
   function isFiniteNumber(value) {
     return typeof value === "number" && Number.isFinite(value);
@@ -58,6 +79,7 @@
 
   function setBusy(value, label = "") {
     busy = value;
+    if (value) stateRevision += 1;
     elements.digitButtons.forEach((button) => { button.disabled = value || !currentState; });
     elements.resetButton.disabled = value || !currentState;
     if (value) setConnection(label || "正在处理…", "busy");
@@ -104,6 +126,7 @@
   }
 
   async function loadState({ keepMessage = false } = {}) {
+    stateRevision += 1;
     const state = await requestJson("/api/state");
     if (!validState(state)) throw new Error("本地服务返回的状态格式不完整。");
     currentState = state;
@@ -317,6 +340,219 @@
     elements.weightValues.textContent = rawRows.join("\n");
   }
 
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const GRAPH_CENTER = { x: 360, y: 260 };
+  const GRAPH_RADIUS = 200;
+
+  function svgElement(name, attributes = {}) {
+    const element = document.createElementNS(SVG_NS, name);
+    Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+    return element;
+  }
+
+  function activityFill(value) {
+    const neutral = [243, 247, 243];
+    const endpoint = value > 0 ? [217, 104, 81] : [84, 124, 163];
+    const amount = isFiniteNumber(value) ? Math.min(1, Math.abs(value)) : 0;
+    const color = neutral.map((base, index) => Math.round(base + (endpoint[index] - base) * amount));
+    return `rgb(${color.join(", ")})`;
+  }
+
+  function graphNodePosition(index) {
+    const angle = -Math.PI / 2 + (index / 20) * Math.PI * 2;
+    return {
+      x: GRAPH_CENTER.x + Math.cos(angle) * GRAPH_RADIUS,
+      y: GRAPH_CENTER.y + Math.sin(angle) * GRAPH_RADIUS,
+      radialX: Math.cos(angle),
+      radialY: Math.sin(angle),
+    };
+  }
+
+  function graphEdgePath(sourceIndex, targetIndex, positions) {
+    const source = positions[sourceIndex];
+    const target = positions[targetIndex];
+    if (sourceIndex === targetIndex) {
+      const tangentX = -source.radialY;
+      const tangentY = source.radialX;
+      const startX = source.x - tangentX * 9 + source.radialX * 17;
+      const startY = source.y - tangentY * 9 + source.radialY * 17;
+      const endX = source.x + tangentX * 9 + source.radialX * 17;
+      const endY = source.y + tangentY * 9 + source.radialY * 17;
+      const controlDistance = 54;
+      const sideDistance = 36;
+      const firstControlX = source.x - tangentX * sideDistance + source.radialX * controlDistance;
+      const firstControlY = source.y - tangentY * sideDistance + source.radialY * controlDistance;
+      const secondControlX = source.x + tangentX * sideDistance + source.radialX * controlDistance;
+      const secondControlY = source.y + tangentY * sideDistance + source.radialY * controlDistance;
+      return `M ${startX.toFixed(1)} ${startY.toFixed(1)} C ${firstControlX.toFixed(1)} ${firstControlY.toFixed(1)}, ${secondControlX.toFixed(1)} ${secondControlY.toFixed(1)}, ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+    }
+
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const distance = Math.hypot(dx, dy);
+    const unitX = dx / distance;
+    const unitY = dy / distance;
+    const startX = source.x + unitX * 23;
+    const startY = source.y + unitY * 23;
+    const endX = target.x - unitX * 27;
+    const endY = target.y - unitY * 27;
+    const lowIndex = Math.min(sourceIndex, targetIndex);
+    const highIndex = Math.max(sourceIndex, targetIndex);
+    const pairHash = lowIndex * 19 + highIndex * 31;
+    const bend = (pairHash % 2 ? 1 : -1) * (12 + (pairHash % 5) * 3);
+    const controlX = (startX + endX) / 2 - unitY * bend;
+    const controlY = (startY + endY) / 2 + unitX * bend;
+    return `M ${startX.toFixed(1)} ${startY.toFixed(1)} Q ${controlX.toFixed(1)} ${controlY.toFixed(1)}, ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+  }
+
+  function appendConnectionList(list, connections, selectedIndex, direction) {
+    const rows = [];
+    for (let otherIndex = 0; otherIndex < 20; otherIndex += 1) {
+      const weight = direction === "incoming"
+        ? connections[selectedIndex][otherIndex]
+        : connections[otherIndex][selectedIndex];
+      if (!isFiniteNumber(weight) || weight === 0) continue;
+      rows.push({ otherIndex, weight });
+    }
+    rows.sort((left, right) => Math.abs(right.weight) - Math.abs(left.weight));
+    list.replaceChildren();
+    if (rows.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "no-connections";
+      empty.textContent = "暂无非零连接";
+      list.append(empty);
+      return 0;
+    }
+    rows.forEach(({ otherIndex, weight }) => {
+      const item = document.createElement("li");
+      item.className = weight > 0 ? "connection-positive" : "connection-negative";
+      item.textContent = direction === "incoming"
+        ? `神经元 ${otherIndex + 1} → ${selectedIndex + 1}　${String(weight)}`
+        : `神经元 ${selectedIndex + 1} → ${otherIndex + 1}　${String(weight)}`;
+      item.title = item.textContent;
+      list.append(item);
+    });
+    return rows.length;
+  }
+
+  function renderNeuronInspector() {
+    const selectedIndex = selectedNeuronIndex;
+    const selected = selectedIndex !== null;
+    elements.graphSelectionEmpty.hidden = selected;
+    elements.graphInspector.hidden = !selected;
+    elements.clearNeuronSelection.disabled = !selected;
+    if (!selected) return;
+
+    const outputText = selectedIndex < 10 ? ` · 输出数字 ${selectedIndex}` : "";
+    const activity = currentState.neurons[selectedIndex];
+    elements.selectedNeuronTitle.textContent = `神经元 ${selectedIndex + 1}${outputText}`;
+    elements.selectedNeuronActivity.textContent = isFiniteNumber(activity) ? String(activity) : "不可用";
+    const connections = currentState.connections;
+    elements.selectedIncomingCount.textContent = String(appendConnectionList(
+      elements.selectedIncoming, connections, selectedIndex, "incoming",
+    ));
+    elements.selectedOutgoingCount.textContent = String(appendConnectionList(
+      elements.selectedOutgoing, connections, selectedIndex, "outgoing",
+    ));
+  }
+
+  function renderNetworkGraph(focusNodeIndex = null) {
+    if (!currentState) return;
+    const focusedNode = document.activeElement && document.activeElement.closest
+      ? document.activeElement.closest(".graph-node")
+      : null;
+    if (focusNodeIndex === null && focusedNode && elements.neuronGraph.contains(focusedNode)) {
+      focusNodeIndex = Number(focusedNode.dataset.nodeIndex);
+    }
+
+    const matrix = currentState.connections;
+    const finiteWeights = matrix.flat().filter(isFiniteNumber);
+    const maxAbs = Math.max(0, ...finiteWeights.map((value) => Math.abs(value)));
+    const thresholdPercent = Number(elements.edgeThreshold.value);
+    const threshold = maxAbs * thresholdPercent / 100;
+    elements.edgeThresholdValue.textContent = `${thresholdPercent}% × 最大值（${displayNumber(threshold, 5)}）`;
+    elements.graphStep.textContent = String(currentState.step);
+    elements.graphCenterStep.textContent = `第 ${currentState.step} 次按键后`;
+
+    const positions = Array.from({ length: 20 }, (_value, index) => graphNodePosition(index));
+    const visibleEdges = [];
+    for (let targetIndex = 0; targetIndex < 20; targetIndex += 1) {
+      for (let sourceIndex = 0; sourceIndex < 20; sourceIndex += 1) {
+        const weight = matrix[targetIndex][sourceIndex];
+        if (!isFiniteNumber(weight) || weight === 0) continue;
+        const passesThreshold = Math.abs(weight) >= threshold;
+        const touchesSelection = selectedNeuronIndex !== null &&
+          (sourceIndex === selectedNeuronIndex || targetIndex === selectedNeuronIndex);
+        if (passesThreshold || touchesSelection) {
+          visibleEdges.push({ sourceIndex, targetIndex, weight });
+        }
+      }
+    }
+
+    elements.graphEdges.replaceChildren();
+    visibleEdges.forEach(({ sourceIndex, targetIndex, weight }) => {
+      const selectedLink = selectedNeuronIndex !== null &&
+        (sourceIndex === selectedNeuronIndex || targetIndex === selectedNeuronIndex);
+      const edge = svgElement("path", {
+        class: `graph-edge ${weight > 0 ? "is-positive" : "is-negative"}${selectedLink ? " is-selected-link" : ""}`,
+        d: graphEdgePath(sourceIndex, targetIndex, positions),
+        "marker-end": weight > 0 ? "url(#arrow-positive)" : "url(#arrow-negative)",
+        "aria-hidden": "true",
+      });
+      const strength = maxAbs > 0 ? Math.abs(weight) / maxAbs : 0;
+      edge.style.strokeWidth = String(0.8 + strength * 1.8 + (selectedLink ? 0.8 : 0));
+      edge.style.opacity = selectedLink ? "0.9" : String(selectedNeuronIndex !== null ? 0.055 : 0.2 + strength * 0.47);
+      const title = svgElement("title");
+      title.textContent = `神经元 ${sourceIndex + 1} → 神经元 ${targetIndex + 1} · 权重 ${String(weight)}`;
+      edge.append(title);
+      elements.graphEdges.append(edge);
+    });
+    const edgeCountText = `显示 ${visibleEdges.length} / 400 条有向连接${selectedNeuronIndex === null
+      ? ` · |权重| ≥ ${displayNumber(threshold, 5)}`
+      : " · 选中节点的全部进出连接均显示"}`;
+    elements.graphEdgeCount.textContent = edgeCountText;
+
+    elements.graphNodes.replaceChildren();
+    currentState.neurons.forEach((rawValue, index) => {
+      const value = isFiniteNumber(rawValue) ? rawValue : 0;
+      const position = positions[index];
+      const selected = selectedNeuronIndex === index;
+      const group = svgElement("g", {
+        class: `graph-node${index < 10 ? " is-output" : ""}${selected ? " is-selected" : ""}`,
+        transform: `translate(${position.x.toFixed(1)} ${position.y.toFixed(1)})`,
+        "data-node-index": index,
+        role: "button",
+        tabindex: "0",
+        "aria-pressed": selected ? "true" : "false",
+        "aria-label": `神经元 ${index + 1}${index < 10 ? `，输出数字 ${index}` : ""}，活动值 ${isFiniteNumber(rawValue) ? String(rawValue) : "不可用"}`,
+      });
+      const nodeTitle = svgElement("title");
+      nodeTitle.textContent = `神经元 ${index + 1}${index < 10 ? ` · 输出数字 ${index}` : ""} · 活动值 ${isFiniteNumber(rawValue) ? String(rawValue) : "不可用"}`;
+      const circle = svgElement("circle", { class: "graph-node-circle", r: "24" });
+      circle.style.fill = activityFill(value);
+      const number = svgElement("text", { class: "graph-node-number", x: "0", y: index < 10 ? "-3" : "5", "text-anchor": "middle" });
+      number.textContent = String(index + 1);
+      group.append(nodeTitle, circle, number);
+      if (index < 10) {
+        const output = svgElement("text", { class: "graph-node-output", x: "0", y: "12", "text-anchor": "middle" });
+        output.textContent = `输出 ${index}`;
+        group.append(output);
+      }
+      elements.graphNodes.append(group);
+    });
+
+    renderNeuronInspector();
+    if (focusNodeIndex !== null && Number.isInteger(focusNodeIndex)) {
+      const focusTarget = elements.graphNodes.querySelector(`[data-node-index="${focusNodeIndex}"]`);
+      if (focusTarget) focusTarget.focus({ preventScroll: true });
+    }
+  }
+
+  function selectNeuron(index) {
+    selectedNeuronIndex = selectedNeuronIndex === index ? null : index;
+    renderNetworkGraph(index);
+  }
+
   function render() {
     elements.sessionChip.hidden = false;
     elements.sessionId.textContent = currentState.session_id;
@@ -329,6 +565,7 @@
     renderPrediction();
     renderNeurons();
     renderWeights();
+    renderNetworkGraph();
     elements.digitButtons.forEach((button) => { button.disabled = busy; });
     elements.resetButton.disabled = busy;
   }
@@ -391,11 +628,59 @@
     }
   }
 
+  async function pollState() {
+    if (!currentState || busy || document.hidden || pollInFlight) return;
+    pollInFlight = true;
+    const revision = stateRevision;
+    try {
+      const state = await requestJson("/api/state");
+      if (revision !== stateRevision || busy || !validState(state)) return;
+      if (state.prediction_id !== currentState.prediction_id) {
+        currentState = state;
+        render();
+        setBusy(false);
+      }
+    } catch (_error) {
+      // State polling is read-only and silent; the next interval can recover.
+    } finally {
+      pollInFlight = false;
+    }
+  }
+
   elements.digitButtons.forEach((button) => {
     button.addEventListener("click", () => pressDigit(Number(button.dataset.digit)));
   });
 
   elements.earlyReveal.addEventListener("change", renderPrediction);
+  elements.graphZoom.addEventListener("click", () => {
+    const zoomed = elements.neuronGraph.classList.toggle("is-zoomed");
+    elements.graphZoom.setAttribute("aria-pressed", String(zoomed));
+    elements.graphZoom.textContent = zoomed ? "显示全图" : "放大查看";
+  });
+  elements.edgeThreshold.addEventListener("input", () => renderNetworkGraph());
+  elements.clearNeuronSelection.addEventListener("click", () => {
+    selectedNeuronIndex = null;
+    renderNetworkGraph();
+  });
+  elements.neuronGraph.addEventListener("click", (event) => {
+    const target = event.target && event.target.closest ? event.target.closest(".graph-node") : null;
+    if (!target || !elements.neuronGraph.contains(target)) return;
+    selectNeuron(Number(target.dataset.nodeIndex));
+  });
+  elements.neuronGraph.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && selectedNeuronIndex !== null) {
+      event.preventDefault();
+      const focusedNode = event.target && event.target.closest ? event.target.closest(".graph-node") : null;
+      selectedNeuronIndex = null;
+      renderNetworkGraph(focusedNode ? Number(focusedNode.dataset.nodeIndex) : null);
+      return;
+    }
+    const target = event.target && event.target.closest ? event.target.closest(".graph-node") : null;
+    if (target && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      selectNeuron(Number(target.dataset.nodeIndex));
+    }
+  });
   elements.resetButton.addEventListener("click", startNewSession);
   document.addEventListener("keydown", (event) => {
     if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -407,10 +692,15 @@
     }
   });
 
-  loadState().catch((error) => {
+  loadState().then(() => {
+    window.setInterval(pollState, 1500);
+  }).catch((error) => {
     setConnection("无法连接", "error");
     elements.resetButton.disabled = true;
     elements.digitButtons.forEach((button) => { button.disabled = true; });
     showMessage(`${error.message} 请确认本地训练服务已经启动，再刷新页面。`, true);
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) pollState();
   });
 })();

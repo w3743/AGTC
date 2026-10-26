@@ -301,6 +301,60 @@ h1 { margin-bottom: 7px; font-size: clamp(25px, 3.5vw, 34px); line-height: 1.22;
 .neuron-item { min-width: 0; display: flex; align-items: center; gap: 7px; padding: 8px 9px; border: 1px solid #e7ede7; border-radius: 10px; color: #74827a; background: #fbfcfb; font-size: 10px; }
 .neuron-dot { width: 11px; height: 11px; flex: 0 0 11px; border: 1px solid rgba(63, 91, 74, 0.12); border-radius: 50%; background: #e1e9e2; }
 .neuron-item strong { overflow: hidden; color: #43564a; font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+
+.network-card { margin: 18px 0 20px; padding: clamp(19px, 3vw, 27px); }
+.network-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.network-heading h2 { margin: 0; font-size: 18px; line-height: 1.3; letter-spacing: -0.025em; font-weight: 740; }
+.graph-step-label { flex: 0 0 auto; padding: 7px 10px; border: 1px solid #e0eae1; border-radius: 9px; color: #77887d; background: #fafcfa; font-size: 10px; }
+.graph-step-label b { color: var(--green-dark); font-variant-numeric: tabular-nums; }
+.network-hint { max-width: 820px; margin: 9px 0 14px; color: #829087; font-size: 11px; line-height: 1.65; }
+.graph-controls { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.threshold-control { min-width: min(100%, 430px); display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 11px; color: #56695e; font-size: 11px; font-weight: 650; }
+.threshold-control input { width: 100%; margin: 0; accent-color: var(--green); cursor: pointer; }
+.threshold-control output { min-width: 155px; color: #77887d; font-size: 10px; font-variant-numeric: tabular-nums; text-align: right; }
+.graph-clear { flex: 0 0 auto; }
+.graph-zoom { display: none; }
+.threshold-help { margin: 7px 0 11px; color: #89968e; font-size: 10px; line-height: 1.5; }
+.graph-frame { overflow-x: auto; border: 1px solid #e7eee8; border-radius: 15px; background: radial-gradient(ellipse at center, #fff 25%, #fafcf9 100%); scrollbar-color: #ccdacf #f4f7f4; scrollbar-width: thin; }
+.neuron-graph { width: min(100%, 760px); height: auto; display: block; margin: 0 auto; overflow: visible; }
+.graph-orbit { fill: none; stroke: #e8efe9; stroke-width: 1; stroke-dasharray: 3 6; }
+.graph-edge { fill: none; stroke-linecap: round; stroke-linejoin: round; transition: opacity 150ms ease, stroke-width 150ms ease; }
+.graph-edge.is-positive { stroke: var(--coral); }
+.graph-edge.is-negative { stroke: var(--blue); }
+.graph-edge.is-selected-link { filter: drop-shadow(0 0 1px rgba(23, 118, 93, .28)); }
+.graph-node { cursor: pointer; outline: none; }
+.graph-node-circle { stroke: #d8e4db; stroke-width: 1.2; transition: fill 170ms ease, stroke 140ms ease, stroke-width 140ms ease, filter 140ms ease; }
+.graph-node.is-output .graph-node-circle { stroke: #bdd7c5; }
+.graph-node.is-selected .graph-node-circle { stroke: var(--green-dark); stroke-width: 3; filter: drop-shadow(0 2px 4px rgba(23, 118, 93, .22)); }
+.graph-node:focus-visible .graph-node-circle { stroke: #17765d; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(23, 118, 93, .3)); }
+.graph-node-number { fill: #20322c; font-size: 11px; font-weight: 800; pointer-events: none; }
+.graph-node-output { fill: #54685b; font-size: 6.5px; font-weight: 700; pointer-events: none; }
+.graph-center-label { fill: #6f8175; font-size: 12px; font-weight: 700; }
+.graph-center-step { fill: #9aa79f; font-size: 10px; font-variant-numeric: tabular-nums; }
+.graph-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 9px 17px; margin: 11px 1px 8px; color: #74857a; font-size: 10px; }
+.graph-legend > span:not(.graph-edge-count) { display: inline-flex; align-items: center; gap: 6px; }
+.activity-swatch { width: 11px; height: 11px; display: inline-block; border: 1px solid rgba(63, 91, 74, .12); border-radius: 50%; }
+.activity-negative { background: #547ca3; }
+.activity-neutral { background: #f3f7f3; }
+.activity-positive { background: #d96851; }
+.graph-edge-count { margin-left: auto; color: #607469; font-variant-numeric: tabular-nums; }
+.graph-selection-empty { padding: 11px 13px; border: 1px dashed #dce8de; border-radius: 11px; color: #819087; background: #fafcfa; font-size: 10px; line-height: 1.55; }
+.graph-inspector { margin-top: 9px; padding: 14px; border: 1px solid #deebe1; border-radius: 12px; background: #f9fcf9; }
+.graph-inspector[hidden] { display: none; }
+.graph-inspector-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.graph-inspector-heading .card-kicker { margin-bottom: 4px; }
+.graph-inspector-heading h3 { margin: 0; font-size: 14px; }
+.selected-activity { margin: 0; color: #72837a; font-size: 11px; }
+.selected-activity code { padding: 4px 7px; border: 1px solid #e1eae2; border-radius: 7px; color: var(--green-dark); background: white; font: 11px ui-monospace, "Cascadia Code", Consolas, monospace; font-variant-numeric: tabular-nums; }
+.selected-connections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.selected-connections section { min-width: 0; }
+.selected-connections h4 { display: flex; justify-content: space-between; margin: 0 0 6px; color: #586c60; font-size: 10px; }
+.selected-connections h4 span { color: #8a998f; font-variant-numeric: tabular-nums; }
+.selected-connections ul { max-height: 190px; overflow: auto; display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.selected-connections li { overflow: hidden; padding: 5px 7px; border-left: 2px solid #c8d7cd; border-radius: 4px; color: #6a7c71; background: #fff; font-size: 9px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+.selected-connections li.connection-positive { border-color: var(--coral); }
+.selected-connections li.connection-negative { border-color: var(--blue); }
+.selected-connections li.no-connections { border-color: #d9e4db; color: #9aa69e; }
 .matrix-scroll { overflow-x: auto; padding: 5px 0 9px; outline-offset: 3px; }
 .weight-table { width: 100%; min-width: 610px; border-spacing: 2px; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .weight-table th { width: 24px; padding: 0 2px; color: #819087; font-size: 9px; font-weight: 600; text-align: center; }
@@ -340,6 +394,7 @@ h1 { margin-bottom: 7px; font-size: clamp(25px, 3.5vw, 34px); line-height: 1.22;
   .retention-note { line-height: 1.55; }
   .inspect-content { padding: 0 9px 9px; }
   .observation-card { padding: 15px; }
+  .network-card { padding: 17px; }
 }
 
 @media (max-width: 500px) {
@@ -380,6 +435,24 @@ h1 { margin-bottom: 7px; font-size: clamp(25px, 3.5vw, 34px); line-height: 1.22;
   .neuron-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 5px; }
   .neuron-item { padding: 7px 6px; gap: 5px; }
   .neuron-item strong { font-size: 9px; }
+  .network-card { padding: 15px 12px; }
+  .network-heading { gap: 7px; }
+  .network-heading h2 { font-size: 16px; }
+  .graph-step-label { max-width: 124px; white-space: normal; line-height: 1.5; }
+  .graph-controls { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .threshold-control { flex: 1 1 100%; min-width: 0; grid-template-columns: 1fr auto; gap: 7px 9px; }
+  .threshold-control > span { grid-column: 1; }
+  .threshold-control input { grid-column: 1 / -1; grid-row: 2; }
+  .threshold-control output { min-width: 0; grid-column: 2; grid-row: 1; font-size: 9px; }
+  .graph-clear { min-height: 31px; padding: 0 8px; }
+  .graph-zoom { display: inline-flex; min-height: 31px; padding: 0 8px; }
+  .graph-frame { margin: 0 -3px; }
+  .neuron-graph.is-zoomed { width: 620px; max-width: none; }
+  .graph-edge-count { flex-basis: 100%; margin-left: 0; }
+  .graph-inspector { padding: 11px; }
+  .selected-connections { gap: 8px; }
+  .selected-connections ul { max-height: 165px; }
+  .selected-connections li { padding: 5px 4px; font-size: 8px; }
   .page-footer { display: grid; gap: 5px; }
 }
 

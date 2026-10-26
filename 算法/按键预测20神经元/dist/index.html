@@ -122,6 +122,72 @@
           </aside>
         </div>
 
+        <section class="network-card card" aria-labelledby="network-title">
+          <div class="network-heading">
+            <div>
+              <p class="card-kicker">网络活动 · 实时快照</p>
+              <h2 id="network-title">20 个神经元激活结构图</h2>
+            </div>
+            <span class="graph-step-label">当前状态 · 第 <b id="graphStep">0</b> 次按键后</span>
+          </div>
+          <p class="network-hint">颜色按固定的 −1 到 +1 标尺显示活动：蓝色为负、珊瑚色为正，颜色越浓绝对值越大。第 1–10 个神经元分别输出数字 0–9，也参与全部循环连接；环形位置只为排布。</p>
+
+          <div class="graph-controls">
+            <label class="threshold-control" for="edgeThreshold">
+              <span>连接显示阈值</span>
+              <input id="edgeThreshold" type="range" min="0" max="100" step="1" value="78" aria-describedby="edgeThresholdHelp" />
+              <output id="edgeThresholdValue" for="edgeThreshold">78% × 最大权重</output>
+            </label>
+            <button class="button button-soft graph-zoom" id="graphZoom" type="button" aria-pressed="false">放大查看</button>
+            <button class="button button-soft graph-clear" id="clearNeuronSelection" type="button" disabled>取消选择</button>
+          </div>
+          <p class="threshold-help" id="edgeThresholdHelp">未选中神经元时，仅画非零且达到阈值的有向连接；调低阈值可显示更多边。图上的筛选只影响显示，不会改动模型或限制训练。</p>
+
+          <div class="graph-frame">
+            <svg class="neuron-graph" id="neuronGraph" viewBox="0 0 720 520" role="group" aria-label="20个神经元的活动值与有效有向连接">
+              <title>20 个神经元结构图</title>
+              <desc>节点颜色表示活动值；箭头从来源神经元指向目标神经元。</desc>
+              <defs>
+                <marker id="arrow-positive" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#d96851" /></marker>
+                <marker id="arrow-negative" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#547ca3" /></marker>
+              </defs>
+              <circle class="graph-orbit" cx="360" cy="260" r="200" aria-hidden="true"></circle>
+              <g id="graphEdges" class="graph-edges" aria-label="有效连接"></g>
+              <g id="graphNodes" class="graph-nodes" aria-label="神经元"></g>
+              <text class="graph-center-label" x="360" y="253" text-anchor="middle" aria-hidden="true">20 个循环单元</text>
+              <text class="graph-center-step" id="graphCenterStep" x="360" y="274" text-anchor="middle" aria-hidden="true">第 0 次按键后</text>
+            </svg>
+          </div>
+
+          <div class="graph-legend" aria-label="图例">
+            <span><i class="activity-swatch activity-negative"></i>负活动 / 负权重</span>
+            <span><i class="activity-swatch activity-neutral"></i>零活动</span>
+            <span><i class="activity-swatch activity-positive"></i>正活动 / 正权重</span>
+            <span class="graph-edge-count" id="graphEdgeCount" aria-live="polite">正在读取连接…</span>
+          </div>
+
+          <div class="graph-selection-empty" id="graphSelectionEmpty">选择一个节点可查看精确活动值，以及它的全部非零输入和输出连接。点击节点，或聚焦后按 Enter / 空格；按 Escape 取消选择。</div>
+          <section class="graph-inspector" id="graphInspector" aria-labelledby="selectedNeuronTitle" hidden>
+            <div class="graph-inspector-heading">
+              <div>
+                <p class="card-kicker">选中神经元</p>
+                <h3 id="selectedNeuronTitle">神经元</h3>
+              </div>
+              <p class="selected-activity">活动值 <code id="selectedNeuronActivity">—</code></p>
+            </div>
+            <div class="selected-connections">
+              <section aria-labelledby="selectedIncomingTitle">
+                <h4 id="selectedIncomingTitle">输入连接 <span id="selectedIncomingCount">0</span></h4>
+                <ul id="selectedIncoming"></ul>
+              </section>
+              <section aria-labelledby="selectedOutgoingTitle">
+                <h4 id="selectedOutgoingTitle">输出连接 <span id="selectedOutgoingCount">0</span></h4>
+                <ul id="selectedOutgoing"></ul>
+              </section>
+            </div>
+          </section>
+        </section>
+
         <p class="retention-note"><span aria-hidden="true">↗</span> 开始新会话会重新计数；旧会话记录仍保存在本地，导出时一并包含。</p>
 
         <details class="inspect-details" id="inspectDetails">
