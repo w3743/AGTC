@@ -206,10 +206,8 @@
       sourceNote.className = "result-source-note";
       sourceNote.textContent = predictionSource === "uniform_cold_start"
         ? "冷启动均匀预测：各数字概率相同，并列时选 0。"
-        : predictionSource === "uoro_rnn"
-          ? "UORO 持续记忆模型的在线预测。"
-          : predictionSource === "plastic_rnn"
-          ? "训练后的神经网络预测。"
+        : predictionSource === "sparse_rnn"
+          ? "窗口训练 · 自适应稀疏输入模型的预测。"
           : `预测来源：${String(predictionSource || "初始均匀预测")}`;
       elements.resultContent.append(sourceNote);
     }
@@ -243,22 +241,8 @@
     const info = currentState.model_info && typeof currentState.model_info === "object"
       ? currentState.model_info
       : {};
-    const rawMode = currentState.training_mode || info.mode;
-    const mode = typeof rawMode === "string" ? rawMode.toLowerCase() : "";
-    if (mode === "uoro") {
-      elements.trainingModeLabel.textContent = "UORO 持续记忆";
-      elements.modelModeDetail.textContent = "本会话内持续保留已观察到的状态，并随每次按键在线更新。";
-    } else if (mode === "window") {
-      elements.trainingModeLabel.textContent = "旧版窗口训练";
-      const context = Number.isInteger(info.context_length)
-        ? `窗口上限 ${info.context_length} 个按键`
-        : "按最近按键窗口训练";
-      const updates = Number.isInteger(info.optimizer_updates) ? ` · 更新 ${info.optimizer_updates} 次` : "";
-      elements.modelModeDetail.textContent = `${context}${updates}。`;
-    } else {
-      elements.trainingModeLabel.textContent = "旧版窗口训练（旧服务）";
-      elements.modelModeDetail.textContent = "此服务尚未提供学习模式和输入权重诊断。";
-    }
+    elements.trainingModeLabel.textContent = "窗口训练 · 自适应稀疏输入";
+    elements.modelModeDetail.textContent = "每次训练重放最近 32 位；每次更新后对输入权重做 λ=0.02 软阈值收缩。";
 
     const history = Array.isArray(currentState.history) ? currentState.history : [];
     if (!inputDigitManuallySelected) {

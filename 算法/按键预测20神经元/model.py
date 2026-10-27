@@ -21,6 +21,7 @@ NEURON_COUNT = 20
 CONTEXT_LENGTH = 32
 TRAINING_UPDATES_PER_PRESS = 3
 LEARNING_RATE = 0.015
+INPUT_SPARSITY = 0.02
 
 
 @dataclass(frozen=True)
@@ -56,6 +57,9 @@ class PlasticRNN(nn.Module):
 
         self.context_length = int(context_length)
         self.updates_per_press = int(updates_per_press)
+        # Fixed production setting; kept on the instance so QA can set it to
+        # zero for a bitwise legacy-window comparison.
+        self.input_sparsity = INPUT_SPARSITY
 
         # Keep initialization deterministic for this model without changing
         # the global torch RNG used by a host application.
@@ -184,6 +188,11 @@ class PlasticRNN(nn.Module):
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0, error_if_nonfinite=True)
             self.optimizer.step()
+            threshold = float(self.optimizer.param_groups[0]["lr"]) * self.input_sparsity
+            if threshold > 0.0:
+                with torch.no_grad():
+                    weights = self.input_weights
+                    weights.copy_(weights.sign() * torch.clamp(weights.abs() - threshold, min=0.0))
             self.optimizer_updates += 1
             loss_value = float(loss.detach().item())
 

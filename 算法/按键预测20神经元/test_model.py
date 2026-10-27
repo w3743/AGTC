@@ -16,6 +16,7 @@ import sys
 import time
 import unittest
 from datetime import datetime
+from typing import Any
 
 import torch
 import torch.nn.functional as F
@@ -46,6 +47,32 @@ def _validate_prediction(
     test.assertTrue(all(math.isfinite(value) for row in edges for value in row))
     test.assertTrue(all(0.0 <= value <= 1.0 for value in probabilities))
     test.assertAlmostEqual(sum(probabilities), 1.0, places=6)
+
+
+def _assert_same_tree(
+    test: unittest.TestCase,
+    actual: Any,
+    expected: Any,
+    path: str = "root",
+) -> None:
+    if isinstance(actual, torch.Tensor) or isinstance(expected, torch.Tensor):
+        test.assertIsInstance(actual, torch.Tensor, path)
+        test.assertIsInstance(expected, torch.Tensor, path)
+        test.assertTrue(torch.equal(actual, expected), path)
+    elif isinstance(actual, dict) or isinstance(expected, dict):
+        test.assertIsInstance(actual, dict, path)
+        test.assertIsInstance(expected, dict, path)
+        test.assertEqual(set(actual), set(expected), path)
+        for key in actual:
+            _assert_same_tree(test, actual[key], expected[key], f"{path}.{key}")
+    elif isinstance(actual, (tuple, list)) or isinstance(expected, (tuple, list)):
+        test.assertIsInstance(actual, (tuple, list), path)
+        test.assertIsInstance(expected, (tuple, list), path)
+        test.assertEqual(len(actual), len(expected), path)
+        for index, (left, right) in enumerate(zip(actual, expected)):
+            _assert_same_tree(test, left, right, f"{path}[{index}]")
+    else:
+        test.assertEqual(actual, expected, path)
 
 
 def _run_prequential(
@@ -195,6 +222,63 @@ class PlasticRNNContractTests(unittest.TestCase):
         self.assertTrue(torch.equal(rng_before, rng_after))
         for name, value in first.state_dict().items():
             self.assertTrue(torch.equal(value, second.state_dict()[name]), name)
+
+    def test_default_input_sparsity_thresholds_only_win_after_one_adam_update(self) -> None:
+        options = {
+            "seed": SEED,
+            "context_length": 32,
+            "updates_per_press": 1,
+            "learning_rate": 0.015,
+        }
+        reference = PlasticRNN(**options)
+        reference.input_sparsity = 0.0
+        model = PlasticRNN(**options)
+        self.assertEqual(model.input_sparsity, 0.02)
+        self.assertEqual(model.context_length, 32)
+        self.assertEqual(model.updates_per_press, 1)
+        self.assertEqual(model.optimizer.param_groups[0]["lr"], 0.015)
+        self.assertEqual(model.optimizer.param_groups[0]["weight_decay"], 1e-4)
+        for name, value in reference.state_dict().items():
+            self.assertTrue(torch.equal(value, model.state_dict()[name]), name)
+
+        history = [3, 8, 1, 5]
+        self.assertEqual(model.train_on_history(history), reference.train_on_history(history))
+        self.assertEqual(model.optimizer_updates, 1)
+        self.assertEqual(reference.optimizer_updates, 1)
+
+        threshold = float(model.optimizer.param_groups[0]["lr"]) * model.input_sparsity
+        expected_input_weights = reference.input_weights.detach().sign() * torch.clamp(
+            reference.input_weights.detach().abs() - threshold,
+            min=0.0,
+        )
+        self.assertTrue(torch.equal(model.input_weights.detach(), expected_input_weights))
+        self.assertTrue(torch.any(model.input_weights.detach() != reference.input_weights.detach()))
+        for name, value in reference.state_dict().items():
+            if name == "input_weights":
+                continue
+            self.assertTrue(torch.equal(value, model.state_dict()[name]), name)
+        _assert_same_tree(
+            self,
+            model.optimizer.state_dict(),
+            reference.optimizer.state_dict(),
+            "Adam state after one update",
+        )
+
+    def test_zero_input_weight_can_recover_without_a_mask(self) -> None:
+        model = PlasticRNN(seed=SEED, updates_per_press=1)
+        with torch.no_grad():
+            model.input_weights[0, 0] = 0.0
+
+        model.optimizer.zero_grad(set_to_none=True)
+        logits, _ = model.step(0, model.initial_state())
+        loss = F.cross_entropy(logits.unsqueeze(0), torch.tensor([1]))
+        loss.backward()
+        self.assertNotEqual(float(model.input_weights.grad[0, 0]), 0.0)
+        model.optimizer.zero_grad(set_to_none=True)
+
+        self.assertEqual(float(model.input_weights[0, 0].detach()), 0.0)
+        model.train_on_history([0, 1])
+        self.assertNotEqual(float(model.input_weights[0, 0].detach()), 0.0)
 
     def test_shared_fast_edge_gain_has_gradient_and_changes(self) -> None:
         model = PlasticRNN(seed=SEED)
