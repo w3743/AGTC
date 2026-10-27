@@ -20,6 +20,7 @@ import urllib.request
 import torch
 
 from model import INPUT_COUNT, NEURON_COUNT
+from online_model import CHECKPOINT_FORMAT_VERSION
 from server import KeypressService, LocalHTTPServer
 
 
@@ -40,7 +41,7 @@ class KeypressHTTPProtocolTests(unittest.TestCase):
 
         cls.data_parent = cls.output_root / "server_runs"
         cls.data_parent.mkdir(parents=True, exist_ok=True)
-        cls.service = KeypressService(data_parent=cls.data_parent, seed=SEED)
+        cls.service = KeypressService(data_parent=cls.data_parent, seed=SEED, mode="window")
         cls.server = LocalHTTPServer(
             ("127.0.0.1", 0),
             cls.service,
@@ -408,6 +409,271 @@ class KeypressHTTPProtocolTests(unittest.TestCase):
             }
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, allow_nan=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+
+class UOROHTTPProtocolTests(unittest.TestCase):
+    """HTTP checks for persistent UORO mode, separate from the window baseline."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        torch.set_num_threads(1)
+        if OUTPUT_DIR:
+            cls.output_root = Path(OUTPUT_DIR)
+            cls.output_root.mkdir(parents=True, exist_ok=True)
+        else:
+            cls.output_root = Path(tempfile.mkdtemp(prefix="keypress20-uoro-server-qa-"))
+
+        cls.data_parent = cls.output_root / "uoro_server_runs"
+        cls.data_parent.mkdir(parents=True, exist_ok=True)
+        cls.service = KeypressService(
+            data_parent=cls.data_parent,
+            seed=SEED,
+            mode="uoro",
+            model_options={"rank": 4, "learning_rate": 0.003, "sparsity_strength": 0.02},
+        )
+        cls.server = LocalHTTPServer(
+            ("127.0.0.1", 0),
+            cls.service,
+            Path(__file__).with_name("dist"),
+        )
+        cls.host, cls.port = cls.server.server_address
+        cls.base_url = f"http://{cls.host}:{cls.port}"
+        cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.server_thread.start()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.server_thread.join(timeout=5)
+
+    def _request(
+        self,
+        path: str,
+        method: str = "GET",
+        body: object = _NO_BODY,
+    ) -> tuple[int, object, bytes]:
+        headers: dict[str, str] = {}
+        data: bytes | None
+        if body is _NO_BODY:
+            data = None
+        elif isinstance(body, bytes):
+            data = body
+        else:
+            data = json.dumps(body, ensure_ascii=False, allow_nan=False).encode("utf-8")
+        if data is not None:
+            headers["Content-Type"] = "application/json"
+        request = urllib.request.Request(
+            self.base_url + path,
+            data=data,
+            headers=headers,
+            method=method,
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=10) as response:
+                return response.status, response.headers, response.read()
+        except urllib.error.HTTPError as error:
+            return error.code, error.headers, error.read()
+
+    def _json_request(self, *args: object, **kwargs: object) -> tuple[int, object, dict[str, object]]:
+        status, headers, payload = self._request(*args, **kwargs)  # type: ignore[arg-type]
+        return status, headers, json.loads(payload.decode("utf-8"))
+
+    def _assert_input_topology(self, state: dict[str, object]) -> None:
+        connections = state["input_connections"]
+        self.assertEqual(len(connections), NEURON_COUNT)
+        self.assertTrue(all(len(row) == INPUT_COUNT for row in connections))
+        expected_counts = [
+            sum(float(row[digit]) != 0.0 for row in connections)
+            for digit in range(INPUT_COUNT)
+        ]
+        self.assertEqual(state["input_counts"], expected_counts)
+        info = state["model_info"]
+        self.assertEqual(info["input_weights"], connections)
+        self.assertEqual(info["by_digit"], expected_counts)
+        self.assertEqual(info["input_nonzero_total"], sum(expected_counts))
+
+    def _assert_same_tree(self, actual: object, expected: object, path: str = "root") -> None:
+        if isinstance(actual, torch.Tensor) or isinstance(expected, torch.Tensor):
+            self.assertIsInstance(actual, torch.Tensor, path)
+            self.assertIsInstance(expected, torch.Tensor, path)
+            self.assertTrue(torch.equal(actual, expected), path)
+        elif isinstance(actual, dict) or isinstance(expected, dict):
+            self.assertIsInstance(actual, dict, path)
+            self.assertIsInstance(expected, dict, path)
+            self.assertEqual(set(actual), set(expected), path)
+            for key in actual:
+                self._assert_same_tree(actual[key], expected[key], f"{path}.{key}")
+        elif isinstance(actual, (list, tuple)) or isinstance(expected, (list, tuple)):
+            self.assertEqual(len(actual), len(expected), path)
+            for index, (left, right) in enumerate(zip(actual, expected)):
+                self._assert_same_tree(left, right, f"{path}[{index}]")
+        else:
+            self.assertEqual(actual, expected, path)
+
+    def test_uoro_press_order_stale_reset_and_complete_checkpoint(self) -> None:
+        self.assertEqual(self.host, "127.0.0.1")
+        self.assertNotEqual(self.port, 8765)
+
+        status, _, initial = self._json_request("/api/state")
+        self.assertEqual(status, 200)
+        self.assertEqual(initial["step"], 0)
+        self.assertEqual(initial["training_mode"], "uoro")
+        self.assertEqual(initial["model_info"]["mode"], "uoro")
+        self.assertEqual(initial["model_info"]["uoro_rank"], 4)
+        self.assertTrue(initial["model_info"]["exact_readout_step"])
+        self.assertEqual(initial["model_info"]["observed_steps"], 0)
+        self._assert_input_topology(initial)
+
+        first_digit = 4
+        status, _, after_first = self._json_request(
+            "/api/press",
+            "POST",
+            {"digit": first_digit, "prediction_id": initial["prediction_id"]},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(after_first["last_result"]["prediction_id"], initial["prediction_id"])
+        self.assertEqual(after_first["last_result"]["probabilities"], initial["probabilities"])
+        self.assertEqual(after_first["step"], 1)
+        self.assertEqual(after_first["model_info"]["observed_steps"], 1)
+        self.assertEqual(after_first["model_info"]["optimizer_updates"], 0)
+        self.assertEqual(after_first["input_counts"], initial["input_counts"])
+
+        # A duplicate sealed token must leave the log, checkpoint, and model untouched.
+        events_path = self.service.session_dir / "events.jsonl"
+        checkpoint_path = self.service.session_dir / "latest_checkpoint.pt"
+        old_events = events_path.read_bytes()
+        old_checkpoint = checkpoint_path.read_bytes()
+        stale_status, _, stale_error = self._json_request(
+            "/api/press",
+            "POST",
+            {"digit": first_digit, "prediction_id": initial["prediction_id"]},
+        )
+        self.assertEqual(stale_status, 409)
+        self.assertEqual(stale_error["error"]["code"], "stale_prediction")
+        self.assertEqual(events_path.read_bytes(), old_events)
+        self.assertEqual(checkpoint_path.read_bytes(), old_checkpoint)
+        self.assertEqual(self.service.model.optimizer_updates, 0)
+
+        inputs = [first_digit] + [index % INPUT_COUNT for index in range(1, 40)]
+        states = [initial, after_first]
+        for index, digit in enumerate(inputs[1:], start=1):
+            before_status, _, before = self._json_request("/api/state")
+            self.assertEqual(before_status, 200)
+            self.assertEqual(before["step"], index)
+            status, _, after = self._json_request(
+                "/api/press",
+                "POST",
+                {"digit": digit, "prediction_id": before["prediction_id"]},
+            )
+            self.assertEqual(status, 200)
+            result = after["last_result"]
+            self.assertEqual(result["prediction_id"], before["prediction_id"])
+            self.assertEqual(result["prediction"], before["prediction"])
+            self.assertEqual(result["probabilities"], before["probabilities"])
+            self.assertEqual(result["actual_digit"], digit)
+            self.assertEqual(after["step"], index + 1)
+            self.assertEqual(after["training_mode"], "uoro")
+            self.assertEqual(after["model_info"]["observed_steps"], index + 1)
+            self.assertEqual(after["model_info"]["optimizer_updates"], index)
+            self.assertEqual(after["history"], inputs[max(0, index - 29) : index + 1])
+            self._assert_input_topology(after)
+            states.append(after)
+
+        # The model has seen more than the old 32-token window; the checkpoint
+        # preserves its complete runtime and is not reconstructed from history.
+        raw_checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        self.assertEqual(raw_checkpoint["training_mode"], "uoro")
+        model_checkpoint = raw_checkpoint["model_checkpoint_state"]
+        self.assertEqual(model_checkpoint["format_version"], CHECKPOINT_FORMAT_VERSION)
+        self.assertIn("model", model_checkpoint)
+        self.assertIn("optimizer", model_checkpoint)
+        self.assertIn("runtime", model_checkpoint)
+        runtime = model_checkpoint["runtime"]
+        self.assertEqual(runtime["observed_steps"], 40)
+        self.assertEqual(runtime["optimizer_updates"], 39)
+        self.assertEqual(tuple(runtime["h"].shape), (NEURON_COUNT,))
+        self.assertEqual(tuple(runtime["fast_edges"].shape), (NEURON_COUNT, NEURON_COUNT))
+        self.assertEqual(tuple(runtime["uoro_a"].shape), (4, 420))
+        self.assertEqual(tuple(runtime["uoro_b"].shape), (4, 623))
+        self.assertIn("rng_state", runtime)
+        self.assertTrue(model_checkpoint["config"]["exact_readout_step"])
+        pending = runtime["pending_transition"]
+        self.assertEqual(tuple(pending["base_state"].shape), (420,))
+        self.assertEqual(tuple(pending["uoro_a"].shape), (4, 420))
+        self.assertEqual(tuple(pending["uoro_b"].shape), (4, 623))
+        self.assertEqual(tuple(pending["theta"].shape), (623,))
+        self.assertIsInstance(pending["digit"], int)
+        self._assert_same_tree(model_checkpoint, self.service.model.checkpoint_state())
+        completed_optimizer_updates = self.service.model.optimizer_updates
+
+        session_id = str(initial["session_id"])
+        session_dir = self.service.session_dir
+        raw_log = events_path.read_bytes()
+        decoded = [json.loads(line) for line in raw_log.decode("utf-8").splitlines()]
+        self.assertEqual(len(decoded), 2 * len(inputs))
+        for index, digit in enumerate(inputs):
+            scored, ready = decoded[2 * index : 2 * index + 2]
+            before = states[index]
+            after = states[index + 1]
+            self.assertEqual(scored["event"], "press_scored")
+            self.assertEqual(ready["event"], "next_prediction_ready")
+            self.assertEqual(scored["actual_digit"], digit)
+            self.assertEqual(scored["prediction_id"], before["prediction_id"])
+            self.assertEqual(scored["probabilities"], before["probabilities"])
+            self.assertEqual(ready["after_step"], index + 1)
+            self.assertEqual(ready["training_mode"], "uoro")
+            self.assertEqual(ready["model_info"]["observed_steps"], index + 1)
+            self.assertEqual(ready["model_info"]["optimizer_updates"], index)
+            self.assertEqual(ready["probabilities"], after["probabilities"])
+        old_log_digest = hashlib.sha256(raw_log).hexdigest()
+
+        snapshot_manifest = json.loads(
+            (self.service.run_root / "source_snapshot" / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("online_model.py", snapshot_manifest["source_sha256"])
+        self.assertTrue((self.service.run_root / "source_snapshot" / "online_model.py").is_file())
+
+        reset_status, _, reset_state = self._json_request("/api/reset", "POST", {})
+        self.assertEqual(reset_status, 200)
+        self.assertNotEqual(reset_state["session_id"], session_id)
+        self.assertEqual(reset_state["step"], 0)
+        self.assertEqual(reset_state["history"], [])
+        self.assertEqual(reset_state["training_mode"], "uoro")
+        self.assertEqual(reset_state["model_info"]["observed_steps"], 0)
+        self.assertEqual(hashlib.sha256(events_path.read_bytes()).hexdigest(), old_log_digest)
+        self.assertTrue(session_dir.is_dir())
+
+        export_status, _, exported = self._json_request("/api/export")
+        self.assertEqual(export_status, 200)
+        exported_session = next(
+            item for item in exported["sessions"] if item["session"]["session_id"] == session_id
+        )
+        self.assertEqual(exported_session["events"], decoded)
+
+        if OUTPUT_DIR:
+            report_path = Path(OUTPUT_DIR) / "uoro_server_summary.json"
+            report_path.write_text(
+                json.dumps(
+                    {
+                        "seed": SEED,
+                        "mode": "uoro",
+                        "listen_host": self.host,
+                        "ephemeral_port": self.port,
+                        "session_id": session_id,
+                        "presses": len(inputs),
+                        "optimizer_updates": completed_optimizer_updates,
+                        "checkpoint_observed_steps": runtime["observed_steps"],
+                        "reset_preserved_old_log_sha256": old_log_digest,
+                        "event_order": "press_scored then next_prediction_ready per key",
+                    },
+                    ensure_ascii=False,
+                    allow_nan=False,
+                    indent=2,
+                )
+                + "\n",
                 encoding="utf-8",
             )
 

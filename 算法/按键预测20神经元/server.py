@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 import mimetypes
 import os
 from pathlib import Path
@@ -27,6 +29,7 @@ from model import (
     TRAINING_UPDATES_PER_PRESS,
     PlasticRNN,
 )
+from online_model import OnlinePlasticRNN
 
 
 DEFAULT_DATA_PARENT = Path("C:/pioneer/local-neuron-runs")
@@ -71,10 +74,37 @@ def create_unique_run_root(parent: Path) -> Path:
 class KeypressService:
     """Owns one run and serializes all session changes behind a single lock."""
 
-    def __init__(self, data_parent: Path = DEFAULT_DATA_PARENT, seed: int = 0) -> None:
+    def __init__(
+        self,
+        data_parent: Path = DEFAULT_DATA_PARENT,
+        seed: int = 0,
+        mode: str = "uoro",
+        model_options: dict[str, Any] | None = None,
+    ) -> None:
         # Tiny matrix operations are faster and more predictable with one CPU
         # worker than with a large BLAS thread pool.
         torch.set_num_threads(1)
+        if mode not in {"uoro", "window"}:
+            raise ValueError("mode must be 'uoro' or 'window'")
+        options = dict(model_options or {})
+        if "input_sparsity" in options:
+            if "sparsity_strength" not in options:
+                options["sparsity_strength"] = options["input_sparsity"]
+            options.pop("input_sparsity")
+        if mode == "uoro":
+            self.model_options = {
+                "rank": 4,
+                "learning_rate": 0.003,
+                "sparsity_strength": 0.02,
+                **options,
+            }
+        else:
+            # Do not change the established window baseline unless the caller
+            # explicitly supplied a learning-rate override.
+            self.model_options = {
+                key: value for key, value in options.items() if key == "learning_rate"
+            }
+        self.mode = mode
         self.seed = int(seed)
         self.data_parent = Path(data_parent)
         self.run_root = create_unique_run_root(self.data_parent)
@@ -84,18 +114,34 @@ class KeypressService:
         self._start_session()
 
     def _config(self) -> dict[str, Any]:
+        is_uoro = self.mode == "uoro"
+        learning_rate = self.model_options.get("learning_rate", LEARNING_RATE)
+        training_window = (
+            "continuous online observation; no finite training window"
+            if is_uoro
+            else "latest observed digits; adjacent next-digit pairs"
+        )
         return {
+            "training_mode": self.mode,
             "input_ports": INPUT_COUNT,
             "neuron_count": NEURON_COUNT,
             "recurrent_edges": NEURON_COUNT * NEURON_COUNT,
-            "context_length": CONTEXT_LENGTH,
-            "training_updates_per_press": TRAINING_UPDATES_PER_PRESS,
-            "learning_rate": LEARNING_RATE,
+            "context_length": None if is_uoro else CONTEXT_LENGTH,
+            "training_updates_per_press": 1 if is_uoro else TRAINING_UPDATES_PER_PRESS,
+            "training_update_note": (
+                "The first observed digit initializes state; transition updates start on the second press."
+                if is_uoro
+                else None
+            ),
+            "learning_rate": learning_rate,
+            "uoro_rank": self.model_options.get("rank") if is_uoro else None,
+            "input_sparsity": self.model_options.get("sparsity_strength") if is_uoro else None,
+            "model_class": "OnlinePlasticRNN" if is_uoro else "PlasticRNN",
             "parameter_count": INPUT_COUNT * NEURON_COUNT
             + NEURON_COUNT * NEURON_COUNT
             + NEURON_COUNT
             + 3,
-            "training_window": "latest observed digits; adjacent next-digit pairs",
+            "training_window": training_window,
             "output_ports": "first 10 activities times one shared positive scale",
             "torch_num_threads": torch.get_num_threads(),
         }
@@ -109,7 +155,14 @@ class KeypressService:
         source_hashes: dict[str, str | None] = {}
         copied_files: list[str] = []
 
-        for name in ("model.py", "server.py", "requirements.txt", "README.md", "start.ps1"):
+        for name in (
+            "model.py",
+            "online_model.py",
+            "server.py",
+            "requirements.txt",
+            "README.md",
+            "start.ps1",
+        ):
             source = project_root / name
             if not source.is_file():
                 source_hashes[name] = None
@@ -176,6 +229,7 @@ class KeypressService:
             "seed": model_seed,
             "config": config,
             "config_sha256": config_digest,
+            "model_config": dict(self.model_config),
             "source_snapshot": "../source_snapshot/",
             "source_sha256": self.source_sha256,
             "python_version": os.sys.version,
@@ -198,12 +252,29 @@ class KeypressService:
 
         model_seed = self.seed + self._session_number - 1
         self.model_seed = model_seed
-        self.model = PlasticRNN(seed=model_seed)
+        if self.mode == "uoro":
+            self.model = OnlinePlasticRNN(seed=model_seed, **self.model_options)
+        else:
+            self.model = PlasticRNN(seed=model_seed, **self.model_options)
+        model_config = getattr(self.model, "config", None)
+        if callable(model_config):
+            self.model_config = dict(model_config())
+        else:
+            self.model_config = {
+                "mode": "window",
+                "model_class": "PlasticRNN",
+                "seed": model_seed,
+                "learning_rate": float(self.model.optimizer.param_groups[0]["lr"]),
+                "context_length": self.model.context_length,
+                "training_updates_per_press": self.model.updates_per_press,
+            }
         self.step = 0
         self.correct = 0
         self.majority_correct = 0
         self.digit_counts = [0] * INPUT_COUNT
         self.history: list[int] = []
+        self.recent_results_30: deque[bool] = deque(maxlen=30)
+        self.recent_results_90: deque[bool] = deque(maxlen=90)
         self.last_result: dict[str, Any] | None = None
         self.training_seconds = 0.0
         self.probabilities = list(UNIFORM_PROBABILITIES)
@@ -211,9 +282,12 @@ class KeypressService:
         self.prediction_source = "uniform_cold_start"
         self.prediction_id = str(uuid.uuid4())
         self.neurons = [0.0] * NEURON_COUNT
-        # Edges exist from session start. The matrix is initialized by the
-        # model; row=destination and column=source.
-        _, _, self.connections = self.model.predict_next([])
+        # The recurrent matrix is a read-only snapshot in UORO mode; the legacy
+        # model still replays its (empty) context for its initial view.
+        if self.mode == "uoro":
+            self.probabilities, self.neurons, self.connections = self.model.predict_next()
+        else:
+            self.probabilities, self.neurons, self.connections = self.model.predict_next([])
         manifest = self._new_manifest(self.session_id, model_seed)
         (self.session_dir / "session.json").write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
@@ -240,7 +314,94 @@ class KeypressService:
             "majority_baseline": (self.majority_correct / self.step) if self.step else 0.0,
         }
 
+    @staticmethod
+    def _as_float_matrix(matrix: Any, rows: int, columns: int) -> list[list[float]]:
+        if hasattr(matrix, "detach"):
+            matrix = matrix.detach().cpu().tolist()
+        if not isinstance(matrix, (list, tuple)) or len(matrix) != rows:
+            raise ValueError(f"input-weight matrix must have {rows} rows")
+        result: list[list[float]] = []
+        for row in matrix:
+            if hasattr(row, "detach"):
+                row = row.detach().cpu().tolist()
+            if not isinstance(row, (list, tuple)) or len(row) != columns:
+                raise ValueError(f"input-weight rows must have {columns} columns")
+            normalized: list[float] = []
+            for value in row:
+                if hasattr(value, "detach"):
+                    value = value.detach().item()
+                try:
+                    number = float(value)
+                except (TypeError, ValueError, OverflowError) as error:
+                    raise ValueError("model returned a non-numeric input weight") from error
+                if not math.isfinite(number):
+                    raise ValueError("model returned a non-finite input weight")
+                normalized.append(number)
+            result.append(normalized)
+        return result
+
+    def _input_weights_unlocked(self, diagnostics: dict[str, Any] | None = None) -> list[list[float]]:
+        matrix = diagnostics.get("input_weights") if diagnostics else None
+        if matrix is None:
+            matrix = getattr(self.model, "input_weights", None)
+            if matrix is not None and hasattr(matrix, "detach"):
+                matrix = matrix.detach().cpu().tolist()
+        if matrix is None:
+            raise RuntimeError("model did not expose its input-weight matrix")
+        return self._as_float_matrix(matrix, NEURON_COUNT, INPUT_COUNT)
+
+    def _diagnostics_unlocked(self) -> dict[str, Any]:
+        diagnostics_method = getattr(self.model, "diagnostics", None)
+        if callable(diagnostics_method):
+            diagnostics = diagnostics_method()
+            if not isinstance(diagnostics, dict):
+                raise TypeError("model diagnostics() must return a dictionary")
+            diagnostics = dict(diagnostics)
+        else:
+            diagnostics = {}
+        input_weights = self._input_weights_unlocked(diagnostics)
+        input_counts = [
+            sum(input_weights[node][digit] != 0.0 for node in range(NEURON_COUNT))
+            for digit in range(INPUT_COUNT)
+        ]
+        diagnostics.update(
+            {
+                "mode": self.mode,
+                "input_weights": input_weights,
+                "input_nonzero_total": sum(input_counts),
+                "by_digit": input_counts,
+                "eta": self._scalar_value(getattr(self.model, "eta", None)),
+                "trace_decay": self._scalar_value(getattr(self.model, "trace_decay", None)),
+                "optimizer_updates": int(getattr(self.model, "optimizer_updates", 0)),
+            }
+        )
+        return diagnostics
+
+    @staticmethod
+    def _scalar_value(value: Any) -> float | None:
+        if value is None:
+            return None
+        if hasattr(value, "detach"):
+            value = value.detach().item()
+        return float(value)
+
+    @staticmethod
+    def _rolling_hits(results: deque[bool]) -> dict[str, Any]:
+        total = len(results)
+        correct = sum(results)
+        return {
+            "correct": correct,
+            "total": total,
+            "accuracy": correct / total if total else 0.0,
+        }
+
     def _state_unlocked(self) -> dict[str, Any]:
+        model_info = self._diagnostics_unlocked()
+        input_connections = self._input_weights_unlocked(model_info)
+        input_counts = [
+            sum(input_connections[node][digit] != 0.0 for node in range(NEURON_COUNT))
+            for digit in range(INPUT_COUNT)
+        ]
         return {
             "session_id": self.session_id,
             "step": self.step,
@@ -254,6 +415,14 @@ class KeypressService:
             "connections": [list(row) for row in self.connections],
             "history": list(self.history[-30:]),
             "last_result": dict(self.last_result) if self.last_result is not None else None,
+            "training_mode": self.mode,
+            "model_info": model_info,
+            "input_connections": input_connections,
+            "input_counts": input_counts,
+            "recent_hit_counts": {
+                "30": self._rolling_hits(self.recent_results_30),
+                "90": self._rolling_hits(self.recent_results_90),
+            },
         }
 
     def get_state(self) -> dict[str, Any]:
@@ -305,6 +474,8 @@ class KeypressService:
             self.step = scored_step
             self.correct += int(correct)
             self.majority_correct += int(majority_guess == digit)
+            self.recent_results_30.append(correct)
+            self.recent_results_90.append(correct)
             self.digit_counts[digit] += 1
             self.history.append(digit)
             if len(self.history) > CONTEXT_LENGTH:
@@ -312,15 +483,25 @@ class KeypressService:
             self.last_result = result
 
             started = time.perf_counter()
-            training_loss = self.model.train_on_history(self.history)
+            if self.mode == "uoro":
+                training_loss = self.model.observe(digit)
+            else:
+                training_loss = self.model.train_on_history(self.history)
             self.training_seconds = time.perf_counter() - started
 
-            self.probabilities, self.neurons, self.connections = self.model.predict_next(self.history)
+            if self.mode == "uoro":
+                self.probabilities, self.neurons, self.connections = self.model.predict_next()
+            else:
+                self.probabilities, self.neurons, self.connections = self.model.predict_next(self.history)
             self.prediction = max(range(INPUT_COUNT), key=self.probabilities.__getitem__)
+            model_updates = int(getattr(self.model, "optimizer_updates", 0))
             self.prediction_source = (
-                "plastic_rnn" if self.model.optimizer_updates > 0 else "uniform_cold_start"
+                ("uoro_rnn" if self.mode == "uoro" else "plastic_rnn")
+                if model_updates > 0
+                else "uniform_cold_start"
             )
             self.prediction_id = str(uuid.uuid4())
+            model_info = self._diagnostics_unlocked()
             self._append_event(
                 {
                     "event": "next_prediction_ready",
@@ -333,16 +514,20 @@ class KeypressService:
                     "probabilities": list(self.probabilities),
                     "neurons": list(self.neurons),
                     "connections": [list(row) for row in self.connections],
+                    "training_mode": self.mode,
+                    "model_info": model_info,
+                    "input_connections": model_info["input_weights"],
+                    "input_counts": list(model_info["by_digit"]),
                     "training_loss": training_loss,
-                    "training_pairs": self.model.last_training_pairs,
-                    "training_updates": self.model.optimizer_updates,
+                    "training_pairs": getattr(self.model, "last_training_pairs", None),
+                    "training_updates": model_updates,
                     "training_seconds": self.training_seconds,
                     "training_ms": self.training_seconds * 1000.0,
-                    "eta": float(self.model.eta.detach().item()),
-                    "trace_decay": float(self.model.trace_decay.detach().item()),
+                    "eta": model_info.get("eta"),
+                    "trace_decay": model_info.get("trace_decay"),
                     "parameter_count": sum(
                         parameter.numel() for parameter in self.model.parameters()
-                    ),
+                    ) if hasattr(self.model, "parameters") else model_info.get("parameter_count"),
                 }
             )
             self._write_checkpoint()
@@ -351,17 +536,23 @@ class KeypressService:
     def _write_checkpoint(self) -> None:
         """Atomically save the latest learned state after a press completes."""
 
+        model_info = self._diagnostics_unlocked()
+        input_connections = model_info["input_weights"]
         checkpoint = {
             "schema_version": 1,
             "session_id": self.session_id,
             "saved_at": utc_now(),
             "seed": self.model_seed,
             "step": self.step,
-            "model_state_dict": self.model.state_dict(),
-            "optimizer_state_dict": self.model.optimizer.state_dict(),
-            "optimizer_updates": self.model.optimizer_updates,
-            "last_training_loss": self.model.last_training_loss,
-            "last_training_pairs": self.model.last_training_pairs,
+            "training_mode": self.mode,
+            "model_state_dict": self.model.state_dict() if hasattr(self.model, "state_dict") else None,
+            "optimizer_state_dict": self.model.optimizer.state_dict() if hasattr(self.model, "optimizer") else None,
+            "optimizer_updates": int(getattr(self.model, "optimizer_updates", 0)),
+            "last_training_loss": getattr(self.model, "last_training_loss", None),
+            "last_training_pairs": getattr(self.model, "last_training_pairs", None),
+            "model_checkpoint_state": self.model.checkpoint_state()
+            if callable(getattr(self.model, "checkpoint_state", None))
+            else None,
             "history": list(self.history),
             "digit_counts": list(self.digit_counts),
             "correct": self.correct,
@@ -374,6 +565,13 @@ class KeypressService:
             },
             "neurons": list(self.neurons),
             "connections": [list(row) for row in self.connections],
+            "model_info": model_info,
+            "input_connections": input_connections,
+            "input_counts": list(model_info["by_digit"]),
+            "recent_hit_counts": {
+                "30": self._rolling_hits(self.recent_results_30),
+                "90": self._rolling_hits(self.recent_results_90),
+            },
             "last_result": self.last_result,
         }
         target = self.session_dir / "latest_checkpoint.pt"
@@ -622,15 +820,39 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_PARENT)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--mode", choices=("uoro", "window"), default="uoro")
+    parser.add_argument("--uoro-rank", type=int, default=None)
+    parser.add_argument("--learning-rate", type=float, default=None)
+    parser.add_argument("--input-sparsity", type=float, default=None)
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
+    if args.uoro_rank is not None and args.uoro_rank < 1:
+        parser.error("--uoro-rank must be at least 1")
+    if args.learning_rate is not None and (not math.isfinite(args.learning_rate) or args.learning_rate <= 0):
+        parser.error("--learning-rate must be positive and finite")
+    if args.input_sparsity is not None and (not math.isfinite(args.input_sparsity) or args.input_sparsity < 0):
+        parser.error("--input-sparsity must be non-negative and finite")
     return args
 
 
 def main() -> None:
     args = parse_args()
-    service = KeypressService(data_parent=args.data_root, seed=args.seed)
+    model_options = {
+        key: value
+        for key, value in (
+            ("rank", args.uoro_rank),
+            ("learning_rate", args.learning_rate),
+            ("input_sparsity", args.input_sparsity),
+        )
+        if value is not None
+    }
+    service = KeypressService(
+        data_parent=args.data_root,
+        seed=args.seed,
+        mode=args.mode,
+        model_options=model_options,
+    )
     static_root = Path(__file__).with_name("dist")
     server = LocalHTTPServer(("127.0.0.1", args.port), service, static_root)
     print(f"Listening on http://127.0.0.1:{args.port}/")

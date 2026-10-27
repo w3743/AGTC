@@ -17,6 +17,8 @@
     hitCount: document.getElementById("hitCount"),
     accuracyValue: document.getElementById("accuracyValue"),
     totalCount: document.getElementById("totalCount"),
+    recent30Hits: document.getElementById("recent30Hits"),
+    recent90Hits: document.getElementById("recent90Hits"),
     recentCount: document.getElementById("recentCount"),
     recentKeys: document.getElementById("recentKeys"),
     earlyReveal: document.getElementById("earlyReveal"),
@@ -29,6 +31,12 @@
     weightValues: document.getElementById("weightValues"),
     footerSession: document.getElementById("footerSession"),
     graphStep: document.getElementById("graphStep"),
+    trainingModeLabel: document.getElementById("trainingModeLabel"),
+    modelModeDetail: document.getElementById("modelModeDetail"),
+    inputDigitSelect: document.getElementById("inputDigitSelect"),
+    inputMapStatus: document.getElementById("inputMapStatus"),
+    inputCountList: document.getElementById("inputCountList"),
+    inputTargetList: document.getElementById("inputTargetList"),
     graphZoom: document.getElementById("graphZoom"),
     graphCenterStep: document.getElementById("graphCenterStep"),
     edgeThreshold: document.getElementById("edgeThreshold"),
@@ -51,6 +59,8 @@
   let currentState = null;
   let busy = false;
   let selectedNeuronIndex = null;
+  let selectedInputDigit = 0;
+  let inputDigitManuallySelected = false;
   let stateRevision = 0;
   let pollInFlight = false;
 
@@ -61,6 +71,16 @@
   function displayNumber(value, places = 3) {
     if (!isFiniteNumber(value)) return "—";
     return value.toFixed(places);
+  }
+
+  function displayWeight(value) {
+    if (!isFiniteNumber(value)) return "—";
+    if (value === 0) return "0";
+    const absolute = Math.abs(value);
+    const formatted = absolute < 0.0001 || absolute >= 100000
+      ? value.toExponential(4)
+      : value.toFixed(5);
+    return value > 0 ? `+${formatted}` : formatted;
   }
 
   function percentage(value) {
@@ -186,7 +206,9 @@
       sourceNote.className = "result-source-note";
       sourceNote.textContent = predictionSource === "uniform_cold_start"
         ? "冷启动均匀预测：各数字概率相同，并列时选 0。"
-        : predictionSource === "plastic_rnn"
+        : predictionSource === "uoro_rnn"
+          ? "UORO 持续记忆模型的在线预测。"
+          : predictionSource === "plastic_rnn"
           ? "训练后的神经网络预测。"
           : `预测来源：${String(predictionSource || "初始均匀预测")}`;
       elements.resultContent.append(sourceNote);
@@ -204,6 +226,95 @@
     elements.hitCount.textContent = `${correct} / ${total}`;
     elements.accuracyValue.textContent = percentage(accuracy);
     elements.totalCount.textContent = String(total);
+    const recent = currentState.recent_hit_counts;
+    [[30, elements.recent30Hits], [90, elements.recent90Hits]].forEach(([windowSize, target]) => {
+      const stats = recent && recent[String(windowSize)];
+      if (stats && Number.isInteger(stats.correct) && Number.isInteger(stats.total)) {
+        target.textContent = `${stats.correct} / ${stats.total}`;
+        target.title = `最近 ${windowSize} 次按键中的命中数`;
+      } else {
+        target.textContent = "—";
+        target.title = "当前服务未提供最近命中统计";
+      }
+    });
+  }
+
+  function renderModelSummary() {
+    const info = currentState.model_info && typeof currentState.model_info === "object"
+      ? currentState.model_info
+      : {};
+    const rawMode = currentState.training_mode || info.mode;
+    const mode = typeof rawMode === "string" ? rawMode.toLowerCase() : "";
+    if (mode === "uoro") {
+      elements.trainingModeLabel.textContent = "UORO 持续记忆";
+      elements.modelModeDetail.textContent = "本会话内持续保留已观察到的状态，并随每次按键在线更新。";
+    } else if (mode === "window") {
+      elements.trainingModeLabel.textContent = "旧版窗口训练";
+      const context = Number.isInteger(info.context_length)
+        ? `窗口上限 ${info.context_length} 个按键`
+        : "按最近按键窗口训练";
+      const updates = Number.isInteger(info.optimizer_updates) ? ` · 更新 ${info.optimizer_updates} 次` : "";
+      elements.modelModeDetail.textContent = `${context}${updates}。`;
+    } else {
+      elements.trainingModeLabel.textContent = "旧版窗口训练（旧服务）";
+      elements.modelModeDetail.textContent = "此服务尚未提供学习模式和输入权重诊断。";
+    }
+
+    const history = Array.isArray(currentState.history) ? currentState.history : [];
+    if (!inputDigitManuallySelected) {
+      const latestDigit = history.length ? history[history.length - 1] : 0;
+      selectedInputDigit = Number.isInteger(latestDigit) && latestDigit >= 0 && latestDigit <= 9
+        ? latestDigit
+        : 0;
+    }
+    elements.inputDigitSelect.value = String(selectedInputDigit);
+
+    const matrix = Array.isArray(currentState.input_connections)
+      ? currentState.input_connections
+      : Array.isArray(info.input_weights) ? info.input_weights : null;
+    const hasInputMatrix = matrix && matrix.length === 20 && matrix.every((row) =>
+      Array.isArray(row) && row.length === 10 && row.every(isFiniteNumber));
+    elements.inputCountList.replaceChildren();
+    elements.inputTargetList.replaceChildren();
+    if (!hasInputMatrix) {
+      elements.inputMapStatus.textContent = "此服务未提供 W_in 数据，无法判断哪些边精确为零。";
+      const unavailable = document.createElement("div");
+      unavailable.className = "input-data-missing";
+      unavailable.textContent = "输入连接数据不可用";
+      elements.inputTargetList.append(unavailable);
+      return;
+    }
+
+    const counts = Array.from({ length: 10 }, (_value, digit) =>
+      matrix.reduce((count, row) => count + (row[digit] !== 0 ? 1 : 0), 0));
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    for (let digit = 0; digit < 10; digit += 1) {
+      const chip = document.createElement("span");
+      chip.className = `input-count-chip${digit === selectedInputDigit ? " is-selected" : ""}`;
+      chip.setAttribute("aria-label", `数字 ${digit}，${counts[digit]} 个直接连接`);
+      const label = document.createElement("span");
+      label.textContent = String(digit);
+      const count = document.createElement("strong");
+      count.textContent = String(counts[digit]);
+      chip.append(label, count);
+      elements.inputCountList.append(chip);
+    }
+    elements.inputMapStatus.textContent = `数字 ${selectedInputDigit} → ${counts[selectedInputDigit]} / 20 个神经元有直接输入连接；全部数字共 ${total} 条非零输入连接。`;
+    for (let node = 0; node < 20; node += 1) {
+      const weight = matrix[node][selectedInputDigit];
+      const connected = weight !== 0;
+      const item = document.createElement("div");
+      item.className = `input-target${connected ? " is-connected" : ""}`;
+      item.setAttribute("role", "listitem");
+      item.setAttribute("aria-label", `神经元 ${node + 1}，${connected ? "已连接" : "权重精确为零，断开"}，权重 ${String(weight)}`);
+      const label = document.createElement("strong");
+      label.textContent = `神经元 ${node + 1}`;
+      const value = document.createElement("span");
+      value.textContent = connected ? displayWeight(weight) : "断开 · 0";
+      item.title = `数字 ${selectedInputDigit} → 神经元 ${node + 1} · 精确权重 ${String(weight)}`;
+      item.append(label, value);
+      elements.inputTargetList.append(item);
+    }
   }
 
   function renderHistory() {
@@ -562,6 +673,7 @@
     renderResult();
     renderMetrics();
     renderHistory();
+    renderModelSummary();
     renderPrediction();
     renderNeurons();
     renderWeights();
@@ -652,6 +764,13 @@
   });
 
   elements.earlyReveal.addEventListener("change", renderPrediction);
+  elements.inputDigitSelect.addEventListener("change", () => {
+    const digit = Number(elements.inputDigitSelect.value);
+    if (!Number.isInteger(digit) || digit < 0 || digit > 9) return;
+    selectedInputDigit = digit;
+    inputDigitManuallySelected = true;
+    renderModelSummary();
+  });
   elements.graphZoom.addEventListener("click", () => {
     const zoomed = elements.neuronGraph.classList.toggle("is-zoomed");
     elements.graphZoom.setAttribute("aria-pressed", String(zoomed));
