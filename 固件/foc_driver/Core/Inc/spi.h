@@ -49,4 +49,3 @@ void MX_SPI1_Init(void);
 #endif
 
 #endif /* __SPI_H__ */
-

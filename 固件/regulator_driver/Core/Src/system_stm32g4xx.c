@@ -283,5 +283,3 @@ void SystemCoreClockUpdate(void)
 /**
   * @}
   */
-
-
