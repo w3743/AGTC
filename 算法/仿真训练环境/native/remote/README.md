@@ -1,3 +1,12 @@
+# 目录文件索引
+
+当前目录提供 LAN worker 与状态拉取辅助。worker_agent.py 的源码启动的是 V1.1 runner；它不启动 Native V2 正式配方。V2 正式训练入口见 ../train/README.md。跨机命令和可视化步骤如下文所述，实际协议状态以 ../MIGRATION_ACCEPTANCE.md 为准。
+
+| 文件 | 用途 |
+| --- | --- |
+| pull_live_state.py | 按 token 轮询远端 worker 的 /live_state endpoint，并原子更新本机状态 JSON，供现有 Viser viewer 读取。 |
+| worker_agent.py | 提供带 X-Auth-Token 请求头的 LAN HTTP worker：启动/停止 V1.1 trial，读取状态、指标、live-state 和有限的 run 文件。 |
+
 # 远程执行与换机（SSH + Git + rsync）
 
 目标：本机（协调者/DSH Agent）驱动另一台 GPU 机器跑 native trial，并回看日志、checkpoint 和可视化。

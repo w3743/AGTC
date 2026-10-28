@@ -1,5 +1,7 @@
 # RK3588 统一深度输出
 
+本目录直接文件：`deploy_candidate.py` 是早期候选部署脚本，`server.patch` 是服务端补丁记录，`README.md` 是状态与接口说明。`app/` 和 `tests/` 的直接文件分别见其 README；`evidence/` 保留原始实验与部署证据。
+
 本目录名沿用“数值深度接口候选”。单深度/ISP直出/NPU监控已部署；latest 缓存新鲜度修正已按审核授权完成受控部署与板端验证，活动 server.py 为已审 SHA d08db78fcea4e9d6169d7c8ca86c585fc28621a466c693fcd7e61fe132193034。2026-10-21 按用户最新要求，常态运行改为 ISP 按需尺寸直出，浏览器仅保留一份实时深度图；相机预览、设备状态和标定保留。
 
 ## 当前运行方式
@@ -16,7 +18,7 @@
 
 ## 唯一生产者与数值接口
 
-生产者为 [server.py](app/server.py) 中 `Live.metric_work → Live.publish`，编码与帧记录实现为 [depth_wire.py](app/depth_wire.py)。`GET /depth.jpg` 是该深度的伪彩色显示，`GET /depth.bin` 是同一生产链路的数值编码；不启动第二个估深模型。唯一语义来源仍为[深度接口契约](../../深度接口契约.md)。
+生产者为 [server.py](app/server.py) 中 `Live.metric_work → Live.publish`，编码与帧记录实现为 [depth_wire.py](app/depth_wire.py)。`GET /depth.jpg` 是该深度的伪彩色显示，`GET /depth.bin` 是同一生产链路的数值编码；不启动第二个估深模型。原引用的 `深度接口契约.md` 当前不在仓库中，接口字段及验证范围见下文记录和代码。
 
 | 项目 | 当前值 |
 |---|---|

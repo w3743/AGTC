@@ -48,6 +48,8 @@ python checks/check_physics_limits.py # 解析极限：Fresnel 反射、双射�
 
 ## 代码结构
 
+本目录的 `run_sim.py` 是实验入口，`make_figures.py` 生成图，`report.py` 生成中文报告，`report.md` 保存生成的报告；本 README 提供项目说明。`figures/` 和 `results/` 保存结果材料，按记录保留。
+
 ```
 gnss_sim/
   geodesy.py         WGS84 坐标/时间基准、ENU 局部坐标系、仰角映射
