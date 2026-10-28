@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>深度图 · 双目视觉</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0a0d10;--panel:#12171c;--line:#273139;--muted:#8c9aa4;--text:#edf4f6;--cyan:#61ded2;--red:#ff7979;--amber:#f1c36a}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -25%,#173034 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;min-height:100vh}
+    button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:#192128;border-radius:10px;padding:10px 15px;transition:background .15s,border-color .15s}button:hover:not(:disabled){background:#222f35;border-color:#49616a}button:disabled{opacity:.48;cursor:not-allowed}.shell{max-width:1360px;margin:auto;padding:24px 28px 36px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:13px}.mark{width:40px;height:40px;border:1px solid #3a5759;border-radius:12px;display:grid;place-items:center;color:var(--cyan);font-size:21px;background:#102023}.title{font-size:20px;font-weight:700;letter-spacing:.02em}.subtitle{font-size:12px;color:var(--muted)}.connection{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:#73808a}.dot.live{background:var(--cyan);box-shadow:0 0 12px #61ded288}.dot.bad{background:var(--red)}
+    .tabs{display:flex;gap:8px;margin-bottom:14px}.tab{font-size:13px;padding:8px 13px;color:#afbbc2}.tab.active{color:var(--cyan);border-color:#37605f;background:#122222}.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}.panel{background:linear-gradient(160deg,#151b20,#101419);border:1px solid var(--line);border-radius:15px;overflow:hidden}.viewer{min-width:0}.viewer-head{display:flex;justify-content:space-between;align-items:center;padding:14px 17px;border-bottom:1px solid var(--line);font-size:13px}.feed-state{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}.stereo-frame{position:relative;width:min(100%,63vh);margin-inline:auto;min-width:0;background:#030506;min-height:0;display:grid;place-items:center;overflow:hidden;aspect-ratio:1080/960;max-height:56vh}.stereo-frame img{display:none}.stereo-frame canvas{display:block;width:100%;height:100%;min-height:0;object-fit:contain}.split{position:absolute;top:0;bottom:0;left:50%;width:1px;background:#dff8f488;pointer-events:none}.eye-label{position:absolute;top:12px;padding:4px 9px;border:1px solid #ffffff26;border-radius:7px;background:#080d10b8;color:#e7f1f4;font-size:12px;letter-spacing:.04em}.eye-label.left{left:12px}.eye-label.right{left:calc(50% + 12px)}.overlay{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:20px;background:#05090bdc;color:#d2dcdf;font-size:14px}.overlay.show{display:grid}.viewer-foot{display:flex;justify-content:space-between;gap:10px;padding:10px 15px;color:var(--muted);font-size:12px}
+    .view-heading{display:none}.view-nav{display:none!important}body[data-view="depth"] .depth-heading,body[data-view="raw"] .raw-heading{display:block}#viewTabs{display:none!important}
+    .side{padding:17px}.side h2{font-size:13px;color:#aebbc2;font-weight:600;margin:0 0 13px}.capture-button{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:58px;border:1px solid #4ebfb7;background:linear-gradient(135deg,#188d86,#176b69);font-size:17px;font-weight:700;box-shadow:0 7px 25px #0c8b8030}.capture-button:hover:not(:disabled){background:linear-gradient(135deg,#20a198,#187d78);border-color:#79e6dc}.camera-icon{font-size:22px;line-height:1}.hint{margin:10px 0 15px;color:var(--muted);font-size:12px;text-align:center}.result{display:none;padding:10px 12px;margin-bottom:13px;border:1px solid #28635b;background:#10231f;border-radius:9px;color:#8ae0c2;font-size:13px}.result.show{display:block}.result.error{border-color:#714343;background:#241516;color:#ffaaaa}.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{border:1px solid #242d33;background:#0c1115;border-radius:9px;padding:10px;min-height:63px}.stat.wide{grid-column:1/-1}.label{font-size:11px;color:#84929c;margin-bottom:4px}.value{font-size:16px;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.value.small{font-size:12px;font-weight:500;color:#d1dcdf;line-height:1.45}.good{color:var(--cyan)}.bad-text{color:var(--red)}.warn{color:var(--amber)}.divider{height:1px;background:var(--line);margin:16px 0}.actions{display:flex;gap:8px}.actions button{flex:1;font-size:12px}.history{padding:16px;margin-top:16px}.history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.history-head h2{margin:0;font-size:13px;font-weight:600}.history-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.capture-card{min-width:0;border:1px solid var(--line);border-radius:9px;padding:10px;background:#0c1115}.capture-id{font-size:12px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.capture-meta{color:var(--muted);font-size:11px;margin:4px 0 8px}.capture-links{display:flex;gap:10px;font-size:11px}.capture-links a{color:var(--cyan);text-decoration:none}.empty{color:var(--muted);font-size:12px;padding:6px 0}.secondary-view{display:none}.secondary-view.active{display:block}.depth-frame{position:relative;height:min(56vh,620px);min-height:min(240px,56vh);max-height:56vh;background:#030506;display:grid;place-items:center;overflow:hidden}.depth-frame img{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;min-height:0}.depth-legend{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:12px;color:#b5c0c5;font-size:12px}.bar{height:8px;width:min(260px,40vw);border-radius:6px;background:linear-gradient(90deg,#2448d8,#1676e8,#00b9d5,#42d66b,#c5e52a,#f2a21a,#db2727)}.depth-controls{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:0 12px 10px;font-size:12px;color:#d1dcdf}.depth-controls label{display:flex;align-items:center;gap:7px}.depth-controls .hint{margin:0;text-align:left}.depth-stats{display:flex;justify-content:center;gap:12px 20px;flex-wrap:wrap;padding:0 12px 12px;color:#afbbc1;font-size:12px}.depth-stats span{white-space:nowrap}.depth-stats strong{color:#edf4f6;font-variant-numeric:tabular-nums}.foot{text-align:right;color:#687781;font-size:11px;margin-top:13px}.capture-details,.display-settings{margin-top:12px}.capture-details>summary,.display-settings>summary,.advanced-settings>summary{cursor:pointer;padding:12px 16px;color:#d4e2e6;font-size:13px}.capture-details-body,.display-settings-body,.advanced-settings-body{padding:0 16px 16px}.capture-details-body{display:grid;grid-template-columns:1fr;gap:12px}.capture-details .side,.capture-details .history{margin:0}.capture-details .history-list{grid-template-columns:repeat(4,minmax(0,1fr))}.display-settings-body{display:grid;gap:8px}.display-settings-body .hint{margin:2px 0;text-align:left}.advanced-settings{border-top:1px solid var(--line)}.advanced-settings-body .actions{max-width:320px}.depth-display-settings{border-top:1px solid var(--line);margin:0 12px 12px}.depth-display-settings>summary{cursor:pointer;padding:9px;color:#d4e2e6}.depth-display-settings .depth-controls{padding:0 0 8px}.depth-display-settings .hint{margin:0;text-align:left}
+    @media(max-width:1100px){.shell{padding:17px}.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 16px}.side>h2,.capture-button,.hint,.result,.divider,.stats,.actions{grid-column:1/-1}.capture-button{max-width:none}.history-list{grid-template-columns:repeat(2,minmax(0,1fr))}.foot{text-align:left}}
+    @media(max-width:520px){.shell{padding:12px}.top{align-items:flex-start}.title{font-size:17px}.connection{font-size:11px}.layout{gap:11px}.side{display:block;padding:14px}.stereo-frame{min-height:0}.viewer-head{padding:11px 12px}.viewer-foot{font-size:11px}.history{padding:13px}.history-list{grid-template-columns:1fr 1fr}.tab{padding:7px 10px}.actions button{padding:9px 7px}}
+  </style>
+  <link rel="stylesheet" href="/ui.css">
+  <script src="/ui.js" defer></script>
+</head>
+<body data-view="depth">
+  <div id="app-shell" data-page="preview" data-view="standard"></div>
+  <main class="shell">
+    <header class="top page-heading">
+      <div class="view-heading depth-heading"><h1>深度图</h1><p class="muted">实时伪彩色深度 · 黑色为无效像素</p></div>
+      <div class="view-heading raw-heading"><h1>相机预览</h1><p class="muted">实时双目预览</p></div>
+      <div class="connection"><i class="dot" id="connectionDot"></i><span id="connectionText">正在连接设备…</span></div>
+    </header>
+    <nav id="viewTabs" class="tabs segmented" aria-label="内部视图"><button class="tab" id="rawTab" type="button">双目画面</button><button class="tab active" id="depthTab" type="button">深度图</button></nav>
+    <section class="secondary-view" id="rawView">
+      <div class="layout">
+        <article class="panel viewer" aria-label="左右双目灰度预览">
+          <div class="viewer-head"><span>双目画面</span><span class="feed-state" id="previewState">等待图像</span></div>
+          <div class="stereo-frame"><img id="stereoImage" src="/stereo.jpg" alt="" aria-hidden="true"><canvas id="stereoCanvas" width="1080" height="960" role="img" aria-label="左、右相机实时预览，已向左旋转90度"></canvas><span class="eye-label left">左相机</span><span class="eye-label right">右相机</span><span class="split"></span><div class="overlay show" id="previewOverlay">正在连接双目相机…</div></div>
+          <div class="viewer-foot"><span>左旋 90° 便于查看 · 保存照片保留传感器方向</span><span>标准预览 · 每眼 640 × 360</span></div>
+        </article>
+      </div>
+      <details class="panel display-settings">
+        <summary>显示设置与说明</summary>
+        <div class="display-settings-body">
+          <label><input id="autoBalance" type="checkbox">自动亮度平衡</label>
+          <p class="hint">默认关闭以保持预览流畅。开启后只调整屏幕显示；保存照片仍是未经亮度处理的原图。</p>
+          <p class="hint">左右图按视频时间戳配对；这不验证相机曝光同步。标准预览为缩小后的画面，照片保留 3840 × 2160 传感器方向。</p>
+          <details class="advanced-settings">
+            <summary>高级控制</summary>
+            <div class="advanced-settings-body">
+              <div class="actions"><button id="rectifyBtn" type="button">重新对齐</button></div>
+              <p class="hint" id="rectifyResult" aria-live="polite"></p>
+            </div>
+          </details>
+        </div>
+      </details>
+      <details class="panel capture-details">
+        <summary>按需拍摄原图与最近照片</summary>
+        <div class="capture-details-body">
+          <aside class="panel side">
+            <h2>拍摄一组原始左右图</h2>
+          <button class="capture-button" id="captureBtn" type="button" disabled><span class="camera-icon" aria-hidden="true">◎</span><span id="captureLabel">拍摄一组</span></button>
+          <p class="hint" id="captureHint">请固定相机并摆板停稳后手动拍摄；时间戳配对不代表曝光同步。</p>
+          <div class="result" id="captureResult" role="status" aria-live="polite"></div>
+          <div class="stats">
+            <div class="stat"><div class="label">已保存组数</div><div class="value good" id="captureCount">0</div></div>
+            <div class="stat"><div class="label">实时左右时间偏差</div><div class="value" id="captureSkew">—</div></div>
+            <div class="stat"><div class="label">拍摄状态</div><div class="value small" id="readyState">等待画面</div></div>
+            <div class="stat"><div class="label">预览图像年龄</div><div class="value" id="previewAge">—</div></div>
+            <div class="stat wide"><div class="label">照片保存位置（开发板）</div><div class="value small">/opt/rk-lightstereo/captures</div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="actions"><button id="downloadBtn" type="button" disabled>下载全部照片</button></div>
+          </aside>
+          <section class="panel history"><div class="history-head"><h2>最近拍摄</h2><span class="feed-state">最多显示 8 组</span></div><div class="history-list" id="historyList"><div class="empty">还没有拍摄记录</div></div></section>
+        </div>
+      </details>
+    </section>
+    <section class="secondary-view active" id="depthView">
+      <article class="panel viewer"><div class="viewer-head"><span id="depthTitle">深度图</span><span class="feed-state" id="depthState">等待深度状态…</span></div><div class="depth-frame"><img id="depthImage" alt="伪彩色深度图像"><div class="overlay show" id="depthOverlay">等待深度图像…</div></div><div class="depth-legend" id="depthLegend"><span>远</span><span id="depthNear">—</span><span class="bar" aria-hidden="true"></span><span id="depthFar">—</span><span>近</span><span id="depthLegendMode">色标 —</span></div><div class="depth-stats"><span>计算范围 <strong id="depthComputeRange">—</strong></span><span>帧率 <strong id="depthFps">—</strong></span><span>有效比例 <strong id="depthValid">—</strong></span></div>
+        <details class="depth-display-settings"><summary>显示设置与帧信息</summary><div class="depth-stats"><span>有效深度最小值 <strong id="depthMin">—</strong></span><span>有效深度最大值 <strong id="depthMax">—</strong></span><span>有效深度中位数 <strong id="depthMedian">—</strong></span><span>主要范围(P5–P95) <strong id="depthPercentiles">—</strong></span><span>处理耗时 <strong id="depthProcess">—</strong></span></div><div class="depth-controls"><label><input id="autoDepthScale" type="checkbox" checked>自动色标</label><span class="hint">自动色标只改变颜色，不改变深度。</span></div><p class="hint" id="depthNote">黑色区域表示无有效深度；实际距离精度待实测。保存照片是未经校正的左右原图。</p></details>
+      </article>
+    </section>
+  </main>
+  <script>
+    (()=>{
+      const $=id=>document.getElementById(id);
+      const finite=v=>v!==null&&v!==undefined&&v!==""&&Number.isFinite(Number(v));
+      const setText=(id,v)=>{$(id).textContent=v;};
+      const fmtMs=v=>finite(v)?Number(v).toFixed(1)+" ms":"—";
+      let connected=false,ready=false,busy=false,feedHealthy=false,depthHealthy=false,lastStatus=null,downloading=false,statusRequestId=0;
+      const stereoCanvas=$('stereoCanvas'),stereoContext=stereoCanvas.getContext('2d',{willReadFrequently:true});
+      let lastPaint=0;
+      const balanceEnabled=$('autoBalance');
+      const autoDepthScale=$('autoDepthScale');
+      const eyeBalance=[{gamma:1,gain:1,contrast:1},{gamma:1,gain:1,contrast:1}];
+      const sampleCanvas=document.createElement("canvas");sampleCanvas.width=64;sampleCanvas.height=64;
+      const sampleContext=sampleCanvas.getContext("2d",{willReadFrequently:true});
+      function paintStereo(now){
+        const img=$('stereoImage');
+        if(now-lastPaint>=33&&feedHealthy&&img.naturalWidth>0&&$('rawView').classList.contains('active')){
+          const w=img.naturalWidth/2,h=img.naturalHeight;
+          if(stereoCanvas.width!==h*2||stereoCanvas.height!==w){stereoCanvas.width=h*2;stereoCanvas.height=w;}
+          // Rotate each eye separately; capture files retain sensor coordinates.
+          for(let eye=0;eye<2;eye++){
+            stereoContext.save();stereoContext.translate(eye*h,w);stereoContext.rotate(-Math.PI/2);
+            stereoContext.drawImage(img,eye*w,0,w,h,0,0,w,h);stereoContext.restore();
+          }
+          if(balanceEnabled.checked){
+            try{
+              const pixels=stereoContext.getImageData(0,0,stereoCanvas.width,stereoCanvas.height);
+              for(let eye=0;eye<2;eye++){
+                sampleContext.drawImage(img,eye*w,0,w,h,0,0,64,64);
+                const data=sampleContext.getImageData(0,0,64,64).data,hist=new Uint32Array(256);let count=0;
+                for(let i=0;i<data.length;i+=4){hist[data[i]]++;count++;}
+                const percentile=q=>{let n=Math.floor(count*q);for(let v=0;v<256;v++){n-=hist[v];if(n<0)return v;}return 255;};
+                const p10=percentile(.10),mid=percentile(.50),p90=percentile(.90);
+                const strength=Math.max(0,Math.min(1,(p90-p10-18)/65));
+                const ratio=Math.max(.18,Math.min(.82,mid/255));
+                const gammaAim=1+(Math.max(.60,Math.min(1.25,Math.log(.43)/Math.log(ratio)))-1)*strength;
+                const gainAim=1+Math.max(-.05,Math.min(.05,128/Math.max(1,mid)-1))*strength;
+                const contrastAim=1+Math.max(-.04,Math.min(.10,(105-(p90-p10))/700))*strength;
+                const state=eyeBalance[eye],smooth=.07;
+                state.gain+=(gainAim-state.gain)*smooth;state.gamma+=(gammaAim-state.gamma)*smooth;state.contrast+=(contrastAim-state.contrast)*smooth;
+                const lut=new Uint8Array(256);for(let v=0;v<256;v++){
+                  const gammaValue=255*Math.pow(v/255,state.gamma);
+                  const curve=Math.max(0,Math.min(255,128+(gammaValue-128)*state.contrast))*state.gain;
+                  lut[v]=Math.max(0,Math.min(255,Math.round(v*.3+curve*.7)));
+                }
+                const x0=eye*h,x1=(eye+1)*h;
+                for(let y=0;y<stereoCanvas.height;y++)for(let x=x0;x<x1;x++){const i=(y*stereoCanvas.width+x)*4,v=lut[pixels.data[i]];pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=v;}
+              }
+              stereoContext.putImageData(pixels,0,0);
+            }catch(_){/* Keep showing the unadjusted frame if pixel access fails. */}
+          }
+          lastPaint=now;
+        }
+        requestAnimationFrame(paintStereo);
+      }
+      requestAnimationFrame(paintStereo);
+      async function request(url,options={},timeout=5000){
+        const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
+        try{return await fetch(url,{...options,signal:controller.signal,cache:"no-store"});}finally{clearTimeout(timer);}
+      }
+      function setConnection(ok){const cameBack=ok&&!connected;connected=ok;$('connectionText').textContent=ok?"设备在线":"设备断开，正在重连";$('connectionDot').className="dot "+(ok?"live":"bad");if(cameBack){ready=false;$('captureBtn').disabled=true;}}
+      function showResult(message,isError=false){const el=$('captureResult');el.textContent=message;el.className="result show"+(isError?" error":"");}
+      function updateCaptureReady(s){
+        const age=finite(s.preview_age_ms)?Number(s.preview_age_ms):null;
+        const imageAge=age===null?Infinity:age;
+        ready=connected&&feedHealthy&&imageAge<=1500&&s.capture_ready===true&&age!==null&&age<=1500&&!busy&&s.capture_busy!==true;
+        $('captureBtn').disabled=!ready;
+        $('readyState').textContent=busy||s.capture_busy?"正在保存…":ready?"可以拍摄":connected?"画面尚未就绪":"设备未连接";
+        $('readyState').className="value small "+(ready?"good":connected?"warn":"bad-text");
+        $('previewAge').textContent=age===null?"—":Math.max(0,age).toFixed(0)+" ms";
+        $('captureSkew').textContent=fmtMs(s.capture_skew_ms);
+        $('captureCount').textContent=finite(s.capture_count)?Number(s.capture_count).toLocaleString("zh-CN"):"0";
+        if(s.capture_error){showResult("拍摄错误："+String(s.capture_error),true);}
+        $('downloadBtn').disabled=downloading||!finite(s.capture_count)||Number(s.capture_count)<1;
+        if(busy||s.capture_busy===true){$('captureLabel').textContent="正在保存…";$('captureHint').textContent="请稍候，正在保存照片到开发板。摆板保持停稳。";}
+        else{$('captureLabel').textContent="拍摄一组";$('captureHint').textContent="请固定相机并摆板停稳后手动拍摄；时间戳配对不代表曝光同步。";}
+        const stale=!connected||!feedHealthy||imageAge>1500||age===null||age>1500;
+        const raw=imagePollers.raw;
+        if(stale&&raw.active()&&raw.healthy&&!raw.timer&&!raw.watchdog){
+          raw.healthy=false;raw.img.removeAttribute('src');setImageHealthy('raw',false);scheduleImage('raw',1000);
+        }
+        $('previewOverlay').classList.toggle("show",stale);
+        $('previewOverlay').textContent=!connected?"设备连接中断，正在自动重连…":!feedHealthy?"双目画面正在连接或重试…":imageAge>1500||age!==null&&age>1500?"预览已过期，正在等待新画面…":"正在等待双目画面…";
+        $('previewState').textContent=stale?"画面未就绪":"画面正常 · "+Math.max(0,imageAge).toFixed(0)+" ms";
+        updateDepth(s);
+      }
+      function updateDepth(s){
+        const mode=String(s.mode||"").toLowerCase(),age=finite(s.age_ms)?Number(s.age_ms):null;
+        const calibrated=s.depth_unit==="m"&&Boolean(s.calibration_id);
+        $('depthTitle').textContent='实时深度';
+        const streamActive=$('depthView').classList.contains("active"),streamMissing=streamActive&&!depthHealthy;
+        const stale=!connected||streamMissing||age===null||age>2000||mode==="waiting"||mode==="error";
+        const msg=!connected?"设备连接中断，等待重连…":streamMissing?"深度视频流正在连接或重连…":age===null?"等待深度状态…":age>2000?"深度图像已过期，等待新帧…":mode==="waiting"?"正在等待深度图像…":mode==="error"?(s.message||"深度处理遇到错误，请查看设备状态。"):"";
+        $('depthOverlay').classList.toggle("show",stale);$('depthOverlay').textContent=msg;
+        $('depthState').textContent=stale?msg:(calibrated?"已标定 · 米制深度":"未标定 · 相对视差");
+        const computeRange=Array.isArray(s.depth_range_m)&&s.depth_range_m.length>=2?s.depth_range_m:null;
+        const colorRange=Array.isArray(s.depth_color_range_m)&&s.depth_color_range_m.length>=2?s.depth_color_range_m:null;
+        const colorMode=s.depth_color_mode==="auto"?"自动色标":s.depth_color_mode==="fixed"?"固定色标":"色标未知";
+        $('depthNear').textContent=!stale&&calibrated&&colorRange?Number(colorRange[1]).toFixed(2)+" m":"—";$('depthFar').textContent=!stale&&calibrated&&colorRange?Number(colorRange[0]).toFixed(2)+" m":"—";$('depthLegendMode').textContent=!stale&&calibrated?colorMode:"色标 —";
+        $('depthComputeRange').textContent=!stale&&calibrated&&computeRange?Number(computeRange[0]).toFixed(2)+"–"+Number(computeRange[1]).toFixed(2)+" m":"—";
+        $('depthFps').textContent=!stale&&finite(s.fps)?Number(s.fps).toFixed(1):"—";
+        $('depthValid').textContent=!stale&&finite(s.valid_fraction)?(Number(s.valid_fraction)*100).toFixed(1)+"%":"—";
+        const depthValue=(key)=>!stale&&calibrated&&finite(s[key])?Number(s[key]).toFixed(2)+" m":"—";
+        $('depthMin').textContent=depthValue("depth_min_m");$('depthMax').textContent=depthValue("depth_max_m");$('depthMedian').textContent=depthValue("depth_median_m");
+        $('depthPercentiles').textContent=!stale&&calibrated&&finite(s.depth_p05_m)&&finite(s.depth_p95_m)?Number(s.depth_p05_m).toFixed(2)+"–"+Number(s.depth_p95_m).toFixed(2)+" m":"—";
+        $('depthProcess').textContent=!stale&&finite(s.process_ms)?fmtMs(s.process_ms):"—";
+        $('depthNote').textContent=calibrated?"黑色区域表示无有效深度（包括范围外像素）；实际距离精度待实测。标定校正已启用。拍摄保存的是未经校正的左右原图。":"未标定，显示相对视差，不能作为米制深度。黑色区域表示无效像素。拍摄保存的是未经校正的左右原图。";
+        $('rectifyBtn').disabled=calibrated;$('rectifyBtn').hidden=calibrated;
+        $('rectifyResult').textContent=calibrated?"标定校正已启用，重新对齐不可用。":"";
+      }
+      async function refreshStatus(){
+        const requestId=++statusRequestId,scale=autoDepthScale.checked?'auto':'fixed';
+        try{
+          const r=await request("/status?scale="+scale,{},4000);if(!r.ok)throw new Error("HTTP "+r.status);
+          const s=await r.json();if(requestId!==statusRequestId)return;lastStatus=s;setConnection(true);updateCaptureReady(s);
+        }catch(_){if(requestId!==statusRequestId)return;setConnection(false);ready=false;$('captureBtn').disabled=true;$('readyState').textContent="设备未连接";$('readyState').className="value small bad-text";$('previewOverlay').classList.add("show");$('previewOverlay').textContent="设备连接中断，正在自动重连…";$('previewState').textContent="连接中断";if(lastStatus)updateDepth(lastStatus);}
+      }
+      async function refreshHistory(){
+        try{const r=await request("/captures",{},4500);if(!r.ok)throw new Error();const data=await r.json();
+          const list=Array.isArray(data.captures)?data.captures.slice(-8).reverse():[];const host=$('historyList');host.replaceChildren();
+          if(!list.length){host.innerHTML='<div class="empty">还没有拍摄记录</div>';return;}
+          for(const c of list){const card=document.createElement("div");card.className="capture-card";
+            const title=document.createElement("div");title.className="capture-id";title.textContent=c.id||"照片组";
+            const meta=document.createElement("div");meta.className="capture-meta";meta.textContent=(c.captured_at||"时间未知")+" · 偏差 "+fmtMs(c.skew_ms);
+            const links=document.createElement("div");links.className="capture-links";
+            for(const side of ["left","right"]){const a=document.createElement("a");a.href="/captures/"+encodeURIComponent(c.id)+"/"+side+".png";a.target="_blank";a.rel="noopener";a.textContent=side==="left"?"左图":"右图";links.append(a);}
+            card.append(title,meta,links);host.append(card);
+          }
+        }catch(_){/* Keep the last visible history during a short service restart. */}
+      }
+      async function capture(){
+        if(!ready||busy||Date.now()-lastStereoLoad>1500)return;busy=true;ready=false;$('captureBtn').disabled=true;$('captureLabel').textContent="正在保存…";$('captureHint').textContent="请稍候，正在保存原始照片";showResult("正在拍摄并保存一组照片…");
+        try{
+          const r=await request("/capture",{method:"POST",headers:{"Accept":"application/json"}},15000);let body;try{body=await r.json();}catch{body=null;}
+          if(!r.ok)throw new Error(body?.message||"拍摄失败（"+r.status+"）");
+          const c=body?.capture||{};lastCaptureId=c.id||null;showResult("拍摄成功："+(c.id||"已保存")+" · "+(c.width||3840)+" × "+(c.height||2160)+"。照片已保存在开发板。");
+          if(finite(body.capture_count))$('captureCount').textContent=Number(body.capture_count).toLocaleString("zh-CN");await refreshHistory();
+        }catch(e){showResult("拍摄失败："+(e.name==="AbortError"?"等待超时，请查看最近拍摄记录。":e.message||"设备暂不可用"),true);}
+        finally{busy=false;$('captureLabel').textContent="拍摄一组";await refreshStatus();}
+      }
+      const imagePollers={
+        raw:{img:$('stereoImage'),url:'/stereo.mjpg',stream:true,healthy:false,timer:0,watchdog:0,active:()=>document.visibilityState!=='hidden'&&$('rawView').classList.contains('active')},
+        depth:{img:$('depthImage'),url:'/depth.mjpg',stream:true,healthy:false,timer:0,watchdog:0,loading:false,reload:false,active:()=>document.visibilityState!=='hidden'&&$('depthView').classList.contains('active')}
+      };
+      let lastStereoLoad=0,feedRequestId=0;
+      function setImageHealthy(kind,ok){
+        const p=imagePollers[kind];p.healthy=ok;
+        if(kind==='raw'){feedHealthy=ok;if(!ok){ready=false;$('captureBtn').disabled=true;}}
+        else depthHealthy=ok;
+        if(lastStatus){if(kind==='raw')updateCaptureReady(lastStatus);else updateDepth(lastStatus);}
+      }
+      function stopImagePoller(kind){
+        const p=imagePollers[kind];clearTimeout(p.timer);clearTimeout(p.watchdog);p.timer=p.watchdog=0;p.loading=false;p.reload=false;
+        if(p.img.hasAttribute('src'))p.img.removeAttribute('src');setImageHealthy(kind,false);
+      }
+      function scheduleImage(kind,delay){
+        const p=imagePollers[kind];clearTimeout(p.timer);p.timer=setTimeout(()=>loadImage(kind),delay);
+      }
+      function loadImage(kind){
+        const p=imagePollers[kind];p.timer=0;if(!p.active())return;
+        if(p.loading){p.reload=true;return;}p.loading=true;p.reload=false;
+        clearTimeout(p.watchdog);
+        p.watchdog=setTimeout(()=>{p.watchdog=0;p.loading=false;setImageHealthy(kind,false);scheduleImage(kind,1000);},6000);
+        const query=kind==='depth'?'?scale='+(autoDepthScale.checked?'auto':'fixed')+'&':'?';
+        p.img.src=p.url+query+'t='+Date.now()+'-'+(++feedRequestId);
+      }
+      function imageLoaded(kind){
+        const p=imagePollers[kind];if(!p.active())return;
+        clearTimeout(p.watchdog);p.watchdog=0;p.loading=false;
+        const ok=p.img.naturalWidth>0;if(kind==='raw'&&ok)lastStereoLoad=Date.now();
+        setImageHealthy(kind,ok);const immediate=p.reload;p.reload=false;if(!p.stream)scheduleImage(kind,immediate?0:ok?(kind==='depth'?100:200):1000);
+      }
+      function imageFailed(kind){
+        const p=imagePollers[kind];clearTimeout(p.watchdog);p.watchdog=0;
+        p.loading=false;if(!p.active())return;const immediate=p.reload;p.reload=false;setImageHealthy(kind,false);scheduleImage(kind,immediate?0:1000);
+      }
+      $('stereoImage').addEventListener('load',()=>imageLoaded('raw'));
+      $('stereoImage').addEventListener('error',()=>imageFailed('raw'));
+      $('depthImage').addEventListener('load',()=>imageLoaded('depth'));
+      $('depthImage').addEventListener('error',()=>imageFailed('depth'));
+      autoDepthScale.addEventListener('change',()=>{
+        refreshStatus();const p=imagePollers.depth;if(!p.active())return;
+        if(p.loading){p.reload=true;return;}scheduleImage('depth',0);
+      });
+      $('rawTab').addEventListener('click',()=>{
+        document.body.dataset.view='raw';document.title='相机预览 · 双目视觉';
+        $('rawTab').classList.add('active');$('depthTab').classList.remove('active');$('rawView').classList.add('active');$('depthView').classList.remove('active');
+        stopImagePoller('depth');if(!imagePollers.raw.timer&&!imagePollers.raw.watchdog)scheduleImage('raw',0);
+      });
+      $('depthTab').addEventListener('click',()=>{
+        document.body.dataset.view='depth';document.title='深度图 · 双目视觉';
+        $('depthTab').classList.add('active');$('rawTab').classList.remove('active');$('depthView').classList.add('active');$('rawView').classList.remove('active');
+        stopImagePoller('raw');if(!imagePollers.depth.timer&&!imagePollers.depth.watchdog)scheduleImage('depth',0);if(lastStatus)updateDepth(lastStatus);
+      });
+      document.addEventListener('visibilitychange',()=>{
+        if(document.visibilityState==='hidden'){stopImagePoller('raw');stopImagePoller('depth');}
+        else{scheduleImage('raw',0);if(imagePollers.depth.active())scheduleImage('depth',0);}
+      });
+      window.addEventListener('pageshow',()=>{scheduleImage('raw',0);if(imagePollers.depth.active())scheduleImage('depth',0);});
+      window.addEventListener('pagehide',()=>{stopImagePoller('raw');stopImagePoller('depth');});
+      $('captureBtn').addEventListener("click",capture);
+      $('downloadBtn').addEventListener("click",async()=>{if(downloading)return;downloading=true;$('downloadBtn').disabled=true;try{const r=await request("/captures.zip",{},30000);if(!r.ok){let d;try{d=await r.json();}catch{}throw new Error(d?.message||"下载失败（"+r.status+"）");}const blob=await r.blob();if(!blob.size)throw new Error("没有可下载的照片");const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="stereo-captures.zip";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}catch(e){showResult("下载失败："+(e.name==="AbortError"?"下载等待超时，请稍后重试。":e.message||"设备暂不可用"),true);}finally{downloading=false;if(lastStatus)updateCaptureReady(lastStatus);}});
+      $('rectifyBtn').addEventListener("click",async()=>{const b=$('rectifyBtn'),out=$('rectifyResult');b.disabled=true;out.textContent="正在请求对齐…";try{const r=await request("/rectify",{method:"POST",headers:{"Accept":"application/json"}},10000);let d;try{d=await r.json();}catch{}if(!r.ok)throw new Error(d?.message||"请求失败（"+r.status+"）");out.textContent=d?.message||"对齐请求已完成";}catch(e){out.textContent="对齐请求失败："+(e.message||"设备暂不可用");}finally{b.disabled=false;}});
+      scheduleImage('depth',0);refreshStatus();refreshHistory();setInterval(refreshStatus,1000);setInterval(refreshHistory,10000);
+      if(new URLSearchParams(location.search).get('view')==='raw') $('rawTab').click();else $('depthTab').click();
+    })();
+  </script>
+</body>
+</html>

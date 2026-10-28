@@ -1,0 +1,23 @@
+
+╔══════════════════════════════════════════════════════════════╗
+║         EasyEDA WebSocket Bridge Server                      ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  Port:        49620                                          ║
+║  Port Range:  49620-49629                                  ║
+║  Service ID:  easyeda-bridge                              ║
+║                                                              ║
+║  HTTP API:    http://localhost:49620                         ║
+║  WS (EDA):   ws://localhost:49620/eda                       ║
+║  WS (Agent): ws://localhost:49620/agent                     ║
+║                                                              ║
+║  Endpoints:                                                  ║
+║    GET  /health     - 健康检查 & EDA 连接状态                ║
+║    POST /execute    - 执行代码 {"code": "..."}               ║
+║                                                              ║
+║  Handshake:                                                  ║
+║    /health returns { service: "easyeda-bridge" }       ║
+║    WS sends { type: "handshake", service: "..." }            ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+      

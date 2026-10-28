@@ -1,0 +1,27 @@
+WSL_NATIVE_TRAINING_PREP: native-stack training harness (capability metrics disabled)
+Warp 1.18.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.4
+   Devices:
+     "cpu"      : "aarch64"
+     "cuda:0"   : "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)" (110 GiB, sm_121, mempool enabled)
+   Kernel cache:
+     /root/.cache/warp/1.18.0
+Module warp._src.coloring 811e0ea load on device 'cpu' took 1.03 ms  (cached)
+Module validate_and_correct_inertia_kernel_1ff2ac62 1ff2ac6 load on device 'cuda:0' took 2.03 ms  (cached)
+Module newton._src.geometry.bvh 58a3a49 load on device 'cuda:0' took 1.48 ms  (cached)
+Module newton._src.solvers.solver d7b7ff4 load on device 'cuda:0' took 1.40 ms  (cached)
+Module create_eval_articulation_fk_tile__locals__eval_articulation_fk_tile_97b60f78 8d76dec load on device 'cuda:0' took 1.84 ms  (cached)
+Module newton._src.sim.articulation cc479e3 load on device 'cuda:0' took 7.83 ms  (cached)
+IDENTITY {"seed": 0, "num_envs": 64, "num_steps": 32, "policy": {"policy_type": "lstm", "hidden_size": 512, "num_layers": 1, "features_dim": 192, "init_std": 0.05000000074505806, "params_total": 1619913, "params_lstm": 1445888, "params_encoder": 108032, "params_heads": 65989}}
+OBS_CONTRACT_SHA 3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c
+PHYSICS {"engine": "newton_xpbd", "device": "cuda:0", "newton": "1.7.0", "warp": "1.18.0", "mujoco": null, "nworld": 64, "dt_s": 0.001, "decimation": 50, "policy_dt_s": 0.05, "dof": 1536, "joints": 1216, "bodies": 1216, "mimic_relations_per_world": 14, "effort_limit_nm": 2.0, "drive_kp": 0.04, "drive_ki": 0.1, "mu": 0.8, "max_track_speed_mps": 4.166666666666667, "drive_semantics": "velocity targets (joint_target_qd) with target_kd=0.04; side PI not applied", "note": "M3 GPU backend; CPU default path does not import newton/warp"}
+RESUMED iteration=2 from /mnt/c/pioneer/agtc-native-acceptance-backup/gpu_preflight_20261025_164558/latest.pt (policy=lstm)
+Module newton._src.solvers.xpbd.kernels 10d9537 load on device 'cuda:0' took 3.78 ms  (cached)
+Module solve_joint_mimics_1ec86ff8 1ec86ff load on device 'cuda:0' took 3.05 ms  (cached)
+Module observation_provider b38fdd3 load on device 'cpu' took 0.36 ms  (cached)
+Module detections_caster 8802857 load on device 'cuda:0' took 16.21 ms  (cached)
+Module depth_caster c398aae load on device 'cuda:0' took 6.71 ms  (cached)
+ITER {"iter": 3, "wall_s": 7.1358, "collection_s": 4.8963, "policy_act_s": 1.0309, "env_step_s": 3.7184, "learning_s": 2.2282, "samples": 2048, "samples_per_s": 418.27, "end_to_end_samples_per_s": 287.0, "rss_mb": 2759.5, "mean_reward": -0.01876, "ppo_loss": 0.0919, "observation_contract_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c", "phase": "wsl_training_prep", "policy_type": "lstm", "capability_metrics_allowed": false, "nonfinite_env_resets": 0, "nonfinite_actions": 0}
+SAVED checkpoint_3.pt
+SUMMARY {"banner": "WSL_NATIVE_TRAINING_PREP", "phase": "wsl_training_prep", "capability_metrics_allowed": false, "capability_blockers": ["RTX domain gap not pixel-compared (depth, detections)"], "iterations": 1, "start_iteration": 2, "end_iteration": 3, "total_wall_s": 8.3825, "num_envs": 64, "num_steps": 32, "device": "cuda", "physics": "newton_xpbd", "observation_contract_sha256": "3aae175eb824cf2cd95a5b288954e0a1cb7c142394d1de8d52cde45c38f7589c", "final_checkpoint": "/mnt/c/pioneer/agtc-native-acceptance-backup/gpu_chain_smoke_20261025_165003/resume_smoke/latest.pt", "rss_mb": 2765.6}
+OUT_DIR /mnt/c/pioneer/agtc-native-acceptance-backup/gpu_chain_smoke_20261025_165003/resume_smoke

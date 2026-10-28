@@ -1,0 +1,59 @@
+{
+  "checked_at_local": "2026-10-15T18:25:54+08:00",
+  "scope": "只读核查BMS 8 warnings与FOC 5 warnings的官方API逐项可得性；未启动新EDA/CLI会话、未修改原生工程。",
+  "judgement": "当前证据不能证明官方API可导出逐条警告。文档有verbose数组返回承诺，但没有定义数组项结构；本轮实际sch_Drc调用只返回按类型汇总的warn/count。",
+  "api_documentation": {
+    "sch_Drc.check": "签名包含includeVerboseError=true时返回Promise<Array<any>>，描述为DRC检查的详细结果；文档未定义Array元素结构，且标记BETA。",
+    "pcb_Drc.check": "有相同的verbose数组签名与泛化的详细结果说明；本轮三板记录脚本调用的是sch_Drc，不是pcb_Drc，不能用PCB_Drc文档推断本轮warning对象。",
+    "SYS_Log": "sort/find返回通用ISYS_LogLine；export(types)返回void且描述为导出日志。日志接口没有说明它会导出DRC逐条错误/警告。"
+  },
+  "runtime_evidence": {
+    "method": "隔离逐文件SHA256一致副本、官方CLI headless会话；官方API调用sch_Drc.check(true,false,true)，并读取sys_Log.sort()。本记录未重跑CLI。",
+    "BMS": {
+      "errors": 0,
+      "warnings": 8,
+      "verbose_result": [
+        {
+          "type": "warn",
+          "count": 8
+        }
+      ],
+      "log_types": [
+        "openProject"
+      ],
+      "warning_objects_available": false
+    },
+    "FOC": {
+      "errors": 0,
+      "warnings": 5,
+      "verbose_result": [
+        {
+          "type": "warn",
+          "count": 5
+        }
+      ],
+      "log_types": [
+        "openProject"
+      ],
+      "warning_objects_available": false
+    },
+    "provenance": "数量及结果来自官方DRC汇总与模块本轮官方DRC运行JSON；历史DRC文本不作为本轮逐项证据。"
+  },
+  "limitations": [
+    "现有verbose API运行值是类别计数对象，不含逐项消息、对象引用或位置。",
+    "文档只声明Array<any>详细结果，没有保证逐条枚举或导出字段；因此不能断言API绝对不具备未文档化能力，但现有证据下不能产出可审计的逐警告详情。",
+    "userInterface=true按文档只说明显示底部DRC窗口；未验证其内容或导出行为。",
+    "BMS/FOC结果只对应本轮记录的已保存隔离副本快照；不代表另一活动BMS会话后续未保存改动。"
+  ],
+  "next_action": "如后续必须取得逐项详情，由主代理在确认不会干扰活动会话后，用隔离副本另测官方DRC UI/API；保存逐项面板/导出证据及对应源SHA。",
+  "evidence_sha256": {
+    "SCH_Drc文档": "1162d81e950f000e781f56ac31fca4baed6ccc93d941a48e465cfb8b63fa4db8",
+    "PCB_Drc文档": "98384762d2e39b72902e789e068a4f02f82f08d24d61e7d0cca1e19742875ed8",
+    "SYS_Log文档": "322590529da7e169614d5cc6793c75f28ef5d22ce81b51ef4e89d7ba9270e43e",
+    "只读检查脚本": "af8104ac82043516e0fce84e95124a433ee26e6ebecf47d56e09d504f539d9a2",
+    "授权修复脚本": "82bbfca3229e39e893b8263d70bb41388039f53eb84f1954a9ebc5ce684481fc",
+    "本轮DRC汇总": "5896c8d214e7f1b72d90b844cb688019f5c9c6a8ff24e4464c7543c72741ab91",
+    "BMS官方运行记录": "47e8fe751c197cebad74a04b67cb3c6539d67720c85424e0924dd9ac305eb4ac",
+    "FOC官方运行记录": "b35329f0fd3b243c4e73c79de1fd7269906bad662296445d3f67a905b86bbeb5"
+  }
+}

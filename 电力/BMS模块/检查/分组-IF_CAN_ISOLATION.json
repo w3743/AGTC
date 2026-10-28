@@ -1,0 +1,256 @@
+[
+  {
+    "ref": "U_CAN",
+    "mpn": "ISO1042DWR",
+    "pins": {
+      "1": "CORE_3V3",
+      "9": "PACK-",
+      "7": null,
+      "11": "CAN_ISO_5V",
+      "12": "CANL",
+      "16": "CAN_ISO_5V",
+      "6": null,
+      "4": null,
+      "2": "B0",
+      "13": "CANH",
+      "15": "PACK-",
+      "3": "CAN_TX",
+      "8": "B0",
+      "14": null,
+      "5": "CAN_RX",
+      "10": "PACK-"
+    },
+    "note": "ISO1042DWR DW16 official pin map. VCC2 local bypass: C_CAN_VCC2_1=100nF plus C_CAN_VCC2_2=1uF (MPN 105); PACK-side ground is PACK-, isolated from B0.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "libUuid": "4b1c789643714e1da4aa669fa08d8a17",
+    "x": 250,
+    "y": 150,
+    "value": "ISO1042"
+  },
+  {
+    "ref": "C_CAN_VCC1",
+    "mpn": "GRM188R71C104KA01D",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "B0"
+    },
+    "note": "100 nF close to VCC1/GND1.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 750,
+    "y": 150,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_CAN_VCC2_1",
+    "mpn": "GRM188R71C104KA01D",
+    "pins": {
+      "1": "CAN_ISO_5V",
+      "2": "PACK-"
+    },
+    "note": "100 nF close to VCC2/GND2.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 1250,
+    "y": 150,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_CAN_VCC2_2",
+    "mpn": "GRM188R71C105KA12D",
+    "pins": {
+      "1": "CAN_ISO_5V",
+      "2": "PACK-"
+    },
+    "note": "1 uF local bulk bypass for VCC2.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 1750,
+    "y": 150,
+    "value": "1uF 16V"
+  },
+  {
+    "ref": "R_CAN_TXD_PU",
+    "mpn": "RC0603FR-0710KL",
+    "pins": {
+      "1": "CORE_3V3",
+      "2": "CAN_TX"
+    },
+    "note": "10 kOhm TXD pull-up makes bus recessive before MCU config.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "x": 2250,
+    "y": 150,
+    "value": "10kΩ 1% 0.1W"
+  },
+  {
+    "ref": "U_CAN_PWR",
+    "mpn": "IF0505S-1WR3",
+    "libUuid": "451dba855dbe49188005d0b6fbc0cd26",
+    "pins": {
+      "6": "CAN_ISO_5V",
+      "1": "VOUT_5V",
+      "4": "PACK-",
+      "5": null,
+      "3": null,
+      "2": "B0"
+    },
+    "note": "Regulated isolated 5 V/1 W. Pin 3,5 NC. Official specs: output accuracy ±3%, line regulation ±0.25% per ±1% Vin change, 5 V load regulation ±2% (10–100%), ripple max 75 mVpp, temperature coefficient ±0.02%/°C typical with no guaranteed max. Paper estimate including typical temp coefficient is 4.58–5.42 V; verify corners against ISO1042 VCC2 range.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 250,
+    "y": 450,
+    "value": "IF0505S-1WR3, 5V/1W isolated"
+  },
+  {
+    "ref": "C_CAN_PWR_IN1",
+    "mpn": "GRM21BR71C475KA73L",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "B0"
+    },
+    "note": "4.7 uF/16 V input bypass at IF0505S.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 750,
+    "y": 450,
+    "value": "4.7uF 16V"
+  },
+  {
+    "ref": "C_CAN_PWR_IN2",
+    "mpn": "GRM188R71C104KA01D",
+    "pins": {
+      "1": "VOUT_5V",
+      "2": "B0"
+    },
+    "note": "100 nF input high-frequency bypass at IF0505S.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 1250,
+    "y": 450,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "C_CAN_PWR_OUT1",
+    "mpn": "GRM21BR71C106KE15L",
+    "pins": {
+      "1": "CAN_ISO_5V",
+      "2": "PACK-"
+    },
+    "note": "10 uF/16 V output capacitor at IF0505S.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 1750,
+    "y": 450,
+    "value": "10uF 16V"
+  },
+  {
+    "ref": "C_CAN_PWR_OUT2",
+    "mpn": "GRM188R71C104KA01D",
+    "pins": {
+      "1": "CAN_ISO_5V",
+      "2": "PACK-"
+    },
+    "note": "100 nF output bypass at IF0505S.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic capacitor symbol for schematic; source MPN retained, no PCB footprint assigned.",
+    "libUuid": "417d4461e9034721a0381da76f854e80",
+    "x": 2250,
+    "y": 450,
+    "value": "100nF 16V"
+  },
+  {
+    "ref": "R_CAN_ISO_MINLOAD",
+    "mpn": "RC1206FR-07220RL",
+    "pins": {
+      "1": "CAN_ISO_5V",
+      "2": "PACK-"
+    },
+    "note": "220 Ohm, 1%, 0.25 W minimum-load resistor. At 4.75 V and +1% tolerance: 21.4 mA. At estimated high corner 5.42 V: 24.64 mA / 0.134 W; with ISO1042 dominant max 73.4 mA, total about 98.1 mA < 200 mA.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic resistor symbol for schematic; source MPN/value retained, no PCB footprint assigned.",
+    "libUuid": "011ff3b07f2048d8b31daa860bb90b50",
+    "x": 250,
+    "y": 750,
+    "value": "220Ω 1% 0.25W"
+  },
+  {
+    "ref": "D_CAN_TVS",
+    "mpn": "PESD2CANFD24V-TR",
+    "pins": {
+      "1": "CANH",
+      "2": "CANL",
+      "3": "PACK-"
+    },
+    "note": "Nexperia SOT23: pin 1 K1 to CANH, pin 2 K2 to CANL, pin 3 common cathode to PACK-; place by J_CAN.",
+    "libUuid": "76bcd52e6dd845eb950d4f76382feb0e",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "3",
+    "libraryNote": "",
+    "x": 750,
+    "y": 750,
+    "value": "PESD2CANFD24V"
+  },
+  {
+    "ref": "J_CAN",
+    "mpn": "Phoenix Contact MSTBA 2,5/3-G-5,08 (1757255)",
+    "pins": {
+      "1": "CANH",
+      "2": "CANL",
+      "3": "PACK-"
+    },
+    "note": "3-position 5.08 mm board header. Connector shell/shield is not connected to B0 by default.",
+    "sourceFile": "接口元件连接.json",
+    "pageGroup": "IF_CAN_ISOLATION",
+    "addIntoPcb": false,
+    "libType": "2",
+    "libraryNote": "Generic 3-pin schematic header symbol only; source MPN remains Phoenix MSTBA 2,5/3-G-5,08. Footprint is intentionally excluded pending library/device pairing.",
+    "libUuid": "5f6efadb84eb4e8582d1374fc21a833f",
+    "x": 1250,
+    "y": 750,
+    "value": "3-pos, 5.08mm"
+  }
+]

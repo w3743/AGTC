@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-10-21",
+  "scope": "只读盘点四块电路板的现行原生入口、BOM与依据，记录归档断链、来源缺失和共用索引新鲜度。FOC BOM按授权从采购索引raw行语义重建。未改原理图、PCB或README。",
+  "authority": "现行保存源、采购输入与最终本地索引；保留初始缺失/恢复记录为历史审计轨迹，不证明电气或制造资格。",
+  "modules": [
+    {
+      "name": "BMS模块",
+      "native_entry": {
+        "project": "BMS模块/BMS-9S4P.eprj3",
+        "schematic": "BMS模块/sch/Schematic1/P1.esch2",
+        "pcb": "BMS模块/pcb/PCB1.epcb2",
+        "sha256": {
+          "project": "90870596d1f7c8c3abe0140a27074cd6701fd5844ab0f1f61847201dc954b48a",
+          "schematic": "ce6fc600b4b3f73374c0a8d53b7014f83c16b68b5e10cb608f2d70f7c962124f",
+          "pcb": "ec40d546018734cb465981057292c9424cba26ec3dc1b103edd025669ad720b6"
+        }
+      },
+      "design_basis": [
+        "BMS模块/项目要求.md",
+        "电力/基本设计.md",
+        "BMS模块/原理图准备/Layout交接.md",
+        "BMS模块/检查/当前设计状态.md"
+      ],
+      "bom": {
+        "sources": [
+          {
+            "module": "BMS模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "BMS模块/原理图准备/BOM.csv",
+            "format": "bms",
+            "bom_rows": 248,
+            "bom_reference_occurrences": 248,
+            "unique_bom_references": 248,
+            "bom_sha256": "26662082bf2870c959c347acf865d3d6ef760ab73c1c60bf3f4c448e63d57a18",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ],
+        "status": "present",
+        "path": "BMS模块/原理图准备/BOM.csv",
+        "sha256": "26662082bf2870c959c347acf865d3d6ef760ab73c1c60bf3f4c448e63d57a18"
+      },
+      "review_state": "layoutEntry=HOLD，manufacturingRelease=HOLD；最终仅删4条TEXT；215/710由已完成官方网表及文本差分派生，最终DRC/API未完成。",
+      "current_scope": {
+        "vehicle_multiplicity": 1,
+        "native_bom_instances": 209,
+        "pcb_counts": {
+          "yes": 206,
+          "no": 3
+        },
+        "procurement_records": 248,
+        "procurement_only_records": 39,
+        "procurement_sources": [
+          {
+            "module": "BMS模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "BMS模块/原理图准备/BOM.csv",
+            "format": "bms",
+            "bom_rows": 248,
+            "bom_reference_occurrences": 248,
+            "unique_bom_references": 248,
+            "bom_sha256": "26662082bf2870c959c347acf865d3d6ef760ab73c1c60bf3f4c448e63d57a18",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FOC驱动模块",
+      "native_entry": {
+        "project": "FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3",
+        "schematic": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+        "configuration": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/Schematic1.ecfg",
+        "pcb": "FOC驱动模块/eda工程文件/FOC_G431_Driver/pcb/PCB1.epcb2",
+        "sha256": {
+          "project": "c3eb000b2da4a3d69fc7ba81da91bd28dea18b0c5dba86ec4430ca854f238ea2",
+          "schematic": "34b80ca57b26b5f9d243edd844bfe9263a9e5afec57ed66957274fb25cfabacb",
+          "configuration": "b0f655a3f8d01b75d5b4dd319c9d4b679d0f8de94913681d98e2112a3d1fb87b",
+          "pcb": "602a48835a0a37c5e8c57e8221c2f420429a30ff1ebad2dd87488cbdf8d94d53"
+        }
+      },
+      "design_basis": [
+        "FOC驱动模块/FOC驱动设计构想.md",
+        "FOC驱动模块/保护与固件约束.md",
+        "FOC驱动模块/参考资料/电机资料/N5065参数证据.md",
+        "FOC驱动模块/检查/原理图电气复核结论.md"
+      ],
+      "bom": {
+        "sources": [
+          {
+            "module": "FOC驱动模块",
+            "vehicle_board_multiplicity": 2,
+            "bom_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "format": "foc",
+            "bom_rows": 89,
+            "bom_reference_occurrences": 152,
+            "unique_bom_references": 152,
+            "bom_sha256": "0da6075c545e92f51eeaa815285f091109dba9b1aca9352b856c37d06e86fceb",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "本轮官方CAD导出"
+          },
+          {
+            "module": "FOC驱动模块",
+            "vehicle_board_multiplicity": 2,
+            "bom_path": "FOC驱动模块/原理图准备/装配采购补充.csv",
+            "format": "regulator",
+            "bom_rows": 1,
+            "bom_reference_occurrences": 1,
+            "unique_bom_references": 1,
+            "bom_sha256": "0dcfa09fef2e6802de26ca9be78e645652a682fb9707e4d5961624b8e59d238d",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ],
+        "status": "present",
+        "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+        "sha256": "0da6075c545e92f51eeaa815285f091109dba9b1aca9352b856c37d06e86fceb"
+      },
+      "delivery": {
+        "documented_directory": "FOC驱动模块/eda工程文件/导出/当前交付/",
+        "directory_existed_before_bom_reconstruction": false,
+        "other_export_files_found": false
+      },
+      "review_state": "真关闭重开165/490契约PASS；原生补齐7件16针；DRC5 warning与实物资格OPEN。",
+      "current_scope": {
+        "vehicle_multiplicity": 2,
+        "native_bom_instances": 152,
+        "pcb_counts": {
+          "yes": 144,
+          "no": 8
+        },
+        "procurement_records": 90,
+        "procurement_only_records": 1,
+        "procurement_sources": [
+          {
+            "module": "FOC驱动模块",
+            "vehicle_board_multiplicity": 2,
+            "bom_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "format": "foc",
+            "bom_rows": 89,
+            "bom_reference_occurrences": 152,
+            "unique_bom_references": 152,
+            "bom_sha256": "0da6075c545e92f51eeaa815285f091109dba9b1aca9352b856c37d06e86fceb",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "本轮官方CAD导出"
+          },
+          {
+            "module": "FOC驱动模块",
+            "vehicle_board_multiplicity": 2,
+            "bom_path": "FOC驱动模块/原理图准备/装配采购补充.csv",
+            "format": "regulator",
+            "bom_rows": 1,
+            "bom_reference_occurrences": 1,
+            "unique_bom_references": 1,
+            "bom_sha256": "0dcfa09fef2e6802de26ca9be78e645652a682fb9707e4d5961624b8e59d238d",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ]
+      }
+    },
+    {
+      "name": "稳压模块",
+      "native_entry": {
+        "project": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+        "schematic": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+        "sha256": {
+          "project": "5f759ee30cd96bc543388eae47bae57223cbd152a5e69f85f9cddd77cb0b22b2",
+          "schematic": "b3e59ef0ae3aad47eb9a4ffc69ac7cf055c8ec021d21c5916cad92e7418a0e42"
+        }
+      },
+      "design_basis": [
+        "稳压模块/稳压模块设计构想.md",
+        "稳压模块/计算与保护边界.md",
+        "稳压模块/原理图准备/design-plan.json",
+        "稳压模块/原理图准备/接口与采样核对.md",
+        "稳压模块/检查/原理图复核结论.md"
+      ],
+      "bom": {
+        "sources": [
+          {
+            "module": "稳压模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "稳压模块/原理图准备/BOM.csv",
+            "format": "regulator",
+            "bom_rows": 168,
+            "bom_reference_occurrences": 168,
+            "unique_bom_references": 168,
+            "bom_sha256": "17c5c06655ba29bee01d75ff68e4130c063967ccd13e328275e9a79b17dcd874",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ],
+        "status": "present",
+        "path": "稳压模块/原理图准备/BOM.csv",
+        "sha256": "17c5c06655ba29bee01d75ff68e4130c063967ccd13e328275e9a79b17dcd874"
+      },
+      "review_state": "当前CAD8S1P；源一致性与0项DRC通过；逐节保护误差/功率资格FAIL或OPEN，16颗以内仅模型候选。",
+      "current_scope": {
+        "vehicle_multiplicity": 1,
+        "native_bom_instances": 165,
+        "pcb_counts": {
+          "yes": 156,
+          "no": 9
+        },
+        "procurement_records": 168,
+        "procurement_only_records": 3,
+        "procurement_sources": [
+          {
+            "module": "稳压模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "稳压模块/原理图准备/BOM.csv",
+            "format": "regulator",
+            "bom_rows": 168,
+            "bom_reference_occurrences": 168,
+            "unique_bom_references": 168,
+            "bom_sha256": "17c5c06655ba29bee01d75ff68e4130c063967ccd13e328275e9a79b17dcd874",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ]
+      }
+    },
+    {
+      "name": "水泵驱动模块",
+      "native_entry": {
+        "project": "水泵驱动模块/eda工程文件/水泵驱动/水泵驱动.eprj3",
+        "schematic": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
+        "sha256": {
+          "project": "43d8da6b47c9c4c58261148eae4f99c5c81ad2930ea76138ce461258d7608129",
+          "schematic": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9"
+        }
+      },
+      "design_basis": [
+        "水泵驱动模块/项目要求.md",
+        "水泵驱动模块/原理图准备/选型与连接约束.md",
+        "水泵驱动模块/原理图准备/原理图连接契约.json",
+        "水泵驱动模块/检查/当前状态.md"
+      ],
+      "bom": {
+        "sources": [
+          {
+            "module": "水泵驱动模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "水泵驱动模块/原理图准备/BOM.csv",
+            "format": "regulator",
+            "bom_rows": 37,
+            "bom_reference_occurrences": 58,
+            "unique_bom_references": 58,
+            "bom_sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ],
+        "status": "present",
+        "path": "水泵驱动模块/原理图准备/BOM.csv",
+        "sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117"
+      },
+      "delivery": {
+        "documented_pdf": "水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动原理图.pdf",
+        "pdf_present": false,
+        "manifest_expected_pdf_sha256": "43a84ff707e2d483ecb91cd24b8b22356f5e103e7079ccf48bb679268d70bd22",
+        "documented_enet": "水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动.enet",
+        "enet_present": false,
+        "manifest_expected_enet_sha256": "d2db4d12a2333ca80aab3fa83d0e2070bc05995c36afe83034cf63f78ce64d00"
+      },
+      "review_state": "六颗100nF Value修正；49/197契约PASS；DRC24 warning及实物资格OPEN。",
+      "current_scope": {
+        "vehicle_multiplicity": 1,
+        "native_bom_instances": 49,
+        "pcb_counts": {
+          "yes": 49
+        },
+        "procurement_records": 58,
+        "procurement_only_records": 9,
+        "procurement_sources": [
+          {
+            "module": "水泵驱动模块",
+            "vehicle_board_multiplicity": 1,
+            "bom_path": "水泵驱动模块/原理图准备/BOM.csv",
+            "format": "regulator",
+            "bom_rows": 37,
+            "bom_reference_occurrences": 58,
+            "unique_bom_references": 58,
+            "bom_sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117",
+            "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+            "bom_basis": "现行采购输入；不代表现价、采购或实物资格"
+          }
+        ]
+      }
+    }
+  ],
+  "shared_library": {
+    "source_configuration": "元件封装库/来源配置.json",
+    "source_configuration_sha256": "7404aadf60d7c91664983ef7dd0d37690228c08dea65937af6ff2429913af367",
+    "native_index": "元件封装库/索引/元件总表.json",
+    "native_index_sha256": "a39e641744f16aae6f4ea2f44cf3f2132d5ac4177be62af2738b123d9a5818b6",
+    "native_index_generated_at_utc": "2026-10-20T18:29:02+00:00",
+    "native_index_coverage": {
+      "module_count": 4,
+      "bom_instance_count": 575,
+      "part_count": 206,
+      "shared_model_count": 15,
+      "mpn_same_cross_board_manufacturer_mismatch_count": 7,
+      "excluded_non_bom_count": 2587,
+      "missing_mpn_count": 5,
+      "missing_manufacturer_count": 28,
+      "mpn_diff_count": 64,
+      "mpn_changed_with_value_inherited_count": 0,
+      "missing_device_binding_count": 0,
+      "missing_symbol_binding_count": 0,
+      "missing_footprint_binding_count": 0
+    },
+    "current_candidate_table": {
+      "path": "元件封装库/索引/可能共用型号.md",
+      "sha256": "81667dd4a4ed3ba3d9759bde8a650f788e92d0fb1a57bcedef1231e7df5b0b73",
+      "authority": "仅旧三板候选；当前以四板索引与成本核对为准"
+    },
+    "final_check": {
+      "path": "检查/统一审查/全库同步与只读校验.json",
+      "sha256": "49c8551398e920d88f95b41b564915d877e0551f850fd52afb5e2a7dbb6eb711",
+      "status": "PASS"
+    },
+    "procurement_index": {
+      "path": "元件封装库/索引/采购补充.json",
+      "sha256": "b72940ea948acb2ed28f2249595c6b34505a37ca249c1c3a6ece95add77620e6",
+      "summary": {
+        "bom_rows": 564,
+        "relations": {
+          "原生已有，采购行关联，不重复计件": 512,
+          "BOM独有条目，未在原生BOM中登记": 52
+        }
+      }
+    }
+  },
+  "archive_and_path_audit": {
+    "missing_documented_paths": [
+      {
+        "referenced_from": "README.md",
+        "path": "归档/工程过程.zip",
+        "exists": false
+      },
+      {
+        "referenced_from": "README.md",
+        "path": "归档/目录整理.json",
+        "exists": false
+      },
+      {
+        "referenced_from": "FOC驱动模块/README.md",
+        "path": "FOC驱动模块/归档/历史与调试.zip",
+        "exists": false
+      },
+      {
+        "referenced_from": "BMS模块/README.md",
+        "path": "BMS模块/归档/历史与调试.zip",
+        "exists": false
+      },
+      {
+        "referenced_from": "FOC驱动模块/README.md",
+        "path": "FOC驱动模块/eda工程文件/导出/当前交付/",
+        "exists_before_bom_reconstruction": false
+      },
+      {
+        "referenced_from": "水泵驱动模块/README.md",
+        "path": "水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动原理图.pdf",
+        "exists": false
+      },
+      {
+        "referenced_from": "水泵驱动模块/README.md",
+        "path": "水泵驱动模块/eda工程文件/导出/当前交付/水泵驱动.enet",
+        "exists": false
+      }
+    ],
+    "expected_module_archives": {
+      "水泵驱动模块/归档/历史与调试.zip": true,
+      "稳压模块/归档/历史与调试.zip": true,
+      "FOC驱动模块/归档/历史与调试.zip": false,
+      "BMS模块/归档/历史与调试.zip": false
+    },
+    "unlisted_root_archives": [
+      {
+        "path": "稳压模块.7z",
+        "bytes": 413094516
+      },
+      {
+        "path": "BMS模块.7z",
+        "bytes": 39226768
+      },
+      {
+        "path": "FOC驱动模块.7z",
+        "bytes": 15120481
+      }
+    ],
+    "unclassified_root_file": {
+      "path": "0819f05c4eef4c71ace90d822a990e87",
+      "bytes": 401408
+    },
+    "note": "README归档约定与实际模块zip/根目录7z布局不一致；三个根级7z未在当前入口文档标注用途或基线，需保留并由项目负责人确认，不能据此当成当前入口。"
+  },
+  "foc_bom_reconstruction": {
+    "target": "检查/统一审查/FOC_G431_BOM_语义重建基线.csv",
+    "status": "reconstructed_from_historical_procurement_raw_rows",
+    "label": "历史采购输入语义重建，非本轮官方CAD导出",
+    "source_snapshot": "元件封装库/索引/采购补充.json",
+    "source_snapshot_sha256": "9f867806850010f31691db6840c553ad3f432969a0518df59b12d82edbddc6b1",
+    "original_path_record": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+    "original_expected_sha256": "3fb69d55da53c6d09e469799b63e4895b179429eefb757a12d33b04b58a6cdf7",
+    "reconstructed_sha256": "53ef35ef9efcade288a77c37765c930287f418e411b06c5a6e817d7c474a1ded",
+    "rows": 86,
+    "expanded_designators": 145,
+    "columns": 13,
+    "field_value_round_trip_equal": true,
+    "current_native_mpn_differences": 0,
+    "original_file_or_archive_member_found": false,
+    "attempts": [
+      "搜寻电力目录中的所有ZIP/7z成员，没有FOC_G431_BOM.csv或其他FOC BOM成员。",
+      "FOC驱动模块.7z仅含原生EPRJ3、P1、ECFG与PCB文件。",
+      "采购索引raw行按常见UTF-8/BOM、CRLF/LF及标准引号组合回写均不能复现原SHA；因此保留新重建SHA，不声称字节级恢复。"
+    ],
+    "applies_to": "改动前86行/145位号；历史采购raw语义重建，非原文件字节恢复。",
+    "current_delivery_supersedes_reconstruction": {
+      "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+      "sha256": "0da6075c545e92f51eeaa815285f091109dba9b1aca9352b856c37d06e86fceb",
+      "rows": 89,
+      "basis": "本轮官方CAD导出"
+    }
+  },
+  "library_check_observed_before_foc_bom_reconstruction": {
+    "command": "python -B .\\元件封装库\\工具\\同步全部.py --check",
+    "exit_code": 1,
+    "native_index_check": "PASS: 4模块、565个BOM实例、472个资产引用、2101个资产文件，来源/索引SHA一致。",
+    "library_package_check": "PASS: 8个显式来源包SHA256与ZIP CRC一致。",
+    "procurement_check": "FAIL: 记录的FOC BOM来源文件缺失。重建后其哈希与历史源哈希不同，尚未刷新采购索引；按负责人要求待BMS收尾后统一刷新。",
+    "notes": "同步全部.py的--check依次传递到三个只读分支；本次未执行无--check生成路径。"
+  },
+  "library_check_after_foc_bom_reconstruction": {
+    "status": "SUPERSEDED_BY_FINAL_CHECK",
+    "current_evidence": "检查/统一审查/全库同步与只读校验.json"
+  },
+  "readme_modified": true,
+  "status": "CURRENT_FINAL_INPUT_INVENTORY_WITH_HISTORICAL_AUDIT_TRAIL",
+  "FOC_vehicle_population_override": {
+    "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_双板装配补充.csv",
+    "sha256": "bfcc46fb9c93538d2b5457c364975597951a43a447357b57f2557e0c1080559e",
+    "basis": "整车两块FOC，禁止再次乘2",
+    "R_LOAD_VALID_BIAS": {
+      "FOC_A": 1,
+      "FOC_B": 0,
+      "vehicle_fitted": 1,
+      "effect": "覆盖CAD按双板展开的实装量，非新增采购行"
+    },
+    "J_LOAD_POWER_VALID_MATE": {
+      "per_FOC_board": 1,
+      "vehicle_fitted": 2,
+      "procurement_source": "FOC驱动模块/原理图准备/装配采购补充.csv"
+    },
+    "new_interface_board_parts": {
+      "FOC_A": 7,
+      "FOC_B": 6,
+      "vehicle_total": 13
+    }
+  },
+  "current_check_evidence": "检查/统一审查/全库同步与只读校验.json"
+}

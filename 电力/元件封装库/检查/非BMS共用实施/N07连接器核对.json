@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-10-15",
+  "candidate_id": "N07",
+  "title": "三芯CAN连接器只读核对与实施记录",
+  "scope": "只读技术核对；未通过本记录直接修改CAD、BOM或中央索引。正式原理图/BOM变更由根代理通过官方API完成，本记录复核其独立重开读回证据。",
+  "decision": {
+    "status": "N07原理图接口与选型已实施并通过原生重开核对；PCB与实物线束资格未确认",
+    "selected_mpn": "B3B-XH-A(LF)(SN)",
+    "manufacturer": "JST",
+    "supplier_part": "C144394",
+    "selected_scope": ["FOC驱动模块::J_CAN", "稳压模块::J_CAN"],
+    "rationale": "稳压模块已用该精确型号；FOC模块已按同一JST XH三芯系统替换旧XY器件。没有足够原厂证据证明XY-XH2.54-3A11-R可与JST XH端子壳互插，因此不按相似名称合并，也不保留混合厂牌线束作为默认方案。",
+    "domestic_and_cost": "暂未找到可核验完整互配尺寸、键位和线端组件的国产替代方案；价格、MOQ、供货和到手成本未核。优先国产/有可核验价格优势的原则仍适用，未经互配证据不得改选。"
+  },
+  "api_assets": {
+    "FOC": {
+      "module": "FOC驱动模块",
+      "page_title": "P1",
+      "page_uuid": "90aa6c46493624cf",
+      "reference": "J_CAN",
+      "native_unique_id": "gge217",
+      "component_id": "1f8d013033343c0b",
+      "manufacturer_part": "B3B-XH-A(LF)(SN)",
+      "supplier_part": "C144394",
+      "symbol_id": "8b65df20ae2c4f84",
+      "device_id": "178750ef1ee79890",
+      "footprint_id": "a1cadde5aff48cef",
+      "source_symbol_library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "source_footprint_asset_uuid": "9054811df59a44d793d623424f169ff2",
+      "source_device_asset_uuid": "6e805ec5cb864bd19e328ebbf2e17903",
+      "api_pin_endpoints": {
+        "1": [3070, 1490],
+        "2": [3070, 1480],
+        "3": [3070, 1470]
+      }
+    },
+    "regulator": {
+      "module": "稳压模块",
+      "reference": "J_CAN",
+      "component_id": "1c4791084768b2c5",
+      "manufacturer_part": "B3B-XH-A(LF)(SN)",
+      "supplier_part": "C144394",
+      "symbol_id": "01f617d2523afbe1",
+      "device_id": "ae2eaa28690b51c4",
+      "footprint_id": "71438f79c7744c41"
+    }
+  },
+  "interface": {
+    "before_foc_pin_map": {
+      "1": "CANH_CONN",
+      "2": "CANL_CONN",
+      "3": "GND_SYS"
+    },
+    "after_foc_pin_map": {
+      "1": "GND_SYS",
+      "2": "CANH_CONN",
+      "3": "CANL_CONN"
+    },
+    "change_type": "三循环调整，1/2/3脚均改变；不是仅交换1脚与3脚",
+    "net_change_evidence": {
+      "pin_count_reviewed": 474,
+      "changed_pins": [
+        {"ref": "J_CAN", "pin": "1", "before": "CANH_CONN", "after": "GND_SYS"},
+        {"ref": "J_CAN", "pin": "2", "before": "CANL_CONN", "after": "CANH_CONN"},
+        {"ref": "J_CAN", "pin": "3", "before": "GND_SYS", "after": "CANL_CONN"}
+      ],
+      "all_other_pins_equal": true,
+      "evidence_file": "元件封装库/检查/非BMS共用实施/正式实施与交付核验.json"
+    },
+    "harness_recommendation": {
+      "board_header_both_ends": "JST B3B-XH-A(LF)(SN)",
+      "mating_housing": "JST XHP-3",
+      "crimp_terminal": "JST SXH-001T-P0.6",
+      "pin_to_pin": {
+        "1": "GND_SYS ↔ GND_SYS",
+        "2": "CANH_CONN ↔ CANH_CONN",
+        "3": "CANL_CONN ↔ CANL_CONN"
+      },
+      "wire_range_per_jst_datasheet": "SXH-001T-P0.6适用AWG28–22、导体0.08–0.33 mm²、绝缘外径0.9–1.9 mm；具体线规应按电流、线束长度与压接工艺确定",
+      "drawing_controls": "线束图应标明两端连接器完整型号、端子型号、腔位号、锁扣/键位朝向、对插面视图、出线方向、线规、绝缘外径、线色及压接工具；本轮只冻结脚位映射，尚未指定线色、线规和线束图视图。"
+    }
+  },
+  "mechanical_check": {
+    "jst_official_reference": {
+      "system": "XH 2.5 mm pitch wire-to-board",
+      "board_header": "B3B-XH-A，3 circuits，top-entry",
+      "pcb_pitch": "2.5 ±0.05 mm",
+      "pcb_hole": "3 circuits or more: Ø0.9 +0.1/-0 mm reference; JST说明需按板材与钻孔工艺复核，硬质玻纤板可考虑增大孔径",
+      "layout_view": "连接器安装面视图；图纸明确孔位公差不累积",
+      "line_mate": "XHP-3 housing + SXH-001T-P0.6 contact",
+      "label_suffix": "原厂资料注明该型号在标签上显示(LF)(SN)，未将其描述为改变机械外形的后缀"
+    },
+    "old_foc_footprint": {
+      "title": "CONN-TH_3P-P2.50_XY-XH2.54-3A11-R",
+      "library_footprint_id": "ed28599d6a167c90",
+      "source_asset_uuid": "3160a71de5274f5d8e25f9711d973a12",
+      "source_file": "元件封装库/原生片段/FOOTPRINT/08ec0936afd54960be6bc66a92b17ad96c83ee76ded5eff233f34eca2d9fe146.jsonl",
+      "file_sha256": "08ec0936afd54960be6bc66a92b17ad96c83ee76ded5eff233f34eca2d9fe146",
+      "pad_centres": "-98.425, 0, +98.425 mil（2.5 mm nominal pitch）",
+      "hole_diameter": "35.434 mil ≈ 0.900 mm",
+      "copper_pad_diameter": "60 mil = 1.524 mm"
+    },
+    "new_foc_footprint": {
+      "title": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "api_footprint_id": "a1cadde5aff48cef",
+      "source_asset_uuid": "9054811df59a44d793d623424f169ff2",
+      "source_file": "元件封装库/原生片段/FOOTPRINT/afb34fbdfb1cfa523948833aa47eb0230c072875881e75b6ed6e51ea33fb26d6.jsonl",
+      "file_sha256": "afb34fbdfb1cfa523948833aa47eb0230c072875881e75b6ed6e51ea33fb26d6",
+      "pad_centres": "-98.425, 0, +98.425 mil（2.5 mm nominal pitch）",
+      "hole_diameter": "35.434 mil ≈ 0.900 mm",
+      "copper_pad_diameter": "61.024 mil ≈ 1.550 mm"
+    },
+    "conclusion": "两份静态封装数据均为三只通孔、2.5 mm名义间距、约0.900 mm孔径；新封装孔径落在JST对3芯及以上顶部插入型连接器公布的参考下限。此比较支持封装库静态适配，不证明板边净空、器件高度、实际PCB钻孔公差、焊接性或实物插拔合格。新旧铜环直径相差约0.026 mm；FOC PCB本轮保持未改，须由布局负责人在实际PCB封装/网络更新时核对。"
+  },
+  "verification": {
+    "formal_record": {
+      "path": "元件封装库/检查/非BMS共用实施/正式实施与交付核验.json",
+      "sha256": "76BBC9851F8CB0EC39127AAC4684483A321AB336928750F92B46630A26881DB8",
+      "foc_schematic_sha256": "1225ef1498a9cfee3f9cbe91bcccb784a53851d80242ddcb575245f0f38f5d88",
+      "foc_pcb_sha256": "602a48835a0a37c5e8c57e8221c2f420429a30ff1ebad2dd87488cbdf8d94d53",
+      "drc_errors": 0,
+      "drc_warnings": 5,
+      "baseline_warnings": 5,
+      "visual_review": "PASS；最终接口预览检查无端口叠字",
+      "qualification_limit": "DRC仍有5条warning；zero-warning不是PASS。"
+    },
+    "api_reopen_readback": {
+      "path": "元件封装库/检查/非BMS共用实施/FOC最终保存重开API.json",
+      "sha256": "8D733BE00C3A02FB13AEDC888EF9F1FD0D017527BCCCFAD60BDACB4E010F38B0",
+      "component_mpn": "B3B-XH-A(LF)(SN)",
+      "component_supplier_part": "C144394"
+    },
+    "preview": {
+      "path": "元件封装库/检查/非BMS共用实施/N07最终接口预览.png",
+      "sha256": "97BE2EBF439D9F08A81CDC0CE20B3E25A13CFE099E60FF22528719E4CD453E36"
+    }
+  },
+  "checked": [
+    "N07候选记录、FOC旧封装片段、新JST封装片段及正式同步后的中央索引实例引用",
+    "FOC J_CAN正式保存并独立重开后的MPN、供应商料号、封装/器件/符号引用和脚位坐标",
+    "脚序三循环、受影响引脚清单、其它引脚不变声明、DRC错误/警告计数、最终接口预览",
+    "JST官方XH系列手册对pitch、top-entry三芯孔径、PCB视图、XHP-3、SXH-001T-P0.6及B3B-XH-A的说明"
+  ],
+  "not_checked": [
+    "XY-XH2.54-3A11-R与JST XH plug/contact的原厂互插证明；目前不作互配声明",
+    "实际PCB布局净空、封装库推送到PCB后的焊盘映射/网络和板级DRC；FOC PCB本轮SHA未变化",
+    "实物连接器、线束压接、插拔保持力、振动、温升、绝缘、线色/线规及端到端CAN通信验证",
+    "国产替代的完整机械/电气证据，以及价格、MOQ、供货和成本优势",
+    "BMS 5.08 mm连接器；该候选未将其纳入本次JST XH统一范围"
+  ],
+  "sources": [
+    {
+      "type": "manufacturer_primary_source",
+      "title": "JST XH Connector catalog, English PDF",
+      "url": "https://www.jst-mfg.com/product/pdf/eng/eXH.pdf",
+      "pages": {
+        "1": "2.5 mm pitch family, electrical/wire range and board thickness context",
+        "2": "top-entry PCB pattern; 3 circuits or more Ø0.9 +0.1/-0 mm, 2.5 ±0.05 mm pitch; mounting-surface view; hole values are references and may depend on PCB/material/process",
+        "3": "SXH-001T-P0.6 wire range and low-insertion-force variant caveat",
+        "4": "XHP-3 three-circuit housing",
+        "5": "B3B-XH-A top-entry header and (LF)(SN) label note"
+      }
+    },
+    {
+      "type": "manufacturer_product_page",
+      "title": "JST XH series product page",
+      "url": "https://www.jst-mfg.com/product/index.php?lang=2&series=277"
+    },
+    {
+      "type": "local_official_api_readback",
+      "path": "元件封装库/检查/非BMS共用实施/FOC最终保存重开API.json"
+    },
+    {
+      "type": "local_implementation_record",
+      "path": "元件封装库/检查/非BMS共用实施/正式实施与交付核验.json"
+    }
+  ]
+}
+

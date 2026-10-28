@@ -1,0 +1,334 @@
+"""CPU checks and an explicit GPU physical acceptance run for Newton XPBD worlds.
+
+Run CPU tests with:
+    python -m unittest native.tools.test_newton_backend_isolation
+
+Run the bounded 1 ms / 50-substep physics acceptance on GPU with:
+    python native/tools/test_newton_backend_isolation.py --acceptance --device cuda:0 \
+        --steps 1400 --output <external-json-path>
+"""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import math
+import sys
+import unittest
+from pathlib import Path
+
+import numpy as np
+
+_NATIVE_DIR = Path(__file__).resolve().parents[1]
+_PROTO_DIR = _NATIVE_DIR / "proto"
+if str(_PROTO_DIR) not in sys.path:
+    sys.path.insert(0, str(_PROTO_DIR))
+from newton_backend import NewtonXPBDGBackend  # noqa: E402
+
+
+def _new_backend(nworld: int = 3, *, device: str = "cpu", decimation: int = 10):
+    if importlib.util.find_spec("newton") is None or importlib.util.find_spec("warp") is None:
+        raise unittest.SkipTest("Newton and Warp are required for the backend acceptance tests")
+    return NewtonXPBDGBackend(nworld=nworld, dt=1e-3, decimation=decimation,
+                              seed=20261025, device=device)
+
+
+def _rotation_matrix(q_xyzw: np.ndarray) -> np.ndarray:
+    x, y, z, w = (float(v) for v in q_xyzw)
+    return np.asarray([
+        [1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y - z * w), 2.0 * (x * z + y * w)],
+        [2.0 * (x * y + z * w), 1.0 - 2.0 * (x * x + z * z), 2.0 * (y * z - x * w)],
+        [2.0 * (x * z - y * w), 2.0 * (y * z + x * w), 1.0 - 2.0 * (x * x + y * y)],
+    ], dtype=np.float64)
+
+
+def _minimum_ground_clearance(backend: NewtonXPBDGBackend) -> float:
+    """Conservative lowest point of the chassis boxes and wheel/guide cylinders."""
+    body_q = backend.state_0.body_q.numpy()
+    labels = [str(x).rsplit("/", 1)[-1] for x in backend.model.body_label]
+    body_world = backend.model.body_world.numpy()
+    clearances = []
+    for w in range(backend.nworld):
+        base = backend.base_body[w]
+        base_q = body_q[base]
+        rotation = _rotation_matrix(base_q[3:7])
+        box_half_extents = np.asarray([0.4, 0.15, 0.075])
+        base_vertical_extent = float(np.abs(rotation[2, :]) @ box_half_extents)
+        clearances.append(float(base_q[2]) - base_vertical_extent)
+        for body_idx, label in enumerate(labels):
+            if int(body_world[body_idx]) != w:
+                continue
+            if "_wheel_" in label and label.endswith("_link"):
+                radius, half_width = 0.045, 0.03
+            elif label.endswith("_front_guide_link"):
+                radius, half_width = 0.045, 0.03
+            else:
+                continue
+            # The authored cylinder's local axis is Z, rotated 90 degrees about X.
+            cylinder_axis_world = rotation_matrix = _rotation_matrix(body_q[body_idx, 3:7]) @ np.asarray([0.0, -1.0, 0.0])
+            axis_z = abs(float(cylinder_axis_world[2]))
+            vertical_extent = radius * math.sqrt(max(0.0, 1.0 - axis_z * axis_z)) + half_width * axis_z
+            clearances.append(float(body_q[body_idx, 2]) - vertical_extent)
+    return min(clearances)
+
+
+def _assert_finite_state(backend: NewtonXPBDGBackend) -> None:
+    state = backend.read()
+    for name, values in state.items():
+        if not np.isfinite(values).all():
+            raise AssertionError(f"non-finite backend read field: {name}")
+    for state_name, sim_state in (("state_0", backend.state_0), ("state_1", backend.state_1)):
+        for field in ("body_q", "body_qd"):
+            if not np.isfinite(getattr(sim_state, field).numpy()).all():
+                raise AssertionError(f"non-finite {state_name}.{field}")
+
+
+class NewtonWorldIsolationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.backend = _new_backend(nworld=3, device="cpu", decimation=10)
+
+    def test_requested_device_reaches_all_physics_buffers(self) -> None:
+        backend = self.backend
+        self.assertEqual(str(backend.device), "cpu")
+        self.assertEqual(str(backend.model.device), "cpu")
+        self.assertEqual(str(backend.solver.model.device), "cpu")
+        self.assertEqual(str(backend.state_0.body_q.device), "cpu")
+        self.assertEqual(str(backend.state_0.body_qd.device), "cpu")
+        self.assertEqual(str(backend.state_1.body_q.device), "cpu")
+        self.assertEqual(str(backend.control.joint_target_q.device), "cpu")
+        self.assertEqual(str(backend.control.joint_target_qd.device), "cpu")
+        self.assertEqual(str(backend.contacts.device), "cpu")
+        self.assertEqual(backend.identity()["device"], "cpu")
+
+    def test_each_world_has_independent_targets_and_actual_joint_readback(self) -> None:
+        backend = self.backend
+        poses = np.asarray([[0.0, 0.0, 0.0, 0.0],
+                            [0.45, 0.2, 0.35, 0.0],
+                            [-0.4, -0.3, -0.5, 0.0]], dtype=np.float64)
+        backend.reset(poses=poses)
+        np.testing.assert_allclose(backend.read()["pos"],
+                                   np.column_stack((poses[:, :2], np.full(3, 0.15)),),
+                                   atol=1e-6, rtol=0.0)
+        actions = np.asarray([[0.8, 0.8, 0.8, 0.0],
+                              [-0.8, -0.8, -0.8, 0.0],
+                              [0.8, -0.8, 0.5, -0.5]], dtype=np.float64)
+        for _ in range(8):
+            backend.step(actions)
+        state = backend.read()
+        self.assertGreater(np.max(np.abs(state["wheel_qd"][0] - state["wheel_qd"][1])), 1e-5)
+        self.assertGreater(np.max(np.abs(state["gimbal_qd"])), 1e-6)
+        self.assertFalse(np.allclose(state["gimbal_q"][0], state["gimbal_q"][1]))
+        self.assertTrue(np.isfinite(state["wheel_qd"]).all())
+        self.assertTrue(np.isfinite(state["gimbal_qd"]).all())
+
+    def test_partial_reset_preserves_other_world_body_and_control_arrays(self) -> None:
+        backend = self.backend
+        poses = np.asarray([[0.0, 0.0, 0.0, 0.0],
+                            [0.4, 0.1, 0.3, 0.0],
+                            [-0.4, -0.1, -0.3, 0.0]], dtype=np.float64)
+        backend.reset(poses=poses)
+        actions = np.asarray([[0.6, 0.4, 0.4, -0.2],
+                              [-0.5, -0.3, -0.6, 0.3],
+                              [0.3, -0.4, 0.2, -0.5]], dtype=np.float64)
+        for _ in range(6):
+            backend.step(actions)
+        before = {
+            "body_q0": backend.state_0.body_q.numpy().copy(),
+            "body_qd0": backend.state_0.body_qd.numpy().copy(),
+            "body_q1": backend.state_1.body_q.numpy().copy(),
+            "body_qd1": backend.state_1.body_qd.numpy().copy(),
+            "control_q": backend.control.joint_target_q.numpy().copy(),
+            "control_qd": backend.control.joint_target_qd.numpy().copy(),
+        }
+        other_bodies = backend.model.body_world.numpy() != 1
+        other_joints = backend.model.joint_world.numpy() != 1
+        backend.reset(env_ids=np.asarray([1]),
+                      poses=np.asarray([[0.75, -0.25, 0.6, 0.04]], dtype=np.float64))
+        np.testing.assert_array_equal(backend.state_0.body_q.numpy()[other_bodies],
+                                      before["body_q0"][other_bodies])
+        np.testing.assert_array_equal(backend.state_0.body_qd.numpy()[other_bodies],
+                                      before["body_qd0"][other_bodies])
+        np.testing.assert_array_equal(backend.state_1.body_q.numpy()[other_bodies],
+                                      before["body_q1"][other_bodies])
+        np.testing.assert_array_equal(backend.state_1.body_qd.numpy()[other_bodies],
+                                      before["body_qd1"][other_bodies])
+        np.testing.assert_array_equal(backend.control.joint_target_q.numpy(),
+                                      np.where(np.ones_like(before["control_q"], dtype=bool),
+                                               backend.control.joint_target_q.numpy(),
+                                               before["control_q"]))
+        # Compare every target coordinate/DOF outside world 1 directly by its world map.
+        target_q_mask = np.ones_like(before["control_q"], dtype=bool)
+        target_qd_mask = np.ones_like(before["control_qd"], dtype=bool)
+        for j in backend.world_joint_idx[1]:
+            q0 = int(backend.model.joint_target_q_start.numpy()[j])
+            q1 = int(backend.model.joint_target_q_start.numpy()[j + 1])
+            d0 = int(backend.model.joint_qd_start.numpy()[j])
+            d1 = int(backend.model.joint_qd_start.numpy()[j + 1])
+            target_q_mask[q0:q1] = False
+            target_qd_mask[d0:d1] = False
+        np.testing.assert_array_equal(backend.control.joint_target_q.numpy()[target_q_mask],
+                                      before["control_q"][target_q_mask])
+        np.testing.assert_array_equal(backend.control.joint_target_qd.numpy()[target_qd_mask],
+                                      before["control_qd"][target_qd_mask])
+        reset_state = backend.read()
+        np.testing.assert_allclose(reset_state["pos"][1], [0.75, -0.25, 0.19], atol=1e-6, rtol=0.0)
+        np.testing.assert_allclose(reset_state["lin_vel"][1], 0.0, atol=1e-6, rtol=0.0)
+        np.testing.assert_allclose(reset_state["ang_vel"][1], 0.0, atol=1e-6, rtol=0.0)
+
+    def test_zero_action_generates_contacts_without_ground_penetration(self) -> None:
+        backend = self.backend
+        backend.reset(poses=np.zeros((3, 4), dtype=np.float64))
+        for _ in range(12):
+            backend.step(np.zeros((3, 4), dtype=np.float64))
+        _assert_finite_state(backend)
+        self.assertGreater(int(backend.contacts.rigid_contact_count.numpy()[0]), 0)
+        self.assertGreaterEqual(_minimum_ground_clearance(backend), -0.015)
+
+
+def run_physics_acceptance(*, device: str, steps: int) -> dict:
+    if steps < 1200:
+        raise ValueError("acceptance requires at least 1200 fixed/random policy steps")
+    backend = _new_backend(nworld=3, device=device, decimation=50)
+    actual_device = str(backend.model.device)
+    if actual_device != str(device):
+        raise AssertionError(f"requested device {device!r}, actual model device is {actual_device!r}")
+    result = {
+        "test": "newton_backend_world_isolation_and_contact_acceptance",
+        "backend_revision": backend.identity()["backend_revision"],
+        "identity": backend.identity(),
+        "requested_device": device,
+        "actual_device": actual_device,
+        "physics_dt_s": backend.dt,
+        "decimation": backend.decimation,
+        "policy_steps_requested": steps,
+        "policy_steps_completed": 0,
+        "fixed_steps": 0,
+        "random_steps": 0,
+        "zero_steps": 0,
+        "nonfinite_checks_failed": 0,
+        "max_contacts": 0,
+        "minimum_ground_clearance_m": math.inf,
+        "partial_reset_untouched_arrays_equal": False,
+        "world_action_readback_distinct": False,
+        "passed": False,
+        "error": None,
+    }
+    try:
+        poses = np.asarray([[0.0, 0.0, 0.0, 0.0],
+                            [0.45, 0.2, 0.35, 0.0],
+                            [-0.4, -0.3, -0.5, 0.0]], dtype=np.float64)
+        backend.reset(poses=poses)
+        initial = backend.read()
+        np.testing.assert_allclose(initial["pos"],
+                                   np.column_stack((poses[:, :2], np.full(3, 0.15))),
+                                   atol=1e-6, rtol=0.0)
+        distinct_actions = np.asarray([[0.8, 0.8, 0.8, 0.0],
+                                       [-0.8, -0.8, -0.8, 0.0],
+                                       [0.8, -0.8, 0.5, -0.5]], dtype=np.float64)
+        for _ in range(12):
+            backend.step(distinct_actions)
+        mapped = backend.read()
+        if np.max(np.abs(mapped["wheel_qd"][0] - mapped["wheel_qd"][1])) <= 1e-5:
+            raise AssertionError("world-specific wheel action readback did not diverge")
+        if np.max(np.abs(mapped["gimbal_qd"])) <= 1e-6:
+            raise AssertionError("gimbal velocity readback stayed zero after distinct commands")
+        result["world_action_readback_distinct"] = True
+
+        before = {
+            "q0": backend.state_0.body_q.numpy().copy(),
+            "qd0": backend.state_0.body_qd.numpy().copy(),
+            "q1": backend.state_1.body_q.numpy().copy(),
+            "qd1": backend.state_1.body_qd.numpy().copy(),
+            "control_q": backend.control.joint_target_q.numpy().copy(),
+            "control_qd": backend.control.joint_target_qd.numpy().copy(),
+        }
+        other_bodies = backend.model.body_world.numpy() != 1
+        backend.reset(env_ids=np.asarray([1]),
+                      poses=np.asarray([[0.75, -0.25, 0.6, 0.04]], dtype=np.float64))
+        for current, key, mask in (
+            (backend.state_0.body_q.numpy(), "q0", other_bodies),
+            (backend.state_0.body_qd.numpy(), "qd0", other_bodies),
+            (backend.state_1.body_q.numpy(), "q1", other_bodies),
+            (backend.state_1.body_qd.numpy(), "qd1", other_bodies),
+        ):
+            np.testing.assert_array_equal(current[mask], before[key][mask])
+        target_q_mask = np.ones_like(before["control_q"], dtype=bool)
+        target_qd_mask = np.ones_like(before["control_qd"], dtype=bool)
+        q_starts = backend.model.joint_target_q_start.numpy()
+        qd_starts = backend.model.joint_qd_start.numpy()
+        for j in np.flatnonzero(backend.model.joint_world.numpy() == 1):
+            target_q_mask[int(q_starts[j]):int(q_starts[j + 1])] = False
+            target_qd_mask[int(qd_starts[j]):int(qd_starts[j + 1])] = False
+        np.testing.assert_array_equal(backend.control.joint_target_q.numpy()[target_q_mask],
+                                      before["control_q"][target_q_mask])
+        np.testing.assert_array_equal(backend.control.joint_target_qd.numpy()[target_qd_mask],
+                                      before["control_qd"][target_qd_mask])
+        result["partial_reset_untouched_arrays_equal"] = True
+
+        backend.reset(poses=np.zeros((3, 4), dtype=np.float64))
+        zero_steps = max(100, steps // 7)
+        fixed_steps = (steps - zero_steps) // 2
+        random_steps = steps - zero_steps - fixed_steps
+        fixed_actions = np.asarray([[0.2, 0.2, 0.0, 0.0],
+                                    [-0.2, -0.2, 0.0, 0.0],
+                                    [0.18, -0.18, 0.1, -0.1]], dtype=np.float64)
+        rng = np.random.default_rng(20261025)
+        for phase, count in (("zero", zero_steps), ("fixed", fixed_steps), ("random", random_steps)):
+            for step_idx in range(count):
+                if phase == "zero":
+                    actions = np.zeros((3, 4), dtype=np.float64)
+                elif phase == "fixed":
+                    actions = fixed_actions
+                else:
+                    actions = rng.uniform(-0.3, 0.3, size=(3, 4))
+                backend.step(actions)
+                _assert_finite_state(backend)
+                result["policy_steps_completed"] += 1
+                result[f"{phase}_steps"] += 1
+                result["max_contacts"] = max(
+                    result["max_contacts"], int(backend.contacts.rigid_contact_count.numpy()[0])
+                )
+                result["minimum_ground_clearance_m"] = min(
+                    result["minimum_ground_clearance_m"], _minimum_ground_clearance(backend)
+                )
+                if result["minimum_ground_clearance_m"] < -0.015:
+                    raise AssertionError(
+                        f"ground penetration exceeded tolerance at {phase} step {step_idx}: "
+                        f"{result['minimum_ground_clearance_m']:.6f} m"
+                    )
+        if result["max_contacts"] <= 0:
+            raise AssertionError("collision pipeline produced no rigid contacts during acceptance")
+        result["passed"] = True
+    except Exception as exc:
+        result["error"] = f"{type(exc).__name__}: {exc}"
+    finally:
+        if math.isinf(result["minimum_ground_clearance_m"]):
+            result["minimum_ground_clearance_m"] = None
+    return result
+
+
+def _main() -> int:
+    if len(sys.argv) == 1:
+        unittest.main(module=__name__)
+        return 0
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--acceptance", action="store_true",
+                        help="run the physical 1 ms / 50-step Newton acceptance case")
+    parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--steps", type=int, default=1400)
+    parser.add_argument("--output", required=True,
+                        help="absolute JSON output path outside the repository")
+    args = parser.parse_args()
+    if not args.acceptance:
+        parser.error("pass --acceptance to run the physics acceptance case")
+    output = Path(args.output).resolve()
+    result = run_physics_acceptance(device=args.device, steps=args.steps)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(result, indent=2, sort_keys=True, allow_nan=False) + "\n",
+                      encoding="utf-8", newline="\n")
+    print(json.dumps(result, indent=2, sort_keys=True, allow_nan=False))
+    return 0 if result["passed"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())

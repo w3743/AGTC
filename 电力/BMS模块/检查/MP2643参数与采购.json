@@ -1,0 +1,206 @@
+{
+  "document": "MP2643参数与采购",
+  "date": "2026-10-12",
+  "status": "candidate_only_not_approved_for_direct_replacement",
+  "scope": [
+    "MP2643 Rev1.1 and EVL2643-R-00A Rev1.0 parameter extraction",
+    "8-stage 9S current propagation estimate",
+    "standard inductor candidate and source snapshot",
+    "no schematic, BOM, native EDA, or source modification"
+  ],
+  "decision": {
+    "architecture": "one MP2643 per adjacent cell pair; 9S extrapolation requires 8 devices",
+    "candidate_only": true,
+    "direct_replacement_approved": false,
+    "reason": "No guaranteed 8-stage remote net current meeting the previous 0.5-1A target; 9S implementation is extrapolated from lower-series official examples; same-edge parallel operation is unsupported.",
+    "parallel_24_device_option_approved": false,
+    "parallel_reason": "No manufacturer-supported current sharing, phase/start sequencing, or reverse circulating-current method for paralleling multiple MP2643 devices across the same cell pair."
+  },
+  "official_references": [
+    {
+      "name": "MP2643 datasheet",
+      "revision": "Rev1.1",
+      "document_date": "2025-11-14",
+      "url": "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MP2643GR/document_id/12324/",
+      "local_file": null,
+      "local_sha256": null,
+      "save_status": "not_saved",
+      "note": "Official PDF was readable online. Direct local request returned 3038-byte anti-bot HTML instead of PDF; invalid files were deleted."
+    },
+    {
+      "name": "EVL2643-R-00A user guide / schematic",
+      "revision": "Rev1.0",
+      "document_date": "2024-12-05",
+      "url": "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/EVL2643-R-00A/document_id/12913/",
+      "local_file": null,
+      "local_sha256": null,
+      "save_status": "not_saved",
+      "note": "Official PDF was readable online. Direct local request returned 3038-byte anti-bot HTML instead of PDF; invalid files were deleted."
+    },
+    {
+      "name": "MPL-AL6050-2R2 datasheet",
+      "revision": "Rev1.1",
+      "document_date": "2019-08-06",
+      "url": "https://www.monolithicpower.com/en/documentview/productdocument/index/version/2/document_type/Datasheet/lang/en/sku/MPL-AL6050-2R2/document_id/5816/",
+      "local_file": null,
+      "local_sha256": null,
+      "save_status": "not_requested"
+    }
+  ],
+  "mp2643": {
+    "package": "MP2643GR, QFN-26, 4mm x 4mm",
+    "adjacent_cell_voltage_ranges_v": {
+      "VCL_to_PGND": [2.4, 4.5],
+      "VCU_to_PGND": [3.9, 16.0]
+    },
+    "boost_start_threshold_vcl_rising_v": 2.4,
+    "boost_run_falling_threshold_vcl_v": 2.1,
+    "vcu_uvlo_falling_typ_v": 3.8,
+    "vcu_uvlo_hysteresis_typ_v": 0.3,
+    "logic": {
+      "EN_pin": 7,
+      "EN_active": "high",
+      "EN_low_max_v": 0.4,
+      "EN_high_min_v": 1.0,
+      "EN_low_state": "sleep; MODE ignored",
+      "recommended_default": "local pulldown so open/host-unpowered control defaults OFF; isolated output enables by pulling high to local logic",
+      "MODE_pin": 8,
+      "MODE_low": "buck",
+      "MODE_high": "boost",
+      "4V5_pin": 9,
+      "4V5_decoupling": "1uF to local AGND; output available only when EN is high; not for external loads",
+      "LOGIC_pin": 18,
+      "LOGIC_connection": "tie to 4V5",
+      "EVL_control": "optocoupler isolation per floating cell-referenced stage"
+    },
+    "selected_pin_functions": {
+      "1": "CL: lower-cell positive",
+      "2": "LX: inductor switch node",
+      "3": "CU: upper-cell positive",
+      "4": "SW: switching node",
+      "5": "PGND: local lower-cell negative/power ground",
+      "6": "BST: bootstrap capacitor to SW",
+      "17": "CU_FB: boost upper-voltage feedback divider input",
+      "22": "LBC: resistor to AGND sets boost current",
+      "24": "UBC: resistor to AGND sets buck current",
+      "10-16,23,25-26": "AGND",
+      "19-21": "NC, leave floating"
+    },
+    "current_setting": {
+      "buck_equation": "I_UBC[A] = 640 / (3 * R_UBC[kohm])",
+      "buck_107kohm_nominal_a": 1.9938,
+      "boost_equation": "I_LBC[A] = 640*(VCU - eta*VCL)/(3*eta*VCL*R_LBC[kohm])",
+      "boost_datasheet_table_condition": "VCL=3.6V, VCU=7.2V; 536kohm=0.5A, 267kohm=1A, 133kohm=2A approximate",
+      "datasheet_feature_claim_net_transfer_current_range_a": [0.5, 2.0],
+      "note": "The datasheet front-page feature advertises 0.5-2A net transfer. The operating section defines IUBC/ILBC setting currents and Figures 3/4 show receiver net-current equations including eta. This analysis distinguishes setting current from received net current; boost set current varies with voltage and efficiency."
+    },
+    "capacitors": {
+      "CCU": "22uF, 16V, X5R/X7R, 0603 per datasheet table",
+      "CCL": "22uF, 10V, X5R/X7R, 0603 per datasheet table",
+      "C4V5": "1uF, 10V to AGND",
+      "CCL_ripple_voltage_limit": "<0.5%",
+      "CCL_temperature_rise_limit": "<=10C",
+      "CCL_ripple_current_max_a": 0.94,
+      "ripple_condition": "IUBC=2A, VCL=2.4V, VCU=7.2V",
+      "selected_capacitor_part_numbers": null,
+      "dc_bias_effective_capacitance_verified": false
+    },
+    "inductor_requirements": {
+      "datasheet_table": "Table 9, MP2643 Rev1.1",
+      "recommended_inductance_uh": 2.2,
+      "recommended_isat_min_a": 5.75,
+      "isat_margin_note": "Table recommendation includes about 1A margin over calculated peak current",
+      "recommended_dcr_max_mohm": 50,
+      "ripple_equation": "dIL = ((VCU-VCL)*VCL)/(L*VCU*fSW[MHz])",
+      "peak_current_equation": "Ipeak = (VCU/VCL)*IUBC + 0.5*dIL"
+    }
+  },
+  "cascade_current_model": {
+    "datasheet_net_transfer_formulas": {
+      "buck_ratio": "r_buck = 2*eta - 1",
+      "boost_ratio": "r_boost = eta / (2 - eta)"
+    },
+    "remote_model": "Iremote = Istart * r^8",
+    "assumptions": [
+      "equal adjacent cell voltages",
+      "constant same eta at each of eight stages",
+      "steady state with zero extra net SOC gain/loss in intermediate cells",
+      "no energy from intermediate cell SOC is added to remote-end result"
+    ],
+    "eta_definition": "single-stage power-conversion efficiency",
+    "r_definition": "single-stage receiver net-current ratio derived from datasheet equations; r is not the same as eta",
+    "datasheet_boost_eta_selection": {"VCL_below_3_65V": 0.89, "VCL_at_or_above_3_65V": 0.91},
+    "limitations": [
+      "eta is an assumed single-stage conversion efficiency, not guaranteed across voltage, temperature, and current",
+      "actual efficiencies and cell voltages differ stage-to-stage",
+      "not measured and not a datasheet guarantee",
+      "does not model controller timing, resistor tolerance, thermal derating, or cell-specific operating limits"
+    ],
+    "script_calculated_results": [
+      {"eta": 0.89, "start_current_a": 2.0, "buck_per_stage_ratio": 0.78, "buck_remote_8stage_a": 0.2740228741366273, "boost_per_stage_ratio": 0.8018018018018019, "boost_remote_8stage_a": 0.3416380375648635},
+      {"eta": 0.93, "start_current_a": 2.0, "buck_per_stage_ratio": 0.86, "buck_remote_8stage_a": 0.5984358542131717, "boost_per_stage_ratio": 0.8691588785046731, "boost_remote_8stage_a": 0.6513634159480688},
+      {"eta": 0.89, "start_current_a": 4.5, "buck_per_stage_ratio": 0.78, "buck_remote_8stage_a": 0.6165514668074115, "boost_per_stage_ratio": 0.8018018018018019, "boost_remote_8stage_a": 0.7686855845209428},
+      {"eta": 0.93, "start_current_a": 4.5, "buck_per_stage_ratio": 0.86, "buck_remote_8stage_a": 1.3464806719796363, "boost_per_stage_ratio": 0.8691588785046731, "boost_remote_8stage_a": 1.4655676858831548}
+    ],
+    "efficiency_interpretation": "eta=0.93 is an optimistic/typical sensitivity point, not a guaranteed minimum. At eta=0.89, an 8-stage chain starting at 2A estimates 0.274A buck and 0.342A boost; 8 devices therefore do not guarantee the previous 0.5-1A remote net-current goal. At eta=0.93 nominal estimates exceed 0.5A but have little margin and remain unguaranteed."
+  },
+  "standard_inductor_candidate": {
+    "mpn": "MPL-AL6050-2R2",
+    "manufacturer": "Monolithic Power Systems",
+    "inductance_uh": 2.2,
+    "tolerance_percent": 20,
+    "dcr_typ_mohm": 8.3,
+    "dcr_max_mohm": 8.8,
+    "rated_current_typ_a_at_40k_rise": 12.0,
+    "isat_25c_typ_a_at_30pct_l_drop": 15.0,
+    "isat_100c_typ_a_at_30pct_l_drop": 15.0,
+    "dimensions_mm": [6.6, 6.4, 4.8],
+    "operating_temperature_max_c": 155,
+    "guaranteed_isat_min": null,
+    "part_fit": "matches 2.2uH datasheet recommendation; nominal current headroom is comfortable, but Isat values are typical rather than guaranteed minima",
+    "power_estimate": {
+      "conditions": "VCU/VCL=6.2/3V, IUBC=2.18A, ripple=1.24App, maximum DCR=8.8mohm",
+      "inductor_average_current_estimate_a": 4.5053,
+      "inductor_peak_current_estimate_a": 5.1253,
+      "triangular_ripple_irms_estimate_a": 4.519531145791317,
+      "dcr_loss_estimate_w": 0.17975022364444446,
+      "boundary": "DCR-only model; does not include AC/core loss or PCB thermal coupling"
+    },
+    "purchase_snapshot": {
+      "source": "MPS official product page",
+      "url": "https://www.monolithicpower.com/en/products/inductor/mpl-al6050-2r2.html",
+      "snapshot_date": "2026-10-12",
+      "stock_units_displayed": 1761,
+      "unit_price_usd_qty1": 1.57,
+      "unit_price_usd_qty10": 1.29,
+      "reel_quantity": 800,
+      "qty8_total_usd_at_qty1_break": 12.56,
+      "qty9_total_usd_at_qty1_break": 14.13,
+      "estimated_ship_date_displayed": "2026-10-15",
+      "mainland_china_cny_price_verified": false,
+      "tax_shipping_delivery_terms_verified": false,
+      "note": "Live manufacturer page snapshot; not a mainland China quote or guaranteed ship date. No MOQ10 price is applied to a 8/9-piece requirement."
+    }
+  },
+  "evl_topology": {
+    "official_demo": "5S, four MP2643 devices",
+    "control": "isolated EN and MODE control with optocouplers per floating stage",
+    "old_evl_example_values": {"inductor_uh": 1.0, "R_UBC_kohm": 120, "R_LBC_kohm": 150},
+    "current_datasheet_difference": "MP2643 Rev1.1 Table 9 recommends 2.2uH; 107kohm is approximately the 2A buck setpoint. Do not copy old EVL example values as current revision design values.",
+    "nine_series_status": "not an official complete 9S reference implementation in reviewed documents; 8-cell-pair stages is topology extrapolation"
+  },
+  "procurement_summary": {
+    "mp2643_official_listing_snapshot": {
+      "url": "https://www.monolithicpower.com/en/products/mp2643.html",
+      "date": "2026-10-12",
+      "stock_units_displayed": 3639,
+      "price_usd_qty1": 2.84,
+      "price_usd_qty10": 2.54,
+      "estimated_ship_date_displayed": "2026-10-15",
+      "mainland_china_cny_price_verified": false
+    },
+    "inductor_qty_for_8_stages": 8,
+    "inductor_qty_with_one_spare": 9,
+    "mainland_china_cny_total_verified": false
+  }
+}

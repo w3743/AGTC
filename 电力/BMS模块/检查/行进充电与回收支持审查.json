@@ -1,0 +1,301 @@
+{
+  "title": "9S行进太阳能充电与动能回收支持审查",
+  "review_date": "2026-10-15",
+  "mode": "模型与只读架构审查；本轮仅更新筛查脚本及检查JSON，未启动EDA；当前正式源状态依据已保存工程/连接源核验。",
+  "verdict": {
+    "status": "NOT_IMPLEMENTED_AS_END_TO_END_FEATURE",
+    "summary": "系统架构已确认：独立MPPT接公共BUS，BMS承接净充电功率；电池侧充电须经主CHG FET与分流器。30W名牌光伏与500/1000/2000W回馈并发已做参数化预算，但MPPT具体器件/组件串并、固件额度分配、全电池及禁止充电时的端到端停注入/能量去向和实物验收未完成，故不能声称行进充电+再生并发功能已验收。",
+    "current_artifacts": {
+      "BMS": "当前正式原理图已保存并落实：217 CAD器件、216个PCB实装器件、53种；独立预期引脚723个、当前差异0。板级连接/保护存在不等于已有固件CCL执行、整车联调或实物验收。",
+      "FOC": "有当前原理图/连接与本地过流、BUS过压泄放设计；存在DRC警告，系统回馈和热能力未完成实物验收。",
+      "central_DC_DC": "双向超容DC/DC和软件PWM母线泄放是设计候选；设计能力和整车联调未验证。",
+      "solar_MPPT": "架构已确认由独立MPPT接公共BUS，BMS从公共BUS承接充电功率。当前本轮未设计或验证MPPT硬件；组件数量/串并、工作/开路电压、器件、效率和停注入动态未冻结。",
+      "system_charge_path": "系统约束：MPPT/回馈接入公共BUS后，电池净充电电流必须穿过BMS主CHG FET与分流器；不得接B0或其他方式旁路。该边界不替代开关CHG时停止外部注入及能量去向的整车验证。"
+    }
+  },
+  "battery_boundary": {
+    "configuration": "EVE INR18650-30P, 9S4P",
+    "pack_voltage_V": [
+      22.5,
+      37.8
+    ],
+    "daily_charge_current_A": 6,
+    "max_net_charge_design_input_A": 16,
+    "basis_and_limit": "6A为日常设计输入。16A为4并×4A/单体的算术上限；电芯最大充电条件为25°C下CCCV至4.20V/0.1A截止，没有并联均流余量，也未证明为全温或板级能力。",
+    "battery_charge_power_at_design_currents_W": {
+      "6A": [
+        135,
+        226.8
+      ],
+      "16A": [
+        360,
+        604.8
+      ]
+    },
+    "bms_oc_current_protection": "BMS OCC只作过流切断，不作恒流限制。当前设计候选OCC寄存器 code 3（实际写入/读回未验证）= 6mV，名义12A；小阈值负误差−2mV与0.505mΩ分流器高角组合时早动作角约7.92A；小阈值正误差+2.65mV与0.495mΩ分流器低角组合时晚动作角约17.5A。OCC仅作延时过流切断，不是恒流调节或16A硬上限。"
+  },
+  "current_balance": {
+    "positive_direction": "电池净充电电流为正。",
+    "power_equation": "P_pack = P_solar + P_regen + P_SC_to_BUS - P_BUS_load - P_BUS_to_SC - P_losses",
+    "current_equation": "I_pack_charge = max(P_pack, 0) / V_pack",
+    "allocation_rule": "太阳能、两块FOC回馈不得分别使用完整CCL。协调器按BMS新鲜本地能力分配各源额度，使电池端净充电不超过CCL；仅在中央实时报告有效可吸收功率/能量时，才能计入超容吸收。",
+    "same_bus_example": {
+      "equation_A": "6A太阳能 + 10A回馈 - 4A母线负载 = 12A净充电",
+      "assumption": "三项电流均已折算到同一电池BUS；不套用转换效率。若实际来源位于不同电压侧，先用功率和效率转换。",
+      "comparison": "12A高于6A日常候选、低于16A最大净充电设计输入；后者没有均流/误差余量，且尚非验收能力。",
+      "classification": "原6A光伏电流仅为通用压力示例，不代表已确认的30W光伏输入。30W按电池电压22.5/30/37.8V及合并光伏至电池效率0.8/0.9/1.0单列于行进充电与回收能量筛查.json。"
+    },
+    "naive_duplicate_limit_example": "若太阳能控制器与回馈控制器各自独立获准16A，合计可能32A；在22.5–37.8V相当于720–1209.6W。应使用单一系统分配额度，而不是复制CCL政策。",
+    "architecture_boundary": "独立MPPT并入公共BUS；BMS根据电池本地状态执行硬保护并提供候选充电能力，单一协调器分配MPPT与两块FOC回馈份额。电池侧所有充电电流须经CHG FET与分流器；B0旁路禁止。"
+  },
+  "capability_and_gaps": [
+    {
+      "area": "BMS净充电能力",
+      "state": "电芯与电流/电压监测及CHG/DSG FET路径存在于当前原理图；0x281 LIMITS、100ms周期、最多300ms有效期、失效额度归零是候选协议。",
+      "gap": "尚无冻结DBC/已实现固件，OCC是切断而非限流。当前原理图连接源已设计并连接五路温度输入：NTC_CELL1/3/5分别接AFE代表热区A/B/C，NTC_BOARD与NTC_MOS分别接板温与MOS温度通道；三个电芯代表热区不等于逐串/逐组测温。各探头R/T曲线与自定义NTC系数、AFE通道/温度保护类别及阈值配置、固件有效性与失效时fail-closed、配置读回、板外探头安装和实测均未验收，因此5–40°C充电窗仍不能宣称已执行。"
+    },
+    {
+      "area": "行进中太阳能充电",
+      "state": "独立MPPT接公共BUS的系统架构已经确认；30W名牌输入的电池侧电流/并发额度敏感性已有一阶筛查。BMS主CHG FET与分流器承担电池路径。",
+      "gap": "MPPT器件与CC/CV、组件配置/工作及开路电压、反灌与停注入响应尚未冻结/验收；还需验证CHG FET打开或CCL=0时源端停止，电池侧路径不得绕过分流器或接B0。30W估算不是MPPT硬件实现或端到端实测。"
+    },
+    {
+      "area": "FOC回馈",
+      "state": "FOC设计将回馈送至公共9S BUS；本地相电流及BUS过压处理与CAN回馈额度分别有设计描述。",
+      "gap": "本地模型和连接不等于固件/整车闭环。关PWM不能切断电机体二极管回馈；双板并发功率、热重复和满电吸能路径仍未验收。"
+    },
+    {
+      "area": "中央超容",
+      "state": "设计目标为双向DC/DC吸收回馈并通过CAN请求FOC限回馈；BUS软件泄放候选约1kW/1s。",
+      "gap": "中间电压冻结模型800W约0.907s、1kW约0.713s；42V只是候选上限，没有独立硬件BUS_OV比较器。未验证余量/故障状态不可算作已可用吸能。"
+    }
+  ],
+  "fault_cases": [
+    {
+      "case": "太阳能与再生同时输入",
+      "chain": "两个来源若分别获整份CCL，或中央超容已满/状态过期却仍计入吸收，PACK净充电将越限。",
+      "required_behavior": "BMS发布本地CCL，单一协调器同时分配MPPT及两块FOC额度；超容额度使用新鲜有效状态，失效归零。"
+    },
+    {
+      "case": "满电或BMS打开CHG FET",
+      "chain": "电池不再吸收；只关PWM仍可能经FOC体二极管回灌BUS；中央软件dump或CAN失效不能保证BUS被钳住。",
+      "required_behavior": "MPPT/充电器收到零CCL或检测电池不可吸收时停止向公共BUS注入；FOC撤销主动回馈，剩余能量由已经验证的中央超容/本地硬件泄放或机械制动处理。"
+    },
+    {
+      "case": "低温、过温或电芯温度无效",
+      "chain": "现行接口与AFE连接源已将NTC_CELL1/3/5接到代表热区A/B/C（TS1 pin21、DCHG pin31、CFETOFF pin29），NTC_BOARD/NTC_MOS分别接TS2 pin22/TS3 pin23；三处代表热区不覆盖每串/每组。温度曲线/系数、AFE保护配置、固件坏读数处理、读回及板外探头安装实测未验证，仍可能在电芯不允许充电时给出非零额度。",
+      "required_behavior": "完成各NTC曲线/系数与AFE温度通道、阈值/保护类别配置并读回；温度无效、越界或未完成配置验收时CCL=0并使MPPT/FOC fail-closed；完成代表热区探头安装、校准及开短路故障注入。"
+    },
+    {
+      "case": "CAN额度过期/控制器掉线",
+      "chain": "300ms是候选额度过期时间，不是母线瞬态保护时间；在60mF BUS电容、37.8V起点、失去电池吸收的简化模型下，剩余500/1000/2000W分别约35.77/17.88/8.94ms即可到45V。",
+      "required_behavior": "过期后源端停止并保持本地快速过流/BUS_OV；不能依赖CAN、TVS或软件dump单独处理剩余电感/电机能量。计算边界见行进充电与回收能量筛查.json。"
+    },
+    {
+      "case": "太阳能接线绕过FET或分流器",
+      "chain": "接在电芯侧或BATT−侧可能绕开CHG切断或电池电流测量；即使CHG打开，外部源仍可能抬高PACK/BUS。",
+      "required_behavior": "将独立MPPT接到公共BUS，并使电池侧充电经主CHG FET及电流分流器；不得接B0或其他旁路。验证CHG打开/CCL=0时MPPT停止向BUS注入，PACK/BUS剩余能量有明确去向。"
+    },
+    {
+      "case": "中央超容满/双向DC/DC失效",
+      "chain": "现有中央限回馈为CAN协调且母线dump没有硬件比较器；超容不能吸收时两个FOC仍可能同时回馈。",
+      "required_behavior": "只有新鲜有效的中央吸能额度可用于调度；余量不足/故障/状态过期时撤销相应回馈和太阳能额度，本地BUS_OV仍保留。"
+    },
+    {
+      "case": "DRIVE模式边走边充",
+      "chain": "当前BMS候选协议要求DRIVE模式充电请求为零，与行进太阳能充电目标冲突；照现有字段实现会拒绝或清零该额度。",
+      "required_behavior": "冻结协议时允许DRIVE下受限太阳能充电与回馈额度并存，同时保留驱动放电保护；不能只改文字。"
+    }
+  ],
+  "protection_simplification": {
+    "simplify_now": "不要复制多套系统级CCL算法：BMS按本地电芯/电流/温度/故障算能力，一个协调器分配额度，MPPT/FOC执行各自份额；各器件的快速本地环和故障关断保留。",
+    "retain_with_fault_reason": [
+      {
+        "protection": "BMS单体电压、温度、电流故障保护与CHG/DSG FET切断",
+        "reason": "充电器/CAN失控时的电池端最后切断，不是正常CC/CV电流调节。"
+      },
+      {
+        "protection": "FOC本地相电流与BUS过压处理",
+        "reason": "母线/相电流瞬态不能等CAN；关PWM后体二极管仍可能回灌，BUS泄放与BMS切CHG不是同一功能。"
+      }
+    ],
+    "not_redundant_pairs": [
+      {
+        "pair": "MPPT CC/CV vs BMS COV",
+        "reason": "CC/CV是正常调节，COV/FET是失控后的最后切断。"
+      },
+      {
+        "pair": "中央软件dump vs FOC硬件BUS_OV",
+        "reason": "中央没有独立硬件BUS_OV比较器；软件PWM/CAN不可替代本地快速硬件吸能。"
+      },
+      {
+        "pair": "FOC电流窗口 vs DRV VDS/OCP",
+        "reason": "保护对象/触发条件不同，不能按名称均为过流就直接删除一项。"
+      },
+      {
+        "pair": "BMS LOAD_POWER_VALID vs CCL",
+        "reason": "前者仅用于预充期间关闭FOC板上Buck，不是太阳能/回馈限流额度；其连接准备源也未完成验收。"
+      }
+    ],
+    "possible_but_not_proven_consolidation": {
+      "candidate": "两块FOC的BUS泄放网络接同一公共BUS，有未来研究成单一共享硬件泄放的空间。",
+      "why_not_delete_now": "当前按单板约1.8kW/1s、双板约3.6kJ筛查；当电池CHG打开、超容已满且两台同时回馈时，删一套可能让剩余单元超能力。中央现有软件dump尚不能接替。",
+      "fault_chain": "电池停止吸能 + 超容满/失联 + 两FOC体二极管仍回灌 -> 没有足额独立BUS泄放时电压继续升高。",
+      "required_proof_before_merge": "单一共享硬件比较器/泄放必须对双板最大功率与能量、热态重复、故障独立性及布局压降验证；否则保留两套。"
+    },
+    "no_new_duplicate": "不额外加一套重复CCL状态机，不把TVS当持续制动负载。当前没有太阳能旧实现可删除；新增MPPT必要保护需按具体拓扑核对。"
+  },
+  "energy_screen": {
+    "source": "BMS模块/检查/行进充电与回收能量筛查.json",
+    "script": "BMS模块/仿真/源码/行进充电能量筛查.py",
+    "key_result": "BUS已知下限60mF，37.8V升至45V仅需17.8848J；无吸收时余量500/1000/2000W分别约35.77/17.88/8.94ms到45V。30W名牌PV按效率0.8–1.0与22.5/30/37.8V筛查，电池端约24–30W、0.635–1.333A。并发矩阵27组中24组超过16A设计输入，只有500W回馈且37.8V电池的3组未超16A；全部27组均超过6A日常输入。16A只是算术设计输入，不是已验证限流能力。",
+    "limitations": "BUS越压计算为无吸收、无负载恒功率集中参数模型；30W预算以名牌功率、给定合并效率敏感性计算；回馈按公共BUS电功率理想地折算电池端。未模拟实时CCL、MPPT/FOC控制、压降损耗、超容动态或热，也不是SPICE/硬件验收。满电/禁止充电时的停注入与剩余能量去向仍待系统验证。",
+    "solar_nameplate_input": {
+      "nameplate_power_W": 30.0,
+      "assumed_panel_count_or_string": "未假设",
+      "pv_to_pack_efficiency_cases": [
+        0.8,
+        0.9,
+        1.0
+      ],
+      "battery_voltage_cases_V": [
+        22.5,
+        30.0,
+        37.8
+      ],
+      "current_range_A": [
+        0.634921,
+        1.333333
+      ],
+      "classification": "30W名牌一阶筛查，不代表任意天气下实际功率或MPPT效率。"
+    },
+    "concurrency_budget": {
+      "regeneration_power_cases_W": [
+        500.0,
+        1000.0,
+        2000.0
+      ],
+      "single_shared_max_net_charge_design_input_A": 16.0,
+      "daily_charge_design_input_A": 6.0,
+      "case_count": 27,
+      "exceeds_16A_case_count": 24,
+      "architecture": "独立MPPT和FOC回馈源并入公共BUS；净充电入电池必须经CHG FET及分流器，严禁B0旁路。"
+    }
+  },
+  "minimum_next_steps": [
+    "冻结实际组件/串并及工作/开路电压边界、MPPT CC/CV/反灌/停注入特性；30W只作为已知名牌筛查输入，不预设面板数量或串并。",
+    "冻结单一电池净CCL、DRIVE下边走边充协议、BMS/MPPT/FOC-A/FOC-B/中央状态有效期与失效默认态。",
+    "完成三处代表电芯热区探头实装与校准、各NTC曲线/系数及AFE通道/温度保护类别/阈值配置读回、低温/过温额度计算和温度无效故障注入；三个代表点不构成逐组覆盖。验收前CCL无效或为零时源端 fail-closed。",
+    "核对MPPT接公共BUS，验证电池充电电流穿过主CHG FET与分流器、不旁路B0；验证CHG打开/CCL=0时源端停止且BUS剩余能量可控。",
+    "以30W光伏名牌与双FOC回馈、满电/低温、超容满、负载最小、CHG打开及通信失效做组合验证；回馈功率/持续时间未定，先不作放行结论。"
+  ],
+  "new_requirements_document_review": {
+    "path": "BMS模块/项目要求.md",
+    "sha256": "b549e5956b887413888dccb6fdbad4c31aca24fa027187fccdd8c50fa9c2af6f",
+    "relative_links": "10/10存在。",
+    "wording_note": "要求文档将太阳能/回馈和保护冗余分别列为用户要求与候选取舍，边界总体清楚。状态表中“有系统接口/能力合同”建议入口后续明确为候选接口/能力约定（DBC和固件未冻结），避免读成已实现。"
+  },
+  "sources": [
+    {
+      "path": "BMS模块/README.md",
+      "sha256": "df8608a5fbda39dffdc154eabd6600a8ec199b0e9ae4c2d50836aa116e7a51ae",
+      "supports": "当前BMS入口及静态网表证据边界。"
+    },
+    {
+      "path": "BMS模块/项目要求.md",
+      "sha256": "b549e5956b887413888dccb6fdbad4c31aca24fa027187fccdd8c50fa9c2af6f",
+      "supports": "行进中太阳能充电/回馈与保护冗余审查的用户要求。"
+    },
+    {
+      "path": "BMS模块/检查/当前设计状态.md",
+      "sha256": "5026974e2e83b3b3b8358021f4845c5b1ef4f7ff3d8448a08f220e11f1d00e0b",
+      "supports": "9S4P、充电设计输入、当前原理图与验收边界。"
+    },
+    {
+      "path": "BMS模块/原理图准备/需求与系统边界.md",
+      "sha256": "ae9bb62b9c78441bac50e78691b42465b2dd20eb7aef34f093863b9467bc724f",
+      "supports": "BMS设计输入与系统职责边界。"
+    },
+    {
+      "path": "BMS模块/原理图准备/控制与接口设计.md",
+      "sha256": "a48b8df7581d62e1688d1043cb73a286f9a7a2d0261a3270eba77c4864ab1391",
+      "supports": "候选0x281 LIMITS、100ms发布/300ms有效期、失效归零及DRIVE/CHARGE互斥规则。"
+    },
+    {
+      "path": "BMS模块/原理图准备/功率与预充设计.md",
+      "sha256": "ad107ef1b20a3c364221d7829559943eb2b37660a7dbfcac401e483d9dd97020",
+      "supports": "BATT/PACK背靠背FET、分流器回流路径、OCC误差角与旁路风险。"
+    },
+    {
+      "path": "BMS模块/检查/当前BMS9S4P网表连接核对.json",
+      "sha256": "b6d9843c1eeb4a9317813a70104fbc1fd64df14c4024a02d79d752208fce40c3",
+      "supports": "当前BMS网表器件/引脚映射核对。"
+    },
+    {
+      "path": "稳压模块/README.md",
+      "sha256": "02692a85379dd1159ebaa7503348b132eb69b8dd7e12c205a3335abe9fb95efb",
+      "supports": "中央模块当前入口和候选状态。"
+    },
+    {
+      "path": "稳压模块/稳压模块设计构想.md",
+      "sha256": "102c8ec946a2c8fbdde6fc591203de258a6d231737899a7807cf53e2390624f7",
+      "supports": "双向超容DC/DC、CAN协调、软件泄放与历史模型边界。"
+    },
+    {
+      "path": "稳压模块/原理图准备/power_plan.json",
+      "sha256": "d63d2155d8f05a063dd82e630cd079a58ef139e199f4250964102274a744738b",
+      "supports": "约1kW/1s泄放候选、42V非硬件钳位保证、无硬件BUS_OV比较器。"
+    },
+    {
+      "path": "FOC驱动模块/FOC驱动设计构想.md",
+      "sha256": "bf7fe8875e0369bc7db0597ba8ad8b70f0ff539fd3560dbdabb17303c31a6102",
+      "supports": "FOC向公共BUS回馈、双板筛查能量与本地泄放。"
+    },
+    {
+      "path": "FOC驱动模块/保护与固件约束.md",
+      "sha256": "9af58a6167024d1b4074cf464607f4ca55fb813570be7b2ac7ccb3c63e8f8a04",
+      "supports": "CAN失联、本地过流/BUS_OV及PWM关闭后体二极管回灌边界。"
+    },
+    {
+      "path": "FOC驱动模块/原理图准备/当前原理图连接.json",
+      "sha256": "1808f822e5d3b7f03d9821b92dbcd85d5252877d47144fe5f7cef14a7e2c1d91",
+      "supports": "BUSOV_N与本地泄放/LOAD_POWER_VALID连接映射。"
+    },
+    {
+      "path": "FOC驱动模块/检查/原理图电气复核结论.md",
+      "sha256": "7125fb96cfbd6ed97424324b6742a167ab8432094913914ee393c69bf1652510",
+      "supports": "当前DRC/电气复核与未完成系统实测边界。"
+    },
+    {
+      "path": "BMS模块/仿真/源码/行进充电能量筛查.py",
+      "sha256": "fef975a9ada9398fb320a7439235017c806b66e1a35e9ce448e6581e10baff57",
+      "supports": "参数化集中电容恒功率筛查源码。"
+    },
+    {
+      "path": "BMS模块/检查/行进充电与回收能量筛查.json",
+      "sha256": "e0b85916ffca2abae0213a440d397e43558443f95b36f33fdecb05ee26f40524",
+      "supports": "参数输入、500/1000/2000W到45V时间、300ms理想外推和同母线净电流示例。"
+    },
+    {
+      "path": "BMS模块/原理图准备/接口元件连接.json",
+      "supports": "当前原理图连接映射包含NTC_CELL1/3/5代表热区A/B/C及NTC_BOARD、NTC_MOS两个温度通道；该连接证据不代表板外探头已经实装/验收。",
+      "sha256": "ca5caf9237f966db1de3d7c219a4046bc9870286ab9ad08c13b02fd67f7d96d3"
+    },
+    {
+      "path": "BMS模块/原理图准备/AFE元件连接.json",
+      "supports": "BQ76952连接映射：TS1 pin21=热区A、DCHG pin31=热区B、CFETOFF pin29=热区C、TS2 pin22=板温、TS3 pin23=MOS；三处电芯探头不是逐组覆盖，AFE温度参数/保护配置及读回仍待验收。",
+      "sha256": "874fba89731a5312d594a114a13cc2f2e8a2b48fb9926860502aaed00271a991"
+    }
+  ],
+  "solar_pv_architecture": {
+    "confirmed": "独立MPPT接公共BUS；BMS由公共BUS承接功率。",
+    "pack_path": "经BMS主CHG FET与电流分流器进入电池。",
+    "forbidden": "B0或任何绕过CHG FET/分流器的充电连接。",
+    "implementation_state": "架构边界已确认；本审查不代表MPPT硬件/端到端控制已实现或验收。"
+  },
+  "backup_before_edit": {
+    "archive": "BMS模块/检查/tmp/solar_regen_three_files_preedit_20261015.zip",
+    "sha256": "70bfa34a3a5a398317a68a20e5c149f999e68ef0632a6223bc0281e860900196",
+    "manifest": "BMS模块/检查/tmp/solar_regen_three_files_preedit_20261015.sha256.json"
+  }
+}

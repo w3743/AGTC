@@ -1,0 +1,615 @@
+{
+  "updated": "2026-10-21",
+  "stage": "Current schematic temperature-interface update; PCB synchronization and manufacturing release remain on hold",
+  "sources": {
+    "BMS-9S4P.eprj3": {
+      "sha256": "90870596d1f7c8c3abe0140a27074cd6701fd5844ab0f1f61847201dc954b48a",
+      "bytes": 2315
+    },
+    "sch/Schematic1/P1.esch2": {
+      "sha256": "ce6fc600b4b3f73374c0a8d53b7014f83c16b68b5e10cb608f2d70f7c962124f",
+      "bytes": 5931653
+    },
+    "sch/Schematic1/Schematic1.ecfg": {
+      "sha256": "9a526808e8c31b4f412531ebee296805761c39f8766a35169b2755b50167157e",
+      "bytes": 763
+    },
+    "原理图准备/BOM.csv": {
+      "sha256": "26662082bf2870c959c347acf865d3d6ef760ab73c1c60bf3f4c448e63d57a18",
+      "bytes": 154306
+    }
+  },
+  "counts": {
+    "pcb_components": 210,
+    "cad_components": 215,
+    "pins": 710,
+    "raw_mpn_strings": 52,
+    "normalized_mpn": 51,
+    "texts": 240,
+    "netports": 295,
+    "wire_groups": 341,
+    "bom_rows": 248
+  },
+  "normalization": "Only merge SN74LVC1G11DCKR and TI SN74LVC1G11DCKR; do not merge CAD carrier and procurement MPN",
+  "counts_scope": "215 CAD components, 710 pins, 295 netports, and 341 wire groups are derived from the prior official ENET plus the exact text-only source diff; final-source API/ENET readback did not return.",
+  "official_independent_copy_reopen": {
+    "fatal": 0,
+    "errors": 0,
+    "warnings": 112,
+    "details_reviewed": false,
+    "evidence": "final-independent-reopen.json",
+    "current": false,
+    "note": "Historical baseline; current evidence is root-after-cleanup-reopen.json"
+  },
+  "known_root_path_runtime": {
+    "status": "ROOT_EPRJ3_AND_P1_OPEN; FINAL_READBACK_TIMEOUT",
+    "root_path_readback": true,
+    "source_hashes_same": false,
+    "final_api_enet_readback": "NO_RESULT_TIMEOUT",
+    "derived_components": 215,
+    "derived_pins": 710,
+    "derived_from_official_netlist_source_sha256": "a713d448b79c51c11663470647ab0cefe02809e6c9159e58bf61aeb7d97cb049",
+    "derivation": "Previous official ENET plus byte-exact P1 diff deleting only four TEXT records; not a final same-source API/ENET export.",
+    "drc_last_completed": [
+      {
+        "type": "warn",
+        "count": 1
+      }
+    ],
+    "drc_last_completed_source_sha256": "a713d448b79c51c11663470647ab0cefe02809e6c9159e58bf61aeb7d97cb049",
+    "drcReview": "HOLD",
+    "layout_release_status": "HOLD",
+    "warning_details_reviewed": false,
+    "evidence": "../../../检查/统一审查/BMS/current-official-netlist.net; ../../../检查/统一审查/BMS/current-official-snapshot.json",
+    "note": "The final read-only API/ENET request after opening the root EPRJ3/P1 timed out without a result. The one-warning DRC belongs to the pre-cleanup a713 source and is not a final-ce6 DRC result."
+  },
+  "geometry": "HISTORICAL_PRE_TEMPERATURE_INTERFACE_PASS",
+  "geometry_scope": "Existing geometry evidence predates the three NTC interfaces and four bare-hole carriers; it does not qualify the current P1 or PCB. Layout entry remains HOLD.",
+  "layout_initial_placement": "HOLD pending current schematic-to-PCB interface synchronization and human review of four bare PTH wire-solder points",
+  "routing_freeze": "HOLD",
+  "fabrication": "HOLD",
+  "physical_qualification": "NOT_PERFORMED",
+  "no_pcb_created": true,
+  "no_fan_hardware": true,
+  "required_next": "Update/review PCB1 against the current P1 source; confirm four bare plated-through-hole wire-solder points, their clearances, insulation and strain relief; complete current DRC warning review. Routing freeze, fabrication and physical qualification remain HOLD.",
+  "trial_native_cleanup_manifest": "../../../归档/原始材料/BMS原生试验工程_20261016/archive_manifest.json",
+  "drcReview": "HOLD",
+  "layout_release_status": "HOLD",
+  "drc_log_review": "检查/Layout验证/drc-log-review.json",
+  "drc_repair_validation": {
+    "status": "PASS",
+    "baseline_snapshot": "检查/DRC修复/latest-drc-before.json",
+    "baseline_snapshot_sha256": "88c769b8dda99b0dcee67b44a1a044b5d9c78507c575098ff87161c9298594ee",
+    "baseline_semantic": "检查/DRC修复/latest-drc-before-semantic.json",
+    "baseline_semantic_sha256": "e346a57de8298c51da4a592c78d54683832ae92670e0f8414c5ad6324c3372d9",
+    "current_semantic_sha256": "0360a97a5ceff4e7899ffadfd70649621a0fc7ef89c4e70b925b32f00bf378d0",
+    "saved_snapshot_sha256": "de50543565c252afe95654e73ef5fab85755b49ae23907d0fda953dc333eed36",
+    "reopened_snapshot_sha256": "de50543565c252afe95654e73ef5fab85755b49ae23907d0fda953dc333eed36",
+    "native_net_attribute_cleanup": {
+      "status": "PASS",
+      "method": "folded-native-record-allowlist; exact 29 duplicate WIRE ATTR key=NET IDs may be absent/tombstoned; config permits only DOCHEAD.client",
+      "backup_manifest": "检查/DRC修复/latest-drc-backup.json",
+      "backup_manifest_sha256": "eabce9dd77c603e701b4883fc9b980263b3b7b52f6caa4152e083f0c046ad88f",
+      "cleanup_plan": "检查/DRC修复/重复网标清理分析.json",
+      "cleanup_plan_sha256": "44cba0d840b5ac07a8118483835c107942661a87acb36f597b7d9606d730ceb5",
+      "cleanup_plan_status": "ANALYSIS_COMPLETE_CLEANUP_METHOD_UNVERIFIED",
+      "archive": "归档/历史与调试.zip",
+      "archive_sha256": "5c6c8b3b1d56199f840566a600bb875334dd67af116ef98a65ba628bb92344c5",
+      "archive_member": "20261016_160730_最新DRC重复网标修复前/sch/Schematic1/P1.esch2",
+      "baseline_p1_sha256": "807049567ce87a4686a76758604914d35467be16cff2ea04e97dd8ae17dd9dbd",
+      "current_p1_sha256": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+      "baseline_raw_record_count": 30333,
+      "current_raw_record_count": 30304,
+      "baseline_active_wire_count": 331,
+      "current_active_wire_count": 331,
+      "baseline_active_net_attribute_count": 360,
+      "current_active_net_attribute_count": 331,
+      "removed_attribute_count": 29,
+      "removed_attribute_ids": [
+        "0f0b001a42f5d6eb",
+        "167f1ab10bdabe73",
+        "251b92da57d846ba",
+        "3191f23be4a3a893",
+        "3f5d6603599564fd",
+        "492c3781c140f545",
+        "5356481b4bd6de0a",
+        "540f0be5aaa36ea7",
+        "5748b7c8224dc310",
+        "5b7801e1c2c4ddbe",
+        "5fa3ad8820b89df1",
+        "5fe6dbc9e8ba2111",
+        "600e7f3262f6a37c",
+        "63138b5ef869f9d2",
+        "8288744c4404d4d8",
+        "83e5d0c12153b171",
+        "8b9123f88b23b9d6",
+        "9a6817619deecfbd",
+        "a483b62ac00830c6",
+        "af7bb42429c737b9",
+        "b54ea8fbb50af36f",
+        "b7640e4fc5874796",
+        "bea07ada4530bf3d",
+        "c356c26b67540722",
+        "cd04b99f31ab8002",
+        "dd690098b2f4b638",
+        "e287ee376174eb69",
+        "f051917d4a9d6689",
+        "ff7a9496c63de6f6"
+      ],
+      "retained_attribute_ids": [
+        "14d71544b19a89b7",
+        "3ba3cfed182ca82c",
+        "816ec78ea6979583",
+        "959b6616606f93a6",
+        "aec876ea7026de53",
+        "c4087446e22ab45c",
+        "f37cda7ac2de34a2",
+        "f59c96830628b056",
+        "f6f57babacebcef0",
+        "f7305534299d8ff6",
+        "fec6a03dd5342e80"
+      ],
+      "added_attribute_ids": [],
+      "changed_attribute_ids": [],
+      "duplicate_wire_group_count": 11,
+      "duplicate_wire_groups": [
+        {
+          "wire_id": "022d33f3e76e72ba",
+          "network_name": "VC15_FILT",
+          "before_attribute_ids": [
+            "816ec78ea6979583",
+            "f051917d4a9d6689"
+          ],
+          "retained_attribute_id": "816ec78ea6979583",
+          "removed_attribute_ids": [
+            "f051917d4a9d6689"
+          ]
+        },
+        {
+          "wire_id": "0308c9804e866248",
+          "network_name": "VC4_FILT",
+          "before_attribute_ids": [
+            "b7640e4fc5874796",
+            "e287ee376174eb69",
+            "f7305534299d8ff6"
+          ],
+          "retained_attribute_id": "f7305534299d8ff6",
+          "removed_attribute_ids": [
+            "b7640e4fc5874796",
+            "e287ee376174eb69"
+          ]
+        },
+        {
+          "wire_id": "2688727ee5336b61",
+          "network_name": "VC3_FILT",
+          "before_attribute_ids": [
+            "540f0be5aaa36ea7",
+            "a483b62ac00830c6",
+            "aec876ea7026de53"
+          ],
+          "retained_attribute_id": "aec876ea7026de53",
+          "removed_attribute_ids": [
+            "540f0be5aaa36ea7",
+            "a483b62ac00830c6"
+          ]
+        },
+        {
+          "wire_id": "2db91f6b68bd9c14",
+          "network_name": "VC2_FILT",
+          "before_attribute_ids": [
+            "5748b7c8224dc310",
+            "63138b5ef869f9d2",
+            "fec6a03dd5342e80"
+          ],
+          "retained_attribute_id": "fec6a03dd5342e80",
+          "removed_attribute_ids": [
+            "5748b7c8224dc310",
+            "63138b5ef869f9d2"
+          ]
+        },
+        {
+          "wire_id": "5dcbcd9ab93912ca",
+          "network_name": "VC0_FILT",
+          "before_attribute_ids": [
+            "3191f23be4a3a893",
+            "c356c26b67540722",
+            "f6f57babacebcef0"
+          ],
+          "retained_attribute_id": "f6f57babacebcef0",
+          "removed_attribute_ids": [
+            "3191f23be4a3a893",
+            "c356c26b67540722"
+          ]
+        },
+        {
+          "wire_id": "65b6a4b4f2b624fc",
+          "network_name": "VC6_FILT",
+          "before_attribute_ids": [
+            "3ba3cfed182ca82c",
+            "5356481b4bd6de0a",
+            "5b7801e1c2c4ddbe"
+          ],
+          "retained_attribute_id": "3ba3cfed182ca82c",
+          "removed_attribute_ids": [
+            "5356481b4bd6de0a",
+            "5b7801e1c2c4ddbe"
+          ]
+        },
+        {
+          "wire_id": "b299cde24d191c26",
+          "network_name": "VC7_FILT",
+          "before_attribute_ids": [
+            "0f0b001a42f5d6eb",
+            "492c3781c140f545",
+            "f37cda7ac2de34a2"
+          ],
+          "retained_attribute_id": "f37cda7ac2de34a2",
+          "removed_attribute_ids": [
+            "0f0b001a42f5d6eb",
+            "492c3781c140f545"
+          ]
+        },
+        {
+          "wire_id": "c87998a4f3cd22db",
+          "network_name": "B0",
+          "before_attribute_ids": [
+            "251b92da57d846ba",
+            "3f5d6603599564fd",
+            "5fa3ad8820b89df1",
+            "f59c96830628b056"
+          ],
+          "retained_attribute_id": "f59c96830628b056",
+          "removed_attribute_ids": [
+            "251b92da57d846ba",
+            "3f5d6603599564fd",
+            "5fa3ad8820b89df1"
+          ]
+        },
+        {
+          "wire_id": "d9bdb5b1d1e14a69",
+          "network_name": "VC5_FILT",
+          "before_attribute_ids": [
+            "8b9123f88b23b9d6",
+            "959b6616606f93a6",
+            "9a6817619deecfbd"
+          ],
+          "retained_attribute_id": "959b6616606f93a6",
+          "removed_attribute_ids": [
+            "8b9123f88b23b9d6",
+            "9a6817619deecfbd"
+          ]
+        },
+        {
+          "wire_id": "de6cce15b0612ada",
+          "network_name": "VC8_FILT",
+          "before_attribute_ids": [
+            "167f1ab10bdabe73",
+            "5fe6dbc9e8ba2111",
+            "8288744c4404d4d8",
+            "af7bb42429c737b9",
+            "b54ea8fbb50af36f",
+            "bea07ada4530bf3d",
+            "c4087446e22ab45c",
+            "cd04b99f31ab8002",
+            "dd690098b2f4b638",
+            "ff7a9496c63de6f6"
+          ],
+          "retained_attribute_id": "c4087446e22ab45c",
+          "removed_attribute_ids": [
+            "167f1ab10bdabe73",
+            "5fe6dbc9e8ba2111",
+            "8288744c4404d4d8",
+            "af7bb42429c737b9",
+            "b54ea8fbb50af36f",
+            "bea07ada4530bf3d",
+            "cd04b99f31ab8002",
+            "dd690098b2f4b638",
+            "ff7a9496c63de6f6"
+          ]
+        },
+        {
+          "wire_id": "f6ee85b0fcde4341",
+          "network_name": "VC1_FILT",
+          "before_attribute_ids": [
+            "14d71544b19a89b7",
+            "600e7f3262f6a37c",
+            "83e5d0c12153b171"
+          ],
+          "retained_attribute_id": "14d71544b19a89b7",
+          "removed_attribute_ids": [
+            "600e7f3262f6a37c",
+            "83e5d0c12153b171"
+          ]
+        }
+      ],
+      "other_native_record_changes": [],
+      "project_sha256_unchanged": true,
+      "config_sha256_unchanged": false,
+      "config_metadata_change": {
+        "record": "DOCHEAD",
+        "changed_fields": [
+          "client"
+        ],
+        "before_client": "c50c8eebfd6f3123",
+        "after_client": "894da77061c0bf1d"
+      },
+      "project_and_config_sha256_unchanged": false
+    },
+    "snapshot_record_comparison": {
+      "status": "PASS",
+      "counts": {
+        "baseline": {
+          "components": 208,
+          "pins": 700,
+          "ports": 285,
+          "wires": 331,
+          "texts": 237
+        },
+        "saved": {
+          "components": 208,
+          "pins": 700,
+          "ports": 285,
+          "wires": 331,
+          "texts": 237
+        },
+        "reopened": {
+          "components": 208,
+          "pins": 700,
+          "ports": 285,
+          "wires": 331,
+          "texts": 237
+        }
+      },
+      "baseline_drc": {
+        "warnings": 12,
+        "errors": 0,
+        "fatal": 0,
+        "raw": [
+          {
+            "type": "warn",
+            "count": 12
+          }
+        ]
+      },
+      "saved_drc": {
+        "warnings": 1,
+        "errors": 0,
+        "fatal": 0,
+        "raw": [
+          {
+            "type": "warn",
+            "count": 1
+          }
+        ]
+      },
+      "reopened_drc": {
+        "warnings": 1,
+        "errors": 0,
+        "fatal": 0,
+        "raw": [
+          {
+            "type": "warn",
+            "count": 1
+          }
+        ]
+      },
+      "baseline_to_saved": {
+        "rows": {
+          "identity_key": "id",
+          "saved_count": 208,
+          "reopened_count": 208,
+          "equal": true,
+          "different_ids": [],
+          "comparison_mode": "ALL_FIELDS_EXACT_EXCEPT_PIN_XY_ABSOLUTE_TOLERANCE",
+          "pin_coordinate_tolerance_absolute": 1e-09,
+          "maximum_pin_coordinate_difference": 0.0,
+          "tolerated_pin_coordinate_differences": [],
+          "pin_coordinate_errors": []
+        },
+        "ports": {
+          "identity_key": "id",
+          "saved_count": 285,
+          "reopened_count": 285,
+          "equal": true,
+          "different_ids": []
+        },
+        "wires": {
+          "identity_key": "primitiveId",
+          "saved_count": 331,
+          "reopened_count": 331,
+          "equal": true,
+          "different_ids": []
+        },
+        "texts": {
+          "identity_key": "primitiveId",
+          "saved_count": 237,
+          "reopened_count": 237,
+          "equal": true,
+          "different_ids": []
+        }
+      },
+      "baseline_to_reopened": {
+        "rows": {
+          "identity_key": "id",
+          "saved_count": 208,
+          "reopened_count": 208,
+          "equal": true,
+          "different_ids": [],
+          "comparison_mode": "ALL_FIELDS_EXACT_EXCEPT_PIN_XY_ABSOLUTE_TOLERANCE",
+          "pin_coordinate_tolerance_absolute": 1e-09,
+          "maximum_pin_coordinate_difference": 0.0,
+          "tolerated_pin_coordinate_differences": [],
+          "pin_coordinate_errors": []
+        },
+        "ports": {
+          "identity_key": "id",
+          "saved_count": 285,
+          "reopened_count": 285,
+          "equal": true,
+          "different_ids": []
+        },
+        "wires": {
+          "identity_key": "primitiveId",
+          "saved_count": 331,
+          "reopened_count": 331,
+          "equal": true,
+          "different_ids": []
+        },
+        "texts": {
+          "identity_key": "primitiveId",
+          "saved_count": 237,
+          "reopened_count": 237,
+          "equal": true,
+          "different_ids": []
+        }
+      },
+      "saved_to_reopened": {
+        "rows": {
+          "identity_key": "id",
+          "saved_count": 208,
+          "reopened_count": 208,
+          "equal": true,
+          "different_ids": [],
+          "comparison_mode": "ALL_FIELDS_EXACT_EXCEPT_PIN_XY_ABSOLUTE_TOLERANCE",
+          "pin_coordinate_tolerance_absolute": 1e-09,
+          "maximum_pin_coordinate_difference": 0.0,
+          "tolerated_pin_coordinate_differences": [],
+          "pin_coordinate_errors": []
+        },
+        "ports": {
+          "identity_key": "id",
+          "saved_count": 285,
+          "reopened_count": 285,
+          "equal": true,
+          "different_ids": []
+        },
+        "wires": {
+          "identity_key": "primitiveId",
+          "saved_count": 331,
+          "reopened_count": 331,
+          "equal": true,
+          "different_ids": []
+        },
+        "texts": {
+          "identity_key": "primitiveId",
+          "saved_count": 237,
+          "reopened_count": 237,
+          "equal": true,
+          "different_ids": []
+        }
+      },
+      "rows_ports_wires_texts_unchanged": true,
+      "expected_post_repair_warnings": 1,
+      "warning_details_reviewed_for_current_snapshot": false
+    },
+    "pin_network_equivalence": {
+      "status": "PASS",
+      "checked_pins": 700,
+      "baseline_pin_identities": 700,
+      "current_pin_identities": 700,
+      "all_pin_network_results_unchanged": true,
+      "compared_fields": "complete pinResults record by ref/pin identity",
+      "differences": []
+    },
+    "baseline_drc_log_review": {
+      "scope": "PRE_REPAIR_BASELINE_ONLY",
+      "status": "PASS_REVIEWED_BASELINE_DRC_LOG",
+      "sha256": "6d2e69604e9dd7063c1b94c28ae5be771987e6ed16cf45adb95f85d5cc71c40a",
+      "reviewed_by_user": true,
+      "fatal_errors": 0,
+      "errors": 0,
+      "warning_count": 12,
+      "warning_line_count": 12,
+      "applies_to_current_reopened_snapshot": false
+    },
+    "current_reopened_drc": {
+      "fatal_errors": 0,
+      "errors": 0,
+      "aggregate_warning_groups": 1,
+      "warning_details_reviewed": false,
+      "drcReview": "HOLD",
+      "layout_release_status": "HOLD",
+      "required_next": "Review a newly captured current DRC log before interpreting or closing the remaining warning."
+    },
+    "procurement_nc_bom_pcb_identity": {
+      "baseline_components": 208,
+      "saved_components": 208,
+      "locked_fields": [
+        "mpn",
+        "manufacturer",
+        "supplier",
+        "supplierId",
+        "component",
+        "symbol",
+        "footprint",
+        "bom",
+        "pcb",
+        "id",
+        "pin_nc"
+      ],
+      "differences": [],
+      "status": "PASS"
+    },
+    "p1_only_allowlisted_net_attribute_ids_changed": true,
+    "native_record_change_allowlist": {
+      "status": "PASS",
+      "p1_removed_net_attribute_count": 29,
+      "p1_removed_net_attribute_ids": [
+        "0f0b001a42f5d6eb",
+        "167f1ab10bdabe73",
+        "251b92da57d846ba",
+        "3191f23be4a3a893",
+        "3f5d6603599564fd",
+        "492c3781c140f545",
+        "5356481b4bd6de0a",
+        "540f0be5aaa36ea7",
+        "5748b7c8224dc310",
+        "5b7801e1c2c4ddbe",
+        "5fa3ad8820b89df1",
+        "5fe6dbc9e8ba2111",
+        "600e7f3262f6a37c",
+        "63138b5ef869f9d2",
+        "8288744c4404d4d8",
+        "83e5d0c12153b171",
+        "8b9123f88b23b9d6",
+        "9a6817619deecfbd",
+        "a483b62ac00830c6",
+        "af7bb42429c737b9",
+        "b54ea8fbb50af36f",
+        "b7640e4fc5874796",
+        "bea07ada4530bf3d",
+        "c356c26b67540722",
+        "cd04b99f31ab8002",
+        "dd690098b2f4b638",
+        "e287ee376174eb69",
+        "f051917d4a9d6689",
+        "ff7a9496c63de6f6"
+      ],
+      "project_sha256_unchanged": true,
+      "config_metadata_change": {
+        "record": "DOCHEAD",
+        "changed_fields": [
+          "client"
+        ],
+        "before_client": "c50c8eebfd6f3123",
+        "after_client": "894da77061c0bf1d"
+      }
+    },
+    "warning_cleared": false,
+    "layout_release_status": "HOLD",
+    "scope": "Historical DRC cleanup validation for the pre-temperature-interface P1 source; it does not qualify the current P1 schematic."
+  },
+  "drc_reviewed_baseline_log": {
+    "scope": "PRE_REPAIR_BASELINE_ONLY",
+    "sha256": "6d2e69604e9dd7063c1b94c28ae5be771987e6ed16cf45adb95f85d5cc71c40a",
+    "reviewed_by_user": true,
+    "applies_to_current_reopened_snapshot": false
+  },
+  "current_source_review": {
+    "official_reopen": "PASS: formal root EPRJ3 and P1 were opened in official CLI; final read-only API/ENET request timed out without a result.",
+    "electrical_counts_and_mapping": "DERIVED: previous official ENET source a713 plus exact P1 diff deleting only four TEXT records supports 215 components, 710 pins, and zero changes to the original 700 pin-to-net mappings; this is not a final same-source export.",
+    "temperature_interface": "Derived electrical connectivity from the prior official ENET plus exact text-only source diff: NTC_CELL1.1→BQ_TS1, NTC_CELL2.1→BQ_DCHG, NTC_CELL3.1→BQ_CFETOFF; all NTC pin 2→B0. TP_CELL_TS1/DCHG/CFETOFF/B0 are bare PCB plated holes; RH-5009 bodies DNP and excluded from BOM. Final-source API/ENET readback did not return.",
+    "purchase_boundary": "BOM remains 248 rows. Compared with the central 248-row raw input, only the three NTC rows were updated for current ref/net mapping. Board procurement increase +0; the three offboard Vishay NTCs were already in procurement input; four RH-5009 bodies are DNP and not purchased.",
+    "evidence": "../../../检查/统一审查/BMS/current-official-netlist.net (pre-cleanup source a713); ../../../检查/统一审查/BMS/current-official-snapshot.json (normalized persisted ce6 source with derived electrical evidence); ../当前设计状态.md"
+  }
+}

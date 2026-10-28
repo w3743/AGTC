@@ -1,0 +1,460 @@
+[
+  {
+    "key": "input.lidar",
+    "branch": "lidar",
+    "column": 0.0,
+    "parents": []
+  },
+  {
+    "key": "features_extractor.laser.0",
+    "branch": "lidar",
+    "column": 1.0,
+    "parents": [
+      "input.lidar"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.1",
+    "branch": "lidar",
+    "column": 2.0,
+    "parents": [
+      "features_extractor.laser.0"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.2",
+    "branch": "lidar",
+    "column": 3.0,
+    "parents": [
+      "features_extractor.laser.1"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.3",
+    "branch": "lidar",
+    "column": 4.0,
+    "parents": [
+      "features_extractor.laser.2"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.4",
+    "branch": "lidar",
+    "column": 5.0,
+    "parents": [
+      "features_extractor.laser.3"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.5",
+    "branch": "lidar",
+    "column": 6.0,
+    "parents": [
+      "features_extractor.laser.4"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.6",
+    "branch": "lidar",
+    "column": 7.0,
+    "parents": [
+      "features_extractor.laser.5"
+    ]
+  },
+  {
+    "key": "features_extractor.laser.7",
+    "branch": "lidar",
+    "column": 8.0,
+    "parents": [
+      "features_extractor.laser.6"
+    ]
+  },
+  {
+    "key": "input.depth",
+    "branch": "depth",
+    "column": 0.0,
+    "parents": []
+  },
+  {
+    "key": "features_extractor.depth.0",
+    "branch": "depth",
+    "column": 1.0,
+    "parents": [
+      "input.depth"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.1",
+    "branch": "depth",
+    "column": 2.0,
+    "parents": [
+      "features_extractor.depth.0"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.2",
+    "branch": "depth",
+    "column": 3.0,
+    "parents": [
+      "features_extractor.depth.1"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.3",
+    "branch": "depth",
+    "column": 4.0,
+    "parents": [
+      "features_extractor.depth.2"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.4",
+    "branch": "depth",
+    "column": 5.0,
+    "parents": [
+      "features_extractor.depth.3"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.5",
+    "branch": "depth",
+    "column": 6.0,
+    "parents": [
+      "features_extractor.depth.4"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.6",
+    "branch": "depth",
+    "column": 7.0,
+    "parents": [
+      "features_extractor.depth.5"
+    ]
+  },
+  {
+    "key": "features_extractor.depth.7",
+    "branch": "depth",
+    "column": 8.0,
+    "parents": [
+      "features_extractor.depth.6"
+    ]
+  },
+  {
+    "key": "input.detections",
+    "branch": "detections",
+    "column": 0.0,
+    "parents": []
+  },
+  {
+    "key": "features_extractor.boxes.0",
+    "branch": "detections",
+    "column": 1.0,
+    "parents": [
+      "input.detections"
+    ]
+  },
+  {
+    "key": "features_extractor.boxes.1",
+    "branch": "detections",
+    "column": 2.0,
+    "parents": [
+      "features_extractor.boxes.0"
+    ]
+  },
+  {
+    "key": "features_extractor.boxes.2",
+    "branch": "detections",
+    "column": 3.0,
+    "parents": [
+      "features_extractor.boxes.1"
+    ]
+  },
+  {
+    "key": "features_extractor.boxes.3",
+    "branch": "detections",
+    "column": 4.0,
+    "parents": [
+      "features_extractor.boxes.2"
+    ]
+  },
+  {
+    "key": "detections.masked",
+    "branch": "detections",
+    "column": 5.0,
+    "parents": [
+      "features_extractor.boxes.3",
+      "input.detections"
+    ]
+  },
+  {
+    "key": "detections.pooled",
+    "branch": "detections",
+    "column": 6.0,
+    "parents": [
+      "detections.masked"
+    ]
+  },
+  {
+    "key": "detections.winner",
+    "branch": "detections",
+    "column": 7.0,
+    "parents": [
+      "detections.masked"
+    ]
+  },
+  {
+    "key": "input.state",
+    "branch": "state",
+    "column": 0.0,
+    "parents": []
+  },
+  {
+    "key": "features_extractor.proprioception.0",
+    "branch": "state",
+    "column": 1.0,
+    "parents": [
+      "input.state"
+    ]
+  },
+  {
+    "key": "features_extractor.proprioception.1",
+    "branch": "state",
+    "column": 2.0,
+    "parents": [
+      "features_extractor.proprioception.0"
+    ]
+  },
+  {
+    "key": "features_extractor",
+    "branch": "fusion",
+    "column": 9.0,
+    "parents": [
+      "features_extractor.laser.7",
+      "features_extractor.depth.7",
+      "detections.pooled",
+      "features_extractor.proprioception.1"
+    ]
+  },
+  {
+    "key": "lstm_actor",
+    "branch": "actor",
+    "column": 14.0,
+    "parents": [
+      "lstm_actor.h"
+    ]
+  },
+  {
+    "key": "lstm_actor.h0",
+    "branch": "actor_memory",
+    "column": 8.0,
+    "parents": []
+  },
+  {
+    "key": "lstm_actor.c0",
+    "branch": "actor_memory",
+    "column": 8.0,
+    "parents": []
+  },
+  {
+    "key": "lstm_actor.h",
+    "branch": "actor_memory",
+    "column": 13.0,
+    "parents": [
+      "lstm_actor.o",
+      "lstm_actor.c"
+    ]
+  },
+  {
+    "key": "lstm_actor.c",
+    "branch": "actor_memory",
+    "column": 12.0,
+    "parents": [
+      "lstm_actor.f",
+      "lstm_actor.i",
+      "lstm_actor.g",
+      "lstm_actor.c0"
+    ]
+  },
+  {
+    "key": "lstm_actor.i",
+    "branch": "actor_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_actor.h0"
+    ]
+  },
+  {
+    "key": "lstm_actor.f",
+    "branch": "actor_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_actor.h0"
+    ]
+  },
+  {
+    "key": "lstm_actor.g",
+    "branch": "actor_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_actor.h0"
+    ]
+  },
+  {
+    "key": "lstm_actor.o",
+    "branch": "actor_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_actor.h0"
+    ]
+  },
+  {
+    "key": "mlp_extractor.policy_net.0",
+    "branch": "actor",
+    "column": 15.0,
+    "parents": [
+      "lstm_actor"
+    ]
+  },
+  {
+    "key": "mlp_extractor.policy_net.1",
+    "branch": "actor",
+    "column": 16.0,
+    "parents": [
+      "mlp_extractor.policy_net.0"
+    ]
+  },
+  {
+    "key": "action_net",
+    "branch": "actor",
+    "column": 17.0,
+    "parents": [
+      "mlp_extractor.policy_net.1"
+    ]
+  },
+  {
+    "key": "lstm_critic",
+    "branch": "critic",
+    "column": 14.0,
+    "parents": [
+      "lstm_critic.h"
+    ]
+  },
+  {
+    "key": "lstm_critic.h0",
+    "branch": "critic_memory",
+    "column": 8.0,
+    "parents": []
+  },
+  {
+    "key": "lstm_critic.c0",
+    "branch": "critic_memory",
+    "column": 8.0,
+    "parents": []
+  },
+  {
+    "key": "lstm_critic.h",
+    "branch": "critic_memory",
+    "column": 13.0,
+    "parents": [
+      "lstm_critic.o",
+      "lstm_critic.c"
+    ]
+  },
+  {
+    "key": "lstm_critic.c",
+    "branch": "critic_memory",
+    "column": 12.0,
+    "parents": [
+      "lstm_critic.f",
+      "lstm_critic.i",
+      "lstm_critic.g",
+      "lstm_critic.c0"
+    ]
+  },
+  {
+    "key": "lstm_critic.i",
+    "branch": "critic_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_critic.h0"
+    ]
+  },
+  {
+    "key": "lstm_critic.f",
+    "branch": "critic_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_critic.h0"
+    ]
+  },
+  {
+    "key": "lstm_critic.g",
+    "branch": "critic_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_critic.h0"
+    ]
+  },
+  {
+    "key": "lstm_critic.o",
+    "branch": "critic_memory",
+    "column": 11.0,
+    "parents": [
+      "features_extractor",
+      "lstm_critic.h0"
+    ]
+  },
+  {
+    "key": "mlp_extractor.value_net.0",
+    "branch": "critic",
+    "column": 15.0,
+    "parents": [
+      "lstm_critic"
+    ]
+  },
+  {
+    "key": "mlp_extractor.value_net.1",
+    "branch": "critic",
+    "column": 16.0,
+    "parents": [
+      "mlp_extractor.value_net.0"
+    ]
+  },
+  {
+    "key": "value_net",
+    "branch": "critic",
+    "column": 17.0,
+    "parents": [
+      "mlp_extractor.value_net.1"
+    ]
+  },
+  {
+    "key": "action.log_std",
+    "branch": "actor",
+    "column": 18.0,
+    "parents": []
+  },
+  {
+    "key": "action.std",
+    "branch": "actor",
+    "column": 19.0,
+    "parents": [
+      "action.log_std"
+    ]
+  },
+  {
+    "key": "action.applied",
+    "branch": "output",
+    "column": 19.0,
+    "parents": [
+      "action_net"
+    ]
+  }
+]

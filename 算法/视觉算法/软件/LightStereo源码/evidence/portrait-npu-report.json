@@ -1,0 +1,58 @@
+{
+  "scope": "first saved pair only; conversion comparison, not independent distance accuracy",
+  "onnx_checked_coverage": 0.5672407670454546,
+  "rknn_checked_coverage": 0.5707785866477273,
+  "common_valid_pixels": 127056,
+  "depth_delta_m": {
+    "median": 0.0006630122661590576,
+    "p95": 0.0023546814918518066
+  },
+  "forward": {
+    "model": "lightstereo_640_352.rknn",
+    "runtime": "2.3.2",
+    "driver": "0.9.6",
+    "runtime_path": "/opt/lightstereo/runtime/librknnrt.so",
+    "shape": [
+      640,
+      352
+    ],
+    "content_width": 352,
+    "core_mask": 7,
+    "reference": "portrait-reference.npz",
+    "runs": 12,
+    "inference_ms": {
+      "median": 212.72575100101676,
+      "p95": 220.2148196996859
+    },
+    "onnx_delta_px": {
+      "mean": 0.07781527936458588,
+      "p95": 0.29874534606933567,
+      "max": 1.4041481018066406
+    },
+    "scope": "NPU forward only; excludes camera, rectification, reverse consistency and UI"
+  },
+  "reverse": {
+    "model": "lightstereo_640_352.rknn",
+    "runtime": "2.3.2",
+    "driver": "0.9.6",
+    "runtime_path": "/opt/lightstereo/runtime/librknnrt.so",
+    "shape": [
+      640,
+      352
+    ],
+    "content_width": 352,
+    "core_mask": 7,
+    "reference": "portrait-reference-reverse.npz",
+    "runs": 12,
+    "inference_ms": {
+      "median": 212.65191700058494,
+      "p95": 224.37272010056404
+    },
+    "onnx_delta_px": {
+      "mean": 0.051659196615219116,
+      "p95": 0.12847919464111324,
+      "max": 0.9133987426757812
+    },
+    "scope": "NPU forward only; excludes camera, rectification, reverse consistency and UI"
+  }
+}

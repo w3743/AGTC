@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f7f3" />
+    <meta name="description" content="和一个固定 20 个神经元的本地模型玩数字预测。" />
+    <title>按键预测 · 20 个神经元</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到训练区</a>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="按键预测首页">
+          <span class="brand-mark" aria-hidden="true"><span>20</span></span>
+          <span class="brand-copy">
+            <span class="brand-name">按键预测</span>
+            <span class="brand-caption">本地小实验</span>
+          </span>
+        </a>
+        <div class="top-actions">
+          <span class="connection-pill" id="connectionStatus" role="status" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>正在连接…
+          </span>
+          <button class="button button-soft" id="resetButton" type="button" disabled>开始新会话</button>
+          <a class="button button-export" href="/api/export" download="keypress20-export.json">导出记录 <span aria-hidden="true">↓</span></a>
+        </div>
+      </header>
+
+      <main id="main">
+        <section class="intro-row" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>固定 20 个神经元 · 数字 0–9</p>
+            <h1 id="page-title">它能猜中你下一次按的数字吗？</h1>
+            <p class="intro-copy">按一个数字看看。每次按下后，才揭晓它刚才的猜测。</p>
+          </div>
+          <div class="session-chip" id="sessionChip" hidden>
+            <span class="session-chip-label">当前会话</span>
+            <strong id="sessionId">—</strong>
+            <span class="session-chip-label">第 <b id="stepValue">0</b> 次按键</span>
+          </div>
+        </section>
+
+        <div class="layout-grid">
+          <section class="play-card card" aria-labelledby="round-title">
+            <div class="play-card-top">
+              <div>
+                <p class="card-kicker">下一次按键</p>
+                <h2 id="round-title">按一个数字开始</h2>
+              </div>
+              <span class="seal-pill" id="sealPill"><span class="seal-icon" aria-hidden="true">✦</span><span id="sealText">预测已封存</span></span>
+            </div>
+
+            <div class="result-panel" id="resultPanel" aria-live="polite" aria-atomic="true">
+              <span class="result-label" id="resultLabel">上一轮结果</span>
+              <div class="result-content" id="resultContent">
+                <span class="result-empty-icon" aria-hidden="true">?</span>
+                <span>按下任意数字，开始第一轮。</span>
+              </div>
+            </div>
+
+            <div class="digit-pad" id="digitPad" role="group" aria-label="选择你要按的数字">
+              <button class="digit-button" type="button" data-digit="0" disabled aria-label="按下数字 0">0</button>
+              <button class="digit-button" type="button" data-digit="1" disabled aria-label="按下数字 1">1</button>
+              <button class="digit-button" type="button" data-digit="2" disabled aria-label="按下数字 2">2</button>
+              <button class="digit-button" type="button" data-digit="3" disabled aria-label="按下数字 3">3</button>
+              <button class="digit-button" type="button" data-digit="4" disabled aria-label="按下数字 4">4</button>
+              <button class="digit-button" type="button" data-digit="5" disabled aria-label="按下数字 5">5</button>
+              <button class="digit-button" type="button" data-digit="6" disabled aria-label="按下数字 6">6</button>
+              <button class="digit-button" type="button" data-digit="7" disabled aria-label="按下数字 7">7</button>
+              <button class="digit-button" type="button" data-digit="8" disabled aria-label="按下数字 8">8</button>
+              <button class="digit-button" type="button" data-digit="9" disabled aria-label="按下数字 9">9</button>
+            </div>
+            <div class="play-footnote">
+              <span class="keyboard-key" aria-hidden="true">0–9</span>
+              <span>点击数字，或直接按键盘上的数字键</span>
+              <span class="key-separator" aria-hidden="true">·</span>
+              <span>先预测，按后揭晓</span>
+            </div>
+            <p class="live-message" id="liveMessage" role="status" aria-live="polite"></p>
+          </section>
+
+          <aside class="side-column" aria-label="训练统计">
+            <section class="card score-card" aria-labelledby="score-title">
+              <div class="section-heading">
+                <div>
+                  <p class="card-kicker">这段会话</p>
+                  <h2 id="score-title">命中情况</h2>
+                </div>
+                <span class="target-badge" aria-label="随机猜中参考值为百分之十">随机参考 <b>10%</b></span>
+              </div>
+              <div class="score-grid">
+                <div class="score-tile score-tile-hit">
+                  <span class="score-label">猜中</span>
+                  <strong class="score-value" id="hitCount">0 / 0</strong>
+                </div>
+                <div class="score-tile score-tile-rate">
+                  <span class="score-label">命中率</span>
+                  <strong class="score-value" id="accuracyValue">0%</strong>
+                </div>
+              </div>
+              <div class="score-bottom">
+                <span>已按 <strong id="totalCount">0</strong> 次</span>
+                <span>随机猜中大约每十次一次</span>
+              </div>
+              <div class="rolling-metrics" aria-label="最近按键预测命中情况">
+                <span>最近 30 次 <strong id="recent30Hits">—</strong></span>
+                <span>最近 90 次 <strong id="recent90Hits">—</strong></span>
+              </div>
+            </section>
+
+            <section class="card recent-card" aria-labelledby="recent-title">
+              <div class="section-heading compact-heading">
+                <div>
+                  <p class="card-kicker">你的输入</p>
+                  <h2 id="recent-title">最近按键</h2>
+                </div>
+                <span class="recent-count" id="recentCount">0</span>
+              </div>
+              <div class="recent-keys" id="recentKeys" aria-live="polite" aria-label="最近按键记录">
+                <span class="empty-note">记录会出现在这里</span>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="network-card card" aria-labelledby="network-title">
+          <div class="network-heading">
+            <div>
+              <p class="card-kicker">网络活动 · 实时快照</p>
+              <h2 id="network-title">20 个神经元激活结构图</h2>
+            </div>
+            <span class="graph-step-label">当前状态 · 第 <b id="graphStep">0</b> 次按键后</span>
+          </div>
+          <p class="network-hint">颜色按固定的 −1 到 +1 标尺显示活动：蓝色为负、珊瑚色为正，颜色越浓绝对值越大。第 1–10 个神经元分别输出数字 0–9，也参与全部循环连接；环形位置只为排布。</p>
+
+          <section class="model-summary" aria-label="模型模式与输入端口连接">
+            <div class="model-mode-card">
+              <p class="card-kicker">当前学习方式</p>
+              <strong id="trainingModeLabel">读取中…</strong>
+              <p id="modelModeDetail">正在读取在线模型状态。</p>
+            </div>
+            <div class="input-map-card">
+              <div class="input-map-heading">
+                <div>
+                  <p class="card-kicker">稀疏输入连接</p>
+                  <h3>数字入口连接到哪些神经元？</h3>
+                </div>
+                <label class="input-digit-picker" for="inputDigitSelect">查看数字
+                  <select id="inputDigitSelect" aria-describedby="inputMapHelp">
+                    <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                  </select>
+                </label>
+              </div>
+              <p class="input-map-status" id="inputMapStatus" aria-live="polite">正在读取输入权重…</p>
+              <div class="input-count-list" id="inputCountList" aria-label="每个数字入口的非零连接数量"></div>
+              <div class="input-target-list" id="inputTargetList" role="list" aria-label="当前数字入口到20个神经元的精确连接"></div>
+              <p class="input-map-help" id="inputMapHelp">这里只看输入权重矩阵 W<sub>in</sub>：权重精确为 0 才算断开。现有循环连接图的显示阈值不会影响此列表。</p>
+            </div>
+          </section>
+
+          <div class="graph-controls">
+            <label class="threshold-control" for="edgeThreshold">
+              <span>连接显示阈值</span>
+              <input id="edgeThreshold" type="range" min="0" max="100" step="1" value="78" aria-describedby="edgeThresholdHelp" />
+              <output id="edgeThresholdValue" for="edgeThreshold">78% × 最大权重</output>
+            </label>
+            <button class="button button-soft graph-zoom" id="graphZoom" type="button" aria-pressed="false">放大查看</button>
+            <button class="button button-soft graph-clear" id="clearNeuronSelection" type="button" disabled>取消选择</button>
+          </div>
+          <p class="threshold-help" id="edgeThresholdHelp">未选中神经元时，仅画非零且达到阈值的有向连接；调低阈值可显示更多边。图上的筛选只影响显示，不会改动模型或限制训练。</p>
+
+          <div class="graph-frame">
+            <svg class="neuron-graph" id="neuronGraph" viewBox="0 0 720 520" role="group" aria-label="20个神经元的活动值与有效有向连接">
+              <title>20 个神经元结构图</title>
+              <desc>节点颜色表示活动值；箭头从来源神经元指向目标神经元。</desc>
+              <defs>
+                <marker id="arrow-positive" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#d96851" /></marker>
+                <marker id="arrow-negative" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 8 4 L 0 8 z" fill="#547ca3" /></marker>
+              </defs>
+              <circle class="graph-orbit" cx="360" cy="260" r="200" aria-hidden="true"></circle>
+              <g id="graphEdges" class="graph-edges" aria-label="有效连接"></g>
+              <g id="graphNodes" class="graph-nodes" aria-label="神经元"></g>
+              <text class="graph-center-label" x="360" y="253" text-anchor="middle" aria-hidden="true">20 个循环单元</text>
+              <text class="graph-center-step" id="graphCenterStep" x="360" y="274" text-anchor="middle" aria-hidden="true">第 0 次按键后</text>
+            </svg>
+          </div>
+
+          <div class="graph-legend" aria-label="图例">
+            <span><i class="activity-swatch activity-negative"></i>负活动 / 负权重</span>
+            <span><i class="activity-swatch activity-neutral"></i>零活动</span>
+            <span><i class="activity-swatch activity-positive"></i>正活动 / 正权重</span>
+            <span class="graph-edge-count" id="graphEdgeCount" aria-live="polite">正在读取连接…</span>
+          </div>
+
+          <div class="graph-selection-empty" id="graphSelectionEmpty">选择一个节点可查看精确活动值，以及它的全部非零输入和输出连接。点击节点，或聚焦后按 Enter / 空格；按 Escape 取消选择。</div>
+          <section class="graph-inspector" id="graphInspector" aria-labelledby="selectedNeuronTitle" hidden>
+            <div class="graph-inspector-heading">
+              <div>
+                <p class="card-kicker">选中神经元</p>
+                <h3 id="selectedNeuronTitle">神经元</h3>
+              </div>
+              <p class="selected-activity">活动值 <code id="selectedNeuronActivity">—</code></p>
+            </div>
+            <div class="selected-connections">
+              <section aria-labelledby="selectedIncomingTitle">
+                <h4 id="selectedIncomingTitle">输入连接 <span id="selectedIncomingCount">0</span></h4>
+                <ul id="selectedIncoming"></ul>
+              </section>
+              <section aria-labelledby="selectedOutgoingTitle">
+                <h4 id="selectedOutgoingTitle">输出连接 <span id="selectedOutgoingCount">0</span></h4>
+                <ul id="selectedOutgoing"></ul>
+              </section>
+            </div>
+          </section>
+        </section>
+
+        <p class="retention-note"><span aria-hidden="true">↗</span> 开始新会话会重新计数；旧会话记录仍保存在本地，导出时一并包含。</p>
+
+        <details class="inspect-details" id="inspectDetails">
+          <summary>
+            <span class="summary-copy"><span class="summary-icon" aria-hidden="true">◉</span><span><strong>观察神经元</strong><small>可查看预测、活动值和连接权重</small></span></span>
+            <span class="summary-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="inspect-content">
+            <section class="observation-card prediction-card" aria-labelledby="prediction-title">
+              <div class="observe-heading">
+                <div>
+                  <p class="card-kicker">当前封存的一轮</p>
+                  <h3 id="prediction-title">模型预测</h3>
+                </div>
+                <label class="switch-label" for="earlyReveal">
+                  <input id="earlyReveal" type="checkbox" />
+                  <span class="switch-track" aria-hidden="true"><span></span></span>
+                  <span>提前显示猜测</span>
+                </label>
+              </div>
+              <p class="observe-hint" id="predictionHint">预测会在你按下数字后揭晓。打开观察开关可提前查看。</p>
+              <div class="prediction-readout" id="predictionReadout" hidden>
+                <div class="prediction-number-wrap">
+                  <span class="prediction-caption">它猜</span>
+                  <strong class="prediction-number" id="predictionValue">—</strong>
+                </div>
+                <div class="probability-list" id="probabilityList" aria-label="各数字预测概率"></div>
+              </div>
+            </section>
+
+            <section class="observation-card" aria-labelledby="neurons-title">
+              <div class="observe-heading">
+                <div>
+                  <p class="card-kicker">网络活动</p>
+                  <h3 id="neurons-title">20 个神经元</h3>
+                </div>
+                <span class="data-tag">实时状态</span>
+              </div>
+              <p class="observe-hint">颜色表示活动方向和相对强度；悬停或聚焦可查看数值。数字 0–9 的输出对应第 1–10 个神经元。</p>
+              <div class="neuron-grid" id="neuronGrid" role="list" aria-label="20 个神经元的活动值"></div>
+            </section>
+
+            <section class="observation-card matrix-card" aria-labelledby="matrix-title">
+              <div class="observe-heading">
+                <div>
+                  <p class="card-kicker">连接状态</p>
+                  <h3 id="matrix-title">20 × 20 连接权重</h3>
+                </div>
+                <div class="weight-legend" aria-label="权重颜色说明"><span class="legend-negative"></span>负值 <span class="legend-positive"></span>正值</div>
+              </div>
+              <p class="observe-hint">每格对应从上方神经元到左侧神经元的一个连接；颜色深浅按当前数据中的最大绝对值缩放。</p>
+              <div class="matrix-scroll" tabindex="0" aria-label="可横向滚动的连接权重矩阵">
+                <table class="weight-table" id="weightTable"></table>
+              </div>
+              <details class="raw-weights">
+                <summary>展开查看权重数值</summary>
+                <pre id="weightValues" aria-label="20乘20权重数值"></pre>
+              </details>
+            </section>
+          </div>
+        </details>
+      </main>
+
+      <footer class="page-footer">
+        <span>本地运行 · 20 个神经元 · 不连接外部服务</span>
+        <span id="footerSession">等待本地模型连接</span>
+      </footer>
+    </div>
+  </body>
+</html>

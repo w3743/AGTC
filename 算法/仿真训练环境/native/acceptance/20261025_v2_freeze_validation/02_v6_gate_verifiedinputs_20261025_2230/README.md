@@ -1,0 +1,11 @@
+# MJW v6 verified-input acceptance package
+
+State: prepared before execution. This package is separate from the earlier v6 attempts whose copied manifest was stale. It contains the final driver, runner, preregistration, active proto source snapshots and candidate source snapshots. The manifest is generated only after all those bytes are final.
+
+The driver verifies the SHA-256 and size of the driver, candidate, runner, preregistration, active repository proto files and source snapshots against the prelaunch manifest before importing Newton/MuJoCo or creating the result directory. It records the manifest hash and every checked input in the successful result JSON. Any mismatch prints an INPUT_SNAPSHOT_MISMATCH record and exits before physics execution.
+
+The fixed matrix is 1, 3 and 64 worlds, each 20 policy steps at dt=1 ms and decimation 50. The policy sequence is 4 zero steps, 8 fixed per-world target steps, then 8 seeded ramp steps. Partial reset happens before ramp step 13. Contact and penetration gates are evaluated during the zero/fixed settling window; after reset, the selected world must remain finite and accept the first ramp policy step, with no immediate contact requirement.
+
+Acceptance remains as preregistered: every world contacts during the settling window; penetration ≤0.015 m; continuous raw mimic residual ≤0.001 rad from stored Newton reduced joint_q and actual MuJoCo Warp qpos; no capacity overflow; finite states, controls, contacts and effort; measured wheel/gimbal actuator limits 2/1 Nm within 1e-5; untouched worlds remain byte-identical on partial reset; readback separates worlds for N=3/64 (N=1 is N/A). Solver warning mask is 3071, eager mode, deterministic mode unspecified, CUDA Graph disabled. LS and outer counters are reported separately.
+
+This package and runner are still unexecuted. For each case, create a unique external attempt directory, save command.txt and a copy of manifest.json before launching the runner. Do not precreate ATTEMPT_ROOT/result.

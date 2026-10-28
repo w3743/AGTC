@@ -1,0 +1,253 @@
+{
+  "evidence": {
+    "suite_log": "full_suite_final.log",
+    "suite_result": "full_suite_final_result.json",
+    "observed_suite_status": "pass",
+    "observed_test_count": 69,
+    "snapshot_note": "Earlier verification snapshot ran 72 tests. The latest snapshot removed five obsolete far route/guard tests and added two replacement far UI route tests. Contract tests were retained; final suite is 69. Both logs are preserved."
+  },
+  "scope": {
+    "covered_execution": "Production depth codec, wire, adapter, publisher, consumer, and FieldTask observation-packing paths exercised with synthetic inputs in CPU unit tests.",
+    "excluded_claims": [
+      "physical depth precision or field accuracy",
+      "real camera exposure-time behavior",
+      "RK3588 or other hardware execution",
+      "GPU inference or performance",
+      "training or checkpoint validation",
+      "LSTM inference; LASSC consumer fixtures use runner=None"
+    ]
+  },
+  "covered_fixture_ids": [
+    "F01",
+    "F02",
+    "F03",
+    "F04",
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12"
+  ],
+  "uncovered_fixture_ids": [],
+  "fixtures": [
+    {
+      "fixture_id": "F01",
+      "contract_item": "Exact codec bytes and legacy pixel values",
+      "test_observations": [
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_codec_and_wire_boundaries_reach_the_exact_legacy_pixels",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F02",
+      "contract_item": "Inclusive range boundaries and invalid values",
+      "test_observations": [
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_codec_and_wire_boundaries_reach_the_exact_legacy_pixels",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_range_endpoints_and_invalid_values_are_not_clipped",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F03",
+      "contract_item": "Source validity mask is applied before normalization and preserved through target sampling",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_mask_is_applied_before_normalization",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_codec_and_wire_boundaries_reach_the_exact_legacy_pixels",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F04",
+      "contract_item": "Concurrent producer readers and writers observe atomic records",
+      "test_observations": [
+        {
+          "test_id": "test_depth_producer_http.DepthProducerTests.test_concurrent_http_reader_never_mixes_published_frames",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_producer_http.DepthProducerTests.test_multiwriter_sequence_metadata_and_payload_commit_atomically",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F05",
+      "contract_item": "Malformed wire length/profile/layout rejection and known-pattern codec checks",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_row_major_little_endian_marker_and_producer_record_roundtrip",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_producer_http.DepthProducerTests.test_little_endian_range_and_source_precision",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_rejects_wire_profile_length_and_layout_mismatches",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F06",
+      "contract_item": "Nearest-neighbor target geometry, crop edges, and calibration K handling",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_nearest_geometry_preserves_same_depth_mask_and_crop_edges",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_nearest_ties_round_half_up_and_honor_source_mask",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_rejects_unsupported_or_mismatched_intrinsics",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_producer_http.DepthProducerTests.test_fast_k_comes_from_source_calibration_transform",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_codec_and_wire_boundaries_reach_the_exact_legacy_pixels",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F07",
+      "contract_item": "Age is measured from source time and stale observations are rejected",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_age_uses_source_time_not_publish_time",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_stale_age_and_clock_uncertainty_reject_without_commit",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F08",
+      "contract_item": "Duplicate and epoch transitions preserve accepted-stream state",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_duplicate_old_sequence_epoch_reset_and_clock_regressions",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_epoch_switch_retires_prior_stream_and_rejects_late_epoch",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_missing_pose_retry_duplicate_conflict_and_reuse",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F09",
+      "contract_item": "Cross-host time requires a validated clock mapping with acceptable uncertainty",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_cross_host_requires_stable_validated_clock_mapping",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_stale_age_and_clock_uncertainty_reject_without_commit",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F10",
+      "contract_item": "Legacy target tensor and FieldTask depth observation packing",
+      "test_observations": [
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_codec_and_wire_boundaries_reach_the_exact_legacy_pixels",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_future_rejection_does_not_commit_and_next_frame_packs_real_depth_state",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_missing_pose_retry_duplicate_conflict_and_reuse",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F11",
+      "contract_item": "Unknown readiness evidence stays unready; publisher and future-time rejection preserve transactional state",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_unknown_extrinsics_clock_or_left_pts_are_parseable_but_unready",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_unknown_registry_and_source_state_are_not_ready",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.DepthContractAcceptanceTests.test_live_publish_http_to_adapter_keeps_unknown_time_and_extrinsics_unready",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_future_rejection_does_not_commit_sequence_or_source_clock",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_future_source_time_is_not_clipped_to_zero_age",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_contract_acceptance.LASSCDepthAcceptanceTests.test_lassc_future_rejection_does_not_commit_and_next_frame_packs_real_depth_state",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    },
+    {
+      "fixture_id": "F12",
+      "contract_item": "Nearest-neighbor crop edges retain aligned depth and mask",
+      "test_observations": [
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_nearest_geometry_preserves_same_depth_mask_and_crop_edges",
+          "status": "pass"
+        },
+        {
+          "test_id": "test_depth_adapter.DepthAdapterTests.test_nearest_ties_round_half_up_and_honor_source_mask",
+          "status": "pass"
+        }
+      ],
+      "status": "pass"
+    }
+  ]
+}

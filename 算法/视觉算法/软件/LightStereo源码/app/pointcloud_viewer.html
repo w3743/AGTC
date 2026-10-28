@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>单帧双目点云查看器</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Microsoft YaHei",sans-serif;background:#080b10;color:#e8edf5}*{box-sizing:border-box}body{margin:0;height:100dvh;overflow:hidden;display:flex;flex-direction:column;background:#080b10}.top{padding:14px 18px;border-bottom:1px solid #202834;display:flex;align-items:center;gap:14px;flex-wrap:wrap}.title{font-size:17px;font-weight:650}.stats{color:#aeb9c8;font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.stats b{color:#f0f4fa;font-weight:600}.actions{margin-left:auto;display:flex;gap:8px}button,.download{border:1px solid #394554;border-radius:7px;background:#151c26;color:#e8edf5;padding:8px 12px;font:inherit;font-size:13px;text-decoration:none;cursor:pointer}button:hover,.download:hover{background:#202a37}.stage{position:relative;flex:1;min-height:160px;overflow:hidden}canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}.hint{position:absolute;left:16px;bottom:14px;color:#8491a2;font-size:12px;pointer-events:none}.notice{position:absolute;right:16px;bottom:14px;color:#aeb9c8;font-size:12px;pointer-events:none}.error[hidden]{display:none}.error{position:absolute;inset:0;display:grid;place-items:center;color:#ff9c9c;padding:20px;text-align:center}
+</style>
+</head>
+<body>
+<header class="top"><div class="title">单帧双目点云</div><div class="stats"><span>实际点数 <b id="total">—</b></span><span>显示点数 <b id="shown">—</b></span><span>单位 <b>米</b></span><span>来源 <b id="source">—</b></span></div><div class="actions"><button id="reset" type="button">重置视角</button><a class="download" href="pointcloud.ply" download>下载 PLY</a></div></header>
+<main class="stage"><canvas id="view" aria-label="可旋转缩放的三维点云"></canvas><div class="hint">拖动旋转 · 滚轮缩放 · 双指缩放</div><div class="notice"><span id="range"></span> · 单帧点云，不是融合地图</div><div id="error" class="error" hidden></div></main>
+<script>
+'use strict';
+const cloud = __POINTCLOUD_DATA__;
+(()=>{
+ const canvas=document.getElementById('view'),ctx=canvas.getContext('2d',{alpha:false});
+ const elTotal=document.getElementById('total'),elShown=document.getElementById('shown'),elSource=document.getElementById('source'),error=document.getElementById('error');
+ const pts=Array.isArray(cloud.points)?cloud.points:[];
+ elTotal.textContent=Number.isFinite(cloud.count)?cloud.count.toLocaleString('zh-CN'):pts.length.toLocaleString('zh-CN');
+ elSource.textContent=cloud.source||'未知';
+ document.getElementById('range').textContent=`近（红）${cloud.color_range_m[0].toFixed(2)} m → 远（紫）${cloud.color_range_m[1].toFixed(2)} m`;
+ const limit=25000,step=Math.max(1,Math.ceil(pts.length/limit)),visible=[];
+ for(let i=0;i<pts.length;i+=step){const p=pts[i];if(Array.isArray(p)&&p.length>=6&&p.slice(0,3).every(Number.isFinite))visible.push(p)}
+ elShown.textContent=visible.length.toLocaleString('zh-CN');
+ if(!ctx){error.hidden=false;error.textContent='当前浏览器不支持 Canvas 2D。';return}
+ if(!visible.length){error.hidden=false;error.textContent='点云数据为空或格式不正确。';return}
+ // 以包围盒中心为旋转原点，避免大坐标导致视角失控。
+ const lo=[0,1,2].map(k=>Number.isFinite(cloud.bounds?.min?.[k])?cloud.bounds.min[k]:Math.min(...visible.map(p=>p[k])));
+ const hi=[0,1,2].map(k=>Number.isFinite(cloud.bounds?.max?.[k])?cloud.bounds.max[k]:Math.max(...visible.map(p=>p[k])));
+ const center=lo.map((v,k)=>(v+hi[k])/2),radius=Math.max(0.05,Math.hypot(...lo.map((v,k)=>(hi[k]-v)/2)));
+ let yaw=0,pitch=0,distance=radius*2.8;
+ const initial={yaw,pitch,distance};
+ let w=1,h=1,dpr=1;
+ function resize(){const rect=canvas.getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);w=Math.max(1,rect.width);h=Math.max(1,rect.height);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);draw()}
+ function draw(){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#080b10';ctx.fillRect(0,0,w,h);
+  const focal=Math.min(w,h)*0.9,cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+  // 相机沿 +Z 看向原点；默认正视 XY，X 向右、Y 向下。
+  const projected=[];
+  for(const p of visible){const x=p[0]-center[0],y=p[1]-center[1],z=p[2]-center[2];const rx=cy*x-sy*z,rz=sy*x+cy*z,ry=cp*y-sp*rz,depth=sp*y+cp*rz+distance;if(depth<=0.02)continue;const scale=focal/depth;projected.push({x:w/2+rx*scale,y:h/2+ry*scale,z:depth,c:p})}
+  projected.sort((a,b)=>b.z-a.z);
+  for(const q of projected){if(q.x<-4||q.x>w+4||q.y<-4||q.y>h+4)continue;const size=Math.max(1,Math.min(3.5,focal/q.z*0.005));ctx.fillStyle=`rgb(${q.c[3]},${q.c[4]},${q.c[5]})`;ctx.fillRect(q.x-size/2,q.y-size/2,size,size)}
+ }
+ canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});lastPinch=pinchDistance()});
+ const pointers=new Map();let lastPinch=0;
+ canvas.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size>=2){const now=pinchDistance();if(lastPinch&&now)distance=Math.max(radius*.45,Math.min(radius*30,distance*lastPinch/now));lastPinch=now}else{yaw+=(e.clientX-prev.x)*.008;pitch=Math.max(-1.48,Math.min(1.48,pitch+(e.clientY-prev.y)*.008))}draw()});
+ function pinchDistance(){const a=[...pointers.values()];return a.length<2?0:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}
+ function release(e){pointers.delete(e.pointerId);lastPinch=pinchDistance()}
+ canvas.addEventListener('pointerup',release);canvas.addEventListener('pointercancel',release);
+ canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(radius*.45,Math.min(radius*30,distance*Math.exp(e.deltaY*.001)));draw()},{passive:false});
+ document.getElementById('reset').addEventListener('click',()=>{yaw=initial.yaw;pitch=initial.pitch;distance=initial.distance;draw()});
+ new ResizeObserver(resize).observe(canvas);resize();
+})();
+</script>
+</body>
+</html>

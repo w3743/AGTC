@@ -1,0 +1,165 @@
+{
+  "title": "FOC P09 lower-divider resistor OVP threshold recheck",
+  "date": "2026-10-15",
+  "scope": {
+    "references": ["FOC R_OVBOT", "FOC R_OVREF_BOT"],
+    "new_part": "HoAR0603-1/10W-10KR-0.1%-TCR25 / LCSC C5123581",
+    "old_part_baseline": "Yageo RT0603BRD0710KL",
+    "screen": "FOC OVP comparator threshold endpoint non-regression only",
+    "not_claimed": [
+      "complete FOC protection-path error qualification",
+      "E100 per-cell error qualification",
+      "hardware, thermal, or bench acceptance"
+    ]
+  },
+  "model": {
+    "source": "FOC驱动模块/仿真/源码/simulate_dc_link_1s.py",
+    "source_sha256": "832C215108967FDE38B90ABEF5A54C085FB7376B44BF8C9F9F70CBB7D3C7ECE6",
+    "relevant_functions": ["thresholds()", "ovp_corner_sweep()"],
+    "saved_baseline_result": "FOC驱动模块/仿真/结果/dc_link_1s/dc_link_1s_results.json",
+    "saved_baseline_result_sha256": "3657E5125BA168C50253F2A452A82B71DD8DE5D4A79B191F9CEE511CED46D806",
+    "input_location": "NOM dictionary is hardcoded in the source; no separate model input file exists.",
+    "python_dependencies": "Python standard library only",
+    "baseline_recomputed_matches_saved_result": true,
+    "existing_corner_coverage": {
+      "four_divider_resistors": "±0.1% initial tolerance",
+      "hysteresis_and_pullup_resistors": "±1%",
+      "SAFE_5V": "±2.5%",
+      "TLV1704_input_offset": "±5.5 mV",
+      "TLV1704_output_low": "0 to 0.9 V endpoints",
+      "corner_count": 512,
+      "resistor_TCR_modeled": false,
+      "resistor_endurance_drift_modeled": false,
+      "resistor_self_heating_modeled": false,
+      "independent_FOC_E100_error_metric_or_model_found": false
+    },
+    "nominal_inputs": {
+      "r_bus_top_ohm": 162000,
+      "r_bus_bottom_ohm": 10000,
+      "r_ref_top_ohm": 10200,
+      "r_ref_bottom_ohm": 10000,
+      "r_hyst_ohm": 200000,
+      "r_pullup_ohm": 4700,
+      "v_safe_v": 4.9764817276,
+      "r_tolerance_bus_divider_ref": 0.001,
+      "r_tolerance_other": 0.01,
+      "v_safe_tolerance": 0.025,
+      "tlv_offset_max_v": 0.0055
+    },
+    "saved_baseline_thresholds": {
+      "nominal_bus_on_v": 43.41451585364279,
+      "nominal_bus_off_v": 41.41522246002897,
+      "bus_on_min_v": 42.10462510039657,
+      "bus_on_max_v": 44.731984791930316,
+      "bus_off_min_v": 40.07639145184499,
+      "bus_off_max_v": 42.969888965372846,
+      "corner_count": 512
+    }
+  },
+  "component_specs_used": {
+    "new_HoAR": {
+      "initial_tolerance_fraction": 0.001,
+      "tcr_ppm_per_C": 25,
+      "rated_temperature_C": [-55, 155],
+      "endurance_drift_fraction": 0.005,
+      "endurance_condition": "70±2°C, 1000 h cyclic test; maximum resistance change ±0.5%"
+    },
+    "old_Yageo": {
+      "initial_tolerance_fraction": 0.001,
+      "tcr_ppm_per_C": 25,
+      "rated_temperature_C": [-55, 155],
+      "endurance_drift_fraction_at_10k": 0.005005,
+      "endurance_spec": "±(0.5% + 0.05 Ω), normalized to 10 kΩ"
+    },
+    "part_identity_check": "HoAR part is ±25 ppm/°C; no 10 ppm part was substituted."
+  },
+  "method": {
+    "lower_resistance_formula": "10000 Ω × (1 ± initial tolerance) × (1 + TCR × (T - 25°C)) × (1 ± endurance drift)",
+    "changed_parameters": "Only R_OVBOT and R_OVREF_BOT resistance endpoints were extended. The source model's top-arm, SAFE_5V, comparator, hysteresis and pull-up corners were retained.",
+    "scenarios": {
+      "endurance_test_temperature_70C": {
+        "temperature_C": 70,
+        "tcr_fraction_endpoints": [-0.001125, 0.001125],
+        "note": "Combines the resistor TCR at the endurance test temperature with the quoted endurance endpoint."
+      },
+      "datasheet_rated_temperature_extremes": {
+        "temperature_C": [-55, 155],
+        "tcr_fraction_endpoints": [-0.002, 0.00325],
+        "note": "Sensitivity envelope combining the full rated TCR extremes and endurance endpoint; this is not a manufacturer guarantee that the extremes occur simultaneously or a lifetime qualification."
+      }
+    },
+    "extended_corner_count_per_part_and_scenario": 512,
+    "nonregression_boundary": "PASS only if each new-part bus-on/off minimum is at least the matching old-part minimum and each new-part maximum is no greater than the matching old-part maximum.",
+    "absolute_design_limits": "No independent OVP threshold acceptance window is encoded in this model; absolute design-limit compliance is not assessed."
+  },
+  "results": {
+    "lower_resistance_bounds_ohm": {
+      "70C": {
+        "HoAR_new": [9928.86744375, 10071.367556249998],
+        "Yageo_old": [9928.81754994375, 10071.417662556247]
+      },
+      "rated_temperature_extremes": {
+        "HoAR_new": [9920.1699, 10092.745162499996],
+        "Yageo_old": [9920.1200499, 10092.795375162497]
+      }
+    },
+    "threshold_ranges_v": {
+      "70C": {
+        "HoAR_new": {
+          "bus_on": [41.73594000647411, 45.12646902043209],
+          "bus_off": [39.725579579318996, 43.34881203190903]
+        },
+        "Yageo_old": {
+          "bus_on": [41.7356404956822, 45.12679262960518],
+          "bus_off": [39.72529458816641, 43.3491228757284]
+        },
+        "new_minus_old_bound_mV": {
+          "bus_on_min": 0.299511,
+          "bus_on_max": -0.323609,
+          "bus_off_min": 0.284991,
+          "bus_off_max": -0.310844
+        }
+      },
+      "rated_temperature_extremes": {
+        "HoAR_new": {
+          "bus_on": [41.63461008696218, 45.210638138864496],
+          "bus_off": [39.62914669201497, 43.42965803142482]
+        },
+        "Yageo_old": {
+          "bus_on": [41.63431128155502, 45.21096224375253],
+          "bus_off": [39.62886237192056, 43.429969351365145]
+        },
+        "new_minus_old_bound_mV": {
+          "bus_on_min": 0.298805,
+          "bus_on_max": -0.324105,
+          "bus_off_min": 0.284320,
+          "bus_off_max": -0.311320
+        }
+      }
+    },
+    "part_swap_nonregression": {
+      "70C": "PASS",
+      "rated_temperature_extremes": "PASS",
+      "overall": "PASS for the defined relative component-corner non-regression boundary only. HoAR threshold ranges are contained within the old-part ranges in both sensitivity scenarios."
+    }
+  },
+  "qualification_status": {
+    "FOC_P09_full_OVP_threshold_error": "OPEN; the corner screen does not model complete channel error or all real circuit effects.",
+    "FOC_hardware_or_bench_validation": "OPEN; no hardware or bench test was performed.",
+    "separate_per_cell_E100": {
+      "record": "稳压模块/仿真/结果/V1.6-BUSFIX/cell_protection_qualification.json",
+      "persisted_end_to_end_E100mV_validated": false,
+      "persisted_qualification_state": "Not qualified / FAIL in the separate module record; unchanged by this FOC P09 screen.",
+      "used_as_P09_input_or_result": false
+    },
+    "prohibited_inference": "Do not treat the OVP threshold ranges or part-swap PASS as an E100 pass, complete FOC qualification, or hardware acceptance."
+  },
+  "reproducibility": {
+    "isolated_script": "tmp/P09模型复查_20261015/复算_P09_OVP.py",
+    "isolated_output": "tmp/P09模型复查_20261015/复算结果.json",
+    "execution": "python tmp/P09模型复查_20261015/复算_P09_OVP.py",
+    "script_sha256": "5494F055BC4A0057FB0A540268D9CD82E6B34927E6DAEA0A76B9D7930308E380",
+    "output_sha256": "DAA28C8584A439B957644491612233946FB6250CBDCC6E9BC7783E84CC0E9898",
+    "scope_note": "No source model, input, CAD, BOM, BMS, central index, or release file was changed by this calculation."
+  }
+}

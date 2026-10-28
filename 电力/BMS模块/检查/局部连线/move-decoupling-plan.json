@@ -1,0 +1,165 @@
+{
+  "planId": "move-decoupling-cseq-20261016",
+  "status": "CANDIDATE_NOT_APPLIED",
+  "scope": "单组 C_SEQ 去耦移动；只供父代理审阅/应用，不修改原理图。",
+  "source": {
+    "snapshot": "BMS模块\\检查\\局部连线\\local-snapshot.json",
+    "snapshotSha256": "d2bc5fdcb7d1f58d46fd347608ca28567a033c7344d097450a4cd2de0f1716c7",
+    "snapshotCounts": {
+      "components": 208,
+      "ports": 287,
+      "wireGroups": 333
+    },
+    "runtimeNative": "归档\\原始材料\\bms-local-wiring-runtime\\sch\\Schematic1\\P1.esch2",
+    "runtimeNativeSha256AtInspection": "d5ab921d5aa9fb69dca4275a01df2284c4e69f247e60a33d3649407c0c12f217"
+  },
+  "candidateGroups": [
+    {
+      "ref": "C_SEQ",
+      "id": "7c955173b4ac6d76",
+      "move": {
+        "ref": "C_SEQ",
+        "id": "7c955173b4ac6d76",
+        "x": 3680,
+        "y": 2450,
+        "rot": 270
+      },
+      "pinsAfterMove": [
+        {
+          "number": "1",
+          "net": "PRE_CTRL_3V3",
+          "x": 3680,
+          "y": 2470,
+          "role": "VDD"
+        },
+        {
+          "number": "2",
+          "net": "B0",
+          "x": 3680,
+          "y": 2430,
+          "role": "GND"
+        }
+      ],
+      "portActions": [
+        {
+          "action": "delete",
+          "id": "2cabbfb4a0a5faa4",
+          "net": "PRE_CTRL_3V3",
+          "from": [
+            3590,
+            2580
+          ],
+          "reason": "移除旧电容端的重复网标；U_SEQ.14 坐标已有同名 PRE_CTRL_3V3 网端口，保留它并由新导线供电。"
+        },
+        {
+          "action": "move",
+          "id": "df83f355c359c448",
+          "net": "B0",
+          "from": [
+            3630,
+            2580
+          ],
+          "to": [
+            3680,
+            2430
+          ],
+          "rotation": 0,
+          "mirror": false,
+          "reason": "保留电容地端本地 B0 端口，不绕线回 U_SEQ.GND。"
+        }
+      ],
+      "deleteZeroLengthLineIds": [
+        "b84f08e0c7ddce19",
+        "951a6e4c470334de"
+      ],
+      "retainExistingAtDestination": [
+        {
+          "id": "9860f6f16aff3717",
+          "type": "Netport-BI",
+          "net": "PRE_CTRL_3V3",
+          "at": [
+            3600,
+            2470
+          ],
+          "reason": "U_SEQ.14 同名供电脚网标。"
+        },
+        {
+          "id": "908f298a54d246a3",
+          "type": "zero-length LINE",
+          "at": [
+            3600,
+            2470
+          ],
+          "reason": "保留目标引脚现有端点标记。"
+        }
+      ],
+      "newWires": [
+        {
+          "net": "PRE_CTRL_3V3",
+          "points": [
+            [
+              3680,
+              2470
+            ],
+            [
+              3600,
+              2470
+            ]
+          ],
+          "length": 80,
+          "from": "C_SEQ.1",
+          "to": "U_SEQ.14 (VCC)",
+          "shape": "单段水平直线"
+        }
+      ],
+      "textMoves": [
+        {
+          "id": "86038ddb7bf60a52",
+          "content": "100nF",
+          "from": [
+            3592,
+            2561
+          ],
+          "to": [
+            3662,
+            2431
+          ],
+          "reason": "随 C_SEQ 平移 (+70,-130)，保留文字内容与样式。"
+        }
+      ],
+      "metadataToPreserve": {
+        "mpn": "GRM188R72A104KA35J",
+        "manufacturer": "Murata Manufacturing Co., Ltd.",
+        "supplier": "LCSC",
+        "supplierId": "C9900019564",
+        "componentId": "7c955173b4ac6d76",
+        "preserveAllComponentProperties": true
+      },
+      "geometryCheck": {
+        "result": "PASS_FOR_CANDIDATE_GEOMETRY",
+        "routeHasForeignWireIntersection": false,
+        "routeHasForeignPinContact": false,
+        "onlyPinOnRoute": "U_SEQ.14 at [3600,2470] (intended endpoint)",
+        "nearbyUnrelatedComponentCentersWithin70Units": [],
+        "nearestNearbySignalWire": "TMR_ACTIVE at y=2485; 15 units from the new VDD terminal and does not touch the route.",
+        "nativeTargetZeroLengthMarkerAtEndpoint": "908f298a54d246a3 is same-coordinate intended endpoint and is retained."
+      },
+      "apiApplicationHint": {
+        "moveComponent": "eda.sch_PrimitiveComponent.modify(id,{x:3680,y:2450,rotation:270})",
+        "moveB0Port": "eda.sch_PrimitiveComponent.modify(\"df83f355c359c448\",{x:3680,y:2430})",
+        "deleteOldVddPort": "eda.sch_PrimitiveComponent.delete(\"2cabbfb4a0a5faa4\")",
+        "deleteOldZeroLines": "eda.sch_PrimitiveWire.delete([\"b84f08e0c7ddce19\",\"951a6e4c470334de\"])",
+        "createWire": "eda.sch_PrimitiveWire.create([3680,2470,3600,2470],\"PRE_CTRL_3V3\")",
+        "moveValueText": "eda.sch_PrimitiveText.modify(\"86038ddb7bf60a52\",{x:3662,y:2431})",
+        "note": "API 名称/参数仅作实施提示；此计划未调用 API，创建的导线图元 ID 由 API 分配。"
+      }
+    }
+  ],
+  "needsReview": [
+    "C_GATE1",
+    "C_AND2",
+    "C_TIMER",
+    "C_POR"
+  ],
+  "verificationLimit": "候选路线、目标位置与端口/零长线 ID 已按 local-snapshot.json 几何核对；未应用、未运行变更后的 strict verifier/DRC，也未做保存重开验证。"
+}

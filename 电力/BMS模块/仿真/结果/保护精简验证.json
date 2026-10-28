@@ -1,0 +1,402 @@
+{
+  "schema": "bms-protection-reduction-verification-v2",
+  "date": "2026-10-16",
+  "status": "PASS_WITH_OPEN_ITEMS",
+  "scope": "只读绑定当前原生P1、正式BOM与官方Layout快照/几何；核验保护拓扑存在性、指定器件精简的功能/实体数、无风扇当前连接和5V保险后抽头；不替代台架/整车验收。",
+  "summary": {
+    "native_p1_sha256_expected": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+    "board_placed_components": 206,
+    "snapshot_placed_components_including_nonpcb_or_nonbom": 208,
+    "board_mpn_unique_raw": 52,
+    "board_mpn_unique_without_ti_prefix": 51,
+    "fan_hardware_refs": [],
+    "fan_current_active_ports": 0,
+    "fan_current_active_wires": 0,
+    "approved_protection_removals": [],
+    "physical_gate_or_capacitor_deletions_from_checked_simplifications": 0,
+    "independent_hardware_pre_ok_comparator_present": false,
+    "old_2p970s_physical_cutoff_claim_retained": false,
+    "five_volt_source_is_fused_tap_b9": true,
+    "formal_geometry_pin_count": 700,
+    "formal_layout_gate_state": {
+      "layout_initial_placement": "CONDITIONAL",
+      "routing_freeze": "HOLD",
+      "fabrication": "HOLD",
+      "physical_qualification": "NOT_PERFORMED",
+      "no_pcb_created": true
+    }
+  },
+  "evidence_files": {
+    "native_p1_page": {
+      "path": "BMS模块\\sch\\Schematic1\\P1.esch2",
+      "sha256": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a"
+    },
+    "native_project_container": {
+      "path": "BMS模块\\BMS-9S4P.eprj3",
+      "sha256": "2c2e46482a00d0476da328704473b6718d5cc898186d18069b3379494f6754a6"
+    },
+    "published_bom": {
+      "path": "BMS模块\\原理图准备\\BOM.csv",
+      "sha256": "3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219",
+      "expected_sha256": "3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219",
+      "rows": 248
+    },
+    "current_build_manifest": {
+      "path": "BMS模块\\检查\\当前施工输入.json",
+      "sha256": "2da3bd3fb52b10daec14477f07ddccd16f3572c91b0b39f06fd937fd4ad09049",
+      "components": 208,
+      "pins": 700
+    },
+    "current_layout_snapshot": {
+      "path": "BMS模块\\检查\\Layout验证\\current-snapshot.json",
+      "sha256": "7bfb998bb6c5eb3f53c049aa5da5178dbfd4858152af86b8edaa95cfecffd8f8"
+    },
+    "official_final_geometry": {
+      "path": "BMS模块\\检查\\Layout验证\\final-geometry.json",
+      "sha256": "9facca601ac27055a2a522dfdf0916960c872e5c4c182dd35b52ffc4a7c20eec"
+    },
+    "publication_manifest": {
+      "path": "BMS模块\\检查\\Layout验证\\publication.json",
+      "sha256": "8eab4c390345efcd33a93074f0743e78661d5ea7214c90dbf3cdfc6f61daa98d"
+    },
+    "current_publication_manifest": {
+      "path": "BMS模块\\检查\\Layout验证\\当前发布.json",
+      "sha256": "50f1474dd33147417f0a8871d2d224baee52f34ba8ba1fc09e94a2ec33a7a3f1"
+    },
+    "formal_precharge_result": {
+      "path": "BMS模块\\仿真\\结果\\预充Layout闭合.json",
+      "sha256": "180f01d1ec9d5553c3ec184dbc62ec0a5546af6488831de25471e4c32ea32800"
+    }
+  },
+  "current_source_hashes": {
+    "功率元件连接.json": {
+      "path": "BMS模块\\原理图准备\\功率元件连接.json",
+      "sha256": "fa04dd717fe733251c5b1d919089118fe745b6eab28aacf17163ff5c871f81be"
+    },
+    "接口元件连接.json": {
+      "path": "BMS模块\\原理图准备\\接口元件连接.json",
+      "sha256": "5f74ca3a72d25b354d5819ae2a908ac260c620b428ca4a8e472981f03fb7f573"
+    },
+    "AFE元件连接.json": {
+      "path": "BMS模块\\原理图准备\\AFE元件连接.json",
+      "sha256": "874fba89731a5312d594a114a13cc2f2e8a2b48fb9926860502aaed00271a991"
+    },
+    "维护线束元件连接.json": {
+      "path": "BMS模块\\原理图准备\\维护线束元件连接.json",
+      "sha256": "cc9703f57095dd33ec03fcc8bfd8f575bf45de755112ed62a754d1311fb132c7"
+    }
+  },
+  "checks": [
+    {
+      "id": "current_source_duplicate_refs_consistent",
+      "status": "PASS",
+      "evidence": "当前来源重复位号的电气身份（MPN、库身份、引脚映射）一致，已去重；说明文字可按来源上下文不同；重复=['J_CELL_SERVICE']。电气身份冲突会立即终止复算。"
+    },
+    {
+      "id": "native_p1_sha_bound",
+      "status": "PASS",
+      "evidence": "BMS模块\\sch\\Schematic1\\P1.esch2 SHA256=3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a; expected 3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a."
+    },
+    {
+      "id": "formal_bom_sha_bound",
+      "status": "PASS",
+      "evidence": "BMS模块\\原理图准备\\BOM.csv SHA256=3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219; expected 3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219."
+    },
+    {
+      "id": "layout_publication_refs_native_p1",
+      "status": "PASS",
+      "evidence": "正式 publication.json 与 P1 页SHA绑定；配套 final-geometry.json 的 sourceSHA256 也引用该P1页。"
+    },
+    {
+      "id": "current_publication_manifest_matches_sources",
+      "status": "PASS",
+      "evidence": "当前发布清单P1=3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a; BOM SHA=3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219 bytes=154376; 实际P1/BOM SHA和BOM字节数均核对。"
+    },
+    {
+      "id": "current_snapshot_bom_source_match",
+      "status": "PASS",
+      "evidence": "current-snapshot 208个唯一位号；BOM 248行；snapshot位号缺BOM=[]，缺当前来源JSON=[]。"
+    },
+    {
+      "id": "snapshot_bom_source_mpn_match",
+      "status": "PASS",
+      "evidence": "当前快照MPN与正式BOM/连接源逐项比较；差异=[]，总数=0。"
+    },
+    {
+      "id": "mounted_population_count",
+      "status": "PASS",
+      "evidence": "snapshot placed=208，manifest期望=208；pin数=700/700；manifest位号/计数匹配=True；pcb=true且bom=true=206；板装料号原始唯一数=52、去TI前缀后=51。"
+    },
+    {
+      "id": "official_layout_geometry",
+      "status": "PASS",
+      "evidence": "正式final-geometry status=PASS / electrical=PASS / strict=True；pins=700；P1与当前快照SHA均在sourceSHA256内=True；非空失败项=[]。"
+    },
+    {
+      "id": "formal_layout_gate_state_preserved",
+      "status": "PASS",
+      "evidence": "当前发布阶段状态={'layout_initial_placement': 'CONDITIONAL', 'routing_freeze': 'HOLD', 'fabrication': 'HOLD', 'physical_qualification': 'NOT_PERFORMED', 'no_pcb_created': True}；几何PASS不提升为布线冻结、制板或物理验收PASS。"
+    },
+    {
+      "id": "current_no_fan_topology",
+      "status": "PASS",
+      "evidence": "current snapshot fan refs=[], active fan ports=0, fan wires=0, formal active fan refs=[]; J_CORE_P2 pins14/17 are NC in source and placed snapshot. Geometry record retains four explicitly inactive historical FAN_* ports in its approved tombstone whitelist; they are not active current wiring."
+    },
+    {
+      "id": "5v_converter_fused_b9_tap",
+      "status": "PASS",
+      "evidence": "current source: PSU5_EXT pin2=TAP_B9; F_CELL_B9/FH_CELL_B9 CELL_B9→TAP_B9; BOM MPN=URB4805YMD-10WR3; note identifies pin2=TAP_B9=True. Fuse is external to PCB and upstream of the converter tap."
+    },
+    {
+      "id": "and3_substitution_function_and_population",
+      "status": "PASS",
+      "evidence": "U_AND2=SN74LVC1G11DCKR; pin6 third input is tied to PRE_CTRL_3V3, four-state truth table equals AND2; U_GATE1 remains a separate gate. Physical gate count is not reduced by this substitution."
+    },
+    {
+      "id": "eight_decoupling_capacitors_preserved",
+      "status": "PASS",
+      "evidence": "当前来源仍含8只独立100nF/100V/X7R/0603 GRM188R72A104KA35J；实体电容未减少，逐只网络保留。"
+    },
+    {
+      "id": "eight_local_balancing_iset_filters_preserved",
+      "status": "PASS",
+      "evidence": "保留8个独立C_BAL_ISET1..8；模型不将滤波或平衡保护计为删减。器件必要性/滤波行为仍要结合原厂配置与实测验证。"
+    },
+    {
+      "id": "protection_function_topology_coverage",
+      "status": "PASS",
+      "evidence": "关键功能器件/抽头熔断器在现行来源JSON中均可追溯；已放置器件也存在于正式快照。缺源=[]，缺快照=[]。该检查只证明拓扑器件存在，不证明保护参数和动作有效。"
+    },
+    {
+      "id": "legacy_2p970s_physical_cutoff_claim_removed",
+      "status": "PASS",
+      "evidence": "已绑定正式预充结果：2.970s只是旧对比场景；FF-B供电至TMR_ACTIVE/逻辑窗撤销最坏=2.8577405271378624s；QPRE物理释放无保证最大值=False；整链物理最大时间=None；固件PRE_OK未用作独立截止=False。"
+    }
+  ],
+  "and3_as_and2_truth_table": [
+    {
+      "A": 0,
+      "B": 0,
+      "C_tied_high": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 0,
+      "B": 1,
+      "C_tied_high": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 1,
+      "B": 0,
+      "C_tied_high": 1,
+      "Y": 0,
+      "expected_AND2": 0
+    },
+    {
+      "A": 1,
+      "B": 1,
+      "C_tied_high": 1,
+      "Y": 1,
+      "expected_AND2": 1
+    }
+  ],
+  "decoupling_population": [
+    {
+      "ref": "C_SRP",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "SRP",
+        "2": "SRN"
+      }
+    },
+    {
+      "ref": "C_TIMER",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "TMR_VDD",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_AND2",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_GATE1",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_SEQ",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_POR",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_IN2",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_OUT2",
+      "mpn": "GRM188R72A104KA35J",
+      "value": "100 nF ±10%, 100 V, X7R, 0603",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "PACK-"
+      }
+    }
+  ],
+  "protection_function_coverage": [
+    {
+      "function": "电芯电压/温度/电流AFE监测",
+      "refs": [
+        "U1",
+        "RSHUNT",
+        "NTC_CELL1",
+        "NTC_CELL5",
+        "NTC_BOARD",
+        "NTC_MOS"
+      ],
+      "status": "TOPOLOGY_PRESENT_CONFIG_UNVERIFIED",
+      "boundary": "BQ配置阈值、热敏通道分配和保护动作须配置读回并实测。"
+    },
+    {
+      "function": "CHG/DSG主开关及AFE硬保护输入",
+      "refs": [
+        "Q_CHG1..3",
+        "Q_DSG1..3",
+        "Q_DFETOFF",
+        "U1"
+      ],
+      "status": "TOPOLOGY_PRESENT_POWER_QUALIFICATION_OPEN",
+      "boundary": "60A铜箔温升、并联均流、短路切断和FET SOA尚未由板级实测证明。"
+    },
+    {
+      "function": "外部主回路/电芯抽头熔断",
+      "refs": [
+        "F1",
+        "F_CELL_B1..9"
+      ],
+      "status": "TOPOLOGY_PRESENT_COORDINATION_OPEN",
+      "boundary": "Class-T总清除I²t及抽头gPV曲线、短路分断与导线/连接器配合未闭合。"
+    },
+    {
+      "function": "开机/主路释放时序与故障关断",
+      "refs": [
+        "U_AND2",
+        "U_GATE1",
+        "U_SEQ",
+        "U_TIMER",
+        "U_POR",
+        "Q_PRE1/2",
+        "Q_QPRE_DRV"
+      ],
+      "status": "LOGIC_WINDOW_ONLY_PHYSICAL_CHAIN_OPEN",
+      "boundary": "无独立硬件PRE_OK差压判据；MCU MAIN_REQ仍是最终许可；硬件逻辑窗有模型边界但物理QPRE关断上界未保证。"
+    },
+    {
+      "function": "PACK端瞬态钳位",
+      "refs": [
+        "D_TVS"
+      ],
+      "status": "DEVICE_PRESENT_LIMITED",
+      "boundary": "SMCJ45A的45V VRWM不代表可承受48V连续；不吸收60mF母线储能。"
+    },
+    {
+      "function": "8路相邻电芯主动均衡失效默认关闭",
+      "refs": [
+        "U_ETA_BAL1..8",
+        "Q_BAL_EN_CLAMP1..8",
+        "U_BAL_OPTO_Q1/2",
+        "Q_BAL_MAINCLR",
+        "Q_BAL_ENABLE"
+      ],
+      "status": "TOPOLOGY_PRESENT_DYNAMIC_OPEN",
+      "boundary": "ETA内部EN上拉、隔离光耦全温CTR、上电默认态和均衡温升需按厂商资料及首板验证。"
+    },
+    {
+      "function": "隔离的LOAD_POWER_VALID",
+      "refs": [
+        "U_LOAD_POWER_VALID",
+        "Q_LOAD_POWER_VALID_DRV"
+      ],
+      "status": "TOPOLOGY_PRESENT_INTERFACE_OPEN",
+      "boundary": "隔离侧拉偏置和外部接收端阈值/失电态须与系统接口联合验证。"
+    },
+    {
+      "function": "5V辅助电源故障隔离输入",
+      "refs": [
+        "PSU5_EXT",
+        "F_CELL_B9",
+        "FH_CELL_B9"
+      ],
+      "status": "FUSED_TAP_PRESENT",
+      "boundary": "TAP_B9位于外置B9保险后；模块启动浪涌、温升和线束短路协调仍需验证。"
+    }
+  ],
+  "layout_constraints": [
+    "主电流路径按60A连续与100A/1s条件核算铜厚、线宽、过孔、端子和温升；CHG/DSG各三只TOLL MOSFET保持对称并联，按实际均流测温。",
+    "RSHUNT按源说明从本体内侧边缘独立引出SRP/SRN Kelvin线，经各自100Ω滤波；禁止从功率连接器或远端铜箔取样。",
+    "D_TVS贴近PACK+ / PACK-外部接口，缩短高di/dt回路；只作为瞬态钳位，不能假定其承受持续48V或母线电容全能量。",
+    "QPRE两只TO-252背靠背器件保持共源、共栅，QPRE_G至QPRE_SRC的10k上拉、4.7k限流和12V齐纳闭合紧凑回路；首板测源参考VGS和实物关断波形。",
+    "PSU5_EXT pin2从已由F_CELL_B9保护的TAP_B9取电，不接CELL_B9保险前节点；Hi-Link启动/短路电流与铜箔温升需核算。",
+    "按无风扇前提闭合板内热源与机箱散热路径；保护阈值或NTC功能不以风扇存在为条件。"
+  ],
+  "open_items": [
+    "本结果是源文件与正式Layout几何/位号的静态复算，不代表实际BQ76952寄存器、固件策略、温度阈值、开断电流或整车安全验收。",
+    "没有独立硬件PRE_OK差压比较；MAIN_REQ由MCU最终许可。预充逻辑计时窗纸面上限与QPRE实体截止必须区分，整链物理最大时限尚未形成保证。",
+    "主回路F1 Class-T总清除I²t、9路抽头保险分断及线束/触点配合未取得完整曲线和系统短路验证。",
+    "60A连续/100A 1s主回路、分流器及CHG/DSG并联MOSFET需按真实板铜、散热和均流测量验证。",
+    "SMCJ45A为45V VRWM，不证明48V连续耐受或60mF母线浪涌能量钳位。",
+    "8路均衡默认关断和热管理、光耦全温传输、BQ保护配置、隔离外部LOAD_POWER_VALID阈值需要配置读回/台架联调。",
+    "无风扇硬件；Layout热预算按无风扇、自然对流/机箱边界核算，不能把风扇散热作为现行硬件前提。"
+  ],
+  "not_tested": [
+    "BQ configuration write/readback",
+    "firmware behavior",
+    "physical precharge cutoff waveforms",
+    "FET/shunt/copper thermal qualification",
+    "fuse coordination and DC interruption",
+    "EMC/vehicle harness transients",
+    "vehicle release"
+  ],
+  "primary_reference_urls": [
+    "https://www.ti.com/lit/ds/symlink/bq76952.pdf",
+    "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+    "https://www.ti.com/lit/ds/symlink/tpl5111.pdf",
+    "https://www.ti.com/lit/gpn/SN74LVC1G11",
+    "https://www.te.com/en/product-1-2176508-5.html",
+    "https://www.onsemi.com/pdf/datasheet/mmsz5221et1-d.pdf"
+  ]
+}

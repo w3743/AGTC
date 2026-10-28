@@ -1,0 +1,10 @@
+await eda.dmt_EditorControl.openDocument('9546dca0bc8bce7f');
+const d=await eda.dmt_SelectControl.getCurrentDocumentInfo();if(d?.uuid!=='9546dca0bc8bce7f')throw new Error('wrong doc');
+const dev={libraryUuid:'0819f05c4eef4c71ace90d822a990e87',uuid:'11a7ff39fa6a461a89d259faea7aed4a'};
+const c=await eda.sch_PrimitiveComponent.create(dev,5000,5000,undefined,0,false,true,true);
+if(!c)throw new Error('BQ create failed');
+const id=c.getState_PrimitiveId();
+const pins=await eda.sch_PrimitiveComponent.getAllPinsByPrimitiveId(id);
+const out={id,ref:c.getState_Designator(),name:c.getState_Name(),device:c.getState_Component(),x:c.getState_X(),y:c.getState_Y(),pins:(pins||[]).map(p=>({n:p.getState_PinNumber(),name:p.getState_PinName(),x:p.getState_X(),y:p.getState_Y(),rot:p.getState_Rotation()}))};
+const del=await eda.sch_PrimitiveComponent.delete([id]);
+return {out,del};

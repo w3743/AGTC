@@ -1,0 +1,953 @@
+{
+  "document": "稳压模块单页原理图接口与采样核对",
+  "date": "2026-10-22",
+  "designVersion": "V1.3",
+  "status": "preparation_candidate_not_frozen",
+  "scope": "coreboard interface, sensing pins, current comparator route, BW6101 and TCAN332 pin/passive references",
+  "constraints": {
+    "oneBoard": true,
+    "oneSchematicPage": true,
+    "coreboardModified": false,
+    "independentHardwareBusOvervoltageDump": false,
+    "powerTarget": "启动瞬态补能与母线支撑；无固定持续时间目标；0.8-1 kW仅为未经验证的历史敏感性参考",
+    "workWindowPerCellV": [
+      2.2,
+      2.45
+    ],
+    "assumedCellMeasurementErrorV": 0.15,
+    "windowAsHardSafetyBoundary": false
+  },
+  "sheetPlan": {
+    "pageCount": 1,
+    "boardCount": 1,
+    "zoneCount": 6,
+    "zones": [
+      "Aux power, WeAct coreboard and CAN",
+      "Bidirectional half bridge, DRV8161 and current shunt",
+      "Eight cumulative taps (PB14 shared as T8 and SC_SUM ADC) and TLV6700",
+      "Eight BW6101 per-cell bleed channels",
+      "BUS software dump, UCC27511A and three temperature zones",
+      "External connectors, wiring and assembly constraints"
+    ],
+    "sheetSize": "TBD after placement; A1 landscape initial fit candidate; use A0 only if actual count and labels cannot remain legible",
+    "estimatedParts": "not counted from an actual schematic; no basis yet to freeze paper size",
+    "externalSupercapacitorAndDumpResistor": "connectors and annotations only; no second board"
+  },
+  "coreboard": {
+    "model": "WeAct Normal QFN48 STM32G431CBU6, V1.0",
+    "localSchematic": "E:/Pioneer/FOC驱动审阅/硬件/数据手册/WeAct_normal_QFN48_V1.0.pdf",
+    "localSchematicSha256": "57ECA2E3467ABD45BD6D4BC993EB11E9C83389A7C390DA2543C3F20CFC2C640D",
+      "headerPitchMm": 2.54,
+      "currentMapClarification": "PB10/P2-5=TEST, PB11/P2-6=NTC_MAIN, PA0/P2-20=AD_T1. I2C2 reuse of PB10/PB11 is an unimplemented future candidate and is not part of current connectivity.",
+    "headerRows": 2,
+    "headerPositions": 12,
+    "P1": [
+      {
+        "pin": 1,
+        "net": "VCC5V"
+      },
+      {
+        "pin": 2,
+        "net": "VCC5V"
+      },
+      {
+        "pin": 3,
+        "net": "GND"
+      },
+      {
+        "pin": 4,
+        "net": "GND"
+      },
+      {
+        "pin": 5,
+        "net": "PB12",
+        "use": "NTC_DUMP_ADC1_IN11"
+      },
+      {
+        "pin": 6,
+        "net": "PB13",
+        "use": "TIM1_CH1N_PWM_L"
+      },
+      {
+        "pin": 7,
+        "net": "PB14",
+        "use": "SC_SUM_ADC_T8_ADC1_IN5; same ADC reading for top tap and pack sum"
+      },
+      {
+        "pin": 8,
+        "net": "PB15",
+        "use": "TEST_FB_ADC2_IN15 through 10k/10k divider"
+      },
+      {
+        "pin": 9,
+        "net": "PC6",
+        "use": "reserved"
+      },
+      {
+        "pin": 10,
+        "net": "PA8",
+        "use": "TIM1_CH1_PWM_H"
+      },
+      {
+        "pin": 11,
+        "net": "PA9",
+        "use": "reserved; check PB6 bridge relationship"
+      },
+      {
+        "pin": 12,
+        "net": "PA10",
+        "use": "reserved"
+      },
+      {
+        "pin": 13,
+        "net": "PA11",
+        "use": "FDCAN1_RX_AF9; shared with USB D-"
+      },
+      {
+        "pin": 14,
+        "net": "PA12",
+        "use": "FDCAN1_TX_AF9; shared with USB D+"
+      },
+      {
+        "pin": 15,
+        "net": "PA15",
+        "use": "reserved"
+      },
+      {
+        "pin": 16,
+        "net": "PC10",
+        "use": "reserved"
+      },
+      {
+        "pin": 17,
+        "net": "PC11",
+        "use": "reserved"
+      },
+      {
+        "pin": 18,
+        "net": "PB3",
+        "use": "reserved"
+      },
+      {
+        "pin": 19,
+        "net": "PB4",
+        "use": "reserved; not VBUS detect"
+      },
+      {
+        "pin": 20,
+        "net": "PB5",
+        "use": "power permit through series resistor to DRV_FAULT_N"
+      },
+      {
+        "pin": 21,
+        "net": "PB6",
+        "use": "PMOS_CTRL only if SB3 and SB6 confirmed open"
+      },
+      {
+        "pin": 22,
+        "net": "PB7",
+        "use": "DUMP_PWM_TIM4_CH2_AF2"
+      },
+      {
+        "pin": 23,
+        "net": "PB8_BOOT0",
+        "use": "do not use; preserve boot configuration"
+      },
+      {
+        "pin": 24,
+        "net": "PB9",
+        "use": "reserved"
+      }
+    ],
+    "P2": [
+      {
+        "pin": 1,
+        "net": "3V3"
+      },
+      {
+        "pin": 2,
+        "net": "3V3"
+      },
+      {
+        "pin": 3,
+        "net": "GND"
+      },
+      {
+        "pin": 4,
+        "net": "GND"
+      },
+      {
+        "pin": 5,
+        "net": "PB10",
+        "use": "TEST; GPIO IDR digital status check"
+      },
+      {
+        "pin": 6,
+        "net": "PB11",
+        "use": "NTC_MAIN_ADC12_IN14"
+      },
+      {
+        "pin": 7,
+        "net": "PB2",
+        "use": "board VBUS detect via SB4; do not repurpose"
+      },
+      {
+        "pin": 8,
+        "net": "VREF+",
+        "use": "preserve board reference wiring"
+      },
+      {
+        "pin": 9,
+        "net": "PB0",
+        "use": "BUS_ADC_ADC1_IN15"
+      },
+      {
+        "pin": 10,
+        "net": "PB1",
+        "use": "DRV_SO_ADC1_IN12_COMP1_INP"
+      },
+      {
+        "pin": 11,
+        "net": "PA7",
+        "use": "DRV_SO_COMP2_INP; ADC2_IN4 capability unused"
+      },
+      {
+        "pin": 12,
+        "net": "PC4",
+        "use": "NTC_SC_ADC2_IN5"
+      },
+      {
+        "pin": 13,
+        "net": "PA5",
+        "use": "T6_ADC2_IN13"
+      },
+      {
+        "pin": 14,
+        "net": "PA6",
+        "use": "T7_ADC2_IN3"
+      },
+      {
+        "pin": 15,
+        "net": "PA3",
+        "use": "T4_ADC1_IN4"
+      },
+      {
+        "pin": 16,
+        "net": "PA4",
+        "use": "T5_ADC2_IN17"
+      },
+      {
+        "pin": 17,
+        "net": "PA1",
+        "use": "T2_ADC12_IN2"
+      },
+      {
+        "pin": 18,
+        "net": "PA2",
+        "use": "T3_ADC1_IN3"
+      },
+      {
+        "pin": 19,
+        "net": "NRST",
+        "use": "preserve reset"
+      },
+      {
+        "pin": 20,
+        "net": "PA0",
+        "use": "AD_T1_ADC12_IN1"
+      },
+      {
+        "pin": 21,
+        "net": "PC14",
+        "use": "reserved"
+      },
+      {
+        "pin": 22,
+        "net": "PC15",
+        "use": "reserved"
+      },
+      {
+        "pin": 23,
+        "net": "VBAT",
+        "use": "preserve board wiring"
+      },
+      {
+        "pin": 24,
+        "net": "PC13",
+        "use": "reserved"
+      }
+    ],
+    "P3_SWD": {
+      "pins": [
+        {
+          "pin": 1,
+          "net": "3V3_TARGET_REFERENCE",
+          "use": "target reference only; debugger must not actively power target"
+        },
+        {
+          "pin": 2,
+          "net": "PA13_SW-DIO",
+          "use": "SWDIO"
+        },
+        {
+          "pin": 3,
+          "net": "PA14_SWCLK",
+          "use": "SWCLK"
+        },
+        {
+          "pin": 4,
+          "net": "GND",
+          "use": "debug ground"
+        }
+      ],
+      "debugProbeMayActivelyDriveTarget3V3": false,
+      "downloadMethod": "SWD"
+    },
+    "boardConstraints": [
+      "PA11/PA12 are hard-connected to Type-C USB D-/D+; CAN and USB data cannot be used simultaneously.",
+      "PB2 VBUS sensing is through SB4 and board resistors; PB4 is not VBUS sense.",
+      "PB6 connects to PA9 through SB3 and CC1 through SB6; verify both physical solder bridges open before PMOS control.",
+      "Do not modify the coreboard; do not drive its VCC with 10/12 V or its 3V3 pin with an external supply."
+    ]
+  },
+  "candidateSignals": [
+    {
+      "name": "AD_T1",
+      "mcu": "PA0",
+      "header": "P2-20",
+      "adc": "ADC12_IN1",
+      "role": "cumulative SC tap 1; current external pin net AD_T1"
+    },
+    {
+      "name": "T2",
+      "mcu": "PA1",
+      "header": "P2-17",
+      "adc": "ADC12_IN2",
+      "role": "cumulative SC tap 2"
+    },
+    {
+      "name": "T3",
+      "mcu": "PA2",
+      "header": "P2-18",
+      "adc": "ADC1_IN3",
+      "role": "cumulative SC tap 3"
+    },
+    {
+      "name": "T4",
+      "mcu": "PA3",
+      "header": "P2-15",
+      "adc": "ADC1_IN4",
+      "role": "cumulative SC tap 4"
+    },
+    {
+      "name": "T5",
+      "mcu": "PA4",
+      "header": "P2-16",
+      "adc": "ADC2_IN17",
+      "role": "cumulative SC tap 5"
+    },
+    {
+      "name": "T6",
+      "mcu": "PA5",
+      "header": "P2-13",
+      "adc": "ADC2_IN13",
+      "role": "cumulative SC tap 6"
+    },
+    {
+      "name": "T7",
+      "mcu": "PA6",
+      "header": "P2-14",
+      "adc": "ADC2_IN3",
+      "role": "cumulative SC tap 7"
+    },
+    {
+      "name": "BUS_ADC",
+      "mcu": "PB0",
+      "header": "P2-9",
+      "adc": "ADC1_IN15"
+    },
+    {
+      "name": "DRV_SO",
+      "mcu": "PB1",
+      "header": "P2-10",
+      "adc": "ADC1_IN12; COMP1_INP",
+      "role": "DRV8161 SO node to ADC1 and COMP1; same analog node branches to PA7 COMP2_INP",
+      "comparator": "COMP1_INP"
+    },
+    {
+      "name": "NTC_SC",
+      "mcu": "PC4",
+      "header": "P2-12",
+      "adc": "ADC2_IN5"
+    },
+    {
+      "name": "NTC_MAIN",
+      "mcu": "PB11",
+      "header": "P2-6",
+      "adc": "ADC12_IN14"
+    },
+    {
+      "name": "NTC_DUMP",
+      "mcu": "PB12",
+      "header": "P1-5",
+      "adc": "ADC1_IN11"
+    },
+    {
+      "name": "TEST",
+      "mcu": "PB10",
+      "header": "P2-5",
+      "direction": "push-pull output; IDR readback is digital only"
+    },
+    {
+      "name": "DUMP_PWM",
+      "mcu": "PB7",
+      "header": "P1-22",
+      "timer": "TIM4_CH2_AF2"
+    },
+    {
+      "name": "PMOS_CTRL",
+      "mcu": "PB6",
+      "header": "P1-21",
+      "condition": "SB3 and SB6 physically open"
+    },
+    {
+      "name": "POWER_PERMIT",
+      "mcu": "PB5",
+      "header": "P1-20",
+      "condition": "series resistor to shared DRV_FAULT_N/SC_OV open-drain node"
+    },
+    {
+      "name": "PWM_H",
+      "mcu": "PA8",
+      "header": "P1-10",
+      "timer": "TIM1_CH1"
+    },
+    {
+      "name": "PWM_L",
+      "mcu": "PB13",
+      "header": "P1-6",
+      "timer": "TIM1_CH1N"
+    },
+    {
+      "name": "CAN_RX",
+      "mcu": "PA11",
+      "header": "P1-13",
+      "peripheral": "FDCAN1_RX_AF9"
+    },
+    {
+      "name": "CAN_TX",
+      "mcu": "PA12",
+      "header": "P1-14",
+      "peripheral": "FDCAN1_TX_AF9"
+    },
+    {
+      "name": "SC_SUM_ADC_T8",
+      "mcu": "PB14",
+      "header": "P1-7",
+      "adc": "ADC1_IN5",
+      "role": "simple-divider reading is both cumulative top tap T8 and pack-top/SC_SUM observation; one channel, not an independent cross-check"
+    },
+    {
+      "name": "TEST_FB",
+      "mcu": "PB15",
+      "header": "P1-8",
+      "adc": "ADC2_IN15",
+      "divider": "10k/10k from TEST to GND_SYS",
+      "role": "analog readback of shared TEST voltage"
+    },
+    {
+      "name": "DRV_SO_COMP2_BRANCH",
+      "mcu": "PA7",
+      "header": "P2-11",
+      "adc": "ADC2_IN4 capability unused",
+      "comparator": "COMP2_INP",
+      "role": "short branch from DRV8161 SO; shared net with PB1 COMP1/ADC route",
+      "sharedNet": "DRV_SO"
+    }
+  ],
+  "tapNetwork": {
+    "componentsTaps1To7": {
+      "tapToAdcOhm": 68000,
+      "adcToGndSysOhm": 10000,
+      "adcToCommonTestOhm": 47000,
+      "adcRc": "value and pole TBD"
+    },
+    "componentsTap8AndSum": {
+      "tapToAdcOhm": 68000,
+      "adcToGndSysOhm": 10000,
+      "adcToCommonTestOhm": 0,
+      "adcRc": "value and pole TBD"
+    },
+    "testFeedback": {
+      "mcu": "PB15",
+      "header": "P1-8",
+      "adc": "ADC2_IN15",
+      "topOhm": 10000,
+      "bottomOhm": 10000,
+      "equation": "V_TEST = 2 * Vadc(PB15)",
+      "status": "candidate; shared TEST source loading and accuracy require closure"
+    },
+    "formula": {
+      "K1to7": 9.2468,
+      "c1to7": 1.4468,
+      "tap1to7": "Vtap[j] = K1to7 * Vadc(PA[j-1]) - c1to7 * V_TEST",
+      "K8": 7.8,
+      "c8": 0,
+      "tap8": "Vtap8 = 7.8 * Vadc(PB14), referenced to GND_SYS",
+      "cell1": "Vcell1 = Vtap1 - V_SCminus",
+      "cell2to7": "Vcell[j] = Vtap[j] - Vtap[j-1]",
+      "cell8": "Vcell8 = Vtap8 - Vtap7",
+      "packTotal": "V_SC_total = Vtap8 - V_SCminus",
+      "SCminus": "SC-negative shunt-side Kelvin voltage relative to GND_SYS; measurement or current/shunt compensation and its error remain unresolved"
+    },
+    "testControl": {
+      "gpio": "PB10",
+      "normalState": "push-pull LOW",
+      "diagnostic": "short HIGH pulse; check GPIO IDR and analog TEST_FB on PB15; wait ADC/RC settling; inspect tap response; restore LOW and verify digital and analog readback"
+    },
+    "diagnosticLimits": [
+      "PB14 is one ADC observation serving both T8 and SC_SUM; no independent T8 cross-check exists.",
+      "Summing adjacent cell differences telescopes to the endpoints and cannot self-validate the PB14 channel.",
+      "PB15 analog TEST_FB improves shared TEST voltage observation but does not prove every tap channel open/short or resistor-drift coverage.",
+      "TLV6700 remains an independent hardware SC-total overvoltage path but does not establish complete tap-fault coverage.",
+      "All tap readings are relative to GND_SYS; do not assume SC_NEG_SHUNT_KELVIN equals GND_SYS."
+    ]
+  },
+  "currentLimitCandidate": {
+    "architecture": "DRV8161 SO feeds ADC and two non-inverting comparator inputs; internal DAC3 thresholds; comparator outputs route to TIM1 Break",
+    "soNet": [
+      "PB1_COMP1_INP_ADC1_IN12",
+      "PA7_COMP2_INP_ADC2_IN4-capability-unused"
+    ],
+    "comp1": {
+      "nonInverting": "PB1",
+      "invertingThreshold": "internal DAC3_CH1",
+      "intendedTrip": "SO > upper threshold"
+    },
+    "comp2": {
+      "nonInverting": "PA7",
+      "invertingThreshold": "internal DAC3_CH2",
+      "intendedTrip": "SO < lower threshold; output polarity must be configured accordingly",
+      "pinCapability": "ADC2_IN4 capability exists but is not used as a tap"
+    },
+    "timer": "TIM1 Break candidate; exact source combine, polarity, latch/rearm, MOE safe states and startup order require RM0440/register review and bench validation",
+    "calculationAssumptions": {
+      "CSAREF_V": 3.3,
+      "gain_VperV": 20,
+      "shunt_ohm": 0.0005,
+      "formula": "VSO ~= 1.65 V + 0.010 V/A * I_SC, discharge positive",
+      "idealPlus80A_V": 2.45,
+      "idealMinus80A_V": 0.85,
+      "idealPlusMinus140ARange_V": [
+        0.25,
+        3.05
+      ]
+    },
+    "claimBoundary": "±80 A trip is an unapproved target candidate; ±140 A endpoints reach nominal CSA swing bounds and have no demonstrated margin; no hardware timing proof yet",
+    "notes": [
+      "PA3 remains allocated to T4; PA7 is the second DRV_SO comparator input.",
+      "PB14 is not a comparator input; PB14 is reserved for shared SC_SUM/T8 ADC reading."
+    ]
+  },
+  "componentPinMaps": {
+    "BW6101": {
+      "manufacturer": "BITWELL",
+      "package": "SOT23-5L",
+      "qty": 8,
+      "onePerCell": true,
+      "pinout": [
+        {
+          "pin": 1,
+          "name": "VDD",
+          "connection": "cell positive"
+        },
+        {
+          "pin": 2,
+          "name": "GND",
+          "connection": "same cell negative"
+        },
+        {
+          "pin": 3,
+          "name": "SEL",
+          "connection": "same cell GND for 2.45 V setting"
+        },
+        {
+          "pin": 4,
+          "name": "LED",
+          "connection": "NC; no indicator resistor/population"
+        },
+        {
+          "pin": 5,
+          "name": "IOUT",
+          "connection": "one local bleed resistor to same cell GND"
+        }
+      ],
+      "passives": [
+        {
+          "refPattern": "R_BAL1..R_BAL8",
+          "value": "120 ohm, 0.25 W candidate",
+          "connection": "IOUT to local cell GND",
+          "calculationAt2p7V": {
+            "current_A": 0.0225,
+            "power_W": 0.06075
+          }
+        }
+      ],
+      "threshold25C": {
+        "selLowTripMinTypMax_V": [
+          2.42,
+          2.45,
+          2.48
+        ],
+        "selLowAlarmMinTypMax_V": [
+          2.51,
+          2.55,
+          2.59
+        ]
+      },
+      "datasheetVsWebsiteBleedCurrent": {
+        "datasheet": "700 mA at VDD=2.65 V",
+        "website": "200 mA without external expansion FET",
+        "status": "conflict; external resistor limits this design and no large current is relied on"
+      },
+      "notes": [
+        "Factory typical application image shows VDD/GND across each cell and IOUT bleed resistor to local GND.",
+        "Do not tie each cell GND to global ground across the stack.",
+        "Not a main charging limiter or a substitute for software per-cell stop."
+      ]
+    },
+    "TCAN332": {
+      "manufacturer": "Texas Instruments",
+      "package": "8-pin D or DCN drawing; selected footprint/orderable package TBD",
+      "pinout": [
+        {
+          "pin": 1,
+          "name": "TXD",
+          "connection": "PA12 / FDCAN1_TX"
+        },
+        {
+          "pin": 2,
+          "name": "GND",
+          "connection": "GND_SYS"
+        },
+        {
+          "pin": 3,
+          "name": "VCC",
+          "connection": "3V3_CORE"
+        },
+        {
+          "pin": 4,
+          "name": "RXD",
+          "connection": "PA11 / FDCAN1_RX"
+        },
+        {
+          "pin": 5,
+          "name": "NC",
+          "connection": "unconnected"
+        },
+        {
+          "pin": 6,
+          "name": "CANL",
+          "connection": "CAN connector CANL"
+        },
+        {
+          "pin": 7,
+          "name": "CANH",
+          "connection": "CAN connector CANH"
+        },
+        {
+          "pin": 8,
+          "name": "NC",
+          "connection": "unconnected"
+        }
+      ],
+      "passives": [
+        {
+          "ref": "C_CAN_VCC",
+          "value": "100 nF ceramic",
+          "connection": "pin 3 to pin 2, close to pins",
+          "status": "TI supply recommendation"
+        },
+        {
+          "ref": "R_CAN_TERM",
+          "value": "120 ohm",
+          "connection": "CANH to CANL",
+          "status": "populate only when this node is a physical bus endpoint; location/option TBD"
+        },
+        {
+          "ref": "CAN_TVS",
+          "value": "TBD",
+          "connection": "near connector if system ESD/EFT/surge assessment requires",
+          "status": "not selected"
+        }
+      ],
+      "notes": [
+        "No standby/shutdown pin on TCAN332; pins 5 and 8 are NC.",
+        "CAN termination is at the two physical ends; do not populate at every node.",
+        "PA11/PA12 also carry USB D-/D+ on the coreboard; do not use CAN and USB data at the same time."
+      ]
+    },
+    "UCC27511A": {
+      "manufacturer": "Texas Instruments",
+      "package": "DBV / SOT-23-6 candidate; exact orderable binding TBD",
+      "qty": 1,
+      "pinout": [
+        {
+          "pin": 1,
+          "name": "VDD",
+          "connection": "12V_DRV"
+        },
+        {
+          "pin": 2,
+          "name": "OUTH",
+          "connection": "10 ohm candidate series resistor to DUMP_FET_GATE"
+        },
+        {
+          "pin": 3,
+          "name": "OUTL",
+          "connection": "10 ohm candidate series resistor to same DUMP_FET_GATE"
+        },
+        {
+          "pin": 4,
+          "name": "GND",
+          "connection": "GND_SYS; keep gate-current return short"
+        },
+        {
+          "pin": 5,
+          "name": "IN-",
+          "connection": "GND_SYS for fixed non-inverting drive"
+        },
+        {
+          "pin": 6,
+          "name": "IN+",
+          "connection": "DUMP_PWM/PB7 through 100 ohm candidate series resistor"
+        }
+      ],
+      "passives": [
+        {
+          "ref": "C_DUMP_DRV_100N",
+          "value": "100 nF ceramic",
+          "connection": "pin 1 VDD to pin 4 GND, close to pins",
+          "status": "candidate local bypass"
+        },
+        {
+          "ref": "C_DUMP_DRV_1U",
+          "value": "1 uF low-ESR",
+          "connection": "pin 1 VDD to pin 4 GND, close to pins",
+          "status": "candidate local bulk"
+        },
+        {
+          "ref": "R_DUMP_IN",
+          "value": "100 ohm",
+          "connection": "PB7 DUMP_PWM to pin 6 IN+",
+          "status": "candidate series resistor"
+        },
+        {
+          "ref": "R_DUMP_IN_PD",
+          "value": "10 kohm",
+          "connection": "pin 6 IN+ to GND_SYS",
+          "status": "candidate input default-off pulldown"
+        },
+        {
+          "refPattern": "R_DUMP_GATE_H/R_DUMP_GATE_L",
+          "value": "10 ohm each",
+          "connection": "pins 2 OUTH and 3 OUTL through separate resistors to shared DUMP_FET_GATE",
+          "status": "candidate; gate waveform and resistor pulse rating require verification"
+        },
+        {
+          "ref": "R_DUMP_GATE_PD",
+          "value": "10 kohm",
+          "connection": "DUMP_FET_GATE to MOSFET source/GND_SYS",
+          "status": "candidate gate-source default-off pulldown"
+        }
+      ],
+      "notes": [
+        "Low-side software-controlled BUS dump driver only; no autonomous BUS overvoltage trigger.",
+        "Driver voltage range and gate current/power budget are not demonstrated by this pin map.",
+        "Values are candidates from the current parameter sidecar, not frozen passives."
+      ]
+    }
+  },
+  "externalInterfaces": [
+    {
+      "name": "J_CORE_P1",
+      "type": "2x12 2.54 mm mating connector, exact gender/MPN TBD",
+      "pins": "coreboard P1 map above"
+    },
+    {
+      "name": "J_CORE_P2",
+      "type": "2x12 2.54 mm mating connector, exact gender/MPN TBD",
+      "pins": "coreboard P2 map above"
+    },
+    {
+      "name": "J_SC_POWER",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "SC+"
+        },
+        {
+          "pin": 2,
+          "net": "SC_NEG_SHUNT_KELVIN"
+        }
+      ],
+      "rating": "TBD"
+    },
+    {
+      "name": "J_SC_TAPS",
+      "pinCount": 9,
+      "pinNets": [
+        "T0_SC_NEG_KELVIN",
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8_SC+"
+      ],
+      "rating": "TBD; sense harness and anti-misplug assembly controls required"
+    },
+    {
+      "name": "J_BUS_POWER",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "BUS_EXT+"
+        },
+        {
+          "pin": 2,
+          "net": "GND_SYS"
+        }
+      ],
+      "rating": "TBD"
+    },
+    {
+      "name": "J_DUMP",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "BUS_EXT+"
+        },
+        {
+          "pin": 2,
+          "net": "DUMP_SW"
+        }
+      ],
+      "rating": "TBD; external resistor only"
+    },
+    {
+      "name": "J_CAN",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "GND_SYS"
+        },
+        {
+          "pin": 2,
+          "net": "CANH"
+        },
+        {
+          "pin": 3,
+          "net": "CANL"
+        }
+      ],
+      "rating": "TBD"
+    },
+    {
+      "name": "J_NTC_SC",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "NTC_SC_ADC"
+        },
+        {
+          "pin": 2,
+          "net": "GND_SYS"
+        }
+      ],
+      "divider": "TBD"
+    },
+    {
+      "name": "J_NTC_MAIN",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "NTC_MAIN"
+        },
+        {
+          "pin": 2,
+          "net": "GND_SYS"
+        }
+      ],
+      "divider": "TBD"
+    },
+    {
+      "name": "J_NTC_DUMP",
+      "pins": [
+        {
+          "pin": 1,
+          "net": "NTC_DUMP_ADC"
+        },
+        {
+          "pin": 2,
+          "net": "GND_SYS"
+        }
+      ],
+      "divider": "TBD"
+    }
+  ],
+  "existingLocalPrecedentReadOnly": {
+    "path": "E:/Pioneer/FOC驱动审阅/硬件/系统辅助板/核验.json",
+    "references": [
+      "J_CORE_P1",
+      "J_CORE_P2"
+    ],
+    "modelCandidate": "M20-7831242",
+    "footprintCandidate": "项目封装_核心板双排母座",
+    "footprintSha256": "d0eb1497f3d48e36938b9b3d0e4cf64485351a0a294b6ce03f710160004ddbcf",
+    "qualification": "read-only format precedent; not approved for this module without physical fit/binding check"
+  },
+  "unimplementedCandidates": [
+    {
+      "name": "I2C2 on PB10/PB11",
+      "status": "unimplemented",
+      "reason": "PB10/P2-5 remains TEST and PB11/P2-6 remains NTC_MAIN in the current pin map; do not imply I2C wiring or move either signal in this NTC source revision."
+    },
+    {
+      "name": "TH_SC and TH_MAIN A1 thermistors",
+      "status": "selected_for_next_source_revision_not_yet_verified",
+      "mpn": "MF52A103F3950(A1)",
+      "lcscCode": "C13879",
+      "retained": "TH_DUMP ATI ATH10K1R8B3950K",
+      "thermalQualification": "open"
+    }
+  ],
+  "unresolved": [
+    "TEST_FB loading and dynamic accuracy, cell voltage error, SC-negative shunt Kelvin reference/compensation, and single-channel fault coverage limits",
+    "PB14 is shared for T8 and SC_SUM; no independent T8 ADC redundancy",
+    "Tap-divider resistor ratio tolerance, input RC values and ADC acquisition/settling time",
+    "COMP/DAC polarity, thresholds, TIM1 Break mapping and latch/rearm behavior; bench response time",
+    "NTC curve/configuration, threshold implementation, mounting and thermal response qualification",
+    "Connector MPN, current/voltage rating, keying, wire sizes and assembly protection",
+    "CAN endpoint status, termination implementation, system ESD/EFT/surge protection and ground/shield policy",
+    "Total schematic part count and A1/A0 fit; native ERC and PCB evidence",
+    "Measured/verified startup-transient power and thermal capability; actual startup deficit and duration are unquantified, with no fixed 1 s acceptance target"
+  ],
+  "sources": {
+    "stm32Datasheet": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+    "stm32ReferenceManual": "https://www.st.com/resource/en/reference_manual/dm00355726.pdf",
+    "stm32ComparatorApplicationNote": "https://www.st.com/resource/en/application_note/an4232-getting-started-with-analog-comparators-for-stm32f3-series-and-stm32g4-series-devices-stmicroelectronics.pdf",
+    "bw6101ManufacturerPage": "https://bitwell.cn/productview.aspx?CateID=607&ID=269",
+    "bw6101ManufacturerDatasheet": "https://bitwell.cn/Upload/%E4%BF%9D%E6%8A%A4%E8%8A%AF%E7%89%87/BW6101_C%E4%BF%9D%E6%8A%A4IC-09311941072.pdf",
+    "tcan332Datasheet": "https://www.ti.com/lit/ds/symlink/tcan332.pdf",
+    "localCoreboardPdf": "E:/Pioneer/FOC驱动审阅/硬件/数据手册/WeAct_normal_QFN48_V1.0.pdf",
+    "localPowerAndProtectionNotes": [
+      "../计算与保护边界.md",
+      "DRV8161_UCC_TLV_参数核对_20261010.md",
+      "../最简元器件方案.md"
+    ],
+    "ucc27511aDatasheet": "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf"
+  }
+}

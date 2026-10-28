@@ -1,0 +1,126 @@
+{
+  "revision": "2026-10-11-hall-interface",
+  "last_updated": "2026-10-15",
+  "evidence_type": "direct_user_confirmation; not arrival measurement or manufacturer qualification",
+  "user_confirmed_selection": {
+    "status": "用户已确认选型",
+    "manufacturer_or_seller": "BDUAV",
+    "model": "N5065",
+    "selected_KV_rpm_per_V": 270,
+    "pole_pairs": 7,
+    "poles": 14,
+    "is_candidate_or_waiting_for_confirmation": false,
+    "canonical_human_record": "N5065参数证据.md",
+    "note": "型号、KV和极对数是已确认项目输入；后续相关工作先读唯一记录，不重复询问型号。"
+  },
+  "user_image_reuse_check_2026_10_15": {
+    "newly_received_image_source_path": "C:/Users/wangj/AppData/Local/Temp/codex-clipboard-4e1bb950-1cfe-471b-9d9d-a138aef8ce0e.jpg",
+    "newly_received_image_sha256": "B749623C1DC91EB6FDCA7041DB6C395739A517791268C00BCEC4BB652221CAE4",
+    "existing_evidence_file": "BDUAV_N5065_用户提供.jpg",
+    "existing_evidence_sha256": "B749623C1DC91EB6FDCA7041DB6C395739A517791268C00BCEC4BB652221CAE4",
+    "byte_identical": true,
+    "interpretation": "复用既有用户规格图；本次未引入新型号或新规格参数。"
+  },
+  "motor": {
+    "manufacturer_or_seller": "BDUAV",
+    "model": "N5065 / 5065",
+    "selected_KV_rpm_per_V": 270,
+    "selection_status": "用户已确认选型；不是候选或待用户确认",
+    "quantity": 2,
+    "drive_arrangement": "one FOC main board per motor; same board design; plug-in G431 core module retained",
+    "sizing_input_power_W_per_motor": 1800,
+    "single_pulse_screen_s": 1,
+    "power_definition": "electrical input",
+    "runtime_note": "1 s is a sizing screen, not a mandated operational cutoff or demonstrated board capability",
+    "seller_image_evidence": {
+      "source_file": "BDUAV_N5065_用户提供.jpg",
+      "sha256": "B749623C1DC91EB6FDCA7041DB6C395739A517791268C00BCEC4BB652221CAE4",
+      "pole_pairs": 7,
+      "poles": 14,
+      "recommended_voltage_V": [
+        24,
+        36
+      ],
+      "maximum_power_W": 1800,
+      "maximum_current_A": 80,
+      "current_definition": "unknown: measurement point, bus/phase, RMS/peak, continuous/peak rating and duration not specified",
+      "no_load_current_A": [
+        1,
+        2
+      ],
+      "series_no_load_speed_rpm": [
+        6480,
+        9600
+      ],
+      "series_no_load_speed_is_270KV_specific_measurement": false,
+      "torque_as_printed": "1.2–2.3 N/m",
+      "qualification": "seller markings; not independently measured"
+    },
+    "unresolved": [
+      "phase/line resistance and inductance",
+      "KV back-EMF definition",
+      "80 A measurement point, bus/phase and RMS/peak/continuous/peak-duration definition",
+      "phase current and any rated/continuous/peak current specification",
+      "motor-specific torque value and the printed N/m unit/measurement conditions",
+      "voltage and speed limits at 9S full charge 37.8 V"
+    ]
+  },
+  "hall": {
+    "wire_count": 5,
+    "connector_seller_designation": "H-JSY 5pin 2.0",
+    "designation_source": "seller model, per user",
+    "pitch_mm": 2.0,
+    "supply_V": 5.0,
+    "working_current_mA_reported": 50,
+    "budget_interpretation": "50 mA per motor complete five-wire Hall assembly; not 50 mA per bare sensing IC",
+    "placement_angle_deg_reported": 60,
+    "user_stated_wire_sequence": [
+      "5V",
+      "U",
+      "V",
+      "W",
+      "GND"
+    ],
+    "candidate_board_pin_map": {
+      "1": "5V_BUCK",
+      "2": "HALL_A_RAW (Hall U signal)",
+      "3": "HALL_B_RAW (Hall V signal)",
+      "4": "HALL_C_RAW (Hall W signal)",
+      "5": "GND_SYS"
+    },
+    "signal_note": "Hall U/V/W are logic signals, distinct from power-phase PH_U/PH_V/PH_W",
+    "unresolved": [
+      "physical Pin 1 and mating-face versus wire-exit viewing orientation",
+      "H-JSY housing/latch/mating dimensions; 2.0 mm pitch alone does not prove JST PH compatibility",
+      "open-collector/open-drain versus push-pull output",
+      "output high/low voltage range, edge timing and MCU power-off injection",
+      "electrical phase offset and measured forward/reverse Hall state sequence"
+    ]
+  },
+  "buck5V_budget_mA": {
+    "core_module_input_allowance": 60,
+    "CAN_normal_allowance": 80,
+    "CAN_dominant_measurement_point": 110,
+    "Hall_complete_assembly": 50,
+    "reserved_margin": 50,
+    "normal_sum": 240,
+    "dominant_sum": 270,
+    "IC_current_limit": 350,
+    "qualification": "allocation only; current limit does not guarantee continuous load, startup or thermal performance"
+  },
+  "other_user_constraints": {
+    "minimum_working_ambient": "0 degrees C and above (user wording: 0°C以上)",
+    "external_BUS_capacitors": "permitted immediately beside busbars; no current volume limit",
+    "schematic": "one sheet",
+    "PCB": "one FOC main board with plug-in G431 module",
+    "CAN": "required on every project board; FOC main board retains CAN",
+    "regenerative_braking": "required; local current/voltage protection and source absorption capability remain design constraints",
+    "maximum_working_ambient_C": 60,
+    "working_ambient_screen_C": {
+      "min": 0,
+      "max": 60,
+      "source": "direct user confirmation, 2026-10-11; 最高60°C",
+      "meaning": "ambient temperature, not case or junction temperature; component self-heating and cooling remain to be verified"
+    }
+  }
+}

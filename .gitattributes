@@ -1,0 +1,134 @@
+# Preserve existing bytes: experiment protocols hash their source snapshots.
+* -text
+*.py diff=python
+算法/局部神经元MNIST实验/model.py whitespace=cr-at-eol,-blank-at-eof
+
+# Native designs, model weights and archives belong in Git LFS.
+*.SLDPRT filter=lfs diff=lfs merge=lfs -text
+*.SLDASM filter=lfs diff=lfs merge=lfs -text
+*.SLDDRW filter=lfs diff=lfs merge=lfs -text
+*.sldprt filter=lfs diff=lfs merge=lfs -text
+*.sldasm filter=lfs diff=lfs merge=lfs -text
+*.step filter=lfs diff=lfs merge=lfs -text
+*.STEP filter=lfs diff=lfs merge=lfs -text
+*.stp filter=lfs diff=lfs merge=lfs -text
+*.stl filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.7z filter=lfs diff=lfs merge=lfs -text
+*.tar filter=lfs diff=lfs merge=lfs -text
+*.gz filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
+*.rknn filter=lfs diff=lfs merge=lfs -text
+*.safetensors filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mkv filter=lfs diff=lfs merge=lfs -text
+*.avi filter=lfs diff=lfs merge=lfs -text
+*.npz filter=lfs diff=lfs merge=lfs -text
+*.npy filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.deb filter=lfs diff=lfs merge=lfs -text
+*.whl filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.PDF filter=lfs diff=lfs merge=lfs -text
+*.epro filter=lfs diff=lfs merge=lfs -text
+*.eprj3 filter=lfs diff=lfs merge=lfs -text
+*.db filter=lfs diff=lfs merge=lfs -text
+*.usd filter=lfs diff=lfs merge=lfs -text
+*.usda filter=lfs diff=lfs merge=lfs -text
+*.usdc filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.mtl filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+
+# Raw trajectory/physics data are preserved without inflating Git history.
+算法/仿真训练环境/results/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+算法/仿真训练环境/results/**/evaluation*.json filter=lfs diff=lfs merge=lfs -text
+算法/仿真训练环境/归档/**/results/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+算法/仿真训练环境/归档/**/results/**/evaluation*.json filter=lfs diff=lfs merge=lfs -text
+算法/定位算法/GNSS_Simulation/results/samples*.csv filter=lfs diff=lfs merge=lfs -text
+
+# Generated component catalogue exceeds the ordinary Git blob limit.
+电力/元件封装库/索引/元件总表.json filter=lfs diff=lfs merge=lfs -text
+
+# CAD TSV exports retain trailing empty columns in the original evidence bytes.
+电力/检查/统一审查/FOC_G431_BOM_CAD_Official.csv whitespace=-blank-at-eol
+
+# Preserve the recorded EOF bytes of frozen validation sources and the raw static log.
+算法/仿真训练环境/results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/static.log whitespace=cr-at-eol,-blank-at-eof
+
+# Isaac Sim migration receipts and frozen sources keep their original whitespace bytes.
+算法/仿真训练环境/results/isaac_field_diagnosis/isaacsim_migration_20261024/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_diagnosis/isaacsim_migration_20261024/native/*-source/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/isaacsim_migration_20261024_smoke_a01/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/isaacsim_migration_20261024_smoke_a02/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/logs/rsl_rl/isaacsim_cli_migration_20261024/cli_a01/git/IsaacLab.diff whitespace=cr-at-eol,-blank-at-eol
+
+# Formal point-move trials preserve frozen sources and raw process output.
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_20261024_a*/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_20261024_a*/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_20261024_a*/**/git/IsaacLab.diff whitespace=cr-at-eol,-blank-at-eol
+
+# Native GUI startup output remains byte-for-byte evidence, including failed attempts.
+算法/仿真训练环境/results/isaac_field_viewer/physx_pointmove_flat12_gui_20261024_a*/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+
+# Sampling optimization regression output is retained without editing raw log bytes.
+算法/仿真训练环境/results/isaac_field_diagnosis/sampling_live_handoff_20261024/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_live_20261024_a03/**/git/IsaacLab.diff whitespace=cr-at-eol,-blank-at-eol
+算法/仿真训练环境/results/isaac_field_diagnosis/live_state_mirror_handoff_20261024/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/**/git/IsaacLab.diff whitespace=cr-at-eol,-blank-at-eol
+
+# GPU-batch checks retain original source copies and process output.
+算法/仿真训练环境/results/isaac_field_diagnosis/torch_batched_task_20261024/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_diagnosis/torch_batched_task_20261024/native_*-source/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_diagnosis/headless_web_recovery_20261024/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_diagnosis/headless_web_recovery_20261024/**/junit.xml whitespace=cr-at-eol,-blank-at-eol
+算法/仿真训练环境/results/isaac_field_diagnosis/torch_batched_task_20261024/**/junit.xml whitespace=cr-at-eol,-blank-at-eol
+
+# The a06 trial freezes its executable entry points and inherited evidence.
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a06/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a06/*.py whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a06/**/*.log whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+
+# Historical native performance reports retain their recorded EOF bytes.
+算法/仿真训练环境/native/proto/DEPTH_DETECTIONS_REPORT.md whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/proto/REPORT.md whitespace=cr-at-eol,-blank-at-eof
+
+# Raw CPU checkpoint audits keep the bytes referenced by their SHA manifests.
+算法/仿真训练环境/native/acceptance/**/baseline_checkpoint_audit.json whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/acceptance/**/checkpoint_transition_audit.json whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/acceptance/**/checkpoint_validation.json whitespace=cr-at-eol,-blank-at-eof
+
+# pilot06 command capture preserves its original trailing space for SHA verification.
+算法/仿真训练环境/native/acceptance/20261025_pilot06_rejected/source/cli_args.txt whitespace=cr-at-eol,-blank-at-eol
+
+# Rejected v3 trial snapshots and command output remain original-byte evidence.
+算法/仿真训练环境/native/acceptance/20261025_v3_formal_rejected/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/acceptance/20261025_v3_formal_rejected/actual_cli_args.txt whitespace=cr-at-eol,-blank-at-eol
+算法/仿真训练环境/native/acceptance/20261025_v3_formal_rejected/run_snapshot/cli_args.txt whitespace=cr-at-eol,-blank-at-eol
+
+# Recovered prototype source copies preserve original EOF bytes.
+算法/仿真训练环境/native/acceptance/20261025_mjw_candidate/source/mjw_backend_candidate.py whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/acceptance/20261025_mjw_candidate/source/mjw_backend_candidate_v4.py whitespace=cr-at-eol,-blank-at-eof
+算法/仿真训练环境/native/acceptance/20261025_mjw_candidate/source/probe_cpu.py whitespace=cr-at-eol,-blank-at-eof
+
+# Raw GPU preflight retains its original padded date line.
+算法/仿真训练环境/native/acceptance/20261025_mjw_repo_validation/cuda_graph_compare_v5_20261025_202500/input_snapshot/nvidia_smi_preflight.txt whitespace=cr-at-eol,-blank-at-eol
+
+算法/仿真训练环境/native/acceptance/20261025_mjw_eager_rep01/train.launcher.log filter=lfs diff=lfs merge=lfs -text
+
+算法/仿真训练环境/native/acceptance/20261025_mjw_eager_rep02/train.launcher.log filter=lfs diff=lfs merge=lfs -text
+
+# Frozen probe source copies retain their original EOF bytes.
+算法/仿真训练环境/native/acceptance/20261025_v2_freeze_validation/**/mjw_backend_candidate_v4.py whitespace=cr-at-eol,-blank-at-eof

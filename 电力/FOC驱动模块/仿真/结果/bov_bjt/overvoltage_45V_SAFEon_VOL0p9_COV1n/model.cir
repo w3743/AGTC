@@ -1,0 +1,116 @@
+* Discrete BJT BUSOV level shift to BREAK_N: overvoltage_45V_SAFEon_VOL0p9_COV1n
+* Q_BOV_PNP=BC857C; Q_BOV_NPN=BC847C. Generic Gummel-Poon models use
+* datasheet hFE bins as typical parameters; not Nexperia production corners.
+.title overvoltage_45V_SAFEon_VOL0p9_COV1n
+.options method=gear reltol=0.001 abstol=1n vntol=1u maxord=2
+.param VSAFE=4.9764817276 VOL=0.9 COV=1e-09
+
+* SAFE rail current is sensed at the source; the Bdrv behavioral source is
+* ideal and its UCC gate-drive current is intentionally not included.
+Vbus bus 0 PWL(0 32.4 2m 32.4 2.01m 45 20m 45)
+Vsafe_src safe5_src 0 {VSAFE}
+Vsafe_sense safe5_src safe5 0
+Vcore5 core5 0 5
+Vlogic mcu3v3 0 3.3
+
+* Candidate resistor network and sense filter, with comparator hysteresis
+* represented by an open-collector behavior source.
+Rovtop bus ov_sense 162k
+Rovbot ov_sense 0 10k
+Covsense ov_sense 0 {COV}
+Rref_top safe5 ov_ref 10.2k
+Rref_bot ov_ref 0 10k
+Rhyst busov_n ov_ref 200k
+Rov_pullup safe5 busov_n 4.7k
+Boc busov_n 0 I={ (v(ov_sense)>v(ov_ref)) ? (v(busov_n)-VOL)/5 : 0 }
+Ccmp busov_n 0 100p
+
+* Actual candidate level shift topology: 10k from BUSOV_N to PNP base;
+* PNP emitter at SAFE_5V, collector feeds NPN base through 4.7k; 10k
+* pull-down; NPN
+* collector pulls BREAK_N low. Other open-collector faults can also pull
+* BREAK_N down but do not connect to the UCC27511 input.
+V_pnp_base_sense bov_pnp_base bov_base_r 0
+R_bov_pnp_b bov_base_r busov_n 10k
+Q_BOV_PNP bov_bk_src bov_pnp_base safe5 QBC857C
+V_pnp_col_sense bov_bk_src bov_col_probe 0
+R_BOV_DRIVE bov_col_probe bov_bk_drive 4.7k
+R_bov_npn_pd bov_bk_drive 0 10k
+V_npn_base_sense bov_bk_drive bov_npn_base 0
+Q_BOV_NPN break_n bov_npn_base 0 QBC847C
+Rbreak_pull mcu3v3 break_n 2.2k
+Cbreak break_n 0 50p
+
+* Independent open-collector current-fault comparator input for the
+* negativeBreak-alone case. It has no route to the chopper enable.
+Vneg_ctrl neg_ctrl 0 0
+Snegative_break break_n 0 neg_ctrl 0 SW_OC
+.model SW_OC SW(Ron=10 Roff=1G Vt=1.5 Vh=0.1)
+
+* SAFE-powered UCC input/gate and 1-ohm dump bank. BREAK_N is logged but is
+* intentionally not the dump command. Q7 is a simple Ron switch model here.
+Bdrv drv_cmd 0 V={ ((v(safe5)>4.5) && (v(busov_n)<1.0)) ? 5 : 0 }
+Rgate drv_cmd brkgate 10
+Cgate brkgate 0 10n IC=0
+Rgate_pd brkgate 0 10k
+RdumpA bus dump_bus 2
+RdumpB bus dump_bus 2
+Ldump dump_bus dump_sw 10n
+Sbrake dump_sw 0 brkgate 0 SW_Q7
+.model SW_Q7 SW(Ron=11.25m Roff=1G Vt=2.5 Vh=0.1)
+
+.model QBC857C PNP(IS=1e-14 BF=420 VAF=70)
+.model QBC847C NPN(IS=1e-14 BF=420 VAF=80)
+
+.save V(bus) V(safe5) V(core5) V(mcu3v3) V(ov_sense) V(ov_ref) V(busov_n) V(bov_pnp_base) V(bov_bk_src) V(bov_bk_drive) V(break_n) V(neg_ctrl) V(drv_cmd) V(brkgate) V(dump_bus) I(Ldump) I(V_pnp_col_sense) I(V_pnp_base_sense) I(V_npn_base_sense) I(Vsafe_sense)
+
+.control
+set noaskquit
+set numdgt=10
+tran 20n 4m 0 20n
+let ipnp_c = i(V_pnp_col_sense)
+let ipnp_b = i(V_pnp_base_sense)
+let inpn_b = i(V_npn_base_sense)
+let isafe = i(Vsafe_sense)
+let abs_ipnp_c = abs(ipnp_c)
+let abs_ipnp_b = abs(ipnp_b)
+let abs_inpn_b = abs(inpn_b)
+let abs_isafe = abs(isafe)
+let pnp_power = (v(safe5)-v(bov_bk_src))*ipnp_c + (v(safe5)-v(bov_pnp_base))*ipnp_b
+let safe_power = v(safe5)*isafe
+let idump = i(Ldump)
+let pdump = v(bus,dump_bus)*idump
+let abs_idump = abs(idump)
+meas tran t_end max time from=0 to=4m
+meas tran busov_n_min min v(busov_n) from=0 to=4m
+meas tran busov_n_max max v(busov_n) from=0 to=4m
+meas tran break_n_min min v(break_n) from=0 to=4m
+meas tran break_n_max max v(break_n) from=0 to=4m
+meas tran bov_drive_max max v(bov_bk_drive) from=0 to=4m
+meas tran brkgate_max max v(brkgate) from=0 to=4m
+meas tran dump_current_max max abs_idump from=0 to=4m
+meas tran dump_resistor_energy integ pdump from=0 to=4m
+meas tran pnp_col_current_peak max abs_ipnp_c from=0 to=4m
+meas tran pnp_col_current_avg avg abs_ipnp_c from=0 to=4m
+meas tran pnp_base_current_peak max abs_ipnp_b from=0 to=4m
+meas tran pnp_base_current_avg avg abs_ipnp_b from=0 to=4m
+meas tran pnp_power_peak max pnp_power from=0 to=4m
+meas tran pnp_power_avg avg pnp_power from=0 to=4m
+meas tran pnp_energy integ pnp_power from=0 to=4m
+meas tran npn_base_current_peak max abs_inpn_b from=0 to=4m
+meas tran npn_base_current_avg avg abs_inpn_b from=0 to=4m
+meas tran safe_current_peak max abs_isafe from=0 to=4m
+meas tran safe_current_avg avg abs_isafe from=0 to=4m
+meas tran safe_power_peak max safe_power from=0 to=4m
+meas tran safe_energy integ safe_power from=0 to=4m
+meas tran bov_drive_at3p5ms find v(bov_bk_drive) at=3.5m
+meas tran busov_n_at3p5ms find v(busov_n) at=3.5m
+meas tran break_n_at3p5ms find v(break_n) at=3.5m
+meas tran brkgate_at3p5ms find v(brkgate) at=3.5m
+meas tran t_busov_1v WHEN v(busov_n)=1 FALL=1
+meas tran t_break_1v WHEN v(break_n)=1 FALL=1
+meas tran t_gate_2p5 WHEN v(brkgate)=2.5 RISE=1
+write overvoltage_45V_SAFEon_VOL0p9_COV1n.raw V(bus) V(ov_sense) V(ov_ref) V(busov_n) V(bov_pnp_base) V(bov_bk_drive) V(break_n) V(neg_ctrl) V(brkgate) I(Ldump)
+quit
+.endc
+.end

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "checked_at_utc": "2026-10-15T09:30:11.631638+00:00",
+  "scope": "只读collect真实采购/BOM记录；CSV写入限于临时目录；不调用正式同步入口",
+  "purchase_generator": "元件封装库/工具/更新采购补充.py",
+  "bom_rows_checked": 511,
+  "native_mpns_contains_null_record_count": 5,
+  "native_mpns_exactly_null_record_count": 5,
+  "native_mpns_exactly_null_examples": [
+    {
+      "module": "FOC驱动模块",
+      "references": [
+        "J_BRAKE_R"
+      ],
+      "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+      "source_row": 18,
+      "native_mpns": [
+        null
+      ]
+    },
+    {
+      "module": "稳压模块",
+      "references": [
+        "J_5V_EXT"
+      ],
+      "source": "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv",
+      "source_row": 158,
+      "native_mpns": [
+        null
+      ]
+    },
+    {
+      "module": "稳压模块",
+      "references": [
+        "J_BUS_POWER"
+      ],
+      "source": "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv",
+      "source_row": 159,
+      "native_mpns": [
+        null
+      ]
+    },
+    {
+      "module": "稳压模块",
+      "references": [
+        "J_DUMP"
+      ],
+      "source": "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv",
+      "source_row": 160,
+      "native_mpns": [
+        null
+      ]
+    },
+    {
+      "module": "稳压模块",
+      "references": [
+        "J_SC_POWER"
+      ],
+      "source": "稳压模块/eda工程文件/导出/20261010_BUS输入修复/稳压模块_V1.6-BUSFIX_完整候选BOM.csv",
+      "source_row": 161,
+      "native_mpns": [
+        null
+      ]
+    }
+  ],
+  "checks": [
+    "真实native_mpns=[None]记录可被collect读取",
+    "JSON对象往返仍为null",
+    "CSV中null列表输出为空单元格且不出现None字面量",
+    "CSV采用同目录临时文件后替换",
+    "模拟替换异常时原CSV保持完整且临时文件清理"
+  ]
+}

@@ -1,0 +1,188 @@
+# 项目协作规则
+
+## 复用与协作
+
+- 完成任务前先查找项目已有实现及现成、开源解决方案，以最小复杂度完成任务；优先复用训练库、仿真器和标准接口，避免另写同类基础设施。
+- 查找、机械性修改、计算、测试、验证等低推理需求任务，尽可能交给子代理，使用低额度模型 `gpt-6-luna`、`max` 推理档。新建此类子代理使用 `fork_turns="none"`，提供明确范围和必要上下文。
+- 勤于向用户提问，优先确认会影响目标、架构或验收的关键问题；已明确的要求直接推进。
+
+## 每五项改动整理一次
+
+- 每完成 **5项独立的功能改动或问题修复**，必须先对项目进行一次整理，再开始下一项改动。
+- 同一功能涉及的实现、测试与文档算一项；不得按文件或代码行重复计数，也不得把无关功能合并为一项来绕过整理。
+- 整理包括：清理确认无用或重复的实现，统一受影响的接口、命名与目录组织，同步说明文档和运行命令，并执行必要的测试、静态检查与验证。
+- 性能相关结论保持相同测量口径；原始实验记录与需要的模型保留，整理不得覆盖或改写实验成绩。
+- 整理围绕已修改范围开展，不扩大成无关重构。
+- 主代理统一记录改动计数和最近整理结果；子代理报告独立改动，避免并行时重复记数。更新计数记录本身不另算一项。
+
+## 当前批次与运行状态
+
+- 2026-10-25 第二十三批五项已完成并作范围整理（5/5）：（1）以 PhysX CUDA 刚体变换经 Isaac Lab 官方转换持续发布 Fabric，使 RTX camera 获取当前刚体/云台真实位姿；（2）headless 时停止默认隐藏 viewport 的无用更新，独立相机 render products 仍运行；（3）为spawn阶段的8个gimbal revolute joints补齐与既有配置相同的angular force DriveAPI（gain、torque limit及物理精度不变；旧驱动未启用，因此旧gimbal轨迹不等价）；（4）观察器绑定实际LiDAR/depth sidecar，深度点以0.05m方块、LiDAR点以0.045m圆点显示；（5）从a06完整model_64.pt（34816 transitions、Adam1360）恢复a07并将8791观察器和完成watcher迁移到a07。a07 protocol SHA为`1a0c3bcbf6b67ab6a3409569a818fa57feb83efa465e40c234151fb551bea6ed`；目标196608 transitions（316次新iteration，预期最终payload iter379/Adam7680）；a06 source97及a07新快照完整，冻结源不再改。native attempt13 baseline exit 0：4环境×16步、相机与传感器轴检查通过、partial reset通过；诊断LiDAR有效点数`[165,160,167,178]`、depth有效点数`[6336,2062,2728,2178]`只描述该正确性探针，不是训练成绩。53模块CPU gate rerun1为pytest 622 passed、4 skipped、47 warnings、10 subtests passed，JUnit共636 tests、0 failures/errors，exit 0；首次失败记录仍保留。最新可读训练日志记录iteration64/380、Total steps 512、Collection 272.720s、Learning 10.574s；首个恢复checkpoint的独立CPU审计已通过，详情见下方审计条目。dt=.001、decimation=50、position iterations=40、velocity iterations=1及传感器分辨率/频率未变；旧相机像素和未启用gimbal drive时的轨迹不声称等价。collection仍慢，GPU kernel瓶颈未识别；未做FPS benchmark，也未证明已解决所有性能瓶颈。
+
+- a07首个恢复checkpoint独立CPU审计（2026-10-24T17:35:26Z，实际run_status仍为running）：a06父model_64 SHA `dc4dd92d633777bb8115021f89309dcd88865798c2e7e800ed1e794681146c36`、34816 transitions/Adam1360恢复到a07 model_64 SHA `28a45d02ab70d6933911c0fe9c807a7bb5585ea6cf2fda49f1b7f30f831d9540`、iter64/35328 transitions/Adam1380；37个optimizer state完整且有限，actor/critic各25/8个state条目变化，policy contract SHA为`f7a46a6f6da7ea7a1dd8da09f29a31feee9989f60dc226e59b6574ed4d75f785`且相同。物理/task/sensor比较全通过，唯一camera metadata例外是detector `update_latest_camera_pose` false→true；未比较旧depth像素画面。manifest 200项校验通过（84 project live、116 trial live、200 snapshots；继承a06 source97快照完整）。CPU `weights_only`加载、CUDA未初始化、sidecar runID/sourcePID匹配且四环境均有有效LiDAR/depth点。独立审计returncode 0，报告和process在`results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a07/diagnosis/checkpoint_audit/`。冻结入口原`first_resumed_checkpoint_cpu.json`的`RuntimeError: a07 is not an unchanged prepared trial`原样保留；该prepared-only gate与实际running状态不符，非model失败，也未伪装run_status。
+
+- a07只读状态（2026-10-25 01:35+08）：protocol/`run_status.json`仍记录`running`/`resume_training_cli`，父PID11236、native PID18100；live sequence374/sim time18.6。真实观察器8791的`viewer_status.json`绑定a07 `live_state.json`与`sensor_samples.npz`，source PID18100/run id匹配；最新读取sequence383及sidecar sequence237均`stale=false`，sidecar可用、8个world-coordinate cloud handles，四环境有有效点。尚未记录浏览器截图验收。外部完成watcher launcher PID47236、worker PID31540，parent PID11236、`parent_identity=match`，last poll `2026-10-24T17:35:42Z`，`delivery.events={}`；未发送唤醒消息。
+
+- 2026-10-24 第二十二批五项已完成并作范围整理（5/5）：第1项为 `SideIntegralDriveController` 固定拓扑缓存与重复校验去重；第2项为a06恢复入口/评估wrapper；第3项为隔离CPU多环境观察器及Viser 1.1.1按需渲染；第4项为可选真实LiDAR/depth侧车导出与只读消费；第5项为观察器简体中文界面。驱动控制专项28 passed、小型CUDA 18步等价检查通过；观察器与导出器组合CPU套件31 passed，覆盖复合generation/frame缓存键和导出器→原子NPZ→读取器链路。观察器源码/README/manifest哈希已核，复用的 `scripts/view_training_state_web.py` 与 `scripts/view_training_state.py` 哈希仍匹配a06快照；未修改97文件冻结训练源。第二十二批整理不构成FPS或总训练提速结论。
+
+- 第二十二批当时运行事实（历史；a06已交接）：a06由 `model_64.pt`、34816 transitions、Adam1360完整检查点交接后停止，用于后续候选诊断；不称训练运行中，也不把停止写作自然完成。训练PID34280已不存在。独立观察器 `http://127.0.0.1:8791/`（worker PID33800）曾保留a06最后状态：4环境×19刚体、sequence2453、sim time121.85秒、`stale=true`。其余a07绑定和运行状态以本节第二十三批条目为准。
+
+- 第二十二批当时真实传感器样点尚未完成原生训练流验收：当时a06没有 `sensor_samples.npz`，观察器云层为空；31项CPU集成测试里的导出数据仅是协议fixture。该历史状态已由第二十三批原生attempt13与a07实际sidecar绑定状态更新。baseline/final评估和候选性能结论不由CPU测试或正确性探针代替。
+
+- 2026-10-24 系统重启中断（历史观察状态）：用户报告画面冻结后手动强制重启；OS LastBootUpTime为2026-10-24T17:00:21.665056+08:00。本轮重启状态观察于2026-10-24T17:07:05.298009+08:00（2026-10-24T09:07:05.298009Z）：无Python进程，旧controller PID26052、训练PID9784、viewer PID39212、watcher PID5596均已失效。a04旧run_status在16:59本地仍记running，现更新为status=interrupted、phase=system_reboot；实际退出码unknown，不记自然完成或安全暂停。26112 transitions候选checkpoint的CPU审计于2026-10-24T17:09:36.935092+08:00通过：Adam step1020、37个optimizer state完整且有限、checkpoint SHA `26c55ba2c1fc9e3da09ed174ec01b20b08c78186ee390657b400dde6152a9025`；86 live源及86 snapshot均匹配protocol。报告 `results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/diagnosis/reboot_20261024T1700/checkpoint_audit.json`。训练日志到26624累计，checkpoint之外新有512 transitions未入已保存检查点，且可能仍有部分rollout无法恢复；该次状态观察时训练未恢复、GUI未打开。冻结原因尚未确定；重启前训练Kit与独立viewer Kit各有一个完整Kit runtime，第二实例带来额外资源需求，但不同时间点的内存读数不是峰值或同时对照，不能据此判定OOM或冻结根因。审计状态字段的简洁对账见 `results/isaac_field_diagnosis/reboot_20261024T1700/checkpoint_audit_review.json`。原线程电源请求由系统重启结束，power_request.active=false；未调用release，也未改系统电源计划。before_reboot_audit快照位于 `results/isaac_field_diagnosis/reboot_20261024T1700/`，run_status SHA256 `2EB990EFF6F00D401858FDD7183DCF512A0471930E4D7F7FE9F09FA727192226`、power_request SHA256 `AF14F5CB00685BC5846BE47D76E5293A432884752122D34FD88B33312EF35F09`。故障记录不单计功能项；当时批次为3/5，随后GPU批处理与轻量webviewer各完成一项，现第二十一批5/5并已整理范围。
+
+- 2026-10-24 GPU批处理完成（第二十一批第4项）：当时用户选择暂缓恢复训练、优先GPU批处理。`env.task_backend`默认`reference`，显式`torch_batched`只支持flat12、plants0/rocks0、fast_stop_v2、absolute-goal；VQF 2.1.2、小型反馈估计、NumPy RNG和传感器时钟/latency队列仍走CPU桥，depth/LiDAR大数组及批量reward/termination/observation在GPU，故不称端到端GPU。`cuda_math_final.json`通过。`native_a03.json`记录4环境×16步部分reset功能通过、exit 0，dt=.001/decimation50/位置求解40/GPU physics，5路观测与CPU参考最大绝对误差为LiDAR 0、depth 5.96e-8、detections 0、state 1.49e-7、feedback 0；源码运行前后hash相同。200物理子步相位诊断中 `physx_fetch_results` 主机等待6.848619秒，`physx_simulate`计时0.0682333秒，是已测到的主要等待点；这是短正确性检查，不能解释为FPS或提速倍数。两次相机位姿检查通过；关闭Fabric连续变换/速度更新的诊断导致相机pose最大误差9.1671m并exit 1，该设置拒绝采用。完整记录 `results/isaac_field_diagnosis/torch_batched_task_20261024/README.md`。a05参考恢复wrapper因新源不匹配而deferred，不能记为已启动。`runtime_architecture.json`记录ARM64 Windows host及AMD64 Python/Torch/Isaac组件；RTX Spark的x86仿真安装路径是官方推荐，不足以单独解释性能。只读profiler审查见`trace_review.md`：CUPTI冲突使CUDA activities/kernel时间缺失、GPU耗时未知。profiler-off单次诊断已失败exit 1，环境构造异常未走step、未导出trace或读回设置，所用flags未被采用，详见trace_review.md。
+
+- 2026-10-24 轻量Viser webviewer与范围整理计入第二十一批第5项：`packet_age_seconds`类型错误已修；最终独立专项17 passed。`results/isaac_field_diagnosis/torch_batched_task_20261024/web_view_validation/verification_final.json`记录HTTP 200、`no_simulation=true`、`forbidden_modules_loaded=[]`、状态stale及1Hz面板刷新，未加载Isaac Sim、SimulationApp、SimulationContext、训练环境或Torch；深色主题和车辆初始相机距离4.02m通过配置检查。真实浏览器确认车辆、地面、目标和`STALE · holding last pose`可见，并验证滚轮缩放、拖动旋转及刷新恢复初始相机；截图与交互证据见`results/isaac_field_diagnosis/torch_batched_task_20261024/web_view_validation/browser_verification.json`、`results/isaac_field_diagnosis/torch_batched_task_20261024/web_view_validation/browser_final.png`。状态来自a04重启中断后的历史包，不是实时训练。第二十一批5/5并已完成范围整理；本轮不报告持续FPS或GPU加速倍数。
+
+- 2026-10-24 SideIntegralDriveController去重为第二十二批第1项：初始化时验证并克隆固定side topology，缓存左右wheel indices；update直接用`index_select`和`mean`计算侧均值，feedforward直接索引广播，内部复用不做重复参数校验的纯tensor积分步骤。公开helper仍严格校验；finite tensor状态合并成一次host bool门禁，Python标量参数仍逐次校验。focused CPU专项28 passed，CUDA小型18步等价检查通过（partial reset、饱和/卸饱和和固定topology均覆盖）；当时输出因工具运行未单独落盘，事后转录说明见`results/isaac_field_diagnosis/torch_batched_task_20261024/drive_validation.md`及JSON，复现脚本未重新运行。静态host `bool()`转换数预期为update 11→1、feedforward读取3→0；这是静态路径计数，不是实测同步数、FPS或提速倍数。最终49模块CPU门禁exit 0：546 passed/4 skipped/47 warnings/10 subtests，61.60秒，记录在`results/isaac_field_diagnosis/torch_batched_task_20261024/cpu_gate_after_drive_20261024T1233Z/cpu_gate_after_drive.json`；旧530门禁保留为历史，不再作为最终结果。第二十一批5/5范围整理已完成。
+
+- a04完成监听重启前已迁至仓库外 `C:/pioneer/isaac-training/watchers/pointmove-mirror-a04/`；重启前watch_status快照记录native watcher PID5596、parent PID26052、identity match，`delivery.events`为空（仅截至重启前快照）；watcher与父进程均已因重启失效。原周期自动化保持PAUSED。
+- 2026-10-24 用户进一步质疑不必要计算；在a03保存25600步/Adam1000并交接停止后、新a04冻结前补入两项等价去重：持久target buffer使3个setter由每控制步150次减为3次，每个物理子步的PD/implicit compute和PhysX submit保持；正常4环境复用finish已有obs，一次性mask严格在reset/state或feedback刷新/下个控制步失效，partial reset全批重算，inactive旧result不复用。真实SDK Warp CPU target buffers经历50次动态qd计算仍保持目标，partial reset/下一步写入及obs缓存边界通过；44模块最终回归483 passed/4 skipped/47 warnings、exit0、源SHA前后同，既有观测mock仅对齐已存在的include_feedback签名。此去重为第二十一批第3项。无GPU/FPS基准，不称150→3等于总速度提升50倍；Detector空场景裁剪与info/deepcopy仅审计未改，传感器/奖励/VQF/物理精度保持。
+
+- 2026-10-24 独立实时状态镜像随a04部署，训练曾以 `--viz none` headless运行并写入 `--live-state-file`；观察端 `scripts/view_training_state.py` 只读最新真实位姿，不加载策略、不构建训练环境、不推进物理。CPU门禁最终44模块483 passed/4 skipped/47 warnings、34.49秒、exit 0，证据 `results/isaac_field_diagnosis/live_state_mirror_handoff_20261024/cpu_gate.json`。重启前viewer PID39212/HWND1903832，最近已保存viewer状态source_pid9784、sequence213、rootprimvalid=true、timelineplaying=false、stale=false。用户已手动取消Windows Python防火墙弹窗，之后按Esc停止Computer Use；随后画面冻结并手动强制重启，旧viewer句柄失效。车辆画面与鼠标交互尚未验收；本次重启后未开GUI。该功能为第二十一批第2项，不测FPS、不宣称训练提速。
+
+- 2026-10-24 a04重启前续训记录（历史）：trial `results/isaac_field_improvement/physx_pointmove_flat12_mirror_20261024_a04/`，protocol SHA `d024e42b3a8af4e45eb1dbb1f6147fc115300631ece1ce95bfda13dbf99d6ab7`，86个源文件已冻结。从a03 `model_48.pt`（iter48、25600累计transitions、Adam step1000）恢复；4环境×128步×334更新，累计目标196608。首个恢复后checkpoint CPU审计passed：累计26112、增加512、Adam1020，33个actor/critic张量条目变化，policy contract identical；物理配置、decimation、完整task及五类sensor配置与a02相同，原a03 checkpoint字节未改，见trial内 `first_resumed_checkpoint_cpu.json`。重启前run_status最后记录仍为running（16:59本地），现已标记system_reboot中断，退出码unknown；上述运行期信息均为历史，不表示仍运行或安全暂停。首rollout日志Collection 206.853s、Learning 2.894s，采样链是主要耗时；未拆分物理/渲染/任务各自耗时，此单次日志不构成性能基准或提速倍数。原a02零步baseline及16种子配对评估沿用；训练/评估自然完成前不宣称能力改善。
+
+- a03曾以训练进程的 `Isaac Lab 3.0.0` 原生视口完成两次观察，证据只适用于a03且其训练/监听现已停止；a04改为headless训练加独立状态镜像，不继承a03视口的验收结论。a03的旧进程停止状态见上述交接证据；自动化保持PAUSED。
+
+- 2026-10-24 用户明确授权优化采样数据拷贝/重复计算，物理精度不变，再从完整检查点恢复并开启训练进程的实时GUI。生产 `env.py` 已合并小型state/feedback张量的host传输、缓存固定旋转/轮侧掩码/换算系数、复用同一步state，reset/首帧渲染后强制失效；未改物理dt=.001、decimation=50、求解位置迭代40、传感器规格/更新调度、奖励或终止。新增采样/partial-reset与冻结实现CPU等价测试各2项通过；37模块整合回归实际436 passed/4 skipped/47上游warnings，exit0，两生产源测试前后SHA一致。第二十批5/5后的范围整理已完成：缓存/失效接口统一、常量移出采样路径、冻结实现对照与partial-reset验证、文档同步、diff-check通过，无冻结源/原成绩/模型改写，无FPS基准；证据在 `results/isaac_field_diagnosis/sampling_live_handoff_20261024/cpu_regression/`。后续可视化续训交接记第二十一批第1项。a02原protocol/source_snapshot/checkpoint原始字节保留，新生产源与旧快照差异属于用户授权的新版本，不能覆盖旧快照或继续冒称旧冻结源一致。
+
+- 2026-10-24 native drive correctness最终检查：4环境×16步、actual exit 0；`camera_positions_checked=2`、partial reset、old observation immutability通过。五路GPU输出device/shape及CPU reference比较通过：LiDAR`(4,1,400)`误差0、depth`(4,1,160,88)`误差5.96e-8、detections`(4,16,8)`误差0、state`(4,33)`误差1.49e-7、feedback`(4,37)`误差0。dt=.001、decimation50、position iterations40未变；六个相关源文件SHA与source snapshot匹配，运行前后SHA一致。`native_drive_final_a01.json`的host inclusive阶段仍显示PhysX fetch等待显著高于simulate；这些不是GPU kernel时间或吞吐基准，也没有FPS/加速倍数结论。
+
+- 2026-10-24 a06 GPU恢复与实时状态镜像（第二十二批第2项，启动期历史记录；当前状态见上方最新条目）：用户授权从a04经CPU审计的26112 transitions/Adam1020 checkpoint恢复，并要求轻量窗口显示训练车辆状态、优先训练效率。a06 trial `results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a06/` 的protocol SHA为`6e2860e77bd84e6dc42466793719fd15361d835de35674c6169d42a8f8aabd72`，冻结97个源文件；prepare、preflight及a06恢复接口/评估wrapper的CPU专项10 passed。2026-10-24 21:00:52+08启动controller launcher PID36144/controller PID27560；native PID34280于21:00:57.560910+08启动，训练launcher PID37044。`run_status.json`为`running`/`resume_training_cli`，argv使用`torch_batched`、`cuda:0`、4环境、333 updates、`--viz none`及a06 `live_state.json`；baseline/final配对评估固定`torch_batched`和seed87010–87025，尚未开始。从父checkpoint续训后的首个检查点已通过CPU审计：26624 transitions、Adam1040，37个Adam optimizer state条目完整且有限；actor/critic权重条目共33个变化（actor 25、critic 8），策略合同与物理/传感器配置保持一致，见`first_resumed_checkpoint_cpu.json`及审计process receipt。首rollout实际新增512 transitions，Collection 415.597s、Learning 9.861s；collection等待尚未解决，不能据此称训练已提速或已达极致。目标仍为196608 transitions、final payload iter380、Adam step7680；最终评估尚未开始。真实浏览器已验收a06 `Connected LIVE`：source PID34280、run id匹配，live序列84→91，截图对应sequence95；深色主题下车辆与地面清晰可见，旋转时视角变化且source sequence继续增长。原始source packet样本sequence57→114→121显示位姿变化。采样/更新间隔有时超过viewer既有5s阈值，会暂时标记STALE，数据恢复后自动回到LIVE；阈值未改，不据此宣称持续高FPS。验收证据见`results/isaac_field_improvement/physx_pointmove_flat12_gpu_20261024_a06/diagnosis/live_viewer_validation/browser_verification.json`、`validation.json`及`browser_live.png`。已按此前授权部署a06完成唤醒器，外部单实例state-dir为`C:/pioneer/isaac-training/watchers/pointmove-gpu-a06/`，launcher PID11808，source脚本SHA前缀/后缀`e0c26ef3...315c9`；已核验native watcher PID10728、parent PID27560、`parent_identity=match`，最近lastpoll `13:15:36Z`且`delivery.events={}`。部署/状态/投递快照见a06的`diagnosis/completion_watch/deployment.json`、`watch_status_snapshot.json`、`delivery_snapshot.json`。既有PAUSED automations未改。恢复入口与配对评估wrapper计作本批第2项；训练运行和日志不另计功能项。没有FPS或性能倍数结论。状态证据见a06的`controller_launch.json`、`run_status.json`、`protocol.json`、`source_manifest.json`、`prepare.json`、`preflight.json`、`first_resumed_checkpoint_cpu.json`、`live_state.json`和`live_viewer/viewer_status.json`。
+
+### 2026-10-24交接前记录（历史状态，不代表仍运行）
+
+- 2026-10-24 PR22 已合入 `main` (`b3fd9cab`)，当前分支 `chore/physx-pointmove-training`。用户授权本机一次 12×12m 平地、零植物/石块、全图随机起终点、60s 的 fast_stop_v2/absolute-goal 定点移动训练：512×1 LSTM、0.4m、XY速度<0.05m/s、全角速度<0.1rad/s并连续保持0.5s；4×128×384=196608 transitions。a01 的20m spacing guard与生产 `env.py:177` 实际22m不符，未通过协议门禁，试验原样保留；a02已修正为22m spacing，76源哈希及protocol SHA `8e1bb86e82eade511d7592a35df2e4bb13d3e87997ee0d625f500a1460b37f0a`冻结，零步baseline真实exit 0并通过检查（0步/0迭代、Adam空、参数有限，SHA `ac1684aaf6d2cfd9a5dfcf33482221dae652aff5d33a3f4a45fdfdaa9ff3d198`）。a02处于`resume_training_cli`运行中；首个完整checkpoint已通过CPU审计，512 transitions、Adam step20、参数有限且权重真实变化，76源及协议/基线SHA未变（见`first_checkpoint_cpu.json`）；未完成训练或能力改善不得提前宣称。自然结束后按同配置配对评估baseline与终局模型，各跑16个60s全图开发场景seed87010–87025；不用830xx/held-out，不据此宣称避苗、粗糙地形或实车能力。当前动态证据及流程边界见 `ISAAC_LAB.md`；第二十批为4/5（含完成事件监听和原生GUI预览），训练/记录不另计独立功能，自动化保持PAUSED。
+
+- 2026-10-24 按用户明确要求新增 `scripts/watch_training_completion.py` 并部署到本机后台：每30秒用普通程序检查a02状态，训练完成并通过终局检查、评估完成或异常时，通过官方 `codex queue` 向当前聊天排队一次；事件持久化去重，最终结束后退出，不重复启动GPU流程。14项CPU单元测试通过；真实队列连通测试exit0并返回确认，测试消息不是完成信号。当前训练仍运行、尚无真实完成事件；76冻结源与协议SHA未变，旧周期自动化未修改。状态/去重记录在仓库外 `C:/pioneer/isaac-training/watchers/pointmove-a02/`，验证证据见 `results/isaac_field_diagnosis/training_completion_wake_20261024/`。
+
+- 2026-10-24 原生Isaac Sim GUI预览已在 `results/isaac_field_viewer/physx_pointmove_flat12_gui_20261024_a03/` 真实验证：窗口中可见训练用简化底盘/滚轮与12m平地，viewport句柄有效，timeline暂停；这是单环境同配置静态预览，不附加训练实时状态。a01启动模板覆盖场景、a02资源同步等待导致黑屏的日志均保留；a03禁用默认模板覆盖、异步加载并恢复正常线程配置后画面通过。只重启了自有预览进程；训练7520、controller7316和完成监听仍运行，76冻结源/协议/原始资产SHA未变。整体GUI打开与黑屏修复计一项，第二十批4/5，下一项独立改动完成后须先整理。
+
+### 历史快照（以下条目保留各自日期的原始数据）
+
+- 2026-10-22 当前分支 `fix/rsl-goal-convergence` 基于 main `28bca570`，第二十批仍第 1 项。fast_stop_v2 训练至 196608 步（`model_93.pt`）自然 exit 0；最近一次可验收开发评估 dev002 为 4/16 严格停稳成功、exit 0，未通过门槛。dev003 报告 6/16，但外层 wrapper 实际 exit 1、Python 子进程 exit 未知，不能作为正常完成验收。58 源、协议和旧原始记录保留。用户已明确授权后续训练与仿真全部迁入 Isaac Sim；当前无 Newton 仿真运行，后续不追加 Newton 段；独立环境兼容性准备尚未迁移或通过。当前动态记录见 ISAAC_LAB.md 和 trial/run_status.json。
+
+- 2026-10-22迁移阶段历史：本worktree `E:/worktree/rsl-rl-migration/先进通用履带底盘工程`，分支`feat/rsl-rl-completion`，基于已合入PR18的main `bb54e169`。新训练/续训、完整评估与显式smoke、LASSC消费/回放、暂停全图点选/跟随预览、真实网络检查及导出均接RSL `.pt`；旧SB3入口显式legacy，历史协议/快照/模型原字节保留，未引入v2奖励。纯Torch encoder保持旧SB3类路径/键兼容，SB3依赖可选。第十九批当前1/5：全链迁移作为一项功能，含范围内整理。全CPU585 passed/23 skipped/55 warnings、31.52s、exit0；后续仅HTML首帧选层修复专项19 passed，静态检查通过。训练时56源快照保留，其后模型卡/HTML补丁单独存身份。唯一原生4×128×1=512步训练exit0、同checkpoint1场景2步评估exit0；Adam保存step20/权重及状态有限，LASSC回放18检查通过，JIT/ONNX核验通过。当时8783/8784真实RSL预览暂停/time0，模型明确smoke未控制验收，全图/点选/跟随/reset/真实61节点网络已浏览器验证。证据在`results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/`与`results/isaac_field_viewer/rsl_completion_smoke_20261022_attempt3/`；早期CPU/audit/UI失败原记录保留，退出口径见ISAAC_LAB.md，不以marker推断未实测退出。未启动完整训练、未宣称控制改善；硬件只有CAD/原理图，无实车验收；两automation保持PAUSED。
+
+
+- 历史课程 trial 为 `results/isaac_field_improvement/fast_stop512_mastery_20261021_attempt2`；其进展集中在 `ISAAC_LAB.md` TRAIN-01与trial原始run_status/decisions/probes，不在本文件滚动复制。其47项冻结训练源、protocol、模型或成绩保持原字节。两自动跟进项保持PAUSED；实际预览与后继采样始终串行使用GPU，不能用定时任务或替代轮询绕过暂停。
+- 第十七批5/5项功能已完成并整理：①LASSC生产消费桥与模型回放，②快停512可追溯续训，③mastery独立fast_stop_512课程，④配对过程量评估，⑤暂停策略地图点选预览。全套WSL CPU pytest在显示修复前真实exit 0（428 passed、22 skipped、8 warnings）；MDX显示修复后预览专项18 passed，py_compile与--check均exit 0。课程冻结47源与protocol保持一致；此前报告、模型、试验成绩未改。CPU-only Viser 1.0.30浏览器交互已通过（证据截图`results/project_history/fast_stop_objective_20261020/preview_map_cpu_verified.png`），但这不等于原生策略物理验收；训练自然完成且真实exit 0前不启动实际策略预览。第十八批计数1/5：新增非冻结的课程全场过程采样入口，复用既有轨迹adapter；验收与运行边界统一见ISAAC_LAB.md TRAIN-01。训练及只读审计不另计功能。
+- 2026-10-21恢复前只读复核（其后当前状态见本节首条）：`wsl -l -v` 显示Ubuntu-24.04为Stopped，未启动发行版，因此下条2026-10-20 SIGSTOP/Tl+仅为历史现场，不能承诺今日仍保留原进程、RAM或显存，也不得对旧PID直接SIGCONT。57344步完整磁盘checkpoint实算SHA仍为 `db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a`，ZIP含Adam、与manifest一致，45/45 live/snapshot源码均匹配原protocol。最后完整诊断65024步，超出磁盘7680步不构成可恢复检查点。没有final正常退出证据、未恢复训练或运行GPU；原automation保持PAUSED。用户再次确认0.4m位置范围及严格停稳。TRAIN-01离线差异/对照/资源/验收与下一依赖统一写入现有 `ISAAC_LAB.md`，不另建方案体系，不改冻结训练文件；该早期核查时点计数为第十七批0/5。
+- 2026-10-20历史暂停记录（适用于当时trial及PID）：用户当时明确要求“暂停训练”。2026-10-20 18:15:36北京时间，核实本轮fast-stop Python336098实际argv后已发SIGSTOP，实际ps确认状态 `Tl+`（进程暂停、没有退出），launcher336095仍等待。训练现场保留内存，显存仍分配；未终止进程、未另起训练或评估、不自动恢复。最近完整磁盘checkpoint57344步、SHA `db473f5e78038c066226f61cb6a5ee02ea71615823f28e519366cb0809ecbb8a` 与manifest/实算一致，ZIP完整且含Adam。原run_status仍running不感知OS暂停，以 `results/project_history/fast_stop_objective_20261020/pause_20261020/pause_record.json` / pause_audit.json及实际ps为准。用户未来明确“继续/恢复”才可核实际PID/argv/T状态和45源SHA后发SIGCONT恢复同进程；不要重新launch或覆盖协议。两个独立viewer未操作。原生automation仍PAUSED，功能计数仍0/5。
+- fast-stop首8192检查点于18:04:03生成；CPU-only独立审计真实exit0，15检查全true，含模型/rollout buffer gamma1、严格停车及稳定奖励系数0、actor/critic512×1、3065801独立参数、45源/协议/模型SHA稳定、权重及Adam有限。37项Adam step均300，65个state张量/3021076元素相对正式0步更新（state含共享别名，不能等同独立参数计数）；plants0检测支路不称已学习。baseline SHA `3366b22d4b2bb76f2688dcd3dd43b2b3447996cf52f9e23e5713523e7d2190d0`，8192 SHA `49280e36e068049ba7e811355311c0b228f718878ac330ec8fd8508f856ae933`。证据 `results/project_history/fast_stop_objective_20261020/first_checkpoint_cpu.json` 及log/exit_code。该8192步记录时仍在训练；滚动训练0/4不是开发评估，未宣称效果提升。
+- fast-stop新512实验已于2026-10-20 18:01:53北京时间正式启动：WSL Ubuntu-24.04 Python336098、launcher336095、exec37814仅作启动记录；后续核真实argv/日志/检查点/退出。新trial/protocol SHA见下条，45源冻结；正式0步baseline已保存，actual actor/critic512×1、policy独立参数3065801，新权重与Adam。gamma1/稳定权重0/严格停车合同已在协议冻结；诊断JSONL已出现真实PPO更新、reward逐步对账matched、稳定惩罚为0；截至该历史记录时仍在训练，不能称最终完成或能力提升。用户关闭定时任务的偏好保持，automation仍PAUSED。
+- fast_stop_v1第5项已完成并整理：CPU377 passed/20 skipped/8 warnings、compileall/Bash/源码稳定性全部真实0；原生Newton20 passed/61 warnings真实exit0，含真实XY/full角速度、局部reset与官方SB3 timeout无bootstrap/终态快照。清除重复终态缓存，复用既有diagnostic_step_infos/episode_results；奖励常量单一来源，旧profile兼容。12历史模型/协议和45旧源码快照不变，live仅4预期源变化。详见 `results/project_history/cleanup_and_validation_20261020_batch16.md`。第十六批5/5完成并已整理；该快照时第十七批为0/5。新实验prepare/preflight真实0，独立目录 `results/isaac_field_improvement/random_global_rough_fast_stop_lstm512_20261020`，45源冻结，protocol SHA `3ca58fcc05b9d7ac34798f836704c91b5ec608d62f7424c3897ed291451a620c`；当时准备正式启动，不混旧512成绩。原生automation保持暂停。
+- 用户确认继续按“最短时间到点停稳”调整。旧512 trial `random_global_rough_lstm512_20261020` 已于17:42:43经核argv后停止；SIGINT未停后台子进程，随后SIGTERM，父shell真实Python exit143，原Python335230/launcher335227实际已不存在。最后完整40960 checkpoint SHA `67bcb7b73dd5f22c1b01e33a1a0e86cf8f8ed82c25587088ceffa907c1df33d5` CPU-only 13项核验真实exit0，原protocol、baseline及所有checkpoint保留；raw run_status仍running是被终止后的陈旧值，以真实退出及 `results/project_history/fast_stop_objective_20261020/previous_stop_outcome.json` 为准。该历史时点正在实现独立fast_stop_v1新奖励/严格停车配置，尚未启动新训练；本项完成后为本批第5项，需先完成第十六批整理再开始后续功能，当前已完成计数仍4/5。定时任务仍暂停。
+- 512实验首8192步检查点已于17:36:10生成；CPU-only独立核验实际exit0、13检查全true，45源live/snapshot和协议稳定，baseline SHA `9fbad2d40f53aec3ab4763f20890abd49578d6b62c3d9bf01d96b697e3af8675`，8192 SHA `c363f75703adbd740dc2b43a1c81065a889ad3cb8cae601c6e716964e02ae817`。实际3065801参数、actor/critic512×1，37项Adam step均289且有限；较0baseline有65个state张量/3028603元素改变（含alias，非独立参数计数），检测分支plants0不称已学会。见 `results/project_history/lstm512_experiment_20261020/first_checkpoint_cpu.json`。本轮仍运行；8192滚动日志0/5不是开发评测，未声称效果改善。原5份历史协议/模型hash核验未变。
+- 2026-10-20 17:33:58北京时间，按用户“先跑512维，可以开始实验”正式启动独立 `results/isaac_field_improvement/random_global_rough_lstm512_20261020/`。WSL Ubuntu-24.04 Python335230、launcher见trial launcher.pid、exec50333仅为启动记录，后续必须核实际argv/进程/日志。45源冻结，protocol SHA `010486bd7ceeb2ed121a1a1b765b6901e7732208496a9c699cc89da53fdad954`；actor/critic各单层LSTM512、融合192，实际policy独立参数3065801，正式0步baseline已保存，initialization.json核实新初始化、没有旧权重迁移。沿用random_rough/4env/69009/196608/60s/植物0岩石0/同侧联动前导向轮/稳定奖励，原2Nm/轮与指令斜坡不变，未将硬件审计候选值写成实车边界。尚无学习提升结论，不构成512与128因果对照。用户后续询问奖励函数，未在运行中更改协议/奖励；automation保持PAUSED。
+- 本项增加prepare专用 `--lstm-hidden-size`、协议/真实模型维度校验、初始化参数记录及可选宽度透传，计数为第十六批第4项，当前4/5。CPU首次2新增测试缺sys导入而失败（357 passed），修正导入后359 passed/18 skipped/8 warnings、compileall/bash语法实际0；首次失败证据保留。prepare/preflight实际0，源冻结后不再编辑45训练源。记录入口 `results/project_history/lstm512_experiment_20261020/`。
+- 用户最新保持摩擦系数0.8，并要求查真实FOC驱动文件判断电驱能力边界。本轮为只读审计，结果入口 `results/hardware_limits/foc_20261020/README.md`；未启动新的rough训练（仍prepared/0步），未改硬件、45冻结源或协议。当前FOC软件仅主机codec/会话/反馈测试，未发现可构建G431完整FOC固件；单板1.8kW输入/1秒与±100A/5000A/s均为选型或模型候选，不是已资格连续能力，卖家80A口径不明。当前BOM主桥为IPT015N10N5、0.5mΩ/5W分流器，不能套旧IRLB/STL主桥筛查。现有仿真仅目标限速15km/h、指令斜坡1.5m/s²、14轮各2Nm，无总电输入功率/母线电流/热/回馈约束；按Kt=.035/效率1每侧2Nm×7轮等效电机轴2.333Nm、Iq66.67A，属于未标定换算。若后续据硬件审计改电驱源，必须另建trial，不能覆盖已准备协议。审计/计算不计新增功能；该只读审计时点为3/5，最新计数与启动状态以上文512实验为准。
+- 最新计数：第十七批5/5已完成并整理，第十八批1/5（课程全场过程采样入口）。第十七批五项及验收见本节上方与ISAAC_LAB.md TRAIN-01；历史训练日志和成绩保留。
+- 用户最新要求：导向轮转速与同侧负重轮绑定，完成后捋顺逻辑、整理文件、适当归档。此前已允许与同目录聊天“评估并优化项目训练方法”协调；该聊天已交出env.py/newton_drive.py/learning.py写入，方法功能保留，当前不再改共享Python或启GPU。
+- 当前启用FrontGuideSpec默认rotation_coupling=same_side_track_speed。每world14条Newton公开mimic/equality（12负重轮+2guide），guide按R_main/R_guide跟随本侧wheel0，默认45mm/45mm=1:1；无新增actuator/PID/扭矩，原14驱动轮每轮2Nm保持。左右guide各.25kg从车体扣除，总30kg；x=.42m、比支撑轴抬高.05m、宽.06m。None模式旧资产/hash/12条关系保持，free仅诊断。新几何仍是离散轮代理，无连续履带斜面/张紧机构，不推定真实翻越高度。
+- 接口由FrontGuideSpec统一资产→cfg普通dict→环境恢复只读规格→Newton world hook→drive metadata→fresh合同。注册hook仅构建期且按joint_world隔离。实际Newton/MuJoCo joint/DOF需用官方映射，不假设全局索引或裸关节名相同。host eq_type=JOINT时eq_objtype=0仍正常；多world的solver模板neq不是全局关系条数。
+- 当前native attempt8专项3 passed/39 warnings、attempt9原环境14 passed/55 warnings，实际exit均0；位置残差最坏4.96e-5rad、速度残差p95 .01286/max .01617rad/s，通过原门槛。粗糙reset、30kg、actuator0、力矩限幅、多环境隔离、真实body角速度和部分reset统计均已验。记录 results/isaac_field_diagnosis/front_guide_coupled_20261020/README.md，早期失败attempt保留。
+- BodyStabilityConfig仅奖励/统计用真值，不加策略观测：每策略步dt×[2×超35°总倾角²+.02×bodyωX/Y平方]，35°为试验软阈值，原1.2rad硬终止不变。root world角速度旋转到body；不能拿云台gyro代替。None不加惩罚，奖励分项和总reward对账；记录策略步峰值/RMS、超阈时长与分开终止原因，非物理子步极值。
+- 当前random_rough：100×100m、plants0/rocks0、地形幅值预算.35m/波长4–10m、60s、4env/seed69009、新随机初始化196608步。目标/起点/朝向全场独立采样，不限附近；每run固定一份地形，不是每回合重生成。rough_a/b用地形80003/80004和开发seed87001–4/82001–4，必须对同实际USD路径/SHA/bytes、真实地形seed、同初态做0baseline/final配对，姿态summary缺失/非有限拒绝。新output results/isaac_field_improvement/random_global_rough_coupled_guides_20261020，prepare/preflight/外层均实际0，45源live/snapshot匹配，protocol SHA 5de27ea7b7e1714b8822ec8fe11f0b53e6f08d194577b253d376913a00405980，状态prepared/0步且未创建baseline或正式训练。
+- 当前完整CPU整理349 passed/18 skipped/8 warnings、compileall/3项目bash-n以及7项额外静态检查均0，80源码/测试SHA前后完全相同。首次outer文件名误写导致exit1，inner已0；第二次outer/inner均真实0，原失败保留，见 results/project_history/front_guide_coupled_cleanup_20261020/read_only_audit_attempt2.json。不改测试门槛、不因wrapper问题覆盖第一次证据。
+- 用户授权归档已执行：6个自由轮阶段旧目录、130文件/2554465字节原样移动到 归档/front_guide_free_rotation_20261020，逐文件SHA/bytes全部一致，实际exit0；原路径映射见该目录archive_manifest_before.json。旧自由轮台阶未跨越、旧rough prepare成功/preflight失败和未启动旧viewer包装器都保留。正式历史模型/协议/源码快照/成绩及资产缓存、共享运行时未移动或改写。
+- 台阶pair_attempt3 free/coupled/analyzer/launcher均真实0，同源码/同地形SHA/同初态固定动作200步有限；guide-step快照187/200、guide输出0、驱动effort最大.9334Nm。60mm台阶没有越过，两模式root最大x约2.2538/2.2535<前缘2.6m，不称翻越提升；最坏guide速度残差.0921rad/s。attempt1/2探针映射/eq_objtype审计失败原样保留。新8781已GUI检查轮组，手动.03/.03运行至5.45s后暂停归零/reset0，console0 error/1上游warn，无checkpoint；metadata14关系/guide2、60s/粗糙plants0/rocks0一致。证据 results/isaac_field_viewer/front_guides_coupled_rough_20261020/。旧8769/8770未替换，不当作新几何或393216策略。
+- 前一轮60s续训实际完成393216步、29checkpoint、2026-10-20 14:44:06北京时间exit0；protocol SHA fe54ce6233e10705a9bbc393784eeca8cbe4d459ac467af1b2fd3656fb4baa18，final SHA 9777af6addd30427026675c0fb9d577c555fd288294bc6129a80b53b1d633a70。CPU全12检查通过，37项Adam step14806、65张量更新、12检测张量plants0未改。重评60s free成功1/4→1/4、field1/4→0/4，零损伤/碰撞但no_improvement，不能称已会可靠导航。父fresh196608 final SHA 6b4c85884a51c2e23f557eb98bc04ea63905fc8f20d4379715fb9fe72b75cdc5，旧20s报告不混算。
+- 独立训练方法入口train_isaac_mastery.py保留奖励/PPO诊断、连续达标课程、真实旧任务on-policy采样、安全选模与显式GAE；三份method_v2协议按旧47源准备，当前源已变，必须新目录重prepare，不能覆盖旧protocol或先称可直接启动。未新增特权critic/势函数塑形，未证明GAE唯一根因。
+- 用户明确关闭的是原周期训练automation，保持PAUSED且不恢复；本轮一次性预览heartbeat当前也PAUSED（详见本节首条），不把原任务恢复或扩大为常驻训练监控。每次进程核验真实argv/日志/检查点/退出，旧PID只是历史，句柄失效不据此重启。60s改变episode_time_ratio，纯延时对照需另固定原时间输入。
+- 本轮完整整理入口 results/project_history/front_guide_coupled_cleanup_20261020/README.md；整理前AGENTS/ISAAC_LAB/使用说明原字节和SHA在同目录docs_before/manifest.json。旧运行期状态、历史PID和逐批失败细节以该备份及各原trial为准，不再在当前状态堆叠互相矛盾的“当前/运行中”。
+
+## 任务边界与验收
+
+- 当前迁移目标为 Isaac Lab + Isaac Sim PhysX；新训练复用本地固定 Isaac Lab 官方 RSL-RL 入口、wrapper 和 runner，SB3-Contrib 仅用于显式历史兼容。保留五路观测、共享编码器、模型身份和既有评估接口，不另造通用训练器。模型自己学，连续四维动作，无 Nav2 或手写规划器替代策略。冻结 Newton 实验只保留复现证据，不追加旧后端训练。
+- 不做训练速度/FPS基准。必要的物理正确性、学习效果、PC负载和UI核验仍做；逻辑20Hz配置不冒充实测帧率。
+- 优先不压苗，允许更慢或超时。历史/通用默认到点为0.4m位置范围、低速hold0.3s；用户最新fast_stop_v1实验为位置≤0.4m、真实水平XY速度<0.05m/s、完整车体角速度模长<0.1rad/s持续0.5s，优先成功并尽量缩短用时，不要求终态朝向。不同成功判据的报告不得混算。
+- 安全验收必须同配置/同初态配对：clean成功增加，且损伤episode数、平均损伤、碰撞不恶化；不能把成功/损伤权衡称能力提升。旧权重可在当前物理重评，但不同规则/几何/驱动/观测下的旧报告不混算，不重贴metadata。
+- 810xx/820xx/870xx是已观察开发数据，830xx保留未观察，只有开发安全门槛通过后才做独立验证。滚动训练窗口不是held-out；CPU固定观测反事实不是车辆轨迹。
+- 完整植物搜索、粗糙地形/石块、对抗训练及整田可靠导航未达成，不以局部通过或训练跑通标记总体完成。当前基础课程plants0，不称已经学会避苗。
+- 每次训练保留协议、源码哈希/快照、配置、种子、检查点、依赖/资产及真实退出。观察超时不是进程结束；句柄失效须核实际进程/端口，不能只看状态文件猜测或重启。
+- 旧后端69项批量删除曾被自动审批拒绝，未执行或绕过。用户后续授权移动，已原样移至 `归档/legacy_before_isaac_20261017/`；不能把历史拒绝视为删除授权。共享运行时/upstream/Isaac模型和记录保留；原路径按archive_manifest.json与SHA查阅。
+
+## 实车事实与代理限制
+
+- 30kg；车身0.8×0.3m，300mm不含履带；整车最外宽470mm；每侧履带宽60mm，中心距410mm，接地595mm，最高15km/h。
+- 两台BDUAV N5065 270KV，4:1减速，主动轮直径60mm；硬地和农田均能原地转向。转一圈用时暂缺，不反复索取、不称已标定。
+- 轻量代理是盒体、七对圆柱轮和双轴云台，不导入高精CAD。45mm代理轮半径不同于30mm主动轮；P.04、Ki.1、2Nm/轮、Kt.035和效率1均未标定。14个轮执行器+同侧约束仍不是两台实车电机的完整模型；不额外施加车体速度/转向伺服。
+- 用户已批准IMU/驱动反馈/协议及硬件修改，并授权自主推进；此前“需批准/尚未实施”属历史，不再阻塞。ATK-IMU901为10轴、随云台偏航和俯仰一起动；云台两轴实测角度/速率、左右驱动电流/机械RPM均可回读，驱动器自研文件在项目内。云台IMU不直接等于车体IMU，不用动作指令冒充实测速率。
+- 已有Python telemetry解码/组装与FOC C主机96checks/0fail，但未完成实机串口/CAN/HAL联调；不能把仿真等效Iq/RPM称实测或接触力。硬件路径 `电力/FOC驱动模块/软件/`；厂家手册镜像 `docs/hardware/atk_imu901/ATK-IMU901_User_Guide_v1.2.pdf` 封面标V1.0，未核实与实物/最新固件一致。各通道单位、噪声、电流/安装外参仍需实机核实。
+- 云台中心离地.4m、俯仰−25°..60°，雷达/相机一起俯仰。X2雷达360°/8m/10Hz/400束；策略与预览同88×160轴向Z深度。气压/海拔不入策略，磁场保留，无重复Euler/温度输入。
+- 玉米约1m，行距.8m、株距.3m，允许健康/干叶混合/遮挡；UWB多基站覆盖。识别相机/单点测距与云台同动，须对准目标再测。
+- 损伤默认stem-contact-v2：履带压茎基或车身撞主茎；叶片擦碰及旧9–15cm保护圈不算。履带595×60mm带和主茎垂直相交，车身当前Z/pitch/roll扩张AABB；水平扫掠是离散2.5D近似，不称精确接触/弯折。旧配置缺metric用root-protection-v1保持复现。
+- 固定植物root未证实每株增加6个q/qd；有位姿/mocap/几何/BVH成本，未测不猜收益，不据此重写bodyless。
+
+## UI与关键证据
+
+- 用户选定bbycroft LLM Visualization风格，external/llm-viz MIT实际复用范围记在 `isaac_field/visualization/THIRD_PARTY_NOTICES.md`。固定深色，无主题切换；只保留完整二维网络展开，无整体视图/网络三维，车辆三维保留，连续曲线连线。
+- 2026-10-25 用户明确喜欢当前8791多环境训练观察器风格；作为长期UI约束，保留当前Viser深色视觉、四环境布局和现有交互，不重设计主界面。后续输入与内部网络激活只在同风格折叠面板或独立区域扩展；激活采样须接现有训练forward数据，禁止额外policy forward或重复推理。
+- 色标为整帧全部采集层及绑定参数最大绝对值±全范围、0同色，扩大立即/新frame收缩最多5%，暂停重复GET/选层不重定标；reset/bind清历史。完整值域无百分位截断。不能仅用PNG变色判断raw激活变化。
+- reset先确定最终start/yaw/goal再完整校验，推进RNG重试；不验证后覆盖端点。证据 `validated_reset_repair/`。生产reset采用H/V矩形连通验证，0.1m网格可能错过狭窄锚点；Scene.radius导航保护区与stem_radius损伤语义不同，尚未修复，不断言策略无法驶入行间。
+- Newton BVH包括VISIBLE与COLLIDE_SHAPES，视觉叶片也能测距；历史空命中因最近株31.54m。近株1.5m LiDAR/单点实测1.488780m，不再传播植物透明/射线只查碰撞的已纠正误判。
+- 旧53248/safe118784/Gaussian-gSDE/GAE对照及转向偏置见文档归档和原results，未通过整体不压苗优先门槛。目标通道正确、梯度非零，未发现训练cache陈旧；不称GAE是唯一根因。
+- WSL必须显式Ubuntu-24.04。localhost/NAT UTF16提示曾用/bin/true实证actual exit0，不把warning当失败；后台检查真实exit和进程。PowerShell会展开双引号里的$rc，状态采集优先保存bash文件再执行。不要擅自重启WSL/驱动/电脑。
+- 详细命令与流程见使用说明.md，当前项目状态见ISAAC_LAB.md；更早历史在 `results/project_history/AGENTS_before_20261017_batch8_cleanup.md` 及本批文档归档。历史PID/源码计数/“当前”只属于相应时点，不覆盖最新记录。
+
+
+## 2026-10-25 第二十四批：训练平台性能改造（实测）
+
+- 性能开关：`isaac_field/env.py` 增加 `ISAAC_FIELD_PERF_PHYSICS=1`，允许 `sim.dt*decimation==task.dt` 的任意组合（默认不设置时仍强制 1 ms/50、solver 40/1、render_interval=50，行为不变）。
+- 探针实测：32 env（dt=1 ms/dec=50）约 5.0×；32 env + dt=5 ms/dec=10 约 19×（41.7 samples/s）。
+- 正式训练：`perf_20261025_n32_dt5`，32 env × 128 steps × 96 iter = 393,216 transitions，2h33m（9218.8 s），平均 42.65 samples/s；`model_95.pt` SHA `710ccb94…`，权重有限。续训链 model_95→112→128→（cont3 目标 287）。
+- 策略评估（12 m 场地、5 ms 物理、非冻结 1 ms 协议）：model_95 2 场景 0/2；model_128 4 场景 0/4（2 个 outside_or_overturned、2 个 time_limit，平均最终距离 6.59 m）。**非 strict-pass、不构成能力结论**；平台吞吐已解决，策略质量仍需更长训练/任务调整。
+- 原生栈（WSL2 Ubuntu-24.04-Arm64）：M0 CPU 端到端 81.7 samples/s（1.9×）；M3a 246.5（5.8×）、M3b 299.6–315.7（7.0–7.4×，稳态口径）；M1 观测等价 lidar numpy 逐位一致、state 4.05e-7、feedback 直通 2.9e-8、VQF 旁路 0.0；remaining blockers 为 depth/detections 占位（估 6–9 人日）。
+- 平台上限：96% 负载下 SM 时钟约 663–690 MHz（最大 3003）、`power.limit=N/A`、功耗读数不可信，疑似 vGPU/功耗墙；1.65 TFLOPS fp32 为真实可复现数字，不能外推到裸机。
+- 文档：`PERF_PLATFORM.md`（性能/训练/评估记录）、`NATIVE_STACK_PLAN.md`（迁移架构、基准、M0–M4 门禁、风险）；分支 `perf/max-throughput` 已推送（最新提交见 git log）。
+- 范围整理：本轮改动集中在性能相关源文件/评估脚本/文档；冻结协议、历史 results、检查点原始字节未改写；临时评估脚本保留在 trial 目录。
+
+
+### 2026-10-25 后续：放弃 Isaac 训练、转 WSL 原生栈（用户决定）
+
+- 用户明确决定：停止 Isaac 训练，以后以 WSL 原生栈为主；`cont4` 在 iter ~183 被按用户指令终止（最后完整 checkpoint `model_176`，741,376 timesteps，权重有限，SHA `a0937d36…`），不记自然完成。
+- WSL 训练准备：新增仓库外 `C:/pioneer/wsl-native/wsl_train/train_wsl.py`（GPU/newton_xpbd/warp lidar/vqf、JSONL、checkpoint/save-interval、resume + observation-contract SHA 校验），冒烟 64 env×16 steps 稳态 ~600–650 samples/s，resume 已验证。
+- 未就绪：depth 160×88（Warp 实现与 reference 对照 MISMATCH，修复中）、detections 16×8（未实现）；`capability_metrics_allowed=false`，当前 WSL 训练只能作吞吐/学习冒烟。
+- 记录：`PERF_PLATFORM.md` §20、`WSL_TRAIN_PLAN.md`；Isaac 仅保留为对照/验收工具。
+
+## 2026-10-25 原生训练平台验收批次（当前入口）
+
+- 本轮五项独立改动已完成范围整理（5/5）：（1）显式任务选择与native_task_contract_v2身份；（2）正式训练启动器完整日志/真实退出码与固定配方；（3）评估入口纠正1ms/50并严格验证检查点、种子覆盖与非有限结果；（4）同进程固定预热/实测的可复现ARM64性能工具；（5）Repository checks增加无需GPU/torch的标准库CPU回归。
+- CPU范围整理实跑：Windows27项全部通过；WSL27项中2项PowerShell专用跳过，其余通过。清除旧重复SHA函数/未使用导入，统一共享契约计算。冻结V1/V1.1协议与历史模型/成绩不改。
+- GPU链路冒烟已真实exit0：64env×32step、LSTM512、五路real、fast_stop_v2、NewtonXPBD、1ms/50；resume iteration2→3、Adam8→12，policy/optimizer均finite；1env/32step eval strict_match同SHA，非能力评估；0.005/10负向请求在环境构造前exit1拒绝。
+- 旧pilot01实际simplified，目标300但最后20轮、manifest exit1、无summary；不记自然完成，不把旧数据回填为V1.1成绩。推理服务PID48968后续已不存在；桌面GPU活动和aria2仍保留，不声称整机隔离。
+- 共享目录曾发生未提交文件/修改意外回退，原因未明；本轮采用明确责任文件、直接文件写入、外部备份和分项提交。旧probe目录丢失后的恢复证据明确标记重建，不伪装原capture。
+- 性能数字、正式训练状态、复现命令与限制统一见 native/MIGRATION_ACCEPTANCE.md；不将早期占位原型、历史Isaac配置优化、共享负载观察与本轮正式完整栈测量混算。当前仍 capability_metrics_allowed=false，RTX域差和代理物理保真/导航能力不以吞吐替代。
+
+- 整理后的后续批次当前2/5：（1）Git来源审计改为实际训练输入raw blob与明确HEAD tree核对，避免全工程LFS索引阻塞，dirty_scope明确不覆盖无关工作区；新增原始LF/改动/未跟踪回归后Windows28项全过。（2）保留两份历史报告EOF原字节的精确.gitattributes例外，修复CI空白阻塞，不放宽其他仓库检查。新pilot06由另一入口在17:03:08启动，按新训练优先保留；禁止并跑benchmark冒称无竞争窗口，复测等待其自然退出。
+
+### 后续五项整理完成：正确物理与严格失败门
+
+- 后续批次5/5已整理：（1）Git实际源raw blob/明确HEAD审计；（2）历史报告EOF原字节精确属性例外；（3）正式零异常与完整300轮证据门；（4）Newton每子步实际contacts；（5）每world映射、partial reset、请求device与显式mu/模型材料身份。下一批从0计，不引入未经实测的CUDA Graph路径。
+- v3 revision为newton_xpbdg_v3_contacts_worldmap_materialcfg。Windows标准库31项全过，WSL31项中2项PS专用跳过；实际Newton CPU6项及GPU3world×1400步、64world×8步物理探针通过。旧v2的resume/eval冒烟仅为执行链路证据，不作为修复后物理通过。
+- 旧pilot06虽exit0/旧formal_eligible=true，iter185有非有限恢复，缺contacts造成跌穿地面；world0广播放大计数，旧材料实际值亦不符。拒绝330.2 samples/s、7.7倍及其策略归因，保留原run/模型/manifest，另存rejected审计，不回填冻结记录。
+- 正确v3两次短测iteration window为278.538和167.671 samples/s；全进程口径196.598和142.085 samples/s。均零异常，存在约39.8%波动，原因未知，不宣称稳定提速倍数。测量源码c94553e2，完整证据见native/acceptance/20261025_v3_rep01、rep02与对比JSON。
+- 用户明确暂停DeepSeekHarness，由此对话统一修复。fixed_physics_v3全新300轮正式验收于北京时间18:47:04启动；只读监测，不改运行中源码/协议，不resume旧错误物理检查点。最终状态统一见native/MIGRATION_ACCEPTANCE.md，未完成前不称正式通过。
+
+- fixed_physics_v3正式trial于18:58:07在iter58/step21发生env11物理非有限状态，严格门自然exit3，formal_eligible=false；57完整轮、wrapper666.72s。不将短探针/短测通过写成正式稳定性通过，不加预算重启；保留原始失败证据并继续定位。
+
+- 后续第1项：修复SH命令捕获-u顺序与JSON整数类型严谨性，Windows32项通过/WSL32项skip2；原run捕获不回填。v3长期失败后再确认XPBD不执行effort限幅、车身惯量小4倍，尚不归因为NaN直接触发源；继续诊断并在新revision/trial修复，不将v3短测当最终正确物理成绩。
+
+### V2改造范围整理（源码fce4ba90）
+
+- 本批5/5已整理：（1）启动命令记录与严格整数证据门；（2）官方MuJoCo-Warp后端、构造前惯量/接触修正、实际执行器力矩与reduced-state reset；（3）新engine canonical身份和可选择的完整栈benchmark；（4）V2草案/固定runner/任务与执行模式门及逐迭代physics_solver_events；（5）实验CUDA Graph与每子步设备端fresh overflow统计。V1/V1.1冻结文本/原始run不改。
+- Windows标准库61项全过，WSL61项中2项PowerShell专用跳过；实际物理CPU10项、仓库版3world/20policy GPU门通过。Graph严格逐轨迹对照未通过；默认eager重复也分叉，RUN_TO_RUN初始化资源超限主动TERM，无policy数据，不视为通过。Windows实测可见RAM30.49GiB、WSL约14GiB，无.wslconfig，不擅自重启或增配内存。
+- 正式主线收敛为ordinary eager GPU、NOT_GUARANTEED模式，Graph不进入V2正式recipe。V2尚DRAFT，必须先取得并冻结实际64→1一致任务SHA与新协议SHA，再启动全新300轮。两轮当前eager短测已exit0：iteration-window112.036/89.540 samples/s，all-samples/full-launch84.178/78.313；加权99.533/81.139。五路real、zero nonfinite/capacity/outer-cap，policy/optimizer132张量finite；LS fresh counters非零，不作导航结论。
+- 后续第1项仅优化非fatal LS console printf：使用官方per-model warning mask，保留真实设备计数和capacity/nonfinite失败门。它是日志执行profile，不更改8次LS/40次outer等物理参数；优化前后源码/原始结果分开保留，不能伪装相同运行或隐瞒LS事件。
+
+### V2冻结与可视化真值整理（当前正式训练仍运行）
+
+- 本批后续五项已整理：LS日志策略保留设备端计数、live目标/回合时间映射、V2协议与任务SHA冻结、真实短测/恢复证据LFS归档、原生物理真值查看器。协议SHA为83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e；唯一task SHA为209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2。
+- 已通过verified-inputs 1/3/64 world各20policy物理门、Windows61项、WSL61项skip2、真实CPU10项；checkpoint7→8恢复及64→1短评估strict-match通过。正式trial native_v2_formal_v6_live_20261025_224005于22:40:05开始，source7d8a167f、raw-source manifest6026336cad5b961e2fe95885d6010781ae75e59e792d1715988bda45d35e8938；须自然完成300轮、最终审计后才称正式通过。
+- quiet两次2warm+5measured完整栈短测加权iteration-window173.258、all-samples/full-launch139.733 samples/s；正式长测带实时查看器及CPU/Git活动，最终单独报告，不能借短测率回填。旧pilot06 330.2/7.7倍仍拒绝，capability_metrics_allowed=false。
+- native查看器绕过旧Isaac USD/terrain；旧USD有4个空body导致方块fallback。新视图采用同冻结源码零step CPU导出的19个实际primitive/local transforms与平面地面，动态姿态/目标/回合时间直接来自当前训练原始packet。静态导出最终SHA为fe0f4449d5416b453664a50c67fa2c880858b842737095e340945ac80d8f2e9e；不宣称读取或逐字节比对GPU几何数组。感知通道尚未显示，来源/校准详情保留，缺几何/身份不匹配即拒绝。
+- 用户要求界面真实映射实际训练，并决定自行用SolidWorks建模；保留其原生装配体、零件和STEP，后续导入必须核对质量/惯量/关节/碰撞与显示一致，不能静默拿代理替换。现有SolidWorks模型尚未导入当前训练。
+- 用户明确选择：先让当前正式300轮完成，再改为每控制步发布画面；当前每5控制步（0.25s仿真）不热改、不为显示中断正式试验。后续启动使用--live-state-interval 1，并实测发布频率；不插值伪造训练状态。

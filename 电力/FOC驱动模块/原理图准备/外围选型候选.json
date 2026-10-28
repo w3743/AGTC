@@ -1,0 +1,4173 @@
+{
+  "document": "FOC外围选型与原理图候选",
+  "revision": "0.1-candidate + electrical-review-20261011",
+  "date": "2026-10-22",
+  "status": "候选网表骨架；供仿真/原理图起步，不是投板、实测或安全验收冻结",
+  "scope": {
+    "boards": 1,
+    "architecture": "每电机一块FOC，六MOS三相桥，低边三分流，双向四象限回馈，共享BUS；每板独立本地BUS过压泄放支路",
+    "bus_V": {
+      "min": 22.5,
+      "nominal_max": 37.8,
+      "transient_design_limit": "待按TVS/布局实测核定"
+    },
+    "input_power_W": 1800,
+    "sizing_pulse_s": 1,
+    "motor_candidate": "5065 270KV Hall",
+    "controller_module": "WeAct STM32G431CBU6 Normal QFN48 V10; 不以Long版本代替；模块 header 物理编号待实物核对",
+    "working_ambient_screen_C": {
+      "min": 0,
+      "max": 60,
+      "source": "direct user confirmation 2026-10-11; component self-heating not included"
+    }
+  },
+  "ic_count": {
+    "functional_main_ICs_per_board": 7,
+    "counted_as": [
+      "U6.MCU: STM32G431CBU6, 1",
+      "U6.LDO: one 3.3V LDO, ME6216A33XG / ME6239A33M3G alternate mark, 1",
+      "U1: DRV8353RSRGZR, 1",
+      "U2: TPS7A4001DGNR, 1",
+      "U3: TLV1704AIPWR, 1",
+      "U4: UCC27511ADBVR, 1",
+      "U5: TCAN1042HGVDRQ1, 1"
+    ],
+    "not_counted_as_IC": [
+      "WeAct模块组件外壳/连接器（模块已按内部MCU与LDO拆开计数）",
+      "MOSFET、TVS、分立二极管、分流器、无源件、连接器、外置制动电阻",
+      "分立BJT及电阻（包括BUSOV到BREAK电平缓冲）"
+    ],
+    "note": "每板实际计7颗IC：Normal核心板内MCU+单颗3.3V LDO为2颗，板外U1-U5为5颗；U6是模块组件而非一颗IC。Normal原理图列ME6216A33XG/ME6239A33M3G备选标识，实际装配批次需目检；未见外置Flash/EEPROM IC。"
+  },
+  "power_bridge_connections": {
+    "BUS+": [
+      "J_BUS_P pins1-4 (board post-fuse input)",
+      "Q1.D",
+      "Q3.D",
+      "Q5.D",
+      "U1.VM",
+      "U1.VDRAIN",
+      "U1.VIN",
+      "CBUS1+",
+      "CBUS2+",
+      "CBUS3+",
+      "DTVS1.K",
+      "R_OVTOP.1",
+      "R_DUMP_A/B external branch through F_BRAKE"
+    ],
+    "PH_U": [
+      "Q1.S",
+      "Q2.D",
+      "U1.SHA",
+      "motor_U"
+    ],
+    "PH_V": [
+      "Q3.S",
+      "Q4.D",
+      "U1.SHB",
+      "motor_V"
+    ],
+    "PH_W": [
+      "Q5.S",
+      "Q6.D",
+      "U1.SHC",
+      "motor_W"
+    ],
+    "U_LOW_SOURCE": [
+      "Q2.S",
+      "RSU.force_high",
+      "U1.SPA Kelvin at shunt top"
+    ],
+    "V_LOW_SOURCE": [
+      "Q4.S",
+      "RSV.force_high",
+      "U1.SPB Kelvin at shunt top"
+    ],
+    "W_LOW_SOURCE": [
+      "Q6.S",
+      "RSW.force_high",
+      "U1.SPC Kelvin at shunt top"
+    ],
+    "GND_SYS": [
+      "RSU.force_low",
+      "RSV.force_low",
+      "RSW.force_low",
+      "CBUS1-",
+      "CBUS2-",
+      "CBUS3-",
+      "DTVS1.A",
+      "U1.GND/DGND/EPAD",
+      "U2.GND",
+      "Q7.S",
+      "external resistor return through Q7"
+    ],
+    "BRK_GATE": [
+      "U4.OUTH via R_DUMP_GATE",
+      "U4.OUTL via R_DUMP_GATE",
+      "Q7.G",
+      "R_DUMP_GATE_PD to GND_SYS"
+    ],
+    "DUMP_SW": [
+      "Q7.D",
+      "J_DUMP_SW pins1-4 (four legs of one board return terminal)",
+      "external SB50/resistor-bank return enters board at J_DUMP_SW"
+    ],
+    "DUMP_BRANCH": [
+      "Board BUS+ (available at J_BUS_P after external F_MAIN) -> external F_BRAKE -> external J_BRAKE_R/SB50 pin1 DUMP_RES_UP -> external two 2ohm resistors in parallel -> SB50 pin2 DUMP_SW -> board J_DUMP_SW pins1-4 (all same net) -> Q7.D; Q7.S -> GND_SYS. No extra board BUS terminal is required for the dump-bank supply tap.",
+      "At43.4V/1ohm, 43.4A and about1.884kW/1s total; two branches each about942W/942J. LPS300 4xPr overload reference is1200W per 300W resistor; hot-repeat, enclosure and thermostat still require test. A Q7 D-S short may draw22.5-37.8A on normal22.5-37.8V BUS, below nominal60A fuse rating."
+    ],
+    "note": "六MOS桥低侧分流适用于有效PWM导通采样窗口。关PWM后体二极管仍可能向BUS回灌；门极关闭不是隔离。三只 shunt 需四线Kelvin及脉冲/热校核。",
+    "BUS_HF_U": [
+      "CBYP_U_HF1: BUS+ to GND_SYS",
+      "CBYP_U_HF2: BUS+ to GND_SYS",
+      "place as close as practical to corresponding half bridge"
+    ],
+    "BUS_HF_V": [
+      "CBYP_V_HF1: BUS+ to GND_SYS",
+      "CBYP_V_HF2: BUS+ to GND_SYS",
+      "place as close as practical to corresponding half bridge"
+    ],
+    "BUS_HF_W": [
+      "CBYP_W_HF1: BUS+ to GND_SYS",
+      "CBYP_W_HF2: BUS+ to GND_SYS",
+      "place as close as practical to corresponding half bridge"
+    ],
+    "BATTERY_INPUT": [
+      "PACK+ source -> external/off-board F_MAIN -> board J_BUS_P pins1-4, all BUS+; J_BUS_P is post-fuse and is the PCB BUS+ input terminal",
+      "PACK- at J_BUS_N -> GND_SYS",
+      "Source-side precharge is required before connection; not implemented on this board. Shared 60mF at37.8V stores about42.9J. Fuse/terminal do not prove inrush handling."
+    ],
+    "HIGH_CURRENT_CONNECTORS": [
+      "J_BUS_P: BUS+ after external F_MAIN; four solder legs same net",
+      "J_BUS_N: GND_SYS",
+      "J_MOTOR_U: PH_U",
+      "J_MOTOR_V: PH_V",
+      "J_MOTOR_W: PH_W",
+      "J_DUMP_SW: DUMP_SW switched dump-return terminal; four solder legs same net, connects external SB50/resistor-bank return to Q7.D"
+    ],
+    "BUS_ADC": [
+      "BUS+ through R_BUSADC_TOP=180k to VBUS_ADC_SENSE",
+      "R_BUSADC_BOT=10k from sense to GND_SYS; R_BUSADC_SER=1k to BUS_ADC at PC4/P2-12",
+      "C_BUSADC=1nF and D_BUSADC_CLAMP=BZT52C3V6 (ElecSuper C5334032, SOD-123, pin1=cathode) from BUS_ADC to GND_SYS; software only"
+    ],
+    "SAFE_ADC": [
+      "SAFE_5V through R_SAFEADC_TOP=27.4k to SAFE_ADC",
+      "R_SAFEADC_BOT=10k SAFE_ADC to GND_SYS",
+      "C_SAFEADC=1nF SAFE_ADC to GND_SYS",
+      "PB0/P2-9 monitors SAFE_ADC and COMP4; verify partial power state"
+    ],
+    "TEMPERATURE_INPUTS": [
+      "J_TEMP_MOS 10k NTC to GND; R_TEMP_MOS_PU=10k to MCU_3V3; R_TEMP_MOS_SER=1k to PA2; C_TEMP_MOS=10nF to GND_SYS",
+      "J_TEMP_MOTOR 10k NTC to GND; R_TEMP_MOTOR_PU=10k to MCU_3V3; R_TEMP_MOTOR_SER=1k to PB1; C_TEMP_MOTOR=10nF to GND_SYS"
+    ],
+    "GATE_UH": [
+      "U1.8:GHA -> R_GUH pin1; R_GUH pin2 -> Q1 pin1 Gate",
+      "R_GS_UH=10k from Q1 Gate to PH_U (Q1 source)"
+    ],
+    "GATE_UL": [
+      "U1.10:GLA -> R_GUL pin1; R_GUL pin2 -> Q2 pin1 Gate",
+      "R_GS_UL=10k from Q2 Gate to SHUNT_U_TOP_KELVIN (Q2 source)"
+    ],
+    "GATE_VH": [
+      "U1.17:GHB -> R_GVH pin1; R_GVH pin2 -> Q3 pin1 Gate",
+      "R_GS_VH=10k from Q3 Gate to PH_V (Q3 source)"
+    ],
+    "GATE_VL": [
+      "U1.15:GLB -> R_GVL pin1; R_GVL pin2 -> Q4 pin1 Gate",
+      "R_GS_VL=10k from Q4 Gate to SHUNT_V_TOP_KELVIN (Q4 source)"
+    ],
+    "GATE_WH": [
+      "U1.18:GHC -> R_GWH pin1; R_GWH pin2 -> Q5 pin1 Gate",
+      "R_GS_WH=10k from Q5 Gate to PH_W (Q5 source)"
+    ],
+    "GATE_WL": [
+      "U1.20:GLC -> R_GWL pin1; R_GWL pin2 -> Q6 pin1 Gate",
+      "R_GS_WL=10k from Q6 Gate to SHUNT_W_TOP_KELVIN (Q6 source)"
+    ],
+    "DUMP_ENABLE": [
+      "SAFE_5V -> J_TEMP normally-closed thermostat -> DUMP_THERM_OK/U4 pin6 IN+",
+      "R_DUMP_INP_PD=10k from DUMP_THERM_OK to GND_SYS; open contact/wire break/Safe loss defaults off",
+      "U4 pin5 IN-=BUSOV_N, low enables output; pins2 OUTH and3 OUTL tied at DUMP_DRV_OUT, then R_DUMP_GATE=10ohm to DUMP_GATE/Q7.G",
+      "PB9/P1-24 observes DUMP_THERM_OK via 12k/20k divider and100k series; software stops active regen; thermostat is not BREAK_N"
+    ],
+    "THERMAL_STATUS": "J_TEMP normally-closed contact is only in SAFE_5V-to-U4.IN+ enable path. R_DUMP_INP_PD pulls input low on open contact/connector/SAFE loss. PB9/P1-24 reads through 12k/20k divider plus100k; software stops active regeneration. Thermal contact does not hard-trip BREAK_N.",
+    "KELVIN_LAYOUT": "PSF4 C4135357 pin1=sense-high, pin2=force-high (both SHUNT_x_TOP); pin3=force-low, pin4=sense-low (both GND_SYS). Route pin1/4 as direct Kelvin traces to U1.SP/SN; do not route through power-current copper. Single canonical ground remains GND_SYS."
+  },
+  "analog_and_protection": {
+    "positive_phase_window": "Gain10 candidate. Phase shunt 0.5mOhm; use internal DAC3 to G431 COMP1/2/3: DAC3_CH1 feeds COMP1/COMP3 INM and DAC3_CH2 feeds COMP2 INM per RM0440 Table 73. Program both channels to code2979 (DAC output=VREF*DOR/4096), normal internal-only mode with output buffer disabled; DAC3 is internal so PA4/PA5 remain SPI1. Threshold ratio is 0.7272727*VREF_CORE (about2.4V at3.3V) for nominal about+150.015A. DAC3 15MSPS TUE ±5LSB and COMP offset still apply. External TLV1704 negative window about0.89918V for nominal -150.16A. Software phase command <=100A and ramp<=5000A/s candidate, preserve PWM ripple margin; ±120A peak signal about1.05–2.25V. Error/temperature/sampling window and response time remain unqualified.",
+    "negative_phase_window": "VNEG_REF=VREF_CORE*10k/(26.7k+10k)=0.89918V nominal at VREF_CORE=3.3V, giving about-150.16A; tracks CSA VREF/2. Each CSA raw SOx reaches the TLV1704 input through its 1k injection-limiting resistor and is compared against this reference; open-drain outputs share BREAK_N.",
+    "bus_overvoltage": "Current source: U7 TLV6700DDCR B channel uses internal 400mV reference; R_OVTOP=1MΩ to VBUS_OV_SENSE, R_OVBOT=10kΩ to GND_SYS, C_OV_SENSE=1nF, U7 OUTB=BUSOV_N. Threshold screen 39.209–41.724V rising and 38.318–41.311V falling is an independent-corner screen, not a full guarantee. U3 unused channel pins10=GND_SYS, pin11=DUMP_5V, pin13=NC. BUSOV_N drives the Q7 dump driver and Q_BOV_PNP/BC847C BREAK_N path. Low-current full-temperature drive, U7 input current at 0.4V, startup, DUMP_5V high-BUS behavior and physical thresholds remain OPEN.",
+    "tim1_break_and_arm": "AOE=0, MOE reset/cleared by Break, no automatic re-arm. Firmware must configure/read back COMP-to-BKIN routing and polarity before ARM; fault recovery requires DISARM, fault removal, zero/offset checks and explicit new ARM. INH/INL six-PWM both low in 6x mode is the intended all-gates-off state; verify actual DRV truth table/configuration.",
+    "safe_rail": "U2 TPS7A4001 generates SAFE_5V for SAFE_ADC and the FOC-A single LOAD_EN_BIAS_EXT resistor; U6 TPS7A4001 independently generates DUMP_5V from BUS for U3 TLV1704, U4 UCC27511A, U7 TLV6700, the BOV pullups, Q_BOV_PNP and J_TEMP. DUMP_5V is independent of SAFE_5V, but shares BUS and GND_SYS.",
+    "bus_monitor": "BUS_ADC at PC4/P2-12: BUS+ divider 180k/10k; 42V about 2.21V, 60V about 3.158V. R_BUSADC_SER=1k and BZT52H-C3V6 candidate to GND_SYS; software monitor only, not fast BUSOV. PB2/P2-7 remains USB VBUS detect through SB4.",
+    "dump_thermal_status": "J_TEMP normally-closed contact gates U4.IN+ from DUMP_5V; R_DUMP_INP_PD pulls DUMP_THERM_OK low on open contact, open connector or DUMP_5V loss. PB9/P1-24 observes the state in firmware. The contact is only a low-current dump-enable path and is not a hard BREAK_N trip; opening it disables the energy dump, so loss-of-sink behavior remains an explicit system risk.",
+    "CSA": {
+      "gain_candidate_V_per_V": 10,
+      "shunt_ohm": 0.0005,
+      "VREF": "VREF_CORE=coreboard VREF+ (P2-8), filtered at U1 pin26; CSA bidirectional zero-current SO=VREF/2. Do not enable VREFBUF; validate coreboard analog reference source and noise.",
+      "phase_limit_A_peak": 120,
+      "hard_window_candidate_A": "Nominal approximately +150.015A/-150.16A with GAIN10; DAC3 code2979 uses RM0440 DOR/4096 and DAC3 internal TUE ±5LSB. Cold electrical corner estimate minimum +131.51A/-130.62A before unbounded CSA drift/response effects. Software phase command <=100A and ramp<=5000A/s candidate candidate, retain ripple margin; not a hardware qualification.",
+      "SEN_OCP": "Configure SEN_LVL=00b (minimum 0.25V) and OCP_MODE=00b latched shutdown with nFAULT to BREAK_N. Across 0.5mOhm this is about500A; it is a separate gross fault backup, not a 120A phase-current clamp.",
+      "bus_current_limit": "No independent bus-current shunt/comparator in this candidate. 100A BUS is a system/operating target, not locally hard-limited.",
+      "SO_at_plus_minus_120A": "For VREF_CORE=3.3V, gain10, 0.5mOhm: nominal CSA_SO about1.05V to2.25V at +/-120A.",
+      "shunt_pulse_screen": "At120A each low-side shunt dissipates7.2W instantaneous; KOA explicit short-overload15W/5s supports only a candidate 1s pulse at this point. With terminal60C and Rth8C/W, simple steady bound is +57.6C ->117.6C below130C rating; not continuous-current or PCB thermal PASS. Verify actual terminal temperature, pulse sequence and Kelvin pads."
+    },
+    "four_quadrant_operation": "Six-switch three-phase inverter can drive/brake in both rotation directions; all three low-side shunt CSAs are bidirectional and referenced to VREF/2. Regeneration energy reaches the shared BUS. Local BUSOV hardware should stop the bridge and enable the local dump; another board/battery/source must absorb energy or the local resistor carries it. Gate-off does not isolate body-diode paths.",
+    "VDS_OCP": {
+      "status": "initial_spi_candidate_pending_bench",
+      "register_settings": {
+        "OCP_MODE_register_0x05_bits_7_6": "00b, latched shutdown for VDS_OCP and SEN_OCP",
+        "OCP_DEG_register_0x05_bits_5_4": "01b, 2us programmed deglitch; 1us exists but 2us is the initial switching-noise compromise pending test",
+        "VDS_LVL_register_0x05_bits_3_0": "1100b, nominal 0.9V; nearest supported setting to ~0.94V (there is no 0.94V code)",
+        "OCP_ACT_register_0x02_bit_10": "1, linked response so a half-bridge OCP disables all three half-bridges",
+        "SEN_LVL_register_0x06_bits_1_0": "00b, minimum 0.25V threshold; not a 120A limit"
+      },
+      "datasheet_threshold": "TI DRV835x Rev A electrical table specifies VDS_LVL=1100b as 0.81V min / 0.90V typ / 0.99V max over the stated temperature range; OCP_DEG codes 00/01/10/11 select 1/2/4/8us. The 0.2V setting (0101b) is rejected.",
+      "screening_current_estimates_A": {
+        "cold_assumption": "Use IPT015N10N5 RDS(on) max 2mOhm at VGS=6V and 25C as a conservative cold screening resistance; at 0.9V nominal the crossing is 450A, and 0.81..0.99V corresponds to 405..495A.",
+        "hot_assumption": "Use 5mOhm hot screening resistance (2mOhm x 2.5 design multiplier, not a guaranteed datasheet max); at 0.9V nominal the crossing is 180A, and 0.81..0.99V corresponds to 162..198A.",
+        "phase_points": "At 120A, estimated MOS VDS is 0.24V cold / 0.60V hot; at 150A it is 0.30V cold / 0.75V hot. Hot 150A has only 60mV below the 0.81V minimum trip threshold.",
+        "rejected_0p2V": "At 0.2V nominal (0.18..0.22V), screening crossing is 90..110A cold or 36..44A hot; under the selected hot model it would nuisance-trip well below the intended 120A operating peak."
+      },
+      "limits": "This VDS monitor is a gross MOS overcurrent/short-circuit protection layer, not an accurate phase-current limiter. Actual threshold current changes with MOS RDS(on), junction temperature, gate voltage, parasitic inductance, switching state and reverse current; 5mOhm is a screening assumption only. SEN_OCP is a separate SP voltage threshold and minimum 0.25V across 0.5mOhm is about 500A. Verify short-circuit SOA, parasitic overshoot, false trips, actual fault-to-gate-off time, polarity coverage, and latch/recovery on hardware; do not claim the VDS setting guarantees ±120A protection."
+    }
+  },
+  "controller_candidate_pinmap": {
+    "status": "Normal QFN48 V10 official schematic electrical header mapping cross-checked. Actual socket orientation, exact fitted LDO variant and board-to-socket continuity still require physical verification.",
+    "tim1_pwm_6x": {
+      "PB15/P1-8": "PWM_WL/TIM1_CH3N",
+      "PA10/P1-12": "PWM_WH/TIM1_CH3",
+      "PB13/P1-6": "PWM_UL/TIM1_CH1N",
+      "PA8/P1-10": "PWM_UH/TIM1_CH1",
+      "PB14/P1-7": "PWM_VL/TIM1_CH2N",
+      "PA9/P1-11": "PWM_VH/TIM1_CH2",
+      "safety_note": "DRV8353 INHx/INLx have 100kΩ internal pulldowns to GND per TI electrical characteristics; keep external 10k G-S resistors on each MOSFET. Firmware must configure all six timer outputs LOW before raising ENABLE or arming PWM; verify reset/high-impedance behavior on the actual coreboard."
+    },
+    "hall_tim2": {
+      "PA15/P1-15": "HALL_A/TIM2_CH1 AF1",
+      "PB10/P2-5": "HALL_C/TIM2_CH3 AF1",
+      "note": "TIM2 Hall candidate; release JTAG/SWO on PA15/PB3, preserve PA13/PA14 SWD. TIM4 PB6/PB7/PB9 is not a standard 3-input Hall XOR map.",
+      "PB3/P1-18": "HALL_B/TIM2_CH2 AF1"
+    },
+    "current_adc_and_comp": {
+      "PA2/P2-18": "TEMP_MOS_ADC / ADC1_IN3",
+      "PA1/P2-17": "SO_U_ADC, COMP1_INP candidate",
+      "PB0/P2-9": "SAFE_ADC, COMP4_INP / ADC1_IN15; inverse polarity to TIM1 Break",
+      "PB9/P1-24": "DUMP_THERM_OK_GPIO",
+      "PA3/P2-15": "SO_V_ADC, COMP2_INP candidate",
+      "PB1/P2-10": "TEMP_MOTOR_ADC",
+      "PA0/P2-20": "SO_W_ADC, COMP3_INP candidate",
+      "PB2/P2-7": "USB_VBUS_DETECT_RESERVED_DO_NOT_USE",
+      "PC4/P2-12": "BUS_ADC",
+      "positive_threshold_DAC": "Internal DAC3_CH1 to COMP1/3 INM and DAC3_CH2 to COMP2 INM (RM0440 Table 73); both DAC channels set to code2979, normal internal-only mode MODE=011/buffer off. Does not use PA4/PA5, which remain SPI1. Confirm selected package/comparator register setup in firmware.",
+      "SAFE_undervoltage_reference": "COMP4 INMSEL=011 / VREFINT, SCALEN=1, BRGEN=0; startup and locked TIM1 Break configuration required before ARM"
+    },
+    "spi1_drv8353": {
+      "PA4/P2-16": "DRV_SPI_CS_N",
+      "PA5/P2-13": "DRV_SPI_SCK",
+      "PA6/P2-14": "DRV_SPI_MISO",
+      "PA7/P2-11": "DRV_SPI_MOSI"
+    },
+    "fdcan1": {
+      "PA12/P1-14": "FDCAN1_TX",
+      "conflict": "PA11/PA12 also connect to USB D-/D+; CAN and USB data cannot operate concurrently; check 5V power/USB VBUS backfeed before connection",
+      "PA11/P1-13": "FDCAN1_RX"
+    },
+    "fault_enable_misc": {
+      "PC13": "spare/board LED conflict to verify",
+      "PA13_PA14": "SWDIO/SWCLK reserved",
+      "PB9": "DUMP_THERM_OK_GPIO; software status only, no thermal BKIN",
+      "PB5": "CAN_STB; 10k pull-up to MCU_3V3 defaults standby",
+      "PB11": "DRV_ENABLE; external 10k pulldown; ENABLE low keeps driver disabled. No separate nSLEEP pin.",
+      "PB12": "BREAK_N active-low direct to TIM1_BKIN and GPIO readback; nFAULT/comparator wired-OR; verify peripheral routing before ARM."
+    },
+    "header_mapping": {
+      "status": "Electrical pad/net mapping cross-checked from Normal schematic; actual socket orientation, module revision and board continuity still require physical verification. Long/QFN48 is not authority.",
+      "left_header": "J_MCU_L: Normal QFN48 V10 P1, 24 schematic contacts; JXT-PM2.54-2X12P-A9 (C54803369) candidate connector. Map actual 2x12 physical pad numbering to P1 labels before placement.",
+      "right_header": "J_MCU_R: Normal QFN48 V10 P2, 24 schematic contacts; JXT-PM2.54-2X12P-A9 (C54803369) candidate connector. Map actual 2x12 physical pad numbering to P2 labels before placement."
+    }
+  },
+  "CAN_and_hall_nets": {
+    "U5_pins": {
+      "1": "FDCAN1_TX",
+      "2": "GND_SYS",
+      "3": "5V_BUCK",
+      "4": "FDCAN1_RX",
+      "5": "MCU_3V3",
+      "6": "CANL_CONN",
+      "7": "CANH_CONN",
+      "8": "CAN_STB"
+    },
+    "hall_logic": "Each Hall channel: J_HALL raw input -> optional 1k series/direct route and/or 10k/18k 5V divider branch -> JP_HA/JP_HB/JP_HC selector -> final MCU/filter net HALL_A/HALL_B/HALL_C. The matching 1nF filter capacitor and coreboard header pin share that final HALL_x net (P1-15, P1-18, P2-5). Open-collector mode requires the selected 4.7k pull-up to MCU_3V3; 3.3V push-pull uses direct; 5V push-pull uses divider; never populate direct and divider together. Output type, edge timing, VDD-off injection and VIH/VIL remain to be verified. TIM2 AF1 Hall candidate: PA15/P1-15, PB3/P1-18, PB10/P2-5; PA15/PB3 require JTAG/SWO release while preserving PA13/PA14 SWD. TIM4 PB6/PB7/PB9 is not the standard Hall CH1-3/XOR map.",
+    "termination": "120ohm only at physical end of CAN bus; DNP/jumper otherwise. CAN ESD array placed at connector with short return. USB D+/D- on PA11/PA12 conflict.",
+    "ESD_source": "https://assets.nexperia.com/documents/data-sheet/PESD2CANFD24V-T.pdf",
+    "ESD": "PESD2CANFD24V-T is ESD/transient shunt only. Its clamp must be checked against TCAN1042 common-mode and transient ratings; it does not establish sustained 37.8V miswire tolerance or thermal safety.",
+    "TCAN1042": "5V VCC on 5V_BUCK; 3V3 VIO on MCU_3V3; pin8 STB on PB5/P1-20 with 10k pull-up so reset defaults to standby. Exact pin order 1 TXD, 2 GND, 3 VCC, 4 RXD, 5 VIO, 6 CANL, 7 CANH, 8 STB. PA11/PA12 are shared with USB D-/D+ and cannot run both functions simultaneously."
+  },
+  "buck5V_load_candidate": {
+    "target_load_mA": 240,
+    "datasheet_limit_mA": 350,
+    "initial_allowance_mA": {
+      "three_hall_sensors": 50,
+      "margin": 50,
+      "G431_module_and_LDO_input_equivalent": 60,
+      "TCAN1042_VCC_normal_dominant_budget": 80
+    },
+    "status": "Allocation only: user-reported 50mA is budgeted for one motor's complete five-wire Hall assembly. Other current, startup/inrush and thermal allowances remain unmeasured; 350mA IC limit is not a continuous-output guarantee. Do not power SAFE from DRV DVDD.",
+    "VM_and_gate_supply": "DRV8353 VM and VDRAIN connect BUS; internal charge pump generates high-side drive and VGLS provides about 11V gate rail. No external 12V is required for this base topology. Gate-charge linear-regulator dissipation with chosen MOSFET Qg and PWM frequency must be calculated and thermally measured; separate 12V only if validation fails.",
+    "fault_load_estimate": "CAN dominant measurement point110mA + core module60mA + Hall assembly50mA + reserved margin50mA =270mA; normal CAN80mA yields240mA. Not an all-corner maximum or startup/thermal proof.",
+    "WeAct_LDO_load_note": "Normal QFN48 schematic has a single ME6216A33XG / ME6239A33M3G alternate 3.3V LDO position. TCAN1042 VIO draws from MCU_3V3 (datasheet max300uA), while CAN bus dominant current is supplied by 5V_BUCK; verify measured LDO and module startup load.",
+    "rcl_timing_review": {
+      "controller": "DRV8353RS integrated LM5008A",
+      "VINmax_V": 37.8,
+      "VOUT_V": 5.0,
+      "RT_ohm": 280000,
+      "RT_tolerance": "±1%",
+      "RCL_ohm": 1000000,
+      "RCL_tolerance": "±1%",
+      "equation5_VFB_V": 2.5,
+      "TON_us_nominal": 1.0259259,
+      "normal_offtime_us_nominal": 6.7300741,
+      "max_normal_offtime_us_screen": 8.8467185,
+      "equation5_nominal_toff_us": 14.7340333,
+      "equation5_low_corner_us": "10.9861528 = Equation 5 at RCL 990k × 0.75 tolerance",
+      "low_corner_margin_us": 2.1394343,
+      "low_corner_margin_percent": 24.1834,
+      "status": "root-selected 1.00MΩ candidate; calculation screen only, switching waveform/current-limit recovery bench check remains open",
+      "source": "https://www.ti.com/lit/ds/symlink/lm5008a.pdf, Rev H Equation 4/5 and Section 8.2.2.2"
+    },
+    "ripple_resistor_at_270mA": {
+      "ohm": 0.82,
+      "drop_V": 0.2214,
+      "power_W": 0.059778,
+      "note": "Nominal arithmetic only; check actual temperature/derating."
+    }
+  },
+  "bulk_capacitor_candidate": {
+    "count": 3,
+    "per_ref": [
+      "CBUS1",
+      "CBUS2",
+      "CBUS3"
+    ],
+    "mpn": "KEMET PEH200PJ5100MB2",
+    "rating": "100V, 10000uF, +/-20%, +85C, 50x95mm can, M5 screw terminals and threaded mounting stud (MB2)",
+    "ripple_current": "datasheet row: 15.3A at 100Hz/85C; 25.6A at 10kHz/40C; 34.7A at 10kHz/50C only with 2m/s forced air and stud-mounted to 3C/W aluminum chassis. Three parallel are 76.8A at 10kHz/40C natural condition or 104.1A under the stated forced-air/heatsink condition; spectrum at actual 20kHz PWM and 1s temperature rise still must be measured.",
+    "physical_layout": "These are large screw-terminal can capacitors, not PCB small-electrolytic footprints. Mount externally beside BUS copper/busbars with mechanical restraint and short low-inductance connections; footprint/terminal geometry is a mechanical interface, not yet frozen."
+  },
+  "external_energy_dump_candidate": {
+    "onboard_switch": "Q7 IRLB4030PBF low-side N-MOS, U4 UCC27511A powered by DUMP_5V; 10k gate-source pulldown; 5V gate drive is within the MOSFET 4.5V RDS(on) specification. Full gate waveform and thermal qualification remain open.",
+    "dump_on_off_threshold_V": {
+      "turn_on": 43.4,
+      "turn_off": 41.4,
+      "calculated_nominal_turn_on": 43.4145,
+      "calculated_nominal_turn_off": 41.4152,
+      "assumptions": "Current P1 uses BUS-fed U6 DUMP_5V, 162k/10k BUS divider, 10.2k/10k reference divider, 200k positive feedback and 4.7k DUMP_5V pullup. Existing turn_on/turn_off fields are legacy nominal estimates; ranges are independent component corners, not a paired hysteresis guarantee. TI Rev.B Table 6.5 line-regulation unit is %VOUT: over VIN=7–100V the typical value is 0.03% VOUT with MIN/MAX blank, not 0.03%/V; overall accuracy ±2.5% is only specified to VIN=24V. Therefore DUMP_5V 4.7771–5.1983V and BOV threshold corners are assumption-only extrapolated screens at high BUS, not guarantees. Any earlier per-volt multiplication of 0.03% is a user-defined assumption, not a datasheet limit.",
+      "status": "screen only; independent resistor/reference/output corners are not a paired board guarantee; verify DUMP_5V, thresholds, ripple, transient and thermal behavior on hardware.",
+      "current_turn_on_screen_range": [
+        41.4477,
+        45.5898
+      ],
+      "current_release_screen_range": [
+        39.8352,
+        43.7867
+      ]
+    },
+    "resistor_bank": "Current screen at 45.5898V: 2 x Vishay LPS0300H2R00FB 2ohm ±1% parallel = 0.99–1.01ohm per board. At Rbank,min 0.99ohm, about 2.099kW per board and 2.099kJ/board for 1s; each 2ohm branch sees about 1.050kW/1.050kJ. At Rbank,max 1.01ohm, two boards together absorb about 4.116kW, 14.3% above the 3.6kW two-board paper screen. The 1s power is ~3.5x each 300W nameplate; hot-start, repeat interval, heatsink, thermal switch and exact pulse curve still require qualification.",
+    "branch_fuse_connector": "Eaton CBBF-60 candidate 60A/58VDC is off-board in series from the board BUS+ copper/input terminal to the external Anderson SB50 cable pair; verify exact interrupt rating and fuse curve against battery prospective short current. The SB50 pair routes outbound DUMP_RES_UP to the two external resistors and returns DUMP_SW to board J_DUMP_SW, a four-leg MFE04542-T1 terminal on Q7.D; >=6AWG candidate. Tap branch supply from the existing post-F_MAIN BUS+ copper/terminal, so no additional BUS terminal is needed. Thermostat is a low-current input only; never place it in high-current dump path.",
+    "failure_policy": "Local BUSOV comparator requests hardware BREAK and turns on the local chopper when DUMP_5V and thermal contact are healthy. SAFE_5V loss does not itself remove the BOV supply path; DUMP_5V/U3/U4/Q7 failure, resistor/fuse open, thermal contact open, or absent BUS can. CAN/soft stop is not a fast substitute. If Q7 D-S shorts, 22.5–45.6V into the ~0.99ohm bank is about 22.7–46.1A, below the nominal 60A branch-fuse rating; the thermostat only interrupts the gate and cannot stop a D-S short. Vehicle requires physical source isolation or an independent high-current thermal disconnect and residual-energy procedure."
+  },
+  "unresolved_before_layout_freeze": [
+    "Configure and read back DRV8353 six-PWM mode, GCSA=10, bidirectional CSA zero=VREF/2, VDS/SEN hard protection, nFAULT latch and ENABLE state; verify DRV package pin map and TI layout.",
+    "Validate positive G431 COMP/DAC and negative TLV1704 threshold accuracy and timing at the nominal +150A/-150.16A window; corner estimate is documented separately. CSA drift, analog source/noise, comparator propagation, PWM ripple, temperature and bench response remain unclosed; do not claim a +/-120A independent hard-limit pass.",
+    "Validate TIM1 Break sources and polarity, AOE=0, reset MOE=0, six-PWM all-low output truth table, deadtime, low-side shunt sample windows, default DRV_ENABLE low and explicit re-arm.",
+    "On the physical Normal QFN48 V10 module verify P1/P2 orientation/continuity, fitted LDO marking, 5V input route, VREF+ path, USB VBUS backfeed and PA11/PA12 USB/CAN exclusivity. Keep PB2 reserved for SB4 USB VBUS detect.",
+    "Measure DRV8353R 5V buck startup and thermal margin at22.5/37.8V with actual WeAct/MCU, TCAN1042, Hall and margins. 240mA normal estimate/270mA dominant estimate remain unmeasured against350mA limit.",
+    "Measure independent TPS7A4001 SAFE_5V load/startup and thermal loss; at37.8V/50mA linear dissipation would be about1.64W. SAFE_5V loss leaves no local dump path.",
+    "Measure IPT VGS and transition times, gate ringing/overshoot, thermal transients, Qg/DRV gate-rail dissipation, PCB/TOLL copper and one-second response. Screening values are not board-level1.8kW/1s PASS.",
+    "For each PSF4 shunt preserve exact C4135357 mapping 1/2 high-side and3/4 low-side; measure pin temperature/current sharing, terminal temp and pulse repeat. KOA 15W/5s is not a 120A continuous rating.",
+    "Measure BUS ripple spectrum/current and capacitor can temperature against PEH200 datasheet frequency/temperature/cooling conditions; do not apply the10kHz/40C rating at85C or 100Hz without correction.",
+    "Check SMCJ40A dynamic clamp under source impedance/layout inductance against MOS/DRV and100V electrolytic limits; it is a transient TVS, not the current U7 threshold screen (~39.209–41.724V).",
+    "Test external LPS0300 resistor pair hot/cold pulse, recovery interval, mounting/airflow, enclosure, J_TEMP trip point/contact life, cable and CBBF-60 fuse curve; 1.522–1.758kJ/board at the current threshold screen is an unqualified paper estimate; 1.8kW/1s is a target, not a confirmed hard user limit.",
+    "Close Q7 D-S short failure: normal-bus 22.5-37.8A through1ohm may not open60A fuse and thermostat cannot stop D-S short; system requires physical source isolation or independent high-current thermal disconnect.",
+    "Implement and test shared source-side precharge for2x30mF total at37.8V (42.9J); this board does not include it, and fuse/terminal ratings do not validate inrush.",
+    "Verify F_MAIN/F_BRAKE interrupting ratings and time-current curves against battery prospective current; verify MFE04542-T1 terminal temperature/torque at80A BUS and120A phase pulse; neither component rating alone qualifies PCB or harness.",
+    "Verify CAN ESD/transient network, TCAN1042 bus pins, termination only at endpoints and sustained wiring-fault response; PA11/PA12 cannot concurrently carry USB data.",
+    "Confirm Hall output type and safe input state for open-collector,3.3V push-pull or optional5V divider configuration; test MCU VDD-off leakage/backfeed and TIM2 AF1 edges.",
+    "Validate BUS_ADC PC4 divider/clamp across transient and MCU VDD-off states; software monitor is not the independent fast BUSOV comparator.",
+    "Specify MOS, motor and dump NTC/thermostat MPNs, curves, insulation/mounting, thresholds and recovery; current external thermal sensors are interface candidates only."
+  ],
+  "other_IC_notes": {
+    "U4": "TI UCC27511 DBV pin 2 OUTH and pin 3 OUTL are tied at DUMP_DRV_OUT before R_DUMP_GATE; pin 6 is temperature-gated SAFE_5V path; pin 5 receives active-low BUSOV_N.",
+    "U3": "TLV1704 channel 4 pin 10 is VBUS_OV_SENSE and pin 11 is V_OV_REF; BUSOV_N at pin13 pulls low on overvoltage and only drives chopper enable plus a separate PNP/R_BOV_DRIVE/NPN path to BREAK_N.",
+    "U5": "TCAN1042HGVDRQ1 pin 3 VCC=5V_BUCK, pin 5 VIO=MCU_3V3, pin 8 STB=PB5; pull STB high for reset-default standby. No RE_N/DE pins.",
+    "U6": "WeAct Normal QFN48 V10 only. Board official schematic maps electrical header signals but socket orientation/revision/continuity still need physical confirmation; no Long board substitution."
+  },
+  "physical_IC_inventory": [
+    {
+      "count_as_IC": true,
+      "mpn": "STM32G431CBU6",
+      "location": "WeAct Normal QFN48 V10 coreboard",
+      "quantity": 1,
+      "ref": "U6.MCU"
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "ME6216A33XG / ME6239A33M3G alternate label per WeAct Normal schematic; verify fitted board",
+      "location": "WeAct Normal QFN48 V10 coreboard",
+      "quantity": 1,
+      "ref": "U6.LDO",
+      "description": "One LDO site and one fitted LDO IC per module; the two markings are alternatives, not two chips."
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "DRV8353RSRGZR",
+      "quantity": 1,
+      "ref": "U1"
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "TPS7A4001DGNR",
+      "quantity": 1,
+      "ref": "U2"
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "TLV1704AIPWR",
+      "quantity": 1,
+      "ref": "U3"
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "UCC27511ADBVR",
+      "quantity": 1,
+      "ref": "U4"
+    },
+    {
+      "count_as_IC": true,
+      "mpn": "TCAN1042HGVDRQ1",
+      "quantity": 1,
+      "ref": "U5"
+    }
+  ],
+  "mosfet_screening": {
+    "primary_bridge_candidate": "6x Infineon IPT015N10N5ATMA1, 100V, max1.5mOhm at VGS=10V, Qg max211nC; DRV8353 gate outputs may be only about9V high-side/9.5V low-side, so do not assume the 10V RDS point. Use max2mOhm at VGS=6V with hot multiplier2.5 => conservative5mOhm screen.",
+    "alternative": "IRLB4030PBF retained only for Q7 dump chopper at 5V logic-level drive; not selected for the six main bridge positions.",
+    "footprint": "EDA checked IPT015N10N5 candidate C6419630/device ac6dfe6f7ea6436c81914453fbccbc56; electrical pins 1=G,2=S (comb pads2-8),3=D/tab. Assembly/copper and VGS waveform remain unverified.",
+    "screening_assumptions": {
+      "method": "Conduction estimate at120A phase peak plus switching overlap sensitivity; Qrr/Eoss/deadtime/board copper/DRV thermal omitted; switching values scale approximately with BUS voltage and assumed tr+tf.",
+      "hot_RDS_IPT_mOhm": 5,
+      "hot_RDS_IRLB_mOhm": 10.75,
+      "IRLB_bridge_comparison_VGS_V": 10,
+      "hot_RDS_Q7_mOhm_at_5V_gate": 11.25,
+      "fsw_kHz": 20,
+      "phase_peak_A": 120,
+      "software_phase_command_candidate_A": 110,
+      "tr_plus_tf_ns": [
+        300,
+        500,
+        1000
+      ]
+    },
+    "conduction_loss_W_6MOS_IPT": 108,
+    "switching_loss_W_at_37p8V": [
+      51.6,
+      86.6,
+      173.2
+    ],
+    "total_loss_W_at_37p8V_IPT": [
+      159.6,
+      194.6,
+      281.2
+    ],
+    "total_loss_W_at_22p5V_IPT": [
+      138.7,
+      159.5,
+      211.1
+    ],
+    "total_loss_W_at_37p8V_IRLB": [
+      283.8,
+      318.8,
+      405.4
+    ],
+    "one_second_thermal_screen": "Preliminary model only: hottest-device screen94.68W; with Tc=60C and assumed RthJC0.4C/W, steady upper calculation gives97.87C. Does not model board/transient thermal impedance or certify the 1s board pulse.",
+    "interpretation": "IPT candidate substantially reduces conduction loss vs IRLB at same assumed switching edges. 1.8kW/1s capability is not accepted by this model; confirm real VGS, switching edges, junction transient, package solder/copper and temperatures.",
+    "gate_charge_proxy": "6 x 211nC x 20kHz x 11V ~=0.279W delivered to gates. If VGLS derives linearly from37.8V BUS, approximate driver linear loss (37.8-9.5)V x25.3mA ~=0.72W; use TI thermal model and measure. No external12V required for base topology, but optional external12V/VM only after validation."
+  },
+  "failure_policy": {
+    "Q7_Drain_Source_Short": "Q7 D-S short can continuously draw about22.5-37.8A through 1ohm external bank at normal BUS; F_BRAKE 60A may not open. Thermostat only interrupts UCC gate drive and cannot stop a D-S short. Vehicle/system requires physical source isolation or independent high-current thermal disconnect plus residual-energy procedure; remains open TODO.",
+    "GateOff": "PWM/gate-off is not isolation: body diodes can still return regenerative energy to shared BUS; residual voltage and source coupling remain.",
+    "CAN": "CAN is coordination only and cannot supply fast local protection.",
+    "SourcePrecharge": "Requires validated source-side precharge for shared 60mF; no board-local contactor included.",
+    "SafeRailLoss": "SAFE_5V loss degrades SAFE_ADC and the FOC-A shared bias but the current P1 BOV/dump path is powered separately from DUMP_5V. DUMP_5V/U3/U4/Q7 loss or thermal contact open still disables the dump; energy absorption is not guaranteed."
+  },
+  "layout_constraints": [
+    "Use one canonical ground net GND_SYS; separate high-current and analog/Kelvin routing geometrically, with local return to the shunt low pad.",
+    "Keep DRV8353 VM/VDRAIN, charge-pump capacitors, VREF capacitor, gate loops and each half-bridge ceramic loop short per TI layout guidance.",
+    "Place the 3 x 4.7uF + 3 x 100nF local BUS ceramics tightly at the three half bridges; validate effective MLCC capacitance under DC bias.",
+    "Hall divider/selector options are mutually exclusive per channel; never populate both direct and 5V divider straps. Hall sensor output type and MCU VDD-off injection are unresolved.",
+    "Do not connect PA11/PA12 to a USB host and CAN simultaneously; verify USB VBUS isolation/backfeed with board supplied from 5V_BUCK.",
+    "Q7 external dump bank and its fuse/connector need enclosure, cable, thermal, short-circuit and source-isolation validation before use."
+  ],
+  "sources": {
+    "DRV8353_datasheet": "https://www.ti.com/lit/ds/symlink/drv8353.pdf",
+    "TI_LM5008A_EVM_application_note": "https://www.ti.com/lit/ug/snva380c/snva380c.pdf",
+    "TPS7A4001_datasheet": "https://www.ti.com/lit/ds/symlink/tps7a4001.pdf",
+    "TLV1704_datasheet": "https://www.ti.com/lit/ds/symlink/tlv1704.pdf",
+    "STM32G431CB_datasheet": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+    "STM32G4_RM0440": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "IRLB4030_datasheet": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-irlb4030-datasheet-en.pdf",
+    "IPT015N10N5_datasheet": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipt015n10n5-datasheet-en.pdf",
+    "KEMET_PEH200_datasheet": "https://content.kemet.com/datasheets/KEM_A4034_PEH200.pdf",
+    "Vishay_LPS300_datasheet": "https://www.vishay.com/docs/50052/lps300.pdf",
+    "Anderson_SB50_datasheet": "https://www.andersonpower.com/content/dam/ideal-anderson-power-dotcom/product-assets/default/data-sheets/ds-sb50.pdf",
+    "Eaton_CBBF60_distributor_record": "https://www.digikey.com/en/products/detail/eaton-bussmann-electrical-division/CBBF-60/5433409",
+    "TDK_4p7uF_100V_MLCC": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C4532X7S2A475K230KB",
+    "TDK_100nF_100V_MLCC": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R2A104K200AE",
+    "WeAct_Normal_QFN48_V10_schematic": "https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/QFN48/WeAct-STM32G431CxUxCoreBoard_V10_SchDoc.pdf",
+    "WeAct_Long_QFN48_V10_schematic_not_used_as_pinout_authority": "https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/QFN48/WeAct-STM32G431CxUxCoreBoard_Long_V10%20SchDoc.pdf",
+    "Eaton_CBBF100_product": "https://www.eaton.com/us/en-us/skuPage.CBBF-100.html",
+    "Nexperia_CAN_ESD": "https://assets.nexperia.com/documents/data-sheet/PESD2CANFD24V-T.pdf",
+    "Nexperia_BZT52H_C3V6": "https://www.nexperia.com/product/BZT52H-C3V6",
+    "TDK_Hall_10uF": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1A106K160AE",
+    "TDK_Hall_100nF": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1A104K080AE",
+    "TCAN1042H_datasheet": "https://www.ti.com/lit/ds/symlink/tcan1042h.pdf",
+    "KOA_PSF4_datasheet": "https://www.koaspeer.com/pdfs/PSF4.pdf",
+    "DRV8161_comparison_datasheet": "https://www.ti.com/lit/ds/symlink/drv8161.pdf",
+    "Nexperia_BC847x_datasheet": "https://assets.nexperia.com/documents/data-sheet/BC847X_SER.pdf",
+    "Nexperia_BC856_BC857_BC858_datasheet": "https://assets.nexperia.com/documents/data-sheet/BC856_BC857_BC858.pdf",
+    "Sumida_CDRH127LD_datasheet": "https://products.sumida.com/products/pdf/CDRH127LD_Ver2.0_E.pdf",
+    "Yageo_RC0603FR_10k_example": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-0710KL",
+    "Yageo_RT0603BRD_10k2_example": "https://www.yageogroup.com/component-documentation/download/specsheet/RT0603BRD0710K2L",
+    "TDK_C0G_1nF_50V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608C0G1H102J080AA",
+    "TDK_C0G_220pF_50V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608C0G1H221J080AA",
+    "TDK_C0G_10nF_50V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608C0G1H103J080AE",
+    "TDK_X7R_2p2uF_100V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R2A225K230AE",
+    "TDK_X7R_22uF_16V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1C226K250AC",
+    "TDK_X7R_10uF_10V": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R1A106K160AE",
+    "TDK_X7R_1uF_16V_0603": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+    "TDK_X7R_470nF_16V_0603": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C474K080AC",
+    "Yageo_PT0603FR_0R82": "https://www.yageogroup.com/component-documentation/download/specsheet/PT0603FR-070R82L",
+    "TDK_47nF_100V_X7S_0603": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7S2A473K080AE",
+    "Yageo_RC0603FR_30K1": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-0730K1L",
+    "Yageo_RC0603FR_280K": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-07280KL",
+    "PreciDip_2p54mm_jumper_catalog": "https://precidip.com/wp-content/uploads/2024/10/Full-English.pdf#page=123",
+    "Yageo_RC0603FR_3K01": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-073K01L",
+    "Yageo_RC0603FR_1M": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-071ML",
+    "Yageo_RC0603FR_97K6": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-0797K6L",
+    "Diodes_DFLS1100_datasheet": "https://www.diodes.com/datasheet/download/DFLS1100.pdf",
+    "Yageo_RC0603FR_4K7": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-074K7L",
+    "UCC27511A_datasheet": "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "historical_baseline_Yageo_RT0603BRD_10k_example": "https://www.yageogroup.com/component-documentation/download/specsheet/RT0603BRD0710KL",
+    "Milliohm_HoAR0603_exact_datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/0BFAEB87CEA46D4D4A0AA08C46D82900.pdf",
+    "LCSC_HoAR0603_exact": "https://www.lcsc.com/pt/product-detail/Chip-Resistor-Surface-Mount_Milliohm-HoAR0603-1-10W-10KR-0-1-TCR25_C5123581.html",
+    "JST_B3B_XH_A_official_search": "https://www.jst-mfg.com/product/index.php?lang=2&search_product=B3B-XH-A&type=1",
+    "LCSC_JST_B3B_XH_A_exact": "https://jlcpcb.com/partdetail/Jst_SalesAmerica-B3B_XH_A_LF_SN/C144394",
+    "TLV6700_datasheet": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf"
+  },
+  "shared_bus_integration": {
+    "precharge_required": true,
+    "source_capacitance_F": 0.06,
+    "bus_voltage_V": 37.8,
+    "stored_energy_J": 42.9,
+    "status": "Source-side precharge not implemented on this board; shared-source TODO. Board input fuse and studs do not qualify inrush.",
+    "regeneration": "Both FOC boards share the same BUS; local BUSOV dump and break act independently. CAN coordinates limits but is not a fast protection path. Gate-off leaves body-diode return path."
+  },
+  "drv8353rs_pin_net": {
+    "1:GND": "GND_SYS",
+    "2:VGLS": "VGLS",
+    "3:CPL": "CP_FLYING_LO",
+    "4:CPH": "CP_FLYING_HI",
+    "5:VM": "BUS+",
+    "6:VDRAIN": "BUS+",
+    "7:VCP": "VCP_PUMP",
+    "8:GHA": "DRV_GUH",
+    "9:SHA": "PH_U",
+    "10:GLA": "DRV_GUL",
+    "11:SPA": "SHUNT_U_TOP",
+    "12:SNA": "GND_SYS",
+    "13:SNB": "GND_SYS",
+    "14:SPB": "SHUNT_V_TOP",
+    "15:GLB": "DRV_GVL",
+    "16:SHB": "PH_V",
+    "17:GHB": "DRV_GVH",
+    "18:GHC": "DRV_GWH",
+    "19:SHC": "PH_W",
+    "20:GLC": "DRV_GWL",
+    "21:SPC": "SHUNT_W_TOP",
+    "22:SNC": "GND_SYS",
+    "23:SOC": "CSA_SO_W_RAW",
+    "24:SOB": "CSA_SO_V_RAW",
+    "25:SOA": "CSA_SO_U_RAW",
+    "26:VREF": "VREF_CORE",
+    "27:AGND": "GND_SYS",
+    "28:nFAULT": "BREAK_N",
+    "29:SDO": "DRV_SPI_MISO",
+    "30:SDI": "DRV_SPI_MOSI",
+    "31:SCLK": "DRV_SPI_SCK",
+    "32:nSCS": "DRV_SPI_CS_N",
+    "33:ENABLE": "DRV_ENABLE",
+    "34:INHA": "PWM_UH",
+    "35:INLA": "PWM_UL",
+    "36:INHB": "PWM_VH",
+    "37:INLB": "PWM_VL",
+    "38:INHC": "PWM_WH",
+    "39:INLC": "PWM_WL",
+    "40:DVDD": "DVDD_5V",
+    "41:DGND": "GND_SYS",
+    "42:SW": "BUCK_SW",
+    "43:VIN": "BUS+",
+    "44:VCC": "BUCK_VCC",
+    "45:BST": "BUCK_BST",
+    "46:RCL": "BUCK_RCL",
+    "47:RT/SD": "BUCK_RT_SD",
+    "48:FB": "BUCK_FB",
+    "EPAD": "GND_SYS"
+  },
+  "drv8353rs_notes": {
+    "VREF": "Use WeAct Normal P2-8 VREF+ as shared VREF_CORE; bypass pin26 with100nF and do not enable MCU VREFBUF.",
+    "CSAs": "Set GCSA=10, bidirectional CSA output centered at VREF/2. Three integrated current amplifiers eliminate three external phase op-amps.",
+    "Sleep": "ENABLE is the sleep/disable input; there is no separate nSLEEP pin. DVDD shuts off in sleep and cannot power independent SAFE_5V.",
+    "Buck": "R variant integrates LM5008A 100V/350mA buck. VM/VDRAIN/VIN connect to BUS; no separate 12V or 5V PSU is required for the base topology. LM5008A component pins and ripple network are mapped separately.",
+    "Gate": "Internal charge pump and VGLS generate gate supply. No external12V is required, but gate-linear dissipation with6x Qg=211nC at20kHz is roughly0.7W at37.8V and needs thermal measurement.",
+    "Fault": "Configure SPI OCP_MODE=00b latched shutdown, OCP_DEG=01b (2us pending bench), VDS_LVL=1100b (0.9V nominal, 0.81..0.99V datasheet limits), OCP_ACT=1 linked shutdown, SEN_LVL=00b minimum 0.25V; nFAULT is wired to BREAK_N. VDS protects gross MOS overcurrent/shorts, not precision phase current. Estimated hot crossing 162..198A using 5mOhm screening RDS; cold crossing 405..495A using 2mOhm. 0.2V setting is rejected because the hot screening crossing would be only36..44A. Verify SOA, parasitics, nuisance trips and total response on hardware; no ±120A guarantee.",
+    "VDS_SEN_SPI_initial_candidate": {
+      "status": "initial_spi_candidate_pending_bench",
+      "register_settings": {
+        "OCP_MODE_register_0x05_bits_7_6": "00b, latched shutdown for VDS_OCP and SEN_OCP",
+        "OCP_DEG_register_0x05_bits_5_4": "01b, 2us programmed deglitch; 1us exists but 2us is the initial switching-noise compromise pending test",
+        "VDS_LVL_register_0x05_bits_3_0": "1100b, nominal 0.9V; nearest supported setting to ~0.94V (there is no 0.94V code)",
+        "OCP_ACT_register_0x02_bit_10": "1, linked response so a half-bridge OCP disables all three half-bridges",
+        "SEN_LVL_register_0x06_bits_1_0": "00b, minimum 0.25V threshold; not a 120A limit"
+      },
+      "datasheet_threshold": "TI DRV835x Rev A electrical table specifies VDS_LVL=1100b as 0.81V min / 0.90V typ / 0.99V max over the stated temperature range; OCP_DEG codes 00/01/10/11 select 1/2/4/8us. The 0.2V setting (0101b) is rejected.",
+      "screening_current_estimates_A": {
+        "cold_assumption": "Use IPT015N10N5 RDS(on) max 2mOhm at VGS=6V and 25C as a conservative cold screening resistance; at 0.9V nominal the crossing is 450A, and 0.81..0.99V corresponds to 405..495A.",
+        "hot_assumption": "Use 5mOhm hot screening resistance (2mOhm x 2.5 design multiplier, not a guaranteed datasheet max); at 0.9V nominal the crossing is 180A, and 0.81..0.99V corresponds to 162..198A.",
+        "phase_points": "At 120A, estimated MOS VDS is 0.24V cold / 0.60V hot; at 150A it is 0.30V cold / 0.75V hot. Hot 150A has only 60mV below the 0.81V minimum trip threshold.",
+        "rejected_0p2V": "At 0.2V nominal (0.18..0.22V), screening crossing is 90..110A cold or 36..44A hot; under the selected hot model it would nuisance-trip well below the intended 120A operating peak."
+      },
+      "limits": "This VDS monitor is a gross MOS overcurrent/short-circuit protection layer, not an accurate phase-current limiter. Actual threshold current changes with MOS RDS(on), junction temperature, gate voltage, parasitic inductance, switching state and reverse current; 5mOhm is a screening assumption only. SEN_OCP is a separate SP voltage threshold and minimum 0.25V across 0.5mOhm is about 500A. Verify short-circuit SOA, parasitic overshoot, false trips, actual fault-to-gate-off time, polarity coverage, and latch/recovery on hardware; do not claim the VDS setting guarantees ±120A protection."
+    }
+  },
+  "other_IC_pin_net": {
+    "U2_TPS7A4001DGNR": {
+      "1": "SAFE_5V",
+      "2": "SAFE_FB",
+      "4": "GND_SYS",
+      "5": "BUS+",
+      "8": "BUS+",
+      "9": "GND_SYS",
+      "unconnected_pins": [
+        "3",
+        "6",
+        "7"
+      ]
+    },
+    "U5_TCAN1042HGVDRQ1": {
+      "1": "FDCAN1_TX",
+      "2": "GND_SYS",
+      "3": "5V_BUCK",
+      "4": "FDCAN1_RX",
+      "5": "MCU_3V3",
+      "6": "CANL_CONN",
+      "7": "CANH_CONN",
+      "8": "CAN_STB"
+    },
+    "D_CAN_ESD_PESD2CANFD24V_T": {
+      "1": "CANH_CONN",
+      "2": "CANL_CONN",
+      "3": "GND_SYS"
+    },
+    "U3_TLV1704AIPWR": {
+      "1": "BREAK_N",
+      "2": "BREAK_N",
+      "3": "SAFE_5V",
+      "4": "VNEG_REF",
+      "5": "NEG_U",
+      "6": "VNEG_REF",
+      "7": "NEG_V",
+      "8": "VNEG_REF",
+      "9": "NEG_W",
+      "10": "VBUS_OV_SENSE",
+      "11": "V_OV_REF",
+      "12": "GND_SYS",
+      "13": "BUSOV_N",
+      "14": "BREAK_N"
+    },
+    "Q_BOV_PNP": {
+      "1": "BOV_PNP_BASE",
+      "2": "SAFE_5V",
+      "3": "BOV_BK_SRC"
+    },
+    "R_BOV_PNP_B": {
+      "1": "BUSOV_N",
+      "2": "BOV_PNP_BASE"
+    },
+    "Q_BOV_NPN": {
+      "1": "BOV_BK_DRIVE",
+      "2": "GND_SYS",
+      "3": "BREAK_N"
+    },
+    "R_BOV_NPN_PD": {
+      "1": "BOV_BK_DRIVE",
+      "2": "GND_SYS"
+    },
+    "R_BOV_DRIVE": {
+      "1": "BOV_BK_SRC",
+      "2": "BOV_BK_DRIVE"
+    },
+    "U4_UCC27511ADBVR": {
+      "1": "SAFE_5V",
+      "2": "DUMP_DRV_OUT",
+      "3": "DUMP_DRV_OUT",
+      "4": "GND_SYS",
+      "5": "BUSOV_N",
+      "6": "DUMP_THERM_OK"
+    }
+  },
+  "electrical_targets": {
+    "bus_V": "22.5-37.8",
+    "input_power_W": 1800,
+    "input_current_A_at_22p5V": 80,
+    "input_current_A_at_37p8V": 47.62,
+    "phase_current_peak_A": 120,
+    "software_phase_command_A_candidate": 110,
+    "bus_current_A_system_target": 100,
+    "bus_current_hardware_limit": "None in this candidate; system-level operating target only",
+    "pulse_s": 1,
+    "current_command_candidate_A": 100,
+    "current_command_ramp_candidate_A_per_s": 5000,
+    "allow_110A_condition": "Measured effective phase L >=44uH plus current waveform confirmation; calculation gives >=3A screen margin, not a physical guarantee."
+  },
+  "buck5V_architecture": {
+    "source": "DRV8353RS integrated LM5008A buck from BUS with Sumida CDRH127/LDNP-221MC 220uH inductor",
+    "output": "5V_BUCK supplies WeAct module VCC, TCAN1042 VCC and Hall sensor 5V",
+    "current_limit_mA": 350,
+    "normal_budget_mA": 240,
+    "dominant_estimate_mA": 270,
+    "separate_5V_PSU": "Not needed in base candidate if measured load/startup/thermal pass",
+    "safe_rail": "Independent TPS7A4001 5V from BUS supplies TLV1704, UCC27511 and BUSOV references; it is not powered by DRV DVDD/buck."
+  },
+  "safe_rail_budget": {
+    "device": "TPS7A4001DGNR",
+    "input": "BUS+ 22.5-37.8V",
+    "output": "SAFE_5V about4.976V",
+    "current_limit_mA": 50,
+    "estimated_load": "Recompute from current P1 before freeze. The BOV PNP/U3/U4/DUMP reference and thermal path are now powered from DUMP_5V, not SAFE_5V. SAFE_5V still has a 50mA regulator ceiling; actual startup, load and thermal margin remain to measure.",
+    "thermal": "At37.8V and50mA, linear dissipation=(37.8-4.976)*0.05=1.64W; do not assume package can sustain full rating without thermal analysis.",
+    "bov_active_current_power_screen": {
+      "safe5_nominal_V": 4.97648,
+      "R_BOV_PNP_B_ohm": 10000,
+      "Q_BOV_PNP_base_current_mA_at_TLV_VOL_0p9V": 0.338,
+      "R_BOV_DRIVE_mpn": "RC0603FR-074K7L",
+      "R_BOV_DRIVE_ohm": 4700,
+      "assumed_Q_BOV_PNP_VCEsat_V": 0.1,
+      "assumed_Q_BOV_NPN_VBE_V": 0.7,
+      "drive_resistor_current_mA_approx": 0.89,
+      "drive_resistor_power_mW_approx": 3.8,
+      "R_BOV_NPN_PD_ohm": 10000,
+      "base_pulldown_current_mA_approx": 0.07,
+      "Q_BOV_NPN_base_current_mA_approx": 0.82,
+      "BREAK_N_pullup_sink_current_mA_approx": 1.5,
+      "forced_beta_approx": 1.8,
+      "safe5_active_estimated_load_mA_excluding_UCC_dynamic": 3.65,
+      "TPS7A4001_loss_at_37p8V_W_approx": 0.12,
+      "Q_BOV_PNP_dissipation_screen_mW": "<1 under stated sub-mA assumptions; confirm with actual voltage/current corners",
+      "Q_BOV_NPN_dissipation_screen_mW": "<1 under stated 1.5mA BREAK sink and low VCE assumption; verify saturation/low level",
+      "status": "Legacy SAFE_5V-fed BOV screen is not current after Q_BOV_PNP emitter moved to DUMP_5V. The output targets are similar nominally, but use current DUMP_5V and high-BUS line-regulation limits for the current P1; transistor current and full-temperature margin remain unqualified.",
+      "current_supply_net": "DUMP_5V",
+      "current_output_screen_V": [
+        4.7771,
+        5.1983
+      ]
+    }
+  },
+  "connectivity_review": {
+    "method": "静态候选组件计数：排除U6模块子组件和quantity=0占位；当前原图为单页P1。实际连通/DRC以当前原理图连接.json及检查/当前原理图证据.json为准。",
+    "component_rows_total": 161,
+    "populated_component_count": 159,
+    "native_component_count": 158,
+    "native_page_component_counts": {
+      "P1": 158
+    },
+    "excluded_quantity_zero_placeholders": [
+      "Q_ALT",
+      "R_BUS_CAP_DIS"
+    ],
+    "expected_singleton_nets": [
+      "BOOT0_RESERVED",
+      "HALL_DUMMY_PB6",
+      "HALL_DUMMY_PB7",
+      "MCU_PB4",
+      "MCU_PC10",
+      "MCU_PC11",
+      "MCU_PC6",
+      "NRST_RESERVED",
+      "PC13_RESERVED",
+      "PC14_RESERVED",
+      "PC15_RESERVED",
+      "USB_VBUS_DETECT_PB2_RESERVED",
+      "VBAT_RESERVED",
+      "PACK+"
+    ],
+    "unexpected_singleton_nets": [],
+    "critical_endpoint_counts": {
+      "HALL_A": 3,
+      "HALL_B": 3,
+      "HALL_C": 3,
+      "SAFE_ADC": 5,
+      "PWM_UH": 2,
+      "PWM_UL": 2,
+      "PWM_VH": 2,
+      "PWM_VL": 2,
+      "PWM_WH": 2,
+      "PWM_WL": 2,
+      "VBUS_OV_SENSE": 4,
+      "VNEG_REF": 6,
+      "BUSOV_N": 5,
+      "BREAK_N": 9,
+      "BOV_BK_SRC": 2,
+      "BOV_BK_DRIVE": 4,
+      "DUMP_SW": 8
+    },
+    "notes": "161条候选记录、159条quantity>0、排除U6模块子组件后158个原图器件。实际源474引脚（461连接、13NC）、97网络；RT接VIN/BUS，SDO上拉4.7k，VM增加33uF，三路CSA经各1k接TLV1704输入。静态候选和实际网表分别保存，不构成功能验收。"
+  },
+  "components": [
+    {
+      "ref": "U1",
+      "type": "gate_driver_3phase_3CSA_buck",
+      "mpn": "DRV8353RSRGZR",
+      "manufacturer": "Texas Instruments",
+      "package": "VQFN-48 RGZ with exposed pad",
+      "count_as_IC": true,
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GND_SYS",
+        "2": "VGLS",
+        "3": "CP_FLYING_LO",
+        "4": "CP_FLYING_HI",
+        "5": "BUS+",
+        "6": "BUS+",
+        "7": "VCP_PUMP",
+        "8": "DRV_GUH",
+        "9": "PH_U",
+        "10": "DRV_GUL",
+        "11": "SHUNT_U_TOP",
+        "12": "GND_SYS",
+        "13": "GND_SYS",
+        "14": "SHUNT_V_TOP",
+        "15": "DRV_GVL",
+        "16": "PH_V",
+        "17": "DRV_GVH",
+        "18": "DRV_GWH",
+        "19": "PH_W",
+        "20": "DRV_GWL",
+        "21": "SHUNT_W_TOP",
+        "22": "GND_SYS",
+        "23": "CSA_SO_W_RAW",
+        "24": "CSA_SO_V_RAW",
+        "25": "CSA_SO_U_RAW",
+        "26": "VREF_CORE",
+        "27": "GND_SYS",
+        "28": "BREAK_N",
+        "29": "DRV_SPI_MISO",
+        "30": "DRV_SPI_MOSI",
+        "31": "DRV_SPI_SCK",
+        "32": "DRV_SPI_CS_N",
+        "33": "DRV_ENABLE",
+        "34": "PWM_UH",
+        "35": "PWM_UL",
+        "36": "PWM_VH",
+        "37": "PWM_VL",
+        "38": "PWM_WH",
+        "39": "PWM_WL",
+        "40": "DVDD_5V",
+        "41": "GND_SYS",
+        "42": "BUCK_SW",
+        "43": "BUS+",
+        "44": "BUCK_VCC",
+        "45": "BUCK_BST",
+        "46": "BUCK_RCL",
+        "47": "BUCK_RT_SD",
+        "48": "BUCK_FB",
+        "EP": "GND_SYS"
+      }
+    },
+    {
+      "ref": "U2",
+      "type": "independent_safe_high_voltage_LDO",
+      "mpn": "TPS7A4001DGNR",
+      "manufacturer": "Texas Instruments",
+      "package": "HVSSOP-8 DGN, exposed pad",
+      "count_as_IC": true,
+      "candidate": true,
+      "eda_library_candidate": {
+        "manufacturer_entry_only": true,
+        "catalog_number": "C55006",
+        "device_uuid": "a200f30b56814b9ba3a9c6c06cb57d78",
+        "symbol_uuid": "f4e39b30db774a9fa2965937ad369f38",
+        "footprint_uuid": "704d3b9b846a4c719bc7fdcd60fd3921"
+      },
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB",
+        "4": "GND_SYS",
+        "5": "BUS+",
+        "8": "BUS+",
+        "9": "GND_SYS"
+      },
+      "unconnected_pins": [
+        "3",
+        "6",
+        "7"
+      ],
+      "physical_pin_note": "TPS7A4001 DGN exposed thermal pad is represented as library pin 9; connect pin 9 to GND_SYS. Pins 3, 6, 7 are explicit NC (not a shared net)."
+    },
+    {
+      "ref": "U3",
+      "type": "quad_open_collector_comparator",
+      "mpn": "TLV1704AIPWR",
+      "manufacturer": "Texas Instruments",
+      "package": "TSSOP-14 PW",
+      "count_as_IC": true,
+      "candidate": true,
+      "reason": "rail-to-rail input common-mode includes both rails; covers CSA SOx about 0.35V–3.0V on 5V SAFE_5V, unlike LM2901 common-mode ceiling",
+      "eda_library_candidate": {
+        "catalog_number": "C181596",
+        "footprint_verification": "pin geometry must be checked before assignment"
+      },
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BREAK_N",
+        "2": "BREAK_N",
+        "3": "DUMP_5V",
+        "4": "VNEG_REF",
+        "5": "NEG_U",
+        "6": "VNEG_REF",
+        "7": "NEG_V",
+        "8": "VNEG_REF",
+        "9": "NEG_W",
+        "10": "VBUS_OV_SENSE",
+        "11": "V_OV_REF",
+        "12": "GND_SYS",
+        "13": "BUSOV_N",
+        "14": "BREAK_N"
+      }
+    },
+    {
+      "ref": "U4",
+      "type": "single_low_side_gate_driver_chopper",
+      "mpn": "UCC27511ADBVR",
+      "manufacturer": "Texas Instruments",
+      "package": "SOT-23-6 DBV",
+      "count_as_IC": true,
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "DUMP_DRV_OUT",
+        "3": "DUMP_DRV_OUT",
+        "4": "GND_SYS",
+        "5": "BUSOV_N",
+        "6": "DUMP_THERM_OK"
+      }
+    },
+    {
+      "ref": "U5",
+      "type": "5V_CAN_transceiver_3V3_VIO",
+      "mpn": "TCAN1042HGVDRQ1",
+      "manufacturer": "Texas Instruments",
+      "package": "SOIC-8 D",
+      "count_as_IC": true,
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "FDCAN1_TX",
+        "2": "GND_SYS",
+        "3": "5V_BUCK",
+        "4": "FDCAN1_RX",
+        "5": "MCU_3V3",
+        "6": "CANL_CONN",
+        "7": "CANH_CONN",
+        "8": "CAN_STB"
+      },
+      "value": "5V CAN transceiver, 3.3V VIO, standby",
+      "datasheet": "https://www.ti.com/lit/ds/symlink/tcan1042h.pdf"
+    },
+    {
+      "ref": "U6",
+      "type": "WeAct_Normal_QFN48_core_module_subassembly",
+      "mpn": "WeAct STM32G431CBU6 CoreBoard Normal QFN48 V10",
+      "manufacturer": "WeAct Studio",
+      "package": "module with QFN48 MCU and two header rows",
+      "count_as_IC": false,
+      "ic_count_inside_module": 2,
+      "internal_ICs": [
+        "STM32G431CBU6",
+        "3V3 LDO per Normal schematic; exact production option/batch marking to inspect"
+      ],
+      "candidate": true,
+      "physical_note": "WeAct official Normal QFN48 V10 schematic shows STM32G431CBU6 and one3.3V LDO position marked ME6216A33XG with ME6239A33M3G alternate text; exactly two ICs inside module, fitted LDO variant needs visual check. No separate Flash/EEPROM IC is shown. D3 BAT54C is a diode, not an IC.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": null
+    },
+    {
+      "ref": "Q1",
+      "type": "high_side_U",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_UH",
+        "2": "PH_U",
+        "3": "BUS+"
+      }
+    },
+    {
+      "ref": "Q2",
+      "type": "low_side_U",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_UL",
+        "2": "SHUNT_U_TOP",
+        "3": "PH_U"
+      }
+    },
+    {
+      "ref": "Q3",
+      "type": "high_side_V",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_VH",
+        "2": "PH_V",
+        "3": "BUS+"
+      }
+    },
+    {
+      "ref": "Q4",
+      "type": "low_side_V",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_VL",
+        "2": "SHUNT_V_TOP",
+        "3": "PH_V"
+      }
+    },
+    {
+      "ref": "Q5",
+      "type": "high_side_W",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_WH",
+        "2": "PH_W",
+        "3": "BUS+"
+      }
+    },
+    {
+      "ref": "Q6",
+      "type": "low_side_W",
+      "mpn": "IPT015N10N5ATMA1",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_10V": 1.5,
+      "VGS_abs_max_V": 20,
+      "Qg_max_nC_at_10V": 211,
+      "candidate": true,
+      "physical_pin_note": "Infineon TOLL HSOF-8 electrical mapping for candidate library symbol: pin1=Gate; combined source pins2-8=Source; exposed tab=Drain. EDA agent confirmed footprint geometry/pin mapping PASS; datasheet and actual thermal pad design still govern.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TOLL/PG-HSOF-8; pin1=G, pin2=combined S pads, pin3=D/tab",
+      "pin_nets": {
+        "1": "GATE_WL",
+        "2": "SHUNT_W_TOP",
+        "3": "PH_W"
+      }
+    },
+    {
+      "ref": "Q7",
+      "type": "BUS_dump_low_side_switch",
+      "mpn": "IRLB4030PBF",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_4V5": 4.5,
+      "hot_RDSon_screening_mOhm": 11.25,
+      "hot_RDSon_screening_basis": "Q7 SAFE_5V drive: use 4.5mOhm maximum at VGS=4.5V, multiply by conservative temperature factor2.5; 4.3mOhm/10.75mOhm is the separate 10V bridge comparison.",
+      "VGS_abs_max_V": 16,
+      "candidate": true,
+      "physical_pin_note": "IRLB4030PBF TO-220AB: pin1=Gate, pin2=Drain/tab, pin3=Source.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "Infineon",
+      "package": "TO-220; pin1=G, pin2=D/tab, pin3=S",
+      "pin_nets": {
+        "1": "DUMP_GATE",
+        "2": "DUMP_SW",
+        "3": "GND_SYS"
+      }
+    },
+    {
+      "ref": "Q_ALT",
+      "type": "bridge_MOS_alternative_for_Q1_to_Q6",
+      "mpn": "IRLB4030PBF",
+      "manufacturer": "Infineon",
+      "package": "TO-220AB",
+      "VDS_V": 100,
+      "RDSon_max_mOhm_at_4V5": 4.5,
+      "Qg_typ_nC_at_4V5": 87,
+      "candidate": false,
+      "status": "热态RDS较高但Qg低/驱动容易；保留作对照替代，不与主候选混用",
+      "physical_pin_note": "IRLB4030PBF TO-220AB: pin1=Gate, pin2=Drain/tab, pin3=Source; alternate only.",
+      "quantity": 0,
+      "fit_status": "unpopulated_alternative_placeholder",
+      "pin_nets": {
+        "1": "DUMP_GATE",
+        "2": "DUMP_SW",
+        "3": "GND_SYS"
+      }
+    },
+    {
+      "ref": "RSU",
+      "type": "low_side_kelvin_shunt_U",
+      "value": "KOA PSF4NTEBL500F, 0.5mOhm +/-1%, 5W",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "KOA Speer",
+      "pad_numbering_assumption": "PSF4 exact: 1=sense-high,2=force-high (same SHUNT_x_TOP net); 3=force-low,4=sense-low (same GND_SYS net).",
+      "mpn": "PSF4NTEBL500F",
+      "pin_mapping_status": "PSF4 C4135357 4-pad: pin1 sense-high and pin2 force-high share phase shunt-top net; pin3 force-low and pin4 sense-low share GND_SYS. Kelvin traces from pins1/4 directly to DRV8353 SP/SN; confirm layout routing.",
+      "pin_nets": {
+        "1": "SHUNT_U_TOP",
+        "2": "SHUNT_U_TOP",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      }
+    },
+    {
+      "ref": "RSV",
+      "type": "low_side_kelvin_shunt_V",
+      "value": "KOA PSF4NTEBL500F, 0.5mOhm +/-1%, 5W",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "KOA Speer",
+      "pad_numbering_assumption": "PSF4 exact: 1=sense-high,2=force-high (same SHUNT_x_TOP net); 3=force-low,4=sense-low (same GND_SYS net).",
+      "mpn": "PSF4NTEBL500F",
+      "pin_mapping_status": "PSF4 C4135357 4-pad: pin1 sense-high and pin2 force-high share phase shunt-top net; pin3 force-low and pin4 sense-low share GND_SYS. Kelvin traces from pins1/4 directly to DRV8353 SP/SN; confirm layout routing.",
+      "pin_nets": {
+        "1": "SHUNT_V_TOP",
+        "2": "SHUNT_V_TOP",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      }
+    },
+    {
+      "ref": "RSW",
+      "type": "low_side_kelvin_shunt_W",
+      "value": "KOA PSF4NTEBL500F, 0.5mOhm +/-1%, 5W",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "manufacturer": "KOA Speer",
+      "pad_numbering_assumption": "PSF4 exact: 1=sense-high,2=force-high (same SHUNT_x_TOP net); 3=force-low,4=sense-low (same GND_SYS net).",
+      "mpn": "PSF4NTEBL500F",
+      "pin_mapping_status": "PSF4 C4135357 4-pad: pin1 sense-high and pin2 force-high share phase shunt-top net; pin3 force-low and pin4 sense-low share GND_SYS. Kelvin traces from pins1/4 directly to DRV8353 SP/SN; confirm layout routing.",
+      "pin_nets": {
+        "1": "SHUNT_W_TOP",
+        "2": "SHUNT_W_TOP",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      }
+    },
+    {
+      "ref": "CBUS1",
+      "type": "bulk_bus_capacitor",
+      "mpn": "PEH200PJ5100MB2",
+      "manufacturer": "KEMET",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "value": "100V, 10000uF, +/-20%, +85C, 50x95mm, M5 stud; each ref qty1"
+    },
+    {
+      "ref": "DTVS1",
+      "type": "bus_transient_TVS",
+      "mpn": "SMCJ40A",
+      "manufacturer": "Littelfuse",
+      "value": "40V VRWM, 64.5V nominal clamp at specified test point; transient only",
+      "candidate": true,
+      "note": "只处理短瞬态；TVS动态钳位、走线电感及驱动/电容/MOS耐压协调仍需仿真和实测，不作为43V持续回馈泄放器",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "U1_DVDD_C",
+      "type": "DRV_DVDD_bypass",
+      "value": "1uF X7R 16V per DRV8353 nominal decoupling recommendation",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DVDD_5V",
+        "2": "GND_SYS"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7R1C105K080AC",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+      "package": "0603"
+    },
+    {
+      "ref": "U1_VGLS_C",
+      "type": "gate_supply_bypass",
+      "value": "1uF X7R 16V per DRV8353 nominal decoupling recommendation",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VGLS",
+        "2": "GND_SYS"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7R1C105K080AC",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+      "package": "0603"
+    },
+    {
+      "ref": "U1_VCP_C",
+      "type": "charge_pump_reservoir",
+      "value": "1uF X7R 16V between VCP and VDRAIN per DRV8353 nominal decoupling recommendation",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VCP_PUMP",
+        "2": "BUS+"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7R1C105K080AC",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C105K080AC",
+      "package": "0603"
+    },
+    {
+      "ref": "U1_CP_C",
+      "type": "charge_pump_flying_cap",
+      "value": "47nF X7S 100V; CPH-CPL floating capacitor exposed to BUS common-mode",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CP_FLYING_HI",
+        "2": "CP_FLYING_LO"
+      },
+      "selection_note": "100V rating selected for BUS common-mode exposure; verify effective capacitance, layout and DRV switching waveforms",
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7S2A473K080AE",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7S2A473K080AE",
+      "package": "0603"
+    },
+    {
+      "ref": "U1_VCC_C",
+      "type": "LM5008A_VCC_bypass",
+      "value": "0.47uF X7R 16V minimum, VCC-to-GND, close to U1",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_VCC",
+        "2": "GND_SYS"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7R1C474K080AC",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1C474K080AC",
+      "package": "0603"
+    },
+    {
+      "ref": "U1_BUCK_L",
+      "type": "buck_inductor",
+      "mpn": "CDRH127/LDNP-221MC",
+      "manufacturer": "Sumida",
+      "value": "220uH ±20%; DCR 338mOhm max (260mOhm typ); Isat 1.45A max (1.90A typ); temperature-rise current 1.75A typ; 12.3x12.3x8mm",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_SW",
+        "2": "5V_BUCK"
+      },
+      "source": "Sumida CDRH127/LD datasheet Ver.2.0, p.2",
+      "package": "CDRH127/LD; 12.3x12.3x8mm; verify two-terminal library pad mapping",
+      "electrical_limits": {
+        "inductance": "220uH ±20%",
+        "DCR_max": "338mOhm",
+        "saturation_current_max": "1.45A",
+        "temperature_rise_current_typ": "1.75A",
+        "operating_temperature_max": "100C including self-heating"
+      }
+    },
+    {
+      "ref": "U1_BUCK_D",
+      "type": "buck_freewheel_diode",
+      "mpn": "DFLS1100-7",
+      "manufacturer": "Diodes Incorporated",
+      "value": "100V Schottky",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_SW",
+        "2": "GND_SYS"
+      },
+      "package": "PowerDI123",
+      "source": "https://www.diodes.com/datasheet/download/DFLS1100.pdf",
+      "sourcing_status": "orderable suffix listed in manufacturer datasheet; confirm footprint cathode/anode and assembly"
+    },
+    {
+      "ref": "U1_BUCK_RFB1",
+      "type": "buck_feedback_lower",
+      "value": "3.01k 1% from FB to GND",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_FB",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-073K01L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-073K01L",
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim"
+    },
+    {
+      "ref": "U1_BUCK_RFB2",
+      "type": "buck_feedback_upper",
+      "value": "3.01k 1% from 5V_BUCK to FB",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "BUCK_FB"
+      },
+      "mpn": "RC0603FR-073K01L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-073K01L",
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim"
+    },
+    {
+      "ref": "U1_BUCK_RRIP",
+      "type": "buck_feedback_ripple_resistor",
+      "value": "0.82 ohm candidate; layout per TI LM5008A EVM low-ripple configuration",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "BUCK_RIPPLE_CAP"
+      },
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim",
+      "package": "0603",
+      "electrical_limits": {
+        "TCR": "±200ppm/C",
+        "power": "0.1W at 70C",
+        "continuous_voltage_at_full_power": "0.3V",
+        "tolerance": "1%"
+      },
+      "mpn": "PT0603FR-070R82L",
+      "manufacturer": "Yageo",
+      "selection_note": "At 250mA the nominal drop/power screen is 0.205V/51.3mW; a 350mA continuous load would reach about 0.287V/100.5mW and is not promised as a continuous design load.",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/PT0603FR-070R82L"
+    },
+    {
+      "ref": "U1_BUCK_RT",
+      "type": "buck_frequency_set",
+      "value": "280k 1% RT/SD-to-VIN (BUS+)",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_RT_SD",
+        "2": "BUS+"
+      },
+      "mpn": "RC0603FR-07280KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-07280KL",
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim"
+    },
+    {
+      "ref": "U1_BUCK_RCL",
+      "type": "buck_current_limit_off_timer",
+      "value": "1.00M 1% RCL-to-GND; E96 candidate",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_RCL",
+        "2": "GND_SYS"
+      },
+      "package": "0603",
+      "mpn": "RC0603FR-071ML",
+      "manufacturer": "Yageo",
+      "sourcing_status": "root-selected timing candidate; not yet measured",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-071ML"
+    },
+    {
+      "ref": "U1_BUCK_CBST",
+      "type": "buck_bootstrap",
+      "value": "10nF 50V C0G between BST and SW",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_BST",
+        "2": "BUCK_SW"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608C0G1H103J080AE",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608C0G1H103J080AE",
+      "package": "0603"
+    },
+    {
+      "ref": "U2_CIN",
+      "type": "safe_ldo_input_cap",
+      "value": "2.2uF X7R 100V 1210; verify effective capacitance at 37.8V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R2A225K230AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U2_COUT",
+      "type": "safe_ldo_output_cap",
+      "value": "10uF X7R 10V, ensure effective >=4.7uF at 5V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R1A106K160AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U2_RTOP",
+      "type": "safe_ldo_feedback_upper",
+      "value": "97.6k 1% OUT-to-FB",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB"
+      },
+      "mpn": "RC0603FR-0797K6L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-0797K6L",
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim"
+    },
+    {
+      "ref": "U2_RBOT",
+      "type": "safe_ldo_feedback_lower",
+      "value": "30.1k 1% FB-to-GND",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_FB",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0730K1L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "source": "https://www.yageogroup.com/component-documentation/download/specsheet/RC0603FR-0730K1L",
+      "sourcing_status": "exact manufacturer candidate; no stock or lead-time claim"
+    },
+    {
+      "ref": "U5_C",
+      "type": "CAN_transceiver_decoupling",
+      "value": "0.1uF X7R 10V at TCAN1042 VCC",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "manufacturer": "TDK",
+      "sourcing_status": "exact manufacturer candidate; DC-bias/effective capacitance still to verify",
+      "mpn": "C1608X7R1A104K080AE",
+      "source": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C1608X7R1A104K080AE",
+      "package": "0603"
+    },
+    {
+      "ref": "RNEG_TOP",
+      "type": "negative_current_threshold_divider_top",
+      "value": "26.7k 1% from VREF_CORE to VNEG_REF; nominal negative threshold approx150.16A at gain10",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VREF_CORE",
+        "2": "VNEG_REF"
+      },
+      "mpn": "RC0603FR-0726K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "RNEG_BOT",
+      "type": "negative_current_threshold_divider_bottom",
+      "value": "10.0k 1% from VNEG_REF to GND_SYS; VNEG_REF=0.89918V at VREF_CORE=3.3V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_OVTOP",
+      "type": "BUS_OV_sense_divider_top",
+      "value": "162k 0.1% from BUS+ to VBUS_OV_SENSE",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "VBUS_OV_SENSE"
+      },
+      "mpn": "RT0603BRD07162KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RT0603BRD series; 0.1%, ±25ppm/C, 0.1W at 70C; BUS divider stress/voltage needs validation"
+    },
+    {
+      "ref": "R_OVBOT",
+      "type": "BUS_OV_sense_divider_bottom",
+      "value": "10.0k 0.1% from VBUS_OV_SENSE to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "manufacturer": "Milliohm (毫欧)",
+      "package": "0603",
+      "sourcing_class": "HoAR exact high-power 0603, 10kΩ ±0.1%, ±25ppm/°C, 0.1W at 70°C, -55..+155°C; table max 75V but 10kΩ continuous voltage is min(sqrt(P×R),75V)=31.62V; endurance drift ±0.5%. Actual stress at 50V BUS: R_OVBOT 2.90698V/0.84505mW; R_OVREF_BOT 2.46360V/0.60693mW. E100 qualification OPEN; rerun and require no worse than baseline. Not a 10ppm part.",
+      "supplier": "LCSC",
+      "supplierId": "C5123581",
+      "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/0BFAEB87CEA46D4D4A0AA08C46D82900.pdf",
+      "footprint_review": "Compare current R0603 copper land to manufacturer recommended A=0.8mm, B=1.0mm, C=0.9±0.2mm before release."
+    },
+    {
+      "ref": "R_OVREF_TOP",
+      "type": "BUS_OV_reference_divider_top",
+      "value": "10.2k 0.1% from SAFE_5V to V_OV_REF",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "V_OV_REF"
+      },
+      "mpn": "RT0603BRD0710K2L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RT0603BRD series; 0.1%, ±25ppm/C, 0.1W at 70C; BUS divider stress/voltage needs validation"
+    },
+    {
+      "ref": "R_OVREF_BOT",
+      "type": "BUS_OV_reference_divider_bottom",
+      "value": "10.0k 0.1% from V_OV_REF to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "V_OV_REF",
+        "2": "GND_SYS"
+      },
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "manufacturer": "Milliohm (毫欧)",
+      "package": "0603",
+      "sourcing_class": "HoAR exact high-power 0603, 10kΩ ±0.1%, ±25ppm/°C, 0.1W at 70°C, -55..+155°C; table max 75V but 10kΩ continuous voltage is min(sqrt(P×R),75V)=31.62V; endurance drift ±0.5%. Actual stress at 50V BUS: R_OVBOT 2.90698V/0.84505mW; R_OVREF_BOT 2.46360V/0.60693mW. E100 qualification OPEN; rerun and require no worse than baseline. Not a 10ppm part.",
+      "supplier": "LCSC",
+      "supplierId": "C5123581",
+      "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/0BFAEB87CEA46D4D4A0AA08C46D82900.pdf",
+      "footprint_review": "Compare current R0603 copper land to manufacturer recommended A=0.8mm, B=1.0mm, C=0.9±0.2mm before release."
+    },
+    {
+      "ref": "R_OV_HYS",
+      "type": "BUS_OV_hysteresis_feedback",
+      "value": "200k 1% from BUSOV_N to V_OV_REF; nominal 43.4V turn-on / 41.4V release (43.4145V / 41.4152V with SAFE_5V=4.97648V, VOL=0.2V); tolerance and corner simulation required",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUSOV_N",
+        "2": "V_OV_REF"
+      },
+      "mpn": "RC0603FR-07200KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_OV_PU",
+      "type": "BUS_OV_output_pullup",
+      "value": "4.7k 1% BUSOV_N to SAFE_5V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "BUSOV_N"
+      },
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_BREAK_PU",
+      "type": "TIM1_BKIN_pullup",
+      "value": "2.2k 1% MCU_3V3 to BREAK_N",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "BREAK_N"
+      },
+      "mpn": "RC0603FR-072K2L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_DRV_EN_PD",
+      "type": "DRV_enable_default_off",
+      "value": "10k 1% from DRV_ENABLE to GND_SYS, default-disabled",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_ENABLE",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_DUMP_GATE_PD",
+      "type": "dump_gate_default_off",
+      "value": "10k 1% DUMP_GATE to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_GATE",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_DUMP_GATE",
+      "type": "dump_gate_resistor",
+      "value": "10ohm series from tied UCC27511 OUTH and OUTL pins to DUMP_GATE/Q7.G",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_DRV_OUT",
+        "2": "DUMP_GATE"
+      },
+      "mpn": "RC0603FR-0710RL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_SAFEADC_TOP",
+      "type": "SAFE_5V_monitor_divider_top",
+      "value": "27.4k 1% SAFE_5V to SAFE_ADC; PB0 COMP4_INP / ADC1_IN15",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_5V",
+        "2": "SAFE_ADC"
+      },
+      "mpn": "RC0603FR-0727K4L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_SAFEADC_BOT",
+      "type": "SAFE_5V_monitor_divider_bottom",
+      "value": "10k 1% SAFE_ADC to GND_SYS; COMP4 compares internal VREFINT",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_SAFEADC",
+      "type": "SAFE_5V_monitor_filter",
+      "value": "1nF C0G SAFE_ADC to GND_SYS; nominal RC 7.33us; PB0 ADC sample time to verify",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "R_BUSADC_TOP",
+      "type": "BUS_voltage_monitor_divider_top",
+      "value": "180k 1% BUS+ to VBUS_ADC_SENSE; 42V=2.21V, 60V=3.158V with 10k bottom",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "VBUS_ADC_SENSE"
+      },
+      "mpn": "RC0603FR-07180KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_BUSADC_BOT",
+      "type": "BUS_voltage_monitor_divider_bottom",
+      "value": "10k 1% VBUS_ADC_SENSE to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_BUSADC",
+      "type": "BUS_ADC_filter",
+      "value": "1nF VBUS_ADC to GND_SYS; verify ADC sampling and VDD-off injection behavior",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "R_BUS_CAP_DIS",
+      "type": "BUS_bulk_discharge",
+      "value": "Not selected; residual voltage discharge/isolated verification is a system TODO",
+      "candidate": false,
+      "quantity": 0,
+      "fit_status": "not_selected_placeholder_system_TODO"
+    },
+    {
+      "ref": "CBUS2",
+      "type": "bulk_bus_capacitor",
+      "mpn": "PEH200PJ5100MB2",
+      "manufacturer": "KEMET",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "value": "100V, 10000uF, +/-20%, +85C, 50x95mm, M5 stud; each ref qty1"
+    },
+    {
+      "ref": "CBUS3",
+      "type": "bulk_bus_capacitor",
+      "mpn": "PEH200PJ5100MB2",
+      "manufacturer": "KEMET",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "value": "100V, 10000uF, +/-20%, +85C, 50x95mm, M5 stud; each ref qty1"
+    },
+    {
+      "ref": "J_BRAKE_R",
+      "type": "external_dump_resistor_connector",
+      "mpn": "SB50 assembly: P992 x2 + 5900 x4",
+      "manufacturer": "Anderson Power Products",
+      "candidate": true,
+      "note": "每板一完整线对线配对组件：两只P992灰色耐化学外壳、四只5900镀银6AWG高插拔力触点；不是板载PCB触点。按原厂工具压接并做拉力、温升、环境与直流分断验证；库存/价格未核。",
+      "assembly_parts": [
+        {
+          "mpn": "P992",
+          "quantity": 2,
+          "description": "SB50 chemical-resistant gray housing"
+        },
+        {
+          "mpn": "5900",
+          "quantity": 4,
+          "description": "SB50 silver-plated 6AWG high-mating-force wire contact"
+        }
+      ],
+      "source": "https://p1.aprimocdn.net/idealindustries/d7c0a682-e691-4b60-8e76-b3f000737d74/ap-web_product-assets_default_data-sheets_ds-sb50_Original%20file.pdf",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      }
+    },
+    {
+      "ref": "F_BRAKE",
+      "type": "external_dump_branch_fuse",
+      "mpn": "Eaton CBBF-60",
+      "value": "60A, 58VDC, 2kA interrupt rating",
+      "candidate": true,
+      "note": "短路电流必须低于分断能力并核时间-电流曲线；保险不是主电池隔离器",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "DUMP_RES_UP"
+      }
+    },
+    {
+      "ref": "J_TEMP",
+      "type": "external_dump_resistor_NC_thermal_interlock",
+      "value": "NC thermostat low-current contact in series SAFE_5V to U4.IN+; opens on overtemperature and disables dump; never in 45A resistor path",
+      "candidate": true,
+      "note": "NC thermostat is in series with SAFE_5V to U4.IN+ only. Opens on overtemperature and disables dump; firmware reads this 5V state through a separate resistor divider. Contact is low current only; never in resistor power path.",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "DUMP_THERM_OK"
+      },
+      "mpn": "HC-XH2.54-2AW-M",
+      "eda_library_candidate": {
+        "device_name": "HC-XH2.54-2AW-M",
+        "device_uuid": "1806f85dcfeb4d419c8b2d3f74cb9b22",
+        "footprint_name": "CONN-TH_HC-XH2.54-2AW-M",
+        "footprint_uuid": "8faee3147d784fac904a62509971c416",
+        "catalog_number": "C53454752",
+        "evidence": "EDAchild library device/footprint property readback"
+      },
+      "manufacturer": "Hongcheng (虹成)",
+      "supplier": "LCSC",
+      "supplierId": "C53454752",
+      "package": "1x2 right-angle through-hole header, 2.5mm class, 3A library rating",
+      "physical_note": "MPN applies to the PCB header only. The mating thermostat/NTC/sensor device and beta curve remain external, application-dependent TBD."
+    },
+    {
+      "ref": "R_DUMP_A",
+      "type": "external_braking_resistor",
+      "mpn": "LPS0300H2R00FB",
+      "manufacturer": "Vishay Sfernice",
+      "value": "2ohm, 300W, 1%",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      }
+    },
+    {
+      "ref": "R_DUMP_B",
+      "type": "external_braking_resistor",
+      "mpn": "LPS0300H2R00FB",
+      "manufacturer": "Vishay Sfernice",
+      "value": "2ohm, 300W, 1%",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_RES_UP",
+        "2": "DUMP_SW"
+      }
+    },
+    {
+      "ref": "J_CAN",
+      "type": "CAN_bus_connector",
+      "value": "CANH, CANL, GND; endpoint termination footprint DNP/jumper",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GND_SYS",
+        "2": "CANH_CONN",
+        "3": "CANL_CONN"
+      },
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "eda_library_candidate": {
+        "device_name": "XY-XH2.54-3A11-R",
+        "device_uuid": "96108f5033f54192a200958f6d15693b",
+        "footprint_name": "CONN-TH_3P-P2.50_XY-XH2.54-3A11-R",
+        "footprint_uuid": "3160a71de5274f5d8e25f9711d973a12",
+        "catalog_number": "C22391423",
+        "evidence": "EDAchild library device/footprint property readback; pin geometry not physical board inspection"
+      },
+      "manufacturer": "JST",
+      "supplier": "LCSC",
+      "supplierId": "C144394",
+      "package": "JST XH-series 1×3 through-hole header, 2.50 mm pitch (verify footprint and mating assembly before release)",
+      "physical_note": "Procurement MPN is JST B3B-XH-A(LF)(SN), LCSC C144394. EDA carrier remains the XYECONN C22391423 library device/footprint, not an exact physical MPN identity. Verify actual pad pitch/orientation and mating cable before release."
+    },
+    {
+      "ref": "D_CAN_ESD",
+      "type": "CAN_ESD_array",
+      "mpn": "PESD2CANFD24V-T",
+      "manufacturer": "Nexperia",
+      "candidate": true,
+      "value": "24V VRWM, 33V typical /42V max clamp at1A; ESD/transient shunt only, sustained 37.8V wiring fault and thermal behavior are not protected",
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "CANL_CONN",
+        "1": "CANH_CONN",
+        "3": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_CAN_TERM",
+      "type": "CAN_termination",
+      "value": "120ohm 1% across CANH/CANL, DNP unless this board is a physical bus end",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CANH_CONN",
+        "2": "CANL_CONN"
+      },
+      "mpn": "RC0603FR-07120RL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "J_HALL",
+      "type": "Hall_connector",
+      "value": "Hall 5V/50mA, 60deg; pin1..5=5V/U/V/W/GND; H-JSY 5pin 2.0 seller designation",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "HALL_A_RAW",
+        "3": "HALL_B_RAW",
+        "4": "HALL_C_RAW",
+        "5": "GND_SYS"
+      },
+      "mpn": "B5B-PH-K-S(LF)(SN)",
+      "eda_library_candidate": {
+        "device_name": "B5B-PH-K-S(LF)(SN)",
+        "device_uuid": "71b96bbb27874f81a96fe8e662677713",
+        "symbol_uuid": "33d606497b3c467d942ac2df7e3507b1",
+        "footprint_name": "CONN-TH_B5B-PH-K-S-LF-SN",
+        "footprint_uuid": "762358675b444cd3a7f07f1015c4e7e9",
+        "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+        "catalog_number": "C157993",
+        "evidence": "2026-10-11 official CLI system-library unique C157993 readback; see EDA自动化/hall-ph2mm-library-proof.json. Actual placed pins and embedded pads must be checked separately."
+      },
+      "manufacturer": "JST",
+      "supplier": "LCSC",
+      "supplierId": "C157993",
+      "package": "JST PH 1x5 through-hole top-entry, 2.00mm pitch; exact library footprint",
+      "physical_note": "User confirms seller designation H-JSY 5pin 2.0 and sequence 5V/U/V/W/GND. JST PH is a 2.0mm board-side candidate, not a proven H-JSY mate. Verify latch, housing and physical Pin1/view orientation on arrival. U/V/W here are Hall logic signals, not power phases."
+    },
+    {
+      "ref": "R_HA",
+      "type": "Hall_A_series",
+      "value": "1k",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_DIRECT"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HB",
+      "type": "Hall_B_series",
+      "value": "1k",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_DIRECT"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HC",
+      "type": "Hall_C_series",
+      "value": "1k",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_DIRECT"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_HA",
+      "type": "Hall_A_filter",
+      "value": "1nF to GND_SYS; optional/DNP pending Hall edge timing",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_A",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "C_HB",
+      "type": "Hall_B_filter",
+      "value": "1nF to GND_SYS; optional/DNP pending Hall edge timing",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_B",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "C_HC",
+      "type": "Hall_C_filter",
+      "value": "1nF to GND_SYS; optional/DNP pending Hall edge timing",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_C",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "R_HALL_PU_A",
+      "type": "Hall_A_pullup",
+      "value": "4.7k to MCU_3V3, populate only for open-collector Hall",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "HALL_A_DIRECT"
+      },
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HALL_PU_B",
+      "type": "Hall_B_pullup",
+      "value": "4.7k to MCU_3V3, populate only for open-collector Hall",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "HALL_B_DIRECT"
+      },
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HALL_PU_C",
+      "type": "Hall_C_pullup",
+      "value": "4.7k to MCU_3V3, populate only for open-collector Hall",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "HALL_C_DIRECT"
+      },
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CNEG_REF",
+      "type": "negative_current_threshold_reference_decoupling",
+      "value": "1nF VNEG_REF to GND_SYS; filter delay/noise tradeoff needs threshold timing validation",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "RSO_U",
+      "type": "CSA_SO_U_series_to_MCU",
+      "value": "47 ohm from CSA_SO_U_RAW to SO_U_ADC",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_U_RAW",
+        "2": "SO_U_ADC"
+      },
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CSO_U",
+      "type": "CSA_SO_U_MCU_input_filter",
+      "value": "220pF from SO_U_ADC to GND_SYS; tau about 10.3ns with 47ohm",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SO_U_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "RSO_V",
+      "type": "CSA_SO_V_series_to_MCU",
+      "value": "47 ohm from CSA_SO_V_RAW to SO_V_ADC",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_V_RAW",
+        "2": "SO_V_ADC"
+      },
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CSO_V",
+      "type": "CSA_SO_V_MCU_input_filter",
+      "value": "220pF from SO_V_ADC to GND_SYS; tau about 10.3ns with 47ohm",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SO_V_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "RSO_W",
+      "type": "CSA_SO_W_series_to_MCU",
+      "value": "47 ohm from CSA_SO_W_RAW to SO_W_ADC",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_W_RAW",
+        "2": "SO_W_ADC"
+      },
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CSO_W",
+      "type": "CSA_SO_W_MCU_input_filter",
+      "value": "220pF from SO_W_ADC to GND_SYS; tau about 10.3ns with 47ohm",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "SO_W_ADC",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "R_GUH",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_UH; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GUH",
+        "2": "GATE_UH"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_UH",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_UH to PH_U",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_UH",
+        "2": "PH_U"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GUL",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_UL; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GUL",
+        "2": "GATE_UL"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_UL",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_UL to SHUNT_U_TOP_KELVIN",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_UL",
+        "2": "SHUNT_U_TOP"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CBYP_U_HF1",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "value": "4.7uF 100V X7S +/-10%, 1812; BUS+ to GND_SYS beside half bridge; effective capacitance at DC bias must be checked",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "CBYP_U_HF2",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "value": "100nF 100V X7R +/-10%, 1210; BUS+ to GND_SYS beside half bridge",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_GVH",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_VH; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GVH",
+        "2": "GATE_VH"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_VH",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_VH to PH_V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_VH",
+        "2": "PH_V"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GVL",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_VL; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GVL",
+        "2": "GATE_VL"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_VL",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_VL to SHUNT_V_TOP_KELVIN",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_VL",
+        "2": "SHUNT_V_TOP"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CBYP_V_HF1",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "value": "4.7uF 100V X7S +/-10%, 1812; BUS+ to GND_SYS beside half bridge; effective capacitance at DC bias must be checked",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "CBYP_V_HF2",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "value": "100nF 100V X7R +/-10%, 1210; BUS+ to GND_SYS beside half bridge",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_GWH",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_WH; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GWH",
+        "2": "GATE_WH"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_WH",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_WH to PH_W",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_WH",
+        "2": "PH_W"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GWL",
+      "type": "MOS_gate_series_resistor",
+      "value": "4.7ohm 1% U1 gate driver to GATE_WL; adjust only after VGS/ringing measurements",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DRV_GWL",
+        "2": "GATE_WL"
+      },
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_GS_WL",
+      "type": "MOS_gate_source_default_off_pulldown",
+      "value": "10k 1% GATE_WL to SHUNT_W_TOP_KELVIN",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GATE_WL",
+        "2": "SHUNT_W_TOP"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "CBYP_W_HF1",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "value": "4.7uF 100V X7S +/-10%, 1812; BUS+ to GND_SYS beside half bridge; effective capacitance at DC bias must be checked",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "CBYP_W_HF2",
+      "type": "local_bus_high_frequency_bypass",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "value": "100nF 100V X7R +/-10%, 1210; BUS+ to GND_SYS beside half bridge",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "F_MAIN",
+      "type": "battery_input_main_fuse",
+      "mpn": "Eaton CBBF-100",
+      "manufacturer": "Eaton Bussmann",
+      "value": "External/off-board 100A, 58VDC fuse in series from battery PACK+ to board J_BUS_P/BUS+; verify time-current curve, holder, interrupt rating against pack prospective short current and 80A low-bus input current",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "PACK+",
+        "2": "BUS+"
+      },
+      "physical_note": "External wire-harness input fuse; place electrically between battery/source PACK+ and board J_BUS_P pins1-4 (BUS+). It is not a PCB-mounted fuse primitive. PACK+ is the off-board source boundary; all board power enters post-fuse at J_BUS_P."
+    },
+    {
+      "ref": "J_BUS_P",
+      "type": "bolted_high_current_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal M5 board BUS+ input terminal after external F_MAIN; thermal/torque qualification required",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "BUS+",
+        "3": "BUS+",
+        "4": "BUS+"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to post-fuse BUS+. External F_MAIN feeds this board terminal from PACK+. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "J_BUS_N",
+      "type": "bolted_high_current_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal, M5; verify thermal rating for 80A BUS and 120A phase peak/1s, copper area, torque and creepage",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "GND_SYS",
+        "2": "GND_SYS",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to the same net. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "J_MOTOR_U",
+      "type": "bolted_high_current_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal, M5; verify thermal rating for 80A BUS and 120A phase peak/1s, copper area, torque and creepage",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "PH_U",
+        "2": "PH_U",
+        "3": "PH_U",
+        "4": "PH_U"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to the same net. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "J_MOTOR_V",
+      "type": "bolted_high_current_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal, M5; verify thermal rating for 80A BUS and 120A phase peak/1s, copper area, torque and creepage",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "PH_V",
+        "2": "PH_V",
+        "3": "PH_V",
+        "4": "PH_V"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to the same net. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "J_MOTOR_W",
+      "type": "bolted_high_current_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal, M5; verify thermal rating for 80A BUS and 120A phase peak/1s, copper area, torque and creepage",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "PH_W",
+        "2": "PH_W",
+        "3": "PH_W",
+        "4": "PH_W"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to the same net. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "J_DUMP_SW",
+      "type": "bolted_high_current_dump_return_terminal_candidate",
+      "mpn": "MFE04542-T1",
+      "manufacturer": "TML / 特米勒",
+      "value": "100A nominal M5 board switched dump-return terminal; external SB50/resistor-bank return to Q7.D",
+      "library_candidate": "C499680",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_SW",
+        "2": "DUMP_SW",
+        "3": "DUMP_SW",
+        "4": "DUMP_SW"
+      },
+      "physical_pin_note": "Native symbol pins1-4: four solder legs of one brass current-carrying terminal; connect all four to the same DUMP_SW net. This is the board return interface from the external SB50 resistor assembly and connects to Q7.D. Verify actual part continuity/torque/thermal before PCB acceptance.",
+      "source": "https://atta.szlcsc.com/upload/public/pdf/source/20200324/C499680_8402BF8CC8A8BA8E93AFB9ACD2C56202.pdf"
+    },
+    {
+      "ref": "R_BUSADC_SER",
+      "type": "BUS_ADC_input_series_resistor",
+      "value": "1k 1% from VBUS_ADC_SENSE to BUS_ADC at PC4/P2-12; software monitor only, not hardware trip",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "BUS_ADC"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "D_BUSADC_CLAMP",
+      "type": "BUS_ADC_input_transient_clamp",
+      "mpn": "BZT52H-C3V6",
+      "manufacturer": "Nexperia",
+      "value": "3.6V zener BUS_ADC to GND_SYS, candidate; assess leakage/error and VDD-off injection; does not replace HV divider or safety comparator",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_TEMP_MOS_PU",
+      "type": "MOS_temperature_divider_pullup",
+      "value": "10k 1% MCU_3V3 to TEMP_MOS_NODE",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "TEMP_MOS_NODE",
+        "1": "MCU_3V3"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_TEMP_MOS_SER",
+      "type": "MOS_temperature_ADC_series",
+      "value": "1k 1% TEMP_MOS_NODE to TEMP_MOS_ADC / PA2",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "TEMP_MOS_ADC",
+        "1": "TEMP_MOS_NODE"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_TEMP_MOS",
+      "type": "MOS_temperature_ADC_filter",
+      "value": "10nF TEMP_MOS_ADC to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "GND_SYS",
+        "1": "TEMP_MOS_ADC"
+      },
+      "mpn": "C1608C0G1H103J080AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "J_TEMP_MOS",
+      "type": "external_MOS_temperature_sensor_connector",
+      "value": "2-pin external 10k NTC to GND and TEMP_MOS_NODE; beta curve and exact sensor MPN depend on mounting; not frozen",
+      "candidate": true,
+      "sensor_connection": {
+        "sensor_candidate": "10k NTC, exact beta/MPN to be selected for mounting",
+        "1": "TEMP_MOS_NODE",
+        "2": "GND_SYS"
+      },
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "TEMP_MOS_NODE",
+        "2": "GND_SYS"
+      },
+      "mpn": "HC-XH2.54-2AW-M",
+      "eda_library_candidate": {
+        "device_name": "HC-XH2.54-2AW-M",
+        "device_uuid": "1806f85dcfeb4d419c8b2d3f74cb9b22",
+        "footprint_name": "CONN-TH_HC-XH2.54-2AW-M",
+        "footprint_uuid": "8faee3147d784fac904a62509971c416",
+        "catalog_number": "C53454752",
+        "evidence": "EDAchild library device/footprint property readback"
+      },
+      "manufacturer": "Hongcheng (虹成)",
+      "supplier": "LCSC",
+      "supplierId": "C53454752",
+      "package": "1x2 right-angle through-hole header, 2.5mm class, 3A library rating",
+      "physical_note": "MPN applies to the PCB header only. The mating thermostat/NTC/sensor device and beta curve remain external, application-dependent TBD."
+    },
+    {
+      "ref": "R_TEMP_MOTOR_PU",
+      "type": "motor_temperature_divider_pullup",
+      "value": "10k 1% MCU_3V3 to TEMP_MOTOR_NODE",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "TEMP_MOTOR_NODE",
+        "1": "MCU_3V3"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_TEMP_MOTOR_SER",
+      "type": "motor_temperature_ADC_series",
+      "value": "1k 1% TEMP_MOTOR_NODE to TEMP_MOTOR_ADC / PB1",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "TEMP_MOTOR_ADC",
+        "1": "TEMP_MOTOR_NODE"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_TEMP_MOTOR",
+      "type": "motor_temperature_ADC_filter",
+      "value": "10nF TEMP_MOTOR_ADC to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "GND_SYS",
+        "1": "TEMP_MOTOR_ADC"
+      },
+      "mpn": "C1608C0G1H103J080AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "J_TEMP_MOTOR",
+      "type": "external_motor_temperature_sensor_connector",
+      "value": "2-pin external 10k NTC to GND and TEMP_MOTOR_NODE; beta curve and exact sensor MPN depend on motor; not frozen",
+      "candidate": true,
+      "sensor_connection": {
+        "sensor_candidate": "10k NTC, exact beta/MPN to be selected for mounting",
+        "1": "TEMP_MOTOR_NODE",
+        "2": "GND_SYS"
+      },
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "TEMP_MOTOR_NODE",
+        "2": "GND_SYS"
+      },
+      "mpn": "HC-XH2.54-2AW-M",
+      "eda_library_candidate": {
+        "device_name": "HC-XH2.54-2AW-M",
+        "device_uuid": "1806f85dcfeb4d419c8b2d3f74cb9b22",
+        "footprint_name": "CONN-TH_HC-XH2.54-2AW-M",
+        "footprint_uuid": "8faee3147d784fac904a62509971c416",
+        "catalog_number": "C53454752",
+        "evidence": "EDAchild library device/footprint property readback"
+      },
+      "manufacturer": "Hongcheng (虹成)",
+      "supplier": "LCSC",
+      "supplierId": "C53454752",
+      "package": "1x2 right-angle through-hole header, 2.5mm class, 3A library rating",
+      "physical_note": "MPN applies to the PCB header only. The mating thermostat/NTC/sensor device and beta curve remain external, application-dependent TBD."
+    },
+    {
+      "ref": "J_PWR_SENSE",
+      "type": "power_and_fault_signal_connector",
+      "value": "5V_BUCK, MCU_3V3, GND_SYS, SAFE_ADC, BUS_ADC, BREAK_N, DRV_ENABLE, nFAULT test points as required; no exposed unprotected BUS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "MCU_3V3",
+        "3": "GND_SYS",
+        "4": "SAFE_ADC",
+        "5": "BUS_ADC",
+        "6": "BREAK_N",
+        "7": "DRV_ENABLE",
+        "8": "BREAK_N"
+      },
+      "mpn": "XY-XH2.54-8A11",
+      "eda_library_candidate": {
+        "device_name": "XY-XH2.54-8A11",
+        "device_uuid": "f8a3c6f55425431398c745f4ffa18ad7",
+        "footprint_name": "HDR-TH_8P-P2.50-V-F-2",
+        "footprint_uuid": "5ceeed265e4c4c788c424d34f49a0ed9",
+        "catalog_number": "C19271374",
+        "evidence": "EDAchild library device/footprint property readback; verify mating connector/physical dimensions"
+      },
+      "manufacturer": "XYECONN",
+      "supplier": "LCSC",
+      "supplierId": "C19271374",
+      "package": "1x8 through-hole XH-style header; library footprint pitch 2.50mm",
+      "physical_note": "No exposed unprotected BUS on this signal connector; exact external mate remains assembly choice."
+    },
+    {
+      "ref": "R_DUMP_INP_PD",
+      "type": "chopper_enable_default_off",
+      "value": "10k 1% DUMP_THERM_OK/U4.IN+ to GND_SYS; NC contact open, connector absent or SAFE_5V absent disables chopper",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_THERM_OK",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "C_HALL_VCC1",
+      "type": "Hall_sensor_supply_decoupling",
+      "mpn": "C3225X7R1A106K160AE",
+      "manufacturer": "TDK",
+      "value": "10uF 10V X7R, 1210; at J_HALL VCC to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "GND_SYS",
+        "1": "5V_BUCK"
+      }
+    },
+    {
+      "ref": "C_HALL_VCC2",
+      "type": "Hall_sensor_supply_decoupling",
+      "mpn": "C1608X7R1A104K080AE",
+      "manufacturer": "TDK",
+      "value": "100nF 10V X7R, 0603; at J_HALL VCC to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "2": "GND_SYS",
+        "1": "5V_BUCK"
+      }
+    },
+    {
+      "ref": "R_THERM_TOP",
+      "type": "dump_thermal_status_divider_top",
+      "value": "12k 1% DUMP_THERM_OK to THERM_SENSE; SAFE_5V nominal 4.98V gives THERM_SENSE about 3.11V",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_THERM_OK",
+        "2": "THERM_SENSE"
+      },
+      "mpn": "RC0603FR-0712KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_THERM_BOT",
+      "type": "dump_thermal_status_divider_bottom",
+      "value": "20k 1% THERM_SENSE to GND_SYS",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "THERM_SENSE",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0720KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_THERM_SER",
+      "type": "dump_thermal_status_GPIO_series",
+      "value": "100k 1% THERM_SENSE to DUMP_THERM_OK_GPIO/PB9; limits injection if MCU VDD=0, verify GPIO VIH and power-off leakage",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "THERM_SENSE",
+        "2": "DUMP_THERM_OK_GPIO"
+      },
+      "mpn": "RC0603FR-07100KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "U1_VM_C1",
+      "type": "driver_local_decoupling",
+      "package": "candidate",
+      "value": "0.1uF X7R, 100V, VM-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U1_VM_C2",
+      "type": "driver_local_decoupling",
+      "package": "candidate",
+      "value": "4.7uF X7S 100V 1812; effective capacitance under BUS bias to verify",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U1_BUCK_CIN1",
+      "type": "buck_input_cap",
+      "package": "candidate",
+      "value": "2.2uF X7R 100V 1210; verify effective capacitance at 37.8V",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R2A225K230AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U1_BUCK_CIN2",
+      "type": "buck_input_cap",
+      "package": "candidate",
+      "value": "0.1uF X7R 100V VIN-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U1_BUCK_COUT1",
+      "type": "buck_output_cap_ripple_branch",
+      "package": "candidate",
+      "value": "22uF X7R 16V after RRIP to GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUCK_RIPPLE_CAP",
+        "2": "GND_SYS"
+      },
+      "mpn": "C3225X7R1C226K250AC",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U1_BUCK_COUT2",
+      "type": "buck_output_bypass",
+      "mpn": "C1608X7R1C474K080AC",
+      "manufacturer": "TDK",
+      "package": "0603",
+      "value": "0.47uF X7R 16V 0603 5V_BUCK-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "procurement_status": "Exact TDK MPN candidate identified from official TDK product data; verify DC-bias effective capacitance and temperature before freeze; sourcing availability not checked",
+      "sourcing_class": "TDK official exact MPN and nominal rating identified; candidate only, verify effective capacitance at applied DC bias/temperature and do not infer supply availability"
+    },
+    {
+      "ref": "U3_C1",
+      "type": "comparator_decoupling",
+      "package": "candidate",
+      "value": "0.1uF SAFE_5V-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608X7R1A104K080AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U3_C2",
+      "type": "comparator_decoupling",
+      "mpn": "C1608X7R1C105K080AC",
+      "manufacturer": "TDK",
+      "package": "0603",
+      "value": "1uF X7R 16V 0603 SAFE_5V-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "procurement_status": "Exact TDK MPN candidate identified from official TDK product data; verify DC-bias effective capacitance and temperature before freeze; sourcing availability not checked",
+      "sourcing_class": "TDK official exact MPN and nominal rating identified; candidate only, verify effective capacitance at applied DC bias/temperature and do not infer supply availability"
+    },
+    {
+      "ref": "U4_C1",
+      "type": "chopper_driver_decoupling",
+      "package": "candidate",
+      "value": "0.1uF SAFE_5V-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608X7R1A104K080AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "U4_C2",
+      "type": "chopper_driver_decoupling",
+      "mpn": "C1608X7R1C105K080AC",
+      "manufacturer": "TDK",
+      "package": "0603",
+      "value": "1uF X7R 16V 0603 SAFE_5V-GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "procurement_status": "Exact TDK MPN candidate identified from official TDK product data; verify DC-bias effective capacitance and temperature before freeze; sourcing availability not checked",
+      "sourcing_class": "TDK official exact MPN and nominal rating identified; candidate only, verify effective capacitance at applied DC bias/temperature and do not infer supply availability"
+    },
+    {
+      "ref": "U1_VREF_C",
+      "type": "CSA_reference_bypass",
+      "package": "candidate",
+      "value": "0.1uF VREF_CORE-GND_SYS at U1 pin 26",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VREF_CORE",
+        "2": "GND_SYS"
+      },
+      "mpn": "C1608X7R1A104K080AE",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "R_CAN_TX_PU",
+      "type": "CAN_TXD_recessive_pullup",
+      "value": "10k 1% MCU_3V3 to FDCAN1_TX",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "FDCAN1_TX"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_CAN_STB_PU",
+      "type": "CAN_standby_default",
+      "value": "10k 1% MCU_3V3 to CAN_STB",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "CAN_STB"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "J_MCU_L",
+      "type": "WeAct_Normal_coreboard_header_P1",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "5V_BUCK",
+        "2": "5V_BUCK",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "BREAK_N",
+        "6": "PWM_UL",
+        "7": "PWM_VL",
+        "8": "PWM_WL",
+        "9": "MCU_PC6",
+        "10": "PWM_UH",
+        "11": "PWM_VH",
+        "12": "PWM_WH",
+        "13": "FDCAN1_RX",
+        "14": "FDCAN1_TX",
+        "15": "HALL_A",
+        "16": "MCU_PC10",
+        "17": "MCU_PC11",
+        "18": "HALL_B",
+        "19": "MCU_PB4",
+        "20": "CAN_STB",
+        "21": "HALL_DUMMY_PB6",
+        "22": "HALL_DUMMY_PB7",
+        "23": "BOOT0_RESERVED",
+        "24": "DUMP_THERM_OK_GPIO"
+      },
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "package": "2x12, 2.54mm pitch; catalog C54803369; module socket mating/orientation verify",
+      "value": "24-pin Normal QFN48 P1/P2 interface represented by 2x12 JXT-PM2.54-2X12P-A9 candidate; verify footprint numbering and socket orientation",
+      "eda_library_candidate": {
+        "catalog_number": "C54803369",
+        "status": "candidate; map physical 2x12 pad numbering to official P1/P2 labels before placement"
+      }
+    },
+    {
+      "ref": "J_MCU_R",
+      "type": "WeAct_Normal_coreboard_header_P2",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "MCU_3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "HALL_C",
+        "6": "DRV_ENABLE",
+        "7": "USB_VBUS_DETECT_PB2_RESERVED",
+        "8": "VREF_CORE",
+        "9": "SAFE_ADC",
+        "10": "TEMP_MOTOR_ADC",
+        "11": "DRV_SPI_MOSI",
+        "12": "BUS_ADC",
+        "13": "DRV_SPI_SCK",
+        "14": "DRV_SPI_MISO",
+        "15": "SO_V_ADC",
+        "16": "DRV_SPI_CS_N",
+        "17": "SO_U_ADC",
+        "18": "TEMP_MOS_ADC",
+        "19": "NRST_RESERVED",
+        "20": "SO_W_ADC",
+        "21": "PC14_RESERVED",
+        "22": "PC15_RESERVED",
+        "23": "VBAT_RESERVED",
+        "24": "PC13_RESERVED"
+      },
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "package": "2x12, 2.54mm pitch; catalog C54803369; module socket mating/orientation verify",
+      "value": "24-pin Normal QFN48 P1/P2 interface represented by 2x12 JXT-PM2.54-2X12P-A9 candidate; verify footprint numbering and socket orientation",
+      "eda_library_candidate": {
+        "catalog_number": "C54803369",
+        "status": "candidate; map physical 2x12 pad numbering to official P1/P2 labels before placement"
+      }
+    },
+    {
+      "ref": "R_HA_5V_SER",
+      "type": "Hall_5V_pushpull_divider_top",
+      "value": "10k 1% HALL_A_RAW to HALL_A_5V_DIV; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_5V_DIV"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HA_5V_PD",
+      "type": "Hall_5V_pushpull_divider_bottom",
+      "value": "18k 1% HALL_A_5V_DIV to GND_SYS; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_A_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "JP_HA",
+      "type": "Hall_input_mode_3pin_header_for_removable_shunt",
+      "mpn": null,
+      "manufacturer": null,
+      "supplier": "LCSC",
+      "supplierId": "C2940050",
+      "package": "3-pin through-hole header, 2.54mm; removable 2-position shunt cap is a separate external BOM accessory",
+      "value": "3-pin selector header; bridge 1-2 for direct/3V3-compatible output or 2-3 for 5V divider; fit one shunt only, never both",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_A_DIRECT",
+        "2": "HALL_A",
+        "3": "HALL_A_5V_DIV"
+      },
+      "eda_library_candidate": {
+        "device_name": "Jumper3",
+        "device_uuid": "83fc2d4e73bd47169f3ef59bbad62430",
+        "footprint_name": "HDR-TH_3P-P2.54-V-M-A",
+        "footprint_uuid": "1da3704b1258469fa7ecb546bb3fe07e",
+        "catalog_number": "C2940050",
+        "library_mpn": "Jumper3",
+        "evidence": "EDAchild device/footprint property readback; this is generic 3-pin header carrier, not shunt-cap MPN"
+      },
+      "physical_note": "The selected library item has three header pads only and does not include the removable shunt cap. Actual sensor output configuration determines which pair is bridged."
+    },
+    {
+      "ref": "R_HB_5V_SER",
+      "type": "Hall_5V_pushpull_divider_top",
+      "value": "10k 1% HALL_B_RAW to HALL_B_5V_DIV; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_5V_DIV"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HB_5V_PD",
+      "type": "Hall_5V_pushpull_divider_bottom",
+      "value": "18k 1% HALL_B_5V_DIV to GND_SYS; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_B_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "JP_HB",
+      "type": "Hall_input_mode_3pin_header_for_removable_shunt",
+      "mpn": null,
+      "manufacturer": null,
+      "supplier": "LCSC",
+      "supplierId": "C2940050",
+      "package": "3-pin through-hole header, 2.54mm; removable 2-position shunt cap is a separate external BOM accessory",
+      "value": "3-pin selector header; bridge 1-2 for direct/3V3-compatible output or 2-3 for 5V divider; fit one shunt only, never both",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_B_DIRECT",
+        "2": "HALL_B",
+        "3": "HALL_B_5V_DIV"
+      },
+      "eda_library_candidate": {
+        "device_name": "Jumper3",
+        "device_uuid": "83fc2d4e73bd47169f3ef59bbad62430",
+        "footprint_name": "HDR-TH_3P-P2.54-V-M-A",
+        "footprint_uuid": "1da3704b1258469fa7ecb546bb3fe07e",
+        "catalog_number": "C2940050",
+        "library_mpn": "Jumper3",
+        "evidence": "EDAchild device/footprint property readback; this is generic 3-pin header carrier, not shunt-cap MPN"
+      },
+      "physical_note": "The selected library item has three header pads only and does not include the removable shunt cap. Actual sensor output configuration determines which pair is bridged."
+    },
+    {
+      "ref": "R_HC_5V_SER",
+      "type": "Hall_5V_pushpull_divider_top",
+      "value": "10k 1% HALL_C_RAW to HALL_C_5V_DIV; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_5V_DIV"
+      },
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "R_HC_5V_PD",
+      "type": "Hall_5V_pushpull_divider_bottom",
+      "value": "18k 1% HALL_C_5V_DIV to GND_SYS; DNP unless 5V push-pull",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_C_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "sourcing_class": "RC0603FR-07 series; 1%, 0.1W at 70C; verify pulse/voltage derating per role"
+    },
+    {
+      "ref": "JP_HC",
+      "type": "Hall_input_mode_3pin_header_for_removable_shunt",
+      "mpn": null,
+      "manufacturer": null,
+      "supplier": "LCSC",
+      "supplierId": "C2940050",
+      "package": "3-pin through-hole header, 2.54mm; removable 2-position shunt cap is a separate external BOM accessory",
+      "value": "3-pin selector header; bridge 1-2 for direct/3V3-compatible output or 2-3 for 5V divider; fit one shunt only, never both",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "HALL_C_DIRECT",
+        "2": "HALL_C",
+        "3": "HALL_C_5V_DIV"
+      },
+      "eda_library_candidate": {
+        "device_name": "Jumper3",
+        "device_uuid": "83fc2d4e73bd47169f3ef59bbad62430",
+        "footprint_name": "HDR-TH_3P-P2.54-V-M-A",
+        "footprint_uuid": "1da3704b1258469fa7ecb546bb3fe07e",
+        "catalog_number": "C2940050",
+        "library_mpn": "Jumper3",
+        "evidence": "EDAchild device/footprint property readback; this is generic 3-pin header carrier, not shunt-cap MPN"
+      },
+      "physical_note": "The selected library item has three header pads only and does not include the removable shunt cap. Actual sensor output configuration determines which pair is bridged."
+    },
+    {
+      "ref": "U5_VIO_C",
+      "value": "100nF X7R 10V, VIO bypass",
+      "mpn": "C1608X7R1A104K080AE",
+      "manufacturer": "TDK",
+      "package": "0603",
+      "quantity": 1,
+      "fit_status": "populate",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "C_OV_SENSE",
+      "type": "BUS_OV_comparator_sense_filter",
+      "value": "1nF C0G 50V from VBUS_OV_SENSE to GND_SYS; RC about 9.42us with 162k/10k divider Thevenin resistance",
+      "candidate": true,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "notes": "Suppress switching spikes; revalidate comparator delay and thresholds with circuit simulation and hardware. No capacitor on V_OV_REF.",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "sourcing_class": "TDK official exact part; confirm effective capacitance at applied DC bias and temperature before freeze"
+    },
+    {
+      "ref": "Q_BOV_PNP",
+      "type": "BUS_OV_to_break_level_shift_PNP",
+      "mpn": "BC857C",
+      "manufacturer": "Nexperia",
+      "package": "SOT-23",
+      "value": "BC857C PNP; pin1=B, pin2=E, pin3=C; E=DUMP_5V, C=BOV_BK_SRC",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BOV_PNP_BASE",
+        "2": "DUMP_5V",
+        "3": "BOV_BK_SRC"
+      },
+      "datasheet_limits": "VCEO=-45V; IC=-100mA; VCEsat max 300mV at IC=-10mA, IB=-0.5mA; operation here is sub-mA and needs bench confirmation"
+    },
+    {
+      "ref": "R_BOV_DRIVE",
+      "type": "BUS_OV_PNP_collector_to_NPN_base_current_limit",
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "value": "4.7k 1% BOV_BK_SRC to BOV_BK_DRIVE",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BOV_BK_SRC",
+        "2": "BOV_BK_DRIVE"
+      },
+      "source": "Yageo_RC0603FR_4K7",
+      "calculation": "At SAFE_5V=4.97648V, assumed PNP VCEsat=0.1V and NPN VBE=0.7V: series current about0.89mA; resistor dissipation about3.8mW. With 10k drive pulldown drawing about0.07mA, about0.82mA remains for NPN base; against about1.5mA BREAK_N pullup load, forced beta is about1.8. Verify transistor saturation and BREAK low voltage across corners."
+    },
+    {
+      "ref": "R_BOV_PNP_B",
+      "type": "BUS_OV_PNP_base_current_limit",
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "value": "10k 1% BUSOV_N to Q_BOV_PNP pin1",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUSOV_N",
+        "2": "BOV_PNP_BASE"
+      }
+    },
+    {
+      "ref": "Q_BOV_NPN",
+      "type": "BUS_OV_to_break_level_shift_NPN",
+      "mpn": "BC847C",
+      "manufacturer": "Nexperia",
+      "package": "SOT-23",
+      "value": "BC847C NPN; pin1=B, pin2=E, pin3=C; B=BOV_BK_DRIVE, E=GND_SYS, C=BREAK_N",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS",
+        "3": "BREAK_N"
+      },
+      "datasheet_limits": "VCEO=45V; IC=100mA; VCEsat max 200mV at IC=10mA, IB=0.5mA; actual BREAK_N sink load approx1.5mA, verify low level on hardware"
+    },
+    {
+      "ref": "R_BOV_NPN_PD",
+      "type": "BUS_OV_level_shift_drive_pulldown",
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "package": "0603",
+      "value": "10k 1% BOV_BK_DRIVE to GND_SYS",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_SPI_SDO_PU",
+      "type": "DRV_open_drain_SDO_pullup",
+      "package": "R0603",
+      "value": "4.7k 1% MCU_3V3 to DRV_SPI_MISO; SPI <=1MHz pending edge/VIH measurement",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "MCU_3V3",
+        "2": "DRV_SPI_MISO"
+      },
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "supplier": "LCSC",
+      "supplierId": "C99782",
+      "sourcing_class": "Exact existing library instance; manufacturer specifications take precedence over carrier description"
+    },
+    {
+      "ref": "U1_VM_C3",
+      "type": "driver_local_bulk",
+      "package": "CAP-SMD_BD10.0-L10.3-W10.3-FD",
+      "value": "33uF +/-20% 100V polarized; VM local bulk >=10uF; retain 4.7uF and 0.1uF ceramics; place at U1 VM/GND",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "BUS+",
+        "2": "GND_SYS"
+      },
+      "mpn": "EEEFK2A330P",
+      "manufacturer": "PANASONIC(松下)",
+      "supplier": "LCSC",
+      "supplierId": "C178571",
+      "sourcing_class": "Exact existing library instance; manufacturer specifications take precedence over carrier description"
+    },
+    {
+      "ref": "R_NEG_U_IN",
+      "type": "CSA_to_negative_comparator_injection_limit",
+      "package": "R0603",
+      "value": "1k 1% CSA_SO_U_RAW to NEG_U; limits U3 input injection during SAFE_5V loss; does not prevent SAFE backfeed or prove safe state",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_U_RAW",
+        "2": "NEG_U"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "YAGEO(国巨)",
+      "supplier": "LCSC",
+      "supplierId": "C22548",
+      "sourcing_class": "Exact existing library instance; manufacturer specifications take precedence over carrier description"
+    },
+    {
+      "ref": "R_NEG_V_IN",
+      "type": "CSA_to_negative_comparator_injection_limit",
+      "package": "R0603",
+      "value": "1k 1% CSA_SO_V_RAW to NEG_V; limits U3 input injection during SAFE_5V loss; does not prevent SAFE backfeed or prove safe state",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_V_RAW",
+        "2": "NEG_V"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "YAGEO(国巨)",
+      "supplier": "LCSC",
+      "supplierId": "C22548",
+      "sourcing_class": "Exact existing library instance; manufacturer specifications take precedence over carrier description"
+    },
+    {
+      "ref": "R_NEG_W_IN",
+      "type": "CSA_to_negative_comparator_injection_limit",
+      "package": "R0603",
+      "value": "1k 1% CSA_SO_W_RAW to NEG_W; limits U3 input injection during SAFE_5V loss; does not prevent SAFE backfeed or prove safe state",
+      "candidate": true,
+      "count_as_IC": false,
+      "quantity": 1,
+      "fit_status": "candidate_base_population",
+      "pin_nets": {
+        "1": "CSA_SO_W_RAW",
+        "2": "NEG_W"
+      },
+      "mpn": "RC0603FR-071KL",
+      "manufacturer": "YAGEO(国巨)",
+      "supplier": "LCSC",
+      "supplierId": "C22548",
+      "sourcing_class": "Exact existing library instance; manufacturer specifications take precedence over carrier description"
+    }
+  ],
+  "procurement_catalog": {
+    "resistor_RC0603FR07": {
+      "manufacturer": "Yageo",
+      "size": "0603",
+      "tolerance": "1%",
+      "power": "0.1W at 70C",
+      "tcr": "±100ppm/C for >100ohm; verify ≤100ohm values",
+      "working_voltage": "75V at rated power; max overload 150V",
+      "value_to_mpn": {
+        "1k": "RC0603FR-071KL",
+        "2.2k": "RC0603FR-072K2L",
+        "4.7k": "RC0603FR-074K7L",
+        "4.7ohm": "RC0603FR-074R7L",
+        "10ohm": "RC0603FR-0710RL",
+        "10k": "RC0603FR-0710KL",
+        "12k": "RC0603FR-0712KL",
+        "18k": "RC0603FR-0718KL",
+        "20k": "RC0603FR-0720KL",
+        "26.7k": "RC0603FR-0726K7L",
+        "47ohm": "RC0603FR-0747RL",
+        "47k": "RC0603FR-0747KL",
+        "100k": "RC0603FR-07100KL",
+        "120ohm": "RC0603FR-07120RL",
+        "180k": "RC0603FR-07180KL",
+        "200k": "RC0603FR-07200KL",
+        "3.01k": "RC0603FR-073K01L",
+        "280k": "RC0603FR-07280KL",
+        "1M": "RC0603FR-071ML",
+        "97.6k": "RC0603FR-0797K6L",
+        "30.1k": "RC0603FR-0730K1L"
+      }
+    },
+    "resistor_RT0603BRD": {
+      "manufacturer": "Yageo",
+      "size": "0603",
+      "tolerance": "0.1%",
+      "power": "0.1W at 70C",
+      "tcr": "±25ppm/C",
+      "working_voltage": "75V table ceiling; continuous limit is min(sqrt(0.1W×R),75V); 162k remains RT0603BRD, 10k bottom parts are separate HoAR MPNs",
+      "value_to_mpn": {
+        "162k": "RT0603BRD07162KL",
+        "10.2k": "RT0603BRD0710K2L"
+      }
+    },
+    "capacitors": {
+      "manufacturer": "TDK for exact listed candidates; selected part numbers are attached to every active capacitor component row.",
+      "notes": "Exact TDK MPNs are attached to active capacitor rows. 100V MLCC effective capacitance at 37.8V and 10V/16V X7R/X7S at operating bias must still be checked against manufacturer bias curves; do not count nominal capacitance as effective.",
+      "confirmed_parts": {
+        "C1608C0G1H102J080AA": "1nF, 50V, C0G, 0603",
+        "C1608C0G1H221J080AA": "220pF, 50V, C0G, 0603",
+        "C1608C0G1H103J080AE": "10nF, 50V, C0G, 0603",
+        "C3225X7R2A225K230AE": "2.2uF, 100V, X7R, 1210",
+        "C3225X7R1C226K250AC": "22uF, 16V, X7R, 1210",
+        "C3225X7R1A106K160AE": "10uF, 10V, X7R, 1210",
+        "C4532X7S2A475K230KB": "4.7uF, 100V, X7S, 1812",
+        "C3225X7R2A104K200AE": "100nF, 100V, X7R, 1210",
+        "C1608X7R1A104K080AE": "100nF, 10V, X7R, 0603",
+        "C1608X7R1C105K080AC": "1uF, 16V, X7R, 0603",
+        "C1608X7R1C474K080AC": "0.47uF, 16V, X7R, 0603",
+        "C1608X7S2A473K080AE": "47nF, 100V, X7S, 0603"
+      }
+    },
+    "inductor": {
+      "manufacturer": "Sumida",
+      "mpn": "CDRH127/LDNP-221MC",
+      "value": "220uH ±20%",
+      "DCR_max": "338mOhm",
+      "Isat_max": "1.45A",
+      "temperature_rise_current_typ": "1.75A",
+      "operating_temperature_max": "100C incl self heating",
+      "source": "Sumida official datasheet Ver2.0 p.2"
+    },
+    "resistor_PT0603FR": {
+      "manufacturer": "Yageo",
+      "size": "0603",
+      "tolerance": "1%",
+      "power": "0.1W at 70C",
+      "tcr": "±200ppm/C",
+      "working_voltage": "0.3V maximum continuous voltage at full rated power",
+      "value_to_mpn": {
+        "0.82ohm": "PT0603FR-070R82L"
+      }
+    },
+    "hall_jumper_shunt_accessory": {
+      "manufacturer": "Preci-Dip",
+      "mpn": "999-19-210-02",
+      "quantity_per_board": 3,
+      "value": "2-position closed-top removable shunt cap, 2.54mm",
+      "source": "https://precidip.com/wp-content/uploads/2024/10/Full-English.pdf#page=123",
+      "status": "exact manufacturer part candidate; separately counted accessory; availability not checked"
+    }
+  },
+  "assembly_accessories": [
+    {
+      "ref": "JP_HALL_SHUNT_CAPS",
+      "type": "2.54mm 2-position removable shunt caps",
+      "manufacturer": "Preci-Dip",
+      "mpn": "999-19-210-02",
+      "quantity": 3,
+      "package": "2-position closed-top female jumper, 2.54mm pitch",
+      "assembly_status": "Separate loose accessory, not PCB primitive or electrical component row. Provide one cap per Hall channel; install only after the Hall output type is known, choosing either pads 1-2 or 2-3 on each 3-pin header.",
+      "source": "https://precidip.com/wp-content/uploads/2024/10/Full-English.pdf#page=123",
+      "notes": "Manufacturer catalog lists 999-19-210-02 as a closed-body 2.54mm jumper with red insulator; current stock not verified."
+    }
+  ],
+  "hall_interface_user_confirmation": {
+    "wire_count": 5,
+    "connector_seller_designation": "H-JSY 5pin 2.0",
+    "designation_source": "seller model, per user",
+    "pitch_mm": 2.0,
+    "supply_V": 5.0,
+    "working_current_mA_reported": 50,
+    "budget_interpretation": "50 mA per motor complete five-wire Hall assembly; not 50 mA per bare sensing IC",
+    "placement_angle_deg_reported": 60,
+    "user_stated_wire_sequence": [
+      "5V",
+      "U",
+      "V",
+      "W",
+      "GND"
+    ],
+    "candidate_board_pin_map": {
+      "1": "5V_BUCK",
+      "2": "HALL_A_RAW (Hall U signal)",
+      "3": "HALL_B_RAW (Hall V signal)",
+      "4": "HALL_C_RAW (Hall W signal)",
+      "5": "GND_SYS"
+    },
+    "signal_note": "Hall U/V/W are logic signals, distinct from power-phase PH_U/PH_V/PH_W",
+    "unresolved": [
+      "physical Pin 1 and mating-face versus wire-exit viewing orientation",
+      "H-JSY housing/latch/mating dimensions; 2.0 mm pitch alone does not prove JST PH compatibility",
+      "open-collector/open-drain versus push-pull output",
+      "output high/low voltage range, edge timing and MCU power-off injection",
+      "electrical phase offset and measured forward/reverse Hall state sequence"
+    ]
+  },
+  "electrical_review_revision": {
+    "intentional_changes": [
+      "RT pin2 GND_SYS to VIN/BUS+",
+      "SDO 4.7k external pullup",
+      "VM local 33uF/100V bulk",
+      "three 1k CSA-to-TLV injection limiting resistors"
+    ],
+    "buck_continuous_350mA_guarantee": false,
+    "safe_loss_injection_limit_only": "Iin <= max(0,V_SO - V_SAFE - clamp_drop)/990ohm; example 3.3V SO, 0V SAFE, 0.5V clamp =>2.83mA per input; SAFE backfeed and fault safe state remain unproven",
+    "human_pcb_design": true,
+    "source_baseline_snapshot": "归档/历史与调试.zip 内 FOC驱动模块/EDA自动化/pre-electrical-review-20261011/外围选型候选.json",
+    "current_expected_connectivity_file": "当前原理图连接.json",
+    "current_component_count": 169,
+    "count_and_description_sync_note": "2026-10-11：当前原生工程已实现COMP4 SAFE欠压接线；158器件、7IC；当前API静态474引脚通过，0致命0错误5警告；闭环和5V新模型为工程筛查，实物未放行。",
+    "safe_undervoltage": "Three existing passive parts replaced (27.4k / 10k / 1nF), PA2/PB0 swapped; retains 158 schematic components / 7 ICs. Physical shutdown and partial supply states remain to test.",
+    "current_source_override_2026_10_21": {
+      "native": "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+      "connectivity_reference": "当前原理图连接.json",
+      "component_count": 169,
+      "pin_count": 506,
+      "Q_BOV_PNP": {
+        "manufacturer_part": "BC857C",
+        "pins": {
+          "1": "BOV_PNP_BASE",
+          "2": "DUMP_5V",
+          "3": "BOV_BK_SRC"
+        },
+        "source_free_text": "Emitter pin 2 is on DUMP_5V; do not use the legacy SAFE_5V-fed BOV simulation as current-source proof."
+      },
+      "exports": "Official raw ENET/BOM were written verbatim from the current API export and match geometry for all pin connections. ENET has two U+FFFD in RSO_W Temperature Coefficient; native P1 retains ±100ppm/℃. Current export SHA ENET=F9A60EFEDE72D927B34456F352788A91807FF69765CD438DE8322D637DB91284; BOM=7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43.",
+      "qualification": "Static pin connection only; official DRC 0 error/6 warnings without item details; post-save reopen NOT_VERIFIED; no physical/hardware qualification.",
+      "net_count": 102,
+      "connected_pins": 491,
+      "unconnected_pins": 15,
+      "source_sha256": {
+        "EPRJ3": "114CAF88E36C054FBB5E58921A47038DBD0FDA3F24884050CC6529190578B5E5",
+        "P1.esch2": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
+        "Schematic1.ecfg": "331CDEE9347659004EC337A2F9230C684E82E9FC97380E19E241F4B754F8EFE9",
+        "PCB1.epcb2": "602A48835A0A37C5E8C57E8221C2F420429A30FF1EBAD2DD87488CBDF8D94D53"
+      },
+      "source_saved": true,
+      "reopen_status": "NOT_VERIFIED: new-session project API timed out twice after save; current session closed by root.",
+      "bov_reference_current": {
+        "U7": "TLV6700DDCR / C2868382",
+        "C_U7": "C1608X7R1A104K080AE / 100nF / 10V",
+        "R_OVTOP": "RC0603FR-071ML / C105578 / 1MΩ",
+        "removed": [
+          "R_OVREF_TOP",
+          "R_OVREF_BOT",
+          "R_OV_HYS"
+        ],
+        "threshold_screen_V": {
+          "turn_on": [
+            39.209,
+            41.724
+          ],
+          "release": [
+            38.318,
+            41.311
+          ]
+        },
+        "source_note": "Current saved source connectivity implemented; post-save reopen NOT_VERIFIED; electrical qualification OPEN."
+      }
+    },
+    "candidate_component_list_status": "Historical 2026-10-11 candidate baseline; current BOV implementation is represented by current_source_override_2026_10_21 and 当前原理图连接.json."
+  },
+  "bov_reference_option_candidate_20261021": {
+    "status": "implemented_in_current_saved_native_source; static connectivity verified; post-save reopen NOT_VERIFIED",
+    "basis": "Saved native source, raw official ENET and API geometry agree on expected pin connectivity and 169/506/102 counts. New-session reopen timed out twice after save. Raw ENET is retained unnormalized despite isolated RSO_W Temperature Coefficient text serialization defect (native ±100ppm/℃; raw ENET ��100ppm/℃).",
+    "baseline_source_sha256": {
+      "P1_esch2": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
+      "official_ENET": "F9A60EFEDE72D927B34456F352788A91807FF69765CD438DE8322D637DB91284"
+    },
+    "expected_after_source_change": {
+      "components": 169,
+      "pins": 506,
+      "nets": 102,
+      "connected_pins": 491,
+      "unconnected_pins": 15,
+      "calculation": "Confirmed actual count: 170 + U7 + C_U7 - R_OVREF_TOP - R_OVREF_BOT - R_OV_HYS = 169; 504 + 6 + 2 - 6 = 506; U3 pin13 and U7 pin1 are NC; 491 connected pins; remove V_OV_REF net to get 102 nets."
+    },
+    "candidate_bom_delta": {
+      "per_board_added": [
+        {
+          "ref": "U7",
+          "manufacturer_part": "TLV6700DDCR",
+          "supplier_id": "C2868382",
+          "quantity": 1,
+          "description": "Use TLV6700 B comparator and internal 400mV reference; project MPN already used at regulator U_SC_OV."
+        },
+        {
+          "ref": "C_U7",
+          "manufacturer_part": "C1608X7R1A104K080AE",
+          "value": "100nF",
+          "supplier_id": "",
+          "quantity": 1,
+          "description": "Local VDD bypass DUMP_5V to GND_SYS."
+        }
+      ],
+      "per_board_removed_refs": [
+        "R_OVREF_TOP",
+        "R_OVREF_BOT",
+        "R_OV_HYS"
+      ],
+      "per_board_changed": {
+        "ref": "R_OVTOP",
+        "from_mpn": "RT0603BRD07162KL",
+        "from_value": "162kΩ",
+        "to_mpn": "RC0603FR-071ML",
+        "to_value": "1.00MΩ",
+        "tolerance": "±1%",
+        "tcr": "±100ppm/°C",
+        "reuse": "Existing FOC U1_BUCK_RCL MPN."
+      },
+      "per_board_net_physical_delta": -1,
+      "two_board_added": 4,
+      "two_board_removed": 6,
+      "two_board_net_physical_delta": -2,
+      "unique_project_mpn_delta": 0,
+      "official_bom": "Current official API BOM written verbatim: 91 grouped rows / 156 board pieces. SHA256 7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43. R_OVTOP Supplier Part C105578; no price or MOQ proof."
+    },
+    "connections": {
+      "U7_TLV6700DDCR": {
+        "1_OUTA": "NC",
+        "2_GND": "GND_SYS",
+        "3_INA+": "GND_SYS",
+        "4_INB-": "VBUS_OV_SENSE",
+        "5_VDD": "DUMP_5V",
+        "6_OUTB": "BUSOV_N"
+      },
+      "C_U7": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS",
+        "mpn": "C1608X7R1A104K080AE",
+        "value": "100nF"
+      },
+      "R_OVTOP": {
+        "1": "BUS",
+        "2": "VBUS_OV_SENSE",
+        "mpn": "RC0603FR-071ML",
+        "value": "1.00MΩ"
+      },
+      "R_OVBOT": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS",
+        "retain": true,
+        "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "value": "10.0kΩ"
+      },
+      "C_OV_SENSE": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS",
+        "retain": true,
+        "mpn": "C1608C0G1H102J080AA",
+        "value": "1nF"
+      },
+      "R_OV_PU": {
+        "1": "DUMP_5V",
+        "2": "BUSOV_N",
+        "retain": true,
+        "mpn": "RC0603FR-074K7L"
+      },
+      "U3_TLV1704AIPWR": {
+        "10_4IN-": "GND_SYS",
+        "11_4IN+": "DUMP_5V",
+        "13_4OUT": "NC",
+        "retain_three_phase_channels": true
+      },
+      "U4_UCC27511ADBVR": {
+        "1_VDD": "DUMP_5V",
+        "2_OUT_H": "DUMP_DRV_OUT",
+        "3_OUT_L": "DUMP_DRV_OUT",
+        "4_GND": "GND_SYS",
+        "5_IN-": "BUSOV_N",
+        "6_IN+": "DUMP_THERM_OK",
+        "retain": true
+      },
+      "removed_net": "V_OV_REF"
+    },
+    "threshold_screen": {
+      "divider_ratio_total": {
+        "min": 99.0132,
+        "max": 103.2783
+      },
+      "Rtop_ohm_full_corner": {
+        "min": 983565,
+        "max": 1020100
+      },
+      "Rbottom_ohm_full_corner": {
+        "min": 9973.76625,
+        "max": 10035.025
+      },
+      "turn_on_V": {
+        "min": 39.209,
+        "max": 41.724
+      },
+      "release_V": {
+        "min": 38.318,
+        "max": 41.311
+      },
+      "internal_thresholds": {
+        "VIT_plus_mV": [
+          396,
+          404
+        ],
+        "VIT_minus_mV": [
+          387,
+          400
+        ],
+        "hysteresis_mV_typ": 5.5,
+        "hysteresis_mV_max": 12,
+        "hysteresis_minimum": "not specified"
+      },
+      "comparisons": {
+        "9S_full_charge_V": 37.8,
+        "lowest_turn_on_margin_V": 1.409,
+        "SMCJ40A_minimum_breakdown_V": 44.4,
+        "highest_turn_on_margin_V": 2.676
+      },
+      "caveat": "Observed source topology is implemented. Threshold values remain independent-corner screens; they exclude TLV6700 INB− current at 0.4V (not specified there), dynamic effects and physical measurement.",
+      "status": "implemented_threshold_screen_only_not_guaranteed"
+    },
+    "hysteresis_and_filter": {
+      "external_feedback": "Remove old 200k BUSOV_N-to-V_OV_REF resistor; it cannot be reused at VBUS_OV_SENSE because value and active polarity are wrong. Do not assume TLV6700 minimum hysteresis; it is unspecified.",
+      "internal_hysteresis_bus_equivalent_V": {
+        "typical_at_nominal_ratio": 0.556,
+        "maximum_from_full_ratio_max": 1.239,
+        "minimum": "not guaranteed"
+      },
+      "C_OV_SENSE": "Retain 1nF C0G. New divider Thevenin resistance ≈9.90kΩ; τ≈9.90µs; 10–90%≈21.8µs. Filtering is not guaranteed DC hysteresis."
+    },
+    "logic_and_failure_states": {
+      "normal_bus": "U7 OUTB high impedance; R_OV_PU raises BUSOV_N; U4 IN- high, so with DUMP_THERM_OK high output is low and Q7 is off.",
+      "overvoltage_and_thermal_contact_closed": "U7 OUTB pulls BUSOV_N low; U4 IN+ high and IN- low, DUMP_DRV_OUT high, Q7 on. Existing Q_BOV_PNP/BC847C path independently asserts BREAK_N.",
+      "thermal_contact_open": "U4 IN+ is pulled low; Q7 off even during BOV. Overvoltage still asserts BREAK_N through the separate BOV transistor path.",
+      "U7_unpowered_DUMP5_alive": "OUTB goes high impedance; BUSOV_N is pulled high, so local BOV fails open.",
+      "DUMP5_lost": "UCC27511A output is held low below its maximum 4.65V rising UVLO; dump path unavailable.",
+      "U7_startup": "Output is guaranteed correct only after VDD exceeds 1.8V for up to 450µs; a BUS already above threshold during rail startup is an unresolved detection delay.",
+      "MCU_state": "MCU GPIO is monitoring only; MCU high/low does not gate local BOV."
+    },
+    "remaining_physical_inputs": [
+      "Battery/BMS rejection regenerative BUS envelope: peak, slew rate, duration and repeated pulses.",
+      "Maximum-speed motor open-circuit and regenerative voltage/current envelope.",
+      "Exact external resistor pulse curve, thermal switch trip/reset temperatures and harness/fuse behavior.",
+      "DUMP_5V and Q7 VGS at 40–46V BUS, during high-temperature steady dump and startup/transient."
+    ],
+    "qualification": "Implemented static connectivity only. Native save true; post-save new-session reopen NOT_VERIFIED. No physical or thermal qualification; 1.8kW/1s/board and 3.6kW/1s two boards remain paper sizing targets.",
+    "resistor_bank": "Two external Vishay LPS0300H2R00FB, 2Ω±1% parallel = 0.99–1.01Ω/board. At current 39.209–41.724V ON screen, paper dissipation is about 1.522–1.758kW/board and 1s energy 1.522–1.758kJ/board; two boards about 3.044–3.517kW. This does not meet the prior 1.8/3.6kW paper target at all screen corners. It is not a confirmed user hard requirement; derive actual limit from measured regen envelope and qualify pulse curve/heatsink/thermostat/harness.",
+    "export_attribute_defect": {
+      "ref": "RSO_W",
+      "property": "Temperature Coefficient",
+      "native_P1": "±100ppm/℃",
+      "official_ENET": "��100ppm/℃ (two U+FFFD)",
+      "action": "Preserved exact API ENET raw text; not normalized. No connectivity difference."
+    }
+  },
+  "cost_replacement_C5334032": {
+    "status": "IMPLEMENTED_IN_CURRENT_SCHEMATIC",
+    "ref": "D_BUSADC_CLAMP",
+    "part": "ElecSuper BZT52C3V6 / C5334032",
+    "package": "SOD-123",
+    "pin1": "BUS_ADC cathode",
+    "pin2": "GND_SYS anode",
+    "unchanged": "180k/10k divider, 1k series, 1nF filter and net mapping",
+    "limits": "Low-current clamp voltage, temperature and MCU-off injection remain OPEN; no PCB changes; all post-schematic work by human."
+  }
+}

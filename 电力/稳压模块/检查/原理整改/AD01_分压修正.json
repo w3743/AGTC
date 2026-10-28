@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "status": "AD01_OVERVOLTAGE_SUBITEM_INTEGRATED_OTHER_HARDWARE_HOLD",
+  "capturedAtLocal": "2026-10-22T01:13:15.219383+08:00",
+  "baseline": {
+    "nativeSha256": "b6db93e570f1375c19f6e6b336029624b456c7cba7024f4899d643164f7e7d57",
+    "bomSha256": "5eb712d38f48b24ec8a799cadc06f9b62a36ecd181956c031763c3ecb1b6c562",
+    "designPlanSha256": "88110f27f146cb8434bba8cdf675e5e6caf149f5d27e278bc24df0d9ec86ad05",
+    "sourceZip": {
+      "path": "检查/原理整改/AD01_修改前源.zip",
+      "sha256": "e4905f56b3df359ab8f53639cd66ab7be93cc435516fbec723eb701efdf8b286",
+      "nativeEntry": "eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2"
+    }
+  },
+  "after": {
+    "nativeSha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+    "bomSha256": "f266d9dadf49b7c9827a9b779ac40b02c85d6c7695f64146536147dcc68af6ae",
+    "designPlanSha256": "d7d29c56dcc6599140d1a4d52bb2f5b186065ccbc688ac6794cc4e3f7f0d1773"
+  },
+  "officialVerification": {
+    "enetPath": "检查/当前官方网表.enet",
+    "enetSha256": "4a06bbc212bda909eb44dbdfd95a26dc0949099348caccf88577e935c32c6ae9",
+    "componentCount": 167,
+    "pinCount": 452,
+    "drc": {
+      "strict": true,
+      "errors": [],
+      "warnings": [],
+      "rawResponsePath": "检查/原理整改/AD01_API原始输出.zip!/ad01-formal-reopen-verification.json"
+    },
+    "savedReopened": true,
+    "sourceNativeSha256": "fe7bd5d4bddc79e65bf6c1a5f1895fb1cd24ee8518f866f6fc3f75e86411f164",
+    "liveApiComponentCount": 167,
+    "liveApiPinCount": 452,
+    "liveApiMismatches": [],
+    "contractMismatches": [],
+    "projectUuid": "6952cb7cd390b897fd299007b770cc00ec05841d5ba0ccdd665403876694f1b0",
+    "pageUuid": "9546dca0bc8bce7f",
+    "rawResponseZip": {
+      "path": "检查/原理整改/AD01_API原始输出.zip",
+      "sha256": "ac411c821d758fe0e4e659f555bd39a0e2d8a27a9b0ccaf3d61a7b910bfec44a"
+    },
+    "sessionClosed": true
+  },
+  "changeProof": {
+    "addedComponents": [
+      "R_BUS_HI2"
+    ],
+    "deletedComponents": [],
+    "pinNetChanges": [
+      {
+        "ref": "R_BUS_HI",
+        "pin": "1",
+        "before": "BUS_EXT",
+        "after": "BUS_HI_MID"
+      }
+    ],
+    "otherExistingPinNetChanges": 0,
+    "channelIdMetadataReindexCount": 9,
+    "metadataDeltas": [
+      {
+        "ref": "SYS_BAT_BUS",
+        "key": "Channel ID",
+        "before": "$1I721",
+        "after": "$1I720"
+      },
+      {
+        "ref": "SC1",
+        "key": "Channel ID",
+        "before": "$1I722",
+        "after": "$1I721"
+      },
+      {
+        "ref": "SC2",
+        "key": "Channel ID",
+        "before": "$1I723",
+        "after": "$1I722"
+      },
+      {
+        "ref": "SC3",
+        "key": "Channel ID",
+        "before": "$1I724",
+        "after": "$1I723"
+      },
+      {
+        "ref": "SC4",
+        "key": "Channel ID",
+        "before": "$1I725",
+        "after": "$1I724"
+      },
+      {
+        "ref": "SC5",
+        "key": "Channel ID",
+        "before": "$1I726",
+        "after": "$1I725"
+      },
+      {
+        "ref": "SC6",
+        "key": "Channel ID",
+        "before": "$1I727",
+        "after": "$1I726"
+      },
+      {
+        "ref": "SC7",
+        "key": "Channel ID",
+        "before": "$1I728",
+        "after": "$1I727"
+      },
+      {
+        "ref": "SC8",
+        "key": "Channel ID",
+        "before": "$1I729",
+        "after": "$1I728"
+      }
+    ],
+    "netPortProcurementFlagCorrections": [
+      {
+        "id": "2c7521a9d3e5cc3e",
+        "name": "BUS_EXT",
+        "Add into BOM": "no",
+        "Convert to PCB": "no"
+      },
+      {
+        "id": "9bf1e83f75207044",
+        "name": "BUS_HI_MID",
+        "Add into BOM": "no",
+        "Convert to PCB": "no"
+      },
+      {
+        "id": "f556102b6b742cb0",
+        "name": "BUS_HI_MID",
+        "Add into BOM": "no",
+        "Convert to PCB": "no"
+      }
+    ],
+    "netPortFlagCorrectionBasis": "Official API exact-ID/name/library assertions and saved false flags; original createNetPort defaults explicitly yes. Three schematic-only labels are excluded from procurement/PCB conversion; electrical components and all 452 pin nets are unchanged. Pre-correction proof preserved inside rawResponseZip/before-port-flags."
+  },
+  "divider": {
+    "upper_total_ohm": 300000,
+    "lower_ohm": 10000,
+    "candidate_multiplier_vbus_over_vadc": 31,
+    "retired_old_multiplier_for_this_candidate": 16,
+    "formula_vbus": "Vbus = Vadc * 31",
+    "formula_vadc_from_raw": "Vadc_estimate = raw / (2^N - 1) * VREFplus (endpoint-scaled estimate; final gain/offset calibration required)",
+    "VDDA_status": "Use VDDA as VREFplus only after verifying the actual board tie/reference configuration; measure/calibrate the active ADC reference.",
+    "tmux_candidate_multiplier": 37.386,
+    "tmux_candidate_status": "separate unimplemented topology only; includes TMUX and output-pulldown loading, not applicable to this direct divider",
+    "adc_dynamic_behavior": "not closed by this candidate; acquisition/settling and ADC input behavior require separate verification",
+    "powered_off_behavior": "not closed by this candidate; MCU-off injection/protection remains unresolved",
+    "review_points": [
+      {
+        "bus_v": 37.8,
+        "nominal_adc_v": 1.2193548387096773,
+        "min_adc_v": 1.2169970028038288,
+        "max_adc_v": 1.2217170901811367
+      },
+      {
+        "bus_v": 69.4,
+        "nominal_adc_v": 2.238709677419355,
+        "min_adc_v": 2.234380740597506,
+        "max_adc_v": 2.2430467211262144
+      },
+      {
+        "bus_v": 80.0,
+        "nominal_adc_v": 2.5806451612903225,
+        "min_adc_v": 2.5756550323890557,
+        "max_adc_v": 2.5856446353039937
+      }
+    ],
+    "scope_of_upper_input": "69.4 V is the existing specified TVS test-point screening value, not proof of the installed transient ceiling; 80 V is an additional component-voltage-boundary screen, not a new normal bus requirement.",
+    "normal_measurement_precondition": "Core/reference powered and valid. This divider change does not qualify core-off or brownout operation."
+  },
+  "cost": {
+    "addedInstances": 1,
+    "newUniqueMpnCount": 0,
+    "mpn": "RT1206BRD07150KL",
+    "supplierCode": "C728671",
+    "addedInstalledCostCny": null,
+    "status": "CNY exact quote not verified"
+  },
+  "boundaries": [
+    "No firmware present or flashed",
+    "Powered-off backfeed and ADC dynamic qualification remain open",
+    "AFE/per-cell hard permit, 0V startup and bidirectional isolation remain HOLD",
+    "8 fixed LICAP capacitors; no 1-second hard requirement"
+  ]
+}

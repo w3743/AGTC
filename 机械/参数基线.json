@@ -1,0 +1,2427 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-10-21",
+  "scope": "只读机械/控制/感知参数基线；已只读读取SolidWorks车、炮台和双目支架默认配置，提取CAD实体极值与装配引用。CAD质量/质心仅为未资格计算，实车值仍按未知记录。未运行仿真/训练/硬件。",
+  "mechanical_prototype_stage": {
+    "status": "cad_schematic_only",
+    "scope": "整车机械样机",
+    "mechanical_prototype_fabricated": false,
+    "as_of": "2026-10-22",
+    "source": {
+      "kind": "user_fact_transmitted_via_coordinator",
+      "date": "2026-10-22",
+      "statement_as_transmitted": "目前只有CAD和原理图，尚未制作。"
+    },
+    "note": "仅描述整车机械样机状态，不表示没有既有板端/传感器台架测试；制作前仍可继续CAD装配/坐标复核与材料数据选型。"
+  },
+  "source_catalog": [
+    {
+      "source_id": "sim_agents",
+      "path": "算法/仿真训练环境/AGENTS.md",
+      "source_kind": "text",
+      "sha256": "55e84cde5b158d7800191bef2614af53f5206caee746e09967cfcbe73dd886bc",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "asset_spec",
+      "path": "算法/仿真训练环境/isaac_field/assets.py",
+      "source_kind": "text",
+      "sha256": "d6e5f07e6c6170dd04dfb7c7febd187a811eaa8886fea1e976b2bc3521da41f0",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "isaac_state",
+      "path": "算法/仿真训练环境/ISAAC_LAB.md",
+      "source_kind": "text",
+      "sha256": "7cfa2b1836fe3589acc00cda9f1e87bacde68bb8090a1c473725bbf6b64e18dc",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "sim_usage",
+      "path": "算法/仿真训练环境/使用说明.md",
+      "source_kind": "text",
+      "sha256": "a6320ed8c9cc2e0bb4deb109b9cd30b7ffd2f63daa72d053687850f610f2e7ec",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "foc_readme",
+      "path": "电力/FOC驱动模块/README.md",
+      "source_kind": "text",
+      "sha256": "8f018659c2e82891771486b069b9c14e3f8599208b5482f840736a5d27996d98",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "motor_evidence",
+      "path": "电力/FOC驱动模块/参考资料/电机资料/N5065参数证据.md",
+      "source_kind": "text",
+      "sha256": "b39466641e45c81bc37331d21e3a52ae902c2d77b93124ef0f5eb171c1d840d8",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "stereo_usage",
+      "path": "算法/视觉算法/软件/stereo/使用说明.md",
+      "source_kind": "text",
+      "sha256": "00a166ec9d85edad61240bbe857223beac9b2612c5f3e394db4e4e267c2f7375",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "stereo_current",
+      "path": "算法/视觉算法/软件/stereo/calibration/current/report.md",
+      "source_kind": "text",
+      "sha256": "aa26bd55f19052b6f4788e8ad71ea12cf37deda557c316ce88fd7a6b412f5b7c",
+      "line_numbering": "1-based"
+    },
+    {
+      "source_id": "mech_car",
+      "path": "机械/车.SLDASM",
+      "source_kind": "binary_cad",
+      "sha256": "377f19a2d1f59456dd151117f997008a90e343878a772a8127f0efb5e54bdb87"
+    },
+    {
+      "source_id": "mech_turret",
+      "path": "机械/炮台.SLDASM",
+      "source_kind": "binary_cad",
+      "sha256": "9152e14a5be3761ad56535ea42ecde9df8089578dfe8ea08086ef164f16a65ea"
+    },
+    {
+      "source_id": "mech_slip_ring",
+      "path": "机械/标准件/滑环.SLDPRT",
+      "source_kind": "binary_cad",
+      "sha256": "d69b09b5d3b8a346215948f7842067615dbc778e9ad570ba9f264754658eadd3"
+    },
+    {
+      "source_id": "stereo_bracket",
+      "path": "算法/RK3588平台/硬件/外壳/双目支架.SLDPRT",
+      "source_kind": "binary_cad",
+      "sha256": "1457c4532cd3add80a35650f36aed9f8820040a58cd4e88ef775e328982d08c0"
+    }
+  ],
+  "groups": {
+    "documented": [
+      {
+        "id": "vehicle_mass_nominal",
+        "label": "文档化整车质量基线",
+        "value": 30,
+        "unit": "kg",
+        "reference_frame": "整车；文档未定义是否含额外载荷或所有附件",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "30kg；车身0.8×0.3m，300mm不含履带；整车最外宽470mm。"
+          }
+        ],
+        "interface_impact": "影响牵引、地压、越障、结构和制动预算。",
+        "validation_gap": "30kg仅为项目文档设计基线，尚未独立称重。[post_fabrication_qualification] 整车机械样机完成后按实际电池/炮台/传感器/载荷配置称重；制作前可继续BOM、材料输入与CAD质量属性核对。"
+      },
+      {
+        "id": "vehicle_body_envelope",
+        "label": "车身外廓（不含履带）",
+        "value": {
+          "length_m": 0.8,
+          "width_m": 0.3
+        },
+        "unit": "m",
+        "reference_frame": "车辆纵向/横向车身外廓；CAD坐标原点和测量基准未核",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "车身0.8×0.3m，300mm不含履带。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 60,
+            "line_end": 64,
+            "evidence": "body_length_m: float = 0.8; body_width_m: float = 0.3; body_height_m is an asset-generation proxy."
+          },
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "SolidWorks车.SLDASM默认配置实体极值：原生CAD轴XYZ跨度0.310/0.414437/0.813658m（44个solid body）；CAD轴未映射车辆纵/横/高轴，5个零实体part实例不贡献边界。"
+          }
+        ],
+        "interface_impact": "决定碰撞包络、履带侧向空间、炮台/云台和相机间隙。",
+        "validation_gap": "CAD可先核对原生轴向映射、总装建模范围及0.8×0.3m“不含履带”定义；[post_fabrication_qualification] 样机完成后再核测实际外廓。当前CAD实体极值不能直接映射车长/宽/高。"
+      },
+      {
+        "id": "vehicle_overall_width",
+        "label": "整车最外宽",
+        "value": 0.47,
+        "unit": "m",
+        "reference_frame": "左右履带最外侧之间；横向基准",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "整车最外宽470mm。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 78,
+            "line_end": 80,
+            "evidence": "User-confirmed 470 mm overall width includes 60 mm tracks on both sides; their center separation is therefore 410 mm."
+          }
+        ],
+        "interface_impact": "用于场景碰撞包络、田间行距适配和上车平台间隙。",
+        "validation_gap": "可先从CAD复核履带/附件最外侧宽度及轴向；[post_fabrication_qualification] 整车机械样机完成后核测实际最外宽。"
+      },
+      {
+        "id": "track_band_width",
+        "label": "单侧履带带宽",
+        "value": 0.06,
+        "unit": "m",
+        "reference_frame": "单条履带接地带宽；车体横向",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "每侧履带宽60mm。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 70,
+            "line_end": 72,
+            "evidence": "User-confirmed track width; the wheel cylinders are proxies for this contact band."
+          }
+        ],
+        "interface_impact": "影响地压、田垄/株距通行和接触损伤模型。",
+        "validation_gap": "可先核对CAD履带实体/节块和带宽定义；[post_fabrication_qualification] 样机装配后再测实际接地带宽。仿真圆柱宽度仅为代理。"
+      },
+      {
+        "id": "track_center_separation",
+        "label": "左右履带中心距",
+        "value": 0.41,
+        "unit": "m",
+        "reference_frame": "左右履带接地带中心线之间；横向",
+        "status": "derived",
+        "source": [
+          {
+            "source_id": "asset_spec",
+            "line_start": 78,
+            "line_end": 80,
+            "evidence": "0.47 m overall width includes 0.06 m tracks; their center separation is therefore 410 mm."
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 362,
+            "line_end": 364,
+            "evidence": "0.41 m center separation derived; 0.30 m body width excludes tracks."
+          }
+        ],
+        "interface_impact": "影响差速转向角速度、轮间约束位置和跨障姿态。",
+        "validation_gap": "可先由CAD装配基准复核左右履带中心距与轴定义；[post_fabrication_qualification] 制作后再核实际装配尺寸。"
+      },
+      {
+        "id": "track_ground_contact_length",
+        "label": "履带接地长度",
+        "value": 0.595,
+        "unit": "m",
+        "reference_frame": "单侧履带沿车辆纵向的接地长度",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "接地595mm。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 73,
+            "line_end": 76,
+            "evidence": "Hardware-confirmed track geometry. These describe the drivetrain and contact span."
+          }
+        ],
+        "interface_impact": "影响地压、茎秆损伤几何、轮/履带位置分布和越障。",
+        "validation_gap": "可先核对CAD履带接地几何、节距和张紧设计；[post_fabrication_qualification] 样机装配后确认真实接地长度与张紧状态。"
+      },
+      {
+        "id": "nominal_top_speed",
+        "label": "最高速度项目基线",
+        "value": 15,
+        "unit": "km/h",
+        "reference_frame": "车辆相对地面的纵向速度",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 58,
+            "evidence": "最高15km/h。"
+          }
+        ],
+        "interface_impact": "决定电机转速、减速器、轮系和感知/制动时延预算。",
+        "validation_gap": "未找到实车测速、速度换算或负载条件；该数值不能视作已验证性能。"
+      },
+      {
+        "id": "drive_motor_configuration",
+        "label": "行走电机项目选型",
+        "value": "2 × BDUAV N5065，270 KV，7极对（14极）",
+        "unit": "电机数量；KV；极对",
+        "reference_frame": "左右两侧驱动电机",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 59,
+            "line_end": 59,
+            "evidence": "两台BDUAV N5065 270KV。"
+          },
+          {
+            "source_id": "foc_readme",
+            "line_start": 3,
+            "line_end": 3,
+            "evidence": "FOC电机输入已由用户确认：BDUAV N5065、270 KV、7极对。"
+          },
+          {
+            "source_id": "motor_evidence",
+            "line_start": 3,
+            "line_end": 7,
+            "evidence": "卖家参数图片不构成独立测量；用户已确认选用BDUAV N5065 270 KV、7极对。"
+          }
+        ],
+        "interface_impact": "影响FOC电流/电角速度换算、减速器和整车转速/牵引能力接口。",
+        "validation_gap": "型号已确认但实物型号一致性、持续电流/功率和实车能力仍需到货及负载验证。"
+      },
+      {
+        "id": "drive_reduction_ratio",
+        "label": "驱动减速比",
+        "value": 4.0,
+        "unit": "ratio",
+        "reference_frame": "电机与主动轮之间；输入/输出方向约定未核",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 59,
+            "line_end": 59,
+            "evidence": "4:1减速。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 73,
+            "line_end": 77,
+            "evidence": "Hardware-confirmed track geometry; drive_reduction_ratio: float = 4.0."
+          }
+        ],
+        "interface_impact": "决定电机RPM到主动轮RPM、转矩和闭环反馈换算。",
+        "validation_gap": "可先用CAD/传动设计核对4:1对应的级数、输入输出轴与方向约定；[post_fabrication_qualification] 样机驱动链装好后再用实测轴速核验。"
+      },
+      {
+        "id": "active_drive_sprocket_diameter",
+        "label": "主动轮直径",
+        "value": 0.06,
+        "unit": "m",
+        "reference_frame": "驱动履带的主动轮外径",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 59,
+            "line_end": 59,
+            "evidence": "主动轮直径60mm。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 375,
+            "line_end": 376,
+            "evidence": "User-confirmed 60 mm active drive sprocket is separate from 45 mm rotating support-roller proxies."
+          }
+        ],
+        "interface_impact": "与减速比共同决定履带线速度和牵引速度换算。",
+        "validation_gap": "可先从CAD复核主动轮齿顶/节圆及其直径定义；[post_fabrication_qualification] 样机装配后核实际零件尺寸。45mm仿真支承轮代理值不可代用。"
+      },
+      {
+        "id": "gimbal_center_height_nominal",
+        "label": "云台中心名义离地高度",
+        "value": 0.4,
+        "unit": "m",
+        "reference_frame": "地面至云台/传感器安装中心的名义高度",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 63,
+            "line_end": 63,
+            "evidence": "云台中心离地.4m。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 343,
+            "line_end": 347,
+            "evidence": "cameraHeightAboveGroundProxyM = reference_height_m + gimbal_offset_z_m."
+          }
+        ],
+        "interface_impact": "影响相机/雷达视场、地面点投影、深度和目标定位变换。",
+        "validation_gap": "可先在CAD中核对名义中心高度、车体基准面、云台零点和传感器偏置；[post_fabrication_qualification] 样机安装后复测实际高度与安装偏差。"
+      },
+      {
+        "id": "gimbal_pitch_limits",
+        "label": "云台俯仰范围",
+        "value": [
+          -25,
+          60
+        ],
+        "unit": "deg",
+        "reference_frame": "云台俯仰关节相对零位；零位基准未核",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 63,
+            "line_end": 63,
+            "evidence": "俯仰−25°..60°。"
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 85,
+            "line_end": 85,
+            "evidence": "pitch_limits_deg: tuple[float, float] = (-25.0, 60.0)."
+          }
+        ],
+        "interface_impact": "限制相机和雷达覆盖、目标对准、传感器时变外参。",
+        "validation_gap": "可先复核CAD关节轴和设计角限位；[post_fabrication_qualification] 样机装配后核真实硬止挡、零位和回差。"
+      },
+      {
+        "id": "gimbal_sensor_motion_relationship",
+        "label": "云台上传感器随动关系",
+        "value": {
+          "camera_and_x2_lidar_follow_pitch": true,
+          "atk_imu901_rotates_with_yaw_and_pitch": true
+        },
+        "unit": "boolean relations",
+        "reference_frame": "云台关节到相机、X2雷达与IMU安装框架",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 61,
+            "line_end": 63,
+            "evidence": "ATK-IMU901为10轴、随云台偏航和俯仰一起动；雷达/相机一起俯仰。"
+          }
+        ],
+        "interface_impact": "任何传感器投影、姿态融合或地面坐标变换都需使用关节角和时间戳。",
+        "validation_gap": "云台/传感器的设计随动关系及名义安装坐标可继续用CAD核对；[post_fabrication_qualification] 最终安装后的运动关系和外参需在样机上实核。云台IMU不是车体IMU。"
+      },
+      {
+        "id": "sensor_and_drive_feedback_readbacks",
+        "label": "文档记录的反馈量及集成状态",
+        "value": {
+          "gimbal_axes": [
+            "angle",
+            "rate"
+          ],
+          "left_right_drive": [
+            "current",
+            "mechanical_rpm"
+          ],
+          "hardware_serial_can_hal_integration": "not completed"
+        },
+        "unit": "signal names/status",
+        "reference_frame": "云台两轴和左右驱动器；采样轴/单位未核",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 61,
+            "line_end": 62,
+            "evidence": "云台两轴实测角度/速率、左右驱动电流/机械RPM均可回读；未完成实机串口/CAN/HAL联调。"
+          }
+        ],
+        "interface_impact": "作为控制器反馈和状态估计入口；RPM轴/单位与数据时龄决定履带速度和制动反馈。",
+        "validation_gap": "信号合同、单位与接口设计可继续推进；[post_fabrication_qualification] 整车驱动/云台系统装配后核反馈取样轴、频率、延迟、单位及噪声。"
+      },
+      {
+        "id": "stereo_calibration_grid_square",
+        "label": "双目标定屏幕棋盘格距",
+        "value": 24.2,
+        "unit": "mm",
+        "reference_frame": "标定屏幕棋盘平面；相邻方格边长",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "stereo_usage",
+            "line_start": 41,
+            "line_end": 43,
+            "evidence": "新版屏幕实测横向连续5格总宽121 mm、纵向连续5格总高121 mm，因此每格均为24.2 mm。"
+          }
+        ],
+        "interface_impact": "决定相机内参与双目基线拟合的尺度输入。",
+        "validation_gap": "文档记为屏幕实测，但本次未复核屏幕或原始测量记录；不是机器人外形测量。"
+      },
+      {
+        "id": "stereo_historical_hand_baseline",
+        "label": "双目镜头间距历史手测参照",
+        "value": 95,
+        "unit": "mm",
+        "reference_frame": "两镜头间距的历史手测；测量端点定义未核",
+        "status": "design_documented",
+        "source": [
+          {
+            "source_id": "stereo_usage",
+            "line_start": 11,
+            "line_end": 11,
+            "evidence": "95 mm镜头间距仅为历史手测参照，不作为拟合约束。"
+          }
+        ],
+        "interface_impact": "只作历史比较背景，不能替代当前校准基线或机器人安装外参。",
+        "validation_gap": "历史手测值未作为拟合约束，也无独立复测记录。"
+      },
+      {
+        "id": "stereo_calibration_quality_status",
+        "label": "当前双目几何标定状态",
+        "value": "geometry_pass_metric_accuracy_unverified",
+        "unit": "status",
+        "reference_frame": "3840×2160原始双目图像坐标系",
+        "status": "derived",
+        "source": [
+          {
+            "source_id": "stereo_current",
+            "line_start": 3,
+            "line_end": 5,
+            "evidence": "状态：geometry_pass_metric_accuracy_unverified；17组新照片，前12组计算、后5组独立验收。"
+          },
+          {
+            "source_id": "stereo_current",
+            "line_start": 17,
+            "line_end": 19,
+            "evidence": "几何门槛通过；手工测量的基线未参与约束。"
+          },
+          {
+            "source_id": "stereo_current",
+            "line_start": 25,
+            "line_end": 25,
+            "evidence": "板端加载参数校验通过；运行性能不代表实物距离精度验证通过。"
+          }
+        ],
+        "interface_impact": "当前几何校正已部署，但不能把深度输出直接当作验证过的实物距离或地图。",
+        "validation_gap": "离车相机几何/米制距离可用现有双目/RK3588台架继续验证；车辆安装外参与装车后的综合精度属post-fabrication_qualification。当前geometry_pass_metric_accuracy_unverified状态保持。"
+      },
+      {
+        "id": "stereo_optical_center_spacing_estimate",
+        "label": "双目光心间距拟合估计值",
+        "value": 96.29,
+        "unit": "mm",
+        "reference_frame": "当前标定报告中的左右相机光心间距",
+        "status": "derived",
+        "source": [
+          {
+            "source_id": "stereo_current",
+            "line_start": 15,
+            "line_end": 19,
+            "evidence": "估计光心间距96.29 mm；手工测量的基线未参与约束。"
+          }
+        ],
+        "interface_impact": "决定由视差恢复米制Z深度的尺度。",
+        "validation_gap": "这是标定拟合估计，不是独立机械测量；实际距离精度未验证。"
+      }
+    ],
+    "simulation": [
+      {
+        "id": "sim_robot_proxy_geometry",
+        "label": "仿真车体/支承轮代理几何",
+        "value": {
+          "body_length_m": 0.8,
+          "body_width_m": 0.3,
+          "body_height_m": 0.15,
+          "support_roller_radius_m": 0.045,
+          "roller_width_m": 0.06,
+          "rollers_per_side": 7,
+          "roller_axis_z_m": -0.105,
+          "continuous_track_model": false,
+          "gimbal_offset_from_base_m": 0.25
+        },
+        "unit": "m; count",
+        "reference_frame": "Isaac FieldSim局部代理模型；车体+履带滚轮+云台",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "asset_spec",
+            "line_start": 56,
+            "line_end": 85,
+            "evidence": "Explicit proxy dimensions and masses; body height is an asset-generation proxy; 7 wheels per side; 45mm support-roller radius."
+          }
+        ],
+        "interface_impact": "决定仿真碰撞、支承接触、轮位和相机高度，不能替代CAD或连续履带动力学。",
+        "validation_gap": "代理尺寸/质量非实测；连续履带、张紧和真实履带接触未建模。"
+      },
+      {
+        "id": "sim_front_guide_proxy",
+        "label": "仿真前导向轮代理",
+        "value": {
+          "count": 2,
+          "center_x_forward_m": 0.42,
+          "axis_height_above_support_m": 0.05,
+          "radius_m": 0.045,
+          "width_m": 0.06,
+          "mass_each_kg": 0.25,
+          "rotation_coupling": "same_side_track_speed",
+          "independent_actuator": false
+        },
+        "unit": "m; kg; count",
+        "reference_frame": "仿真车体局部坐标；x向前，z高于支承轮轴",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "asset_spec",
+            "line_start": 133,
+            "line_end": 148,
+            "evidence": "Trial proxy; dimensions are explicit modeling assumptions, not measurements; x=0.42m, z offset=0.05m, radius=0.045m, width=0.06m, mass=0.25kg."
+          }
+        ],
+        "interface_impact": "用于仿真轮系接触及本侧速度联动；不增加执行器/PID或扭矩额度。",
+        "validation_gap": "实际导向轮位置、质量、半径和接触几何未从CAD/实车核验。"
+      },
+      {
+        "id": "sim_mass_allocation_with_guides",
+        "label": "启用前导向轮时的仿真质量分配",
+        "value": {
+          "total_mass_kg": 30.0,
+          "chassis_without_guides_kg": 26.4,
+          "support_rollers_14_each_kg": 0.25,
+          "gimbal_links_2_each_kg": 0.05,
+          "guide_wheels_2_each_kg": 0.25,
+          "chassis_mass_after_guide_deduction_kg": 25.9
+        },
+        "unit": "kg",
+        "reference_frame": "仿真代理质量组件；仅该资产生成配置",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "asset_spec",
+            "line_start": 65,
+            "line_end": 68,
+            "evidence": "total_mass_kg=30.0, chassis_mass_kg=26.4, wheel_mass_kg=0.25, gimbal_link_mass_kg=0.05."
+          },
+          {
+            "source_id": "asset_spec",
+            "line_start": 318,
+            "line_end": 336,
+            "evidence": "Guide mass is subtracted from proxy chassis mass before assembled mass is authored."
+          }
+        ],
+        "interface_impact": "用于仿真惯性/接触计算；不得据此证明实车含导向轮后质量仍为30kg。",
+        "validation_gap": "仿真通过扣减代理车体质量维持30kg；实车配置称重和附件/载荷边界未知。"
+      },
+      {
+        "id": "sim_drive_control_surrogate",
+        "label": "仿真驱动控制近似",
+        "value": {
+          "actuated_wheels": 14,
+          "torque_limit_per_wheel_nm": 2.0,
+          "proportional_gain": 0.04,
+          "side_integral_gain": 0.1,
+          "motor_torque_constant_nm_per_a": 0.035,
+          "efficiency": 1.0,
+          "full_two_motor_drivetrain": false
+        },
+        "unit": "count; N·m; gains; N·m/A; ratio",
+        "reference_frame": "仿真左右履带分配到14个轮执行器；非实车电机模型",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 60,
+            "line_end": 60,
+            "evidence": "45mm代理轮半径不同于30mm主动轮；P.04、Ki.1、2Nm/轮、Kt.035和效率1均未标定；14个轮执行器仍不是两台实车电机的完整模型。"
+          },
+          {
+            "source_id": "isaac_state",
+            "line_start": 12,
+            "line_end": 12,
+            "evidence": "原14个负重轮执行器各保持2 Nm限幅；P=0.04、侧积分Ki=0.1；参数仍需实车标定。"
+          }
+        ],
+        "interface_impact": "当前策略动作不是直接实测电机电流、车体速度或真实牵引力。",
+        "validation_gap": "需在两台驱动电机、真实减速比、左右履带和负载条件下标定速度/转矩/电流闭环。"
+      },
+      {
+        "id": "sim_surface_friction",
+        "label": "仿真接触摩擦系数",
+        "value": 0.8,
+        "unit": "dimensionless",
+        "reference_frame": "仿真接触材料参数",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "isaac_state",
+            "line_start": 12,
+            "line_end": 12,
+            "evidence": "摩擦系数0.8；以上参数仍需实车标定。"
+          }
+        ],
+        "interface_impact": "改变加速、滑移、转弯和制动效果。",
+        "validation_gap": "缺硬地/农田实测摩擦和含水、土质、履带状态条件。"
+      },
+      {
+        "id": "sim_rough_field_profile",
+        "label": "训练用崎岖场景假设",
+        "value": {
+          "field_size_m": [
+            100,
+            100
+          ],
+          "terrain_amplitude_budget_m": 0.35,
+          "wavelength_range_m": [
+            4,
+            10
+          ],
+          "plants": 0,
+          "independent_rocks": 0
+        },
+        "unit": "m; count",
+        "reference_frame": "Isaac训练世界；非实测田块",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "isaac_state",
+            "line_start": 31,
+            "line_end": 31,
+            "evidence": "零植物、零独立岩石、崎岖连续地形；100×100m、幅值预算0.35m、波长4–10m。"
+          },
+          {
+            "source_id": "sim_usage",
+            "line_start": 75,
+            "line_end": 80,
+            "evidence": "地形100×100m；障碍植物0、独立岩石0。"
+          }
+        ],
+        "interface_impact": "界定当前训练覆盖范围，不包含真实植被避障或完整农田地形分布。",
+        "validation_gap": "需采集目标农田高程/土质/障碍分布；现有植物零值不能支持避苗能力结论。"
+      },
+      {
+        "id": "sim_crop_geometry_assumption",
+        "label": "玉米行作场景假设",
+        "value": {
+          "plant_height_m_approx": 1.0,
+          "row_spacing_m": 0.8,
+          "in_row_spacing_m": 0.3,
+          "plant_states": [
+            "healthy",
+            "dry_leaf_mixed",
+            "occluded"
+          ]
+        },
+        "unit": "m; categorical states",
+        "reference_frame": "训练/环境场景输入；未见目标田实测来源",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 64,
+            "line_end": 64,
+            "evidence": "玉米约1m，行距.8m、株距.3m，允许健康/干叶混合/遮挡。"
+          }
+        ],
+        "interface_impact": "影响检测、路径间隙、避苗和单点测距工况。",
+        "validation_gap": "为场景参数，未找到田间抽样和作物阶段统计。"
+      },
+      {
+        "id": "sim_policy_io_contract",
+        "label": "仿真策略输入/动作接口",
+        "value": {
+          "observations": {
+            "lidar": "1×400",
+            "depth": "1×160×88 axial Z",
+            "detections": "16×8",
+            "state": 33,
+            "feedback": 37
+          },
+          "actions": [
+            "left_track_target_speed",
+            "right_track_target_speed",
+            "gimbal_yaw_rate",
+            "gimbal_pitch_rate"
+          ],
+          "action_range": [
+            -1,
+            1
+          ]
+        },
+        "unit": "tensor dimensions; normalized command",
+        "reference_frame": "sensor-minimal-v6仿真策略接口",
+        "status": "simulation_config",
+        "source": [
+          {
+            "source_id": "sim_usage",
+            "line_start": 109,
+            "line_end": 118,
+            "evidence": "LiDAR 1×400；深度1×160×88；反馈37；动作4维：左右履带目标速度、云台偏航/俯仰速率，归一化[-1,1]。"
+          }
+        ],
+        "interface_impact": "在控制/感知集成时需匹配动作语义、传感器尺寸、反馈有效位和时龄。",
+        "validation_gap": "归一化动作到实机单位/驱动器命令的转换合同未验证；仿真Iq/RPM为等效量。"
+      }
+    ],
+    "unknown": [
+      {
+        "id": "physical_center_of_mass",
+        "label": "实车质心位置",
+        "value": null,
+        "unit": "m",
+        "reference_frame": "车体坐标系；坐标原点/含载荷配置未定",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "车.SLDASM默认配置已只读读取；CAD原始MassProperty返回质量/质心，但aggregate density=1000kg/m3、49个part材料名均为空、5个part实例无solid body，装配完整性/坐标映射未资格，非实车测量。"
+          },
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 60,
+            "evidence": "文档给出30kg和外廓；代理模型使用估算质量分配。"
+          }
+        ],
+        "interface_impact": "影响倾覆边界、姿态控制、传感器稳定和制动。",
+        "validation_gap": "实车质量分布/质心值仍为null，属[post_fabrication_qualification]，当前没有已制作的机械样机可称重。制作前可继续核对CAD轴向/装配范围、补齐零实体组件并依据具体材料牌号与密度复核设计CAD质量属性；历史CAD材料名空/聚合密度1000kg/m3仍未资格。"
+      },
+      {
+        "id": "physical_inertia_tensor",
+        "label": "实车惯量张量",
+        "value": null,
+        "unit": "kg·m²",
+        "reference_frame": "车体质心；车体坐标轴",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "车.SLDASM默认配置和实体树已读取；本次只读原始质量/体积/密度/质心与override状态，未导出惯量张量；CAD质量属性未资格。"
+          },
+          {
+            "source_id": "mech_turret",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "炮台.SLDASM默认配置、组件树和原始质量属性已读取；未导出组合件惯量张量，密度/材料未资格。"
+          }
+        ],
+        "interface_impact": "影响姿态/云台耦合、转向响应和控制器标定。",
+        "validation_gap": "实车惯量测量属[post_fabrication_qualification]，当前无机械样机，值保持null。制作前仍可在材料牌号/密度明确后导出设计CAD惯量、核对装配范围和参考轴；本次未导出CAD惯量张量，仿真代理值不能代替实车值。"
+      },
+      {
+        "id": "payload_capacity",
+        "label": "额定载荷/炮台载荷能力",
+        "value": null,
+        "unit": "kg",
+        "reference_frame": "整车与炮台安装接口",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "车.SLDASM默认配置的50个递归组件实例已读取，raw CAD质量属性未资格；未做紧固、结构强度或施加载荷分析。"
+          },
+          {
+            "source_id": "mech_turret",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "炮台.SLDASM默认配置的6个组件实例已读取，raw CAD质量属性未资格；未做连接、结构强度或载荷分析。"
+          }
+        ],
+        "interface_impact": "影响30kg车辆质量口径、质心、履带地压和稳定控制。",
+        "validation_gap": "额定载荷与连接强度可先按CAD结构、材料牌号/性能和安装面开展设计核验；样机完成后的静载/负载试验用于[post_fabrication_qualification]，当前无已测载荷能力。"
+      },
+      {
+        "id": "physical_support_roller_geometry",
+        "label": "实车支承轮/履带链节几何",
+        "value": null,
+        "unit": "m; mm",
+        "reference_frame": "履带纵向与横向；单个轮/链节",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 59,
+            "line_end": 60,
+            "evidence": "45mm代理轮半径不同于30mm主动轮。"
+          },
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "装配文件未解析，未核实轮径、节距、张紧及真实接地轮廓。"
+          }
+        ],
+        "interface_impact": "决定履带速度、接地压力、越障和同侧轮运动学。",
+        "validation_gap": "可先从CAD核对支承轮/链节几何、节距和张紧设计；[post_fabrication_qualification] 样机装配后再测实际滚轮尺寸与履带接触。45mm仍仅为仿真代理。"
+      },
+      {
+        "id": "verified_vehicle_speed",
+        "label": "实车最高速度实测值",
+        "value": null,
+        "unit": "km/h",
+        "reference_frame": "车辆相对地面；负载/地面条件未定",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 58,
+            "line_end": 59,
+            "evidence": "文档列最高15km/h；未记录旋转一圈时间，也未称已标定。"
+          },
+          {
+            "source_id": "isaac_state",
+            "line_start": 12,
+            "line_end": 12,
+            "evidence": "仿真驱动参数仍需实车标定。"
+          }
+        ],
+        "interface_impact": "决定控制指令缩放、感知时延、停止距离和功率上限。",
+        "validation_gap": "15km/h仅为文档设计基线。[post_fabrication_qualification] 真实机械样机完成后，在空载/载荷及不同地面条件下测速；当前不要求提供未制作样机的实测值。"
+      },
+      {
+        "id": "turn_time_and_turn_rate",
+        "label": "实车原地旋转时间/角速度",
+        "value": null,
+        "unit": "s/rev; rad/s",
+        "reference_frame": "车体绕垂直轴；左右履带命令及地面条件",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 59,
+            "line_end": 59,
+            "evidence": "硬地和农田均能原地转向。转一圈用时暂缺。"
+          }
+        ],
+        "interface_impact": "决定差速转向映射、路径跟踪和底盘安全边界。",
+        "validation_gap": "原地转向时间/角速度属[post_fabrication_qualification]，机械样机完成后测完整转圈时间、半径与滑移；当前可继续完善CAD传动/履带接口和控制设计。"
+      },
+      {
+        "id": "braking_response",
+        "label": "实车制动能力",
+        "value": null,
+        "unit": "m/s²; m; s",
+        "reference_frame": "车辆纵向制动；速度、载荷、坡度与地面条件",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_usage",
+            "line_start": 46,
+            "line_end": 55,
+            "evidence": "仿真到点条件使用目标距离、真实仿真速度/角速度与保持时间；为策略终止条件。"
+          },
+          {
+            "source_id": "sim_agents",
+            "line_start": 62,
+            "line_end": 62,
+            "evidence": "未完成实机串口/CAN/HAL联调。"
+          }
+        ],
+        "interface_impact": "影响快速停车任务、安全裕度和电驱/能量吸收边界。",
+        "validation_gap": "实车减速度、停止距离、回馈和失电制动边界属[post_fabrication_qualification]，须在机械样机和驱动系统完成后按安全条件测试；当前值保持null，设计安全分析仍可先行。"
+      },
+      {
+        "id": "encoder_and_drive_feedback_calibration",
+        "label": "编码器分辨率、RPM取样轴和换算",
+        "value": null,
+        "unit": "counts/rev; RPM; Hz; ms",
+        "reference_frame": "电机轴/减速后主动轮轴/履带；实际取样轴未确认",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 61,
+            "line_end": 62,
+            "evidence": "驱动机械RPM可回读；通道单位、噪声和接口尚待实机核实；硬件联调未完成。"
+          },
+          {
+            "source_id": "sim_usage",
+            "line_start": 115,
+            "line_end": 118,
+            "evidence": "仿真左右等效Iq/RPM及有效性/时龄；仿真等效量非实机测量。"
+          }
+        ],
+        "interface_impact": "决定真实履带速度估计、差速里程计、反馈时龄和停车闭环。",
+        "validation_gap": "CPR、实际反馈轴、RPM/履带速度换算及时戳校准属[post_fabrication_qualification]，待样机驱动链和传感器装配后实测；制作前可继续确定器件规格和软件接口，不要求当前提供样机测值。"
+      },
+      {
+        "id": "physical_gimbal_yaw_limits",
+        "label": "云台偏航止挡/连续转动范围",
+        "value": null,
+        "unit": "deg or continuous",
+        "reference_frame": "炮台/云台偏航关节相对车体",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "asset_spec",
+            "line_start": 85,
+            "line_end": 85,
+            "evidence": "仿真规格明列pitch_limits_deg，未列偏航角限位。"
+          },
+          {
+            "source_id": "mech_turret",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "炮台装配未解析；无法确认止挡或线缆/滑环边界。"
+          },
+          {
+            "source_id": "mech_slip_ring",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "标准件目录中存在滑环零件，但未核实其安装或实际可连续旋转。"
+          }
+        ],
+        "interface_impact": "约束相机/雷达指向范围、线束寿命和云台动作规划。",
+        "validation_gap": "可先读取/核对CAD云台旋转约束、限位和线缆空间；[post_fabrication_qualification] 样机装配后确认真实硬限位、滑环/线缆方案及回零方式。"
+      },
+      {
+        "id": "sensor_extrinsics_to_vehicle",
+        "label": "IMU/相机/雷达到车体的实测外参",
+        "value": null,
+        "unit": "m; rad",
+        "reference_frame": "ATK-IMU901、双目光心、X2雷达相对于车体和云台关节坐标系",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "sim_agents",
+            "line_start": 61,
+            "line_end": 62,
+            "evidence": "云台IMU不直接等于车体IMU；电流/安装外参仍需实机核实。"
+          },
+          {
+            "source_id": "mech_car",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "车体装配未解析传感器安装位和参考坐标。"
+          }
+        ],
+        "interface_impact": "决定视觉/雷达/IMU数据融合、车体运动补偿和目标定位准确度。",
+        "validation_gap": "名义安装位姿、CAD坐标基准与装配关系可在制作前继续核对；相机/IMU/雷达到车体的实际测量外参属[post_fabrication_qualification]，待机械样机按最终安装状态完成后实测。"
+      },
+      {
+        "id": "stereo_rig_vehicle_integration",
+        "label": "双目支架与车体/炮台的机械集成关系",
+        "value": null,
+        "unit": "assembly relationship / transform",
+        "reference_frame": "RK3588双目支架相对于车体和俯仰云台",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "stereo_bracket",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "双目支架零件默认配置已只读解析为1个solid；其CAD原生XYZ实体跨度为0.090/0.125/0.042m，未与车体坐标或镜头光心绑定。"
+          },
+          {
+            "source_id": "mech_turret",
+            "line_start": null,
+            "line_end": null,
+            "evidence": "车/炮台当前配置递归组件树已读；未在组件名称/引用路径中定位明确双目/相机/支架组件。炮台Transform2只记录当前装配放置，不能证明实际安装或光心位置。"
+          }
+        ],
+        "interface_impact": "决定相机视场遮挡、俯仰运动、线缆布置和视觉外参。",
+        "validation_gap": "可先继续核对双目支架与车/炮台CAD的装配引用、孔位、姿态及名义光心；[post_fabrication_qualification] 样机装配后确认实物安装和车辆坐标外参。"
+      },
+      {
+        "id": "stereo_metric_distance_accuracy",
+        "label": "双目实际米制距离精度",
+        "value": null,
+        "unit": "m or %",
+        "reference_frame": "标定后相机光轴Z距离；多个已知目标距离和姿态",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "stereo_current",
+            "line_start": 3,
+            "line_end": 3,
+            "evidence": "状态：geometry_pass_metric_accuracy_unverified；实物距离和建图精度尚未验证。"
+          },
+          {
+            "source_id": "stereo_usage",
+            "line_start": 23,
+            "line_end": 23,
+            "evidence": "当前几何标定已验收，但实际距离精度还需尺量验证。"
+          }
+        ],
+        "interface_impact": "限制用双目深度进行避障、制动距离估计和农作物距离决策。",
+        "validation_gap": "离车双目/RK3588现有台架可在当前阶段先用已知距离目标做米制精度资格验证；整车最终安装的外参耦合和综合测距精度属post_fabrication_qualification。此分类不替代、不改写已有台架证据。"
+      },
+      {
+        "id": "field_surface_and_track_friction",
+        "label": "真实田间土壤/履带摩擦与地形分布",
+        "value": null,
+        "unit": "friction coefficient; elevation profile",
+        "reference_frame": "硬地、农田土壤；湿度/坡度/履带状态条件",
+        "status": "unconfirmed",
+        "source": [
+          {
+            "source_id": "isaac_state",
+            "line_start": 12,
+            "line_end": 12,
+            "evidence": "仿真摩擦系数0.8且仍需实车标定。"
+          },
+          {
+            "source_id": "isaac_state",
+            "line_start": 31,
+            "line_end": 31,
+            "evidence": "训练地形为100×100m波形场景与幅值预算，不是实测田块。"
+          }
+        ],
+        "interface_impact": "影响牵引、差速转向、制动、陷车和仿真迁移。",
+        "validation_gap": "真实机械样机可用后，在目标田地采集地形/土壤、履带滑移与摩擦记录，属[post_fabrication_qualification]；当前可继续准备地形采样方案和仿真场景，不要求不存在的样机实测。"
+      }
+    ]
+  },
+  "validation_priority": {
+    "documented_but_without_independent_vehicle_measurement": [
+      "vehicle_mass_nominal",
+      "vehicle_body_envelope",
+      "vehicle_overall_width",
+      "track_band_width",
+      "track_ground_contact_length",
+      "nominal_top_speed",
+      "drive_motor_configuration",
+      "drive_reduction_ratio",
+      "active_drive_sprocket_diameter",
+      "gimbal_center_height_nominal",
+      "gimbal_pitch_limits",
+      "sensor_and_drive_feedback_readbacks"
+    ],
+    "no_value_found_or_no_physical_validation": [
+      "physical_center_of_mass",
+      "physical_inertia_tensor",
+      "payload_capacity",
+      "physical_support_roller_geometry",
+      "verified_vehicle_speed",
+      "turn_time_and_turn_rate",
+      "braking_response",
+      "encoder_and_drive_feedback_calibration",
+      "physical_gimbal_yaw_limits",
+      "sensor_extrinsics_to_vehicle",
+      "stereo_rig_vehicle_integration",
+      "stereo_metric_distance_accuracy",
+      "field_surface_and_track_friction"
+    ],
+    "shortest_measurement_set": [
+      "[post_fabrication_qualification] 整车机械样机完成后，按实际电池/炮台/传感器/计划载荷配置称重，并测支点载荷以定位质心。",
+      "[post_fabrication_qualification] 记录最高速度、制动距离/减速度、原地转一圈时间；同步记录左右驱动RPM/电流和履带运动。",
+      "[post_fabrication_qualification] 样机驱动链装配后校准编码器CPR、反馈取样轴、RPM/履带速度换算及时间戳/有效状态。",
+      "[post_fabrication_qualification] 机械样机装配后核实云台真实止挡、IMU/相机/雷达到车体的安装外参与反馈分辨率/时延。",
+      "[existing_sensor_bench_qualification] 现有双目/RK3588台架可先用多个已知距离目标验证米制误差；整车安装后的外参与综合精度另作post_fabrication_qualification。",
+      "[post_fabrication_qualification] 使用机械样机在目标地表记录滑移/制动，并采集目标田地形、土壤与作物间距。"
+    ],
+    "cad_review_before_fabrication": [
+      "vehicle_body_envelope",
+      "vehicle_overall_width",
+      "track_band_width",
+      "track_center_separation",
+      "track_ground_contact_length",
+      "active_drive_sprocket_diameter",
+      "physical_support_roller_geometry",
+      "drive_reduction_ratio",
+      "payload_capacity",
+      "physical_center_of_mass",
+      "physical_inertia_tensor",
+      "gimbal_center_height_nominal",
+      "gimbal_pitch_limits",
+      "physical_gimbal_yaw_limits",
+      "sensor_extrinsics_to_vehicle",
+      "stereo_rig_vehicle_integration"
+    ],
+    "existing_sensor_bench_qualification": [
+      "stereo_metric_distance_accuracy"
+    ],
+    "post_fabrication_qualification": [
+      "vehicle_mass_nominal",
+      "physical_center_of_mass",
+      "physical_inertia_tensor",
+      "verified_vehicle_speed",
+      "turn_time_and_turn_rate",
+      "braking_response",
+      "encoder_and_drive_feedback_calibration",
+      "sensor_and_drive_feedback_readbacks",
+      "physical_gimbal_yaw_limits",
+      "sensor_extrinsics_to_vehicle",
+      "stereo_rig_vehicle_integration",
+      "stereo_metric_distance_accuracy",
+      "field_surface_and_track_friction"
+    ],
+    "qualification_scope_note": "post_fabrication_qualification只指整车机械样机上的实物称重、运动/制动、安装外参与集成验收，不阻塞当前CAD/材料输入核查；stereo_metric_distance_accuracy可先用既有双目/RK3588台架验证，post-fabrication条目仅指最终装车状态复核。"
+  },
+  "verification_summary": {
+    "measurement_verified_count": 0,
+    "note": "本次未核验任何独立实车测量；文档中写“实车事实”或“hardware-confirmed”的输入仍按design_documented记录。"
+  },
+  "material_confirmation": {
+    "source": {
+      "kind": "user_direct_confirmation",
+      "date": "2026-10-21",
+      "statement": "零件全部是PC，齿轮是 pa"
+    },
+    "role_rules": [
+      {
+        "role": "non_gear_part",
+        "material_family": "PC",
+        "name_zh": "聚碳酸酯",
+        "status": "user_confirmed"
+      },
+      {
+        "role": "gear",
+        "material_family": "PA",
+        "name_zh": "聚酰胺（尼龙）",
+        "status": "user_confirmed"
+      }
+    ],
+    "component_mapping": {
+      "identified_gears": [
+        {
+          "model_source_id": "mech_car",
+          "instance_name2": "内齿圈-1",
+          "persistent_path": "机械/标准件/内齿圈.SLDPRT",
+          "solid_body_count": 1,
+          "material_family": "PA",
+          "identity_basis": "当前CAD组件清单名称/路径明确标为内齿圈；材料族来自用户确认，不代表CAD材料属性已写入或经测量。"
+        }
+      ],
+      "unresolved_virtual_instances": [
+        {
+          "model_source_id": "mech_car",
+          "count": 37,
+          "name_pattern": "零件…^车…及镜向零件20^车-3",
+          "status": "role_unmapped",
+          "note": "匿名虚拟件无法从名称确认是否齿轮；暂不建立实例级PC/PA映射。"
+        },
+        {
+          "model_source_id": "mech_turret",
+          "count": 5,
+          "name_pattern": "零件…^炮台…",
+          "status": "role_unmapped",
+          "note": "匿名虚拟件无法从名称确认是否齿轮；暂不建立实例级PC/PA映射。"
+        }
+      ]
+    },
+    "unknown_details": [
+      "具体牌号",
+      "增强填料",
+      "含水/调湿状态",
+      "材料密度（未采用通用密度）"
+    ],
+    "cad_properties_note": "历史CAD读取中车/炮台part材料名为空、聚合密度报告1000kg/m3且质量override=false；这些原始记录保留。CAD材料属性未赋值，1000kg/m3不视为实料密度，未据此重算质量；原CAD质量/质心/惯量资格状态不变。"
+  },
+  "cad_extraction": {
+    "status": "success_with_cad_scope_limits",
+    "tool": {
+      "application": "SOLIDWORKS",
+      "installed_release": "SOLIDWORKS 2026 SP0",
+      "api_revision": "34.0.0",
+      "interface": "strongly typed .NET SolidWorks.Interop.sldworks",
+      "apartment": "STA",
+      "helper_pid": 12188,
+      "started_utc": "2026-10-21T06:46:13.2378138Z",
+      "ended_utc": "2026-10-21T06:46:32.6683980Z",
+      "initial_document_count": 0,
+      "exit_app_called": true
+    },
+    "method": {
+      "component_enumeration": "IAssemblyDoc.GetComponents(false), recursive all levels; Name2 used to retain hierarchical component identity",
+      "solid_extrema": "For each unsuppressed solid body: IBody2.Copy(), ApplyTransform(component.Transform2) on the copy, then GetExtremePoint along +/- current native root X/Y/Z and union coordinate extrema. Hidden solids included; original bodies/transforms/documents not modified.",
+      "subassembly_transform": "Transform2.ArrayData retained raw for component 炮台-1; local component to current root assembly; translation m and rotation/scale dimensionless. This is placement only, not gimbal kinematics or camera optical center.",
+      "approximate_boxes": "IAssemblyDoc.GetBox(0) and IPartDoc.GetPartBox(true) retained only as approximate CAD API boxes.",
+      "method_source_sha256": "562dd247e6636a1dea6d02ccff06506abcc5c714c488d5ed26eb8edc27018e9f",
+      "result_sha256": "59f767fed8ff58db42870e29d2365b2125b238a33367018686b296696d39314c",
+      "unit": "SolidWorks API SI: geometry and CoM in m, mass in kg, volume in m3; physical vehicle axis mapping not established."
+    },
+    "sources_line_locator": null,
+    "models": [
+      {
+        "source_id": "mech_car",
+        "path": "机械/车.SLDASM",
+        "source_fingerprint": {
+          "sha256_before": "377f19a2d1f59456dd151117f997008a90e343878a772a8127f0efb5e54bdb87",
+          "sha256_after": "377f19a2d1f59456dd151117f997008a90e343878a772a8127f0efb5e54bdb87",
+          "size_bytes_before": 2520540,
+          "size_bytes_after": 2520540,
+          "last_write_utc_before": "2026-10-19T11:28:07.4849757Z",
+          "last_write_utc_after": "2026-10-19T11:28:07.4849757Z",
+          "unchanged": true,
+          "line_locator": null
+        },
+        "document": {
+          "kind": "assembly",
+          "read_only": true,
+          "open_doc6_options": 3,
+          "open_errors": 0,
+          "open_warnings": 0,
+          "save_flag_at_open": false,
+          "save_flag_after_read": false,
+          "configuration_names": [
+            "默认"
+          ],
+          "active_configuration": "默认"
+        },
+        "component_inventory": {
+          "component_count_total": 50,
+          "part_instance_count": 49,
+          "subassembly_instance_count": 1,
+          "virtual_part_instance_count": 42,
+          "processed_solid_bodies": 44,
+          "geometry_method_failures": 0,
+          "zero_solid_part_instances": [
+            "零件15^车-1",
+            "零件17^车-1",
+            "零件19^车-1",
+            "零件26^车-1",
+            "零件9^车-1"
+          ],
+          "other_geometry_types_for_zero_solid_parts": "not queried; surface/sketch/empty representation unknown",
+          "suppressed_component_count": 0,
+          "all_component_models_loaded": true,
+          "suppression_state_raw_counts": {
+            "2": 50
+          }
+        },
+        "components": [
+          {
+            "name2": "零件1^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "左侧板-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/左侧板.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "右侧板-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/右侧板.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件4^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件2^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件3^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件6^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件12^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件7^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件5^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件10^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件11^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-5",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-9",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-12",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-3",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-8",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-6",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-7",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-10",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-4",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-11",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件20^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件21^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件14^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件18^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "下导轨-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/下导轨.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "下导轨-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/下导轨.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "下轴承保持架-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/下轴承保持架.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件15^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 0,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件17^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 0,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件19^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 0,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "内齿圈-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/标准件/内齿圈.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件8^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件26^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 0,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1",
+            "kind": "subassembly",
+            "referenced_configuration": null,
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/炮台.SLDASM",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true,
+            "transform2_raw_array_data": [
+              -0.01668342306879277,
+              -3.4302489988857326e-15,
+              0.9998608220120979,
+              -5.722829527971998e-17,
+              1,
+              3.4297715837320645e-15,
+              -0.9998608220120979,
+              -6.453769781989919e-30,
+              -0.01668342306879277,
+              0.15000000000000013,
+              0.24378837362535327,
+              -0.5901317591116405,
+              1,
+              0,
+              0,
+              0
+            ],
+            "transform2_frame_and_units": "16-element native SolidWorks ArrayData; component-local to current root assembly; translation m, rotation/scale dimensionless; physical vehicle axes not mapped; this is subassembly placement only, not gimbal kinematics or camera optical center."
+          },
+          {
+            "name2": "炮台-1/零件2^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1/上轴承保持架-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/上轴承保持架.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1/零件3^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1/零件16^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1/零件5^炮台-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "炮台-1/零件4^炮台-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件9^车-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 0,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-14",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "镜向零件20^车-3",
+            "kind": "part",
+            "referenced_configuration": "镜向零件20^车",
+            "active_part_configuration": "镜向零件20^车",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件18^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件13^车-13",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件14^车-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          }
+        ],
+        "approximate_bbox": {
+          "api": "IAssemblyDoc.GetBox(0)",
+          "unit": "m",
+          "raw_min_xyz_max_xyz": [
+            -0.005000000000000001,
+            -0.010999999999999996,
+            -0.7386581100926972,
+            0.305,
+            0.4034371745045016,
+            0.07500000000000001
+          ],
+          "quality": "approximate CAD API bounding box; retained separately from solid extrema"
+        },
+        "solid_body_extrema": {
+          "method": "IBody2.Copy -> ApplyTransform(component.Transform2) on copy -> GetExtremePoint along +/- root XYZ",
+          "body_type": "solid; includes hidden solids; suppressed components excluded",
+          "reference_frame": "Current document native CAD root coordinates; no physical vehicle-axis mapping established",
+          "minimum_xyz_m": [
+            -0.005,
+            -0.011,
+            -0.7386581100926971
+          ],
+          "maximum_xyz_m": [
+            0.305,
+            0.40343717450450084,
+            0.07499999999999996
+          ],
+          "span_xyz_m": [
+            0.31,
+            0.41443717450450085,
+            0.8136581100926971
+          ],
+          "processed_solid_bodies": 44,
+          "geometry_method_failures": 0,
+          "issues": [],
+          "physical_vehicle_axis_mapping": null,
+          "qualification": "CAD configuration geometry only; real-vehicle completeness and sensor optical frames not qualified"
+        },
+        "cad_mass_properties": {
+          "status": "cad_computed_unqualified",
+          "cad_raw_mass_kg": 5.521234729898032,
+          "volume_m3": 0.0055212347298980195,
+          "density_kg_m3": 1000.0000000000024,
+          "cad_raw_center_of_mass_m": [
+            0.15017527253871873,
+            0.1369775796156777,
+            -0.3663071141692149
+          ],
+          "use_system_units": true,
+          "include_hidden_bodies_or_components": true,
+          "overrides": {
+            "mass": false,
+            "center_of_mass": false,
+            "moments_of_inertia": false
+          },
+          "inertia_tensor_kg_m2": null,
+          "qualification": "Raw CAD calculation; density/material and assembly completeness not qualified; not physical measurements",
+          "part_material_name_queried_count": 49,
+          "part_material_name_blank_count": 49
+        },
+        "physical_values": {
+          "mass_kg": null,
+          "center_of_mass_m": null,
+          "inertia_tensor_kg_m2": null
+        }
+      },
+      {
+        "source_id": "mech_turret",
+        "path": "机械/炮台.SLDASM",
+        "source_fingerprint": {
+          "sha256_before": "9152e14a5be3761ad56535ea42ecde9df8089578dfe8ea08086ef164f16a65ea",
+          "sha256_after": "9152e14a5be3761ad56535ea42ecde9df8089578dfe8ea08086ef164f16a65ea",
+          "size_bytes_before": 960657,
+          "size_bytes_after": 960657,
+          "last_write_utc_before": "2026-10-19T11:28:03.3423795Z",
+          "last_write_utc_after": "2026-10-19T11:28:03.3423795Z",
+          "unchanged": true,
+          "line_locator": null
+        },
+        "document": {
+          "kind": "assembly",
+          "read_only": true,
+          "open_doc6_options": 3,
+          "open_errors": 0,
+          "open_warnings": 0,
+          "save_flag_at_open": false,
+          "save_flag_after_read": false,
+          "configuration_names": [
+            "默认"
+          ],
+          "active_configuration": "默认"
+        },
+        "component_inventory": {
+          "component_count_total": 6,
+          "part_instance_count": 6,
+          "subassembly_instance_count": 0,
+          "virtual_part_instance_count": 5,
+          "processed_solid_bodies": 6,
+          "geometry_method_failures": 0,
+          "zero_solid_part_instances": [],
+          "other_geometry_types_for_zero_solid_parts": "not queried; surface/sketch/empty representation unknown",
+          "suppressed_component_count": 0,
+          "all_component_models_loaded": true,
+          "suppression_state_raw_counts": {
+            "2": 6
+          }
+        },
+        "components": [
+          {
+            "name2": "零件4^炮台-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件16^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "上轴承保持架-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": false,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "project_file_reference",
+            "persistent_path": "机械/上轴承保持架.SLDPRT",
+            "path_exists_at_read": true,
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件3^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件2^炮台-1",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          },
+          {
+            "name2": "零件5^炮台-2",
+            "kind": "part",
+            "referenced_configuration": "默认",
+            "active_part_configuration": "默认",
+            "is_virtual": true,
+            "solid_body_count": 1,
+            "part_material_name_reported": "",
+            "reference_kind": "embedded_virtual_component",
+            "persistent_path": null,
+            "path_note": "normalized to owner assembly + Name2 + referenced configuration; GetPathName was a session temporary VC~~ proxy",
+            "suppression_state": 2,
+            "suppressed": false,
+            "model_loaded": true
+          }
+        ],
+        "approximate_bbox": {
+          "api": "IAssemblyDoc.GetBox(0)",
+          "unit": "m",
+          "raw_min_xyz_max_xyz": [
+            -0.10000000000000056,
+            -0.0006407120024695366,
+            -0.08400000000000002,
+            0.12999999999999978,
+            0.15964880087914798,
+            0.08400000000000002
+          ],
+          "quality": "approximate CAD API bounding box; retained separately from solid extrema"
+        },
+        "solid_body_extrema": {
+          "method": "IBody2.Copy -> ApplyTransform(component.Transform2) on copy -> GetExtremePoint along +/- root XYZ",
+          "body_type": "solid; includes hidden solids; suppressed components excluded",
+          "reference_frame": "Current document native CAD root coordinates; no physical vehicle-axis mapping established",
+          "minimum_xyz_m": [
+            -0.10000000000000055,
+            -9.589853646493039e-17,
+            -0.08400000000000002
+          ],
+          "maximum_xyz_m": [
+            0.1299999999999995,
+            0.1596488008791478,
+            0.08400000000000003
+          ],
+          "span_xyz_m": [
+            0.23000000000000004,
+            0.15964880087914787,
+            0.16800000000000004
+          ],
+          "processed_solid_bodies": 6,
+          "geometry_method_failures": 0,
+          "issues": [],
+          "physical_vehicle_axis_mapping": null,
+          "qualification": "CAD configuration geometry only; real-vehicle completeness and sensor optical frames not qualified"
+        },
+        "cad_mass_properties": {
+          "status": "cad_computed_unqualified",
+          "cad_raw_mass_kg": 1.0538565225232748,
+          "volume_m3": 0.0010538565225232748,
+          "density_kg_m3": 1000,
+          "cad_raw_center_of_mass_m": [
+            0.004557755725384107,
+            0.06047742650360233,
+            -0.0009940949040520351
+          ],
+          "use_system_units": true,
+          "include_hidden_bodies_or_components": true,
+          "overrides": {
+            "mass": false,
+            "center_of_mass": false,
+            "moments_of_inertia": false
+          },
+          "inertia_tensor_kg_m2": null,
+          "qualification": "Raw CAD calculation; density/material and assembly completeness not qualified; not physical measurements",
+          "part_material_name_queried_count": 6,
+          "part_material_name_blank_count": 6
+        },
+        "physical_values": {
+          "mass_kg": null,
+          "center_of_mass_m": null,
+          "inertia_tensor_kg_m2": null
+        }
+      },
+      {
+        "source_id": "stereo_bracket",
+        "path": "算法/RK3588平台/硬件/外壳/双目支架.SLDPRT",
+        "source_fingerprint": {
+          "sha256_before": "1457c4532cd3add80a35650f36aed9f8820040a58cd4e88ef775e328982d08c0",
+          "sha256_after": "1457c4532cd3add80a35650f36aed9f8820040a58cd4e88ef775e328982d08c0",
+          "size_bytes_before": 98255,
+          "size_bytes_after": 98255,
+          "last_write_utc_before": "2026-09-27T16:14:21.7010762Z",
+          "last_write_utc_after": "2026-09-27T16:14:21.7010762Z",
+          "unchanged": true,
+          "line_locator": null
+        },
+        "document": {
+          "kind": "part",
+          "read_only": true,
+          "open_doc6_options": 3,
+          "open_errors": 0,
+          "open_warnings": 0,
+          "save_flag_at_open": false,
+          "save_flag_after_read": false,
+          "configuration_names": [
+            "默认"
+          ],
+          "active_configuration": "默认"
+        },
+        "component_inventory": {
+          "component_count_total": null,
+          "solid_body_count": 1
+        },
+        "components": [],
+        "approximate_bbox": {
+          "api": "IPartDoc.GetPartBox(true)",
+          "unit": "m",
+          "raw_min_xyz_max_xyz": [
+            -0.010000000000000037,
+            -6.746085343855986e-34,
+            -0.019,
+            0.07999999999999999,
+            0.125,
+            0.023
+          ],
+          "quality": "approximate CAD API bounding box; retained separately from solid extrema"
+        },
+        "solid_body_extrema": {
+          "method": "IBody2.Copy -> ApplyTransform(component.Transform2) on copy -> GetExtremePoint along +/- root XYZ",
+          "body_type": "solid; includes hidden solids; suppressed components excluded",
+          "reference_frame": "Current document native CAD root coordinates; no physical vehicle-axis mapping established",
+          "minimum_xyz_m": [
+            -0.010000000000000021,
+            0,
+            -0.019
+          ],
+          "maximum_xyz_m": [
+            0.07999999999999999,
+            0.125,
+            0.023
+          ],
+          "span_xyz_m": [
+            0.09000000000000001,
+            0.125,
+            0.041999999999999996
+          ],
+          "processed_solid_bodies": 1,
+          "geometry_method_failures": 0,
+          "issues": [],
+          "physical_vehicle_axis_mapping": null,
+          "qualification": "CAD configuration geometry only; real-vehicle completeness and sensor optical frames not qualified"
+        },
+        "cad_mass_properties": {
+          "status": "cad_computed_unqualified",
+          "cad_raw_mass_kg": 0.21201517699835312,
+          "volume_m3": 0.00021201517699835312,
+          "density_kg_m3": 1000,
+          "cad_raw_center_of_mass_m": [
+            0.03431865580570339,
+            0.0625,
+            0.001990295088642673
+          ],
+          "use_system_units": true,
+          "include_hidden_bodies_or_components": true,
+          "overrides": {
+            "mass": false,
+            "center_of_mass": false,
+            "moments_of_inertia": false
+          },
+          "inertia_tensor_kg_m2": null,
+          "qualification": "Raw CAD calculation; density/material and assembly completeness not qualified; not physical measurements",
+          "part_material_name_query": "not performed for the part document"
+        },
+        "physical_values": {
+          "mass_kg": null,
+          "center_of_mass_m": null,
+          "inertia_tensor_kg_m2": null
+        }
+      }
+    ],
+    "workflow_note": "初次pywin32动态接口绑定未枚举IAssemblyDoc；后续改用强类型.NET Interop完成只读提取。早期脚本绑定错误不代表软件不可用或CAD阻塞。",
+    "remaining_limits": [
+      "CAD原生X/Y/Z未映射到车辆纵向/横向/竖直轴。",
+      "极值覆盖当前配置中成功读取的solid body；车装配另有5个零solid part实例，surface/sketch/empty类型未查询，不能证明实车配置/BOM完整。",
+      "用户已确认非齿轮普通零件PC、齿轮PA；历史CAD读取时车/炮台part材料名为空、聚合密度报告1000kg/m3且质量override=false，原始值保留。CAD属性未赋值，具体牌号/填料/调湿状态/密度与匿名虚拟件齿轮身份待核；CAD质量/质心仍非实车测量。",
+      "未导出CAD惯量张量，也未获得独立实车称重/质心/惯量测量。",
+      "相机/IMU光心、安装位姿和炮台运动学轴仍未建立物理外参。"
+    ]
+  }
+}

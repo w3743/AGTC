@@ -1,0 +1,1943 @@
+{
+  "schema_version": 1,
+  "title": "四板复用与成本边界核对",
+  "generated_date": "2026-10-22",
+  "status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES_ELECTRICAL_AND_FULL_COST_OPEN",
+  "global_optimization_rule": {
+    "scope": "全电力系统",
+    "objective": "以系统总价和最高性价比为准，优先最少选型与现有精确料号复用；不得以单板最低价牺牲电气、热、机械、装配或安全资格。",
+    "vehicle_multiplicity": {
+      "BMS模块": 1,
+      "FOC驱动模块": 2,
+      "稳压模块": 1,
+      "水泵驱动模块": 1
+    },
+    "budget_limit_cny": null,
+    "previous_500_cny_supercapacitor_cap": "cancelled",
+    "supercapacitor": {
+      "required_mpn": "SC0350-270-RSS",
+      "max_cells": 8,
+      "current_regulator_bom_cells": 8,
+      "previous_40_cell_candidate": "excluded",
+      "screened_model_candidates": {
+        "8S2P_low_voltage_window_800W_bidirectional": "cancelled_obsolete_historical",
+        "1000W_directional": "cancelled_obsolete_historical",
+        "active_candidate": false,
+        "transfer_to_current_bom_quantity": false,
+        "note": "用户最新决定固定现有8颗，仅作启动瞬态功率辅助；16颗扩容及其模型候选已取消，不进入当前用量/成本。历史仿真结果仍留在原仿真位置。"
+      },
+      "candidate_total_count": null,
+      "candidate_added_count": 0,
+      "candidate_is_current": false,
+      "candidate_status": "cancelled_obsolete",
+      "historical_cancelled_candidate_total_count": 16,
+      "historical_cancelled_candidate_added_count": 8,
+      "quantity_rule": "用户最新决定仅保留现有8颗；有效总量上限8，当前增量0。历史16颗扩容方案已取消/作废，不是有效候选且不计入成本。",
+      "use_case": "startup_transient_power_assist",
+      "sustained_1s_requirement": false,
+      "duration_s": null,
+      "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+      "reference_power_w": {
+        "min": 800,
+        "max": 1000,
+        "status": "unverified_design_reference_only"
+      }
+    },
+    "budget_interpretation": "未设统一整车总额；不取消模块独立成本目标。仅稳压旧500元硬上限取消，BMS板内约200元目标保留。",
+    "module_cost_targets_cny": {
+      "BMS_board": 200,
+      "supercapacitor_old_500_cap_cancelled": true
+    }
+  },
+  "snapshot": {
+    "central_native_index": {
+      "path": "元件封装库/索引/元件总表.json",
+      "sha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
+      "generated_at_utc": "2026-10-21T18:47:05+00:00",
+      "summary": {
+        "module_count": 4,
+        "bom_instance_count": 580,
+        "part_count": 201,
+        "shared_model_count": 17,
+        "mpn_same_cross_board_manufacturer_mismatch_count": 8,
+        "excluded_non_bom_count": 2655,
+        "missing_mpn_count": 5,
+        "missing_manufacturer_count": 28,
+        "mpn_diff_count": 79,
+        "mpn_changed_with_value_inherited_count": 0,
+        "mpn_changed_without_actual_value_count": 0,
+        "missing_device_binding_count": 0,
+        "missing_symbol_binding_count": 0,
+        "missing_footprint_binding_count": 0
+      }
+    },
+    "source_configuration": {
+      "path": "元件封装库/来源配置.json",
+      "sha256": "7404aadf60d7c91664983ef7dd0d37690228c08dea65937af6ff2429913af367"
+    },
+    "procurement_index": {
+      "path": "元件封装库/索引/采购补充.json",
+      "sha256": "03b12a923fd2049e572e3ce225d27caf864ea3510387cecb1ff94d0c1fdabe07",
+      "generated_at": "2026-10-21T18:47:06.590269+00:00",
+      "summary": {
+        "bom_rows": 567,
+        "relations": {
+          "原生已有，采购行关联，不重复计件": 515,
+          "BOM独有条目，未在原生BOM中登记": 52
+        }
+      }
+    },
+    "module_boms": [
+      {
+        "module": "BMS模块",
+        "vehicle_board_multiplicity": 1,
+        "bom_path": "BMS模块/原理图准备/BOM.csv",
+        "format": "bms",
+        "bom_rows": 248,
+        "bom_reference_occurrences": 248,
+        "unique_bom_references": 248,
+        "bom_sha256": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba",
+        "vehicle_reference_occurrences": 248,
+        "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+        "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+        "matches_current_procurement_index": true,
+        "duplicate_references": []
+      },
+      {
+        "module": "FOC驱动模块",
+        "vehicle_board_multiplicity": 2,
+        "bom_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+        "format": "foc",
+        "bom_rows": 91,
+        "bom_reference_occurrences": 156,
+        "unique_bom_references": 156,
+        "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+        "vehicle_reference_occurrences": 312,
+        "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+        "bom_basis": "本轮官方CAD导出",
+        "matches_current_procurement_index": true,
+        "duplicate_references": []
+      },
+      {
+        "module": "FOC驱动模块",
+        "vehicle_board_multiplicity": 2,
+        "bom_path": "FOC驱动模块/原理图准备/装配采购补充.csv",
+        "format": "regulator",
+        "bom_rows": 1,
+        "bom_reference_occurrences": 1,
+        "unique_bom_references": 1,
+        "bom_sha256": "0dcfa09fef2e6802de26ca9be78e645652a682fb9707e4d5961624b8e59d238d",
+        "vehicle_reference_occurrences": 2,
+        "quantity_basis": "单板来源Quantity=1；FOC车辆两板，整车共2只板外配对插头；不得再乘其它倍数。",
+        "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+        "matches_current_procurement_index": true,
+        "duplicate_references": []
+      },
+      {
+        "module": "稳压模块",
+        "vehicle_board_multiplicity": 1,
+        "bom_path": "稳压模块/原理图准备/BOM.csv",
+        "format": "regulator",
+        "bom_rows": 169,
+        "bom_reference_occurrences": 169,
+        "unique_bom_references": 169,
+        "bom_sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+        "vehicle_reference_occurrences": 169,
+        "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+        "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+        "matches_current_procurement_index": true,
+        "duplicate_references": []
+      },
+      {
+        "module": "水泵驱动模块",
+        "vehicle_board_multiplicity": 1,
+        "bom_path": "水泵驱动模块/原理图准备/BOM.csv",
+        "format": "regulator",
+        "bom_rows": 37,
+        "bom_reference_occurrences": 58,
+        "unique_bom_references": 58,
+        "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+        "vehicle_reference_occurrences": 58,
+        "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+        "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+        "matches_current_procurement_index": true,
+        "duplicate_references": []
+      }
+    ],
+    "native_schematic_hash_freshness": [
+      {
+        "module": "BMS模块",
+        "path": "BMS模块/sch/Schematic1/P1.esch2",
+        "index_sha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
+        "current_sha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
+        "matches": true,
+        "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
+      },
+      {
+        "module": "FOC驱动模块",
+        "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+        "index_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+        "current_sha256": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+        "matches": true,
+        "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
+      },
+      {
+        "module": "稳压模块",
+        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+        "index_sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+        "current_sha256": "02ad832c553f6db4ecc562d1074f554234d1bb31b56d27d08167b4ea2978822a",
+        "matches": true,
+        "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
+      },
+      {
+        "module": "水泵驱动模块",
+        "path": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
+        "index_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+        "current_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+        "matches": true,
+        "index_status": "MATCHES_CURRENT_CENTRAL_INDEX"
+      }
+    ],
+    "final_library_check": {
+      "path": "检查/统一审查/全库同步与只读校验.json",
+      "sha256": "55769ed1631cf9513a1c037ca15d60bbaea2e6897d0074269cc7d09aeedc7b92",
+      "status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
+      "reported_status": "PASS_SOURCE_ASSET_AND_LIBRARY_CONSISTENCY_ONLY",
+      "matches_current_index_artifacts": true
+    },
+    "note": "4类当前原生源、5个采购CSV来源；580是按各模块单板/单套口径统计的原生BOM实例总数，非全车实装量。采购行关联不重复加入原生实例；FOC装配采购补充及整车数量口径分别见snapshot.module_boms与board_scope。 本次机械快照与当前中央索引/同步证明绑定；索引缺失、源SHA不匹配或同步证明过期时明确标为STALE；价格未刷新。",
+    "local_source_refresh": {
+      "as_of": "2026-10-22",
+      "coverage_path": "检查/统一审查/全部原理图检查覆盖.json",
+      "coverage_sha256": "b25fc2e999355a59d5662c60c7244b0bf1ee7311aa6c31d6d08a2b052c15fe0b",
+      "central_sync_run_by_this_script": false,
+      "central_index_status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES",
+      "index_path": "元件封装库/索引/元件总表.json",
+      "index_sha256": "2c7aa268f4e461ce6bb6f28c9fe6e4be24e11a0a406b4aaf6464c080b5cb6057",
+      "procurement_index_path": "元件封装库/索引/采购补充.json",
+      "procurement_index_sha256": "03b12a923fd2049e572e3ce225d27caf864ea3510387cecb1ff94d0c1fdabe07",
+      "sync_proof_sha256": "55769ed1631cf9513a1c037ca15d60bbaea2e6897d0074269cc7d09aeedc7b92",
+      "pages_different_from_current_index": [],
+      "bom_sources_different_from_current_procurement_index": [],
+      "sync_proof_matches_current_index_artifacts": true,
+      "current_index_summary": {
+        "module_count": 4,
+        "bom_instance_count": 580,
+        "part_count": 201,
+        "shared_model_count": 17,
+        "mpn_same_cross_board_manufacturer_mismatch_count": 8,
+        "excluded_non_bom_count": 2655,
+        "missing_mpn_count": 5,
+        "missing_manufacturer_count": 28,
+        "mpn_diff_count": 79,
+        "mpn_changed_with_value_inherited_count": 0,
+        "mpn_changed_without_actual_value_count": 0,
+        "missing_device_binding_count": 0,
+        "missing_symbol_binding_count": 0,
+        "missing_footprint_binding_count": 0
+      },
+      "prices_recalculated": false,
+      "note": "本次仅读取当前源及真实中央索引/同步证明重算路径、SHA、BOM和索引派生统计；未运行中央同步或刷新价格。"
+    },
+    "final_library_check_status_note": "final_library_check仅在同步证明索引SHA、采购索引SHA、来源配置SHA与现存文件一致且源SHA相符时视为当前PASS；本脚本不运行同步或--check。",
+    "vehicle_supplement": {
+      "path": "元件封装库/整车器件补充.json",
+      "sha256": "62286305a709a34cfb71328e0b0fc40e1f788bfef62f628bd20a7ebfd49931a3",
+      "project_constraints": {
+        "vehicle_cost_policy": {
+          "applies_to_all_modules": true,
+          "priority": "优先复用已满足要求的精确器件，减少不同型号并比较可核验的总采购成本；缺报价保留null，不宣称未证实降本。",
+          "source_ids": [
+            "vehicle_project_constraints"
+          ]
+        },
+        "regulator_supercapacitor": {
+          "manufacturer": "LICAP Technologies",
+          "fixed_manufacturer_part": "SC0350-270-RSS",
+          "total_count_max": 8,
+          "native_current_count": 8,
+          "candidate_total_count": null,
+          "candidate_added_count": 0,
+          "candidate_is_current": false,
+          "legacy_budget_cny": 500,
+          "legacy_budget_status": "cancelled_not_a_current_limit",
+          "source_ids": [
+            "vehicle_project_constraints"
+          ],
+          "candidate_status": "cancelled_obsolete",
+          "historical_cancelled_candidate_total_count": 16,
+          "historical_cancelled_candidate_added_count": 8,
+          "quantity_rule": "用户最新决定仅保留现有8颗；有效总量上限8，当前增量0。历史16颗扩容方案已取消/作废，不是有效候选且不计入成本。",
+          "use_case": "startup_transient_power_assist",
+          "sustained_1s_requirement": false,
+          "duration_s": null,
+          "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+          "reference_power_w": {
+            "min": 800,
+            "max": 1000,
+            "status": "unverified_design_reference_only"
+          }
+        },
+        "bms_cost_target": {
+          "target_cny": 200,
+          "scope": "BMS board-mounted parts only; external MCU and off-board accessories are excluded and reported separately.",
+          "status": "not_proven",
+          "source_ids": [
+            "bms_board_budget"
+          ]
+        },
+        "post_schematic_human_scope": {
+          "owner": "human",
+          "items": [
+            "PCB design and layout",
+            "fabrication and manufacturing handoff",
+            "prototyping",
+            "assembly",
+            "firmware implementation",
+            "physical testing and qualification"
+          ],
+          "source_ids": [
+            "vehicle_project_constraints"
+          ]
+        }
+      }
+    }
+  },
+  "board_scope": {
+    "BMS模块": {
+      "vehicle_multiplicity": 1,
+      "native_component_primitives": 1431,
+      "native_bom_instances": 209,
+      "excluded_non_bom_instances": 1222,
+      "pcb_counts": {
+        "yes": 206,
+        "no": 3,
+        "unknown": 0
+      },
+      "procurement_records": 248,
+      "procurement_only_records": 39,
+      "procurement_sources": [
+        {
+          "module": "BMS模块",
+          "vehicle_board_multiplicity": 1,
+          "bom_path": "BMS模块/原理图准备/BOM.csv",
+          "format": "bms",
+          "bom_rows": 248,
+          "bom_reference_occurrences": 248,
+          "unique_bom_references": 248,
+          "bom_sha256": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba",
+          "vehicle_reference_occurrences": 248,
+          "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+          "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+          "matches_current_procurement_index": true,
+          "duplicate_references": []
+        }
+      ]
+    },
+    "FOC驱动模块": {
+      "vehicle_multiplicity": 2,
+      "native_component_primitives": 344,
+      "native_bom_instances": 156,
+      "excluded_non_bom_instances": 188,
+      "pcb_counts": {
+        "yes": 148,
+        "no": 8,
+        "unknown": 0
+      },
+      "procurement_records": 92,
+      "procurement_only_records": 1,
+      "procurement_sources": [
+        {
+          "module": "FOC驱动模块",
+          "vehicle_board_multiplicity": 2,
+          "bom_path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+          "format": "foc",
+          "bom_rows": 91,
+          "bom_reference_occurrences": 156,
+          "unique_bom_references": 156,
+          "bom_sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+          "vehicle_reference_occurrences": 312,
+          "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+          "bom_basis": "本轮官方CAD导出",
+          "matches_current_procurement_index": true,
+          "duplicate_references": []
+        },
+        {
+          "module": "FOC驱动模块",
+          "vehicle_board_multiplicity": 2,
+          "bom_path": "FOC驱动模块/原理图准备/装配采购补充.csv",
+          "format": "regulator",
+          "bom_rows": 1,
+          "bom_reference_occurrences": 1,
+          "unique_bom_references": 1,
+          "bom_sha256": "0dcfa09fef2e6802de26ca9be78e645652a682fb9707e4d5961624b8e59d238d",
+          "vehicle_reference_occurrences": 2,
+          "quantity_basis": "单板来源Quantity=1；FOC车辆两板，整车共2只板外配对插头；不得再乘其它倍数。",
+          "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+          "matches_current_procurement_index": true,
+          "duplicate_references": []
+        }
+      ]
+    },
+    "稳压模块": {
+      "vehicle_multiplicity": 1,
+      "native_component_primitives": 735,
+      "native_bom_instances": 166,
+      "excluded_non_bom_instances": 569,
+      "pcb_counts": {
+        "yes": 157,
+        "no": 9,
+        "unknown": 0
+      },
+      "procurement_records": 169,
+      "procurement_only_records": 3,
+      "procurement_sources": [
+        {
+          "module": "稳压模块",
+          "vehicle_board_multiplicity": 1,
+          "bom_path": "稳压模块/原理图准备/BOM.csv",
+          "format": "regulator",
+          "bom_rows": 169,
+          "bom_reference_occurrences": 169,
+          "unique_bom_references": 169,
+          "bom_sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+          "vehicle_reference_occurrences": 169,
+          "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+          "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+          "matches_current_procurement_index": true,
+          "duplicate_references": []
+        }
+      ]
+    },
+    "水泵驱动模块": {
+      "vehicle_multiplicity": 1,
+      "native_component_primitives": 725,
+      "native_bom_instances": 49,
+      "excluded_non_bom_instances": 676,
+      "pcb_counts": {
+        "yes": 49,
+        "no": 0,
+        "unknown": 0
+      },
+      "procurement_records": 58,
+      "procurement_only_records": 9,
+      "procurement_sources": [
+        {
+          "module": "水泵驱动模块",
+          "vehicle_board_multiplicity": 1,
+          "bom_path": "水泵驱动模块/原理图准备/BOM.csv",
+          "format": "regulator",
+          "bom_rows": 37,
+          "bom_reference_occurrences": 58,
+          "unique_bom_references": 58,
+          "bom_sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+          "vehicle_reference_occurrences": 58,
+          "quantity_basis": "单板；FOC双板实装另按装配覆盖扣除一只偏置",
+          "bom_basis": "现行采购输入；不代表现价、采购或实物资格",
+          "matches_current_procurement_index": true,
+          "duplicate_references": []
+        }
+      ]
+    }
+  },
+  "exact_shared_model_groups_from_index_snapshot": [
+    {
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "manufacturer": [
+        "Milliohm(毫欧)",
+        "Milliohm（毫欧）"
+      ],
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 10,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 1
+    },
+    {
+      "mpn": "RMC06031K1%N",
+      "manufacturer": [
+        "Tyohm(幸亚电阻)",
+        "Tyohm（幸亚电阻）"
+      ],
+      "modules": [
+        "BMS模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 9,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "RMC06033.3K1%N",
+      "manufacturer": [
+        "Tyohm(幸亚电阻)",
+        "Tyohm（幸亚电阻）"
+      ],
+      "modules": [
+        "BMS模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 4,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": [
+        "YAGEO",
+        "Yageo"
+      ],
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块"
+      ],
+      "indexed_instance_count": 4,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "MFR25SFRE52-120R",
+      "manufacturer": [
+        "YAGEO(国巨)",
+        "YAGEO（国巨）"
+      ],
+      "modules": [
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 10,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "manufacturer": "DEGSON(高正/高松)",
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "manufacturer": "JST",
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 3,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "SMCJ40A",
+      "manufacturer": "Littelfuse",
+      "modules": [
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "HoLRS2512-6W-0.5mR-1%",
+      "manufacturer": "Milliohm(毫欧)",
+      "modules": [
+        "BMS模块",
+        "稳压模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "PESD2CANFD24V-TR",
+      "manufacturer": "Nexperia",
+      "modules": [
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 18,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "TCAN1042HGVDRQ1",
+      "manufacturer": "Texas Instruments",
+      "modules": [
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "TLV6700DDCR",
+      "manufacturer": "TI(德州仪器)",
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "UCC27511ADBVR",
+      "manufacturer": "TI(德州仪器)",
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块"
+      ],
+      "indexed_instance_count": 2,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 1
+    },
+    {
+      "mpn": "RMC0603100K1%N",
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "modules": [
+        "BMS模块",
+        "稳压模块"
+      ],
+      "indexed_instance_count": 26,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "RMC060347K1%N",
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "modules": [
+        "BMS模块",
+        "稳压模块"
+      ],
+      "indexed_instance_count": 5,
+      "device_asset_variants": 2,
+      "footprint_asset_variants": 2,
+      "carrier_mpn_diff_instances": 0
+    },
+    {
+      "mpn": "MF52A103F3950(A1)",
+      "manufacturer": "时恒",
+      "modules": [
+        "BMS模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instance_count": 5,
+      "device_asset_variants": 3,
+      "footprint_asset_variants": 3,
+      "carrier_mpn_diff_instances": 5
+    }
+  ],
+  "same_mpn_manufacturer_mismatch_groups_from_index_snapshot": [
+    {
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "mpn_normalized": "2edgvc-5.08-02p-14-100a(h)",
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "board_count": 3,
+      "bom_instance_count": 4,
+      "manufacturer_fields": [
+        {
+          "module": "BMS模块",
+          "manufacturer": "DEGSON(高正/高松)",
+          "designators": [
+            "J_LOAD_POWER_VALID"
+          ]
+        },
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "DEGSON(高正/高松)",
+          "designators": [
+            "J_LOAD_POWER_VALID"
+          ]
+        },
+        {
+          "module": "水泵驱动模块",
+          "manufacturer": "DEGSON(町洋)",
+          "designators": [
+            "J_BUS",
+            "J_MOTOR"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-17de7f95796cd53e",
+        "MODEL-2fe522d6bf84b4a1"
+      ],
+      "instance_keys": [
+        "BMS模块::J_LOAD_POWER_VALID",
+        "FOC驱动模块::J_LOAD_POWER_VALID",
+        "水泵驱动模块::J_BUS",
+        "水泵驱动模块::J_MOTOR"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "IRLB4030PBF",
+      "mpn_normalized": "irlb4030pbf",
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块"
+      ],
+      "board_count": 2,
+      "bom_instance_count": 4,
+      "manufacturer_fields": [
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "Infineon",
+          "designators": [
+            "Q7"
+          ]
+        },
+        {
+          "module": "稳压模块",
+          "manufacturer": "Infineon(英飞凌)",
+          "designators": [
+            "Q_DUMP",
+            "Q_MAIN_H",
+            "Q_MAIN_L"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-0c7b85ee1c643b90",
+        "MODEL-118d10e7374d98eb"
+      ],
+      "instance_keys": [
+        "FOC驱动模块::Q7",
+        "稳压模块::Q_DUMP",
+        "稳压模块::Q_MAIN_H",
+        "稳压模块::Q_MAIN_L"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "mpn_normalized": "jxt-pm2.54-2x12p-a9",
+      "modules": [
+        "FOC驱动模块",
+        "水泵驱动模块",
+        "稳压模块"
+      ],
+      "board_count": 3,
+      "bom_instance_count": 6,
+      "manufacturer_fields": [
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "JXT",
+          "designators": [
+            "J_MCU_L",
+            "J_MCU_R"
+          ]
+        },
+        {
+          "module": "水泵驱动模块",
+          "manufacturer": "JXT/JXTCONN(共用库名称不一致，待核实)",
+          "designators": [
+            "J_MCU_A",
+            "J_MCU_B"
+          ]
+        },
+        {
+          "module": "稳压模块",
+          "manufacturer": "JXTCONN(聚兴泰)",
+          "designators": [
+            "J_CORE_P1",
+            "J_CORE_P2"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-24d7131c4271a6a1",
+        "MODEL-81307afe7908b663",
+        "MODEL-8c6345f587749aec"
+      ],
+      "instance_keys": [
+        "FOC驱动模块::J_MCU_L",
+        "FOC驱动模块::J_MCU_R",
+        "水泵驱动模块::J_MCU_A",
+        "水泵驱动模块::J_MCU_B",
+        "稳压模块::J_CORE_P1",
+        "稳压模块::J_CORE_P2"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "MMBT5551",
+      "mpn_normalized": "mmbt5551",
+      "modules": [
+        "BMS模块",
+        "稳压模块"
+      ],
+      "board_count": 2,
+      "bom_instance_count": 4,
+      "manufacturer_fields": [
+        {
+          "module": "BMS模块",
+          "manufacturer": "MDD(辰达半导体)",
+          "designators": [
+            "Q_BAL_ENABLE",
+            "Q_BAL_MAINCLR",
+            "Q_QPRE_DRV"
+          ]
+        },
+        {
+          "module": "稳压模块",
+          "manufacturer": "JKSEMI(金开盛)",
+          "designators": [
+            "Q_PMOS_CTRL"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-2fabd43bcbd09a83",
+        "MODEL-66ac8fa160b2156d"
+      ],
+      "instance_keys": [
+        "BMS模块::Q_BAL_ENABLE",
+        "BMS模块::Q_BAL_MAINCLR",
+        "BMS模块::Q_QPRE_DRV",
+        "稳压模块::Q_PMOS_CTRL"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "PESD2CANFD24V-TR",
+      "mpn_normalized": "pesd2canfd24v-tr",
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "board_count": 3,
+      "bom_instance_count": 3,
+      "manufacturer_fields": [
+        {
+          "module": "BMS模块",
+          "manufacturer": "Nexperia(安世)",
+          "designators": [
+            "D_CAN_TVS"
+          ]
+        },
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "Nexperia",
+          "designators": [
+            "D_CAN_ESD"
+          ]
+        },
+        {
+          "module": "水泵驱动模块",
+          "manufacturer": "Nexperia",
+          "designators": [
+            "D_CAN"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-5b9075023fa8c03f",
+        "MODEL-cfdf1c043d1e18dd"
+      ],
+      "instance_keys": [
+        "BMS模块::D_CAN_TVS",
+        "FOC驱动模块::D_CAN_ESD",
+        "水泵驱动模块::D_CAN"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "RC0603FR-0710RL",
+      "mpn_normalized": "rc0603fr-0710rl",
+      "modules": [
+        "FOC驱动模块",
+        "稳压模块"
+      ],
+      "board_count": 2,
+      "bom_instance_count": 3,
+      "manufacturer_fields": [
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "Yageo",
+          "designators": [
+            "R_DUMP_GATE"
+          ]
+        },
+        {
+          "module": "稳压模块",
+          "manufacturer": "YAGEO(国巨)",
+          "designators": [
+            "R_DUMP_OH",
+            "R_DUMP_OL"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-73c05c3584ed5ec7",
+        "MODEL-b84ccb164ea301d9"
+      ],
+      "instance_keys": [
+        "FOC驱动模块::R_DUMP_GATE",
+        "稳压模块::R_DUMP_OH",
+        "稳压模块::R_DUMP_OL"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "RC0603FR-074K7L",
+      "mpn_normalized": "rc0603fr-074k7l",
+      "modules": [
+        "BMS模块",
+        "FOC驱动模块"
+      ],
+      "board_count": 2,
+      "bom_instance_count": 5,
+      "manufacturer_fields": [
+        {
+          "module": "BMS模块",
+          "manufacturer": "YAGEO",
+          "designators": [
+            "R_QPRE_PU"
+          ]
+        },
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "Yageo",
+          "designators": [
+            "R_BOV_DRIVE",
+            "R_OV_PU",
+            "R_SPI_SDO_PU"
+          ]
+        },
+        {
+          "module": "FOC驱动模块",
+          "manufacturer": "YAGEO(国巨)",
+          "designators": [
+            "R_BUCK_VALID_BASE"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-3598a49a55e6ceaf",
+        "MODEL-ba7f02f28c9e1f04"
+      ],
+      "instance_keys": [
+        "BMS模块::R_QPRE_PU",
+        "FOC驱动模块::R_BOV_DRIVE",
+        "FOC驱动模块::R_BUCK_VALID_BASE",
+        "FOC驱动模块::R_OV_PU",
+        "FOC驱动模块::R_SPI_SDO_PU"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    },
+    {
+      "mpn": "RS-03K1002FT",
+      "mpn_normalized": "rs-03k1002ft",
+      "modules": [
+        "BMS模块",
+        "水泵驱动模块"
+      ],
+      "board_count": 2,
+      "bom_instance_count": 13,
+      "manufacturer_fields": [
+        {
+          "module": "BMS模块",
+          "manufacturer": "FH(风华)",
+          "designators": [
+            "R_ALERT_PU",
+            "R_CAN_TXD_PU",
+            "R_SCL_PU",
+            "R_SDA_PU"
+          ]
+        },
+        {
+          "module": "水泵驱动模块",
+          "manufacturer": "风华高科",
+          "designators": [
+            "R_CAN_STB_PU",
+            "R_CAN_TXD_PU",
+            "R_FAULT_PU",
+            "R_IN1_PD",
+            "R_IN2_PD",
+            "R_SLEEP",
+            "R_VREF_BOTTOM",
+            "R_VREF_TOP"
+          ]
+        },
+        {
+          "module": "水泵驱动模块",
+          "manufacturer": "风华高科（FH）",
+          "designators": [
+            "R_FB_TOP"
+          ]
+        }
+      ],
+      "strict_part_keys": [
+        "MODEL-38c578da736b92a5",
+        "MODEL-571b02edfd2daf63",
+        "MODEL-e7d84dac81c29379"
+      ],
+      "instance_keys": [
+        "BMS模块::R_ALERT_PU",
+        "BMS模块::R_CAN_TXD_PU",
+        "BMS模块::R_SCL_PU",
+        "BMS模块::R_SDA_PU",
+        "水泵驱动模块::R_CAN_STB_PU",
+        "水泵驱动模块::R_CAN_TXD_PU",
+        "水泵驱动模块::R_FAULT_PU",
+        "水泵驱动模块::R_FB_TOP",
+        "水泵驱动模块::R_IN1_PD",
+        "水泵驱动模块::R_IN2_PD",
+        "水泵驱动模块::R_SLEEP",
+        "水泵驱动模块::R_VREF_BOTTOM",
+        "水泵驱动模块::R_VREF_TOP"
+      ],
+      "note": "仅实际MPN字段跨板相同，制造商字段不一致或缺失；保留各严格型号组，不自动合并，也不代表电气/机械验收。"
+    }
+  ],
+  "carrier_identity": {
+    "mpn_diff_instances": 79,
+    "rule": "采购目标与CAD载体分开；不据载体下单或自动合并。"
+  },
+  "low_change_reuse_candidates": [
+    {
+      "mpn": "RMC0603100K1%N",
+      "boards": [
+        "BMS模块",
+        "稳压模块"
+      ],
+      "indexed_instances": 26,
+      "change": "No schematic/BOM replacement; consolidate exact procurement identity if current quote/MOQ supports it.",
+      "boundary": "Two footprint asset variants; keep board-local assets."
+    },
+    {
+      "mpn": "PESD2CANFD24V-TR",
+      "boards": [
+        "BMS模块",
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instances": 3,
+      "change": "Same recorded MPN already used; normalize manufacturer alias only after source confirmation.",
+      "boundary": "Separate CAD identities remain; device/footprint verification per board."
+    },
+    {
+      "mpn": "CL10B105KA8NNNC",
+      "boards": [
+        "BMS模块",
+        "FOC驱动模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instances": 18,
+      "change": "原三种1uF型号已并为Samsung 1uF±10%25V X7R0603；BMS11、FOC每板5×2、水泵2。",
+      "boundary": "按工作节点核对；厂家DC-bias仅典型值，纹波/有效容量/瞬态仍待人类验证；当前商城无现货，不能保证交期。",
+      "supplier_part": "C29936",
+      "vehicle_quantity": 23,
+      "status": "IMPLEMENTED_SAVED_REOPENED_VERIFIED_HARDWARE_HOLD"
+    },
+    {
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "boards": [
+        "FOC驱动模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instances": 3,
+      "change": "Continue exact JST ordering code; no schematic change.",
+      "boundary": "Three footprint variants; preserve pin order, orientation, retention and mating-harness geometry."
+    },
+    {
+      "mpn": "MFR25SFRE52-120R",
+      "boards": [
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "indexed_instances": 10,
+      "change": "Use the same exact resistor MPN where assembly is required.",
+      "boundary": "Water-pump R_TERM is default DNP; count only if bus-end termination is physically required; retain local footprints."
+    }
+  ],
+  "high_value_candidates": [
+    {
+      "candidate": "FOC两板12颗IPT015N10N5ATMA1评估复用BMS已选HYG022N10NS1TA",
+      "status": "值得进入封装/热/保护/报价下一轮核验；仅候选，不替换BOM或原生图。",
+      "quantity_and_package": {
+        "FOC_qty_per_board": 6,
+        "FOC_board_count": 2,
+        "vehicle_FOC_qty": 12,
+        "BMS_HYG_qty": 6,
+        "voltage_rating_both_V": 100,
+        "pin_mapping": "两者均为TOLL类；BMS现有HYG映射为pin1=G、pins2-8=S、散热焊盘D映射CAD pin9。FOC当前封装名为HSOF-8_IPT007N06N；几何与焊盘兼容尚未逐尺寸叠图确认。"
+      },
+      "datasheet_comparison": {
+        "IPT015N10N5ATMA1": "Infineon数据表：RDS(on)最大1.5mΩ@VGS=10V/ID=150A、2.0mΩ@6V/75A；Qg最大211nC、Qgd最大51nC；RθJC最大0.4°C/W；Tj上限175°C。",
+        "HYG022N10NS1TA": "BMS所附HYMEXA/HUAYI数据表：RDS(on)最大2.8mΩ@VGS=10V/ID=50A；Qg典型160.5nC、Qgd典型44nC且未列最大值；RθJC 0.48°C/W；Tj上限175°C。动态参数测试电压/电流条件不一致，不据此宣称开关损耗更低。"
+      },
+      "same_100A_peak_conduction_screen": {
+        "formula": "沿用selected_ipt015_thermal_screen：Pcond=1.5×Ipk²×Rhot；统一RDS热倍率2.5（筛查假设，非厂家保证）。",
+        "matched_VGS_10V_RDSon_max_delta_mohm": 1.3,
+        "base_25C_bridge_delta_W_per_board": 19.5,
+        "screened_delta_W_per_board_at_100A_peak": 48.75,
+        "two_FOC_boards_if_each_at_100A_peak_delta_W": 97.5,
+        "interpretation": "数学筛查值，不是连续额定或实测损耗；同为10V最大值但数据表测试电流不同（IPT 150A、HYG 50A），100A处按所列最大值建模。既有FOC热筛查另采用IPT 2.0mΩ@6V作最低栅压基线，需先确认DRV8353实际VGS并以统一条件复核。"
+      },
+      "protection_and_thermal_boundary": "FOC电流环模型运行限值±100A、候选峰值120A；纸面静态相过流门限最小约+131.513A/−130.588A，120A余量仅11.513/10.588A，延迟与过冲未闭合。DRV8353 VDS过流候选0.9V（角点0.81–0.99V）；现有5mΩ热筛查对应162–198A。HYG按2.8mΩ×2.5=7mΩ筛查时约116–141A（0.9V标称约129A），靠近120A候选峰值，不能原样沿用保护设定；需重核误触发、短路SOA、散热和响应波形。",
+      "price_reference_not_quote": {
+        "IPT015N10N5ATMA1_RS_public_index_CNY_ex_tax": 35.984,
+        "IPT015N10N5ATMA1_RS_public_index_CNY_tax_included": 40.662,
+        "IPT015N10N5ATMA1_MOQ": 5,
+        "IPT_reference_status": "用户查得公开索引值；商品正文抓取超时，非可采购实价。",
+        "HYG022N10NS1TA_old_CNY_each": 7.2168,
+        "HYG_reference_status": "BMS历史华秋1+报价，需刷新库存与当前报价。",
+        "savings_amount_claimed": false
+      },
+      "next_checks": [
+        "叠合Infineon与HUAYI推荐焊盘尺寸及FOC现有封装，核对pin9散热焊盘与铜皮/钢网。",
+        "确认实际DRV8353栅压、门阻、死区、VGS波形及HYG器件最大Qg/批次追溯。",
+        "以最高环境温度与散热结构复算结温，并重定VDS-OCP、短路SOA及过流台架响应。",
+        "刷新两料号可采购含税价、库存、MOQ/包装后再评系统总成本。"
+      ],
+      "evidence": [
+        "电力/FOC驱动模块/计算/selected_ipt015_thermal_screen.md",
+        "电力/FOC驱动模块/保护与固件约束.md",
+        "电力/FOC驱动模块/FOC驱动设计构想.md",
+        "电力/BMS模块/厂商资料/HYG022N10NS1TA.pdf",
+        "电力/BMS模块/原理图准备/BOM.csv",
+        "Infineon IPT015N10N5 Rev.2.4 datasheet: https://www.infineon.com/dgdl/Infineon-IPT015N10N5-DataSheet-v02_04-EN.pdf?fileId=5546d4624a75e5f1014ac94680661aff"
+      ]
+    }
+  ],
+  "do_not_force_merge": [
+    {
+      "mpn": "MMBT5551",
+      "boards": [
+        "BMS模块:MDD",
+        "稳压模块:JKSEMI"
+      ],
+      "reason": "Same generic MPN but different manufacturers; compare voltage gain bins, leakage, saturation, dissipation and SOT-23 pinout before standardizing."
+    },
+    {
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "boards": [
+        "BMS模块",
+        "水泵驱动模块"
+      ],
+      "reason": "DEGSON manufacturer aliases differ; verify exact OEM/order suffix, mating part, current rating and harness before treating procurement identities as one."
+    },
+    {
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "boards": [
+        "FOC驱动模块",
+        "稳压模块",
+        "水泵驱动模块"
+      ],
+      "reason": "Manufacturer attribution varies among JXT/JXTCONN; verify original maker and exact suffix; three CAD footprints must not be collapsed."
+    },
+    {
+      "item": "BMS U_LOAD_POWER_VALID",
+      "reason": "BOM target VO617A-2X007T differs from CAD carrier VO617A-4X007T. Never order from the carrier MPN; CTR/electrical/pin compatibility and current BMS source require confirmation."
+    },
+    {
+      "item": "All shared MPN groups",
+      "reason": "Shared purchase MPN is not permission to merge device/footprint assets; snapshot shows multiple footprint variants and 64 actual-vs-carrier MPN differences, many intentional."
+    }
+  ],
+  "cost_boundary": {
+    "numeric_records_by_module": [
+      {
+        "module": "BMS模块",
+        "procurement_record_count": 248,
+        "current_full_price_complete": false,
+        "quote_status": "BMS少量旧报价保留为历史，其余未取得全套现行到手价"
+      },
+      {
+        "module": "FOC驱动模块",
+        "procurement_record_count": 92,
+        "current_full_price_complete": false,
+        "quote_status": "BMS少量旧报价保留为历史，其余未取得全套现行到手价"
+      },
+      {
+        "module": "稳压模块",
+        "procurement_record_count": 169,
+        "current_full_price_complete": false,
+        "quote_status": "BMS少量旧报价保留为历史，其余未取得全套现行到手价"
+      },
+      {
+        "module": "水泵驱动模块",
+        "procurement_record_count": 58,
+        "current_full_price_complete": false,
+        "quote_status": "BMS少量旧报价保留为历史，其余未取得全套现行到手价"
+      }
+    ],
+    "historical_quotes": [
+      {
+        "module": "BMS模块",
+        "mpn": "HYG022N10NS1TA",
+        "references": [
+          "Q_CHG1",
+          "Q_CHG2",
+          "Q_CHG3",
+          "Q_DSG1",
+          "Q_DSG2",
+          "Q_DSG3"
+        ],
+        "quantity_per_BMS": 6,
+        "old_unit_price_cny": 7.2168,
+        "source": "华秋前轮1+报价；本轮页面抓取失败，采购前刷新",
+        "status": "old_quote_refresh_required"
+      },
+      {
+        "module": "BMS模块",
+        "mpn": "TPL5111DDCR",
+        "references": [
+          "U_TIMER"
+        ],
+        "quantity_per_BMS": 1,
+        "old_unit_price_cny": 10.82,
+        "quote_date": "2026-10-14",
+        "source": "DigiKey中国 Cut Tape，含13%增值税；原备注要求刷新库存/报价",
+        "status": "historical_quote_refresh_required"
+      }
+    ],
+    "current_aggregate_cost_calculated": false,
+    "savings_claimed": false,
+    "unpriced_missing_system_items": [
+      {
+        "item": "RK3588供电板",
+        "status": "当前四板BOM/元件库未登记现行成品型号",
+        "cost_treatment": "方案与型号待用户确定，暂不计入价格或数量比较。"
+      },
+      {
+        "item": "独立冷却板",
+        "status": "当前四板BOM/元件库未登记现行成品型号",
+        "cost_treatment": "方案与型号待用户确定，暂不计入价格或数量比较。"
+      }
+    ],
+    "boundary": "No current full-project total or savings claim. Refresh live quote, MOQ, stock, tax/shipping, quantity/Foc×2, external harness, DNP fit, and qualification costs before comparison."
+  },
+  "nonclaims": [
+    "未证明全项目最低成本或现行总价；需报价、MOQ、库存、税运、装配和验证成本。",
+    "全库最终只读检查PASS仅证明登记来源与资产一致性，不证明电气、PCB或实物资格。",
+    "FOC按两板计，偏置仅A装，插头全车2；板外/候选/DNP不得误计。",
+    "原生缺MPN/厂家字段已逐位号列出，禁止自动强并。",
+    "本轮文件哈希/行数机械快照不代表中央元件库同步、价格核验或设计放行。"
+  ],
+  "FOC_vehicle_population_override": {
+    "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_双板装配补充.csv",
+    "sha256": "bfcc46fb9c93538d2b5457c364975597951a43a447357b57f2557e0c1080559e",
+    "basis": "整车两块FOC，禁止再次乘2",
+    "R_LOAD_VALID_BIAS": {
+      "FOC_A": 1,
+      "FOC_B": 0,
+      "vehicle_fitted": 1,
+      "effect": "覆盖CAD按双板展开的实装量，非新增采购行"
+    },
+    "J_LOAD_POWER_VALID_MATE": {
+      "per_FOC_board": 1,
+      "vehicle_fitted": 2,
+      "procurement_source": "FOC驱动模块/原理图准备/装配采购补充.csv"
+    },
+    "new_interface_board_parts": {
+      "FOC_A": 7,
+      "FOC_B": 6,
+      "vehicle_total": 13
+    }
+  },
+  "incomplete_native_procurement_identity": {
+    "counts": {
+      "missing_mpn_count": 5,
+      "missing_manufacturer_count": 28,
+      "actual_rows_rebuilt": 29
+    },
+    "instances": [
+      {
+        "module": "FOC驱动模块",
+        "designator": "F_BRAKE",
+        "mpn": "Eaton CBBF-60",
+        "manufacturer": null,
+        "pcb": "no",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "Eaton CBBF-60",
+            "manufacturer": "",
+            "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 16,
+            "notes": "60A / 58V EXT"
+          }
+        ]
+      },
+      {
+        "module": "FOC驱动模块",
+        "designator": "J_BRAKE_R",
+        "mpn": null,
+        "manufacturer": "Anderson Power Products",
+        "pcb": "no",
+        "missing_fields": [
+          "mpn"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "",
+            "manufacturer": "Anderson Power Products",
+            "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 19,
+            "notes": "SB50 / DUMP R"
+          }
+        ]
+      },
+      {
+        "module": "FOC驱动模块",
+        "designator": "JP_HA",
+        "mpn": "Jumper3",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "Jumper3",
+            "manufacturer": "",
+            "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 18,
+            "notes": "3P selector"
+          }
+        ]
+      },
+      {
+        "module": "FOC驱动模块",
+        "designator": "JP_HB",
+        "mpn": "Jumper3",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "Jumper3",
+            "manufacturer": "",
+            "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 18,
+            "notes": "3P selector"
+          }
+        ]
+      },
+      {
+        "module": "FOC驱动模块",
+        "designator": "JP_HC",
+        "mpn": "Jumper3",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "Jumper3",
+            "manufacturer": "",
+            "source": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 18,
+            "notes": "3P selector"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL1",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 6,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL2",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 7,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL3",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 8,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL4",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 9,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL5",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 10,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL6",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 11,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL7",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 12,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_BAL8",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 13,
+            "notes": ""
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_CAN1",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 25,
+            "notes": "100nF 50V X7R; {\"recordedRequirement\":\"100nF 50V X7R\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_NTC_DUMP",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 34,
+            "notes": "100nF 50V X7R filter candidate; {\"recordedRequirement\":\"100nF 50V X7R filter candidate\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_NTC_MAIN",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 35,
+            "notes": "100nF 50V X7R filter candidate; {\"recordedRequirement\":\"100nF 50V X7R filter candidate\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "C_NTC_SC",
+        "mpn": "C0805C104K5RAC7800",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "C0805C104K5RAC7800",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 36,
+            "notes": "100nF 50V X7R filter candidate; {\"recordedRequirement\":\"100nF 50V X7R filter candidate\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "J_5V_EXT",
+        "mpn": null,
+        "manufacturer": null,
+        "pcb": "no",
+        "missing_fields": [
+          "mpn",
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 159,
+            "notes": "2-pin external 5V interface, exact connector pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"2-pin external 5V interface, exact connector pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=2-pin external 5V interface, exact connector pending; placement=ON_BOARD_PACKAGE_PENDING"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "J_BUS_POWER",
+        "mpn": null,
+        "manufacturer": null,
+        "pcb": "no",
+        "missing_fields": [
+          "mpn",
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 160,
+            "notes": "High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=High-current BUS interface; M6 stud or equivalent >=design-current path, footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "J_DUMP",
+        "mpn": null,
+        "manufacturer": null,
+        "pcb": "no",
+        "missing_fields": [
+          "mpn",
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 161,
+            "notes": "External resistor interface; high-current stud/connector footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"External resistor interface; high-current stud/connector footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=External resistor interface; high-current stud/connector footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "J_SC_POWER",
+        "mpn": null,
+        "manufacturer": null,
+        "pcb": "no",
+        "missing_fields": [
+          "mpn",
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 162,
+            "notes": "High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending; schematic-only symbol; PCB footprint/connector rating not selected; {\"recordedRequirement\":\"High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending\",\"requirements\":\"schematic-only symbol; PCB footprint/connector rating not selected\",\"status\":\"two_pin_power_symbol_placeholder\"}; req=High-current SC interface after external F_SC; M6 stud or equivalent, footprint pending; placement=ON_BOARD_PACKAGE_PENDING"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL1",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 147,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL2",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 148,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL3",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 149,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL4",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 150,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL5",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 151,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL6",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 152,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL7",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 153,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      },
+      {
+        "module": "稳压模块",
+        "designator": "U_BAL8",
+        "mpn": "BW6101-C1AP",
+        "manufacturer": null,
+        "pcb": "yes",
+        "missing_fields": [
+          "manufacturer"
+        ],
+        "reason": "当前中央索引中的原生有效属性为空；不自动推断厂家或替代采购目标。",
+        "procurement_candidates": [
+          {
+            "mpn": "BW6101-C1AP",
+            "manufacturer": "",
+            "source": "稳压模块/原理图准备/BOM.csv",
+            "row": 154,
+            "notes": "BW6101-C1AP; {\"recordedRequirement\":\"BW6101-C1AP\"}"
+          }
+        ]
+      }
+    ],
+    "scope": "由当前元件总表.instances直接重建；空字段仍是采购身份缺口，不代表结构一致性检查失败。"
+  },
+  "candidate_analysis_basis": "已实施的1uF并料以当前proof及implemented_cost_performance_changes为准；其他候选保留待核，不自动修改源。高价值MOS仍未替换、未核现价。",
+  "report_refresh_mutates_native_or_procurement_sources": false,
+  "board_scope_snapshot_status": "CURRENT_INDEX_AND_SYNC_PROOF_MATCH_CURRENT_FILES",
+  "implemented_cost_performance_changes": {
+    "date": "2026-10-22",
+    "proof_path": "检查/统一审查/跨板并料复核.json",
+    "proof_sha256": "cce09a3c0439f40b7c8cc882c304d68d2e0b85dc68f8558cd4498ebcd610ff09",
+    "currency": "CNY",
+    "scope": "本轮Samsung23颗并料与REG TH_SC/TH_MAIN两只NTC替换；不含更早C533更换，不是整车总价。",
+    "installed_value": {
+      "before": 65.2617,
+      "after": 23.3034,
+      "saving": 41.9583
+    },
+    "estimated_moq_cash": {
+      "before": 86.9734,
+      "after": 24.8649,
+      "saving": 62.1085,
+      "guaranteed_order_total": false
+    },
+    "quantities": {
+      "Samsung_C29936": {
+        "BMS": 11,
+        "FOC_two_boards": 10,
+        "PUMP": 2,
+        "vehicle": 23
+      },
+      "ShiHeng_C13879": {
+        "BMS": 2,
+        "PUMP": 1,
+        "REG": 2,
+        "vehicle": 5
+      },
+      "ATI_retained_TH_DUMP": 1,
+      "C5334032_FOC_two_boards": 2,
+      "SC0350_270_RSS": 8
+    },
+    "performance_and_stability": [
+      "BMS B9网标恢复保险前后边界，13针恢复既有合同，零新增器件成本。",
+      "FOC/水泵相应电容额定由16V提高到25V；Samsung工作点典型DC-bias保容曲线更有利，但不是最低保证值或实测稳定性证明。",
+      "REG温度探头复用既有时恒型号，高温TH_DUMP保留；R/T曲线、容差与候选阈值计算已写入合同，安装热滞后与动态仍待验证。"
+    ],
+    "purchase_limits": [
+      "C29936 MOQ10、C13879 MOQ10，订单步进未知，现金估算暂按单颗步进；ATI起订约束未全部核实。",
+      "C29936页面现货0，在途和页面3工作日不构成交期保证。",
+      "报价观察不含运费/优惠/装配/验证；没有发生采购。"
+    ],
+    "design_release": "HOLD"
+  },
+  "current_price_snapshot": {
+    "path": "元件封装库/索引/商城成本.json",
+    "sha256": "568ef0be1c6b38fba4e19ea03308b9233d6dab33d8b6acf7f6f92cb113cfd948",
+    "scenario": "actual_vehicle",
+    "verified_installed_subtotal_cny": 785.805502,
+    "complete_installed_total_cny": null,
+    "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 950.540725,
+    "complete_minimum_cash_purchase_cny": null,
+    "unpriced_sku_count": 105,
+    "unpriced_quantity": 376,
+    "status": "PARTIAL",
+    "note": "已报价小计不是整车总价；缺价保持null。"
+  }
+}

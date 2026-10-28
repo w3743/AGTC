@@ -1,0 +1,6 @@
+Post-run source review:
+- GPU launch snapshot is `input_snapshot/sha256.json`; it has the exact code loaded by v1b.
+- After the GPU run, I removed only the newly-added final LF at EOF in the two edited repo files to restore the files' original no-final-newline byte convention. No code lines or behavior changed; the CPU 10-test suite was rerun and passed afterward.
+- This makes the current repo file SHA differ from the GPU input snapshot by exactly that trailing newline. The post-run hashes are in postrun_source_sha256.json. `newton_backend.py` and `physics_backend.py` remain byte-identical to the GPU snapshot.
+CPU command: `wsl.exe -d Ubuntu-24.04-Arm64 -- env CUDA_VISIBLE_DEVICES= PYTHONPATH=/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/proto:/mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/train /opt/venv_mujoco315_smoke/bin/python -m unittest discover -s /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native/proto -p 'test_newton*backend*.py' -v`
+Result: Ran 10 tests in 6.267s; OK.

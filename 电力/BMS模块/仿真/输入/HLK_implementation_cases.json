@@ -1,0 +1,208 @@
+{
+  "schema": "hlk-urb4805-bms-power-implementation-cases-v1",
+  "status": "implemented_source_local_verification",
+  "scope": "核对当前已落实的5V电源模块替换、模块CTRL开关、最低负载和重复下拉合并；本文件只驱动受限计算/模型，不修改正式BOM、连接源或EasyEDA工程",
+  "baseline": {
+    "scope_note": "本地模型仅按当前连接源与采购BOM逐位核查落实状态；历史PCB/BOM总数不参与本次计算",
+    "official_library_module": {
+      "mpn": "URB4805YMD-10WR3",
+      "cad_component": "C5365326",
+      "library_uuid": "bd9ce49027fc4c83a722f82268af98d2",
+      "confirmation_source": "当前共用器件库索引及已落实的正式模块连接源；CAD载体身份与采购MPN分开核验"
+    }
+  },
+  "official_module_spec": {
+    "source_pdf": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+    "model": "URB4805YMD-10WR3",
+    "input_min_v": 18.0,
+    "input_nominal_v": 48.0,
+    "input_max_v": 75.0,
+    "output_nominal_v": 5.0,
+    "output_current_rated_a": 2.0,
+    "output_power_rated_w": 10.0,
+    "output_voltage_accuracy_max_fraction": 0.02,
+    "efficiency_min_fraction_at_48v_rated_resistive_25c": 0.81,
+    "efficiency_typ_fraction_at_48v_rated_resistive_25c": 0.83,
+    "maximum_capacitive_load_uf": 2200.0,
+    "minimum_load_fraction_for_capacitive_load": 0.03,
+    "ctrl_off_v_max": 1.2,
+    "ctrl_on_v_min": 3.5,
+    "ctrl_on_v_max": 12.0,
+    "ctrl_open_means_on": true,
+    "ctrl_voltage_reference": "相对于模块输入负端",
+    "disabled_input_current_max_ma_at_spec_test_conditions": 1.0,
+    "operating_ambient_min_c": -40.0,
+    "operating_ambient_max_c": 85.0,
+    "maximum_case_temperature_c": 100.0,
+    "hot_plug_supported": false,
+    "hot_plug_application_constraint": "海凌科V1.7第2页明确热插拔不支持；须避免模块输入直接带电插拔，现有计算不能作为热插拔放行依据。",
+    "temperature_derating_curve": {
+      "source_page": 4,
+      "full_power_through_ambient_c": 71.0,
+      "power_fraction_at_85c": 0.60,
+      "curve_end_ambient_c": 90.0,
+      "curve_reading": "对手册曲线图的读图值；非具体板上热模型"
+    },
+    "startup_time_conflict": {
+      "page_1_typical_feature_ms": 10.0,
+      "page_2_table_typical_ms": 1.0,
+      "page_2_condition": "标称输入电压及恒阻负载",
+      "maximum_specified": false,
+      "conclusion": "同一V1.7手册两处典型值互相矛盾且均无最大值；任何一值均不作保证或启动模型参数"
+    },
+    "page_6_test_circuit_input_capacitor_reference_uf": [47.0, 100.0],
+    "page_4_typical_emc_48v_input_capacitor_reference": "100uF/100V electrolytic plus 1uF/100V ceramic in its typical EMC filter; not stated as guaranteed minimum"
+  },
+  "expected_module_pin_map": {
+    "1": "B0 (-Vin)",
+    "2": "CELL_B9 (+Vin)",
+    "3": "VOUT_5V (+Vo)",
+    "4": "NC (NP)",
+    "5": "B0 (module output GND; intentionally commoned with input return)",
+    "6": "CTRL_MODULE"
+  },
+  "switch": {
+    "ref": "SW_RUN_STORE",
+    "mpn": "MN22SS1G01",
+    "contact_commons": [2, 5],
+    "run_closed_pairs": [[2, 3], [5, 6]],
+    "store_closed_pairs": [[2, 1], [5, 4]],
+    "current_pin_map": {
+      "1": null,
+      "2": "SW_RUN",
+      "3": "REG1",
+      "4": null,
+      "5": "PRE_CTRL_3V3",
+      "6": "REG1"
+    },
+    "expected_pin_map": {
+      "1": null,
+      "2": "PRE_CTRL_3V3",
+      "3": "REG1",
+      "4": "B0",
+      "5": "CTRL_MODULE",
+      "6": null
+    },
+    "run_behavior": "pin2-pin3供PRE_CTRL_3V3；pin5-pin6闭合但pin6为NC，CTRL_MODULE开路，模块开启",
+    "store_behavior": "pin2-pin1开路，PRE_CTRL_3V3由保留100k下拉；pin5-pin4将CTRL_MODULE接B0，模块关闭",
+    "external_switch_purchase_quantity_remains": 1,
+    "switch_is_not_a_safety_rated_isolator": true
+  },
+  "control_rail_merge": {
+    "net_rename": {
+      "from": "SW_RUN",
+      "to": "PRE_CTRL_3V3"
+    },
+    "rename_targets": [
+      "SW_RUN_STORE pin2",
+      "U_GATE1 pin1"
+    ],
+    "remove_duplicate_pulldown_ref": "R_IF_RUN_PD",
+    "retain_pulldown_ref": "R_PRE_CTRL_PD",
+    "pulldown_mpn": "RMC0603100K1%N",
+    "pulldown_nominal_ohm": 100000.0,
+    "pulldown_tolerance_fraction": 0.01,
+    "pulldown_tcr_ppm_per_c": 100.0,
+    "control_decoupling_refs": ["C_AND2", "C_GATE1", "C_SEQ", "C_POR"],
+    "each_control_decoupling_nominal_uf": 0.1,
+    "decoupling_tolerance_fraction": 0.10,
+    "preserve_por_ref": "U_POR",
+    "por_note": "RC关断计算不能替代POR阈值/复位完整性；保留既有POR",
+    "switch_disconnection_during_store": "PRE_CTRL_3V3与REG1隔离；被动RC计算不包含芯片负载和漏电"
+  },
+  "minimum_load_bank": {
+    "decision": "冻结为7只510欧姆并联；优先复用当前精确MPN以减少料号种类",
+    "refs": ["R_PSU_MINLOAD1", "R_PSU_MINLOAD2", "R_PSU_MINLOAD3", "R_PSU_MINLOAD4", "R_PSU_MINLOAD5", "R_PSU_MINLOAD6", "R_PSU_MINLOAD7"],
+    "mpn": "RC0603FR-07510RL",
+    "manufacturer": "Yageo",
+    "nominal_ohm_each": 510.0,
+    "tolerance_fraction": 0.01,
+    "tcr_ppm_per_c": 100.0,
+    "rated_power_w_each": 0.1,
+    "temperature_range_for_resistor_c": [0.0, 60.0],
+    "connection": {"pin1": "VOUT_5V", "pin2": "B0"},
+    "existing_same_mpn_ref": "R_LOAD_POWER_VALID_LED",
+    "single_75_ohm_comparator": {
+      "selected": false,
+      "new_mpn_type_would_be_required": true,
+      "analysis_only": true
+    }
+  },
+  "load_cases": {
+    "base_5v_planning_current_a": 0.30,
+    "base_load_is_measured": false,
+    "fan_candidate": {
+      "mpn": "Delta KSB0405HBF0D",
+      "typical_current_a": 0.16,
+      "label_max_current_a": 0.30,
+      "startup_current_known": false,
+      "status": "当前候选，风扇控制与热需求仍需实物确认"
+    },
+    "fan_pressure_cases_from_legacy_budget": [
+      {"name": "legacy_continuous", "fan_current_a": 0.50, "not_actual_selected_fan": true},
+      {"name": "legacy_startup", "fan_current_a": 0.80, "not_actual_selected_fan": true},
+      {"name": "legacy_current_limit", "fan_current_a": 1.10, "not_actual_selected_fan": true}
+    ],
+    "voltage_corners_v": {
+      "official_accuracy_low": 4.9,
+      "nominal": 5.0,
+      "official_accuracy_high": 5.1,
+      "extended_engineering_stress_low": 4.75,
+      "extended_engineering_stress_high": 5.25
+    }
+  },
+  "capacitors": {
+    "module_input_refs": ["C_PSU_IN1", "C_PSU_IN2", "C_PSU_IN3"],
+    "module_input_nominal_uf": 9.5,
+    "module_input_mpn_by_ref": {
+      "C_PSU_IN1": "GRM32ER72A475KE14L",
+      "C_PSU_IN2": "GRM188R72A104KA35J",
+      "C_PSU_IN3": "GRM32ER72A475KE14L"
+    },
+    "module_output_refs": ["C_PSU_OUT1", "C_PSU_OUT2", "C_CAN_PWR_IN1", "C_FAN_IN1"],
+    "module_output_mpn": "GRM32ER61C476KE15L",
+    "module_output_nominal_each_uf": 47.0,
+    "module_output_nominal_total_uf": 188.0,
+    "actual_effective_capacitance_known": false,
+    "input_cap_recommendation_disposition": "仅保留现有9.5uF标称输入陶瓷作候选，不把手册典型47-100uF测试电容写成保证下限；必须确认纹波、输入动态阻抗及滤波稳定性",
+    "output_cap_limit_check": "将现有4x47uF的188uF标称总量与官方2200uF容性负载上限比较；不代表有效容量或启动验证"
+  },
+  "supply_domains": {
+    "module_input_net": "CELL_B9",
+    "module_return_net": "B0",
+    "breg_chain": "CELL_B9 -> D_BREG(BAT46W) -> R_BREG_FEED(1k,2W) -> Q_BREG(FCX495TA) -> REGIN -> U1(BQ7695202PFBR) REG1=3.3V",
+    "module_input_is_independent_of_reg1": true,
+    "main_power_hard_shutdown_is_separate": true,
+    "no_global_power_off_claim": true,
+    "backfeed_state": "无规划的VOUT_5V至REG1直连；跨域GPIO/外部MCU、外部5V接入和模块反向供电行为没有器件级证据，列为未验证，不宣称无回灌"
+  },
+  "implemented_changes": {
+    "remove_refs": ["C_PSU_BOOT", "C_PSU_FF", "R_PSU_FB_TOP", "R_PSU_FB_BOT", "L_PSU", "D_PSU", "R_PSU_EN", "R_IF_RUN_PD"],
+    "replace_in_place": {"ref": "U_PSU", "from_mpn": "SCT2A26STER", "to_mpn": "URB4805YMD-10WR3"},
+    "add_refs": ["R_PSU_MINLOAD1", "R_PSU_MINLOAD2", "R_PSU_MINLOAD3", "R_PSU_MINLOAD4", "R_PSU_MINLOAD5", "R_PSU_MINLOAD6", "R_PSU_MINLOAD7"],
+    "retain_refs": ["C_PSU_IN1", "C_PSU_IN2", "C_PSU_IN3", "C_PSU_OUT1", "C_PSU_OUT2", "C_CAN_PWR_IN1", "C_FAN_IN1", "R_PRE_CTRL_PD", "U_POR"],
+    "no_new_switch_purchase": true,
+    "formal_source_changed": true,
+    "baseline_archive": "BMS模块/检查/tmp/source_before_implementation.zip",
+    "implemented_module_ref": "PSU5_EXT",
+    "implemented_switch_pin_map": {
+      "1": null,
+      "2": "PRE_CTRL_3V3",
+      "3": "REG1",
+      "4": "B0",
+      "5": "CTRL_MODULE",
+      "6": null
+    },
+    "implemented_control_net": "PRE_CTRL_3V3",
+    "implemented_switch_purchase_quantity": 1
+  },
+  "simulation_method": {
+    "method": "stdlib Python reduced-order analytical/time-domain RC and static power/current model",
+    "ngspice_expected": false,
+    "converter_macromodel_available": false,
+    "startup_sensitivity_ramp_ms": [1.0, 10.0, 50.0],
+    "startup_capacitance_scenarios_uf": [40.0, 188.0],
+    "startup_model_warning": "I=C*dV/dt linear-ramp sensitivity only; not converter control-loop/current-limit/SPICE/macromodel simulation",
+    "no_hardware_sample": true
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "recorded_at_asia_shanghai": "2026-10-21T01:36:15.2229607+08:00",
+  "method": "Read-only ADB snapshot; no service, exposure, HDR, calibration or source changes",
+  "interpretation": {
+    "exposure_time_note": "V4L2 exposure is in sensor line units. Approximate 30ms previously inferred from exposure2025/(2192+58)/30, not a microsecond measurement.",
+    "latency_note": "Software process_ms, capture FPS and encoder latency are distinct. End-to-end exposure-to-control latency has not been measured.",
+    "synchronization_note": "Software PTS pairing only; hardware exposure synchronization unverified.",
+    "hdr_note": "Inspect per-device ISP HDRMGE/HDRDRC and CIF hdr mode below; sensor capability alone is not deployment proof."
+  },
+  "snapshot": {
+    "device_time_is_not_trusted": true,
+    "sensor_names": {
+      "2": "m00_b_imx415 2-001a\n",
+      "7": "m01_f_imx415 0-001a\n"
+    },
+    "sensor_controls": {
+      "2": {
+        "exit_code": 0,
+        "output": "\nUser Controls\n\n                       exposure 0x00980911 (int)    : min=4 max=2242 step=1 default=2242 value=2025\n                horizontal_flip 0x00980914 (bool)   : default=0 value=0\n                  vertical_flip 0x00980915 (bool)   : default=0 value=0\n\nImage Source Controls\n\n              vertical_blanking 0x009e0901 (int)    : min=58 max=30575 step=1 default=58 value=58\n            horizontal_blanking 0x009e0902 (int)    : min=4936 max=4936 step=1 default=4936 value=4936 flags=read-only\n                  analogue_gain 0x009e0903 (int)    : min=0 max=240 step=1 default=0 value=181\n\nImage Processing Controls\n\n                 link_frequency 0x009f0901 (intmenu): min=0 max=4 default=0 value=1\n\t\t\t\t0: 297000000 (0x11b3dc40)\n\t\t\t\t1: 446000000 (0x1a956b80)\n\t\t\t\t2: 743000000 (0x2c4947c0)\n\t\t\t\t3: 891000000 (0x351b94c0)\n\t\t\t\t4: 1188000000 (0x46cf7100)\n                     pixel_rate 0x009f0902 (int64)  : min=0 max=950400000 step=1 default=356800000 value=356800000 flags=read-only\n"
+      },
+      "7": {
+        "exit_code": 0,
+        "output": "\nUser Controls\n\n                       exposure 0x00980911 (int)    : min=4 max=2242 step=1 default=2242 value=2025\n                horizontal_flip 0x00980914 (bool)   : default=0 value=0\n                  vertical_flip 0x00980915 (bool)   : default=0 value=0\n\nImage Source Controls\n\n              vertical_blanking 0x009e0901 (int)    : min=58 max=30575 step=1 default=58 value=58\n            horizontal_blanking 0x009e0902 (int)    : min=4936 max=4936 step=1 default=4936 value=4936 flags=read-only\n                  analogue_gain 0x009e0903 (int)    : min=0 max=240 step=1 default=0 value=181\n\nImage Processing Controls\n\n                 link_frequency 0x009f0901 (intmenu): min=0 max=4 default=0 value=1\n\t\t\t\t0: 297000000 (0x11b3dc40)\n\t\t\t\t1: 446000000 (0x1a956b80)\n\t\t\t\t2: 743000000 (0x2c4947c0)\n\t\t\t\t3: 891000000 (0x351b94c0)\n\t\t\t\t4: 1188000000 (0x46cf7100)\n                     pixel_rate 0x009f0902 (int64)  : min=0 max=950400000 step=1 default=356800000 value=356800000 flags=read-only\n"
+      }
+    },
+    "isp_debug": {
+      "rkisp0-vir0": "rkisp0-vir0 ISP:0x60 Version:v02.05.01\nclk_isp_core 702000000\naclk_isp   750000000\nhclk_isp   198000000\nclk_isp_core_marvin 702000000\nclk_isp_core_vicap 702000000\nInterrupt  Cnt:615867 ErrCnt:0\nInput      rkcif-mipi-lvds Format:SGBRG10_1X10 Size:3840x2160@30fps Offset(0,0) Inp:0x104\nIsp offline mode:frame1 (frame:307933 rate:33ms state:working time:12ms frameloss:0) cnt(total:307933 X1:307933 X2:-1 X3:-1) rd_bufcnt:1\n\t   hw link:2 idle:0 vir(mode:1 index:0)\nOutput     rkisp_mainpath Format:NM12 Size:3840x2160 Dcrop(0,0|3840x2160) (frame:307932 rate:33ms delay:45ms frameloss:2 bufcnt:4)\nOutput     rkisp_selfpath Format:NM12 Size:640x360 Dcrop(0,0|3840x2160) (frame:307932 rate:33ms delay:45ms frameloss:5 bufcnt:2)\nCMSK       OFF(0x0)\nDPCC0      ON(0x5)\nDPCC1      ON(0x5)\nDPCC2      ON(0x5)\nBLS        ON(0x1)\nSDG        OFF(0x6397)\nLSC        ON(0x15)\nAWBGAIN    ON(0x6397) (gain: 0x01000100, 0x016b0320)\nDEBAYER    ON(0x111)\nCCM        ON(0x1)\nGAMMA_OUT  ON(0x5)\nCPROC      ON(0xf)\nIE         OFF(0x0) (effect: BLACKWHITE)\nHDRDRC     OFF(0x0)\nHDRMGE     OFF(0x2)\nBAYNR      ON(0x101)\nBAY3D      ON(0x2005)\nYNR        ON(0x4001001)\nCNR        ON(0x1)\nSHARP      ON(0x1)\nGIC        OFF(0x0)\nDHAZ       ON(0x4110011)\n3DLUT      OFF(0x0)\nLDCH       OFF(0x0)\nCSM        FULL(0x6397), y_offs:0x0 c_offs:0x80\n\t   coeff Y:0x26 0x4b 0xf CB:0x1ea 0x1d6 0x40 CR:0x40 0x1ca 0x1f6\nCAC        OFF(0x0)\nGAIN       ON(0x10111)\nRAWAF      ON(0x107f)\nRAWAWB     ON(0x774688f)\nRAWAE0     ON(0x3)\nRAWAE1     ON(0xf5)\nRAWAE2     ON(0xf5)\nRAWAE3     ON(0x5)\nRAWHIST0   ON(0x501)\nRAWHIST1   ON(0x20000501)\nRAWHIST2   ON(0x20000501)\nRAWHIST3   ON(0x20000501)\nBigMode    ON(0x30000010)\nDEBUG1     space full status group (0x990ffff0)\n\t   ibuf2:0x9 ibuf1:0x9 ibuf0:0x0 mpfbc_infifo:0xf\n\t   r1fifo:0xf r0fifo:0xf outfifo:0xf lafifo:0x0\nDEBUG2     0x7c00750\n\t   bay3d_fifo_full iir:0 cur:0\n\t   module outform vertical counter:1984, out frame counter:0\n\t   isp output line counter:1872\nDEBUG3     isp pipeline group (0xffffffff)\n\t   mge(1 1) rawnr(1 1) bay3d(1 1) tmo(1 1)\n\t   gic(1 1) dbr(1 1) debayer(1 1) dhaz(1 1)\n\t   lut3d(1 1) ldch(1 1) ynr(1 1) shp(1 1)\n\t   cgc(1 1) cac(1 1) isp_out(1 1) isp_in(1 1)\nMonitor    OFF Cnt:0\n\nDebug      mode:0x0\n",
+      "rkisp0-vir1": "rkisp0-vir1 ISP:0x60 Version:v02.05.01\nclk_isp_core 702000000\naclk_isp   750000000\nhclk_isp   198000000\nclk_isp_core_marvin 702000000\nclk_isp_core_vicap 702000000\nInterrupt  Cnt:615862 ErrCnt:0\nInput      rkcif-mipi-lvds1 Format:SGBRG10_1X10 Size:3840x2160@30fps Offset(0,0) Inp:0x104\nIsp offline mode:frame1 (frame:307930 rate:33ms state:idle time:12ms frameloss:0) cnt(total:307930 X1:307930 X2:-1 X3:-1) rd_bufcnt:0\n\t   hw link:2 idle:0 vir(mode:1 index:1)\nOutput     rkisp_mainpath Format:NM12 Size:3840x2160 Dcrop(0,0|3840x2160) (frame:307930 rate:33ms delay:46ms frameloss:3 bufcnt:4)\nOutput     rkisp_selfpath Format:NM12 Size:640x360 Dcrop(0,0|3840x2160) (frame:307930 rate:33ms delay:46ms frameloss:2 bufcnt:2)\nCMSK       OFF(0x0)\nDPCC0      ON(0x5)\nDPCC1      ON(0x5)\nDPCC2      ON(0x5)\nBLS        ON(0x1)\nSDG        OFF(0x6397)\nLSC        ON(0x15)\nAWBGAIN    ON(0x6397) (gain: 0x01000100, 0x018702dd)\nDEBAYER    ON(0x111)\nCCM        ON(0x1)\nGAMMA_OUT  ON(0x5)\nCPROC      ON(0xf)\nIE         OFF(0x0) (effect: BLACKWHITE)\nHDRDRC     OFF(0x0)\nHDRMGE     OFF(0x2)\nBAYNR      ON(0x101)\nBAY3D      ON(0x2005)\nYNR        ON(0x4001001)\nCNR        ON(0x1)\nSHARP      ON(0x1)\nGIC        OFF(0x0)\nDHAZ       ON(0x4110011)\n3DLUT      OFF(0x0)\nLDCH       OFF(0x0)\nCSM        FULL(0x6397), y_offs:0x0 c_offs:0x80\n\t   coeff Y:0x26 0x4b 0xf CB:0x1ea 0x1d6 0x40 CR:0x40 0x1ca 0x1f6\nCAC        OFF(0x0)\nGAIN       ON(0x10111)\nRAWAF      ON(0x107f)\nRAWAWB     ON(0x774688f)\nRAWAE0     ON(0x3)\nRAWAE1     ON(0xf5)\nRAWAE2     ON(0xf5)\nRAWAE3     ON(0x5)\nRAWHIST0   ON(0x501)\nRAWHIST1   ON(0x20000501)\nRAWHIST2   ON(0x20000501)\nRAWHIST3   ON(0x20000501)\nBigMode    ON(0x30000010)\nDEBUG1     space full status group (0x990ffff0)\n\t   ibuf2:0x9 ibuf1:0x9 ibuf0:0x0 mpfbc_infifo:0xf\n\t   r1fifo:0xf r0fifo:0xf outfifo:0xf lafifo:0x0\nDEBUG2     0x7d30763\n\t   bay3d_fifo_full iir:0 cur:0\n\t   module outform vertical counter:2003, out frame counter:0\n\t   isp output line counter:1891\nDEBUG3     isp pipeline group (0xfffffffd)\n\t   mge(1 1) rawnr(1 1) bay3d(1 1) tmo(1 1)\n\t   gic(1 1) dbr(1 1) debayer(1 1) dhaz(1 1)\n\t   lut3d(1 1) ldch(1 1) ynr(1 1) shp(1 1)\n\t   cgc(1 1) cac(1 1) isp_out(1 1) isp_in(0 1)\nMonitor    OFF Cnt:0\n\nDebug      mode:0x0\n",
+      "rkisp1-vir1": "rkisp1-vir1 ISP:0x60 Version:v02.05.01\nclk_isp_core 300000000\naclk_isp   750000000\nhclk_isp   198000000\nclk_isp_core_marvin 300000000\nclk_isp_core_vicap 300000000\nInterrupt  Cnt:0 ErrCnt:0\nInput      (null) Format:SRGGB8_1X8 Size:800x600@5fps Offset(0,0) Inp:0x0\n"
+    },
+    "cif_debug": {
+      "rkcif-mipi-lvds": "Driver Version:v00.02.00\nWork Mode:ping pong\nMonitor Mode:idle\naclk_cif:750000000\nhclk_cif:198000000\ndclk_cif:594000000\niclk_host0:396000000\niclk_host1:396000000\nInput Info:\n\tsrc subdev:m00_b_imx415 2-001a\n\tinterface:mipi csi2 dphy\n\tlanes:4\n\tvc channel: 0\n\thdr mode: normal\n\tformat:SGBRG10_1X10/3864x2192@30\n\tcrop.bounds:(12, 16)/3840x2160\nOutput Info:\n\tformat:GB10/3840x2160(12,16)\n\tcompact:enable\n\tframe amount:307934\n\tearly:0 ms\n\treadout:32 ms\n\trate:33 ms\n\tfps:30\n\tirq statistics:\n\t\t\ttotal:307934\n\t\t\tcsi over flow:0\n\t\t\tcsi bandwidth lack:0\n\t\t\tcsi size err:0\n\t\t\tnot active buf cnt:0 0 0 0\n\t\t\tall err count:0\n\t\t\tframe dma end:307934 0 0 0\nirq time: 14292 ns\ndma enable: 0x1 0x0 0x0 0x0\nbuf_cnt in drv: 3 0 0 0\ntotal buf_cnt: 4 0 0 0\n",
+      "rkcif-mipi-lvds1": "Driver Version:v00.02.00\nWork Mode:ping pong\nMonitor Mode:idle\naclk_cif:750000000\nhclk_cif:198000000\ndclk_cif:594000000\niclk_host0:396000000\niclk_host1:396000000\nInput Info:\n\tsrc subdev:m01_f_imx415 0-001a\n\tinterface:mipi csi2 dphy\n\tlanes:4\n\tvc channel: 0\n\thdr mode: normal\n\tformat:SGBRG10_1X10/3864x2192@30\n\tcrop.bounds:(12, 16)/3840x2160\nOutput Info:\n\tformat:GB10/3840x2160(12,16)\n\tcompact:enable\n\tframe amount:307931\n\tearly:0 ms\n\treadout:32 ms\n\trate:33 ms\n\tfps:30\n\tirq statistics:\n\t\t\ttotal:307931\n\t\t\tcsi over flow:0\n\t\t\tcsi bandwidth lack:0\n\t\t\tcsi size err:0\n\t\t\tnot active buf cnt:0 0 0 0\n\t\t\tall err count:0\n\t\t\tframe dma end:307931 0 0 0\nirq time: 14292 ns\ndma enable: 0x1 0x0 0x0 0x0\nbuf_cnt in drv: 4 0 0 0\ntotal buf_cnt: 4 0 0 0\n",
+      "rkcif-mipi-lvds2": "Driver Version:v00.02.00\nWork Mode:ping pong\nMonitor Mode:idle\naclk_cif:750000000\nhclk_cif:198000000\ndclk_cif:594000000\niclk_host0:396000000\niclk_host1:396000000\n"
+    },
+    "service": {
+      "exit_code": 0,
+      "output": "MainPID=659\nExecStart={ path=/bin/sh ; argv[]=/bin/sh /opt/rk-lightstereo/run.sh serve ; ignore_errors=no ; start_time=[Mon 2024-08-26 03:05:16 CST] ; stop_time=[n/a] ; pid=659 ; code=(null) ; status=0/0 }\nWorkingDirectory=/opt/rk-lightstereo\nActiveState=active\nSubState=running\n"
+    },
+    "calibration": {
+      "baseline_mm": 96.28656304102675,
+      "P1": [
+        [
+          2359.795101298333,
+          0.0,
+          1894.111343383789,
+          0.0
+        ],
+        [
+          0.0,
+          2359.795101298333,
+          1091.7700958251953,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "P2": [
+        [
+          2359.795101298333,
+          0.0,
+          1894.111343383789,
+          0.0
+        ],
+        [
+          0.0,
+          2359.795101298333,
+          1091.7700958251953,
+          -227216.55978506804
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "image_size": [
+        3840,
+        2160
+      ],
+      "sha256": "fc0ee7b44fe56c397d0abab6cf94140d85c5017793c13656cbeb09a2ed9c2a1e"
+    },
+    "fast_depth_sha256": "df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4",
+    "status": {
+      "algorithm": "Calibrated SGBM CPU (240x131)",
+      "depth_mode": "fast",
+      "mode": "waiting",
+      "message": "正在启动两路相机",
+      "fps": null,
+      "pair_skew_ms": null,
+      "valid_fraction": null,
+      "frames": 0,
+      "auto_alignment": false,
+      "alignment_state": "calibrated",
+      "alignment_message": "采用已验收的固定双目标定参数",
+      "alignment_checks": 0,
+      "alignment_p90_px": null,
+      "mapping": "深度试验已就绪；实际测距精度待验证，尚未启动建图",
+      "sync": "软件时间戳配对；未经硬件曝光同步验证",
+      "calibration_id": "fc0ee7b44fe5",
+      "baseline_mm": 96.287,
+      "depth_unit": "m",
+      "depth_range_m": [
+        0.3,
+        5.0
+      ],
+      "pointcloud_calibration_id": "fc0ee7b44fe5",
+      "pointcloud_error": null,
+      "age_ms": null,
+      "capture_ready": false,
+      "preview_age_ms": 10260107,
+      "capture_skew_ms": 13.59,
+      "camera_capture_fps": [
+        30.0,
+        30.0
+      ],
+      "camera_pts_interval_ms": [
+        33.33,
+        33.33
+      ],
+      "camera_age_ms": [
+        21,
+        7
+      ],
+      "camera_pts_ns": [
+        [
+          10264444804100,
+          10264478141392,
+          10264511480391,
+          10264544803392,
+          10264578136100,
+          10264611470392
+        ],
+        [
+          10264458393391,
+          10264491862684,
+          10264525145392,
+          10264558382684,
+          10264591716683,
+          10264625059392
+        ]
+      ],
+      "capture_count": 4,
+      "capture_busy": false,
+      "preview_stats": {
+        "fps": 29.76,
+        "resize_ms": 0.54,
+        "jpeg_ms": 4.96,
+        "jpeg_bytes": 27562,
+        "resolution": [
+          1280,
+          360
+        ]
+      },
+      "camera_copy_ms": [
+        0.24,
+        0.28
+      ],
+      "camera_copy_ms_p50": [
+        0.24,
+        0.15
+      ],
+      "camera_format": "NV12",
+      "hardware_video": {
+        "enabled": true,
+        "codec": "H.264 High 5.1",
+        "transport": "fragmented MP4 / MSE",
+        "encoder": "RK3588 MPP",
+        "native": true,
+        "streams": [
+          {
+            "eye": 0,
+            "resolution_wh": [
+              3840,
+              2160
+            ],
+            "encoded_fps": 30.064,
+            "pts_fps": 30.0,
+            "age_ms": 24,
+            "bitrate_mbps": 9.492,
+            "encode_latency_ms": 79.33,
+            "fragments": 26734,
+            "buffered_bytes": 3526520,
+            "source_offset_s": 4.488555555570706E-06
+          },
+          {
+            "eye": 1,
+            "resolution_wh": [
+              3840,
+              2160
+            ],
+            "encoded_fps": 30.079,
+            "pts_fps": 30.0,
+            "age_ms": 14,
+            "bitrate_mbps": 9.274,
+            "encode_latency_ms": 75.73,
+            "fragments": 25983,
+            "buffered_bytes": 3440392,
+            "source_offset_s": 4.836444444433763E-06
+          }
+        ],
+        "error": null
+      },
+      "npu_preview": {
+        "mode": "idle",
+        "message": "按需启用 NPU 精细深度",
+        "fps": 0,
+        "sequence": 0,
+        "age_ms": null,
+        "active": false
+      },
+      "camera_stream_resolution": [
+        640,
+        360
+      ],
+      "capture_resolution": [
+        3840,
+        2160
+      ],
+      "uncompressed_input_bytes_per_second": [
+        10368023.0,
+        10368041.0
+      ],
+      "pointcloud_stats": {
+        "sequence": 0,
+        "points": 0,
+        "bytes": 0,
+        "encode_ms": null
+      },
+      "capture_error": null,
+      "capture_width": 3840,
+      "capture_height": 2160,
+      "capture_directory": "/opt/rk-lightstereo/captures",
+      "calibration_target": {
+        "id": "screen-checkerboard-10x7",
+        "inner_corners": [
+          9,
+          6
+        ],
+        "square_size_mm": 24.2,
+        "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+        "source": "User-selected target; not automatically detected"
+      },
+      "last_capture": {
+        "id": "20240825T202554668352Z-fa1e27e0",
+        "captured_at": "2024-08-26T04:25:54.668352+08:00",
+        "width": 3840,
+        "height": 2160,
+        "skew_ms": 3.51,
+        "left_pts_ns": 275502005,
+        "right_pts_ns": 279011879,
+        "left_device": "/dev/video33",
+        "right_device": "/dev/video42",
+        "pixel_format": "GRAY8",
+        "rectified": false,
+        "sync": "GStreamer running-time pairing; hardware exposure sync unverified",
+        "square_size_reference_mm": 24.2,
+        "baseline_reference_mm": 95,
+        "calibration_target": {
+          "id": "screen-checkerboard-10x7",
+          "inner_corners": [
+            9,
+            6
+          ],
+          "square_size_mm": 24.2,
+          "measurement": "User measured five cells horizontally and vertically: 121 mm each",
+          "source": "User-selected target; not automatically detected"
+        },
+        "calibrated": false
+      },
+      "depth_color_mode": "auto"
+    }
+  }
+}

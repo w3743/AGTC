@@ -1,0 +1,107 @@
+#===============================================================================
+# @brief    Kconfig file of SLE Range Link sample.
+# Copyright (c) NearLink Project. 2026-2026. All rights reserved.
+#===============================================================================
+
+choice
+    prompt "Select SLE Range Link role"
+    default SAMPLE_SUPPORT_SLE_RANGE_LINK_SERVER
+    config SAMPLE_SUPPORT_SLE_RANGE_LINK_SERVER
+        bool "Enable SLE Range Link Server sample (anchor)."
+    config SAMPLE_SUPPORT_SLE_RANGE_LINK_CLIENT
+        bool "Enable SLE Range Link Client sample (tag)."
+endchoice
+
+config RANGE_LINK_USER_PERIOD_MS
+    int
+    prompt "Client user data period (ms)."
+    default 5000
+    range 50 10000
+    help
+        This option means the period of client sending user data to server.
+        NOTE: user data writes share the same SLE connection with the CS/IQ
+        ranging flow; a too-fast period perturbs the IQ upload and biases the
+        measured distance (measured: 500ms period pulled raw distance at 0.5m
+        from 1583mm down to 1420mm). 5000ms is the recommended default for
+        accurate ranging; use 500ms only when data throughput matters more.
+
+config RANGE_LINK_FILTER_WIN
+    int
+    prompt "Server distance filter window size (1 = pass-through)."
+    default 16
+    range 1 32
+    help
+        This option means the sliding window size of server distance filter
+        (output = median of window, robust against static jitter).
+        1 = no filtering (use the library's own Kalman-smoothed distance
+        directly, same as the official sample).
+
+config RANGE_LINK_PROB_MIN
+    int
+    prompt "Minimum confidence (permille, 0..1000) to accept a sample."
+    default 200
+    range 0 1000
+    help
+        Samples with probability below this value are dropped instead of
+        being pushed into the filter. Note: prob is mostly RSSI driven and is
+        NOT an accuracy indicator; keep this low (e.g. 200).
+
+config RANGE_LINK_CALIB_MM
+    int
+    prompt "Distance calibration offset (mm)."
+    default 0
+    range -10000 10000
+    help
+        Offset applied after scale: d_cal = d_raw * SCALE_PM / 1000 - CALIB_MM.
+
+config RANGE_LINK_CALIB_SCALE_PM
+    int
+    prompt "Distance calibration scale (permille, 1000 = 1.0)."
+    default 1000
+    range 100 3000
+    help
+        Scale applied to the raw smoothed distance before the offset.
+        Two-point calibration: measure at 0.5m and 1.0m, then
+        scale = 500 / (d_1m - d_0p5m), offset = scale * d_1m - 1000.
+
+config RANGE_LINK_AUTO_TARE_MM
+    int
+    prompt "Auto tare target distance on boot (mm, 0 = disabled)."
+    default 0
+    range 0 10000
+    help
+        When nonzero, after boot the server waits for the first converged
+        frames (smooth_num = 6), takes the median of the raw smoothed
+        distance D1 and uses (median - RANGE_LINK_AUTO_TARE_MM) as the
+        calibration offset, i.e. it assumes the two boards are placed
+        exactly AUTO_TARE_MM apart. Pressing Reset re-zeroes the reading,
+        so a slow thermal/multipath drift can be removed without reflashing.
+        Set 0 to use the static RANGE_LINK_CALIB_MM offset instead.
+
+config RANGE_LINK_DIST_NOTIFY
+    bool
+    prompt "Report distance to client by SSAP notify (experimental)."
+    default n
+    help
+        This option means the server notifies the measured distance back to
+        the client. It is disabled by default because the notify path is
+        still being validated on hardware (server side may reboot); the
+        server-side serial distance print is always available.
+
+config RANGE_LINK_RX_PRINT
+    bool
+    prompt "Print each received user data packet (in write callback context)."
+    default n
+    help
+        This option means printing every RL_MSG_USER_DATA packet from the
+        SSAP write callback. Disabled by default to avoid heavy printing in
+        callback context; RX counters are still shown in the server distance
+        line (RX_SEQ/RX_CNT).
+
+config RANGE_LINK_VERBOSE
+    bool
+    prompt "Enable verbose log of SLE Range Link sample."
+    default n
+    help
+        This option means enable the original IQ/intermediate logs, which
+        are disabled by default to keep the serial output readable.

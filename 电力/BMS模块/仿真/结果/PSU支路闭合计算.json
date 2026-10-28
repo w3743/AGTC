@@ -1,0 +1,605 @@
+{
+  "recordType": "conditional_paper_design",
+  "title": "B9-to-URB4805 control power source branch protection closure",
+  "date": "2026-10-16",
+  "status": "当前P1 56f8f62e…4db41e8f、EPRJ3 fd5caba1…3f283369a6d；根项目/P1官方CLI打开成功，但同源DRC/ENET调用未返回。本文TAP_B9拓扑与保险选型仍为条件纸面方案，当前网络保持依据先前官方a713网表及当前源差分派生，非当前同源API读回。layoutEntry/manufacturingRelease=HOLD。故障电流、保险适用条件下总清除时间/I²t、线束及J_CELL_SERVICE焊点/PCB铜箔能量配合均OPEN。",
+  "scope": {
+    "allowedOutput": "BMS模块/检查/PSU支路闭合.md and BMS模块/仿真/结果/PSU支路闭合计算.json",
+    "documentationWriteOnly": true,
+    "noBomOrNativeSchematicEditByThisDocumentationUpdate": true,
+    "notForBoardRelease": true
+  },
+  "decision": {
+    "reuseExistingSourceFuse": true,
+    "fuseRef": "F_CELL_B9",
+    "fuseMpn": "Eaton PV-5A10F",
+    "fuseRating": {
+      "current_A": 5,
+      "voltage_Vdc": 1000,
+      "class": "gPV",
+      "manufacturerInterruptRating_kA": 50,
+      "preArcI2T_A2s": 19,
+      "totalClearingI2T_A2s": 50,
+      "totalClearingI2T_condition": "1000 Vdc datasheet test condition only; not an arbitrary 37.8 Vdc prospective-fault clearing bound."
+    },
+    "holderRef": "FH_CELL_B9",
+    "holderMpn": "Eaton CHPV1U",
+    "holderPublishedRatings": {
+      "current_A": 30,
+      "voltage_Vdc": 1000,
+      "publishedPVSeriesBreakingCapacity_kA": 33,
+      "breakingCapacitySource": "Eaton Technical Data 720147, CHPV row with PV-A10F family",
+      "systemUsableInterruptBoundary_kA": 33,
+      "note": "33 kA is the lower published CHPV/PV-family combination boundary; actual battery prospective DC current is unknown, so this is not an acceptance PASS."
+    },
+    "additionalProtectionParts": 0,
+    "boardEndDuplicateFuse": false,
+    "sourceFusePosition": "At CELL_B9 source, before the complete thin harness and both DT mating halves; minimize the unfused pigtail.",
+    "takeoffNode": "TAP_B9",
+    "returnNode": "B0",
+    "main100AFuseSubstitute": false,
+    "conclusion": "Use existing source F_CELL_B9/FH_CELL_B9 and existing TAP_B9/J_CELL_SERVICE.10. Do not add a duplicate fuse or protective IC."
+  },
+  "cadNetChanges": [
+    {
+      "ref": "PSU5_EXT",
+      "pin": 2,
+      "from": "CELL_B9",
+      "to": "TAP_B9",
+      "status": "APPLIED_IN_FINAL_P1",
+      "evidence": {
+        "schematicPath": "BMS模块/sch/Schematic1/P1.esch2",
+        "schematicSha256": "e4e1477fed48a2e00d5bc3af67422541654c5c2fb88cdd3d5fbf75ed6dc89b08",
+        "netLabelPersistenceRecord": "BMS模块/检查/tmp/Layout闭合/psu-fused-tap-change.json",
+        "persistenceRecordSha256": "225e960b9bd3f2d7b0f56902d678c3de6f8de0d71c22cbc6904541140ff6fdf1"
+      }
+    },
+    {
+      "ref": "C_PSU_IN1",
+      "pin": 1,
+      "from": "CELL_B9",
+      "to": "TAP_B9",
+      "status": "APPLIED_IN_FINAL_P1",
+      "evidence": {
+        "schematicPath": "BMS模块/sch/Schematic1/P1.esch2",
+        "schematicSha256": "e4e1477fed48a2e00d5bc3af67422541654c5c2fb88cdd3d5fbf75ed6dc89b08",
+        "netLabelPersistenceRecord": "BMS模块/检查/tmp/Layout闭合/psu-fused-tap-change.json",
+        "persistenceRecordSha256": "225e960b9bd3f2d7b0f56902d678c3de6f8de0d71c22cbc6904541140ff6fdf1"
+      }
+    },
+    {
+      "ref": "C_PSU_IN2",
+      "pin": 1,
+      "from": "CELL_B9",
+      "to": "TAP_B9",
+      "status": "APPLIED_IN_FINAL_P1",
+      "evidence": {
+        "schematicPath": "BMS模块/sch/Schematic1/P1.esch2",
+        "schematicSha256": "e4e1477fed48a2e00d5bc3af67422541654c5c2fb88cdd3d5fbf75ed6dc89b08",
+        "netLabelPersistenceRecord": "BMS模块/检查/tmp/Layout闭合/psu-fused-tap-change.json",
+        "persistenceRecordSha256": "225e960b9bd3f2d7b0f56902d678c3de6f8de0d71c22cbc6904541140ff6fdf1"
+      }
+    },
+    {
+      "ref": "C_PSU_IN3",
+      "pin": 1,
+      "from": "CELL_B9",
+      "to": "TAP_B9",
+      "status": "APPLIED_IN_FINAL_P1",
+      "evidence": {
+        "schematicPath": "BMS模块/sch/Schematic1/P1.esch2",
+        "schematicSha256": "e4e1477fed48a2e00d5bc3af67422541654c5c2fb88cdd3d5fbf75ed6dc89b08",
+        "netLabelPersistenceRecord": "BMS模块/检查/tmp/Layout闭合/psu-fused-tap-change.json",
+        "persistenceRecordSha256": "225e960b9bd3f2d7b0f56902d678c3de6f8de0d71c22cbc6904541140ff6fdf1"
+      }
+    }
+  ],
+  "topology": {
+    "positivePath": [
+      "CELL_B9 source",
+      "F_CELL_B9/FH_CELL_B9",
+      "TAP_B9",
+      "16 AWG source-to-board wire",
+      "K_CELL_BATTERY pin 10",
+      "DT service connector",
+      "K_CELL_BMS pin 10",
+      "J_CELL_SERVICE pin 10",
+      "board TAP_B9 net to PSU5_EXT pin 2 and C_PSU_IN1/2/3 pin 1"
+    ],
+    "return": [
+      "B0",
+      "J_CELL_SERVICE pin 1",
+      "PSU5_EXT pin 1 and pin 5",
+      "C_PSU_IN1/2/3 pin 2"
+    ],
+    "bypassMustBePostFuse": true,
+    "cellB9MustNotFeedPsuInputDirectly": true
+  },
+  "wireAndInterface": {
+    "selectedWire": "16 AWG stranded copper",
+    "equivalentArea_mm2": 1.31,
+    "continuousCurrentCapabilityAfterActualDerating_A_min": 5,
+    "minimumInsulationVoltage_Vdc": 60,
+    "transientRatingMustCoverMeasuredMaximum": true,
+    "fuseHolderTerminalRange_mm2": [
+      1,
+      25
+    ],
+    "teContactPins": [
+      {
+        "ref": "K_CELL_BATTERY",
+        "mpn": "TE 0462-201-16141",
+        "wireRange_AWG": "16-20",
+        "wireRange_mm2": [
+          0.5,
+          1.5
+        ],
+        "typicalCurrent_A": 13
+      },
+      {
+        "ref": "K_CELL_BMS",
+        "mpn": "TE 0460-202-16141",
+        "wireRange_AWG": "16-20",
+        "wireRange_mm2": [
+          0.5,
+          1.5
+        ],
+        "typicalCurrent_A": 13
+      }
+    ],
+    "pcbEntry": "J_CELL_SERVICE pin 10: existing PTH 2.0 mm finished hole / 4.0 mm pad; verify 16 AWG fit, solder method, current capacity and temperature rise.",
+    "mechanical": "Secure CHPV1U on a source enclosure DIN rail, cover live terminals, strain-relieve harness, and keep the unfused segment to the shortest practical length.",
+    "hotPlug": false
+  },
+  "operatingEnvelope": {
+    "batteryVoltage_Vdc": {
+      "min": 22.5,
+      "max": 37.8
+    },
+    "module": "Hi-Link URB4805YMD-10WR3",
+    "moduleInputRange_Vdc": [
+      18,
+      75
+    ],
+    "moduleRatedOutput_W": 10,
+    "moduleOutput_V": 5,
+    "bmsFan": false,
+    "minimumLoad_mA_budget": 73,
+    "base5VLoad_mA_planned": 300,
+    "basePlusMinimumLoad_mA": 373,
+    "basePlusMinimumLoad_W": 1.865,
+    "activeBalanceCellCurrentTarget_A": 2.9,
+    "activeBalanceTargetIsAcceptedMaximum": false,
+    "efficiencyAssumption": {
+      "value": 0.81,
+      "publishedCondition": "48 V nominal input, rated/full load minimum; not guaranteed at 22.5-37.8 V or the planned light load",
+      "lowLineCalculationsAreExtrapolations": true
+    }
+  },
+  "calculations": {
+    "plannedLoadInputCurrent_A": {
+      "at_22_5V": 0.10233,
+      "at_37_8V": 0.06091,
+      "formula": "Iin=Pout/(Vin*eta), Pout=5 V*(0.300 A+0.073 A)=1.865 W; eta=0.81 assumed"
+    },
+    "rated10WInputCurrent_A": {
+      "at_22_5V": 0.5487,
+      "at_37_8V": 0.3266,
+      "formula": "Iin=10 W/(Vin*0.81); explanatory low-line extrapolation only"
+    },
+    "paperScenarioWithBalanceTarget_A": 3.4487,
+    "paperScenarioFormula": "2.9 A active-balance target + 0.54870 A rated 5 V converter input at 22.5 V",
+    "paperScenarioVs5AFuse": {
+      "nominalFuseCurrent_A": 5,
+      "remainingArithmeticMargin_A": 1.5513,
+      "remainingArithmeticMarginPercent": 31.026,
+      "provesNoNuisanceTripOrThermalPass": false
+    }
+  },
+  "faultInterruption": {
+    "actualBatteryProspectiveShortCircuitCurrent_A": null,
+    "status": "UNKNOWN_NOT_ACCEPTED",
+    "EVE30P_ACResistanceEvidence": {
+      "value_mOhm_perCell": 18,
+      "condition": "initial SOC, 1 kHz AC upper bound from cell datasheet",
+      "idealized9S4PArithmeticProxy_A": 933,
+      "isDcMinimumResistance": false,
+      "isMaxShortCircuitCurrentBound": false,
+      "acceptedForInterruptionPass": false
+    },
+    "fuseInterruptRating_kA": 50,
+    "holderFusePublishedBoundary_kA": 33,
+    "preArcI2T_A2s": 19,
+    "preArcI2TIsTotalClearingI2T": false,
+    "requiredBeforeShortCircuitAcceptance": [
+      "Establish a defensible upper bound for actual B9-source DC prospective current at up to 37.8 V.",
+      "Confirm exact fuse-holder combination rating and fuse total-clearing/time-current curve under the application conditions.",
+      "Coordinate total clearing energy against 16 AWG line, TE contacts, J_CELL_SERVICE wire joints, PCB copper/pads and enclosure.",
+      "Demonstrate all actual branch current stays within fuse and derated conductor/interface thermal limits."
+    ],
+    "auxiliaryPositiveWireFault": {
+      "status": "OPEN_NOT_ACCEPTED",
+      "scope": "CELL_B9 至板端 TAP_B9 辅助正极线支路的对 B0/邻接点故障及切断能力",
+      "reason": "实际电池 DC 预期短路电流未知；PV-5A10F/CHPV1U 的 33 kA 组合目录边界不构成当前电池支路的验收结论，19 A²s 为预弧 I²t 而非总清除 I²t；线缆、触点、焊点及铜箔能量协调未闭合。 50 A²s 总清除 I²t 只绑定数据表 1000 Vdc 测试条件，不能作为 37.8 Vdc 任意故障的清除上界。"
+    },
+    "totalClearingI2T_A2s": 50,
+    "totalClearingI2T_condition": "Manufacturer datasheet value at 1000 Vdc test condition. Do not apply as a 37.8 Vdc arbitrary-fault upper bound without the matching time-current/clearing curve and test conditions.",
+    "below_rated_current_note": "A 5 A fuse rating is not a guarantee that faults below 5 A, or modest overloads, will clear within a required time; use manufacturer time-current curves and actual available fault current."
+  },
+  "firstArticleValidation": [
+    "At 22.5 V and 37.8 V, test actual 5 V planned load and rated-load boundary with highest measured B9 balancing current; capture Vin dip, output transient, input current and component temperatures.",
+    "Measure startup/inrush with a current probe or characterized shunt under non-hot-plug operation; verify F_CELL_B9 does not nuisance open and PSU input does not collapse.",
+    "Verify the post-fuse net path and absence of any CELL_B9-to-PSU/capacitor bypass before powered tests.",
+    "Determine the controlled fixture's prospective short current and total-clear behavior before any controlled line-to-B0/adjacent-node fault test; do not short a live battery pack while its fault current remains unknown."
+  ],
+  "sources": [
+    {
+      "path": "BMS模块/项目要求.md",
+      "sha256": "1381e6ecbe65d6d78bf33e33fc81c04d5ff8c2a1a4a10da4cd7001c527a60fdd",
+      "supports": "当前 U21 风扇已从 BMS 移除及海凌科 5 V 模块设计输入。"
+    },
+    {
+      "path": "BMS模块/原理图准备/接口元件连接.json",
+      "sha256": "defed46a6993e23a143d3a7206d1cc16fb9761c1d1ab4b87d5417456295c28ef",
+      "supports": "Current PSU and input-capacitor net assignments, MPNs and pin mapping; PSU inputs use TAP_B9."
+    },
+    {
+      "path": "BMS模块/原理图准备/维护线束元件连接.json",
+      "sha256": "cc9703f57095dd33ec03fcc8bfd8f575bf45de755112ed62a754d1311fb132c7",
+      "supports": "Source-end fuse/holder, service harness, connectors, TAP_B9 route and contacts."
+    },
+    {
+      "path": "BMS模块/检查/海凌科电源落实验证.json",
+      "sha256": "b0825a65e0a6043afe15bd61fa2f5bd95ed1c6b5311a4eb71b3f25010aa38853",
+      "supports": "Current module pin mapping, input capacitors, fanless changes, startup/inrush/hot-plug open items."
+    },
+    {
+      "path": "BMS模块/检查/5V电源预算.md",
+      "sha256": "214fb6381e06c680c47a7912ace0473b9a3ce29a1107e6952855cf7438c2c920",
+      "supports": "300 mA planned base load and 73 mA minimum-load budget."
+    },
+    {
+      "path": "BMS模块/检查/抽头保险性价比候选.md",
+      "sha256": "4e14e71f195e06f8e04513ae9d4b13b6b80ea677afb7abd3451ef8958d4ee503",
+      "supports": "2.9 A active-balance target, AC-resistance proxy and unresolved DC fault-current bound."
+    },
+    {
+      "path": "稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+      "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d",
+      "supports": "Manufacturer module ratings and published conditions."
+    },
+    {
+      "path": "BMS模块/原理图准备/BOM.csv",
+      "sha256": "6690cb1b5c26e6872f827f07592ff63aacc61b4541f53a3fcbcc867b65ae0f3b",
+      "supports": "当前 BOM 元件身份；F_CELL_B9/FH_CELL_B9 与 PSU5_EXT 支路对应，不以网注释代替原理图证据。"
+    }
+  ],
+  "manufacturerLinks": [
+    "https://www.eaton.com/us/en-us/skuPage.PV-5A10F.html",
+    "https://www.eaton.com/us/en-us/skuPage.CHPV1U.html",
+    "https://www.eaton.com/content/dam/eaton/products/electrical-circuit-protection/bussmann-iec-low-voltage-fuses/bussmann-iec-modular-fuse-holders/eaton-bussmann-series-10x38mm-modular-fuse-holders-datasheet-720147-en-us.pdf",
+    "https://www.te.com/en/product-0462-201-16141.html",
+    "https://www.te.com/en/product-0460-202-16141.html",
+    "https://www.hlktech.com/Goods-278.html"
+  ],
+  "bomBinding": {
+    "status": "BOUND_CURRENT_BOM",
+    "path": "BMS模块/原理图准备/BOM.csv",
+    "sha256": "3038221d8bd3400e02448ddd869cff079b68fd82229db925e26b1db20037c219",
+    "note": "已绑定本轮当前 BOM（含 PSU5_EXT 旧网注释修正）；本报告仅记录绑定，没有修改 BOM。"
+  },
+  "date_updated": "2026-10-21",
+  "historicalP1Evidence": {
+    "path": "BMS模块/sch/Schematic1/P1.esch2",
+    "sha256": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+    "tapChangeRecord": {
+      "path": "BMS模块/检查/tmp/Layout闭合/psu-fused-tap-change.json",
+      "sha256": "225e960b9bd3f2d7b0f56902d678c3de6f8de0d71c22cbc6904541140ff6fdf1",
+      "changedLabelIds": [
+        "0161211ef5630999",
+        "3c20d0e45177adc9",
+        "12f0b9c261c5ab63"
+      ],
+      "saved": true,
+      "persisted": true
+    },
+    "staticGeometry": {
+      "path": "BMS模块/检查/Layout验证/final-geometry.json",
+      "sha256": "9facca601ac27055a2a522dfdf0916960c872e5c4c182dd35b52ffc4a7c20eec",
+      "status": "PASS",
+      "semanticStatus": "PASS",
+      "strictSemanticGeometry": true,
+      "components": 208,
+      "pins": 700,
+      "wires": 331,
+      "labels": 285,
+      "defectCounts": {
+        "malformedNativeRecords": 0,
+        "missingNativeComponents": 0,
+        "unrepresentedNativeComponents": 0,
+        "stalePortRows": 0,
+        "missingPortRows": 0,
+        "portsMissingNET": 0,
+        "malformedPins": 0,
+        "duplicateRefs": 0,
+        "duplicatePins": 0,
+        "missingExpectedComponents": 0,
+        "unmanifestedSnapshotComponents": 0,
+        "missingExpectedPins": 0,
+        "unexpectedSnapshotPins": 0,
+        "snapshotNCFlagMismatches": 0,
+        "floatingExpectedPins": 0,
+        "pinNetMismatches": 0,
+        "ncContact": 0,
+        "lineGroupNameConflicts": 0,
+        "clusterNameConflicts": 0,
+        "danglingNetports": 0
+      },
+      "sourceSHA256": {
+        "E:\\Pioneer\\先进通用履带底盘工程\\电力\\BMS模块\\检查\\DRC修复\\latest-drc-reopened.json": "de50543565c252afe95654e73ef5fab85755b49ae23907d0fda953dc333eed36",
+        "sch/Schematic1/P1.esch2": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+        "检查/Layout验证/current-snapshot.json": "7bfb998bb6c5eb3f53c049aa5da5178dbfd4858152af86b8edaa95cfecffd8f8",
+        "检查/Layout验证/ports-with-cleanup-whitelist.json": "30240ebcaeceeca1f7a48f4feaadb702398b32a62e358ce73cc0ff3191b10622",
+        "检查/Layout验证/cleanup-manifest.json": "8469d3ad8a9e7150ae0bdb2284c3784225eaf87433a1cae50c52ef9d8b1e2cdd",
+        "检查/当前施工输入.json": "2da3bd3fb52b10daec14477f07ddccd16f3572c91b0b39f06fd937fd4ad09049"
+      }
+    },
+    "independentReopen": {
+      "path": "BMS模块/检查/Layout验证/final-independent-reopen.json",
+      "sha256": "83d0650d553b82ccdab3a4e70b7fb3c335604c22096a3f8e846354407469d13f",
+      "status": "PASS",
+      "componentRows": 207,
+      "current": false,
+      "historical": true,
+      "note": "Historical independent reopen before current repair; current source is bound to rootCleanupReopen."
+    },
+    "scope": "Current schematic semantic geometry and official identical-copy readback; the formal root page remains HOLD; not PCB DRC, board layout, thermal, wire/connector capacity, or fault-interruption acceptance.",
+    "rootCleanupReopen": {
+      "path": "BMS模块/检查/Layout验证/root-after-cleanup-reopen.json",
+      "sha256": "48f9dbaaeb893de62c76d34164c08a1a45cbe9a806cf2cf290b594561aeb0914",
+      "status": "PASS_IDENTICAL_COPY_READBACK_WITH_UNRESOLVED_DRC_WARNING_ROOT_PATH_HOLD",
+      "readbackMethod": "OFFICIAL_IDENTICAL_COPY_READBACK",
+      "readbackProject": "E:\\Pioneer\\先进通用履带底盘工程\\电力\\归档\\原始材料\\bms-drc-readback\\BMS-9S4P.eprj3",
+      "readbackStatus": "PASS_IDENTICAL_COPY_READBACK",
+      "rootPathReadback": false,
+      "rootPathStatus": "HOLD_OPEN_DOCUMENT_TIMEOUT",
+      "sourceHashesSame": true,
+      "copySourceSHA256": {
+        "BMS-9S4P.eprj3": "2c2e46482a00d0476da328704473b6718d5cc898186d18069b3379494f6754a6",
+        "sch/Schematic1/P1.esch2": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+        "sch/Schematic1/Schematic1.ecfg": "0eac005c81fc0e12a4bc57d3b1ae8da248fa4dcf731043eacea6e81419902351"
+      },
+      "components": 208,
+      "pins": 700,
+      "sourceUnchanged": true,
+      "p1Sha256": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+      "snapshotMatch": true,
+      "snapshotDifferences": 0,
+      "drc": {
+        "warn": 1,
+        "warningDetailsReviewed": false
+      },
+      "warningCleared": false,
+      "scope": "Official identical-copy read-only reopen; all three native file bytes were rehashed and match the formal project, before/after maps, and readback-scope. The formal root project page remains HOLD after open timeout. Any DRC warning remains unresolved; this is not PCB routing, thermal, or fault-interruption acceptance."
+    },
+    "positiveInputSemanticPins": {
+      "reportPath": "BMS模块/检查/Layout验证/final-geometry.json",
+      "reportSHA256": "9facca601ac27055a2a522dfdf0916960c872e5c4c182dd35b52ffc4a7c20eec",
+      "allExpectedAndActualNames": "TAP_B9",
+      "pins": [
+        {
+          "ref": "PSU5_EXT",
+          "pin": "2",
+          "point": [
+            460.0,
+            1040.0
+          ],
+          "expected": "TAP_B9",
+          "actualNames": [
+            "TAP_B9"
+          ],
+          "cluster": "C00024",
+          "lineSegments": 1,
+          "clusterPins": [
+            "PSU5_EXT.2"
+          ],
+          "clusterNetports": [
+            "TAP_B9[3c20d0e45177adc9]"
+          ],
+          "labelSources": [
+            {
+              "source": "netport_NET",
+              "name": "TAP_B9",
+              "portId": "3c20d0e45177adc9",
+              "pin": "1"
+            }
+          ],
+          "snapshotNC": false,
+          "status": "PASS"
+        },
+        {
+          "ref": "C_PSU_IN1",
+          "pin": "1",
+          "point": [
+            310.0,
+            1080.0
+          ],
+          "expected": "TAP_B9",
+          "actualNames": [
+            "TAP_B9"
+          ],
+          "cluster": "C00013",
+          "lineSegments": 4,
+          "clusterPins": [
+            "C_PSU_IN1.1",
+            "C_PSU_IN3.1"
+          ],
+          "clusterNetports": [
+            "TAP_B9[12f0b9c261c5ab63]"
+          ],
+          "labelSources": [
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "netport_NET",
+              "name": "TAP_B9",
+              "portId": "12f0b9c261c5ab63",
+              "pin": "1"
+            }
+          ],
+          "snapshotNC": false,
+          "status": "PASS"
+        },
+        {
+          "ref": "C_PSU_IN2",
+          "pin": "1",
+          "point": [
+            270.0,
+            1000.0
+          ],
+          "expected": "TAP_B9",
+          "actualNames": [
+            "TAP_B9"
+          ],
+          "cluster": "C00008",
+          "lineSegments": 1,
+          "clusterPins": [
+            "C_PSU_IN2.1"
+          ],
+          "clusterNetports": [
+            "TAP_B9[0161211ef5630999]"
+          ],
+          "labelSources": [
+            {
+              "source": "netport_NET",
+              "name": "TAP_B9",
+              "portId": "0161211ef5630999",
+              "pin": "1"
+            }
+          ],
+          "snapshotNC": false,
+          "status": "PASS"
+        },
+        {
+          "ref": "C_PSU_IN3",
+          "pin": "1",
+          "point": [
+            310.0,
+            920.0
+          ],
+          "expected": "TAP_B9",
+          "actualNames": [
+            "TAP_B9"
+          ],
+          "cluster": "C00013",
+          "lineSegments": 4,
+          "clusterPins": [
+            "C_PSU_IN1.1",
+            "C_PSU_IN3.1"
+          ],
+          "clusterNetports": [
+            "TAP_B9[12f0b9c261c5ab63]"
+          ],
+          "labelSources": [
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "native_LINE_NET_ATTR",
+              "name": "TAP_B9",
+              "lineGroup": "6690151d06ac467e"
+            },
+            {
+              "source": "netport_NET",
+              "name": "TAP_B9",
+              "portId": "12f0b9c261c5ab63",
+              "pin": "1"
+            }
+          ],
+          "snapshotNC": false,
+          "status": "PASS"
+        }
+      ]
+    },
+    "boundSourceSHA256": {
+      "sch/Schematic1/P1.esch2": "3b99f65dcef6fa37a519188d35dca64d9a6f54843209b3e58daf07c37c72a16a",
+      "检查/Layout验证/current-snapshot.json": "7bfb998bb6c5eb3f53c049aa5da5178dbfd4858152af86b8edaa95cfecffd8f8",
+      "检查/Layout验证/ports-with-cleanup-whitelist.json": "30240ebcaeceeca1f7a48f4feaadb702398b32a62e358ce73cc0ff3191b10622",
+      "检查/Layout验证/cleanup-manifest.json": "8469d3ad8a9e7150ae0bdb2284c3784225eaf87433a1cae50c52ef9d8b1e2cdd",
+      "检查/当前施工输入.json": "2da3bd3fb52b10daec14477f07ddccd16f3572c91b0b39f06fd937fd4ad09049"
+    }
+  },
+  "currentSourceBinding": {
+    "status": "CURRENT_PERSISTED_SOURCE; DERIVED_FROM_PRIOR_OFFICIAL_NETLIST; NO_FINAL_API_ENET_OR_DRC_RESULT",
+    "eprj3": {
+      "path": "BMS模块/BMS-9S4P.eprj3",
+      "sha256": "fd5caba1dd80d61fcbfa895b93fd6c647de7378443d248db7c3e99f283369a6d"
+    },
+    "p1": {
+      "path": "BMS模块/sch/Schematic1/P1.esch2",
+      "sha256": "56f8f62e754d1e4af8f068bdc7b19c37dfa4788101cdb2852dc2f2254db41e8f"
+    },
+    "bom": {
+      "path": "BMS模块/原理图准备/BOM.csv",
+      "sha256": "6690cb1b5c26e6872f827f07592ff63aacc61b4541f53a3fcbcc867b65ae0f3b",
+      "data_rows": 248
+    },
+    "interfaceContract": {
+      "path": "BMS模块/原理图准备/接口元件连接.json",
+      "sha256": "defed46a6993e23a143d3a7206d1cc16fb9761c1d1ab4b87d5417456295c28ef"
+    },
+    "harnessContract": {
+      "path": "BMS模块/原理图准备/维护线束元件连接.json",
+      "sha256": "cc9703f57095dd33ec03fcc8bfd8f575bf45de755112ed62a754d1311fb132c7"
+    },
+    "priorOfficialBasis": {
+      "p1_sha256": "a713d448b79c51c11663470647ab0cefe02809e6c9159e58bf61aeb7d97cb049",
+      "reported_netlist": "215 designators / 710 pins; legacy 700-pin mapping unchanged"
+    },
+    "differentialEvidence": "Current source retains the same 215-designator set and byte-identical WIRE/LINE records versus prior official P1; the only electrical component substitution is R_QPRE_PU at the same placement with matching pin 1/2 local geometry. The text-only cleanup removes four TEXT records. These comparisons support derived continuity for the TAP_B9 route, but are not a current official ENET/DRC readback.",
+    "limitations": [
+      "No current-source DRC result returned.",
+      "No current-source ENET export returned.",
+      "Current PCB routing, copper/via capacity, solder-wire interface, thermal rise, and physical fuse coordination are not verified."
+    ]
+  },
+  "currentP1Evidence": {
+    "path": "BMS模块/sch/Schematic1/P1.esch2",
+    "sha256": "56f8f62e754d1e4af8f068bdc7b19c37dfa4788101cdb2852dc2f2254db41e8f",
+    "status": "CURRENT_SOURCE_DIFF_DERIVED_NO_CURRENT_API_ENET_DRC_READBACK",
+    "priorOfficialNetlistP1Sha256": "a713d448b79c51c11663470647ab0cefe02809e6c9159e58bf61aeb7d97cb049",
+    "derivedEvidence": "Current source retains the same 215-designator set and byte-identical WIRE/LINE records versus prior official P1; the only electrical component substitution is R_QPRE_PU at the same placement with matching pin 1/2 local geometry. The text-only cleanup removes four TEXT records. These comparisons support derived continuity for the TAP_B9 route, but are not a current official ENET/DRC readback.",
+    "scope": "Derived schematic topology continuity only. The official CLI opened the current project and page, but same-source DRC/ENET did not return. No current-source DRC result, current netlist export, PCB copper/via capacity, solder-joint capacity, thermal or fuse-interruption qualification is claimed.",
+    "historicalApiEvidenceKey": "historicalP1Evidence"
+  }
+}
