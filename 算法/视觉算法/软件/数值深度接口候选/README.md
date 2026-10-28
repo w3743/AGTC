@@ -75,9 +75,9 @@ python -B -m unittest discover -s '算法\视觉算法\软件\数值深度接口
 
 旧 `/measure`、`/pointcloud`、`/far` 跳转到唯一深度视图；旧 `/stereo4k`、`/measure4k` 跳转到普通相机预览。标注图、点云、远距、独立NPU和4K视频数据接口返回410，不启动对应任务。已经从应用目录删除相关HTML，旧参数、标定、模型、runtime和systemd配置未改动。
 
-最终切换前回滚包：`算法/视觉算法/备份/直出与单深度前_20261021_1034/direct-single-20261021-1034.tar.gz`，SHA-256 `a5823532546e4c47a427f90e1859dd5bf47619f2b71c9cfa6aaa14ea7448973f`。板端原件 `/opt/rk-lightstereo/backups/direct-single-20261021-1034` 包含 manifest、旧文件及 installer.py。安装前已拉回并核对归档SHA；本轮未执行回滚演练。最终模板文字修正后的活动SHA以本轮证据为准，prepare manifest保留切换时的版本。
+最终切换前的本地回滚包曾保存在`算法/视觉算法/备份/直出与单深度前_20261021_1034/direct-single-20261021-1034.tar.gz`，SHA-256为`a5823532546e4c47a427f90e1859dd5bf47619f2b71c9cfa6aaa14ea7448973f`；该本地副本已于2026-10-28随视觉算法备份目录从工作树删除。板端原件路径`/opt/rk-lightstereo/backups/direct-single-20261021-1034`是部署时记录，当前是否仍存在未核验。安装前曾拉回并核对归档SHA，本轮未执行回滚演练。最终模板文字修正后的活动SHA以本轮证据为准，prepare manifest保留切换时的版本。
 
-如需恢复切换前的状态（会重启视觉服务）：
+当时记录的板端恢复命令（执行前须确认设备上该备份仍存在；会重启视觉服务）：
 
 ```powershell
 adb shell python3 -B /opt/rk-lightstereo/backups/direct-single-20261021-1034/installer.py rollback --backup /opt/rk-lightstereo/backups/direct-single-20261021-1034
@@ -98,7 +98,7 @@ adb shell systemctl is-active rk-lightstereo.service
 
 为核对监控确实能随任务变化，单独运行现成保存输入的RKNN前向测试约13.5秒（不切换生产算法）：三核从0/0/0升到80/79/83%，结束后回到0/0/0，稍后电源off。完整原始采样见 [npu-monitor-load-test.json](evidence/npu-monitor-load-test.json)，模型测试结果见 [npu-monitor-forward-check.json](evidence/npu-monitor-forward-check.json)。这只验证计数响应；1秒浏览器采样可能漏掉短脉冲，不构成模型加速或距离精度改进。最终页面截图为 [npu-monitor-final.png](evidence/npu-monitor-final.png)。
 
-当前监控修复回滚包为 `算法/视觉算法/备份/NPU监控修复前_20261021-120543/npu-monitor-20261021-120543.tar.gz`，SHA-256 `f53967945b9dbcc8c902c112beb94f1c7d9603ce611c040ecb0fc49fbfedab3f`；安装前已拉回校验。备份 manifest 记录初次安装SHA，最终排版调整后的SHA见本节活动证据。需要恢复本次监控改动前的状态时：
+监控修复前的本地回滚包曾保存在`算法/视觉算法/备份/NPU监控修复前_20261021-120543/npu-monitor-20261021-120543.tar.gz`，SHA-256为`f53967945b9dbcc8c902c112beb94f1c7d9603ce611c040ecb0fc49fbfedab3f`；该本地副本及其manifest已于2026-10-28随视觉算法备份目录从工作树删除。安装前曾拉回并校验该SHA，最终排版调整后的活动SHA见本节活动证据。设备端目录`/opt/rk-lightstereo/backups/npu-monitor-20261021-120543`是部署时记录，当前是否仍存在未核验。当时记录的板端恢复命令（执行前先确认设备备份仍在）：
 
 ```powershell
 adb shell python3 -B /opt/rk-lightstereo/backups/npu-monitor-20261021-120543/installer.py rollback --backup /opt/rk-lightstereo/backups/npu-monitor-20261021-120543
@@ -143,7 +143,7 @@ python -B '算法/视觉算法/软件/数值深度接口候选/app/probe_depth.p
 
 ### 已审源码受控部署与板端复核
 
-PR #11 审核授权仅部署 `server.py`，SHA为 `d08db78fcea4e9d6169d7c8ca86c585fc28621a466c693fcd7e61fe132193034`。编译检查通过，旧活动源与回滚安装器已归档：板端 `/opt/rk-lightstereo/backups/latest-cache-20261021-151447`，本地 `算法/视觉算法/备份/latest-cache-20261021-151447.tar.gz`，归档SHA `9615f099588cd55f16af281e454fa3706c305c880860663affa36e5fbbd6ec46`。该备份本地保留，不默认纳入源码提交。
+PR #11 审核授权仅部署 `server.py`，SHA为 `d08db78fcea4e9d6169d7c8ca86c585fc28621a466c693fcd7e61fe132193034`。编译检查通过；部署时曾记录旧活动源与回滚安装器位于板端 `/opt/rk-lightstereo/backups/latest-cache-20261021-151447`，并记录本地路径`算法/视觉算法/备份/latest-cache-20261021-151447.tar.gz`、归档SHA `9615f099588cd55f16af281e454fa3706c305c880860663affa36e5fbbd6ec46`。本地视觉算法备份目录已于2026-10-28从工作树删除，上述本地副本不再可用；板端备份当前是否仍存在未核验。该部署与SHA信息仅保留为历史记录。
 
 首次安装的在线latest/历史检查通过，但隔离测试目录缺失标定资源，27项中1项报FileNotFoundError，因此立即回滚，旧服务恢复active。随后只为临时测试目录增加现有标定文件的只读符号链接，单独的1项资源预检通过，再安装同一已审源码；未修改生产标定、源码或测试来凑通过。第二次安装验证成功。两次安装及一次回滚共触发3次受控服务重启，当前PID879848、ActiveState=active、自动NRestarts=0。首次失败、回滚和第二次成功都保存在既有恢复证据中。
 

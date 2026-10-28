@@ -1,5 +1,7 @@
 # Isaac Lab 项目状态
 
+> 2026-10-28：按用户要求，`results/` 中的原始训练结果及 `logs/` 运行日志已删除；下文对应路径仅作为历史来源，汇总见[训练结果汇总](训练结果汇总.md)。
+
 ## 2026-10-25：第二十三批范围整理与当前运行状态（最新）
 
 第二十三批五项已完成并整理（5/5）：真实 PhysX CUDA 刚体变换经 Isaac Lab 转换发布到 Fabric，修正相机实际捕获位姿；headless 隐藏默认 viewport 停止更新，但相机 render products 保持工作；8个云台转轴补齐 angular force DriveAPI，配置gain/torque及物理精度不变；观察器现绑定训练产生的LiDAR/depth样点，显示青色LiDAR圆点（0.045m）和橙色depth方块（0.05m）；a07从a06已审计checkpoint恢复训练并迁移8791观察器与完成watcher。旧相机像素与之前未启用DriveAPI时的云台轨迹不声称数值等价。

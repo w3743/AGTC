@@ -1,9 +1,0 @@
-Initial CPU audit attempt evidence index
-
-The original report is preserved byte-for-byte as first_checkpoint_cpu_attempt1.json.
-Original process actual_exit_code: 1.
-Reported failed check: record_passed_global_65536.
-Observed checkpoint payload field: num_timesteps=65536.
-Observed first_periodic_checkpoint.json field: global_num_timesteps=65536, status=passed.
-Cause: audit looked up the wrong step field in the checkpoint record. This was a record-field lookup defect, not a model/Adam audit failure. The report's other 18 checks were true.
-Raw stdout/stderr for the initial process were not separately captured; this file is an evidence index, not a verbatim console log.

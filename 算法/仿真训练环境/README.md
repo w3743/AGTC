@@ -15,4 +15,4 @@
 | `安装IsaacLab.cmd` | Windows 下的 Isaac Lab 安装入口脚本。 |
 | `启动IsaacLab.cmd` | Windows 下的 Isaac Lab 启动入口脚本。 |
 
-子目录中的源码、工具和项目资料按各自说明使用。`results/`、`归档/`、`native/acceptance/` 等保存实验或验收记录，须保留原始字节；`external/` 中的第三方代码按项目固定版本管理。
+子目录中的源码、工具和项目资料按各自说明使用。原始`results/`训练结果与运行日志已按用户要求删除，删除范围和保留摘要见[训练结果汇总](训练结果汇总.md)。其它文档中保留的`results/`路径仅作历史溯源，不表示对应文件仍存在；`归档/`和`native/acceptance/`中的记录按各自说明管理。`external/`中的第三方代码按项目固定版本管理。

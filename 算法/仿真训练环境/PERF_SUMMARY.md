@@ -1,5 +1,7 @@
 # 训练平台性能改造：当前入口与证据
 
+截至2026-10-28，原始`results/`训练结果与运行日志已按用户要求删除。下文保留当时的实验与状态记录，其中引用的`results/...`路径仅作历史溯源，不表示文件或进程仍可核验；删除范围与当前可核实状态见[训练结果汇总](训练结果汇总.md)。
+
 ## 当前正式状态
 
 当前主线为 Windows 11 ARM64 / RTX Spark N1X 主机上的 Ubuntu 24.04 ARM64 WSL2、Newton MuJoCo Warp V6、普通 eager GPU、NOT_GUARANTEED。Native V2 协议已冻结，protocol SHA256 为 83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e；当前 task SHA256 为 209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2。源码 commit 7d8a167f，raw source manifest 6026336cad5b961e2fe95885d6010781ae75e59e792d1715988bda45d35e8938。
