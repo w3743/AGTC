@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "catalog_name": "整车器件补充",
+  "purpose": "登记原生四板BOM与采购补充之外的整车选型和未冻结需求；本文件不回写任何原生图或BOM。数量、身份与状态严格按来源记录，未知字段为null。",
+  "identity_rules": {
+    "manufacturer_part": "只将来源明确给出的制造商料号填入manufacturer_part；裸芯片型号不得用作摄像头/计算板整板料号。",
+    "merge": "仅对明确制造商和完整制造商料号精确一致的项目允许共享part identity；缺制造商/料号或泛称按本文件item_id独立，禁止跨来源自动合并。",
+    "quantity": "quantity_per_vehicle保留来源可证数值；数量证据不足用null并说明quantity_status；不按描述推算价格数量。",
+    "cost": "价格只由元件封装库/商城报价.json精确映射；缺报价或身份未闭合时保留null。"
+  },
+  "manufacturer_aliases": [
+    {
+      "canonical": "Texas Instruments",
+      "aliases": [
+        "Texas Instruments",
+        "TI",
+        "TI(德州仪器)",
+        "TI (德州仪器)"
+      ],
+      "basis": "项目现行BOM中的TI和Texas Instruments品牌书写显式归一；不归一其他厂商。"
+    },
+    {
+      "canonical": "YAGEO",
+      "aliases": [
+        "YAGEO",
+        "Yageo",
+        "YAGEO(国巨)",
+        "YAGEO (国巨)",
+        "Yageo(国巨)"
+      ],
+      "basis": "项目现行BOM的YAGEO/国巨写法显式归一。"
+    },
+    {
+      "canonical": "KEMET",
+      "aliases": [
+        "KEMET",
+        "KEMET(基美)",
+        "KEMET (基美)"
+      ],
+      "basis": "仅品牌名及中文名书写差异。"
+    },
+    {
+      "canonical": "Infineon",
+      "aliases": [
+        "Infineon",
+        "Infineon(英飞凌)",
+        "Infineon (英飞凌)"
+      ],
+      "basis": "仅品牌名及中文名书写差异。"
+    },
+    {
+      "canonical": "Nichicon",
+      "aliases": [
+        "Nichicon",
+        "Nichicon(尼吉康)",
+        "Nichicon (尼吉康)"
+      ],
+      "basis": "仅品牌名及中文名书写差异。"
+    },
+    {
+      "canonical": "EVE",
+      "aliases": [
+        "EVE",
+        "EVE(亿纬)",
+        "EVE (亿纬)",
+        "亿纬"
+      ],
+      "basis": "电力基本设计中的亿纬与EVE书写。"
+    },
+    {
+      "canonical": "BDUAV",
+      "aliases": [
+        "BDUAV"
+      ],
+      "basis": "来源按品牌原文记录。"
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "mech_baseline",
+      "path": "机械/参数基线.json",
+      "sha256": "4b4ce6a8743f78fcebf686f1a8e14adfad4dd3e8f0df1d9ad0efe77132169fd9",
+      "locator": "id=drive_motor_configuration 的 value/source 字段（行走电机项目选型）"
+    },
+    {
+      "source_id": "electrical_baseline",
+      "path": "电力/基本设计.md",
+      "sha256": "a0b1ff6972068fda7859dd336f34edebbda6c0e01ad37c3825a72bab4cddfeae",
+      "locator": "2026-10-21稳压模块要求更新：固定8颗LICAP SC0350-270-RSS、启动瞬态用途、无持续1秒硬门槛；同时包含9S4P电池与21V有刷水泵用户基线。"
+    },
+    {
+      "source_id": "vision_current",
+      "path": "算法/视觉算法/README.md",
+      "sha256": "b0eff12a04fab131702dbf6c8c7c24a019d80f0ae5af49a23a00dbd78fc6b872",
+      "locator": "第7行：保留双IMX415与RK3588"
+    },
+    {
+      "source_id": "robotics_baseline",
+      "path": "算法/仿真训练环境/AGENTS.md",
+      "sha256": "adc80e6d7017bfe6d543e76eb8a3f262348736a066dc277ba4891dd8687901c6",
+      "locator": "ATK-IMU901、X2雷达与云台参考系/性能条目"
+    },
+    {
+      "source_id": "pump_project_requirements",
+      "path": "电力/水泵驱动模块/项目要求.md",
+      "sha256": "c4954d06ea201bb1f464150a3af7b2cf7788d1455201c3b182c451600704eb25",
+      "locator": "第9、18行及原始对话turn证据：用户确认21V有刷水泵、运行最大约3A；品牌型号未知"
+    },
+    {
+      "source_id": "foc_motor_drive_mapping",
+      "path": "电力/FOC驱动模块/软件/速度反馈协议.md",
+      "sha256": "61ae04fab2a12d4d067db42deda0191f77fee91ed00863f762f550291d702590",
+      "locator": "第9行：当前两块G431 FOC板各驱动一台BDUAV N5065 270KV电机。"
+    },
+    {
+      "source_id": "vehicle_project_constraints",
+      "path": "电力/AGENTS.md",
+      "sha256": "c915b6b7ab21c17e7ddd74b3586edfaaf3a8a068c1e417871d8699a126cacf08",
+      "locator": "通用偏好：全系统成本、性能与稳定性；电力项目记忆：固定LICAP8颗8S1P、启动瞬态、无持续1秒硬要求；用户分工：原理图后由人类实施。"
+    },
+    {
+      "source_id": "bms_board_budget",
+      "path": "电力/BMS模块/项目要求.md",
+      "sha256": "4284d253e98008411934081e68aab389d28eff558c5aa4fd4c5f423c0e7b124a",
+      "locator": "第58行：BMS板内200元目标、板内与板外配套分别列明。"
+    }
+  ],
+  "items": [
+    {
+      "item_id": "vehicle_n5065_270kv",
+      "product_name": "BDUAV N5065 270KV motor",
+      "manufacturer": "BDUAV",
+      "manufacturer_part": "N5065 270KV",
+      "model_designation": "N5065 270KV",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": 2,
+      "quantity_unit": "pcs",
+      "quantity_status": "confirmed_by_mechanical_baseline",
+      "status": "selected",
+      "attributes": {
+        "kv": 270,
+        "pole_pairs": 7,
+        "poles": 14
+      },
+      "source_ids": [
+        "mech_baseline",
+        "foc_motor_drive_mapping"
+      ],
+      "notes": "机械参数基线列出两台BDUAV N5065 270KV；FOC-A、FOC-B各对应其中一台。分配关系不产生第二份数量；本记录不继承卖家价格或CAD载体。",
+      "preferred_quote_marketplace": "LCSC_CN",
+      "demand_allocations": [
+        {
+          "allocation_id": "foc_board_a_motor",
+          "consumer_module": "FOC驱动模块",
+          "consumer_instance": "FOC-A",
+          "quantity": 1,
+          "source_id": "foc_motor_drive_mapping"
+        },
+        {
+          "allocation_id": "foc_board_b_motor",
+          "consumer_module": "FOC驱动模块",
+          "consumer_instance": "FOC-B",
+          "quantity": 1,
+          "source_id": "foc_motor_drive_mapping"
+        }
+      ],
+      "quantity_counting_rule": "整车总量只有本记录的2台；FOC-A/FOC-B各分配1台为需求关系，不另行加计。"
+    },
+    {
+      "item_id": "vehicle_eve_inr18650_30p",
+      "product_name": "EVE INR18650-30P cell",
+      "manufacturer": "EVE",
+      "manufacturer_part": "INR18650-30P",
+      "model_designation": "INR18650-30P",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": 36,
+      "quantity_unit": "pcs",
+      "quantity_status": "confirmed_by_electrical_baseline",
+      "status": "selected",
+      "attributes": {
+        "pack_configuration": "9S4P",
+        "nominal_cell_voltage_v": 3.6,
+        "cell_voltage_min_v": 2.5,
+        "cell_voltage_max_v": 4.2
+      },
+      "source_ids": [
+        "electrical_baseline"
+      ],
+      "notes": "电力基本设计给出9S4P、36只；本主档保留来源口径，不以电芯裸料号代替整包成本。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    },
+    {
+      "item_id": "vehicle_imx415_camera_modules",
+      "product_name": "IMX415 camera modules",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "model_designation": "IMX415 camera module",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": 2,
+      "quantity_unit": "modules",
+      "quantity_status": "confirmed_by_current_vision_readme",
+      "status": "current",
+      "attributes": {
+        "sensor_family_reference": "IMX415"
+      },
+      "source_ids": [
+        "vision_current"
+      ],
+      "notes": "来源确认双IMX415相机模块；整板/模组制造商与SKU未冻结。不得把IMX415裸传感器当作完整相机模块报价。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    },
+    {
+      "item_id": "vehicle_rk3588_controller_board",
+      "product_name": "RK3588 main controller board",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "model_designation": "RK3588-based controller board",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": 1,
+      "quantity_unit": "boards",
+      "quantity_status": "confirmed_as_retained_controller_board_sku_unknown",
+      "status": "current",
+      "attributes": {
+        "soc_reference": "RK3588",
+        "board_sku_frozen": false
+      },
+      "source_ids": [
+        "vision_current"
+      ],
+      "notes": "保留一块RK3588主控板；准确整板SKU未知，禁止用RK3588裸芯替代整板。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    },
+    {
+      "item_id": "vehicle_atk_imu901",
+      "product_name": "ATK-IMU901 inertial sensor module",
+      "manufacturer": null,
+      "manufacturer_part": "ATK-IMU901",
+      "model_designation": "ATK-IMU901",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": null,
+      "quantity_unit": "sets",
+      "quantity_status": "needs_physical_quantity_verification",
+      "status": "current",
+      "attributes": {
+        "axes": 10,
+        "installation": "gimbal yaw/pitch assembly"
+      },
+      "source_ids": [
+        "robotics_baseline"
+      ],
+      "notes": "基线确认型号和随云台安装关系，但文件未给出可核实的实物套数；数量留空。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    },
+    {
+      "item_id": "vehicle_x2_lidar",
+      "product_name": "X2 lidar",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "model_designation": "X2雷达",
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": null,
+      "quantity_unit": "sets",
+      "quantity_status": "needs_physical_quantity_verification",
+      "status": "current",
+      "attributes": {
+        "field_of_view_deg": 360,
+        "range_m": 8,
+        "rate_hz": 10,
+        "points_per_scan": 400
+      },
+      "source_ids": [
+        "robotics_baseline"
+      ],
+      "notes": "基线按X2雷达描述性能，但未证实具体厂家、订货号或实物数量；保留型号描述，不将其扩写成完整MPN。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    },
+    {
+      "item_id": "vehicle_brushed_water_pump",
+      "product_name": "21V brushed DC water pump",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "model_designation": null,
+      "supplier": null,
+      "supplier_part": null,
+      "quantity_per_vehicle": 1,
+      "quantity_unit": "pcs",
+      "quantity_status": "user_confirmed_single_pump",
+      "status": "current",
+      "attributes": {
+        "nominal_voltage_v": 21,
+        "max_running_current_a": 3,
+        "motor_type": "brushed DC",
+        "manufacturer_and_exact_model_known": false
+      },
+      "source_ids": [
+        "electrical_baseline",
+        "pump_project_requirements"
+      ],
+      "notes": "用户明确有刷、21V、运行最大约3A；厂家/精确型号未知。运行电流不等同启动/堵转电流。",
+      "preferred_quote_marketplace": "LCSC_CN"
+    }
+  ],
+  "requirement_slots": [
+    {
+      "slot_id": "rk3588_power_supply",
+      "name": "RK3588主控供电",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "quantity_per_vehicle": null,
+      "status": "unresolved",
+      "reason": "供电实现/准确模块SKU与数量未冻结。",
+      "source_ids": [
+        "vision_current",
+        "electrical_baseline"
+      ]
+    },
+    {
+      "slot_id": "gimbal_motor_drive",
+      "name": "云台电驱",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "quantity_per_vehicle": null,
+      "status": "unresolved",
+      "reason": "接口、驱动器与数量未冻结。",
+      "source_ids": [
+        "robotics_baseline"
+      ]
+    },
+    {
+      "slot_id": "can_and_power_harness",
+      "name": "CAN/电源线束总成",
+      "manufacturer": null,
+      "manufacturer_part": null,
+      "quantity_per_vehicle": null,
+      "status": "unresolved",
+      "reason": "整车长度、端头、线规、分支与数量未冻结；不把单板接口连接器当成线束。",
+      "source_ids": [
+        "electrical_baseline"
+      ]
+    }
+  ],
+  "manufacturer_mpn_prefixes": [
+    {
+      "prefix": "Murata",
+      "canonical": "muRata(村田)",
+      "basis": "采购补充MPN中的显式品牌前缀；与原生字段逐位号核对。"
+    },
+    {
+      "prefix": "onsemi",
+      "canonical": "onsemi(安森美)",
+      "basis": "采购补充MPN中的显式品牌前缀；与原生字段逐位号核对。"
+    },
+    {
+      "prefix": "Littelfuse",
+      "canonical": "Littelfuse",
+      "basis": "采购补充MPN中的显式品牌前缀；不扩展到相似品牌。"
+    },
+    {
+      "prefix": "TE Connectivity",
+      "canonical": "TE Connectivity",
+      "basis": "采购补充MPN中的显式品牌前缀。"
+    },
+    {
+      "prefix": "TI",
+      "canonical": "Texas Instruments",
+      "basis": "与已维护的TI/Texas Instruments明确别名一致。"
+    },
+    {
+      "prefix": "Anderson",
+      "canonical": "Anderson",
+      "basis": "采购补充MPN中的显式品牌前缀。"
+    },
+    {
+      "prefix": "Eaton",
+      "canonical": "Eaton",
+      "basis": "采购补充MPN中的显式品牌前缀。"
+    },
+    {
+      "prefix": "TE",
+      "canonical": "TE Connectivity",
+      "basis": "采购补充MPN中的显式品牌前缀；与TE Connectivity视为明确厂家别名。"
+    },
+    {
+      "prefix": "WeAct",
+      "canonical": "WeAct Studio",
+      "basis": "与水泵BOM中的WeAct Studio厂家名称一致。"
+    }
+  ],
+  "project_constraints": {
+    "vehicle_cost_policy": {
+      "applies_to_all_modules": true,
+      "priority": "优先复用已满足要求的精确器件，减少不同型号并比较可核验的总采购成本；缺报价保留null，不宣称未证实降本。",
+      "source_ids": [
+        "vehicle_project_constraints"
+      ]
+    },
+    "regulator_supercapacitor": {
+      "manufacturer": "LICAP Technologies",
+      "fixed_manufacturer_part": "SC0350-270-RSS",
+      "total_count_max": 8,
+      "native_current_count": 8,
+      "candidate_total_count": null,
+      "candidate_added_count": 0,
+      "candidate_is_current": false,
+      "legacy_budget_cny": 500,
+      "legacy_budget_status": "cancelled_not_a_current_limit",
+      "source_ids": [
+        "vehicle_project_constraints"
+      ],
+      "candidate_status": "cancelled_obsolete",
+      "historical_cancelled_candidate_total_count": 16,
+      "historical_cancelled_candidate_added_count": 8,
+      "quantity_rule": "用户最新决定仅保留现有8颗；有效总量上限8，当前增量0。历史16颗扩容方案已取消/作废，不是有效候选且不计入成本。",
+      "use_case": "startup_transient_power_assist",
+      "sustained_1s_requirement": false,
+      "duration_s": null,
+      "duration_status": "待实际启动波形与功率缺口核定；没有固定持续1秒门槛。",
+      "reference_power_w": {
+        "min": 800,
+        "max": 1000,
+        "status": "unverified_design_reference_only"
+      }
+    },
+    "bms_cost_target": {
+      "target_cny": 200,
+      "scope": "BMS board-mounted parts only; external MCU and off-board accessories are excluded and reported separately.",
+      "status": "not_proven",
+      "source_ids": [
+        "bms_board_budget"
+      ]
+    },
+    "post_schematic_human_scope": {
+      "owner": "human",
+      "items": [
+        "PCB design and layout",
+        "fabrication and manufacturing handoff",
+        "prototyping",
+        "assembly",
+        "firmware implementation",
+        "physical testing and qualification"
+      ],
+      "source_ids": [
+        "vehicle_project_constraints"
+      ]
+    }
+  }
+}

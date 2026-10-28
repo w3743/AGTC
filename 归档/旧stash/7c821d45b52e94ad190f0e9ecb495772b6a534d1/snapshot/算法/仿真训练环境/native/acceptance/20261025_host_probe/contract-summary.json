@@ -1,0 +1,54 @@
+{
+  "source_path": "C:\\pioneer\\先进通用履带底盘工程\\算法\\仿真训练环境\\native\\train\\runs\\native_v1_1_pilot01_20261025_161510\\observation_contract.json",
+  "source_sha256": "852c7144ddfb0e0e640fe982b20d976ad2039df2f28f64e9c7d10aa0467f9805",
+  "run_id": "native_v1_1_pilot01_20261025_161510",
+  "phase": "wsl_training_prep",
+  "physics_dt_s": 0.001,
+  "decimation": 50,
+  "physics_experimental": false,
+  "profile_enabled": true,
+  "observation_contract_sha256": "ba3f2f7803f13158712a6933a0e9b03927d9fa681e34177844280736de425d85",
+  "channels": [
+    {
+      "name": "lidar",
+      "mode": "real",
+      "backend": "warp_kernel",
+      "verified_vs": null,
+      "usable_for_capability": false
+    },
+    {
+      "name": "depth",
+      "mode": "real",
+      "backend": "analytic_warp",
+      "verified_vs": "m1_depth_verification.json (independent numpy caster)",
+      "usable_for_capability": false
+    },
+    {
+      "name": "detections",
+      "mode": "real",
+      "backend": "analytic_detector_warp",
+      "verified_vs": "detections_verification.json (FieldTask._observation packing)",
+      "usable_for_capability": false
+    },
+    {
+      "name": "state",
+      "mode": "real",
+      "backend": null,
+      "verified_vs": null,
+      "usable_for_capability": false
+    },
+    {
+      "name": "feedback",
+      "mode": "real",
+      "backend": "vqf_reference",
+      "verified_vs": "m1_verification.feedback (see m1_vqf_verification.json)",
+      "usable_for_capability": false
+    }
+  ],
+  "capability_metrics_allowed": false,
+  "capability_blockers": [
+    "RTX domain gap not pixel-compared (depth, detections)"
+  ],
+  "task_backend_recorded": false,
+  "reward_note": "simplified goto task for the throughput prototype; not the training task"
+}
