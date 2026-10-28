@@ -6,6 +6,13 @@
 > 官方算法研究：[`Docs/research/sle-ranging-algorithm-analysis.md`](../research/sle-ranging-algorithm-analysis.md)
 > 官方基线实测：[`official-baseline.md`](official-baseline.md)｜实测日志：[`demo-evidence.log`](demo-evidence.log)
 
+## 本目录直接文件
+
+| 文件 | 用途 |
+|---|---|
+| `official-baseline.md` | 记录纯官方测距 sample 的基线配置、操作条件和实测结果，用于与本工程改动比较。 |
+| `demo-evidence.log` | 保存硬件联调与验收过程的原始串口输出，支撑当前状态和历史版本的实测结论。 |
+
 ## 1. 当前状态（v31 server + v16 client，两点/三点线性校准已验证，满足 ≤10cm 要求）
 
 > **验收标准（用户要求）**：测量误差不超过约 **±10cm**。

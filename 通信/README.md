@@ -26,8 +26,8 @@
 │   ├── sle_range_link/         # 我们的示例工程源码（可直接放入 SDK 的 application/samples/products/）
 │   └── sdk_patches/            # 需要同步到 SDK 的 4 个文件（保持相对路径，说明见其中 README）
 ├── firmware/
-│   ├── server_v31/             # A 板（server / 锚点）固件，烧到 COM22
-│   └── client_v16/             # B 板（client / 标签）固件，烧到 COM23
+│   ├── server_v31/             # A 板（server / 锚点）冻结固件包与构建元数据，烧到 COM22
+│   └── client_v16/             # B 板（client / 标签）冻结固件包，烧到 COM23
 ├── docs/
 │   ├── range_link/             # 使用/校准/实测记录/官方基线
 │   ├── design/                 # 设计说明、重构说明（官方源码 + 钩子 + 扩展层）
@@ -35,6 +35,11 @@
 └── tools/
     └── calibrate.ps1           # 一键采集→改校准常量→编译→出烧录命令
 ```
+
+`firmware/` 保存已生成的固件快照：`server_v31/bs21e_all.fwpkg` 是 server 镜像，
+`client_v16/bs21e_all.fwpkg` 是 client 镜像；`server_v31/build_info.txt` 记录该 server
+产物的标识、构建时间、功能/库版本、AT 命令接口和固件包大小。固件目录是冻结交付物，
+其用途与版本信息在本上级说明中维护。
 
 ## 工程结构（关键设计）
 
