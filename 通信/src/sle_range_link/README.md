@@ -12,6 +12,7 @@ sle_range_link/
 ├─ Kconfig
 ├─ CMakeLists.txt
 ├─ sle_range_link.c                  # 入口：sle_range_link_entry()（唯一 app_run）
+├─ rl_ext.c/.h                       # 本工程扩展层：校准、AT 命令、距离回传和用户数据
 ├─ range_link_filter.c/.h            # server 侧滑动中值+均值滤波、野值剔除
 ├─ range_link_server/                # 复制自 sle_measure_dis_server（内部符号名保持 measure_dis_*）
 │   ├─ sle_measure_dis_server.c      # 属性 NOTIFY、距离回传、用户数据 RX、[RL] 日志
@@ -23,6 +24,22 @@ sle_range_link/
     ├─ sle_measure_dis_client.h      # RL 报文结构
     ├─ sle_measure_dis_client_slem.c/.h    # 仅把逐帧日志改为 RL_LOG（逻辑未改）
 ```
+
+## 本目录直接文件
+
+| 文件 | 用途 |
+|---|---|
+| `Kconfig` | 声明 sample 的 SERVER/CLIENT 角色、数据周期、滤波、校准、notify 与日志配置项。 |
+| `CMakeLists.txt` | 将本 sample 的入口、扩展层、滤波器以及所选角色的官方样例源文件加入构建。 |
+| `sle_range_link.c` | 注册唯一 `app_run` 入口并启动角色任务；SERVER 任务处理测距队列、喂看门狗并在空闲时让出 CPU，CLIENT 任务按配置周期发送用户数据。 |
+| `rl_ext.c` | 实现本工程扩展逻辑：距离校准/多点拟合和 AT 命令、距离过滤/日志/notify、用户数据收发及客户端距离通知处理。 |
+| `rl_ext.h` | 定义扩展层使用的 SSAP 消息类型与载荷结构，并声明 SERVER/CLIENT 钩子接口。 |
+| `range_link_filter.c` | 实现 server 距离样本的窗口中值、均值输出、野值门控和连续异常后的窗口重置。 |
+| `range_link_filter.h` | 暴露滤波器初始化、重置、压入样本接口及窗口/野值门限配置。 |
+
+`range_link_client/` 和 `range_link_server/` 的直接源码文件均列在上方目录树中，
+它们从海思 `sle_measure_dis` 官方 sample 派生；本工程修改点通过 `[RANGE_LINK]` 钩子标记，
+源码用途和来源集中在本 README 说明，不在这些上游派生目录中重复放置 README。
 
 ## 通信协议（SSAP，沿用样例帧头 `u32 type; u32 len; u8 data[]`）
 
