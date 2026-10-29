@@ -16,7 +16,7 @@
 | `hardware.html`、`hardware_video.py` | 硬件状态页面和板端视频流。 |
 | `native_roi.py`、`roi_depth.py`、`range4k.py` | 高分辨率 ROI 深度实验及原始图像到深度网格的坐标映射。 |
 | `npu_live.py` | 按需 NPU 深度预览实验。 |
-| `pointcloud.py` | 将深度帧导出为点云。 |
+| `pointcloud.py` | 遗留点云实现，当前服务不调用。 |
 | `probe_depth.py` | 采样和保存数值深度 HTTP 数据。 |
 | `realtime.py` | 界面叠加和板端资源采样辅助逻辑。 |
 | `README.md` | 本目录索引。 |

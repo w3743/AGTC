@@ -43,13 +43,13 @@ class CalibrationLive:
     def clear_outputs(self):
         live = self.live
         with live.condition:
-            live.jpeg = live.jpeg_fixed = live.measure_jpeg = live.pointcloud_packet = None
-            live.measure_input = live.pointcloud_input = None
+            live.jpeg = live.jpeg_fixed = live.measure_jpeg = None
+            live.measure_input = None
             live.measure_history.clear()
             live.updated = None
             live.state.update(mode='calibrating' if self.active else 'waiting', fps=None,
                               depth_median_m=None, valid_fraction=None,
-                              message='校准中：深度、测距、点云暂停' if self.active else '校准已退出，等待新画面')
+                              message='校准中：深度和测距暂停' if self.active else '校准已退出，等待新画面')
             live.condition.notify_all()
 
     def start(self, payload):
@@ -340,8 +340,6 @@ class CalibrationLive:
             from range4k import Range4K
             FastSGBMDepth(candidate, input_size=(640, 360))
             Range4K(candidate)
-            from pointcloud import PointCloudStream
-            PointCloudStream(candidate)
             transaction = prepare_transaction(self.root, candidate)
             identifier = launch_transaction(transaction)
             self.message = '正在应用标定并重新启动服务；连接恢复后检查新标定 ID'

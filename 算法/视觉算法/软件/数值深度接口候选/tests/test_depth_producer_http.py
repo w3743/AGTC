@@ -68,7 +68,6 @@ def fake_live():
     live.jpeg_fixed = None
     live.measure_history = deque(maxlen=180)
     live.measure_input = None
-    live.pointcloud_input = None
     live.state = {}
     live.updated = None
     live.capture_running = True
@@ -161,7 +160,6 @@ class DepthProducerTests(unittest.TestCase):
             self.assertEqual(record.metadata["seq"], entry[0])
             self.assertEqual(record.metadata["left_pts_ns"], entry[2])
             self.assertEqual(int(record.millimetres[0, 0]), 700 + (entry[2] - 100) * 100)
-        self.assertIsNone(live.pointcloud_input)
         self.assertIsNone(live.measure_input)
 
     def test_concurrent_http_reader_never_mixes_published_frames(self):

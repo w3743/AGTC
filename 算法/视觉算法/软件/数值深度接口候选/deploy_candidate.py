@@ -12,7 +12,7 @@ import tarfile
 APP = Path('/opt/rk-lightstereo/app')
 BACKUPS = APP.parent / 'backups'
 FILES = ('server.py', 'depth_wire.py', 'depth_adapter.py', 'hardware_video.py',
-         'native_roi.py', 'roi_depth.py', 'pointcloud.py', 'index.html', 'far.html')
+         'native_roi.py', 'roi_depth.py', 'index.html', 'far.html')
 BASELINE = {
     'server.py': '554c30e9c179989074246335d9e347aba6062caf95f0204267b8021c87c0bf6e',
     'fast_depth.py': 'df48bae5e63a5882d51cfbbf418b754189cf81acbe648cc575d6950c66d109e4',

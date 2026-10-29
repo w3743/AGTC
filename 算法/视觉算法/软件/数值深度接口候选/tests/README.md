@@ -11,5 +11,5 @@
 | `test_far_routes.py` | 远距相关路由测试。 |
 | `test_hardware_monitor.py` | 硬件监测接口测试。 |
 | `test_native_roi.py`、`test_roi_depth.py` | ROI 深度处理测试。 |
-| `test_pointcloud_geometry.py` | 点云几何计算测试。 |
+| `test_pointcloud_geometry.py` | 遗留点云模块的几何测试。 |
 | `README.md` | 本目录索引。 |
