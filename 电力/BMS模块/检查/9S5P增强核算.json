@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-29",
+  "status": "ARITHMETIC_AND_CONTRACT_CHECKS_ONLY",
+  "source_sha256": {
+    "BMS模块\\原理图准备\\BOM.csv": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba",
+    "BMS模块\\原理图准备\\功率元件连接.json": "8af6858036b7a6bf535c14cfbf663181b235ace0fd42ce74df5f7ee65046115e",
+    "BMS模块\\原理图准备\\9S5P增量报价.json": "a32f1a1f8b19e82b68f29790dcfa7fdf85a1abc7cd571361aaf6f4b4d3bab75a",
+    "BMS模块\\设计需求.md": "e6cbbaae18fb6cecc6ac0565e9e3e5217f68cb5ee47458a824d87c12eeff41f7",
+    "BMS模块\\厂商资料\\HYG022N10NS1TA.pdf": "7e11113b04e73d2745354e769be3883694cfbcf96d3e53555e479b1ac26746d6",
+    "BMS模块\\厂商资料\\HoLRS2512-6W-0.5mR-1%_HoS20260522-54_A0.pdf": "36a45f9c01c697d0f27ae78edc58a4c99e5c2a8459cbd5f4b8514744f63f85b8"
+  },
+  "checks_passed": [
+    "six unique new refs",
+    "existing exact MPN reuse",
+    "incremental money arithmetic",
+    "per-FET current not above old comparison point",
+    "OCD1 no-false-trip static screen with declared parasitic budget"
+  ],
+  "shunt": {
+    "nominal_ohm": 0.0005,
+    "signal_at_130A_mV": 65,
+    "power_at_130A_W": 8.45,
+    "pulse_1s_energy_J": 8.45,
+    "manufacturer_short_overload_test": "15W for 5s; resistance change test, not a board thermal rating"
+  },
+  "MOS_conduction": [
+    {
+      "current_A": 60,
+      "parallel_per_bank": 3,
+      "path_R_25C_max_ohm": 0.0018666666666666666,
+      "path_loss_25C_W": 6.72,
+      "per_MOS_current_A": 20.0,
+      "heat_factor2_screen_W": 13.44
+    },
+    {
+      "current_A": 60,
+      "parallel_per_bank": 4,
+      "path_R_25C_max_ohm": 0.0014,
+      "path_loss_25C_W": 5.04,
+      "per_MOS_current_A": 15.0,
+      "heat_factor2_screen_W": 10.08
+    },
+    {
+      "current_A": 100,
+      "parallel_per_bank": 3,
+      "path_R_25C_max_ohm": 0.0018666666666666666,
+      "path_loss_25C_W": 18.666666666666668,
+      "per_MOS_current_A": 33.333333333333336,
+      "heat_factor2_screen_W": 37.333333333333336
+    },
+    {
+      "current_A": 130,
+      "parallel_per_bank": 3,
+      "path_R_25C_max_ohm": 0.0018666666666666666,
+      "path_loss_25C_W": 31.546666666666667,
+      "per_MOS_current_A": 43.333333333333336,
+      "heat_factor2_screen_W": 63.093333333333334
+    },
+    {
+      "current_A": 130,
+      "parallel_per_bank": 4,
+      "path_R_25C_max_ohm": 0.0014,
+      "path_loss_25C_W": 23.66,
+      "per_MOS_current_A": 32.5,
+      "heat_factor2_screen_W": 47.32
+    }
+  ],
+  "gate": {
+    "Qg_typ_nC_per_FET": 160.5,
+    "Qg_typ_nC_per_bank": 642,
+    "twice_typ_engineering_screen_nC_per_bank": 1284,
+    "Ciss_typ_nF_per_bank": 36.104,
+    "BQ20us_turnoff_test_load_nF": 20,
+    "maximum_bank_turnoff_time_proved": false
+  },
+  "thresholds": {
+    "shunt_corner_temperature_C": 75,
+    "calibration_temperature_C": 25,
+    "Rmin_ohm": 0.0004937625,
+    "Rmax_ohm": 0.0005062625,
+    "sense_error_budget_abs_ohm": 1e-05,
+    "old_OCD1_earliest_A": 125.90494176896443,
+    "new_OCD1_earliest_A": 145.27493281034356,
+    "new_OCD1_latest_A": 175.70605410712903,
+    "SCD_earliest_A": 164.64492385172272,
+    "SCD_latest_A": 237.719955556704,
+    "OCC_latest_A": 17.88067491796078,
+    "OCC_does_not_guarantee_16A": true
+  },
+  "peak_power": {
+    "motor_input_W": 3600,
+    "auxiliary_assumption_W": 100,
+    "loaded_BUS_assumption_V": 22.5,
+    "battery_target_A": 130,
+    "battery_power_W": 2925,
+    "capacitor_gap_W": 775,
+    "no_loss_of_regen_priority": true
+  },
+  "limits": [
+    "no 130A real hardware rating",
+    "no temperature/repetition qualified",
+    "fault energy and fuse coordination pending",
+    "no switch gate timing extrapolation",
+    "startup limited when capacitor energy unavailable",
+    "no mechanical brake fallback",
+    "0V startup and braking envelope remain separate open items"
+  ]
+}

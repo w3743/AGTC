@@ -1,0 +1,135 @@
+{
+  "schema": "0V-initial-charge LCSC quote coverage",
+  "snapshot_date": "2026-10-29",
+  "source_inventory": "电力/稳压模块/检查/0V初充器件清单.json",
+  "scope": "43 added instances in the independent MAX17853 candidate, plus the shared gate-readback AUP1T14 package and existing parts reused without new procurement quantity.",
+  "currency_policy": "Do not convert LCSC USD listings into CNY. cny_unit_price is null unless an exact, public LCSC RMB quote was directly verified. LCSC listings are volatile references, not a purchase commitment.",
+  "new_43_parts": {
+    "count_check": {"ic_instances": 3, "resistor_instances": 30, "capacitor_instances": 10, "total_instances": 43},
+    "items": [
+      {
+        "refs": ["U_AFE_MAX17853"], "qty_new": 1, "design_mpn": "MAX17853ACB/V+", "quoted_mpn": "MAX17853ACB/V+", "manufacturer": "ADI/Maxim", "lcsc_part": "C7451746", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": 113.57, "cny_quote_status": "verified by parent from public LCSC Chinese listing", "min_order_qty": 1, "order_multiple": 1, "stock_snapshot": 0, "availability": "out of stock; order required",
+        "usd_reference": {"unit_at_min_qty": 17.3802, "min_qty": 1, "status": "public LCSC international listing reference; separate currency, do not combine with CNY"},
+        "source_urls": ["https://item.szlcsc.com/8476691.html", "https://www.lcsc.com/product-detail/C7451746.html"],
+        "note": "CNY 113.57 is parent-verified, not exposed in the anonymous page snapshot returned to this agent."
+      },
+      {
+        "refs": ["U_TPS3850"], "qty_new": 1, "design_mpn": "TPS3850G33DRCT", "quoted_mpn": "TPS3850G33DRCR", "manufacturer": "Texas Instruments", "lcsc_part": "C2066725", "identity": "exact quoted MPN and LCSC code verified; design suffix differs only by tape/reel ordering code",
+        "cny_unit_price": null, "cny_quote_status": "not found on a public exact-MPN RMB listing", "usd_reference": {"unit_at_min_qty": 1.4151, "min_qty": 1, "stock_snapshot": 0, "status": "public listing; reference price while out of stock"}, "min_order_qty": 1, "order_multiple": 1, "stock_snapshot": 0,
+        "source_urls": ["https://www.lcsc.com/product-detail/supervisor-and-reset-ics_ti-tps3850g33drcr_C2066725.html"],
+        "note": "Recommend aligning the schematic/BOM to TPS3850G33DRCR so the purchasable exact LCSC identity matches. DRCR is the 3000-piece reel ordering code and DRCT is the 250-piece tape ordering code; same G33 VSON-10 device/package."
+      },
+      {
+        "refs": ["U_AFE_AND"], "qty_new": 1, "design_mpn": "SN74LVC1G11DCKR", "quoted_mpn": "SN74LVC1G11DCKR", "manufacturer": "Texas Instruments", "lcsc_part": "C529281", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "not found on a public exact-MPN RMB listing", "usd_reference": {"unit_at_min_qty": 0.1556, "min_qty": 5, "stock_snapshot": 6240, "status": "public LCSC listing snapshot"}, "min_order_qty": 5, "order_multiple": 5,
+        "source_urls": ["https://www.lcsc.com/product-detail/Logic-Gates_Texas-Instruments-SN74LVC1G11DCKR_C529281.html"], "note": "This gate is in the 43-part candidate; parent is separately considering replacing the combinational AND with an HCS74 latch, so do not treat this price as the final shared shutdown package."
+      },
+      {
+        "refs": ["R_MAX_C0..R_MAX_C8", "R_MAX_SCLK_SER", "R_MAX_SDI_SER", "R_MAX_CSB_SER"], "qty_new": 12, "value": "1kΩ, 1%, 0603", "mpn": "RC0603FR-071KL", "manufacturer": "YAGEO", "lcsc_part": "C22548", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "no exact public RMB unit price exposed", "usd_reference": {"unit_at_min_qty": 0.0036, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0036}, {"qty": 1000, "usd": 0.0027}, {"qty": 5000, "usd": 0.0022}, {"qty": 10000, "usd": 0.0019}, {"qty": 50000, "usd": 0.0017}]}, "min_order_qty": 100, "order_multiple": 100, "stock_snapshot": 10394700,
+        "source_urls": ["https://www.lcsc.com/product-detail/C22548.html", "https://www.szlcsc.com/p/RC0603FR-071KL_1314.html"], "note": "Chinese public exact page confirms part identity; price block was not publicly exposed in the anonymous result. USD tiers are LCSC international listing snapshot."
+      },
+      {
+        "refs": ["R_MAX_DCIN"], "qty_new": 1, "value": "100Ω, 1%, 0603", "mpn": "RC0603FR-07100RL", "manufacturer": "YAGEO", "lcsc_part": "C105588", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0034, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0034}, {"qty": 1000, "usd": 0.0030}, {"qty": 5000, "usd": 0.0028}, {"qty": 10000, "usd": 0.0027}]}, "min_order_qty": 100, "order_multiple": 100, "stock_snapshot": 4535400,
+        "source_urls": ["https://www.lcsc.com/product-detail/C105588.html", "https://item.szlcsc.com/106804.html"]
+      },
+      {
+        "refs": ["R_MAX_SHDNL_PU", "R_MAX_ALERT_PU", "R_MAX_AUX0_PU..R_MAX_AUX5_PU", "R_MAX_CSB_PU", "R_TPS_CWD_PU", "R_TPS_RST_WDO_PU"], "qty_new": 11, "value": "10kΩ, 1%, 0603", "mpn": "RC0603FR-0710KL", "manufacturer": "YAGEO", "lcsc_part": "C98220", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0027, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0027}, {"qty": 1000, "usd": 0.0020}, {"qty": 5000, "usd": 0.0017}, {"qty": 10000, "usd": 0.0015}, {"qty": 50000, "usd": 0.0013}]}, "min_order_qty": 100, "order_multiple": 100, "stock_snapshot": 3775200,
+        "source_urls": ["https://www.lcsc.com/product-detail/C98220.html"], "note": "Exact LCSC identity verified; the public RMB result was not surfaced."
+      },
+      {
+        "refs": ["R_MAX_SHDNL_PD", "R_TPS_WDI_PD", "R_AFE_OK_PD", "R_WD_OK_PD", "R_AFE_PERMIT_PD"], "qty_new": 5, "value": "47kΩ, 1%, 0603", "mpn": "RC0603FR-0747KL", "manufacturer": "YAGEO", "lcsc_part": "C105579", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0031, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0031}, {"qty": 1000, "usd": 0.0026}, {"qty": 5000, "usd": 0.0023}, {"qty": 10000, "usd": 0.0022}, {"qty": 50000, "usd": 0.0020}]}, "min_order_qty": 100, "order_multiple": 100, "stock_snapshot": 200,
+        "source_urls": ["https://www.lcsc.com/product-detail/Chip-Resistor-Surface-Mount_YAGEO-RC0603FR-0747KL_C105579.html", "https://item.szlcsc.com/106794.html"]
+      },
+      {
+        "refs": ["R_GATE_SER"], "qty_new": 1, "value": "680Ω, 1%, 0603", "mpn": "RC0603FR-07680RL", "manufacturer": "YAGEO", "lcsc_part": "C112310", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0032, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0032}, {"qty": 1000, "usd": 0.0024}, {"qty": 5000, "usd": 0.0020}, {"qty": 10000, "usd": 0.0018}, {"qty": 50000, "usd": 0.0016}]}, "min_order_qty": 100, "order_multiple": 100,
+        "source_urls": ["https://www.lcsc.com/product-detail/C112310.html", "https://item.szlcsc.com/113542.html"]
+      },
+      {
+        "refs": ["C_MAX_DCIN"], "qty_new": 1, "value": "2.2µF, 100V, X7R", "mpn": "C4532X7R2A225KT0L0U", "manufacturer": "TDK", "lcsc_part": "C329963", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.557, "min_qty": 1, "price_tiers": [{"qty": 1, "usd": 0.557}, {"qty": 10, "usd": 0.4682}, {"qty": 30, "usd": 0.4305}, {"qty": 100, "usd": 0.3828}, {"qty": 500, "usd": 0.3615}, {"qty": 1000, "usd": 0.3483}]}, "min_order_qty": 1, "order_multiple": 1, "stock_snapshot": 798,
+        "source_urls": ["https://www.lcsc.com/product-detail/C329963.html"]
+      },
+      {
+        "refs": ["C_MAX_HV"], "qty_new": 1, "value": "4.7µF, 50V, X7R", "mpn": "C1206C475K5RACAUTO", "manufacturer": "KEMET", "lcsc_part": "C696377", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.1828, "min_qty": 5, "price_tiers": [{"qty": 5, "usd": 0.1828}, {"qty": 50, "usd": 0.1477}, {"qty": 150, "usd": 0.1327}, {"qty": 500, "usd": 0.114}, {"qty": 2000, "usd": 0.1057}, {"qty": 4000, "usd": 0.1007}]}, "min_order_qty": 5, "order_multiple": 5, "stock_snapshot": 6460,
+        "source_urls": ["https://www.lcsc.com/product-detail/C696377.html"]
+      },
+      {
+        "refs": ["C_MAX_CPP"], "qty_new": 1, "value": "0.1µF, 100V, X7R", "mpn": "C2225C104K1RACTU", "manufacturer": "KEMET", "lcsc_part": "C2411772", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not found", "usd_reference": {"unit_at_min_qty": 0.7456, "min_qty": 1, "price_tiers": [{"qty": 1, "usd": 0.7456}, {"qty": 200, "usd": 0.2887}, {"qty": 500, "usd": 0.2794}, {"qty": 1000, "usd": 0.2733}], "stock_snapshot": 0, "status": "out of stock; reference price only"}, "min_order_qty": 1, "order_multiple": 1, "stock_snapshot": 0,
+        "source_urls": ["https://www.lcsc.com/product-detail/C2411772.html"], "note": "Product page was inaccessible to the anonymous browser during this check; LCSC code/price came from the prior exact-identity catalog snapshot."
+      },
+      {
+        "refs": ["C_MAX_VAA"], "qty_new": 1, "value": "1µF, 100V, X7R candidate", "mpn": "C3225X7R2A105K200AA", "manufacturer": "TDK", "lcsc_part": "C2167578", "identity": "exact MPN and LCSC code verified; 100V part exceeds original 10V minimum",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.3422, "min_qty": 5, "price_tiers": [{"qty": 5, "usd": 0.3422}, {"qty": 50, "usd": 0.2734}, {"qty": 150, "usd": 0.2438}, {"qty": 500, "usd": 0.207}, {"qty": 2500, "usd": 0.1824}, {"qty": 5000, "usd": 0.1725}], "stock_snapshot": 0, "status": "out of stock; reference price only"}, "min_order_qty": 5, "order_multiple": 5, "stock_snapshot": 0,
+        "source_urls": ["https://www.lcsc.com/product-detail/C2167578.html"], "note": "The LCSC page confirms exact 1µF X7R 100V 1210 identity; exact online stock/price block was not rendered in the current anonymous page."
+      },
+      {
+        "refs": ["C_MAX_VDDL1", "C_MAX_VDDL2", "C_MAX_VDDL3"], "qty_new": 3, "value": "470nF, 10V, X7R, 0603", "mpn": "CC0603KRX7R6BB474", "manufacturer": "YAGEO", "lcsc_part": "C106250", "identity": "exact MPN and LCSC code verified",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0246, "min_qty": 20, "price_tiers": [{"qty": 20, "usd": 0.0246}, {"qty": 200, "usd": 0.0193}, {"qty": 600, "usd": 0.0164}, {"qty": 4000, "usd": 0.0139}, {"qty": 8000, "usd": 0.0123}, {"qty": 20000, "usd": 0.0115}]}, "min_order_qty": 20, "order_multiple": 20, "stock_snapshot": 5300,
+        "source_urls": ["https://www.lcsc.com/product-detail/C106250.html"]
+      },
+      {
+        "refs": ["C_MAX_SHDNL"], "qty_new": 1, "value": "1nF, C0G, 100V candidate", "mpn": "CC0805CG100V102GN", "manufacturer": "TORCH", "lcsc_part": "C54157534", "identity": "exact MPN and LCSC code verified; 100V part exceeds original 25V minimum",
+        "cny_unit_price": null, "cny_quote_status": "exact product RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0094, "min_qty": 100, "price_tiers": [{"qty": 100, "usd": 0.0094}, {"qty": 1000, "usd": 0.0077}, {"qty": 4000, "usd": 0.0068}, {"qty": 8000, "usd": 0.0063}, {"qty": 48000, "usd": 0.0058}, {"qty": 100000, "usd": 0.0056}]}, "min_order_qty": 100, "order_multiple": 100, "stock_snapshot": 1700,
+        "source_urls": ["https://www.lcsc.com/product-detail/C54157534.html", "https://item.szlcsc.com/4422301.html"], "note": "The Chinese page surfaced ¥0.0415 for a same-package/similar 1nF C0G TORCH alternate, not the exact quoted MPN; excluded that proxy price from exact price fields."
+      },
+      {
+        "refs": ["C_TPS_VDD", "C_AFE_AND_VDD"], "qty_new": 2, "value": "0.1µF, 50V X7R, 0603 candidate", "mpn": "CGA3E2X7R1H104KT0Y0S", "manufacturer": "TDK", "lcsc_part": "C342998", "identity": "exact MPN and LCSC code verified; 50V part exceeds original 10V minimum",
+        "cny_unit_price": null, "cny_quote_status": "exact public RMB price not exposed", "usd_reference": {"unit_at_min_qty": 0.0297, "min_qty": 1, "price_tiers": [{"qty": 1, "usd": 0.0297}, {"qty": 10, "usd": 0.0229}, {"qty": 30, "usd": 0.0191}, {"qty": 200, "usd": 0.0169}, {"qty": 400, "usd": 0.0149}, {"qty": 1000, "usd": 0.0139}], "stock_snapshot": 15, "status": "low stock; listing status is volatile"}, "min_order_qty": 1, "order_multiple": 1, "stock_snapshot": 15,
+        "source_urls": ["https://www.lcsc.com/product-detail/C342998.html"]
+      }
+    ],
+    "min_qty_cost_reference_usd_excluding_MAX": {
+      "new_resistors": 1.6,
+      "new_capacitors": 5.419,
+      "new_TPS3850_and_AND_ICs": 2.1931,
+      "subtotal": 9.2121,
+      "scope_note": "Uses public USD reference prices at each LCSC minimum order, includes MOQ surplus and currently out-of-stock reference-priced parts, excludes MAX17853 because its verified quote is CNY, excludes taxes/shipping, and excludes the separate shared AUP1T14 package. This is a procurement planning subtotal, not a mixed-currency total."
+    },
+    "one_board_consumption_reference_usd_excluding_MAX": {
+      "new_resistors": 0.095,
+      "new_capacitors": 1.9702,
+      "new_TPS3850_and_AND_ICs": 1.5707,
+      "subtotal": 3.6359,
+      "scope_note": "One assembled candidate-board consumed-value reference at the smallest listed price break; excludes MAX17853 CNY quote, MOQ leftovers, taxes/shipping."
+    }
+  },
+  "shared_gate_readback_package_outside_43": [
+    {
+      "refs": ["U_DRV_FAULT_FB"], "qty_new": 1, "mpn": "SN74AUP1T14DCKR", "manufacturer": "Texas Instruments", "lcsc_part": "C2682010", "identity": "exact MPN and LCSC code verified", "cny_unit_price": null,
+      "usd_reference": {"unit_at_min_qty": 0.198, "min_qty": 5, "stock_snapshot": 2865, "status": "public LCSC listing snapshot; prices volatile"}, "min_order_qty": 5, "order_multiple": 5,
+      "source_urls": ["https://www.lcsc.com/product-detail/Inverters_Texas-Instruments-SN74AUP1T14DCKR_C2682010.html"], "note": "Retain only if actual merged DRV_FAULT_N readback remains required; MAX ALERTOUT can report AFE fault but cannot read back the final driver permission node."
+    },
+    {
+      "refs": ["C_DRV_FAULT_FB"], "qty_new": 1, "mpn": "CGA3E2X7R1H104KT0Y0S", "manufacturer": "TDK", "lcsc_part": "C342998", "identity": "same exact MPN as the 43-part bypass-cap group", "cny_unit_price": null,
+      "usd_reference": {"unit_at_min_qty": 0.0297, "min_qty": 1, "stock_snapshot": 15}, "min_order_qty": 1, "order_multiple": 1,
+      "source_urls": ["https://www.lcsc.com/product-detail/C342998.html"], "note": "New instance, so it has procurement cost despite reusing the same MPN as other new bypass caps. Not included in the 43-part subtotal."
+    }
+  ],
+  "existing_reused_parts_no_new_procurement_qty": [
+    {
+      "refs": ["C_BAL1..C_BAL8"], "qty_reused": 8, "qty_new_procurement": 0, "mpn": "C0805C104K5RAC7800", "manufacturer": "KEMET", "lcsc_part_exact_mpn": "C75414", "identity": "exact MPN and exact LCSC supplier code verified", "cny_unit_price": null,
+      "usd_reference": {"unit_at_min_qty": 0.0486, "min_qty": 10, "stock_snapshot": 24860, "status": "public LCSC category listing USD snapshot"},
+      "source_urls": ["https://item.szlcsc.com/76538.html", "https://www.lcsc.com/zh-CN/category/1142.html?brand=435"],
+      "note": "Existing 8 capacitors are rewired as MAX differential filters and add zero procurement quantity. Existing EDA supplier mapping says C129690 but exact MPN resolves to LCSC C75414; correct the supplier code during BOM reconciliation."
+    },
+    {
+      "refs": ["R_BAL1..R_BAL8"], "qty_reused": 8, "qty_new_procurement": 0, "mpn": "MFR25SFRE52-120R", "manufacturer": "YAGEO", "supplier": "LCSC", "lcsc_part": null, "identity": "exact LCSC listing/code not verified",
+      "cny_unit_price": null, "usd_reference": null, "quote_status": "unknown at LCSC; no exact public LCSC listing found", "source_urls": [],
+      "note": "Existing 8 resistors are reconnected as SW balance-current limiters and add zero procurement quantity if the existing fitted parts are retained. Do not use another distributor's price as an LCSC quote."
+    }
+  ],
+  "quote_caveats": [
+    "The current public LCSC pages/search snapshots primarily expose USD prices; CNY values are intentionally left null rather than FX-converted.",
+    "Prices, MOQ and stock can change; MAX17853 and some passive reference-price entries were out of stock at the observed quote.",
+    "New quantity is charged by physical instance even if its MPN already appears elsewhere. Only C_BAL1..8 and R_BAL1..8 are zero incremental procurement because the existing instances are rewired.",
+    "The 43-part list is an independent pre-deduplication candidate. The separate AUP readback package and any parent-selected HCS74/LTC7001 shutdown package must be reconciled before a final board BOM total."
+  ]
+}
