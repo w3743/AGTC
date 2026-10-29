@@ -1,0 +1,41 @@
+* DC-only fixture for the coarse channel and forward/reverse body-diode equivalents.
+* It does not cover switching, reverse recovery, or a real converter load waveform.
+.include HYG022_参数化等效模型.lib
+.options TNOM=25
+.temp 25
+
+* Common-source B2B pair: 80 A at 10 V gate, using 2x2.2 mOhm typical RDS(on).
+VON onnode 0 0.512
+RLOAD1 onnode d1 1m
+XPAIR d1 d2 gatepair mid HYG022_B2B
+RLOAD2 d2 0 1m
+VGP gatepair mid 10
+
+* Single-device forward diode point: ideal 50 A test current, as in the datasheet.
+IFWD50 0 sd 50
+XDIOD 0 gdiod sd HYG022_EQ
+VGDIOD gdiod 0 0
+
+* Two-polarity gate-off path screen at 20 V; each midpoint has a 1 GOhm reference.
+VBLKP pblock 0 20
+XBLOCKP pblock 0 goff midp HYG022_B2B
+RMIDP midp 0 1G
+VGOP goff midp 0
+VBLKN nblock 0 20
+XBLOCKN 0 nblock goffn midn HYG022_B2B
+RMIDN midn 0 1G
+VGON goffn midn 0
+
+.control
+set noaskquit
+op
+let i_on=-i(VON)
+let v_pair=v(d1)-v(d2)
+let i_diode=50
+let v_diode=v(sd)
+let leak_positive=abs(i(VBLKP))
+let leak_negative=abs(i(VBLKN))
+print i_on v_pair i_diode v_diode leak_positive leak_negative
+quit
+.endc
+.end

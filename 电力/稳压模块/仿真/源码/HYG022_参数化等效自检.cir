@@ -1,0 +1,18 @@
+* Runs fixed-point and dynamic checks for HYG022_参数化等效模型.lib.
+* Single-device RC gate-port charge fixture only. It does not simulate a power path.
+.include HYG022_参数化等效模型.lib
+
+* 10 V gate step through 2.5 ohm external Rg and 2.3 ohm internal Rg.
+XTEST 0 gate 0 HYG022_EQ
+VDRV drv 0 PULSE(0 10 1u 2n 2n 20u 50u)
+RGEXT drv gate 2.5
+
+.temp 25
+.control
+set noaskquit
+set wr_singlescale
+tran 1n 7u 0 1n
+wrdata hyg022_gatecharge_wave.txt v(gate) v(drv) i(VDRV)
+quit
+.endc
+.end

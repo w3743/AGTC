@@ -1,0 +1,401 @@
+{
+  "status": "ADOPTED_SELECTION_NOT_YET_DRAWN",
+  "date": "2026-10-29",
+  "scope": "independent SC regulator, 8 cells; not BMS or battery upgrade",
+  "baseline_sha256": "789de860f8d400c3b631f9eb96b2ea310c72765b08c280e7c5b236366083f478",
+  "native_sha256": "55f6732618d03d243bbd5bfc74b5c17330bad4811018e7c30a9d91647ac654af",
+  "counts": {
+    "baseline_instances": 169,
+    "added": 22,
+    "retired": 20,
+    "net_added": 2,
+    "selected_instances": 171,
+    "new_exact_MPNs_vs_regulator_baseline": 10,
+    "added_instance_MPNs": 13,
+    "additional_mandatory_external_supply_if_not_already_fitted": 1,
+    "physical_added_including_previously_optional_supply": 23,
+    "physical_net_added_including_previously_optional_supply": 3
+  },
+  "conditional_to_mandatory": [
+    {
+      "ref": "PSU5_EXT",
+      "mpn": "URB4805YMD-10WR3",
+      "qty": 1,
+      "reason": "原169条目已含此备选身份，现明确必配；此前未安装时实物/费用另加1个，不能漏算"
+    }
+  ],
+  "new_mpn_list": [
+    "0603B104K160NT",
+    "HYG022N10NS1TA",
+    "LTC7001IMSE#PBF",
+    "RC0603FR-071ML",
+    "RS-03K1002FT",
+    "RS-03K4702FT",
+    "RT0603BRD075K11L",
+    "SN74LVC1G07DCKR",
+    "STPS30100ST",
+    "TMUX1511PWR"
+  ],
+  "added": [
+    {
+      "Reference": "U_CELL_MUX1",
+      "Quantity": "1",
+      "Manufacturer part": "TMUX1511PWR",
+      "Supplier part": "C2866750",
+      "Requirements and notes": "四通道共用ADC，断电不从累计抽头反灌MCU"
+    },
+    {
+      "Reference": "U_CELL_MUX2",
+      "Quantity": "1",
+      "Manufacturer part": "TMUX1511PWR",
+      "Supplier part": "C2866750",
+      "Requirements and notes": "四通道共用ADC，断电不从累计抽头反灌MCU"
+    },
+    {
+      "Reference": "U_SIGNAL_ISO",
+      "Quantity": "1",
+      "Manufacturer part": "TMUX1511PWR",
+      "Supplier part": "C2866750",
+      "Requirements and notes": "BUS及CSA掉电输入隔离"
+    },
+    {
+      "Reference": "U_GATE_OD",
+      "Quantity": "1",
+      "Manufacturer part": "SN74LVC1G07DCKR",
+      "Supplier part": "C7830",
+      "Requirements and notes": "TIM1 Break清MOE后许可保持低；无需外置FF"
+    },
+    {
+      "Reference": "U_ISO_DRV",
+      "Quantity": "1",
+      "Manufacturer part": "LTC7001IMSE#PBF",
+      "Supplier part": "C581062",
+      "Requirements and notes": "双向隔离管驱动；VCCUV pin2接地，OVLO pin5接地；12V合格后至少等1秒首次ARM"
+    },
+    {
+      "Reference": "Q_SC_ISO1",
+      "Quantity": "1",
+      "Manufacturer part": "HYG022N10NS1TA",
+      "Supplier part": "C2925050",
+      "Requirements and notes": "共源背靠背，阻断两方向电流；复用BMS精确型号；TA封装为TOLL"
+    },
+    {
+      "Reference": "Q_SC_ISO2",
+      "Quantity": "1",
+      "Manufacturer part": "HYG022N10NS1TA",
+      "Supplier part": "C2925050",
+      "Requirements and notes": "共源背靠背，阻断两方向电流；复用BMS精确型号；TA封装为TOLL"
+    },
+    {
+      "Reference": "D_SC_LO",
+      "Quantity": "1",
+      "Manufacturer part": "STPS30100ST",
+      "Supplier part": "C172485",
+      "Requirements and notes": "主桥双向续流或制动电阻/线束电感续流；单二极管器件"
+    },
+    {
+      "Reference": "D_SC_HI",
+      "Quantity": "1",
+      "Manufacturer part": "STPS30100ST",
+      "Supplier part": "C172485",
+      "Requirements and notes": "主桥双向续流或制动电阻/线束电感续流；单二极管器件"
+    },
+    {
+      "Reference": "D_DUMP_FW",
+      "Quantity": "1",
+      "Manufacturer part": "STPS30100ST",
+      "Supplier part": "C172485",
+      "Requirements and notes": "主桥双向续流或制动电阻/线束电感续流；单二极管器件"
+    },
+    {
+      "Reference": "Q_DUMP_SW",
+      "Quantity": "1",
+      "Manufacturer part": "MMBT5551",
+      "Supplier part": "C408396",
+      "Requirements and notes": "MDD MMBT5551额定值和1=B、2=E、3=C引脚符合旧器件；MDD对应库封装焊盘几何不同，PCB阶段需复核。"
+    },
+    {
+      "Reference": "C_ISO_BST",
+      "Quantity": "1",
+      "Manufacturer part": "C3225X7R2A105K200AA",
+      "Supplier part": "C2167578",
+      "Requirements and notes": "LTC7001浮动驱动储能；复用BUS/SC既有型号，12V偏压及温度后有效C≥0.5µF"
+    },
+    {
+      "Reference": "R_ADC_A_PD",
+      "Quantity": "1",
+      "Manufacturer part": "PTFR0805B10K0N9",
+      "Supplier part": "C328436",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_ADC_B_PD",
+      "Quantity": "1",
+      "Manufacturer part": "PTFR0805B10K0N9",
+      "Supplier part": "C328436",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_ARM_PD",
+      "Quantity": "1",
+      "Manufacturer part": "RMC0603100K1%N",
+      "Supplier part": "C269699",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_ISO_GS",
+      "Quantity": "1",
+      "Manufacturer part": "RC0603FR-071ML",
+      "Supplier part": "C105578",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_ISO_TGUP",
+      "Quantity": "1",
+      "Manufacturer part": "RS-03K1002FT",
+      "Supplier part": "C115324",
+      "Requirements and notes": "13处非精密10k统一已有大陆风华料，0603、1%、100mW、50V、100ppm；12V下功耗不足16mW，3.3V上拉/故障下拉满足要求；NTC换用1%上拉不放宽原1%要求。SC_OV及ADC精密下拉不变。"
+    },
+    {
+      "Reference": "R_DUMP_HW_PU",
+      "Quantity": "1",
+      "Manufacturer part": "RS-03K1002FT",
+      "Supplier part": "C115324",
+      "Requirements and notes": "13处非精密10k统一已有大陆风华料，0603、1%、100mW、50V、100ppm；12V下功耗不足16mW，3.3V上拉/故障下拉满足要求；NTC换用1%上拉不放宽原1%要求。SC_OV及ADC精密下拉不变。"
+    },
+    {
+      "Reference": "R_DUMP_SW_BASE",
+      "Quantity": "1",
+      "Manufacturer part": "RS-03K1002FT",
+      "Supplier part": "C115324",
+      "Requirements and notes": "13处非精密10k统一已有大陆风华料，0603、1%、100mW、50V、100ppm；12V下功耗不足16mW，3.3V上拉/故障下拉满足要求；NTC换用1%上拉不放宽原1%要求。SC_OV及ADC精密下拉不变。"
+    },
+    {
+      "Reference": "R_BUS_OV_TOP1",
+      "Quantity": "1",
+      "Manufacturer part": "PTFR0805B255KP9",
+      "Supplier part": "C2849126",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_BUS_OV_TOP2",
+      "Quantity": "1",
+      "Manufacturer part": "PTFR0805B255KP9",
+      "Supplier part": "C2849126",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    },
+    {
+      "Reference": "R_BUS_OV_BOT",
+      "Quantity": "1",
+      "Manufacturer part": "RT0603BRD075K11L",
+      "Supplier part": "C705788",
+      "Requirements and notes": "ADC负载/复位默认态/隔离驱动/制动硬OV必要外围"
+    }
+  ],
+  "retired": [
+    "U_BAL1",
+    "U_BAL2",
+    "U_BAL3",
+    "U_BAL4",
+    "U_BAL5",
+    "U_BAL6",
+    "U_BAL7",
+    "U_BAL8",
+    "Q_BUS_P",
+    "D_QP_GS_ZENER",
+    "R_12V_PRELOAD",
+    "C_BAL6",
+    "C_BAL7",
+    "C_BAL8",
+    "C_T4_FILTER",
+    "C_T5_FILTER",
+    "C_T6_FILTER",
+    "C_T7_FILTER",
+    "C_T8_FILTER",
+    "C_TEST_FB"
+  ],
+  "domestic_peripheral_review": "国产外围替代核对.json",
+  "gpio_contract": {
+    "PA8": "TIM1_CH1 PWM_H",
+    "PB13": "TIM1_CH1N PWM_L",
+    "PA9": "TIM1_CH2 ARM",
+    "PB12": "TIM1_BKIN FAULT",
+    "PA10": "FAULT input",
+    "PA6": "COMP1_OUT OD",
+    "PA2": "COMP2_OUT OD",
+    "PA0": "COMP3 IMON",
+    "PB1": "COMP1/ADC IMON",
+    "PA7": "COMP2 IMON",
+    "PB0": "BUS_ADC",
+    "PB14": "SC_ADC_A ADC1_IN5",
+    "PB15": "SC_ADC_B ADC2_IN15",
+    "PB11": "NTC_MAIN",
+    "PC4": "NTC_SC",
+    "PA3": "NTC_DUMP",
+    "PB7": "DUMP_PWM",
+    "PC6": "MUX_SEL1",
+    "PA15": "MUX_SEL2",
+    "PC10": "MUX_SEL3",
+    "PC11": "MUX_SEL4",
+    "PB3": "MUX_SEL5",
+    "PB4": "MUX_SEL6",
+    "PB5": "MUX_SEL7",
+    "PB9": "MUX_SEL8",
+    "PA11": "CAN_RX",
+    "PA12": "CAN_TX",
+    "PA13": "SWDIO",
+    "PA14": "SWCLK"
+  },
+  "working_window": {
+    "highest_measured_cell_standby_V": 2.0,
+    "warning_derate_V": 2.15,
+    "regen_charge_stop_V": 2.2,
+    "scan_period_ms": 20,
+    "IWDG_prescaler": 4,
+    "IWDG_RLR": 700,
+    "first_arm_wait_after_12V_valid_s": 1
+  },
+  "reused_or_replaced_refs": [
+    "C_BAL1",
+    "C_BAL2",
+    "C_BAL3",
+    "C_BAL4",
+    "C_BAL5",
+    "C_BUS_ADC",
+    "C_BUS_FILM1",
+    "C_BUS_FILM2",
+    "C_BUS_FILM3",
+    "C_BUS_HF",
+    "C_CAN1",
+    "C_DRV_CSAREF",
+    "C_DRV_SO",
+    "C_DRV_VDRAIN",
+    "C_NTC_DUMP",
+    "C_NTC_MAIN",
+    "C_NTC_SC",
+    "C_SC_BULK",
+    "C_SC_BULK2",
+    "C_SC_HF",
+    "C_T1_FILTER",
+    "C_T2_FILTER",
+    "C_T3_FILTER",
+    "J_CORE_P1",
+    "J_CORE_P2",
+    "Q_MAIN_H",
+    "Q_PMOS_CTRL",
+    "R_BAL1",
+    "R_BAL2",
+    "R_BAL3",
+    "R_BAL4",
+    "R_BAL5",
+    "R_BAL6",
+    "R_BAL7",
+    "R_BAL8",
+    "R_BUS_HI",
+    "R_BUS_LO",
+    "R_DRV_FAULT_PD",
+    "R_DRV_SO_SER",
+    "R_DUMP_GATE_PD",
+    "R_DUMP_IN_PD",
+    "R_DUMP_IN_SER",
+    "R_NTC_DUMP_PU",
+    "R_NTC_MAIN_PU",
+    "R_NTC_SC_PU",
+    "R_PB5_PERMIT",
+    "R_PB6_BASE",
+    "R_PWM_H_PD",
+    "R_PWM_L_PD",
+    "R_QH_GS",
+    "R_QL_GS",
+    "R_QP_BE",
+    "R_QP_COL",
+    "R_QP_GS",
+    "R_T1_TEST",
+    "R_T2_TEST",
+    "R_T3_TEST",
+    "R_T4_TEST",
+    "R_T5_TEST",
+    "R_T6_TEST",
+    "R_T7_TEST",
+    "R_TEST_HI",
+    "R_TEST_LO",
+    "U1",
+    "U_DUMP_DRV",
+    "U_SC_OV",
+    "U_AUX1",
+    "J_BUS_POWER",
+    "J_DUMP",
+    "J_SC_POWER",
+    "COREBOARD_WEACT",
+    "F_BUS",
+    "F_SC",
+    "R_DUMP_EXT",
+    "PSU5_EXT"
+  ],
+  "resistor": {
+    "quantity": 1,
+    "ohm": 0.82,
+    "tolerance_percent": 5,
+    "power_rating": null,
+    "thermal_design": "user scope",
+    "temperature_fuse": false
+  },
+  "price": {
+    "currency": "CNY",
+    "known_added_partial": 14.88,
+    "known_refs": [
+      "Q_SC_ISO1",
+      "Q_SC_ISO2"
+    ],
+    "unknown_new_refs": [
+      "U_CELL_MUX1",
+      "U_CELL_MUX2",
+      "U_SIGNAL_ISO",
+      "U_GATE_OD",
+      "U_ISO_DRV",
+      "D_SC_LO",
+      "D_SC_HI",
+      "D_DUMP_FW",
+      "Q_DUMP_SW",
+      "C_ISO_BST",
+      "R_ADC_A_PD",
+      "R_ADC_B_PD",
+      "R_ARM_PD",
+      "R_ISO_GS",
+      "R_ISO_TGUP",
+      "R_DUMP_HW_PU",
+      "R_DUMP_SW_BASE",
+      "R_BUS_OV_TOP1",
+      "R_BUS_OV_TOP2",
+      "R_BUS_OV_BOT"
+    ],
+    "complete_total": null,
+    "net_material_delta": null,
+    "mandatory_external_supply_price": null,
+    "tax_freight_moq_not_totalled": true,
+    "known_source": "BMS模块/原理图准备/9S5P增量报价.json; HYG 1+ ¥7.44, 2026-10-29",
+    "formula": "14.88 + Σ(other 20 added board positions × verified unit price) + mandatory PSU5_EXT if previously not fitted + Σ(same-quantity replacement new-old) − Σ(20 retired positions × old unit price)",
+    "battery_separate": {
+      "added_cells": 9,
+      "unit_user_CNY": 13,
+      "increment_CNY": 117
+    }
+  },
+  "not_claimed": [
+    "native schematic updated",
+    "new official ENET or DRC",
+    "PCB or firmware implemented",
+    "physical validation",
+    "complete RMB total"
+  ],
+  "checks": {
+    "unique_references": true,
+    "count_reconciliation": true,
+    "new_MPN_count": true
+  },
+  "count_semantics": {
+    "selected_instances": "历史字段名：171个BOM条目，含COREBOARD_WEACT装配项；不是网表实例数。",
+    "selected_BOM_rows": 171,
+    "target_netlist_instances": 170
+  }
+}

@@ -1,0 +1,274 @@
+{
+  "date": "2026-10-29",
+  "user_requirements": {
+    "mechanical_brake": false,
+    "supercap_priority": "吸收电制动回生；启动补能次要，无余电允许慢加速",
+    "initial_charge_target": "几十秒量级；不是必须满充才准车辆启动",
+    "independent_regulator_required": true,
+    "new_selected_battery_design": "9S5P EVE30P；现行原生仍是旧9S4P，130A为增强候选",
+    "dual_motor_peak_input_each_W": 1800,
+    "peak_duration": "未冻结"
+  },
+  "input": {
+    "mechanical_path": "机械\\参数基线.json",
+    "mechanical_sha256": "4b4ce6a8743f78fcebf686f1a8e14adfad4dd3e8f0df1d9ad0efe77132169fd9",
+    "mass_kg": 30.0,
+    "speed_kmh": 15.0,
+    "mechanical_status": "文档基线，非实称/测速，不含未知载荷/旋转等效惯量",
+    "cell_count": 8,
+    "cell_nominal_F": 350,
+    "cell_EOL_sensitivity_F": 280,
+    "voltage_points_only_not_frozen_thresholds_V_per_cell": [
+      2.2,
+      2.45
+    ]
+  },
+  "braking": {
+    "translational_energy_J": 260.41666666666674,
+    "constant_deceleration_level_ground_cases": [
+      {
+        "stop_time_s": 0.5,
+        "decel_m_per_s2": 8.333333333333334,
+        "stop_distance_m": 1.0416666666666667,
+        "mean_mechanical_power_W": 520.8333333333335,
+        "initial_mechanical_power_W": 1041.666666666667
+      },
+      {
+        "stop_time_s": 1,
+        "decel_m_per_s2": 4.166666666666667,
+        "stop_distance_m": 2.0833333333333335,
+        "mean_mechanical_power_W": 260.41666666666674,
+        "initial_mechanical_power_W": 520.8333333333335
+      },
+      {
+        "stop_time_s": 2,
+        "decel_m_per_s2": 2.0833333333333335,
+        "stop_distance_m": 4.166666666666667,
+        "mean_mechanical_power_W": 130.20833333333337,
+        "initial_mechanical_power_W": 260.41666666666674
+      },
+      {
+        "stop_time_s": 3,
+        "decel_m_per_s2": 1.388888888888889,
+        "stop_distance_m": 6.25,
+        "mean_mechanical_power_W": 86.80555555555559,
+        "initial_mechanical_power_W": 173.61111111111117
+      }
+    ],
+    "rotating_mass_sensitivity": [
+      {
+        "total_energy_to_translation_ratio": 1,
+        "energy_J": 260.41666666666674
+      },
+      {
+        "total_energy_to_translation_ratio": 1.25,
+        "energy_J": 325.5208333333334
+      },
+      {
+        "total_energy_to_translation_ratio": 1.5,
+        "energy_J": 390.6250000000001
+      },
+      {
+        "total_energy_to_translation_ratio": 2,
+        "energy_J": 520.8333333333335
+      }
+    ],
+    "downhill_constant_speed_cases": [
+      {
+        "slope_deg": 5,
+        "gravitational_power_W": 106.83823307704026,
+        "gravitational_energy_per_vertical_m_J": 294.1995
+      },
+      {
+        "slope_deg": 10,
+        "gravitational_power_W": 212.8633626896753,
+        "gravitational_energy_per_vertical_m_J": 294.1995
+      },
+      {
+        "slope_deg": 20,
+        "gravitational_power_W": 419.2589798180837,
+        "gravitational_energy_per_vertical_m_J": 294.1995
+      },
+      {
+        "slope_deg": 30,
+        "gravitational_power_W": 612.915625,
+        "gravitational_energy_per_vertical_m_J": 294.1995
+      }
+    ],
+    "boundary": "忽略滚阻/风阻，按能量全部需电气处理作筛查；不证明轮地附着、制动力矩、低速或故障停车。"
+  },
+  "capacitor_cases": [
+    {
+      "series": 8,
+      "parallel": 1,
+      "cell_F": 350,
+      "equivalent_F": 43.75,
+      "selection_status": "当前8S1P基线比较",
+      "low_bank_V": 17.6,
+      "high_bank_V": 19.6,
+      "ideal_energy_at_low_J": 6776.000000000001,
+      "ideal_energy_at_high_J": 8403.500000000002,
+      "ideal_reserve_low_to_high_J": 1627.5000000000007,
+      "translation_energy_equivalent_stops": 6.249600000000001,
+      "bank_V_after_one_translation_stop_from_low": 17.935014968066294,
+      "bank_V_after_2x_translation_energy_from_low": 18.26388578067449,
+      "maximum_initial_voltage_for_translation_stop_V": 19.293917126784756,
+      "initial_charge_comparison": [
+        {
+          "time_s_comparison_only": 30,
+          "ideal_constant_bank_charge_A": 25.66666666666667,
+          "ideal_per_parallel_cell_charge_A": 25.66666666666667,
+          "end_cap_power_W": 451.73333333333346,
+          "mean_cap_power_W": 225.86666666666673
+        },
+        {
+          "time_s_comparison_only": 60,
+          "ideal_constant_bank_charge_A": 12.833333333333336,
+          "ideal_per_parallel_cell_charge_A": 12.833333333333336,
+          "end_cap_power_W": 225.86666666666673,
+          "mean_cap_power_W": 112.93333333333337
+        }
+      ],
+      "cap_side_current_for_reference_power": [
+        {
+          "power_W_comparison_only": 500,
+          "current_A_ignoring_losses": 28.409090909090907
+        },
+        {
+          "power_W_comparison_only": 1000,
+          "current_A_ignoring_losses": 56.81818181818181
+        }
+      ],
+      "notes": "没有ESR、能量转换损耗、末段降流、监测无效区、滤波/截止延迟；不构成保证容量/功率或停车能力。"
+    },
+    {
+      "series": 8,
+      "parallel": 1,
+      "cell_F": 280,
+      "equivalent_F": 35.0,
+      "selection_status": "当前8S1P基线比较",
+      "low_bank_V": 17.6,
+      "high_bank_V": 19.6,
+      "ideal_energy_at_low_J": 5420.800000000001,
+      "ideal_energy_at_high_J": 6722.800000000001,
+      "ideal_reserve_low_to_high_J": 1302.0000000000007,
+      "translation_energy_equivalent_stops": 4.9996800000000015,
+      "bank_V_after_one_translation_stop_from_low": 18.01779543620563,
+      "bank_V_after_2x_translation_energy_from_low": 18.426120176583698,
+      "maximum_initial_voltage_for_translation_stop_V": 19.21663465904079,
+      "initial_charge_comparison": [
+        {
+          "time_s_comparison_only": 30,
+          "ideal_constant_bank_charge_A": 20.533333333333335,
+          "ideal_per_parallel_cell_charge_A": 20.533333333333335,
+          "end_cap_power_W": 361.3866666666667,
+          "mean_cap_power_W": 180.69333333333336
+        },
+        {
+          "time_s_comparison_only": 60,
+          "ideal_constant_bank_charge_A": 10.266666666666667,
+          "ideal_per_parallel_cell_charge_A": 10.266666666666667,
+          "end_cap_power_W": 180.69333333333336,
+          "mean_cap_power_W": 90.34666666666668
+        }
+      ],
+      "cap_side_current_for_reference_power": [
+        {
+          "power_W_comparison_only": 500,
+          "current_A_ignoring_losses": 28.409090909090907
+        },
+        {
+          "power_W_comparison_only": 1000,
+          "current_A_ignoring_losses": 56.81818181818181
+        }
+      ],
+      "notes": "没有ESR、能量转换损耗、末段降流、监测无效区、滤波/截止延迟；不构成保证容量/功率或停车能力。"
+    },
+    {
+      "series": 4,
+      "parallel": 2,
+      "cell_F": 350,
+      "equivalent_F": 175.0,
+      "selection_status": "未选用的串并对比，不是替代方案实施",
+      "low_bank_V": 8.8,
+      "high_bank_V": 9.8,
+      "ideal_energy_at_low_J": 6776.000000000001,
+      "ideal_energy_at_high_J": 8403.500000000002,
+      "ideal_reserve_low_to_high_J": 1627.5000000000007,
+      "translation_energy_equivalent_stops": 6.249600000000001,
+      "bank_V_after_one_translation_stop_from_low": 8.967507484033147,
+      "bank_V_after_2x_translation_energy_from_low": 9.131942890337244,
+      "maximum_initial_voltage_for_translation_stop_V": 9.646958563392378,
+      "initial_charge_comparison": [
+        {
+          "time_s_comparison_only": 30,
+          "ideal_constant_bank_charge_A": 51.33333333333334,
+          "ideal_per_parallel_cell_charge_A": 25.66666666666667,
+          "end_cap_power_W": 451.73333333333346,
+          "mean_cap_power_W": 225.86666666666673
+        },
+        {
+          "time_s_comparison_only": 60,
+          "ideal_constant_bank_charge_A": 25.66666666666667,
+          "ideal_per_parallel_cell_charge_A": 12.833333333333336,
+          "end_cap_power_W": 225.86666666666673,
+          "mean_cap_power_W": 112.93333333333337
+        }
+      ],
+      "cap_side_current_for_reference_power": [
+        {
+          "power_W_comparison_only": 500,
+          "current_A_ignoring_losses": 56.81818181818181
+        },
+        {
+          "power_W_comparison_only": 1000,
+          "current_A_ignoring_losses": 113.63636363636363
+        }
+      ],
+      "notes": "没有ESR、能量转换损耗、末段降流、监测无效区、滤波/截止延迟；不构成保证容量/功率或停车能力。"
+    },
+    {
+      "series": 4,
+      "parallel": 2,
+      "cell_F": 280,
+      "equivalent_F": 140.0,
+      "selection_status": "未选用的串并对比，不是替代方案实施",
+      "low_bank_V": 8.8,
+      "high_bank_V": 9.8,
+      "ideal_energy_at_low_J": 5420.800000000001,
+      "ideal_energy_at_high_J": 6722.800000000001,
+      "ideal_reserve_low_to_high_J": 1302.0000000000007,
+      "translation_energy_equivalent_stops": 4.9996800000000015,
+      "bank_V_after_one_translation_stop_from_low": 9.008897718102816,
+      "bank_V_after_2x_translation_energy_from_low": 9.213060088291849,
+      "maximum_initial_voltage_for_translation_stop_V": 9.608317329520395,
+      "initial_charge_comparison": [
+        {
+          "time_s_comparison_only": 30,
+          "ideal_constant_bank_charge_A": 41.06666666666667,
+          "ideal_per_parallel_cell_charge_A": 20.533333333333335,
+          "end_cap_power_W": 361.3866666666667,
+          "mean_cap_power_W": 180.69333333333336
+        },
+        {
+          "time_s_comparison_only": 60,
+          "ideal_constant_bank_charge_A": 20.533333333333335,
+          "ideal_per_parallel_cell_charge_A": 10.266666666666667,
+          "end_cap_power_W": 180.69333333333336,
+          "mean_cap_power_W": 90.34666666666668
+        }
+      ],
+      "cap_side_current_for_reference_power": [
+        {
+          "power_W_comparison_only": 500,
+          "current_A_ignoring_losses": 56.81818181818181
+        },
+        {
+          "power_W_comparison_only": 1000,
+          "current_A_ignoring_losses": 113.63636363636363
+        }
+      ],
+      "notes": "没有ESR、能量转换损耗、末段降流、监测无效区、滤波/截止延迟；不构成保证容量/功率或停车能力。"
+    }
+  ]
+}

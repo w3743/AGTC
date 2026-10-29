@@ -1,0 +1,1 @@
+const rows=await eda.lib_Device.search("URB4812YMD-10WR3",undefined,undefined,undefined,100,1);const result=[];for(const r of rows){const d=await eda.lib_Device.get(r.uuid,r.libraryUuid);if(d?.property?.manufacturerId==="URB4812YMD-10WR3")result.push(d);}return {status:"READ_ONLY_12V_MANUFACTURER_IDENTITIES",rows:result};

@@ -1,0 +1,17 @@
+* TI UCC27511 TRANS model, selected two 10ohm gate resistors and 10k gate pull-down.
+* Simplified constant 11.36nF Ciss from IRLB4030 selection record; NOT a MOSFET model.
+.include ucc.lib
+Vdd vdd 0 PWL(0 12 6.99u 12 7.09u 0 12u 0)
+Vin minus 0 PWL(0 12 .99u 12 1u 0 2.99u 0 3u 12 4.99u 12 5u 0 12u 0)
+X1 vdd minus 0 vdd outh outl UCC27511_TRANS
+Rhi outh gate 10
+Rlo outl gate 10
+Rgs gate 0 10k
+Cgs gate 0 11.36n
+.control
+set noaskquit
+tran 5n 12u
+wrdata ucc_gate.txt v(vdd) v(minus) v(gate) v(outh) v(outl)
+quit
+.endc
+.end

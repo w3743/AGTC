@@ -1,0 +1,46 @@
+{
+  "status": "LTC_EQUIVALENT_WITH_HYG_ONE_PORT_FIT_NOT_REAL_SWITCHING",
+  "cases": [
+    {
+      "bst_C_nF": 500,
+      "assumed_pump_uA": 0,
+      "to_8V_s": 0.00059862487,
+      "gate_before_off_V": 9.26964962,
+      "bst_before_off_V": 9.36088014,
+      "off_to_1V_s": 4.308899999999616e-07
+    },
+    {
+      "bst_C_nF": 500,
+      "assumed_pump_uA": 15,
+      "to_8V_s": 0.00059652487,
+      "gate_before_off_V": 9.32004041,
+      "bst_before_off_V": 9.41839928,
+      "off_to_1V_s": 4.1157999999992534e-07
+    },
+    {
+      "bst_C_nF": 1000,
+      "assumed_pump_uA": 0,
+      "to_8V_s": 0.0005662248699999999,
+      "gate_before_off_V": 9.57608409,
+      "bst_before_off_V": 9.67282559,
+      "off_to_1V_s": 4.027099999998063e-07
+    },
+    {
+      "bst_C_nF": 1000,
+      "assumed_pump_uA": 15,
+      "to_8V_s": 0.00056542487,
+      "gate_before_off_V": 9.60179425,
+      "bst_before_off_V": 9.70218485,
+      "off_to_1V_s": 4.0350000000011904e-07
+    }
+  ],
+  "HYG_model_sha256": "9e67201b1885622412bbaf58a9c0325c3178cde505e32eb9845ccc5bb3c1314d",
+  "assumptions": [
+    "LTC为7Ω/4Ω理想开关+10k上拉、1M栅源，非官方宏模型",
+    "初始BST=10V，恒流泵0/15µA是假设，未模拟启动/UVLO/延迟",
+    "TS及两漏极固定0V，不存在实际负载电流",
+    "HYG单口Q(VGS)曲线混合VDS=50V图与80V典型电荷表，Miller平台宽4.2–4.4V为人为平滑；没有VDS耦合Miller或反向恢复",
+    "7Ω/4Ω保证值和15µA指标的原厂测试条件与此模型不同，不能当成此工况保证"
+  ],
+  "interpretation": "8V和1V是便于比较的任意电压点，不表示实际MOS导通/关断。与固定32.1nF模型的差异仅作模型敏感性。"
+}

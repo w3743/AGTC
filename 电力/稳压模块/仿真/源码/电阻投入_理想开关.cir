@@ -1,0 +1,15 @@
+* 30kg / 15km/h 匀减速，电池与SC不接收回生；理想开关、电阻与母线
+* 功率注入假设机械能100%进入母线；不含线束、电感、开关损耗与驱动延迟
+Cbus bus 0 5.4m IC=37.8
+Bregen 0 bus I={495.3*max(1-time/1.0515512484,0)/max(V(bus),1)}
+Sdump bus rnode bus 0 SWD
+Rdump rnode 0 0.82
+.model SWD SW(Ron=0.001 Roff=1e9 Vt=39.475 Vh=0.845)
+.control
+set noaskquit
+tran 2u 1.052 0 2u uic
+let idump = v(rnode)/0.82
+wrdata dump_wave.txt v(bus) idump
+quit
+.endc
+.end

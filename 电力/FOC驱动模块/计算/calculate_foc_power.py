@@ -4,9 +4,9 @@
 Run from any directory with Python 3:
     python calculate_foc_power.py
 
-Writes foc_power_results.json beside this script.  Values are selection
-screens under the explicit assumptions documented in 1秒脉冲能力核算.md, not a
-hardware qualification.
+Writes foc_power_results.json beside this script. Values are selection screens
+under the assumptions summarized in 设计细节.md, section "电机、热与模型筛查",
+not a hardware qualification.
 """
 from __future__ import annotations
 

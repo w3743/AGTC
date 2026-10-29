@@ -1,0 +1,153 @@
+{
+  "status": "PARAMETERIZED_EQUIVALENT_NUMERICAL_FIXTURE_ONLY",
+  "simulator": "ngspice 47 portable",
+  "source_files": [
+    "HYG022_参数化等效模型.lib",
+    "HYG022_参数化等效自检.cir"
+  ],
+  "official_model_search": {
+    "HYG022N10NS1TA": {
+      "exact_public_manufacturer_spice_model_found": false,
+      "official_manufacturer_site_checked": "https://www.hymexa.com",
+      "manufacturer_datasheet_url": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf",
+      "result": "No exact public SPICE download found; manufacturer website fetch timed out. Local manufacturer datasheet remains the parameter source."
+    },
+    "IRLB4030PBF": {
+      "exact_manufacturer_spice_model_found": false,
+      "official_product_page": "https://www.infineon.com/part/IRLB4030",
+      "official_datasheet_url": "https://www.infineon.com/dgdl/irlb4030pbf.pdf?fileId=5546d462533600a4015356604640258d",
+      "official_100V_library": "https://www.infineon.com/dgdl/Infineon-OptiMOS_Power_MOSFET_Spice_100_V_N-Channel-SimulationModels-v04_00-EN.zip?fileId=db3a30433d346a2d013d459a89bf5736",
+      "library_inspection": "StrongIRFET/StrongIRFET_100V_LTSpice.lib has 218 subcircuits and no IRLB4030 model."
+    }
+  },
+  "infineon_neighbor_sensitivity_candidate": {
+    "part_number": "IPF042N10NF2S",
+    "official_library_subcircuit": "IPF042N10NF2S_L1",
+    "official_datasheet_url": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-ipf042n10nf2s-datasheet-en.pdf",
+    "datasheet_package": "PG-TO263-7 (D2PAK 7-pin)",
+    "IRLB4030PBF_package": "TO-220AB",
+    "values": {
+      "VDS_V": {
+        "IPF042": 100,
+        "IRLB4030": 100,
+        "relative_difference_percent": 0.0
+      },
+      "RDSon_typ_mOhm": {
+        "IPF042": 3.7,
+        "IRLB4030": 3.4,
+        "relative_difference_percent": 8.8235,
+        "conditions": "IPF042: VGS=10 V, ID=80 A; IRLB4030: VGS=10 V, ID=110 A"
+      },
+      "RDSon_max_mOhm": {
+        "IPF042": 4.25,
+        "IRLB4030": 4.3,
+        "relative_difference_percent": -1.1628,
+        "conditions": "Different test currents; IPF042 80 A, IRLB4030 110 A"
+      },
+      "Qg_typ_nC": {
+        "IPF042": 57,
+        "IRLB4030": 87,
+        "relative_difference_percent": -34.4828,
+        "conditions": "IPF042: VDD=50 V, ID=80 A, VGS=0..10 V; IRLB4030 table/product specification uses a different gate-charge test point"
+      },
+      "Ciss_pF": {
+        "IPF042": 4000,
+        "IRLB4030": 11360,
+        "relative_difference_percent": -64.7887,
+        "conditions": "Both at VGS=0 V, VDS=50 V, f=1 MHz"
+      },
+      "Crss_pF": {
+        "IPF042": 28,
+        "IRLB4030": 290,
+        "relative_difference_percent": -90.3448,
+        "conditions": "Both at VGS=0 V, VDS=50 V, f=1 MHz"
+      },
+      "Coss_pF": {
+        "IPF042": 630,
+        "IRLB4030": 670,
+        "relative_difference_percent": -5.9701,
+        "conditions": "Both at VGS=0 V, VDS=50 V, f=1 MHz"
+      }
+    },
+    "assessment": "Only a same-100-V-class sensitivity candidate. The notably lower Ciss/Crss and different Qg, diode behavior and package prevent treating it as an IRLB4030PBF equivalent or drop-in substitute.",
+    "not_simulated_as_IRLB4030": true
+  },
+  "datasheet_fit": {
+    "device": "HYG022N10NS1TA",
+    "charge_test_target_C": 1.605e-07,
+    "simulated_gate_charge_C": 1.6050014173764507e-07,
+    "charge_from_terminal_state_C": 1.6049999999199743e-07,
+    "terminal_charge_balance_error_percent": 8.831504525753962e-05,
+    "gate_driver_energy_J": 1.598908297029322e-06,
+    "gate_resistor_energy_J": 8.179287089417716e-07,
+    "Q(VGS)_branch_work_J": 7.809850765563308e-07,
+    "gate_energy_balance_error_percent": -0.00034326351239978467,
+    "final_vgs_V": 9.999999999999782,
+    "gate_charge_plot_plateau_read_from_datasheet_V": 4.2,
+    "finite_plateau_fit_range_V": [
+      4.2,
+      4.4
+    ],
+    "simulated_internal_vgs_inside_fitted_plateau_segment_V_min_max": [
+      4.203913355,
+      4.398177098
+    ],
+    "test_conditions": "single-device gate port; 10 V source through 2.5 ohm external + 2.3 ohm internal Rg; no drain/load dynamics. Curve interpolates datasheet Fig.10 and Qg table."
+  },
+  "body_diode_forward_fit": {
+    "datasheet_target_current_A": 50.0,
+    "simulated_current_A": 50.0,
+    "simulated_vsd_V": 0.8310229,
+    "datasheet_typ_vsd_V": 0.83,
+    "datasheet_max_vsd_V": 1.3,
+    "test_temperature_C": 25,
+    "reverse_recovery": "not modeled; no TT/Qrr behavior"
+  },
+  "b2b_static_screen": {
+    "gate_vgs_V": 10.0,
+    "target_current_A": 80.0,
+    "simulated_current_A": 80.0,
+    "simulated_pair_drop_V": 0.352,
+    "computed_pair_rds_typ_ohm": 0.0044,
+    "computed_pair_loss_W": 28.159999999999997,
+    "both_polarity_20V_gate_off_leakage_A": [
+      1.899539e-10,
+      1.899539e-10
+    ],
+    "interpretation": "DC-only fixture matching the 10 V RDS(on) typical point; not the module's switching/load-current waveform"
+  },
+  "non_covered": [
+    "No VDS-coupled Miller behavior or actual MOS turn-on/turn-off waveform. The 4.2..4.4 V finite plateau width is a curve-smoothing assumption; the datasheet plot itself is approximately flat.",
+    "No verified reverse-recovery transient. Datasheet Qrr=239 nC and trr=93.3 ns are typical at ISD=50 A and dISD/dt=100 A/us, but the equivalent intentionally has no TT/Qrr recovery behavior.",
+    "No DC/DC or vehicle load-current waveform, gate-driver current limiting, thermal coupling, avalanche, SOA, package/layout parasitics, Miller-induced turn-on margin, or fault turn-off guarantee.",
+    "The Qg/Qgs/Qgd table uses VDS=80 V while Fig.10 uses VDS=50 V. Gate charge is a typical single-device curve fixture, not validation of the module's operating waveform or the two-device pair's real gate charge under its voltage sharing."
+  ],
+  "source_sha256": {
+    "files": {
+      "仿真/源码/HYG022_参数化等效模型.lib": "9e67201b1885622412bbaf58a9c0325c3178cde505e32eb9845ccc5bb3c1314d",
+      "仿真/源码/HYG022_参数化等效自检.cir": "528b15c14424f6801664bffb0aed59b6f71084960d1db28f969fada942c168a9",
+      "仿真/源码/HYG022_参数化等效静态自检.cir": "53dc1c848c10eb094cf3103b77e6e1f1f345c2118eee668f8845f1f41b641aff",
+      "仿真/源码/运行HYG022参数化等效自检.py": "07744c846554d78127a7987fab5b06d3070f205353b6a14813b537ae42b1958c",
+      "../BMS模块/厂商资料/HYG022N10NS1TA.pdf": "7e11113b04e73d2745354e769be3883694cfbcf96d3e53555e479b1ac26746d6",
+      "仿真/输入/厂家模型/IRLB4030PBF_Infineon_官方数据手册.pdf": "b2ceacb4254a30aa2a3fc7b13b31cfe22c9ed24c89f886eb28144dfc1206535f",
+      "仿真/输入/厂家模型/IPF042N10NF2S_Infineon_官方数据手册.pdf": "eda0455260f236eef99a7906541defedc6f708c52ae41738fce216ffa1f4249f",
+      "仿真/输入/厂家模型/Infineon-OptiMOS_Power_MOSFET_Spice_100_V_N-Channel-SimulationModels-v04_00-EN.zip": "81cad4c128e2995cd5da5dd398404bf9f4e29351c3fded5313d540d32efaad84"
+    },
+    "zip_member_sha256": {
+      "StrongIRFET/StrongIRFET_100V_LTSpice.lib": "b15f62cfa3264acf3d05bd9f9dcc99c45ac00cdbc365bcc9207beaed364394a8"
+    }
+  },
+  "result_artifact_sha256": {
+    "HYG022_参数化等效栅电荷波形.txt": "3bc85d0f9f7f5562f3c15e119025fab0721701af6052394298aef36180bb45d7",
+    "HYG022_参数化等效静态自检.log": "ee06faf7448f3cf9f05c9af4585cef938930f0e4ff0768c6d4d09b371f97275b"
+  },
+  "checks": {
+    "single_device_gate_charge_within_1pct": true,
+    "gate_terminal_charge_kcl_within_1pct": true,
+    "gate_network_energy_balance_within_1pct": true,
+    "diode_forward_current_within_1pct": true,
+    "diode_forward_voltage_within_0p01V": true,
+    "b2b_static_path_within_1pct_of_80A": true,
+    "both_polarity_off_leakage_below_2uA": true
+  }
+}

@@ -6,8 +6,8 @@
   py -3 -B .\\水泵驱动模块\\EDA自动化\\刷新交付证据.py
 
 本脚本不会启动或控制 EDA。它会调用离线网表核对脚本、共享库同步及其 --check，
-并更新当前交付清单、最终库同步核对和当前状态。它不会运行或改写 DRC 明细；
-当前状态中的旧 DRC 结论会标成历史参考/待本轮复核。
+并更新当前交付清单、最终库同步核对和根目录的设计细节文档。它不会运行或改写 DRC 明细；
+只在可验证的同源官方证据存在时保留其历史数量和源哈希，否则标成当前源待复核。
 """
 
 from __future__ import annotations
@@ -32,10 +32,11 @@ DELIVERY = EDA / "导出" / "当前交付"
 
 MANIFEST_PATH = CHECK / "当前交付清单.json"
 SYNC_REPORT_PATH = CHECK / "最终库同步核对.json"
-STATUS_PATH = CHECK / "当前状态.md"
+STATUS_PATH = MODULE / "设计细节.md"
 DRC_PATH = CHECK / "DRC明细与处理.json"
 NETLIST_CHECK_PATH = CHECK / "网表逐脚核对.json"
 BASELINE_PATH = CHECK / "源文件基线.json"
+CROSS_MODULE_PROOF_PATH = ROOT / "检查" / "统一审查" / "跨板并料复核.json"
 
 NETLIST_VERIFIER = CHECK / "验证原理图.py"
 LIBRARY_SYNC = ROOT / "元件封装库" / "工具" / "同步全部.py"
@@ -182,6 +183,50 @@ def refresh_delivery_files(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     return files
 
 
+def extract_same_source_drc(proof: Any, proof_sha: str | None, current_schematic_sha: str,
+                            old_drc: dict[str, Any], old_drc_record_sha: str) -> dict[str, Any]:
+    """Extract prior official strict DRC only when its proof is bound to this exact P1 SHA."""
+    pump = proof.get("modules", {}).get("PUMP", {}) if isinstance(proof, dict) else {}
+    after = pump.get("after", {})
+    official = pump.get("officialVerification", {})
+    drc = official.get("drc", {})
+    recorded_sha = after.get("nativeSha256")
+    same_source = bool(recorded_sha == current_schematic_sha and drc.get("strict") is True)
+
+    def count_items(value: Any) -> int | None:
+        if isinstance(value, (list, dict, tuple, set)):
+            return len(value)
+        return None
+
+    errors = drc.get("errors")
+    warnings = drc.get("warnings")
+    warning_rules: dict[str, int] = {}
+    if isinstance(warnings, list):
+        for warning in warnings:
+            rule = warning.get("rule", "UNKNOWN") if isinstance(warning, dict) else "UNKNOWN"
+            warning_rules[rule] = warning_rules.get(rule, 0) + 1
+
+    return {
+        "path": "检查/统一审查/跨板并料复核.json",
+        "proof_sha256": proof_sha,
+        "proof_date": proof.get("date") if isinstance(proof, dict) else None,
+        "source_sha256": recorded_sha,
+        "current_schematic_sha256": current_schematic_sha,
+        "source_sha_matches": same_source,
+        "strict": drc.get("strict") if isinstance(drc, dict) else None,
+        "errors": count_items(errors) if same_source else None,
+        "warnings": count_items(warnings) if same_source else None,
+        "warning_rules": warning_rules if same_source else {},
+        "current_round_drc_run": False,
+        "local_drc_record": {
+            "path": "水泵驱动模块/检查/DRC明细与处理.json",
+            "record_sha256": old_drc_record_sha,
+            "recorded_source_sha256": old_drc.get("source_sha256"),
+            "source_sha_matches": old_drc.get("source_sha256") == current_schematic_sha,
+        },
+    }
+
+
 def update_status_markdown(
     text: str,
     date_text: str,
@@ -190,50 +235,71 @@ def update_status_markdown(
     component_count: Any,
     pin_count: Any,
     library_status: str,
-    old_drc_sha: Any,
+    drc_context: dict[str, Any],
     current_schematic_sha: str,
 ) -> str:
     text, date_count = re.subn(r"(?m)^更新：\d{4}-\d{2}-\d{2}。", f"更新：{date_text}。", text, count=1)
     if date_count != 1:
-        raise ValueError("当前状态.md 未找到唯一的更新日期行")
+        raise ValueError("设计细节.md 未找到唯一的更新日期行")
 
     netlist_row = (
-        f"| ENET逐脚核对 | {netlist_status} | [网表逐脚核对.json](网表逐脚核对.json)"
+        f"| ENET逐脚核对 | {netlist_status} | [网表逐脚核对.json](检查/网表逐脚核对.json)"
         f"以当前ENET、BOM及连接契约为输入，核对{component_count}个器件、{pin_count}个引脚"
         f"（含明确NC项），状态{netlist_status}。当前ENET SHA256为`{netlist_sha}`。"
         "该结果证明导出网表与契约/BOM一致，不证明DRC、PCB或实物正确。 |"
     )
     text, net_count = re.subn(r"(?m)^\| ENET逐脚核对 \|.*$", lambda _: netlist_row, text, count=1)
     if net_count != 1:
-        raise ValueError("当前状态.md 未找到唯一的 ENET逐脚核对 行")
+        raise ValueError("设计细节.md 未找到唯一的 ENET逐脚核对 行")
 
-    drc_sha_text = old_drc_sha if isinstance(old_drc_sha, str) and old_drc_sha else "未记录"
-    source_match_text = "与当前原理图源 SHA256 一致" if drc_sha_text == current_schematic_sha else "与当前原理图源 SHA256 不一致"
-    drc_row = (
-        "| 原生DRC | 待本轮复核 | [DRC明细与处理.json](DRC明细与处理.json)仅保留既有记录，"
-        f"其记录的原理图源 SHA256 为`{drc_sha_text}`，{source_match_text}（当前为`{current_schematic_sha}`）。"
-        "本刷新脚本未运行EDA/DRC；该记录不作为本轮DRC结论。 |"
-    )
+    if drc_context.get("source_sha_matches"):
+        errors = drc_context.get("errors")
+        warnings = drc_context.get("warnings")
+        status = f"同源历史严格检查：{errors} error / {warnings} warning（OPEN，未复跑）"
+        detail = (
+            f"[同源官方复核](../检查/统一审查/跨板并料复核.json)日期`{drc_context.get('proof_date')}`，"
+            f"其PUMP源SHA=`{drc_context.get('source_sha256')}`与当前P1 SHA=`{current_schematic_sha}`相同；"
+            f"规则计数`{drc_context.get('warning_rules', {})}`。本刷新脚本未运行EDA/DRC；24项警告仍OPEN。"
+        )
+    else:
+        status = "当前源未绑定官方DRC（待复核）"
+        local = drc_context.get("local_drc_record", {})
+        old_sha = local.get("recorded_source_sha256") or "未记录"
+        detail = (
+            f"当前P1 SHA=`{current_schematic_sha}`；本模块[旧DRC摘要](检查/DRC明细与处理.json)"
+            f"绑定源SHA=`{old_sha}`，不作为当前源DRC结论。本刷新脚本未运行EDA/DRC。"
+        )
+    drc_row = f"| 原生DRC | {status} | {detail} |"
     text, drc_count = re.subn(r"(?m)^\| 原生DRC \|.*$", lambda _: drc_row, text, count=1)
     if drc_count != 1:
-        raise ValueError("当前状态.md 未找到唯一的 原生DRC 行")
+        raise ValueError("设计细节.md 未找到唯一的 原生DRC 行")
 
     library_row = (
-        f"| 共用库同步 | {library_status} | [最终库同步核对.json](最终库同步核对.json)："
+        f"| 共用库同步 | {library_status} | [最终库同步核对.json](检查/最终库同步核对.json)："
         "本轮同步及只读校验结果、6份其它源文件SHA256基线核对见记录；该证据不替代PCB或实物验收。 |"
     )
     text, library_count = re.subn(r"(?m)^\| 共用库同步 \|.*$", lambda _: library_row, text, count=1)
     if library_count != 1:
-        raise ValueError("当前状态.md 未找到唯一的 共用库同步 行")
+        raise ValueError("设计细节.md 未找到唯一的 共用库同步 行")
 
-    # 旧状态页在表格后有一段基于旧 DRC 的详细解释。保留 DRC JSON 原件，
-    # 但停止把旧警告列表和数量呈现为刷新后的当前结论。
-    marker = "告警涉及位号："
-    if marker in text:
-        text = text.split(marker, 1)[0].rstrip() + (
-            "\n\n本轮刷新脚本没有运行原生DRC。上方DRC条目只记录既有明细的来源SHA与当前原理图SHA关系；"
-            "完成本轮GUI DRC检查后，再由负责人更新当前告警分类、数量和处理说明。"
+    note = (
+        "本刷新脚本未运行EDA或官方DRC。"
+        f"当前P1 SHA=`{current_schematic_sha}`；"
+        if drc_context.get("source_sha_matches")
+        else "本刷新脚本未运行EDA或官方DRC，也未找到与当前P1同源的严格DRC记录。"
+    )
+    if drc_context.get("source_sha_matches"):
+        note += (
+            f"最近一次同源官方严格DRC为{drc_context.get('errors')} error / "
+            f"{drc_context.get('warnings')} warning（仍OPEN），源SHA与当前相同；这不是本轮复跑。"
         )
+    start = "<!-- PUMP_AUTO_REFRESH_NOTE_START -->"
+    end = "<!-- PUMP_AUTO_REFRESH_NOTE_END -->"
+    start_pos = text.find(start)
+    end_pos = text.find(end)
+    if start_pos < 0 or end_pos < start_pos:
+        raise ValueError("设计细节.md 缺少自动刷新说明边界标记")
+    text = text[:start_pos + len(start)] + "\n" + note + "\n" + text[end_pos:]
     return text.rstrip() + "\n"
 
 
@@ -243,12 +309,20 @@ def main() -> int:
         if not path.is_file():
             raise FileNotFoundError(f"缺少刷新所需的现有文件：{path.relative_to(ROOT).as_posix()}")
 
-    # 读取现有证据作为输入上下文；旧 DRC 只记入历史来源关系，不继承其数量/结论。
+    # 读取现有证据作为输入上下文；本模块旧DRC摘要可能是异源，
+    # 仅从跨模块官方复核中读取与当前P1哈希完全相同的历史DRC计数。
     manifest = read_json(MANIFEST_PATH)
-    previous_sync_report = read_json(SYNC_REPORT_PATH)
     old_status = STATUS_PATH.read_text(encoding="utf-8-sig")
     old_drc = read_json(DRC_PATH)
-    previous_netlist_check = read_json(NETLIST_CHECK_PATH)
+    cross_module_proof = None
+    cross_module_proof_sha = None
+    if CROSS_MODULE_PROOF_PATH.is_file():
+        try:
+            cross_module_proof = read_json(CROSS_MODULE_PROOF_PATH)
+            cross_module_proof_sha = sha256_file(CROSS_MODULE_PROOF_PATH)
+        except Exception:
+            cross_module_proof = None
+            cross_module_proof_sha = None
     baseline_manifest = read_json(BASELINE_PATH)
 
     baseline_entries, _ = snapshot_baselines(baseline_manifest)
@@ -272,6 +346,13 @@ def main() -> int:
     sync_run = run_python(LIBRARY_SYNC)
     check_run = run_python(LIBRARY_SYNC, ["--check"])
     current_schematic_sha_after = sha256_file(current_schematic_path)
+    drc_context = extract_same_source_drc(
+        cross_module_proof,
+        cross_module_proof_sha,
+        current_schematic_sha_after,
+        old_drc,
+        old_drc_record_sha,
+    )
     sync_evidence: dict[str, Any] | None = None
     sync_evidence_error = None
     try:
@@ -305,7 +386,6 @@ def main() -> int:
     )
 
     now = datetime.now().astimezone()
-    now_iso = now.isoformat(timespec="seconds")
     sync_evidence_hash = sha256_file(LIBRARY_EVIDENCE) if LIBRARY_EVIDENCE.is_file() else None
     netlist_summary = verifier_report.get("summary", {})
     component_count = netlist_summary.get("enet_components", 0)
@@ -317,26 +397,26 @@ def main() -> int:
     manifest["pins_verified"] = pin_count
     manifest["netlist_check"] = verifier_report.get("status", "FAIL") if verifier_current else "FAIL"
     manifest["library_sync_check"] = "PASS" if library_ok else "FAIL"
+    drc_context["status"] = (
+        "HISTORICAL_SAME_SOURCE_NOT_RERUN"
+        if drc_context.get("source_sha_matches")
+        else "PENDING_CURRENT_SOURCE_DRC"
+    )
+    drc_context["disposition"] = (
+        "存在与当前P1哈希相同的官方严格DRC历史证据；本刷新脚本未重跑DRC，原告警保持OPEN。"
+        if drc_context.get("source_sha_matches")
+        else "未找到与当前P1哈希相同的官方严格DRC记录；本刷新脚本未运行EDA/DRC。"
+    )
     manifest["drc"] = {
-        "status": "PENDING_CURRENT_ROUND_DRC",
+        "status": drc_context["status"],
         "fatal": None,
-        "error": None,
-        "warn": None,
-        "disposition": "本刷新脚本未运行EDA/DRC；既有DRC明细仅作为历史来源记录，不作为本轮结论。完成本轮DRC后更新此字段。",
-        "previous_record": {
-            "path": "水泵驱动模块/检查/DRC明细与处理.json",
-            "record_sha256": old_drc_record_sha,
-            "recorded_source_sha256": old_drc.get("source_sha256"),
-            "current_schematic_sha256": current_schematic_sha_after,
-            "source_sha_matches": old_drc.get("source_sha256") == current_schematic_sha_after,
-            "treated_as_current_round": False,
-        },
+        "error": drc_context.get("errors"),
+        "warn": drc_context.get("warnings"),
+        "disposition": drc_context["disposition"],
+        "official_same_source_record": drc_context,
+        "previous_record": drc_context["local_drc_record"],
     }
 
-    prior_root_readme = previous_sync_report.get("root_readme", {
-        "path": "README.md",
-        "pump_entry_updated_to_current_native_project_pdf_enet_and_checks": None,
-    })
     sync_report = {
         "schema_version": 2,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -386,17 +466,12 @@ def main() -> int:
             "library_sync_source_record_matches": sync_source_matches,
         },
         "other_source_baseline": finalized_baselines,
-        "drc_context": {
-            "path": "水泵驱动模块/检查/DRC明细与处理.json",
-            "record_sha256": old_drc_record_sha,
-            "recorded_source_sha256": old_drc.get("source_sha256"),
-            "current_schematic_sha256": current_schematic_sha_after,
-            "source_sha_matches": old_drc.get("source_sha256") == current_schematic_sha_after,
-            "record_treated_as_current_round": False,
-            "current_round_drc_run": False,
-        },
+        "drc_context": drc_context,
         "refreshed_delivery_files": refreshed_files,
-        "root_readme": prior_root_readme,
+        "design_documents": {
+            "requirements": "水泵驱动模块/设计需求.md",
+            "details": "水泵驱动模块/设计细节.md",
+        },
         "scope_note": "记录本轮共享库同步、--check、当前ENET逐脚核对和六份其它源文件哈希基线；本脚本不运行EDA/DRC，不构成PCB、实物或整车验收。",
     }
 
@@ -408,7 +483,7 @@ def main() -> int:
         component_count,
         pin_count,
         "PASS" if library_ok else "FAIL",
-        old_drc.get("source_sha256"),
+        drc_context,
         current_schematic_sha_after,
     )
 

@@ -1,0 +1,374 @@
+{
+  "title": "稳压模块国产外围替代核对",
+  "date": "2026-10-29",
+  "scope": {
+    "purpose": "嘉立创EDA使用前的国产外围身份/参数核查，供选型准备脚本更新。",
+    "write_boundary": "仅本附件；不改主文档、BOM、native、共用库。",
+    "frozen_main_parts": [
+      "STM32G431",
+      "DRV8161",
+      "TMUX1511",
+      "LTC7001",
+      "SN74LVC1G07",
+      "STPS和批准功率拓扑"
+    ],
+    "price_policy": "仅使用2026-10-21商城快照；缺报价标未知、不填0、不宣称降本，快照不等于当前成交价。"
+  },
+  "strict_keep": {
+    "precision_dividers_and_adc_loads": [
+      "R_T1_HI..R_T8_HI 68kΩ±0.1%，保持原TCR/MPN。",
+      "R_T1_LO..R_T8_LO 10kΩ±0.1%，保持原TCR/MPN。",
+      "R_BUS_HI/R_BUS_HI2 150kΩ±0.1%。",
+      "R_BUS_LO、R_TEST_HI、R_TEST_LO、R_ADC_A_PD、R_ADC_B_PD 10kΩ±0.1%。",
+      "R_BUS_OV_TOP1/2和R_SC_OV_TOP1/2 255kΩ±0.1%，保持原TCR/MPN。",
+      "R_BUS_OV_BOT 5.11kΩ±0.1%。",
+      "R_SC_OV_BOT 10kΩ±0.1%。"
+    ],
+    "capacitors": [
+      "C_BAL5接12V_DRV，保留50V X7R。",
+      "C_ISO_BST保留1µF/100V X7R，偏压和温度后有效容量仍须≥0.5µF。",
+      "所有C0G保持原选型，不换X7R。"
+    ],
+    "main_parts": "STM32G431、DRV8161、TMUX1511、LTC7001、SN74LVC1G07、STPS与批准功率拓扑冻结。"
+  },
+  "common_library_existing_domestic_or_keep": [
+    {
+      "refs": [
+        "D_BUS_TVS"
+      ],
+      "identity": "Boarden(宝宫) SMCJ43A / C967183",
+      "decision": "已有国产选择，保留；未提出未经同规格核验的替换。"
+    },
+    {
+      "refs": [
+        "J_CORE_P1",
+        "J_CORE_P2"
+      ],
+      "identity": "JXTCONN(聚兴泰) JXT-PM2.54-2X12P-A9 / C54803369",
+      "decision": "已有国产身份，保留。"
+    },
+    {
+      "refs": [
+        "J_NTC_MAIN",
+        "J_NTC_SC",
+        "J_NTC_DUMP",
+        "J_CAN_TERM"
+      ],
+      "identity": "HanElectricity(瀚源) 2541WV-2X01P / C41430884",
+      "decision": "已有国产身份，保留。"
+    },
+    {
+      "refs": [
+        "J_CAN",
+        "J_SC_TAPS"
+      ],
+      "identity": "JST B3B-XH-A(LF)(SN) / C144394；JST B9B-XH-A(LF)(SN) / C157966",
+      "decision": "共用库未核得结构与参数均匹配的国产替代，保留现有接口。"
+    },
+    {
+      "refs": [
+        "D_CAN_TVS"
+      ],
+      "identity": "Littelfuse SM24CANB-02HTG / C151237",
+      "decision": "未核得电容、工作电压与CAN保护参数等价的国产替代，保留。"
+    },
+    {
+      "refs": [
+        "J_BUS_POWER",
+        "J_SC_POWER",
+        "J_DUMP"
+      ],
+      "identity": "板外高电流接口占位",
+      "decision": "本轮不新增器件或替造具体连接器。"
+    }
+  ],
+  "execution_boundary": [
+    "只将已采用身份交给选型准备脚本；本附件不是原理图/PCB修改记录。",
+    "任何±0.1%分压和ADC负载件不改成±1%；精密件温漂要求不放宽。",
+    "不改C_BAL5、C_ISO_BST、C0G电容、TVS和连接器接口。",
+    "价格仅为2026-10-21快照；C2846678、C38522价格未知。"
+  ],
+  "adopted_substitutions": [
+    {
+      "references": [
+        "R_T1_TEST",
+        "R_T2_TEST",
+        "R_T3_TEST",
+        "R_T4_TEST",
+        "R_T5_TEST",
+        "R_T6_TEST",
+        "R_T7_TEST",
+        "R_QP_GS",
+        "R_PWM_H_PD",
+        "R_PWM_L_PD"
+      ],
+      "new_mpn": "RS-03K4702FT",
+      "new_supplier_part": "C136590",
+      "new_value": "47kΩ ±1%",
+      "new_footprint": "R0603",
+      "new_manufacturer": "FH(风华)",
+      "reason": "10处47k逻辑/输入下拉统一大陆风华0603、1%、100mW、50V、100ppm；无采样分压用途。参数由嘉立创精确商品核实，价格未核，不冒称已降本。"
+    },
+    {
+      "references": [
+        "Q_PMOS_CTRL",
+        "Q_DUMP_SW"
+      ],
+      "new_mpn": "MMBT5551",
+      "new_supplier_part": "C408396",
+      "new_value": "MMBT5551 NPN",
+      "new_footprint": "SOT-23-3_L2.9-W1.6-P1.90-LS2.8-BR",
+      "new_manufacturer": "MDD(辰达半导体)",
+      "reason": "MDD MMBT5551额定值和1=B、2=E、3=C引脚符合旧器件；MDD对应库封装焊盘几何不同，PCB阶段需复核。"
+    },
+    {
+      "references": [
+        "C_BAL1",
+        "C_BAL2",
+        "C_BAL3",
+        "C_BAL4",
+        "C_CAN1",
+        "C_NTC_MAIN",
+        "C_NTC_SC",
+        "C_NTC_DUMP",
+        "C_DRV_CSAREF"
+      ],
+      "new_mpn": "0603B104K160NT",
+      "new_supplier_part": "C2846678",
+      "new_value": "100nF ±10% 16V X7R",
+      "new_footprint": "C0603",
+      "new_manufacturer": "FH(风华)",
+      "reason": "九处均为3.3V普通旁路或NTC滤波，额定值16V、X7R介质及C0603封装匹配；共用库已有准确料。价格未知，详见adopt明细。"
+    },
+    {
+      "references": [
+        "R_ISO_TGUP",
+        "R_DUMP_HW_PU",
+        "R_DUMP_SW_BASE",
+        "R_QP_COL",
+        "R_PB6_BASE",
+        "R_DUMP_IN_PD",
+        "R_DUMP_GATE_PD",
+        "R_QH_GS",
+        "R_QL_GS",
+        "R_DRV_FAULT_PD",
+        "R_NTC_DUMP_PU",
+        "R_NTC_MAIN_PU",
+        "R_NTC_SC_PU"
+      ],
+      "new_mpn": "RS-03K1002FT",
+      "new_supplier_part": "C115324",
+      "new_value": "10kΩ ±1%",
+      "new_footprint": "R0603",
+      "new_manufacturer": "FH(风华)",
+      "reason": "13处非精密10k统一已有大陆风华料，0603、1%、100mW、50V、100ppm；12V下功耗不足16mW，3.3V上拉/故障下拉满足要求；NTC换用1%上拉不放宽原1%要求。SC_OV及ADC精密下拉不变。"
+    }
+  ],
+  "selection_note": "按大陆厂商优先执行国产要求。幸亚/厚声为台系品牌，前期比较保留作来源，不称大陆国产；最终普通47k/10k统一风华。",
+  "adopt_comparison_history": [
+    {
+      "function": "MUX选择脚下拉",
+      "quantity": 7,
+      "refs": [
+        "R_T1_TEST",
+        "R_T2_TEST",
+        "R_T3_TEST",
+        "R_T4_TEST",
+        "R_T5_TEST",
+        "R_T6_TEST",
+        "R_T7_TEST"
+      ],
+      "from": {
+        "manufacturer": "RESI(开步睿思)",
+        "mpn": "PTFR0805B47K0N9",
+        "lcsc": "C328442",
+        "footprint": "R0805",
+        "params": "47kΩ ±0.1%"
+      },
+      "to": {
+        "manufacturer": "Tyohm(幸亚电阻)",
+        "mpn": "RMC060347K1%N",
+        "lcsc": "C269715",
+        "footprint": "R0603",
+        "params": "47kΩ ±1%, 100mW, 50V, ±100ppm/℃, -55..155℃"
+      },
+      "decision": "可采用。七只现为MUX SEL下拉，不属于精密分压链；标称阻值和下拉功能不变，1%及该TCR适合逻辑选择脚。",
+      "reuse": "C269715已在共用元件总表出现5处，含稳压模块R_QP_GS；仅更换既有7只，不增加数量或新SKU。",
+      "evidence": [
+        "LCSC精确商品身份：https://item.szlcsc.com/259155.html",
+        "LCSC商品参数及共用Device记录核实47k、±1%、100mW、50V、±100ppm/℃。"
+      ],
+      "quote_2026_10_21": {
+        "C328442": {
+          "MOQ": 5,
+          "tiers_CNY_each": [
+            "5+:1.1811",
+            "50+:0.9531",
+            "150+:0.8554",
+            "500+:0.696825",
+            "2500+:0.55955",
+            "5000+:0.52858"
+          ],
+          "stock_snapshot": 8295
+        },
+        "C269715": {
+          "MOQ": 100,
+          "tiers_CNY_each": [
+            "100+:0.0221",
+            "1000+:0.0167",
+            "5000+:0.0135"
+          ],
+          "stock_snapshot": 7600
+        },
+        "note": "不同起订量，未核项目合并采购总额；不作当前价格或节省额承诺。"
+      }
+    },
+    {
+      "function": "硬件OV和软件dump小信号NPN",
+      "quantity": 2,
+      "refs": [
+        "Q_PMOS_CTRL",
+        "Q_DUMP_SW"
+      ],
+      "from": {
+        "manufacturer": "JKSEMI(金开盛)",
+        "mpn": "MMBT5551",
+        "lcsc": "C2972766",
+        "footprint": "SOT-23"
+      },
+      "to": {
+        "manufacturer": "MDD(辰达半导体)",
+        "mpn": "MMBT5551",
+        "lcsc": "C408396",
+        "footprint": "SOT-23"
+      },
+      "decision": "可采用。两版数据表均为MMBT5551 NPN、VCEO 160V、IC 600mA、耗散功率300mW；引脚均为1=B、2=E、3=C。MDD关键增益/饱和数据不低于原JKSEMI器件。",
+      "pcb_note": "JKSEMI与MDD共用库封装焊盘几何描述不同；未来PCB应使用MDD对应封装并复核焊盘/间距，不沿用旧封装外形假设。此差异不阻止原理图阶段选型。",
+      "reuse": "MDD C408396已在BMS模块使用3处，复用后不新增SKU。",
+      "evidence": [
+        "本地MDD资料：电力/BMS模块/厂商资料/MDD_MMBT5551_C408396.pdf",
+        "MDD产品页：https://www.mdddiodes.com/product/transistor-sot-23-series-mmbt5551/",
+        "LCSC身份页：https://www.lcsc.com/product-detail/C408396.html",
+        "旧料对照：电力/元件封装库/厂商资料/JKSEMI_MMBT5551_C2972766.pdf"
+      ],
+      "quote_2026_10_21": {
+        "C2972766": {
+          "MOQ": 50,
+          "tiers_CNY_each": [
+            "50+:0.1314",
+            "500+:0.1044",
+            "3000+:0.0965",
+            "6000+:0.0875",
+            "24000+:0.0797",
+            "51000+:0.0754"
+          ],
+          "stock_snapshot": 0
+        },
+        "C408396": {
+          "MOQ": 50,
+          "tiers_CNY_each": [
+            "50+:0.087494",
+            "500+:0.070228",
+            "3000+:0.052089",
+            "6000+:0.046269",
+            "24000+:0.041322",
+            "51000+:0.038606"
+          ],
+          "stock_snapshot": 1271450
+        },
+        "note": "仅为10月21日单价/库存快照，不推断当前库存或整单节省额。"
+      }
+    },
+    {
+      "function": "3.3V普通旁路及NTC滤波",
+      "quantity": 9,
+      "refs": [
+        "C_BAL1",
+        "C_BAL2",
+        "C_BAL3",
+        "C_BAL4",
+        "C_CAN1",
+        "C_NTC_MAIN",
+        "C_NTC_SC",
+        "C_NTC_DUMP",
+        "C_DRV_CSAREF"
+      ],
+      "from": {
+        "manufacturer": "TDK",
+        "mpn": "CGA3E2X7R1H104KT0Y0S",
+        "lcsc": "C342998",
+        "footprint": "C0603",
+        "params": "100nF ±10%, 50V, X7R"
+      },
+      "to": {
+        "manufacturer": "FH(风华)",
+        "mpn": "0603B104K160NT",
+        "lcsc": "C2846678",
+        "footprint": "C0603",
+        "params": "100nF ±10%, 16V, X7R"
+      },
+      "decision": "可采用。目标位为3V3_CORE去耦或3.3V上拉的NTC信号滤波，16V有充足电压余量，封装和介质类型不变。精确库记录未附DC-bias曲线；这些位置没有规定最小有效电容量。若后续将滤波拐点定为严格指标，再核对应偏压下有效容量。",
+      "reuse": "C2846678存在项目精确器件库记录，且已在BMS模块使用；复用，不增加SKU。",
+      "evidence": [
+        "LCSC商品页：品牌FH、MPN 0603B104K160NT、C2846678、0603、100nF±10%、16V、X7R：https://item.szlcsc.com/3041402.html",
+        "本地Device：电力/元件封装库/原生片段/DEVICE/0aec00e132e0afd3e33b351acbdf3b47f51ee09da7144f29cb7c2f1a3839a551.jsonl",
+        "选型BOM网络：C_BAL1..4、C_CAN1、C_DRV_CSAREF为3V3_CORE/GND_SYS；C_NTC_MAIN/SC/DUMP为NTC信号/GND_SYS。"
+      ],
+      "quote": "未找到可用价格阶梯；价格未知，不填0、不宣称降本。"
+    },
+    {
+      "function": "非精密10k偏置、下拉及栅源电阻",
+      "quantity": 9,
+      "refs": [
+        "R_ISO_TGUP",
+        "R_DUMP_HW_PU",
+        "R_DUMP_SW_BASE",
+        "R_QP_COL",
+        "R_PB6_BASE",
+        "R_DUMP_IN_PD",
+        "R_DUMP_GATE_PD",
+        "R_QH_GS",
+        "R_QL_GS"
+      ],
+      "from": {
+        "manufacturer": "Milliohm(毫欧)",
+        "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "lcsc": "C5123581",
+        "footprint": "R0603",
+        "params": "10kΩ ±0.1%, 100mW, ±25ppm/℃"
+      },
+      "to": {
+        "manufacturer": "UNI-ROYAL(厚声)",
+        "mpn": "0805W8F1002T5E",
+        "lcsc": "C38522",
+        "footprint": "R0805",
+        "params": "10kΩ ±1%, 125mW, 150V, ±100ppm/℃, -55..155℃"
+      },
+      "decision": "可采用于所列非精密偏置/逻辑下拉/栅源电阻；10k标称不变，1%足够。仅换身份并用已有R0805封装，不增加器件；目标是SKU复用，不宣称降本。",
+      "reuse": "准确MPN C38522已有稳压模块共用库4处：R_DRV_FAULT_PD、三路R_NTC_*_PU。",
+      "evidence": [
+        "本地共用Device记录含准确MPN/C38522/R0805。",
+        "数据手册/商品资料：https://item.szlcsc.com/datasheet/0805W8F1002T5E/39505.html；标称10kΩ、±1%、125mW、150V、±100ppm/℃。",
+        "按BOM网络核为栅源下拉、NPN基极或逻辑偏置，非精密分压。"
+      ],
+      "quote_2026_10_21": "商城报价快照含C38522精确身份，但价格阶梯缺失；价格未知，不填0、不宣称降本。"
+    }
+  ],
+  "current_adoption_authority": "adopted_substitutions；adopt_comparison_history为曾比较项，已被最终大陆风华替代决定覆盖",
+  "mainland_resistor_sources": [
+    {
+      "url": "https://jlcpcb.com/partdetail/147906-RS03K4702FT/C136590",
+      "mpn": "RS-03K4702FT",
+      "spec": "47kΩ/1%/100mW/50V/100ppm/0603",
+      "price_CNY": null
+    },
+    {
+      "url": "https://jlcpcb.com/partdetail/RS-03K1002FT/C115324",
+      "mpn": "RS-03K1002FT",
+      "spec": "10kΩ/1%/100mW/50V/100ppm/0603",
+      "price_CNY": null,
+      "reuse": "共用总表BMS/水泵已有C115324"
+    }
+  ],
+  "changed_positions": 34
+}

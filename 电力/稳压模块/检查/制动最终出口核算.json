@@ -1,0 +1,413 @@
+{
+  "status": "DETERMINISTIC_PAPER_SCREEN_NOT_PURCHASE_OR_VEHICLE_VALIDATION",
+  "scope": {
+    "sole_energy_outlet": "one central resistor",
+    "battery_absorption_credit_W": 0.0,
+    "supercapacitor_absorption_credit_W": 0.0,
+    "FOC_or_other_resistor_takeover_credit": false,
+    "other_absorber_or_energy_sink_credit": false,
+    "thermal_fuse_or_BMS_interlock_added": false,
+    "existing_FOC_devices_modified_or_removed": false,
+    "rotating_inertia_requirement_assumed": false,
+    "stop_target_status": "3.9624m/s^2 is a paper comparison reference, not a user hard requirement",
+    "energy_policy": "all translational kinetic energy and any modeled downhill gravitational energy is assigned to resistor heat"
+  },
+  "input_and_part": {
+    "mass_kg": 30.0,
+    "speed_kmh": 15.0,
+    "reference_deceleration_m_s2": 3.9624,
+    "BUS_points_V": [
+      22.5,
+      37.8,
+      42.0
+    ],
+    "temperature_environment_C": [
+      0.0,
+      60.0
+    ],
+    "candidate_family": "Uni-Royal HEWR500W",
+    "single_standard_order_code_from_published_coding_rule": "HEWRA0J0100500",
+    "code_decode": "HEWR series / A0 terminal / J ±5% / 0100 = 1Ω / 500W",
+    "standard_resistance_range_ohm": [
+      0.5,
+      12000.0
+    ],
+    "published_package_dimensions_mm": {
+      "length": 335,
+      "width": 60,
+      "height": 30
+    },
+    "actual_stock_quote_lead_time": "not publicly verified; confirm with manufacturer or distributor before purchase",
+    "manufacturer_sources": [
+      {
+        "title": "Uni-Royal DIP-SP-049 V.6 official HEWR/HBWR datasheet, 2024-05-06",
+        "url": "https://www.uni-royal.cn/en/images/userfile/file/1717729679cac485d4bbc6a42a.pdf",
+        "pages": [
+          2,
+          3,
+          5,
+          6
+        ],
+        "claims": [
+          "coding: HEWR+A0+J+0100+500 gives 1Ω ±5%, 500W terminal type",
+          "HEWR500W standard resistance range 0.5Ω–12kΩ; package 335×60×30mm",
+          "continuous power at ambient through 25°C; linear derating reaches zero at 275°C",
+          "for R below 20Ω, temperature coefficient ±400ppm/°C",
+          "HEWR short-time overload test is 6.25× rated power or applicable maximum overload voltage, whichever is lower, for 5s",
+          "RCWV=sqrt(P*R); overload voltage is limited by the lower of 2.5×RCWV and applicable maximum overload voltage"
+        ]
+      },
+      {
+        "title": "Uni-Royal official HEWR product page",
+        "url": "https://www.uni-royal.cn/en/product.php?id=76",
+        "claims": [
+          "HEWR series published power options, resistance ranges and TCR ranges"
+        ]
+      }
+    ]
+  },
+  "resistor_resistance_and_thermal": {
+    "nominal_resistance_ohm": 1.0,
+    "tolerance_fraction": 0.05,
+    "TCR_ppm_per_C": 400.0,
+    "TCR_reference_C": 25.0,
+    "25C_resistance_range_ohm": {
+      "min": 0.95,
+      "max": 1.05
+    },
+    "60C_ambient_proxy_range_ohm_not_hot_element_bound": {
+      "min": 0.9367,
+      "max": 1.0647
+    },
+    "125C_TCR_screen_range_ohm": {
+      "min": 0.912,
+      "max": 1.092
+    },
+    "125C_screen_note": "Uses the datasheet ±400ppm/°C across its room-temperature/125°C test span. The resistor element temperature under braking is not predicted.",
+    "ambient_derating_fraction_at_60C": 0.86,
+    "nameplate_continuous_power_25C_W": 500.0,
+    "manufacturer_continuous_power_at_60C_W": 430.0,
+    "normal_average_resistor_power_limit_W": 400.0,
+    "thermal_margin_at_60C_W": 30.0,
+    "thermal_margin_fraction_of_60C_rating": 0.069767,
+    "thermal_management_policy": "Keep commanded average resistor power at or below 400W under the specified 0–60°C ambient and mounting conditions. Do not interrupt the sole braking resistor because a temperature sensor trips during braking; no fuse or BMS interlock is included.",
+    "mounting_airflow_resistor_thermal_impedance_verified": false
+  },
+  "reference_braking_for_comparison_only": {
+    "mass_kg": 30.0,
+    "speed_kmh": 15.0,
+    "speed_m_s": 4.166667,
+    "deceleration_reference_m_s2": 3.9624,
+    "brake_force_N": 118.872,
+    "uncapped_reference_stop_time_s": 1.051551,
+    "uncapped_reference_stop_distance_m": 2.190732,
+    "translation_energy_to_resistor_J_battery_and_supercap_absorption_zero": 260.416667,
+    "uncapped_reference_power_profile_W": {
+      "equation": "P_ref(t)=m*a_ref*(v0-a_ref*t)",
+      "start_peak": 495.3,
+      "end": 0.0,
+      "mean": 247.65
+    },
+    "normal_400W_limited_control_law": "P(t)=min(400W, m*a_ref*v(t)); all brake energy is dissipated in the resistor",
+    "crossover_speed_for_400W_limit_m_s": 3.364964,
+    "capped_stop_result": {
+      "effective_inertial_mass_kg": 30.0,
+      "power_crossover_speed_m_s": 3.364964,
+      "power_crossover_speed_kmh": 12.11387,
+      "constant_400W_phase_time_s": 0.22643,
+      "constant_400W_phase_distance_m": 0.855913,
+      "reference_deceleration_phase_time_s": 0.849224,
+      "reference_deceleration_phase_distance_m": 1.428804,
+      "stop_time_s": 1.075654,
+      "stop_distance_m": 2.284717,
+      "energy_to_resistor_J": 260.416667,
+      "mean_resistor_power_over_stop_W": 242.100883,
+      "start_deceleration_m_s2_on_level_ground": 3.2,
+      "peak_resistor_average_power_W": 400.0,
+      "power_profile_integral_check_J": 260.416667
+    },
+    "interpretation": "400W cap reduces initial level-ground deceleration from 3.9624m/s² to the power-limited value; once speed falls to the crossover, the reference deceleration is restored. The 260.4J kinetic energy still all goes to the resistor."
+  },
+  "low_BUS_22_5V_margin": {
+    "worst_Rmax_125C_TCR_screen_ohm": 1.092,
+    "full_on_resistor_power_at_Rmax_W": 463.598901,
+    "normal_requested_peak_average_power_W": 400.0,
+    "power_headroom_W": 63.598901,
+    "power_headroom_fraction_of_400W": 0.158997,
+    "largest_R_for_400W_at_22_5V_ohm": 1.265625,
+    "minimum_BUS_voltage_for_400W_at_Rmax_V": 20.899761,
+    "minimum_full_on_resistor_current_at_Rmax_A": 20.604396,
+    "peak_equivalent_current_for_400W_A": 17.777778,
+    "screen": "PASS for ideal static resistor power at 22.5V, including ±5% and ±400ppm/°C to 125°C screen",
+    "qualification_limit": "does not cover wiring drop, switch loss, BUS dynamic excursion, or actual element temperature"
+  },
+  "BUS_PWM_instantaneous_stress": {
+    "rows": [
+      {
+        "bus_V": 22.5,
+        "meaning": "9S低端正常功率能力核算",
+        "normal_sink_power_command_peak_W": 400.0,
+        "equivalent_average_sink_current_at_400W_A": 17.777778,
+        "resistor_full_on_current_A_at_125C_TCR_screen": {
+          "min": 20.604396,
+          "max": 24.671053
+        },
+        "resistor_full_on_power_W_at_125C_TCR_screen": {
+          "min": 463.598901,
+          "max": 555.098684
+        },
+        "ideal_PWM_duty_range_for_400W_average": {
+          "min": 0.720593,
+          "max": 0.862815
+        },
+        "power_at_Rmax_margin_over_400W_W": 63.598901,
+        "note": "BUS决定PWM导通瞬时应力；母线闭环和制动功率曲线决定电阻平均热功率。42V没有被当成连续满导通负载。"
+      },
+      {
+        "bus_V": 37.8,
+        "meaning": "9S理论上限参考",
+        "normal_sink_power_command_peak_W": 400.0,
+        "equivalent_average_sink_current_at_400W_A": 10.582011,
+        "resistor_full_on_current_A_at_125C_TCR_screen": {
+          "min": 34.615385,
+          "max": 41.447368
+        },
+        "resistor_full_on_power_W_at_125C_TCR_screen": {
+          "min": 1308.461538,
+          "max": 1566.710526
+        },
+        "ideal_PWM_duty_range_for_400W_average": {
+          "min": 0.255312,
+          "max": 0.305703
+        },
+        "power_at_Rmax_margin_over_400W_W": 908.461538,
+        "note": "BUS决定PWM导通瞬时应力；母线闭环和制动功率曲线决定电阻平均热功率。42V没有被当成连续满导通负载。"
+      },
+      {
+        "bus_V": 42.0,
+        "meaning": "PWM导通瞬时电压/电流/功率筛查，不是连续全开工况",
+        "normal_sink_power_command_peak_W": 400.0,
+        "equivalent_average_sink_current_at_400W_A": 9.52381,
+        "resistor_full_on_current_A_at_125C_TCR_screen": {
+          "min": 38.461538,
+          "max": 46.052632
+        },
+        "resistor_full_on_power_W_at_125C_TCR_screen": {
+          "min": 1615.384615,
+          "max": 1934.210526
+        },
+        "ideal_PWM_duty_range_for_400W_average": {
+          "min": 0.206803,
+          "max": 0.247619
+        },
+        "power_at_Rmax_margin_over_400W_W": 1215.384615,
+        "note": "BUS决定PWM导通瞬时应力；母线闭环和制动功率曲线决定电阻平均热功率。42V没有被当成连续满导通负载。"
+      }
+    ],
+    "42V_screen": {
+      "resistor_terminal_voltage_V": 42.0,
+      "maximum_full_on_current_A": 46.052632,
+      "full_on_power_range_W": {
+        "min": 1615.384615,
+        "max": 1934.210526
+      },
+      "RCWV_for_500W_1ohm_V": 22.36068,
+      "2_5x_RCWV_V": 55.901699,
+      "42V_below_2_5x_RCWV_formula": true,
+      "6_25x_nameplate_overload_test_power_W": 3125.0,
+      "peak_power_below_6_25x_test_power_number": true,
+      "qualification_limit": "The series datasheet further limits overload voltage by the lesser applicable maximum overload voltage; that exact maximum is not stated in the retrieved sheet. The 6.25×/5s test screens peak voltage/power only; it does not establish arbitrary repetitive PWM or repeated-stop qualification."
+    }
+  },
+  "repeated_stop_heat": {
+    "normal_resistor_power_limit_W": 400.0,
+    "manufacturer_60C_continuous_rating_W": 430.0,
+    "cases": [
+      {
+        "inertia_factor": 1.0,
+        "status": "translation-only paper baseline",
+        "effective_inertial_mass_kg": 30.0,
+        "power_crossover_speed_m_s": 3.364964,
+        "power_crossover_speed_kmh": 12.11387,
+        "constant_400W_phase_time_s": 0.22643,
+        "constant_400W_phase_distance_m": 0.855913,
+        "reference_deceleration_phase_time_s": 0.849224,
+        "reference_deceleration_phase_distance_m": 1.428804,
+        "stop_time_s": 1.075654,
+        "stop_distance_m": 2.284717,
+        "energy_to_resistor_J": 260.416667,
+        "mean_resistor_power_over_stop_W": 242.100883,
+        "start_deceleration_m_s2_on_level_ground": 3.2,
+        "peak_resistor_average_power_W": 400.0,
+        "power_profile_integral_check_J": 260.416667,
+        "start_to_start_period_lower_bound_from_400W_mean_only_s": 1.075654,
+        "additional_dwell_after_stop_from_400W_mean_only_s": 0.0,
+        "energy_over_430W_continuous_rating_s": 0.60562,
+        "400W_peak_below_430W_60C_continuous_rating": true,
+        "repeat_boundary": "Average energy divided by power is only a thermal mean condition. With the assumed control law, the requested resistor average power never exceeds 400W; repeated pulse qualification still depends on manufacturer overload limits and actual thermal installation."
+      },
+      {
+        "inertia_factor": 1.5,
+        "status": "sensitivity only, not a user requirement",
+        "effective_inertial_mass_kg": 45.0,
+        "power_crossover_speed_m_s": 2.243309,
+        "power_crossover_speed_kmh": 8.075914,
+        "constant_400W_phase_time_s": 0.693488,
+        "constant_400W_phase_distance_m": 2.289324,
+        "reference_deceleration_phase_time_s": 0.566149,
+        "reference_deceleration_phase_distance_m": 0.635024,
+        "stop_time_s": 1.259637,
+        "stop_distance_m": 2.924348,
+        "energy_to_resistor_J": 390.625,
+        "mean_resistor_power_over_stop_W": 310.109166,
+        "start_deceleration_m_s2_on_level_ground": 2.133333,
+        "peak_resistor_average_power_W": 400.0,
+        "power_profile_integral_check_J": 390.625,
+        "start_to_start_period_lower_bound_from_400W_mean_only_s": 1.259637,
+        "additional_dwell_after_stop_from_400W_mean_only_s": 0.0,
+        "energy_over_430W_continuous_rating_s": 0.90843,
+        "400W_peak_below_430W_60C_continuous_rating": true,
+        "repeat_boundary": "Average energy divided by power is only a thermal mean condition. With the assumed control law, the requested resistor average power never exceeds 400W; repeated pulse qualification still depends on manufacturer overload limits and actual thermal installation."
+      },
+      {
+        "inertia_factor": 2.0,
+        "status": "sensitivity only, not a user requirement",
+        "effective_inertial_mass_kg": 60.0,
+        "power_crossover_speed_m_s": 1.682482,
+        "power_crossover_speed_kmh": 6.056935,
+        "constant_400W_phase_time_s": 1.089777,
+        "constant_400W_phase_distance_m": 3.378764,
+        "reference_deceleration_phase_time_s": 0.424612,
+        "reference_deceleration_phase_distance_m": 0.357201,
+        "stop_time_s": 1.514389,
+        "stop_distance_m": 3.735965,
+        "energy_to_resistor_J": 520.833333,
+        "mean_resistor_power_over_stop_W": 343.923024,
+        "start_deceleration_m_s2_on_level_ground": 1.6,
+        "peak_resistor_average_power_W": 400.0,
+        "power_profile_integral_check_J": 520.833333,
+        "start_to_start_period_lower_bound_from_400W_mean_only_s": 1.514389,
+        "additional_dwell_after_stop_from_400W_mean_only_s": 0.0,
+        "energy_over_430W_continuous_rating_s": 1.21124,
+        "400W_peak_below_430W_60C_continuous_rating": true,
+        "repeat_boundary": "Average energy divided by power is only a thermal mean condition. With the assumed control law, the requested resistor average power never exceeds 400W; repeated pulse qualification still depends on manufacturer overload limits and actual thermal installation."
+      }
+    ],
+    "boundary": "For the capped power law each stop averages less than 400W and instantaneous average resistor command is never above 400W. E/P gives a mean-energy interval only; PWM peak repetition and installation thermal time constants still require manufacturer limits or qualification."
+  },
+  "slope_parameter_capability": {
+    "constant_speed_downhill_gravity_power_equation": "P=m*g*v*sin(theta)",
+    "reference_deceleration_power_equation": "P_ref_start=m*(a_ref+g*sin(theta))*v0",
+    "400W_power_limited_initial_net_deceleration_equation": "a_net_start=400/(m*v0)-g*sin(theta)",
+    "sweep": [
+      {
+        "downhill_angle_deg_parameter_only": 0.0,
+        "constant_speed_gravity_power_W": 0.0,
+        "power_peak_to_hold_reference_deceleration_W": 495.3,
+        "energy_for_reference_deceleration_stop_J": 260.416667,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 3.2,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 5.0,
+        "constant_speed_gravity_power_W": 106.838233,
+        "power_peak_to_hold_reference_deceleration_W": 602.138233,
+        "energy_for_reference_deceleration_stop_J": 316.589605,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 2.345294,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 10.0,
+        "constant_speed_gravity_power_W": 212.863363,
+        "power_peak_to_hold_reference_deceleration_W": 708.163363,
+        "energy_for_reference_deceleration_stop_J": 372.335034,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 1.497093,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 15.0,
+        "constant_speed_gravity_power_W": 317.268474,
+        "power_peak_to_hold_reference_deceleration_W": 812.568474,
+        "energy_for_reference_deceleration_stop_J": 427.228696,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 0.661852,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 18.0,
+        "constant_speed_gravity_power_W": 378.802688,
+        "power_peak_to_hold_reference_deceleration_W": 874.102688,
+        "energy_for_reference_deceleration_stop_J": 459.581887,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 0.169578,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 19.0,
+        "constant_speed_gravity_power_W": 399.091618,
+        "power_peak_to_hold_reference_deceleration_W": 894.391618,
+        "energy_for_reference_deceleration_stop_J": 470.249311,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": 0.007267,
+        "400W_sink_can_balance_gravity_at_15kmh": true,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 20.0,
+        "constant_speed_gravity_power_W": 419.25898,
+        "power_peak_to_hold_reference_deceleration_W": 914.55898,
+        "energy_for_reference_deceleration_stop_J": 480.852818,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": -0.154072,
+        "400W_sink_can_balance_gravity_at_15kmh": false,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 25.0,
+        "constant_speed_gravity_power_W": 518.058672,
+        "power_peak_to_hold_reference_deceleration_W": 1013.358672,
+        "energy_for_reference_deceleration_stop_J": 532.799288,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": -0.944469,
+        "400W_sink_can_balance_gravity_at_15kmh": false,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 30.0,
+        "constant_speed_gravity_power_W": 612.915625,
+        "power_peak_to_hold_reference_deceleration_W": 1108.215625,
+        "energy_for_reference_deceleration_stop_J": 582.672762,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": -1.703325,
+        "400W_sink_can_balance_gravity_at_15kmh": false,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      },
+      {
+        "downhill_angle_deg_parameter_only": 45.0,
+        "constant_speed_gravity_power_W": 866.793589,
+        "power_peak_to_hold_reference_deceleration_W": 1362.093589,
+        "energy_for_reference_deceleration_stop_J": 716.155607,
+        "initial_net_deceleration_if_resistor_is_limited_to_400W_m_s2": -3.734349,
+        "400W_sink_can_balance_gravity_at_15kmh": false,
+        "note": "parameter capability curve only; does not assign a user-required grade"
+      }
+    ],
+    "constant_speed_slope_at_15kmh_for_400W_W_only_deg": 19.044911,
+    "interpretation": "At slopes where m*g*v*sin(theta)>400W, the single outlet cannot hold 15km/h at steady descent under this average power ceiling. This is a parameter capability boundary, not an assumed slope demand or proven vehicle limit."
+  },
+  "selection_conclusion_for_document": {
+    "candidate": "one Uni-Royal HEWR500W 1Ω ±5% terminal-type resistor, code HEWRA0J0100500",
+    "continuous_case": "At 60°C the manufacturer derating curve gives about 430W continuous. Set the normal average resistor command to 400W, leaving 30W margin. Under all battery/supercapacitor absorption set to zero, the 30kg/15km/h translation-only energy is 260.4J; the 400W-capped power-law stop is about 1.076s and 2.285m in the paper model. This is near the 3.9624m/s² comparison reference (uncapped 1.052s/2.191m) while keeping the resistor's requested average heat under its 60°C continuous rating.",
+    "low_bus_case": "At 22.5V, Rmax=1.092Ω in the 125°C TCR screen still permits about 464W full-on, above the 400W command; ideal low-BUS power margin is about 63.6W.",
+    "high_bus_PWM_case": "At 42V the worst screened full-on pulse is about 1.93kW/46.1A, below the 6.25×500W test-power number of 3.125kW and below 2.5×RCWV=55.9V. The separate maximum-overload-voltage limit and any repetitive PWM envelope still need factory confirmation; 42V is not treated as continuous full-on.",
+    "temperature_policy": "No thermal fuse, BMS interlock, or overtemperature cutoff may interrupt the only braking energy outlet; manage the 0–60°C installation and 400W operating envelope by resistor rating and thermal design.",
+    "purchase_status": "Code/range/form factor are supported by the published factory coding and datasheet; inventory, lead time, price, exact maximum overload voltage, and mounting/thermal conditions are not confirmed. Do not freeze purchase before quote and installation review.",
+    "status": "paper selection candidate, not schematic/hardware/vehicle qualification"
+  },
+  "not_included": [
+    "Rotating inertia, payload variation, drivetrain conversion loss, wheel torque, traction, zero-speed brake torque, or parking hold.",
+    "A specific downhill grade, repeated-stop requirement, or vehicle stopping acceptance limit.",
+    "Any energy acceptance by battery, supercapacitor, FOC resistor, or other device.",
+    "A thermal fuse, BMS interlock, or switching shutdown that would remove the sole resistor path during braking.",
+    "Chopper topology, MOSFET SOA, current waveform, wire drop, BUS overshoot, controller response, or physical thermal test."
+  ]
+}

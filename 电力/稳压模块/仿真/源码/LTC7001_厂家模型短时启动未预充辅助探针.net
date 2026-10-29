@@ -1,0 +1,22 @@
+* ADI LTC7001 model power-loss and recovery probe; linear gate-load approximation only.
+* INP remains asserted while VCC loses 12 V and recovers.
+.include LTC7001.sub
+Vcc vcc 0 PWL(0 0 1u 12 20m 12 20.001m 0 80m 0 80.001m 12 120m 12)
+Vin inp 0 PWL(0 0 5m 0 5.001m 3.3 120m 3.3)
+Xiso vcc 0 0 inp 0 gate tgup 0 bst LTC7001
+Rup tgup gate 10k
+Rgs gate 0 1Meg
+Cgs gate 0 32.1n
+Cbst bst 0 1u
+.tran 0 120m 0 20u
+.save V(vcc) V(gate) V(bst) V(inp) V(tgup)
+.meas tran vcc_before_loss FIND V(vcc) AT=19m
+.meas tran gate_before_loss FIND V(gate) AT=19m
+.meas tran bst_before_loss FIND V(bst) AT=19m
+.meas tran vcc_during_loss FIND V(vcc) AT=60m
+.meas tran gate_during_loss FIND V(gate) AT=60m
+.meas tran bst_during_loss FIND V(bst) AT=60m
+.meas tran vcc_after_recovery FIND V(vcc) AT=100m
+.meas tran gate_after_recovery FIND V(gate) AT=100m
+.meas tran bst_after_recovery FIND V(bst) AT=100m
+.end

@@ -1,0 +1,170 @@
+{
+  "schema": "EASYEDA_SOFTWARE_PREFLIGHT_PREPARATION_V1",
+  "status": "READ_ONLY_PREFLIGHT_EXECUTED_APPLY_AND_POST_ACCEPTANCE_NOT_EXECUTED",
+  "preparedAt": "2026-10-29",
+  "target": {
+    "projectPath": "电力/稳压模块",
+    "pageUuid": "9546dca0bc8bce7f",
+    "contractInput": "电力/稳压模块/原理图准备/软件接线输入.json",
+    "runtimeBinding": "外部CLI将动态JSON contract对象传入__CLI__.args.contract；也接受__CLI__.args.bom或JSON字符串。脚本不访问本地文件系统。"
+  },
+  "scripts": {
+    "preflight": "电力/稳压模块/工具/软件前预检.js",
+    "postPinAcceptance": "电力/稳压模块/工具/软件后逐针验收.js",
+    "parameterTemplate": "电力/稳压模块/原理图准备/软件预检参数说明.json",
+    "apply": "电力/稳压模块/工具/应用目标网表.js"
+  },
+  "scope": {
+    "readOnly": true,
+    "apiOperations": [
+      "核对当前工程、当前原理图页、文档类型和目标UUID",
+      "读取当前页器件、关联库UUID/器件UUID、MPN/C编号和引脚定义",
+      "只对新加或目标料号与当前实例不同的位号按精确MPN/C编号查询库项，并返回全部匹配候选",
+      "软件后逐针验收将位号集合、引脚编号集合以及EasyEDA网表中每针net/NC逐项比较"
+    ],
+    "forbiddenInScripts": [
+      "器件放置/删除/替换",
+      "连线或网络修改",
+      "器件属性写入",
+      "工程/文档保存",
+      "浏览器fetch或文件系统API",
+      "候选库项按返回顺序自动选择"
+    ],
+    "netlist": {
+      "postAcceptanceAlwaysExports": true,
+      "format": "EasyEDA",
+      "recordLookup": "components[uid].props.Designator",
+      "pinNetLookup": "pinInfoMap[pin].net",
+      "noConnectRule": "net为空字符串",
+      "includeRawTextByDefault": false
+    },
+    "drc": {
+      "called": false,
+      "reason": "当前脚本阶段不触发DRC；保留官方签名供独立阶段使用。"
+    },
+    "forbiddenInScripts_scope": "仅指只读预检和逐针验收脚本；独立应用脚本在apply=true时会改接/保存。"
+  },
+  "apiEvidence": [
+    {
+      "api": "eda.dmt_Project.getCurrentProjectInfo()",
+      "signature": "getCurrentProjectInfo(): Promise<IDMT_ProjectItem | undefined>",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/DMT_Project.md"
+    },
+    {
+      "api": "eda.dmt_SelectControl.getCurrentDocumentInfo()",
+      "signature": "getCurrentDocumentInfo(): Promise<IDMT_EditorDocumentItem | undefined>",
+      "beta": true,
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/DMT_SelectControl.md",
+      "documentType": "EDMT_EditorDocumentType.SCHEMATIC_PAGE = 1",
+      "documentTypeReference": "电力/.agents/skills/easyeda-api-skill/references/enums/EDMT_EditorDocumentType.md"
+    },
+    {
+      "api": "eda.dmt_Schematic.getCurrentSchematicPageInfo()",
+      "signature": "getCurrentSchematicPageInfo(): Promise<IDMT_SchematicPageItem | undefined>",
+      "beta": true,
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/DMT_Schematic.md"
+    },
+    {
+      "api": "eda.dmt_Schematic.getAllSchematicPagesInfo()",
+      "signature": "getAllSchematicPagesInfo(): Promise<Array<IDMT_SchematicPageItem>>",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/DMT_Schematic.md"
+    },
+    {
+      "api": "eda.sch_PrimitiveComponent.getAll(undefined, false)",
+      "signature": "getAll(componentType?: ESCH_PrimitiveComponentType$1, allSchematicPages?: boolean): Promise<Array<ISCH_PrimitiveComponent$1>>",
+      "beta": true,
+      "purpose": "false表示只枚举当前原理图页，不跨页汇总",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/SCH_PrimitiveComponent.md"
+    },
+    {
+      "api": "ISCH_PrimitiveComponent getters used",
+      "signatures": [
+        "getState_Designator(): string | undefined",
+        "getState_PrimitiveId(): string",
+        "getState_Component(): { libraryUuid: string; uuid: string; }",
+        "getState_Name(): string | undefined",
+        "getState_ManufacturerId(): string | undefined",
+        "getState_SupplierId(): string | undefined"
+      ],
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/ISCH_PrimitiveComponent.md"
+    },
+    {
+      "api": "eda.sch_PrimitiveComponent.getAllPinsByPrimitiveId(primitiveId)",
+      "signature": "getAllPinsByPrimitiveId(primitiveId: string): Promise<Array<ISCH_PrimitiveComponentPin> | undefined>",
+      "beta": true,
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/SCH_PrimitiveComponent.md",
+      "pinGetters": [
+        "getState_PinNumber(): string",
+        "getState_PinName(): string",
+        "getState_NoConnected(): boolean"
+      ],
+      "pinGetterReferences": [
+        "电力/.agents/skills/easyeda-api-skill/references/classes/ISCH_PrimitivePin.md",
+        "电力/.agents/skills/easyeda-api-skill/references/classes/ISCH_PrimitiveComponentPin.md"
+      ]
+    },
+    {
+      "api": "eda.lib_Device.getByLcscIds(lcscIds, libraryUuid, allowMultiMatch)",
+      "signature": "getByLcscIds(lcscIds: Array<string>, libraryUuid?: string, allowMultiMatch?: boolean): Promise<Array<ILIB_DeviceSearchItem>>",
+      "beta": true,
+      "purpose": "数组重载并设置allowMultiMatch=true，避免一个C编号在同库有多项时只保留第一条",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/LIB_Device.md"
+    },
+    {
+      "api": "eda.lib_Device.search(key, libraryUuid, classification, symbolType, itemsOfPage, page)",
+      "signature": "search(key: string, libraryUuid?: string, classification?: ILIB_ClassificationIndex | Array<string>, symbolType?: ELIB_SymbolType, itemsOfPage?: number, page?: number): Promise<Array<ILIB_DeviceSearchItem>>",
+      "beta": true,
+      "purpose": "搜索精确MPN并逐页读取；只对返回记录内可精确核实MPN的库项计为MPN匹配",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/LIB_Device.md"
+    },
+    {
+      "api": "eda.lib_Device.get(deviceUuid, libraryUuid)",
+      "signature": "get(deviceUuid: string, libraryUuid?: string): Promise<ILIB_DeviceItem | undefined>",
+      "beta": true,
+      "purpose": "读取候选库项完整属性作为MPN匹配证据",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/LIB_Device.md"
+    },
+    {
+      "api": "eda.sch_ManufactureData.getNetlistFile(fileName, netlistType)",
+      "signature": "getNetlistFile(fileName?: string, netlistType?: ESYS_NetlistType): Promise<File | undefined>",
+      "purpose": "后验收只读导出EasyEDA JSON网表，await File.text()解析components、Designator、pinInfoMap与net",
+      "netlistEnumValue": "ESYS_NetlistType.EASYEDA_PRO = \"EasyEDA\"",
+      "beta": true,
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/SCH_ManufactureData.md",
+      "enumReference": "电力/.agents/skills/easyeda-api-skill/references/enums/ESYS_NetlistType.md"
+    },
+    {
+      "api": "eda.sch_Netlist.getNetlist(type)",
+      "signature": "getNetlist(type?: ESYS_NetlistType): Promise<string>",
+      "status": "deprecated",
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/SCH_Netlist.md"
+    },
+    {
+      "api": "eda.sch_Drc.check(strict, userInterface, includeVerboseError)",
+      "signatures": [
+        "check(strict: boolean, userInterface: boolean, includeVerboseError: false): Promise<boolean>",
+        "check(strict: boolean, userInterface: boolean, includeVerboseError: true): Promise<Array<any>>"
+      ],
+      "status": "not_called",
+      "beta": true,
+      "reference": "电力/.agents/skills/easyeda-api-skill/references/classes/SCH_Drc.md"
+    }
+  ],
+  "executionStatus": {
+    "edaClientAvailable": true,
+    "bridgeAvailable": false,
+    "scriptsExecuted": true,
+    "apiCallsMade": true,
+    "result": "已执行客户端只读预检及库查询；后验收仅有离线模拟，原生接线/DRC尚未执行。",
+    "limitation": "软件后逐针脚本遇到网表导出失败或格式无法解析时会输出FAIL_OR_INCOMPLETE，不会退化成只核引脚号后给出PASS。",
+    "clientVersion": "4.1.93",
+    "transport": "OFFICIAL_CLI",
+    "preflightExecuted": true,
+    "applyExecuted": false,
+    "postPinAcceptanceExecutedInEDA": false
+  },
+  "root_review_fixes": [
+    "NC合同net:null转换为官方net空字符串",
+    "跳过无位号网络端口/电源标识，避免误判为多余器件"
+  ]
+}

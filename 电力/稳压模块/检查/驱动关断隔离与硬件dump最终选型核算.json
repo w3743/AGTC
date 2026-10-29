@@ -1,0 +1,624 @@
+{
+  "schema": "sc_regulator_gate_shutdown_isolation_dump_final_selection_review",
+  "date": "2026-10-29",
+  "status": "SELECTION_AND_PAPER_ARITHMETIC_CLOSED_NOT_DRAWN_OR_HARDWARE_QUALIFIED",
+  "scope": "独立8S1P超容稳压模块的DRV8161关断、双向实体隔离、BUS硬OV中央dump及功率级续流；包括同一最终选型表中的测量隔离新增件数量对账。",
+  "authority_and_baseline": {
+    "selected_instance_list": "电力/稳压模块/检查/最终选型清单.json",
+    "selected_instance_list_sha256": "978f2f7060c8a2024c31ab50237fb08f80dff9065830c604f7e7b637e43b2695",
+    "baseline_bom": "电力/稳压模块/原理图准备/BOM.csv",
+    "baseline_bom_sha256": "789DE860F8D400C3B631F9EB96B2EA310C72765B08C280E7C5B236366083F478",
+    "baseline_native": "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+    "baseline_native_sha256": "02AD832C553F6DB4ECC562D1074F554234D1BB31B56D27D08167B4EA2978822A",
+    "native_status": "原生图及采购BOM未修改；当前原生仍含旧P沟道关断及旧DUMP输入接法。本文件及最终选型清单是待落图的选型/接口合同，不表示工程已更新。",
+    "conflicting_legacy_contracts": [
+      "旧77新增/31退及SN74LVC1G175外部锁存、AUP反相回读和六件LTC辅助供电均撤回，不属于本采用清单。",
+      "旧设计细节中TLV OUTB并到UCC输入、PB7驱动旧Q_PMOS_CTRL的文字与本次双NPN接法冲突；不得据此落图。U_SC_OV pin6 OUTB仍接DRV_FAULT_N。",
+      "本次UCC27511A pin5=IN−、pin6=IN+；原BOM把pin5标GND_SYS且pin6标DUMP_IN，需按本合同更正原理图符号/连线。"
+    ]
+  },
+  "design_bounds": {
+    "retained_power_stage": "G431、DRV8161DGSR、Q_MAIN_H/Q_MAIN_L/Q_DUMP=IRLB4030PBF及2x10uH磁件保留。电感热态偏置下限、饱和电流及整车故障能量仍需资格核对。",
+    "battery_bus": "9S电池理论22.5–37.8V；BUS最高按42V作器件电压筛查。",
+    "supercapacitor": "8S1P LICAP SC0350-270-RSS，单节名义最高2.7V、堆叠最高21.6V；未增加超容。",
+    "logic_rails": "3V3_CORE筛查3.0–3.6V，12V_DRV为名义12V。",
+    "bounded_inductor_pulse": "仅用24uH、80A、单次磁能释放作续流筛查，不等同峰值额定、重复制动额定或短路持续吸能。",
+    "12V_short_scope": "12V_DRV缓慢/持续欠压且比较器/驱动器有时间按已定义UVLO动作属于筛查范围；12V硬短路、瞬时跌至0V或在DRV欠压去毛刺前恢复，不纳入可保证的故障包络。全电源突然归零时1MΩ栅源电阻只保证最终泄放趋势，不保证最大关断时间。",
+    "explicit_nonclaims": [
+      "不保证任意组合故障、任意电源毛刺、QH/QL短路后BUS持续供能、中央dump连续热额定或整车停车距离。",
+      "不宣称原理图、BOM、固件、PCB、样机或实物测试已通过。"
+    ]
+  },
+  "reconciled_counts": {
+    "baseline_instances": 169,
+    "new_instances": 22,
+    "retired_instances": 20,
+    "net_instance_increase": 2,
+    "new_exact_mpns_vs_regulator_baseline": 10,
+    "distinct_mpns_in_added_instances": 13,
+    "scope_note": "22件包含3颗TMUX及2只ADC下拉，测量子包5件，其余17件；位号以最终选型清单为准。",
+    "selected_instances": 171,
+    "physical_added_including_previously_optional_5V_module": 23,
+    "physical_net_added_including_previously_optional_5V_module": 3
+  },
+  "selected_added_parts": [
+    {
+      "ref": "U_CELL_MUX1",
+      "qty": 1,
+      "manufacturer": "Texas Instruments",
+      "mpn": "TMUX1511PWR",
+      "supplier": "LCSC",
+      "supplier_part": "C2866750",
+      "function": "单体测量隔离；复用C_BAL1对应去耦位置。"
+    },
+    {
+      "ref": "U_CELL_MUX2",
+      "qty": 1,
+      "manufacturer": "Texas Instruments",
+      "mpn": "TMUX1511PWR",
+      "supplier": "LCSC",
+      "supplier_part": "C2866750",
+      "function": "单体测量隔离；复用C_BAL2对应去耦位置。"
+    },
+    {
+      "ref": "U_SIGNAL_ISO",
+      "qty": 1,
+      "manufacturer": "Texas Instruments",
+      "mpn": "TMUX1511PWR",
+      "supplier": "LCSC",
+      "supplier_part": "C2866750",
+      "function": "仅BUS/IMON掉电隔离；其余两通道不用，不存在AFE SPI。"
+    },
+    {
+      "ref": "U_GATE_OD",
+      "qty": 1,
+      "manufacturer": "Texas Instruments",
+      "mpn": "SN74LVC1G07DCKR",
+      "supplier": "LCSC",
+      "supplier_part": "C7830",
+      "function": "PA9/TIM1_CH2许可转为开漏共享DRV故障/关断线；复用C_BAL4作3V3_CORE本地去耦。"
+    },
+    {
+      "ref": "U_ISO_DRV",
+      "qty": 1,
+      "manufacturer": "Analog Devices",
+      "mpn": "LTC7001IMSE#PBF",
+      "supplier": "LCSC",
+      "supplier_part": "C581062",
+      "function": "12V_DRV直接供电的高侧共源背靠背N-MOS栅极驱动，I等级。"
+    },
+    {
+      "ref": "Q_SC_ISO1",
+      "qty": 1,
+      "manufacturer": "Huayi",
+      "mpn": "HYG022N10NS1TA",
+      "supplier": "LCSC",
+      "supplier_part": "C2925050",
+      "function": "SC存储端至ISO_MID的一只隔离N-MOS。"
+    },
+    {
+      "ref": "Q_SC_ISO2",
+      "qty": 1,
+      "manufacturer": "Huayi",
+      "mpn": "HYG022N10NS1TA",
+      "supplier": "LCSC",
+      "supplier_part": "C2925050",
+      "function": "ISO_MID至SC_FUSED变换器端的一只隔离N-MOS。"
+    },
+    {
+      "ref": "D_SC_LO",
+      "qty": 1,
+      "manufacturer": "STMicroelectronics",
+      "mpn": "STPS30100ST",
+      "supplier": "LCSC",
+      "supplier_part": "C172485",
+      "function": "GND_SYS→SC_FUSED下钳位/续流。"
+    },
+    {
+      "ref": "D_SC_HI",
+      "qty": 1,
+      "manufacturer": "STMicroelectronics",
+      "mpn": "STPS30100ST",
+      "supplier": "LCSC",
+      "supplier_part": "C172485",
+      "function": "SC_FUSED→BUS_EXT上钳位/续流。"
+    },
+    {
+      "ref": "D_DUMP_FW",
+      "qty": 1,
+      "manufacturer": "STMicroelectronics",
+      "mpn": "STPS30100ST",
+      "supplier": "LCSC",
+      "supplier_part": "C172485",
+      "function": "DUMP_SW→BUS_EXT续流，限制dump开关和外接线束电感回扫。"
+    },
+    {
+      "ref": "Q_DUMP_SW",
+      "qty": 1,
+      "manufacturer": "MDD(辰达半导体)",
+      "mpn": "MMBT5551",
+      "supplier": "LCSC",
+      "supplier_part": "C408396",
+      "function": "PB7软件dump独立NPN；必须按同一JKSEMI料号/封装核B-E-C脚序。"
+    },
+    {
+      "ref": "C_ISO_BST",
+      "qty": 1,
+      "manufacturer": "TDK",
+      "mpn": "C3225X7R2A105K200AA",
+      "supplier": "LCSC",
+      "supplier_part": "C2167578",
+      "function": "LTC7001 BST–TS浮动储能电容；1uF、100V、1210。"
+    },
+    {
+      "ref": "R_ADC_A_PD",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "PTFR0805B10K0N9",
+      "supplier": "LCSC",
+      "supplier_part": "C328436",
+      "function": "SC_ADC_A合并D总线至GND_SYS下拉，10kΩ±0.1%。"
+    },
+    {
+      "ref": "R_ADC_B_PD",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "PTFR0805B10K0N9",
+      "supplier": "LCSC",
+      "supplier_part": "C328436",
+      "function": "SC_ADC_B合并D总线至GND_SYS下拉，10kΩ±0.1%。"
+    },
+    {
+      "ref": "R_ARM_PD",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "RMC0603100K1%N",
+      "supplier": "LCSC",
+      "supplier_part": "C269699",
+      "function": "PA9/TIM1_CH2 100kΩ下拉，复位/掉电默认许可低。"
+    },
+    {
+      "ref": "R_ISO_GS",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "RC0603FR-071ML",
+      "supplier": "LCSC",
+      "supplier_part": "C105578",
+      "function": "ISO_G至ISO_MID的1MΩ栅源泄放/静态偏置。"
+    },
+    {
+      "ref": "R_ISO_TGUP",
+      "qty": 1,
+      "manufacturer": "FH(风华)",
+      "mpn": "RS-03K1002FT",
+      "supplier": "LCSC",
+      "supplier_part": "C115324",
+      "function": "LTC7001 TGUP至ISO_G开通限流10kΩ；TGDN保持直连。"
+    },
+    {
+      "ref": "R_DUMP_HW_PU",
+      "qty": 1,
+      "manufacturer": "FH(风华)",
+      "mpn": "RS-03K1002FT",
+      "supplier": "LCSC",
+      "supplier_part": "C115324",
+      "function": "12V_DRV上拉U_SC_OV OUTA硬OV节点BUS_OV_OUT。"
+    },
+    {
+      "ref": "R_DUMP_SW_BASE",
+      "qty": 1,
+      "manufacturer": "FH(风华)",
+      "mpn": "RS-03K1002FT",
+      "supplier": "LCSC",
+      "supplier_part": "C115324",
+      "function": "DUMP_PWM_LIMIT至Q_DUMP_SW基极串联10kΩ。"
+    },
+    {
+      "ref": "R_BUS_OV_TOP1",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "PTFR0805B255KP9",
+      "supplier": "LCSC",
+      "supplier_part": "C2849126",
+      "function": "BUS_OV分压上臂255kΩ±0.1%；与TOP2串联分压/分压功耗。"
+    },
+    {
+      "ref": "R_BUS_OV_TOP2",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "PTFR0805B255KP9",
+      "supplier": "LCSC",
+      "supplier_part": "C2849126",
+      "function": "BUS_OV分压上臂255kΩ±0.1%；与TOP1串联。"
+    },
+    {
+      "ref": "R_BUS_OV_BOT",
+      "qty": 1,
+      "manufacturer": "",
+      "mpn": "RT0603BRD075K11L",
+      "supplier": "LCSC",
+      "supplier_part": "C705788",
+      "function": "BUS_OV分压下臂5.11kΩ±0.1%、100mW、75V，接SC_MINUS。"
+    }
+  ],
+  "retired_instances": [
+    "U_BAL1",
+    "U_BAL2",
+    "U_BAL3",
+    "U_BAL4",
+    "U_BAL5",
+    "U_BAL6",
+    "U_BAL7",
+    "U_BAL8",
+    "Q_BUS_P",
+    "D_QP_GS_ZENER",
+    "R_12V_PRELOAD",
+    "C_BAL6",
+    "C_BAL7",
+    "C_BAL8",
+    "C_T4_FILTER",
+    "C_T5_FILTER",
+    "C_T6_FILTER",
+    "C_T7_FILTER",
+    "C_T8_FILTER",
+    "C_TEST_FB"
+  ],
+  "existing_parts_reused_or_rewired": [
+    {
+      "ref": "C_BAL1/C_BAL2/C_BAL3",
+      "from": "cell-stack nodes",
+      "to": "3颗TMUX局部去耦/测量接口位置",
+      "mpn_rule": "改用项目已有精确TDK CGA3E2X7R1H104KT0Y0S / LCSC C342998；不沿用旧C129690身份。",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_BAL4",
+      "from": "cell-stack节点",
+      "to": "U_GATE_OD VCC=3V3_CORE至GND_SYS本地100nF去耦",
+      "mpn_rule": "TDK CGA3E2X7R1H104KT0Y0S / C342998。",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_BAL5",
+      "from": "cell-stack节点",
+      "to": "U_ISO_DRV pin1 VCC=12V_DRV至GND_SYS本地100nF去耦",
+      "mpn_rule": "TDK CGA3E2X7R1H104KT0Y0S / C342998；更正旧C0805C104K5RAC7800 / C129690身份。",
+      "qty_delta": 0
+    },
+    {
+      "ref": "Q_PMOS_CTRL",
+      "from": "P-MOS控制",
+      "to": "BUS硬OV的MMBT5551 NPN；E=GND_SYS、C=DUMP_OFF、B经R_PB6_BASE接BUS_OV_OUT",
+      "mpn": "MMBT5551 / LCSC C2972766",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_PB6_BASE",
+      "from": "旧P驱动基极电阻",
+      "to": "BUS_OV_OUT至Q_PMOS_CTRL基极串联电阻",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25 / C5123581",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_QP_BE",
+      "from": "旧P驱动B-E",
+      "to": "Q_PMOS_CTRL基极至发射极下拉",
+      "mpn": "RMC0603100K1%N / C269699",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_QP_COL",
+      "from": "旧P驱动集电极/门极电阻",
+      "to": "12V_DRV至DUMP_OFF上拉10kΩ",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25 / C5123581",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_QP_GS",
+      "from": "旧PMOS G-S电阻",
+      "to": "TMUX1511 SEL8下拉",
+      "mpn": "RMC060347K1%N / C269715",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_PB5_PERMIT",
+      "from": "PB5许可串阻",
+      "to": "3V3_CORE至共享DRV_FAULT_N/nDRVOFF上拉1kΩ",
+      "mpn": "RMC06031K1%N / C269704",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_DRV_FAULT_PD",
+      "from": "共享线下拉",
+      "to": "保留DRV_FAULT_N至GND_SYS 10kΩ下拉",
+      "mpn": "0805W8F1002T5E / C38522",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_DUMP_IN_PD",
+      "from": "DUMP_IN下拉",
+      "to": "Q_DUMP_SW基极—发射极10kΩ下拉",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25 / C5123581",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_DUMP_IN_SER",
+      "from": "PB7至UCC输入100Ω串阻",
+      "to": "PB7至DUMP_PWM_LIMIT 100Ω串阻；之后再经新增R_DUMP_SW_BASE驱动Q_DUMP_SW",
+      "mpn": "RC0603FR-07100RL / C105588",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_T3_FILTER",
+      "from": "旧抽头滤波",
+      "to": "BUS_OV_DIV至SC_MINUS 1nF滤波",
+      "mpn": "CC0805CG100V102GN / C54157534",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_SC_BULK/C_SC_BULK2",
+      "from": "SC_FUSED变换器侧",
+      "to": "SC_ISO_STORAGE储能侧与SC_MINUS之间",
+      "mpn": "RYHG35V100UF6*8 / C48970442，各100uF/35V；8S储能侧最高21.6V名义。",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_SC_HF",
+      "from": "SC_FUSED至SC_MINUS",
+      "to": "SC_FUSED至GND_SYS",
+      "mpn": "C3225X7R2A105K200AA / C2167578",
+      "qty_delta": 0
+    },
+    {
+      "ref": "C_BUS_FILM3",
+      "from": "BUS_BR至GND_SYS",
+      "to": "SC_FUSED至GND_SYS",
+      "mpn": "R76IR4220SE40J 2.2uF/250V PP",
+      "qty_delta": 0
+    },
+    {
+      "ref": "U1/Q_MAIN_H/Q_MAIN_L/Q_DUMP/U_DUMP_DRV",
+      "from": "原驱动与半桥",
+      "to": "保留DRV8161DGSR、IRLB4030PBF三颗及UCC27511ADBVR",
+      "qty_delta": 0
+    },
+    {
+      "ref": "R_12V_PRELOAD",
+      "action": "RETIRE",
+      "reason": "HiLink官方单路支持0–100%负载；390Ω2W假负载无最低负载必要性，原位置删除",
+      "source": "参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf pages 1/3"
+    }
+  ],
+  "pin_and_net_contract": {
+    "U_GATE_OD_SN74LVC1G07DCKR_DCK_top_view": {
+      "pin1": "NC",
+      "pin2": "A=PA9/TIM1_CH2",
+      "pin3": "GND_SYS",
+      "pin4": "Y=DRV_FAULT_N共享线",
+      "pin5": "VCC=3V3_CORE"
+    },
+    "U_ISO_DRV_LTC7001IMSE_PBF_MSE_top_view": {
+      "pin1": "VCC=12V_DRV",
+      "pin2": "VCCUV=GND_SYS（最低门驱UVLO设置）",
+      "pin3": "GND=GND_SYS",
+      "pin4": "INP=DRV_FAULT_N共享许可线",
+      "pin5": "OVLO=GND_SYS",
+      "pin6": "TGDN直连ISO_G（关断快路径）",
+      "pin7": "TGUP经R_ISO_TGUP 10kΩ接ISO_G（只限开通）",
+      "pin8": "TS=ISO_MID",
+      "pin9": "BST；C_ISO_BST接BST与TS之间",
+      "pin10": "NC悬空",
+      "pin11_EP": "GND_SYS，焊接到地平面"
+    },
+    "U_DUMP_DRV_UCC27511A_DBV_top_view": {
+      "pin1": "VDD=12V_DRV",
+      "pin2": "OUTH=UCC_OUT_H",
+      "pin3": "OUTL=UCC_OUT_L",
+      "pin4": "GND=GND_SYS",
+      "pin5": "IN−=DUMP_OFF",
+      "pin6": "IN+=12V_DRV"
+    },
+    "U_SC_OV_TLV6700_DDC": {
+      "pin1": "OUTA=BUS_OV_OUT（本次硬OV输出）",
+      "pin2": "GND=SC_MINUS",
+      "pin3": "INA+=BUS_OV_DIV",
+      "pin4": "INB−=SC_OV_DIV",
+      "pin5": "VDD=12V_DRV",
+      "pin6": "OUTB=DRV_FAULT_N共享低有效线（SC过压时拉低）"
+    },
+    "Q_SC_ISO_HYG022N10NS1TA": {
+      "pin1": "G",
+      "pin2_to_8": "S；两只并到ISO_MID",
+      "pin9_and_tab": "D；Q_SC_ISO1接SC_ISO_STORAGE，Q_SC_ISO2接SC_FUSED",
+      "gate": "两只G共接ISO_G"
+    },
+    "Q_DUMP_SW_and_Q_PMOS_CTRL_MMBT5551": {
+      "pin1": "B",
+      "pin2": "E=GND_SYS",
+      "pin3": "C=DUMP_OFF",
+      "note": "两只NPN集电极可并到DUMP_OFF；基极必须各自有独立电阻与下拉，不能短接基极。新增Q_DUMP_SW需在器件库确认与JKSEMI C2972766完全一致的脚序。"
+    },
+    "STPS30100ST_TO220": {
+      "pin1_and_3": "并接阳极",
+      "pin2_and_tab": "阴极"
+    }
+  },
+  "shutdown_and_reset_calculation": {
+    "shared_open_drain_line": {
+      "wired_low_sources": "G07、DRV8161 pin4、TLV6700 OUTB，以及各自配置为开漏且故障低有效的COMP1/COMP2外引PA6/PA2，共同拉低DRV_FAULT_N。禁止推挽高输出并线。",
+      "pullup_and_pulldown": "R_PB5_PERMIT=1kΩ从3V3_CORE上拉；R_DRV_FAULT_PD=10kΩ至GND_SYS。",
+      "minimum_high_screen_V": "2.7273V = 3.0V×10k/(1k+10k)，高于DRV8161 VIH=2.2V及LTC7001 INP VIH max=2.2V；LTC7001 INP内部另有约1MΩ下拉。",
+      "maximum_sink_screen_mA": "3.6mA=3.6V/1kΩ；SN74LVC1G07在该电流下有足够下拉能力。",
+      "readback": "PA10直接采样此真实共享线；PB12/TIM1_BKIN接同线，低有效。无需AUP反相器或额外锁存器。"
+    },
+    "tim1_break_contract": {
+      "PA9": "复用AF TIM1_CH2作为许可源；OC2M强制有效、CC2E=1、CC2P=0时MOE=1输出高。",
+      "break_idle": "TIM1_CR2.OIS2=0、TIM1_BDTR.OSSI=1；Break异步清MOE后CH2进入低闲置态，U_GATE_OD再拉低共享许可线。TIM1_BDTR.AOE=0，故障释放不会在UEV自动重开MOE。",
+      "comparator_sources": "COMP1/COMP2各自经TIM1 BKCMP1E/BKCMP2E启用硬件Break；外部PB12 pin source由AF1.BKINE单独启用。比较器与BKIN在源使能位上独立。BKF=0以保留无滤波异步关断语义。",
+      "restart_sequence": "FAULT触发后保持CH1/CH1N为强制低并由MOE=0关闭。仅在显式新ARM时暂清AF1.BKINE，保持BKE、BKCMP1E、BKCMP2E有效；置MOE令PA9升高释放许可，PA10必须读到实际共享线高；随后恢复AF1.BKINE，检查BKIN正常后才允许CH1 PWM。若线仍低，BKIN立即再清MOE。任何软件复位后的启动均不自动执行ARM。",
+      "reset_behavior": "BOR/IWDG复位使PA9回到高阻输入且TIM1 MOE复位清零；新增R_ARM_PD=100kΩ将PA9拉低。G07 A低则Y拉低；DRV与LTC INP均处于关断态。硬件MOE故障锁存本身不跨MCU复位保存，必须由启动软件保持OFF并要求新ARM。"
+    },
+    "current_sense_comparators": {
+      "mapping": "COMP1(+PB1,−DAC3_CH1)检测充电SO低阈值；COMP2(+PA7,−DAC3_CH2)检测放电SO高阈值并配置反相；COMP3(+PA0,−DAC1_CH1)仅清CH1 OCREF。COMP1/2内部直入TIM1 Break，PA6/PA2外引配置开漏，均以故障低态并到共享DRV_FAULT_N；不得使用推挽输出并线。",
+      "nominal_screen": "DRV8161 CSA gain20、R_SC_SHUNT=0.5mΩ时斜率约10mV/A；CORE=3.3V、SO中心约1.65V。充电名义40A阈值约1.25V，放电名义65A约2.30V，COMP3初充25A约1.40V。",
+      "limits": "DRV CSA输入失调按±1.94mV折算±3.88A；另有分流器公差、偏置温漂、DAC基准/量化、TMUX路径及响应延迟。故40A/65A/25A是名义阈值，不是硬额定。50A/80A只作数据年龄/能量筛查上界，未扣尽误差和延迟，不得发布为保护保证值；COMP3实际可到约30A筛查，不能把40s初充计算写成保证。",
+      "fault_polarity": "名义SO=1.65V−0.01V/A×Icharge：COMP1设充电低阈值，SO跌至阈值以下时比较器故障输出低并拉低共享FAULT_N。COMP2设放电高阈值；SO升至阈值以上时需配置反相比较器输出为低有效故障，再拉低同一共享FAULT_N。PA6/COMP1_OUT与PA2/COMP2_OUT按主合同均为开漏、极性配置成正常态不触发TIM1；两个输出必须各自配置开漏后并至共享FAULT_N，推挽高输出不得相并。",
+      "polarity": "DRV SP=GND_SYS、SN=SC_MINUS；充电SO下降，放电SO上升。"
+    }
+  },
+  "isolation_driver_calculation": {
+    "gate_drive": "LTC7001的BST−TS调节约12V，HYG022N10NS1TA额定VGS=±20V，额定电压筛查有余量；每只MOSFET VDS=100V，需把实际开关尖峰限制在100V以内。两只体二极管反向串接，公共源连接后关断时阻断SC到变换器及反向路径。",
+    "gate_charge": "HYG022 Qg=160.5nC典型@10V/每只，两只合计321nC典型。LTC7001关系CB>Qg/1V；C_ISO_BST标称1uF，设计交接要求在12V直流偏压、温度与容差后Ceff≥0.5uF。该下限对应典型Qg电压跌落约0.642V，低于1V预算；厂家未给Qg最大值，不能把它转成最坏情况保证。",
+    "startup_charge_pump": "LTC7001应用条件约CB×12V/30uA；1.1uF名义上限对应约0.44s。驱动启动合同：12V_DRV有效且稳定后，至少等待1.0s再拉高INP。ADI表在VTS=20V、VBST−TS=10V列充电泵电流−15µA min/−30µA typ；1.1uF、12V按15µA算0.88s，仅该表列测试条件可支持此筛查，1s是固件接口合同，不能替代未知TS轨迹的样机资格。",
+    "steady_bleed": "R_ISO_GS=1MΩ；VGS=12V时电流约12µA，HYG两只门漏电各最大100nA，总门漏电200nA使静态VGS偏移约0.2V。1MΩ持续负载低于约15µA的受测泵电流，余量约2.8µA；是静态泄放，不是快速掉电关断保证。",
+    "turnoff_path": "正常有电时LTC7001 TGDN直接接ISO_G，TGUP经10kΩ仅限制开通。TGDN路径依据ADI在VCC=VBST=12V条件下最大4Ω输出下拉；VCC跌穿UVLO仍有电时驱动器将TGDN拉至TS。不可把VCC=0时最大关断时间推导为已保证。",
+    "vcc_uvlo": "VCCUV pin2接GND，VCC上升UVLO典型3.5V（min3.1/max3.7），下降典型3.2V（min2.8/max3.4）；pin1 VCC仅需至少0.1uF旁路，本方案移用C_BAL5=100nF。",
+    "mosfet_on_loss_screen": "每只RDS(on) max 2.8mΩ@VGS=10V/50A测试条件；两只串联名义筛查约5.6mΩ，在80A时约35.8W瞬时导通损耗。该数不含高温增阻、布局热阻、真实电流时长或短路能量，不能发布为持续电流额定。"
+  },
+  "12v_brownout_boundary": {
+    "slow_or_sustained_fall": "DRV8161 GVDD UVLO下降约6.7V典型、nFAULT有5–15us去毛刺；若12V_DRV在CORE有效时缓慢/持续越过该UVLO，pin4拉低共享线，PB12 Break异步清MOE并锁至显式重臂。LTC7001独立VCCUV在下降约3.4V max前还有电源时，也将TGDN拉到TS。",
+    "abrupt_loss": "若12V_DRV硬短/瞬时跌落快于DRV去毛刺，DRV输出可能来不及有效拉低；12V消失后LTC有电UVLO不再可依赖，1MΩ只缓慢泄放MOS门电荷。此路径无最大关断时间证明，故12V硬短路及任意快速掉电明确不在本方案保证范围；未为此臆加辅助电源/比较器。",
+    "central_dump": "UCC27511A与U_SC_OV也由12V_DRV供电；12V_DRV掉电时不保证中央dump吸收制动能量。不能据此承诺失电停车、连续长下坡或机械制动替代。"
+  },
+  "bus_hard_ov_and_dump": {
+    "comparator_reuse": "复用现有U_SC_OV=TLV6700DDCR；pin2 GND及分压下臂都接SC_MINUS。OUTB(pin6)保留SC总压过压并接共享DRV_FAULT_N；闲置INA+(pin3)/OUTA(pin1)复用于BUS硬OV。OUTA在低于释放阈值时下拉，BUS过压超过上阈后开漏释放。",
+    "divider": "BUS_EXT经R_BUS_OV_TOP1=255kΩ及TOP2=255kΩ串联至BUS_OV_DIV；R_BUS_OV_BOT=5.11kΩ由BUS_OV_DIV接SC_MINUS。分压IC地和下臂使用同一SC_MINUS参考，比较器阈值对GND_SYS的偏移只随分流器SC_MINUS地差1:1移动，不乘以分压比。C_T3_FILTER=1nF复用，Rth≈5.059kΩ、tau≈5.06us。",
+    "threshold_math": {
+      "nominal_formula": "Vtrip=0.400V×(1+510kΩ/5.11kΩ)=40.3219V。",
+      "divider_resistor_corner": "上臂509.49–510.51kΩ，下臂5.10489–5.11511kΩ。",
+      "TLV_reference_and_hysteresis": "全温VIT=396–404mV；迟滞最大12mV。含±0.1%电阻角落，最早名义上跳约39.8395V，最迟约40.8057V；最低释放点约38.6323V。",
+      "input_bias": "INA+偏置最大25nA；Rth约5.059kΩ造成输入约±0.1265mV、折算BUS约±12.75mV。",
+      "ground_shunt_offset": "R_SC_SHUNT=0.5mΩ、80A筛查时SC_MINUS相对GND_SYS约±40mV；这是阈值1:1平移。最低释放筛查38.6323−0.01275−0.040≈38.5795V，仍高于37.8V电池满压约0.7795V。",
+      "threshold_decision": "中央硬OV约40.32V名义，静态角落约39.84–40.81V；FoC本地BOV历史静态范围约39.209–41.724V，动作窗口重叠，不保证哪个先动作。该硬OV只作为补充路径，不冒充动作排序或制动热能力保证。"
+    },
+    "two_npn_logic": "R_DUMP_HW_PU从12V_DRV上拉BUS_OV_OUT；OUTA正常下拉使旧Q_PMOS_CTRL关闭，BUS超限后OUTA释放，BUS_OV_OUT经旧R_PB6_BASE驱动Q_PMOS_CTRL。PB7经旧R_DUMP_IN_SER=100Ω到DUMP_PWM_LIMIT，再经新增R_DUMP_SW_BASE=10kΩ驱动新增Q_DUMP_SW；旧R_DUMP_IN_PD作其B-E下拉。两NPN发射极接GND_SYS、集电极并到DUMP_OFF，基极不并联。两管都关闭时旧R_QP_COL=10kΩ将DUMP_OFF上拉12V_DRV；任一导通均拉低DUMP_OFF。",
+    "base_drive_screen": "BUS硬OV路径在11.4V_DRV时经两只10kΩ串联，基极电流约0.535mA；MCU路径CORE=3.0V、10kΩ基极串阻给约0.23mA，扣除10kΩ B-E约70uA后约0.16mA。DUMP_OFF上拉在12.6V时最大约1.26mA。MMBT5551/C2972766数据表给hFE≥80@1mA筛查，足以驱动约1.26mA节点电流；仍应按JKSEMI同批精确器件脚序/封装核验。",
+    "ucc_truth": "UCC27511A pin6 IN+固定12V_DRV，pin5 IN−接DUMP_OFF。IN+高且IN−高时输出低、Q_DUMP关；任一NPN拉低IN−时输出高、Q_DUMP开。不得将TLV OUTB直接接此节点。",
+    "power_stage": "Q_DUMP保留IRLB4030PBF；UCC_OUT_H/OUT_L按分立开通/关断栅极阻值驱动，保留现有栅源下拉。D_DUMP_FW阳极接DUMP_SW/Q_DUMP漏极、阴极接BUS_EXT。R_DUMP_EXT=0.82Ω±5%板外单只采用阻值；用户负责功率/短时脉冲与热实现，本轮不选功率或新增温熔，硬件控制不等于已具有连续dump吸能能力。",
+    "12v_dependency": "TLV6700、UCC27511A由12V_DRV供电；12V_DRV丢失时硬OV和中央dump不保证动作。"
+  },
+  "freewheel_screen": {
+    "paths": [
+      {
+        "ref": "D_SC_LO",
+        "anode": "GND_SYS",
+        "cathode": "SC_FUSED",
+        "role": "桥侧负向电感电流的下钳位回路。"
+      },
+      {
+        "ref": "D_SC_HI",
+        "anode": "SC_FUSED",
+        "cathode": "BUS_EXT",
+        "role": "桥侧正向电感电流的上钳位/回BUS路径。"
+      },
+      {
+        "ref": "D_DUMP_FW",
+        "anode": "DUMP_SW",
+        "cathode": "BUS_EXT",
+        "role": "dump低边关断时为Q_DUMP/外接电阻线束电感提供回BUS续流路径。"
+      }
+    ],
+    "bounded_single_pulse": {
+      "assumed_L_H_I": "L=24uH, I=80A（筛查值，不是已保证上限）",
+      "stored_energy_mJ": 76.8,
+      "assumed_total_clamp_voltage_V": 1.4,
+      "linear_decay_time_ms": 1.3714,
+      "initial_power_W": 112,
+      "linear_decay_I2t_A2s": 2.9257,
+      "diode_reference": "STPS30100ST单管IF(AV)=30A条件值、IFSM=300A/10ms非重复正弦条件值；datasheet的VF最大值有指定电流/温度条件，不把1.4V当作全工况保证钳位电压。",
+      "thermal_screen": "从数据表瞬态Zth曲线约0.2K/W@约1ms读取，80A脉冲估算约22K单次结温升；乘2敏感性约45K，起始85°C时约130°C。曲线读取、实际电流波形、VF、安装散热及重复率均未资格验证，该敏感性筛查不作为PASS或重复额定。",
+      "limits": "此筛查只覆盖受控中断后的储能电感单次释放；QH/QL短路使BUS持续给电感供能、外部dump电阻持续吸能、长线束电感/重复PWM、整车刹车能量都未由二极管IFSM替代或闭合。隔离后电流可经二极管继续流动，不能从分流器归零读数宣布实际电流归零。"
+    }
+  },
+  "paper_checks": {
+    "ltc7001_pinout_matches_adi_rev_g": true,
+    "ucc27511a_pin5_in_minus_pin6_in_plus_matches_ti": true,
+    "bus_ov_threshold_and_release_recomputed_with_same_sc_minus_reference": true,
+    "common_drain_node_has_independent_base_resistors": true,
+    "core_reset_pa9_has_external_default_low": true,
+    "timer_aoe_zero_prevents_update_auto_rearm": true,
+    "timer_comparator_breaks_stay_enabled_while_external_bkin_source_masked": true,
+    "power_stage_freewheel_paths_have_named_diode_polarity": true,
+    "native_bom_and_esch2_not_modified": true,
+    "not_checked": [
+      "原生原理图落图/保存重开/官方ENET/DRC",
+      "固件实现、实物关断波形、实物MOS VGS/Miller、实际QH/QL短路",
+      "12V硬短路或任意快速掉电最大关断时间",
+      "STPS重复热资格、实际bus注入能量和连续制动能力",
+      "电感热偏置下界及实际故障峰值电流"
+    ]
+  },
+  "official_sources": [
+    {
+      "name": "ST RM0440 STM32G4 reference manual",
+      "url": "https://www.st.com/resource/en/reference_manual/dm00355726-stm32g4-series-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf",
+      "used_for": "TIM1 CH2 OIS/OSSI、MOE break异步清零、AOE=0手动恢复，以及TIM1 BKINE和BKCMP1E/BKCMP2E为独立break来源。"
+    },
+    {
+      "name": "ST STM32G431 datasheet",
+      "url": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+      "used_for": "PA9 TIM1_CH2、PB12 TIM1_BKIN、PA10 GPIO、比较器GPIO复用。"
+    },
+    {
+      "name": "TI DRV8161 Rev C",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8161.pdf",
+      "used_for": "共享pin4 nFAULT/nDRVOFF开漏功能、逻辑阈值、GVDD欠压及去毛刺。"
+    },
+    {
+      "name": "TI SN74LVC1G07 Rev AG",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf",
+      "used_for": "DCK pinout、开漏输出、输入电压范围、下拉能力及Ioff。"
+    },
+    {
+      "name": "ADI LTC7001 Rev G",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/ltc7001.pdf",
+      "used_for": "MSOP pins1–10/EP、VCCUV、BST-TS电容关系、约30uA charge pump、TGDN UVLO关断及驱动下拉。"
+    },
+    {
+      "name": "TI TLV6700 Rev B",
+      "url": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf",
+      "used_for": "SOT-23-6 pinout、OUTA/OUTB开漏状态、参考/迟滞、偏置及电源范围。"
+    },
+    {
+      "name": "TI UCC27511A Rev A",
+      "url": "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+      "used_for": "DBV pinout、IN+ / IN−真值关系及OUTH/OUTL分立门极输出。"
+    },
+    {
+      "name": "JKSEMI MMBT5551 / LCSC C2972766 datasheet",
+      "url": "https://datasheet.lcsc.com/lcsc/2203092030_Shenzhen-Jinkaisheng-Elec-MMBT5551_C2972766.pdf",
+      "used_for": "新增与复用NPN精确供应料号、hFE筛查值及封装引脚。"
+    },
+    {
+      "name": "HUAYI HYG022N10NS1TA manufacturer file",
+      "url": "local:电力/BMS模块/厂商资料/HYG022N10NS1TA.pdf",
+      "used_for": "隔离MOS脚位、±20V VGS、100V VDS、Qg典型值及门漏电。"
+    },
+    {
+      "name": "ST STPS30100ST",
+      "url": "https://www.st.com/resource/en/datasheet/stps30100st.pdf",
+      "used_for": "TO-220脚位、平均/脉冲额定、VF及瞬态热阻曲线。"
+    },
+    {
+      "name": "Infineon IRLB4030PBF",
+      "url": "https://www.infineon.com/dgdl/irlb4030pbf.pdf?fileId=5546d462533600a4015356604640258",
+      "used_for": "主半桥与dump MOSFET 100V VDS及门极电压额定。"
+    },
+    {
+      "name": "TDK C3225X7R2A105K200AA",
+      "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R2A105K200AA",
+      "used_for": "C_ISO_BST精确MPN、1uF±10%、100V、Production状态及DC bias特性页入口。"
+    },
+    {
+      "name": "Yageo RT0603BRD075K11L / LCSC C705788",
+      "url": "https://jlcpcb.com/partdetail/YAGEO-RT0603BRD075K11L/C705788",
+      "used_for": "5.11kΩ、±0.1%、100mW、75V、0603精确供应身份。"
+    },
+    {
+      "name": "MDD MMBT5551",
+      "url": "https://www.mdddiodes.com/product/transistor-sot-23-series-mmbt5551/",
+      "used_for": "最终两只NPN改MDD，pin1 B/2 E/3 C；旧JKSEMI资料只作对照。"
+    }
+  ],
+  "peripheral_update": "34处同数量国产替代以国产外围替代核对.json及当前选型BOM为准；不改变针网，NPN改MDD C408396，非精密10k为风华C115324/1%。"
+}

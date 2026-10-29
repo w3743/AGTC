@@ -58,10 +58,10 @@ def pins_equal(actual: dict[str, Any], expected: dict[str, Any]) -> bool:
 def main() -> int:
     case = load_json(INPUT)
     source_relpaths = [
-        "BMS模块/项目要求.md",
+        "BMS模块/设计需求.md",
         "BMS模块/检查/最大料号归并候选.json",
         "BMS模块/检查/URB4805替换候选.json",
-        "BMS模块/检查/5V电源预算.md",
+        "BMS模块/设计细节.md",
         "BMS模块/检查/风扇调速支持审查.json",
         "BMS模块/原理图准备/接口元件连接.json",
         "BMS模块/原理图准备/功率元件连接.json",

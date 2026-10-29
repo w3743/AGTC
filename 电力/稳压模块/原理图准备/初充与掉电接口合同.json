@@ -1,0 +1,210 @@
+{
+  "date": "2026-10-29",
+  "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tmux1511.pdf",
+    "https://www.ti.com/lit/ds/symlink/drv8161.pdf",
+    "https://www.st.com/resource/en/datasheet/stm32g431c6.pdf",
+    "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+    "https://www.st.com/resource/en/application_note/dm00442720-migrating-between-stm32f334303-lines-and-stm32g474xxg431xx-microcontrollers-stmicroelectronics.pdf"
+  ],
+  "add": [
+    {
+      "ref": "U_SIGNAL_ISO",
+      "mpn": "TMUX1511PWR",
+      "supplier_part": "C2866750",
+      "qty": 1,
+      "pins": {
+        "1": "WD_OK",
+        "2": "BUS_ADC_SOURCE",
+        "3": "BUS_ADC",
+        "4": "WD_OK",
+        "5": "IMON_SOURCE",
+        "6": "IMON",
+        "7": "GND_SYS",
+        "8": "MAX_MISO_CORE",
+        "9": "MAX_SDO_AFE",
+        "10": "WD_OK",
+        "11": "MAX_CSB_CORE",
+        "12": "MAX_CSB_AFE",
+        "13": "WD_OK",
+        "14": "3V3_CORE"
+      }
+    },
+    {
+      "ref": "C_SIGNAL_ISO",
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "qty": 1,
+      "pins": {
+        "1": "3V3_CORE",
+        "2": "GND_SYS"
+      }
+    }
+  ],
+  "reuse": [
+    {
+      "ref": "R_T1_LO",
+      "mpn": "PTFR0805B10K0N9",
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_T2_LO",
+      "mpn": "PTFR0805B10K0N9",
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "IMON",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_T3_LO",
+      "mpn": "PTFR0805B10K0N9",
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "MAX_MISO_CORE",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_T4_LO",
+      "mpn": "PTFR0805B10K0N9",
+      "value": "10k 0.1%",
+      "pins": {
+        "1": "MAX_CSB_CORE",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_BUS_LO",
+      "pins": {
+        "1": "BUS_ADC_SOURCE",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_BUS_HI",
+      "pins": {
+        "1": "BUS_HI_MID",
+        "2": "BUS_ADC_SOURCE"
+      }
+    },
+    {
+      "ref": "C_BUS_ADC",
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_DRV_SO_SER",
+      "pins": {
+        "1": "DRV_SO",
+        "2": "IMON_SOURCE"
+      }
+    },
+    {
+      "ref": "C_DRV_SO",
+      "pins": {
+        "1": "IMON",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_MAX_CSB_SER",
+      "pins": {
+        "1": "MAX_CSB_CORE",
+        "2": "MCU_PA15"
+      }
+    },
+    {
+      "ref": "R_MAX_CSB_PU",
+      "pins": {
+        "1": "MAX_CSB_AFE",
+        "2": "MAX_VDDL3"
+      }
+    },
+    {
+      "ref": "R_MAX_SCLK_SER",
+      "pins": {
+        "1": "MCU_PB3",
+        "2": "MAX_SCLK"
+      }
+    },
+    {
+      "ref": "R_MAX_SDI_SER",
+      "pins": {
+        "1": "MCU_PB4",
+        "2": "MAX_SDI"
+      }
+    }
+  ],
+  "MAX_SPI_correction": {
+    "9_TXUN_SCLK": "MAX_SCLK",
+    "10_TXUP_CSB": "MAX_CSB_AFE",
+    "15_TXLP_SDO": "MAX_SDO_AFE",
+    "16_TXLN_SDI": "MAX_SDI",
+    "17_RXLP": "GND_SYS unused SPI receiver; MUST NOT be wired as SCLK",
+    "12_RXUN": "GND_SYS",
+    "13_RXUP": "GND_SYS",
+    "18_RXLN": "GND_SYS",
+    "UARTSEL": "SC_MINUS",
+    "note": "MAX pin numbers per Rev6 p36; keep GNDL versus AGND separation without shunt bypass."
+  },
+  "G431_pin_allocation": {
+    "PB1": "IMON ADC/COMP1_INP; existing P2-10",
+    "PA7": "IMON COMP2_INP; existing P2-11",
+    "PA0": "IMON COMP3_INP; old AD_T1, P2-20",
+    "PA3": "NTC_DUMP ADC; old AD_T4, P2-15; replaces previous PA0 candidate",
+    "PB12": "actual DRV fault feedback to TIM1_BKIN; old NTC_DUMP, P1-5",
+    "PA10": "actual DRV fault feedback digital; P1-12",
+    "PA6": "COMP1_OUT active-low open-drain hard-current fault",
+    "PA2": "COMP2_OUT active-low open-drain hard-current fault",
+    "PB3": "SPI SCLK",
+    "PB4": "SPI MOSI",
+    "PB9": "SPI MISO from MAX_MISO_CORE",
+    "PA15": "SPI CSB",
+    "PA8_PB13": "TIM1 CH1/CH1N to DRV INH/INL",
+    "PB5_PB6": "ARM edge/RUN",
+    "PB7": "central dump software PWM",
+    "PA11_PA12": "CAN RX/TX, USB data mutually exclusive"
+  },
+  "current_comparator_contract": {
+    "polarity": "DRV SP=GND_SYS, SN=SC_MINUS; cap charging makes SO fall, cap discharge makes SO rise. Do not reverse the control-loop sign.",
+    "COMP1": "PB1 versus DAC3_CH1; fixed lower hard-fault window, active-low external fault output; internal TIM1 Break enabled.",
+    "COMP2": "PA7 versus DAC3_CH2; fixed upper hard-fault window, active-low external fault output; internal TIM1 Break enabled.",
+    "COMP3": "PA0 versus DAC1_CH1; inverted output detects charging-current peak and clears TIM1 OCREF through the internal mux (RM0440 Table272). Not connected to the ISO FF clear.",
+    "charge_example": "At CORE=3.3V, gain20 and0.5mOhm: SO=1.65-0.01*I_charge. 25A gives1.40V. This is a nominal conversion, not an error-free hardware threshold.",
+    "Break": "AOE=0. Serious faults stay off pending explicit ARM; cycle regulation uses OCREF clear, never automatic Break rearm.",
+    "asynchronous_stage": "During 0..2V stack OCV charging, keep CH1N disabled and INL low apart from the bounded bootstrap sequence; COMP3 clearing CH1 must not turn on the complementary low-side output.",
+    "normal_charge": "At higher voltage permit synchronous freewheel only while current stays positive; cap charge command at most30A before temperature/voltage derating, peak control adjustable, use50A for data-age OV budget."
+  },
+  "bootstrap_contract": {
+    "sequence": "After healthy rails/AFE and ARM, high-side held off. Apply150 low-side input pulses of2us at100us intervals, then both PWM inputs low before beginning high-side current packets.",
+    "conditions": "Stack<=19.6V, BUS>=22.5V, effective bootstrap C>=0.5uF, nominal1uF tolerance upper1.1uF, 12V supply minimum11.4V. Clear any fault rather than continuing this sequence.",
+    "reason": "Avoid a continuous50us low-side bootstrap pulse across a charged supercapacitor; at19.6V/12.8uH it could establish about77A reverse current.",
+    "calculation": "A2.08us maximum low pulse screens to3.19A reverse peak at19.6V/12.8uH. The100us interval exceeds the return-to-BUS diode decay estimate. Final bootstrap target>=9.7V; a500nC engineering charge budget into0.5uF leaves>=8.7V.",
+    "limit": "Qg at12V, actual input-to-channel timing, bootstrap diode charging and biased capacitance must satisfy these budgets. These are schematic qualification constraints, not claimed min/max values absent from a vendor table. Never bootstrap with unbounded low-side ON time."
+  },
+  "power_off_boundary": {
+    "steady_state": "TMUX VDD<1.5V signal pins remain within0..3.6V; atVDD0 its full-temperature leakage<=2uA. Four host10k pulldowns limit corresponding MCU DC inputs to20.02mV in the leakage model.",
+    "transient": "Use supervisor WD_OK to open channels while CORE is still valid. The4us supply-off timing is specified for a1us supply ramp, not every possible regulator collapse. Board3V3 waveform, pin transient and supply hold-up must meet the handoff envelope.",
+    "BUS_ADC": "Two10k shunts and300k upper leg produce nominal1:61 while on, not1:31; firmware/calibration contract changes accordingly. At3.3V/12bit one BUS LSB is about49.15mV, before oversampling.",
+    "other_inputs": "NTC pullups and TCAN332 useCORE. AUP and LVC buffers must retain Ioff. MAX CSB pullup staysAFE-side; SDO and CSB cross the switch. SCLK/SDI remain SPI inputs with host-series resistors and noAFE-side pullup to an alive rail.",
+    "not_covered": "External harness shorts toBUS, fast charge injection and arbitrary3V3 collapse are separate transient/fault cases; a steady-state leakage calculation is not a blanket electrical-stress PASS."
+  },
+  "counts_delta_vs_58_45": {
+    "new_instances": 2,
+    "retirements_cancelled": 4,
+    "net_piece_increase": 6,
+    "new_exact_MPNs_in_this_subpackage": 1
+  },
+  "status_before_withdrawal": "SCHEMATIC_CONNECTION_CANDIDATE_NOT_NATIVE",
+  "current_adopted_design": false,
+  "withdrawal_reason": "用户要求先核清故障路径和简约性再加选型；原理必要性/替代/能量接管未闭合，撤回当前采用地位，保留比较数据。",
+  "current_adopted_increment_count": null
+}

@@ -1,0 +1,446 @@
+{
+  "schema": "0V-initial-charge schematic review delta, machine-readable candidate; not an edited schematic/BOM",
+  "date": "2026-10-29",
+  "basis": "Keep independent STM32G431 and CAN, 9S5P 22.5–37.8V battery, 8S1P LICAP350F x8; keep DRV8161 half-bridge/current-sense power stage. Add externally powered MAX17853 8-cell monitoring; no separate resistor precharge stage.",
+  "status": "schematic-level design candidate; datasheet-supported functions are separated from settings, derating and later human validation; no PCB or firmware changes",
+  "added_instances": 43,
+  "added_parts": [
+    {
+      "ref": "U_AFE_MAX17853",
+      "value": "MAX17853ACB/V+; 64-pin LQFP",
+      "qty": 1,
+      "connection": "Externally powered by 12V_DRV at DCIN; AGND/AUXGND=SC_MINUS; GNDL1/2/3=GND_SYS; SPI.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C0",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "SC_MINUS to MAX C0. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C1",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T1 to MAX C1. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C2",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T2 to MAX C2. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C3",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T3 to MAX C3. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C4",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T4 to MAX C4. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C5",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T5 to MAX C5. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C6",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T6 to MAX C6. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C7",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "T7 to MAX C7. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_C8",
+      "value": "1.00kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "SC_PLUS to MAX C8. C0 is the negative reference for cell 1.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_DCIN",
+      "value": "100Ω, 1%, 0603",
+      "qty": 1,
+      "connection": "12V_DRV to MAX DCIN.",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_DCIN",
+      "value": "2.2µF, 100V, X7R",
+      "qty": 1,
+      "connection": "DCIN to AGND.",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_HV",
+      "value": "4.7µF, 50V, X7R",
+      "qty": 1,
+      "connection": "HV to DCIN.",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_CPP",
+      "value": "0.1µF, 100V, X7R",
+      "qty": 1,
+      "connection": "CPP to CPN.",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_VAA",
+      "value": "1µF, 10V, X7R",
+      "qty": 1,
+      "connection": "VAA to AGND.",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_VDDL1",
+      "value": "0.47µF, 10V, X7R",
+      "qty": 1,
+      "connection": "VDDL1 to GNDL1; tie VDDL1 to VAA and VDDL2/VDDL3 to VAA (all ≥ VAA).",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_VDDL2",
+      "value": "0.47µF, 10V, X7R",
+      "qty": 1,
+      "connection": "VDDL2 to GNDL2; tie VDDL1 to VAA and VDDL2/VDDL3 to VAA (all ≥ VAA).",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_VDDL3",
+      "value": "0.47µF, 10V, X7R",
+      "qty": 1,
+      "connection": "VDDL3 to GNDL3; tie VDDL1 to VAA and VDDL2/VDDL3 to VAA (all ≥ VAA).",
+      "note": ""
+    },
+    {
+      "ref": "C_MAX_SHDNL",
+      "value": "1nF, C0G, 25V",
+      "qty": 1,
+      "connection": "SHDNL to AGND.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_SHDNL_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "3V3_CORE to SHDNL; external SPI-mode enable.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_SHDNL_PD",
+      "value": "47kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "SHDNL to AGND; discharges/forces shutdown when 3V3_CORE is absent.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_ALERT_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX ALERTOUT/AFE_OK to VDDL2; share AFE_OK with existing TLV6700 OUTB and AND input.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX0_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN0 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX1_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN1 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX2_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN2 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX3_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN3 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX4_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN4 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_AUX5_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX AUXIN5 to THRM, pull-up-only per pin description; AUX channels disabled unless explicitly used.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_SCLK_SER",
+      "value": "1kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "G431/MAX SPI SCLK series resistor.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_SDI_SER",
+      "value": "1kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "G431/MAX SPI SDI series resistor.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_CSB_SER",
+      "value": "1kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "G431/MAX SPI CSB series resistor.",
+      "note": ""
+    },
+    {
+      "ref": "R_MAX_CSB_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MAX CSB to VDDL3; inactive-high so MAX SDO is high impedance when host is reset/off.",
+      "note": ""
+    },
+    {
+      "ref": "U_TPS3850",
+      "value": "TPS3850G33DRCT; DRC 10-pin VSON",
+      "qty": 1,
+      "connection": "VDD=SENSE=3V3_CORE; SET0=SET1=GND_SYS; CWD via 10kΩ to VDD; CRST=NC; WDI=G431 PC11; RESET and WDO wire-OR to G431 NRST and WD_OK.",
+      "note": ""
+    },
+    {
+      "ref": "R_TPS_CWD_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "CWD to TPS3850 VDD. With SET0=SET1=0 selects 1:8 window, tWDL(max)=10.35ms; tWDU=92.7ms min, 125.4ms max.",
+      "note": ""
+    },
+    {
+      "ref": "C_TPS_VDD",
+      "value": "0.1µF, 10V, X7R",
+      "qty": 1,
+      "connection": "TPS3850 VDD to GND_SYS, local bypass.",
+      "note": ""
+    },
+    {
+      "ref": "R_TPS_WDI_PD",
+      "value": "47kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "TPS3850 WDI to GND_SYS; default low during MCU reset.",
+      "note": ""
+    },
+    {
+      "ref": "R_TPS_RST_WDO_PU",
+      "value": "10kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "Shared open-drain RESET/WDO/NRST/WD_OK node to 3V3_CORE.",
+      "note": ""
+    },
+    {
+      "ref": "U_AFE_AND",
+      "value": "SN74LVC1G11DCKR; SC70-6",
+      "qty": 1,
+      "connection": "3-input AND: A=AFE_OK, B=WD_OK, C=MCU_PERMIT; Y through 680Ω to existing DRV_FAULT_N.",
+      "note": ""
+    },
+    {
+      "ref": "C_AFE_AND_VDD",
+      "value": "0.1µF, 10V, X7R",
+      "qty": 1,
+      "connection": "SN74LVC1G11 VCC to GND_SYS, local bypass.",
+      "note": ""
+    },
+    {
+      "ref": "R_AFE_OK_PD",
+      "value": "47kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "AFE_OK to GND_SYS; fail-low if MAX VDDL disappears.",
+      "note": ""
+    },
+    {
+      "ref": "R_WD_OK_PD",
+      "value": "47kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "WD_OK to GND_SYS; fail-low during/reset supervisor startup.",
+      "note": ""
+    },
+    {
+      "ref": "R_AFE_PERMIT_PD",
+      "value": "47kΩ, 1%, 0603",
+      "qty": 1,
+      "connection": "MCU_PERMIT/AND input C to GND_SYS; driver remains off during reset/high-Z.",
+      "note": ""
+    },
+    {
+      "ref": "R_GATE_SER",
+      "value": "680Ω, 1%, 0603",
+      "qty": 1,
+      "connection": "SN74LVC1G11 Y to DRV8161 pin 4 DRV_FAULT_N/nDRVOFF.",
+      "note": ""
+    }
+  ],
+  "removed_instances": 42,
+  "removed_parts": [
+    {
+      "ref_pattern": "U_BAL1..U_BAL8 (BW6101-C1AP)",
+      "qty": 8,
+      "why": "Replaced by one MAX17853; no LED-as-logic assumption."
+    },
+    {
+      "ref_pattern": "R_T1_HI/LO..R_T8_HI/LO",
+      "qty": 16,
+      "why": "Retire cumulative per-cell dividers after MAX C0..C8 ADC channels are commissioned."
+    },
+    {
+      "ref_pattern": "R_T1_TEST..R_T7_TEST",
+      "qty": 7,
+      "why": "Remove retired cumulative TEST injection branches; only if TEST has no remaining independent use."
+    },
+    {
+      "ref_pattern": "C_T1_FILTER..C_T8_FILTER",
+      "qty": 8,
+      "why": "Retire G431 cumulative-tap RC capacitors; MAX cell filter caps are the reused C_BAL1..8."
+    },
+    {
+      "ref_pattern": "R_TEST_HI, R_TEST_LO, C_TEST_FB",
+      "qty": 3,
+      "why": "Retire only the old cumulative TEST_FB measurement path."
+    }
+  ],
+  "reused_parts": [
+    {
+      "ref_pattern": "C_BAL1..C_BAL8",
+      "qty": 8,
+      "current_value": "100nF each",
+      "reuse": "MAX C1-C0..C8-C7 differential filter capacitors; do not delete."
+    },
+    {
+      "ref_pattern": "R_BAL1..R_BAL8",
+      "qty": 8,
+      "current_value": "120Ω each",
+      "reuse": "Move/use as MAX SW1..SW8 series cell-balance current limit; at 2.45V ideal current≤20.4mA; do not increase to figure-4 22Ω without thermal review."
+    },
+    {
+      "ref": "U_SC_OV",
+      "qty": 1,
+      "reuse": "Keep TLV6700 total-stack OVP. Change VDD 12V_DRV→3V3_CORE and move OUTB from DRV_FAULT_N to AFE_OK; existing 100nF C_SC_OV_VDD retained if layout permits."
+    },
+    {
+      "ref": "R_PB5_PERMIT",
+      "qty": 1,
+      "reuse": "Change 1kΩ→4.7kΩ; same instance."
+    },
+    {
+      "ref": "R_DRV_FAULT_PD",
+      "qty": 1,
+      "reuse": "Keep driver-node pull-down; recommend change 10kΩ→47kΩ to improve the AND-VOH margin, then recheck powered-off default and DRV input noise."
+    }
+  ],
+  "wiring_contract": [
+    "MAX C0..C8 measure eight adjacent LICAP cells: C0=SC_MINUS, C1=T1, ... C7=T7, C8=SC_PLUS. R_MAX_C0..C8 are the manufacturer example 1k series filters. Reuse each C_BALn=100nF across Cn/Cn-1. Keep SC_MINUS↔GND_SYS connected only through the existing 0.5mΩ power shunt; no AFE ground wire may bypass it.",
+    "Reuse R_BAL1..8=120Ω from physical cell taps to SW1..SW8 as balancing current-limit resistors; SW0=SC_MINUS. Tie unused C9..C14 together and unused SW9..SW14 together; mask nonexistent channels, set TOPCELL1/2=8 and CELLEN=0x00FF. Leave VBLK unused because existing TLV6700 total OVP remains.",
+    "SPI: G431 PB3=SCLK→MAX RXLP, PB4=MOSI→MAX TXLN/SDI, PB9=MISO←MAX TXLP/SDO, PA15=CSB→MAX TXUP/CSB. Use bit-banged SPI to preserve PB5 permit and PA8/PB13 PWM. MAX UARTSEL=AGND; SHDNL is enabled from 3V3_CORE through10k with1nF to AGND and47k pulldown to AGND. VDDL1/2/3 all tie VAA; GNDL1/2/3=GND_SYS; AGND/AUXGND=SC_MINUS. Unused RX UART pins may be tied directly to their GNDL; ALERTIN unused in SPI.",
+    "MAX alert: set SPI open-drain mode SPIDRVINT=0 and ALERTEN=1. ALERTOUT active-low, pulled to VDDL2 by10k and wire-ORed with existing TLV6700 OUTB to AFE_OK. AFE_OK also has47k pulldown and drives SN74LVC1G11 input A, so MAX power loss or OVP inhibits the gate independent of G431. Keep total OVP TLV comparator on the same fault input; do not connect push-pull Y to the open-drain alert node.",
+    "TPS3850G33: monitor 3V3_CORE. CWD=10k to VDD; SET0=SET1=GND; CRST=NC. Wire RESET and WDO open-drain outputs together to G431 NRST and WD_OK, use one10k pull-up to3V3_CORE and one47k pulldown. WDI is PC11, kept low by47k during reset. Issue falling-edge heartbeat only after both a complete fresh bipolar ADC scan and a complete fresh unipolar comparator scan, with SCANDONE=1, DATARDY=1, SCANTIMEOUT=0, no rejected-scan/PEC/diagnostic fault, and all eight results/statuses read valid. Run paired scan at20ms; heartbeat interval must stay >10.35ms and <92.7ms guaranteed window. First pulse must be before92.7ms after RESET release.",
+    "Configure MAX in single-buffer mode so scan data transfers at scan completion; clear SCANDONE/SCANTIMEOUT/DATARDY before each scan, require each scan to be accepted and completed, read current output registers, and verify PEC/status before WDI. The ADC scan uses bipolar polarity for all eight 0V-capable channels; separately run comparator scan with all channels unipolar. Do not count a prior scan/register image as fresh.",
+    "SN74LVC1G11 Y drives DRV8161 pin4 via680Ω; keep local pull-down on DRV_FAULT_N. Inputs are AFE_OK, WD_OK and PB5 permit. PB5 remains low/high-Z by reset default, with existing PB5 series resistor changed to4.7k and 47k input pulldown. AFE alert/total OVP, supervisor RESET, watchdog WDO and G431 permit all have a direct hardware path to disable the driver.",
+    "For 0V charge, hold gate permit low through reset/configuration. After MAX ID/config/diagnostic checks and an initial fresh scan pair, use the existing DRV8161+G431 buck current loop; low-side pulse/bootstrapping and SO zero-offset acquisition precede high-side PWM. Soft-start to20A cap current; enforce a30A design ceiling. Cell balancing remains disabled during initial charge. No dedicated resistor precharge leg is added."
+  ],
+  "charge_and_threshold_math": {
+    "charge_target_per_cell_V": 2.2,
+    "nominal_current_A": 20,
+    "design_max_current_assumption_A": 30,
+    "lifecap_cell_C_min_EOL_F": 280,
+    "lifecap_cell_nominal_F": 350,
+    "lifecap_cell_C_upper_tolerance_F": 420,
+    "ideal_time_to_2p2_s_at_20A": {
+      "280F_EOL": 30.8,
+      "350F_nominal": 38.5,
+      "420F_upper": 46.2
+    },
+    "dV_dt_per_cell_at_30A_280F_V_per_s": 0.1071429,
+    "ADC_period_s": 0.02,
+    "TPS3850_watchdog_tWDU_max_s": 0.1254,
+    "conservative_unobserved_interval_s": 0.1454,
+    "rise_during_conservative_interval_mV_at_30A": 15.58,
+    "MAX_COMPOVTH_code": 502,
+    "nominal_comparator_trip_V": 2.4512,
+    "MAX_comparator_accuracy_bound_mV": 20,
+    "DAC_half_lsb_mV": 2.44,
+    "worst_expected_trip_plus_interval_rise_V": 2.4893,
+    "LICAP_cell_max_operating_V": 2.7,
+    "remaining_voltage_margin_V": 0.2107,
+    "safety_note": "The 30A current is a design maximum input, not a proven guarantee of the existing DRV SO path. DRV8161 datasheet p12 offset is ±1.94mV at25°C plus8µV/°C drift; with0.5mΩ×20V/V this is roughly±5.5A at hot/cold endpoints before shunt/gain errors. If uncalibrated actual peak may approach35.5A, recompute OVP rise as~18.4mV, still below2.7V with>0.20V margin. Verify current calibration/COMP trip and SOA in human bench qualification."
+  },
+  "delta_summary": "43 added instances, 42 retired instances (net +1 instance, not a claim of lower total BOM cost). The common DRV_FAULT_N readback interface U_DRV_FAULT_FB SN74AUP1T14DCKR + C_DRV_FAULT_FB 100nF is deliberately outside this 43 and should be counted once by the shared gate_shutdown package; it reads actual DRV_FAULT_N and cannot be replaced by MAX ALERTOUT, which reports AFE alerts only.",
+  "comparison": [
+    {
+      "candidate": "Retain DRV8161 + MAX17853",
+      "result": "Selected schematic candidate. Keeps current G431 PWM/DRV MOS stage and adds MAX monitor. MAX can be externally powered from 12V_DRV while the cap stack is 0V; current loop uses existing SO/shunt/inductor path; no separate resistor stage."
+    },
+    {
+      "candidate": "LT8228 + MAX17853",
+      "result": "LT8228 is itself capable of current limiting over VOUT=0–100V and supports buck V1→V2 plus reverse boost. It cannot replace the MAX per-cell 0V measurement/OV scan. Official full typical application uses M2/M3 main FETs plus M1A/B and M4A/B protection FETs (6 MOSFETs), 2 current shunts, 2 loop-compensation networks, ISET/UV/FB dividers, inrush/timer and multiple bypass parts. If using LT8228, retain at least required V2 back-to-back protection for cap-side fault isolation; do not presume total peripheral count falls. LCSC core prices reported by parent: LT8228HFE#PBF C673654 ¥140.12; MAX17853ACB/V+ C7451746 ¥113.57, pair ¥253.69 before passives/MOSFETs, vs only MAX incremental for retained DRV."
+    },
+    {
+      "candidate": "Current DRV + cumulative divider/BW6101",
+      "result": "Not suitable as the frozen 0V safeguard: cumulative tap subtraction has accumulated divider/ADC/reference/ground errors; BW6101 IOUT is balancing, not series cutoff, and its LED output lacks guaranteed logic levels/propagation for a hard permit. Replace only after MAX wiring/ALERT path is implemented; reuse existing balance resistors/caps."
+    }
+  ],
+  "official_sources": [
+    {
+      "name": "ADI MAX17853 Rev6 (19-100355, 10/23)",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/max17853.pdf",
+      "pages": "p24–27 electrical: DCIN 9–65V, bipolar input range, cell accuracy ±4.5mV over -2.3…+2.3V, comparator accuracy ±20mV at0.2…4.8V; p35–38 pin and external filter network; p43 uncalibrated measurement process; p65–66 bipolar/comp exclusion and input coding; p74–75 scan modes/times; p82 watchdog timeout; p84 scan timeout/data clearing; p91 status/data and alert behavior; p208,211 SPI ALERTEN/SPIDRVINT; p259,262 SCANCTRL clearing and strobe; p295 unused-input and DCIN network guidance."
+    },
+    {
+      "name": "TI TPS3850 RevB SBVS301B",
+      "url": "https://www.ti.com/lit/ds/symlink/tps3850.pdf",
+      "pages": "p6–7 output/supervisor/watchdog limits and timing; p25–26 CWD=10k,SET=00 1:8 window and tWDU formulas; p37 G/H threshold percentage and 3.3V G33 option."
+    },
+    {
+      "name": "TI DRV8161 RevC SLVSGZ1C",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8161.pdf",
+      "pages": "p4 shared nFAULT/nDRVOFF; p8 logic thresholds and nFAULT 5mA sink; p12 SO offset and drift; p16 bidirectional CSA; p30–31 bidirectional SO operation."
+    },
+    {
+      "name": "ADI LT8228 RevC",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/lt8228.pdf",
+      "pages": "p24 bidirectional 0–100V current-limit range; p69 full typical application with six protection/main MOSFET positions and dual shunts."
+    },
+    {
+      "name": "LICAP SC0350-270-RSS",
+      "url": "https://www.licaptech.com/pdfs/datasheets/ultracapacitors/60862a8f5979e5f969df83ba_LICAP_SC0350_270_RSS_Datasheet_061120.pdf",
+      "pages": "Use 350F nominal, 0/+20% capacitance tolerance and 2.7V maximum cell rating as design inputs; 65°C maximum cell operating temperature. Do not reinterpret 34Arms at ΔT=40°C as a 60°C ambient continuous rating."
+    }
+  ],
+  "later_human_validation_not_blocking_schematic": "No PCB or firmware performed. Validate 0V boot/scan sequencing, alert polarity/OV hard inhibit, startup below2.7V at every cell, max actual cap current including SO offset and shunt tolerances, 0–60°C cell temperature rise and repetitive charge duty, 12V_DRV transient/power budget, SC_MINUS/GND_SYS common-mode/no-shunt-bypass, watchdog WDI timing at all corners, and the shared gate readback/logic voltage noise margin."
+}
