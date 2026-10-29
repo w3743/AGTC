@@ -1,0 +1,44 @@
+{
+  "status": "SIMPLIFIED_GATE_NETWORK_NOT_ADI_MODEL",
+  "cases": [
+    {
+      "bst_C_nF": 500,
+      "assumed_constant_pump_uA": 0,
+      "time_to_8V_s": 0.000587224871,
+      "gate_before_off_V": 9.27298905,
+      "bst_before_off_V": 9.37320257,
+      "gate_falls_to_1V_after_input_s": 3.328400000001362e-07
+    },
+    {
+      "bst_C_nF": 500,
+      "assumed_constant_pump_uA": 15,
+      "time_to_8V_s": 0.000585124871,
+      "gate_before_off_V": 9.32041765,
+      "bst_before_off_V": 9.43004215,
+      "gate_falls_to_1V_after_input_s": 3.328400000001362e-07
+    },
+    {
+      "bst_C_nF": 1000,
+      "assumed_constant_pump_uA": 0,
+      "time_to_8V_s": 0.0005532248709999999,
+      "gate_before_off_V": 9.56812825,
+      "bst_before_off_V": 9.67672079,
+      "gate_falls_to_1V_after_input_s": 3.328400000001362e-07
+    },
+    {
+      "bst_C_nF": 1000,
+      "assumed_constant_pump_uA": 15,
+      "time_to_8V_s": 0.000552424871,
+      "gate_before_off_V": 9.592456,
+      "bst_before_off_V": 9.70590247,
+      "gate_falls_to_1V_after_input_s": 3.328400000001362e-07
+    }
+  ],
+  "assumptions": [
+    "TS固定0V；BST初始10V、0或15µA恒流假设，不模拟限压/预充/UVLO/延迟。手册15µA指标条件为TS=20V、BST−TS=10V，不能当成此TS=0V工况的保证。",
+    "上拉7Ω和下拉4Ω取手册12V条件下最大值、外串10k和1M栅源；直接套用BST=10V无保证。",
+    "两MOS总典型Qg约321nC换算常数电容32.1nF，不代表非线性Qg、Miller平台或极限值",
+    "输入理想互补开关，不验证LTC实际逻辑、驱动电源骤降、MOS短路电流或电感能量"
+  ],
+  "interpretation": "8V和1V仅为波形比较点，不代表MOS导通/关断额定阈值。"
+}

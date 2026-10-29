@@ -1,0 +1,42 @@
+Post-isolation freewheel clamp; 12p8uH_Ip80A
+* Current reference: positive i(Lmain_a) flows SW -> SC_FUSED.
+* Isolation MOS channels are already off; only QH/QL body diodes remain.
+* The SC storage stack is disconnected. No pack source: 5.4 mF alone absorbs L energy.
+.include "ST_POWER_SCHOTTKY_V10.LIB"
+.temp 25
+.param L_TOTAL=1.28e-05
+.param I0=80
+.param SW0=-1.1187
+.options method=gear reltol=1e-5 abstol=1e-10 vntol=1e-8
+.ic V(N_SC_LO)=17.6 V(N_SC_HI)=37.8 V(N_QH_BODY)=37.8 V(N_QL_BODY)={SW0}
+
+C_BUS BUS 0 5.4m IC=37.8
+C_SC_LOCAL SC_FUSED 0 3.2u IC=17.6
+R_L_DCR LDCR SC_FUSED 2.23m
+L_MAIN_A SW LMID {L_TOTAL/2} IC={I0}
+L_MAIN_B LMID LDCR {L_TOTAL/2} IC={I0}
+
+* STPS30100ST vendor subcircuit pins: 1=A, 2=K, 3=A.
+* V_SC_LO and V_SC_HI are zero-volt current probes in the diode branches.
+X_D_SC_LO 0 N_SC_LO 0 STPS30100ST
+V_SC_LO N_SC_LO SC_FUSED 0
+X_D_SC_HI SC_FUSED N_SC_HI SC_FUSED STPS30100ST
+V_SC_HI N_SC_HI BUS 0
+
+* Explicit generic D-only body-diode equivalents for the off IRLB4030PBF QH/QL.
+* They intentionally contain no MOS channel, Coss, Qrr, package or thermal model.
+D_QH_BODY SW N_QH_BODY D_MOS_BODY
+V_QH_SENSE N_QH_BODY BUS 0
+D_QL_BODY 0 N_QL_BODY D_MOS_BODY
+V_QL_SENSE N_QL_BODY SW 0
+R_SW_NUMERIC_REFERENCE SW 0 1Meg
+.model D_MOS_BODY D(IS=1e-8 N=1.5 RS=3m BV=100 IBV=1m)
+
+.control
+set noaskquit
+set wr_singlescale
+tran 5n 150u 1n 5n uic
+wrdata 12p8uH_Ip80A.txt v(BUS) v(SC_FUSED) v(SW) i(L_MAIN_A) i(V_SC_LO) i(V_SC_HI) i(V_QH_SENSE) i(V_QL_SENSE) v(N_SC_LO) v(N_SC_HI) v(N_QH_BODY) v(N_QL_BODY)
+quit
+.endc
+.end

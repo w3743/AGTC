@@ -1,0 +1,111 @@
+{
+  "status": "PARAMETER_SCREEN_NOT_HARDWARE_OR_STOPPING_QUALIFICATION",
+  "user_reference": "M1A1 1:10 approximate braking comparison",
+  "source_original_author": "USMC MCO8420.13 20Aug1991 Enclosure1 p22",
+  "source_mirror": "https://studylib.net/doc/11034714/mco-8420.13-cbg-20-aug-91",
+  "source_conditions": "13ft/s² from30mph to maximum on dry, level, paved roads; not a direct 15km/h model measurement",
+  "chosen_comparison_deceleration_m_s2": 3.9624,
+  "geometric_scale": 0.1,
+  "similarity_inference": {
+    "length_ratio": 0.1,
+    "speed_and_time_ratio": 0.31622776601683794,
+    "acceleration_ratio": 1.0
+  },
+  "cases": [
+    {
+      "effective_inertial_mass_factor_assumption": 1.0,
+      "actual_vehicle_mass_kg": 30.0,
+      "effective_mass_kg": 30.0,
+      "stop_time_s": 1.051551248401642,
+      "stop_distance_m": 2.1907317675034212,
+      "kinetic_energy_J": 260.41666666666674,
+      "initial_mechanical_power_W": 495.3,
+      "mean_mechanical_power_W": 247.65,
+      "required_grip_coefficient_level_assuming_no_weight_transfer": 0.40405235223037433,
+      "central_dump_Rmax_at22_5V_ohm": 1.0221078134463961,
+      "one_ohm_min_voltage_for_peak_V": 22.366336311519596,
+      "note": "Factors above1 are sensitivity assumptions, not known rotating inertia."
+    },
+    {
+      "effective_inertial_mass_factor_assumption": 1.5,
+      "actual_vehicle_mass_kg": 30.0,
+      "effective_mass_kg": 45.0,
+      "stop_time_s": 1.051551248401642,
+      "stop_distance_m": 2.1907317675034212,
+      "kinetic_energy_J": 390.625,
+      "initial_mechanical_power_W": 742.95,
+      "mean_mechanical_power_W": 371.475,
+      "required_grip_coefficient_level_assuming_no_weight_transfer": 0.6060785283455614,
+      "central_dump_Rmax_at22_5V_ohm": 0.681405208964264,
+      "one_ohm_min_voltage_for_peak_V": 27.393055689353094,
+      "note": "Factors above1 are sensitivity assumptions, not known rotating inertia."
+    },
+    {
+      "effective_inertial_mass_factor_assumption": 2.0,
+      "actual_vehicle_mass_kg": 30.0,
+      "effective_mass_kg": 60.0,
+      "stop_time_s": 1.051551248401642,
+      "stop_distance_m": 2.1907317675034212,
+      "kinetic_energy_J": 520.8333333333335,
+      "initial_mechanical_power_W": 990.6,
+      "mean_mechanical_power_W": 495.3,
+      "required_grip_coefficient_level_assuming_no_weight_transfer": 0.8081047044607487,
+      "central_dump_Rmax_at22_5V_ohm": 0.5110539067231981,
+      "one_ohm_min_voltage_for_peak_V": 31.63077615234884,
+      "note": "Factors above1 are sensitivity assumptions, not known rotating inertia."
+    }
+  ],
+  "initial_charge_20A": [
+    {
+      "single_C_F": 280,
+      "pack_C_F": 35.0,
+      "time_to17_6V_s": 30.8,
+      "pack_stored_energy_at17_6V_J": 5420.800000000001
+    },
+    {
+      "single_C_F": 350,
+      "pack_C_F": 43.75,
+      "time_to17_6V_s": 38.50000000000001,
+      "pack_stored_energy_at17_6V_J": 6776.000000000001
+    },
+    {
+      "single_C_F": 420,
+      "pack_C_F": 52.5,
+      "time_to17_6V_s": 46.2,
+      "pack_stored_energy_at17_6V_J": 8131.200000000002
+    }
+  ],
+  "cap_standby_headroom_J": [
+    {
+      "single_C_F": 280,
+      "energy_2_2_to2_45_cell_V_J": 1302.0000000000007
+    },
+    {
+      "single_C_F": 350,
+      "energy_2_2_to2_45_cell_V_J": 1627.5000000000007
+    },
+    {
+      "single_C_F": 420,
+      "energy_2_2_to2_45_cell_V_J": 1953.000000000001
+    }
+  ],
+  "central_existing_1_8ohm": {
+    "power_at22_5V_W": 281.25,
+    "power_at37_8V_W": 793.7999999999998,
+    "verdict": "Insufficient alone for base495W peak at low bus; FOC BOV asserts Break, cannot assume active braking continues after trigger."
+  },
+  "braking_power_allocation": "Do not count FOC BOV dump into normal CAN sink budget. Continue active FOC braking into qualified central dump/SC/battery headroom. CCL0 is not physical isolation or a stop command.",
+  "not_frozen": [
+    "rotating inertia",
+    "actual mass/load",
+    "grip and weight transfer",
+    "repetition/downhill envelope",
+    "low-speed torque and parking",
+    "full central resistor MPN/pulse/thermal/quote",
+    "BMS source response and transient net charge",
+    "bus>37.8V all-module compatibility"
+  ],
+  "arithmetic_checks": {
+    "energy_equals_integral_triangular_power": true
+  }
+}

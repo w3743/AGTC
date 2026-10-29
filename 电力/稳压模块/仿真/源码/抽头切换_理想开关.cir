@@ -1,0 +1,22 @@
+* Ideal mux on resistance 4.5 ohm: alternate 16V and 2V cumulative taps.
+* Does not include TMUX charge injection, ADC sampling capacitor, leakage or MCU firmware.
+Vhi high 0 16
+Vlo low 0 2
+Rhi1 high th 68k
+Rlo1 th 0 10k
+Rhi2 low tl 68k
+Rlo2 tl 0 10k
+Vch ch 0 PULSE(0 3.3 1u 1n 1n 59u 200u)
+Vcl cl 0 PULSE(0 3.3 61u 1n 1n 59u 200u)
+Shi th adc ch 0 mux
+Slo tl adc cl 0 mux
+.model mux SW(Ron=4.5 Roff=1e12 Vt=1.65 Vh=0)
+Rpd adc 0 10k
+Cfilter adc 0 1n
+.control
+set noaskquit
+tran 50n 120u 0 50n
+wrdata mux_wave.txt v(ch) v(cl) v(adc)
+quit
+.endc
+.end

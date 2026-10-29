@@ -1,0 +1,6427 @@
+{
+  "schema_version": 1,
+  "title": "稳压模块最终逐针连接合同",
+  "date": "2026-10-29",
+  "status": "APPLIED_NATIVE_PIN_ACCEPTANCE_PASS_DRC_ONE_BOUNDARY_WARNING",
+  "basis": "目标逐针合同已应用到原生原理图，保存重开后官方网表及NC标记核对通过；DRC保留BUS_SOURCE单端边界警告。",
+  "sources": [
+    {
+      "description": "selected adopted parts BOM",
+      "path": "电力/稳压模块/原理图准备/选型BOM.csv",
+      "sha256": "3fedc4abd29a4dce8e60c6cc8812bc54d5d5e0290b2a044710bf0ecc2b805539"
+    },
+    {
+      "description": "approved selected instance/count ledger",
+      "path": "电力/稳压模块/检查/最终选型清单.json",
+      "sha256": "da47e695893056feab86f6a64ad5c5633a1d3644dc6df5b651e1c8a495d64cf1"
+    },
+    {
+      "description": "original official netlist before this reconnection",
+      "path": "电力/稳压模块/检查/接线前网表基线.enet",
+      "sha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70"
+    },
+    {
+      "description": "WeAct Normal QFN48 V1.0 manufacturer schematic",
+      "path": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+      "sha256": "57eca2e3467abd45bd6d4bc993eb11e9c83389a7c390da2543c3f20cfc2c640d"
+    },
+    {
+      "description": "TI TMUX1511 official datasheet",
+      "path": "电力/稳压模块/参考资料/TMUX1511_Official.pdf",
+      "sha256": "04291b41a68347fedbbb0776aa44f500eaca65f2ca3af0e022ee60d41c7b1e9f"
+    },
+    {
+      "description": "approved driver and dump physical pin evidence",
+      "path": "电力/稳压模块/检查/驱动关断隔离与硬件dump最终选型核算.json",
+      "sha256": "bbcc4b619752a5fe48dcca7d99efca57aa5d1f73513bc02290e087ac550948ac"
+    },
+    {
+      "description": "Hi-Link official UR(A)B_YMD-10WR3 V1.7, module pin function and six-pin package view (p.5)",
+      "path": "电力/稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+      "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d"
+    }
+  ],
+  "pin_semantics": {
+    "NET": "物理脚连接到net字段所列网名。",
+    "NC": "该物理脚单独悬空；net为null；不与其他NC脚短接。",
+    "core_header_view": "WeAct官方V1.0原理图中的P1/P2编号，pin 1在左列顶部；奇数脚自上而下沿左列，偶数脚自上而下沿右列。",
+    "package_contact_note": "多脚并联焊盘按每个实际引脚号码分别列出；封装端子名含TAB表示该引脚与外露散热片为同一电气节点。",
+    "power_module_pin_source": "Hi-Link manufacturer drawing identifies single-output pins 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL; pin 6 is left floating per the selected auto-enable interface. PSU5_EXT官方5脚符号不包含空脚位置4；U_AUX1现有6脚载体的4脚仍明确NC。"
+  },
+  "scope": {
+    "selected_BOM_rows": 171,
+    "components_array_count": 170,
+    "excluded_non_PCB_assembly_ref": "COREBOARD_WEACT",
+    "excluded_reason": "WeAct核心板为插接式外部模块，主板上实体的J_CORE_P1/J_CORE_P2已逐针列出，核心板不作为重复的PCB元件。",
+    "included_scopes": {
+      "ON_BOARD": 158,
+      "ON_BOARD_MODULE_ASSEMBLY": 1,
+      "BOARD_INTERFACE_PACKAGE_PENDING": 4,
+      "OFF_BOARD_EXTERNAL": 7
+    },
+    "note": "OFF_BOARD_EXTERNAL及BOARD_INTERFACE_PACKAGE_PENDING条目保留为网表/接口合同；这不表示它们是主板上器件。J_5V_EXT等连接器型号待定仅影响封装，不改变本合同的物理脚编号和net。"
+  },
+  "components": [
+    {
+      "ref": "C_12V_IN",
+      "manufacturer_part": "CGA9N3X7S2A106M230KB",
+      "supplier_part": "C2168351",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C2220"
+    },
+    {
+      "ref": "C_12V_IN_HF",
+      "manufacturer_part": "C2225C104K1RACTU",
+      "supplier_part": "C2411772",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET(基美)",
+      "footprint": "C2225"
+    },
+    {
+      "ref": "C_12V_OUT",
+      "manufacturer_part": "RYHT25V10UF5*8",
+      "supplier_part": "C48970488",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HONOR(荣誉)",
+      "footprint": "CAP-TH_BD5.0-P2.00-D0.5-FD"
+    },
+    {
+      "ref": "C_12V_OUT_HF",
+      "manufacturer_part": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BAL1",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BAL2",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BAL3",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BAL4",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BAL5",
+      "manufacturer_part": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_BUS_ADC",
+      "manufacturer_part": "CC0805CG100V102GN",
+      "supplier_part": "C54157534",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_ADC_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TORCH(火炬)",
+      "footprint": "C0805"
+    },
+    {
+      "ref": "C_BUS_BULK1",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_BULK2",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_BULK3",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_BULK4",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_BULK5",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_BULK6",
+      "manufacturer_part": "PEH226NL3900QE4",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目候选_PEH226ML3900QE4_径向直立_15p24"
+    },
+    {
+      "ref": "C_BUS_FILM1",
+      "manufacturer_part": "R76IR4220SE40J",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目封装_薄膜电容_27点5毫米"
+    },
+    {
+      "ref": "C_BUS_FILM2",
+      "manufacturer_part": "R76IR4220SE40J",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目封装_薄膜电容_27点5毫米"
+    },
+    {
+      "ref": "C_BUS_FILM3",
+      "manufacturer_part": "R76IR4220SE40J",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET",
+      "footprint": "项目封装_薄膜电容_27点5毫米"
+    },
+    {
+      "ref": "C_BUS_HF",
+      "manufacturer_part": "C3225X7R2A105K200AA",
+      "supplier_part": "C2167578",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C1210"
+    },
+    {
+      "ref": "C_CAN1",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_DRV_BOOT",
+      "manufacturer_part": "C3216X7R1E105K160AA",
+      "supplier_part": "C3869375",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BOOT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C1206"
+    },
+    {
+      "ref": "C_DRV_CSAREF",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_DRV_GVDD",
+      "manufacturer_part": "RYHT25V10UF5*8",
+      "supplier_part": "C48970488",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HONOR(荣誉)",
+      "footprint": "CAP-TH_BD5.0-P2.00-D0.5-FD"
+    },
+    {
+      "ref": "C_DRV_GVDD_HF",
+      "manufacturer_part": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_DRV_SO",
+      "manufacturer_part": "C1608C0G1H101J080AE",
+      "supplier_part": "C3848670",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "IMON_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_DRV_VDRAIN",
+      "manufacturer_part": "C2225C104K1RACTU",
+      "supplier_part": "C2411772",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "KEMET(基美)",
+      "footprint": "C2225"
+    },
+    {
+      "ref": "C_DUMP_DRV_BULK",
+      "manufacturer_part": "C3216X7R1E105K160AA",
+      "supplier_part": "C3869375",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C1206"
+    },
+    {
+      "ref": "C_DUMP_DRV_HF",
+      "manufacturer_part": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_NTC_DUMP",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_NTC_MAIN",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_NTC_SC",
+      "manufacturer_part": "0603B104K160NT",
+      "supplier_part": "C2846678",
+      "scope": "ON_BOARD",
+      "action": "REPLACE_SAME_QUANTITY",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_SC",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_SC_BULK",
+      "manufacturer_part": "RYHG35V100UF6*8",
+      "supplier_part": "C48970442",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HONOR(荣誉)",
+      "footprint": "CAP-TH_BD6.3-P2.5-D0.6-FD-RYHG35V100UF"
+    },
+    {
+      "ref": "C_SC_BULK2",
+      "manufacturer_part": "RYHG35V100UF6*8",
+      "supplier_part": "C48970442",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HONOR(荣誉)",
+      "footprint": "CAP-TH_BD6.3-P2.5-D0.6-FD-RYHG35V100UF"
+    },
+    {
+      "ref": "C_SC_HF",
+      "manufacturer_part": "C3225X7R2A105K200AA",
+      "supplier_part": "C2167578",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C1210"
+    },
+    {
+      "ref": "C_SC_OV_VDD",
+      "manufacturer_part": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C0603"
+    },
+    {
+      "ref": "C_T1_FILTER",
+      "manufacturer_part": "CC0805CG100V102GN",
+      "supplier_part": "C54157534",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TORCH(火炬)",
+      "footprint": "C0805"
+    },
+    {
+      "ref": "C_T2_FILTER",
+      "manufacturer_part": "CC0805CG100V102GN",
+      "supplier_part": "C54157534",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TORCH(火炬)",
+      "footprint": "C0805"
+    },
+    {
+      "ref": "C_T3_FILTER",
+      "manufacturer_part": "CC0805CG100V102GN",
+      "supplier_part": "C54157534",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_OV_DIV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TORCH(火炬)",
+      "footprint": "C0805"
+    },
+    {
+      "ref": "D_BUS_TVS",
+      "manufacturer_part": "SMCJ43A",
+      "supplier_part": "C967183",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Boarden(宝宫)",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD"
+    },
+    {
+      "ref": "D_CAN_TVS",
+      "manufacturer_part": "SM24CANB-02HTG",
+      "supplier_part": "C151237",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "CANH",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "CANL",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "3",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Littelfuse(美国力特)",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR"
+    },
+    {
+      "ref": "J_CAN",
+      "manufacturer_part": "B3B-XH-A(LF)(SN)",
+      "supplier_part": "C144394",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "CANH",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "3",
+          "net": "CANL",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "JST",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P"
+    },
+    {
+      "ref": "J_CAN_TERM",
+      "manufacturer_part": "2541WV-2X01P",
+      "supplier_part": "C41430884",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "CANH",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "TERM_IN",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HanElectricity(瀚源)",
+      "footprint": "HDR-TH_2541WV-2X01P"
+    },
+    {
+      "ref": "J_CORE_P1",
+      "manufacturer_part": "JXT-PM2.54-2X12P-A9",
+      "supplier_part": "C54803369",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "VCC",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "VCC",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "PB12",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "PB13",
+          "net": "PWM_L",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "PB14",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "PB15",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "PC6",
+          "net": "MUX_SEL1",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "PA8",
+          "net": "PWM_H",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "PA9",
+          "net": "PA9_TIM1_CH2",
+          "connection": "NET"
+        },
+        {
+          "number": "12",
+          "name": "PA10",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "PA11",
+          "net": "CAN_RX",
+          "connection": "NET"
+        },
+        {
+          "number": "14",
+          "name": "PA12",
+          "net": "CAN_TX",
+          "connection": "NET"
+        },
+        {
+          "number": "15",
+          "name": "PA15",
+          "net": "MUX_SEL2",
+          "connection": "NET"
+        },
+        {
+          "number": "16",
+          "name": "PC10",
+          "net": "MUX_SEL3",
+          "connection": "NET"
+        },
+        {
+          "number": "17",
+          "name": "PC11",
+          "net": "MUX_SEL4",
+          "connection": "NET"
+        },
+        {
+          "number": "18",
+          "name": "PB3",
+          "net": "MUX_SEL5",
+          "connection": "NET"
+        },
+        {
+          "number": "19",
+          "name": "PB4",
+          "net": "MUX_SEL6",
+          "connection": "NET"
+        },
+        {
+          "number": "20",
+          "name": "PB5",
+          "net": "MUX_SEL7",
+          "connection": "NET"
+        },
+        {
+          "number": "21",
+          "name": "PB6",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "22",
+          "name": "PB7",
+          "net": "DUMP_PWM",
+          "connection": "NET"
+        },
+        {
+          "number": "23",
+          "name": "PB8_BOOT0",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "24",
+          "name": "PB9",
+          "net": "MUX_SEL8",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "JXTCONN(聚兴泰)",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2"
+    },
+    {
+      "ref": "J_CORE_P2",
+      "manufacturer_part": "JXT-PM2.54-2X12P-A9",
+      "supplier_part": "C54803369",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "3.3V",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "3.3V",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "PB10",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "6",
+          "name": "PB11",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "PB2",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "8",
+          "name": "VREF+",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "9",
+          "name": "PB0",
+          "net": "BUS_ADC",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "PB1",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "PA7",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        {
+          "number": "12",
+          "name": "PC4",
+          "net": "NTC_SC",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "PA5",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "14",
+          "name": "PA6",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "15",
+          "name": "PA3",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "16",
+          "name": "PA4",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "17",
+          "name": "PA1",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "18",
+          "name": "PA2",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "19",
+          "name": "NRST",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "20",
+          "name": "PA0",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        {
+          "number": "21",
+          "name": "PC14",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "22",
+          "name": "PC15",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "23",
+          "name": "VB",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "24",
+          "name": "PC13",
+          "net": null,
+          "connection": "NC"
+        }
+      ],
+      "manufacturer": "JXTCONN(聚兴泰)",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2"
+    },
+    {
+      "ref": "J_NTC_DUMP",
+      "manufacturer_part": "2541WV-2X01P",
+      "supplier_part": "C41430884",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HanElectricity(瀚源)",
+      "footprint": "HDR-TH_2541WV-2X01P"
+    },
+    {
+      "ref": "J_NTC_MAIN",
+      "manufacturer_part": "2541WV-2X01P",
+      "supplier_part": "C41430884",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HanElectricity(瀚源)",
+      "footprint": "HDR-TH_2541WV-2X01P"
+    },
+    {
+      "ref": "J_NTC_SC",
+      "manufacturer_part": "2541WV-2X01P",
+      "supplier_part": "C41430884",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_SC",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HanElectricity(瀚源)",
+      "footprint": "HDR-TH_2541WV-2X01P"
+    },
+    {
+      "ref": "J_SC_TAPS",
+      "manufacturer_part": "B9B-XH-A(LF)(SN)",
+      "supplier_part": "C157966",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T1",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "3",
+          "net": "T2",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "4",
+          "net": "T3",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "5",
+          "net": "T4",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "6",
+          "net": "T5",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "7",
+          "net": "T6",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "8",
+          "net": "T7",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "9",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "JST",
+      "footprint": "CONN-TH_B9B-XH-A-LF-SN"
+    },
+    {
+      "ref": "L_MAIN_A",
+      "manufacturer_part": "IHXL2000VZEB100M3A",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SW",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "L_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Vishay",
+      "footprint": "IHXL2000VZEB100M3A_CANDIDATE"
+    },
+    {
+      "ref": "L_MAIN_B",
+      "manufacturer_part": "IHXL2000VZEB100M3A",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "L_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Vishay",
+      "footprint": "IHXL2000VZEB100M3A_CANDIDATE"
+    },
+    {
+      "ref": "Q_DUMP",
+      "manufacturer_part": "IRLB4030PBF",
+      "supplier_part": "C2663",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "G",
+          "net": "GATE_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "D",
+          "net": "DUMP_SW",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "S",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Infineon(英飞凌)",
+      "footprint": "TO-220-3_L10.0-W4.5-P2.54-T"
+    },
+    {
+      "ref": "Q_MAIN_H",
+      "manufacturer_part": "IRLB4030PBF",
+      "supplier_part": "C2663",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "G",
+          "net": "GATE_H",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "D",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "S",
+          "net": "SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Infineon(英飞凌)",
+      "footprint": "TO-220-3_L10.0-W4.5-P2.54-T"
+    },
+    {
+      "ref": "Q_MAIN_L",
+      "manufacturer_part": "IRLB4030PBF",
+      "supplier_part": "C2663",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "G",
+          "net": "GATE_L",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "D",
+          "net": "SW",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "S",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Infineon(英飞凌)",
+      "footprint": "TO-220-3_L10.0-W4.5-P2.54-T"
+    },
+    {
+      "ref": "Q_PMOS_CTRL",
+      "manufacturer_part": "MMBT5551",
+      "supplier_part": "C408396",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "B",
+          "net": "DUMP_HW_BASE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "E",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "C",
+          "net": "DUMP_OFF",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "MDD(辰达半导体)",
+      "footprint": "SOT-23-3_L2.9-W1.6-P1.90-LS2.8-BR"
+    },
+    {
+      "ref": "R_BAL1",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL2",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T1",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL3",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T3",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T2",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL4",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T4",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T3",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL5",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T4",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL6",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T6",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T5",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL7",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T7",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T6",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BAL8",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T7",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_BUS_HI",
+      "manufacturer_part": "RT1206BRD07150KL",
+      "supplier_part": "C728671",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_HI_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_ADC_SOURCE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R1206"
+    },
+    {
+      "ref": "R_BUS_HI2",
+      "manufacturer_part": "RT1206BRD07150KL",
+      "supplier_part": "C728671",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_HI_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R1206"
+    },
+    {
+      "ref": "R_BUS_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_ADC_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_CAN_TERM",
+      "manufacturer_part": "MFR25SFRE52-120R",
+      "supplier_part": "C1744031",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "TERM_IN",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "CANL",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5"
+    },
+    {
+      "ref": "R_DRV_DT",
+      "manufacturer_part": "RMC06033.3K1%N",
+      "supplier_part": "C269710",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_DT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_FAULT_PD",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_GAIN",
+      "manufacturer_part": "RMC060330K1%N",
+      "supplier_part": "C269901",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_GAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_GH_SER",
+      "manufacturer_part": "CRCW25122R20FKEGHP",
+      "supplier_part": "C4168885",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_GH",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GATE_H",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "VISHAY(威世)",
+      "footprint": "R2512"
+    },
+    {
+      "ref": "R_DRV_GL_SER",
+      "manufacturer_part": "CRCW25122R20FKEGHP",
+      "supplier_part": "C4168885",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_GL",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GATE_L",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "VISHAY(威世)",
+      "footprint": "R2512"
+    },
+    {
+      "ref": "R_DRV_ID1",
+      "manufacturer_part": "HoLTT0603-1/10W-5.6K-1%",
+      "supplier_part": "C2904527",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_ID1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Milliohm(毫欧)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_ID2",
+      "manufacturer_part": "HoLTT0603-1/10W-5.6K-1%",
+      "supplier_part": "C2904527",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_ID2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Milliohm(毫欧)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_SO_SER",
+      "manufacturer_part": "RMC0603221%N",
+      "supplier_part": "C269708",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_SO",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "IMON_SOURCE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DRV_VDSLVL",
+      "manufacturer_part": "RMC060327K1%N",
+      "supplier_part": "C325610",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_VDS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_GATE_PD",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "GATE_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_IN_PD",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DUMP_SW_BASE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_IN_SER",
+      "manufacturer_part": "RC0603FR-07100RL",
+      "supplier_part": "C105588",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DUMP_PWM",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_PWM_LIMIT",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_OH",
+      "manufacturer_part": "RC0603FR-0710RL",
+      "supplier_part": "C109318",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "UCC_OUT_H",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GATE_DUMP",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_OL",
+      "manufacturer_part": "RC0603FR-0710RL",
+      "supplier_part": "C109318",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "UCC_OUT_L",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GATE_DUMP",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_NTC_DUMP_PU",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_NTC_MAIN_PU",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_NTC_SC_PU",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "NTC_SC",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PB5_PERMIT",
+      "manufacturer_part": "RMC06031K1%N",
+      "supplier_part": "C269704",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PB6_BASE",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_OV_OUT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_HW_BASE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PWM_H_PD",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_INH",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PWM_H_SER",
+      "manufacturer_part": "RC0603FR-07100RL",
+      "supplier_part": "C105588",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "PWM_H",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DRV_INH",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PWM_L_PD",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DRV_INL",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_PWM_L_SER",
+      "manufacturer_part": "RC0603FR-07100RL",
+      "supplier_part": "C105588",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "PWM_L",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DRV_INL",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_QH_GS",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "GATE_H",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_QL_GS",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "GATE_L",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_QP_BE",
+      "manufacturer_part": "RMC0603100K1%N",
+      "supplier_part": "C269699",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DUMP_HW_BASE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_QP_COL",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_OFF",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_QP_GS",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL8",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_SC_OV_BOT",
+      "manufacturer_part": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "supplier_part": "C5123581",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_OV_DIV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Milliohm(毫欧)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_SC_OV_TOP1",
+      "manufacturer_part": "PTFR0805B255KP9",
+      "supplier_part": "C2849126",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_OV_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_SC_OV_TOP2",
+      "manufacturer_part": "PTFR0805B255KP9",
+      "supplier_part": "C2849126",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_OV_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_OV_DIV",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_SC_SHUNT",
+      "manufacturer_part": "HoLRS2512-6W-0.5mR-1%",
+      "supplier_part": "C55113221",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Milliohm(毫欧)",
+      "footprint": "RES-SMD_L6.3-W3.2_R2512"
+    },
+    {
+      "ref": "R_T1_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T1",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T1_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T1_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T2_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T2",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T2_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T2_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T3_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T3",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T3",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T3_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T3",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T3_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL3",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T4_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T4",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T4",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T4_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T4",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T4_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL4",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T5_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T5",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T5_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T5_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T6_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T6",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T6",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T6_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T6",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T6_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL6",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T7_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T7",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T7",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T7_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T7",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_T7_TEST",
+      "manufacturer_part": "RS-03K4702FT",
+      "supplier_part": "C136590",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "MUX_SEL7",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T8_HI",
+      "manufacturer_part": "RT0603BRD0768KL",
+      "supplier_part": "C705793",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "AD_T8",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_T8_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "AD_T8",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_TEST_HI",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_ADC",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_TEST_LO",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "SC1",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC2",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T1",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC3",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T3",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T2",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC4",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T4",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T3",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC5",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T4",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC6",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T6",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T5",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC7",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "T7",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T6",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "SC8",
+      "manufacturer_part": "SC0350-270-RSS",
+      "supplier_part": "",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "T7",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "LICAP Technologies",
+      "footprint": "LICAP_SC0350-270-RSS_USER"
+    },
+    {
+      "ref": "U1",
+      "manufacturer_part": "DRV8161DGSR",
+      "supplier_part": "C43985204",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "DT/MODE",
+          "net": "DRV_DT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "INH/IN",
+          "net": "DRV_INH",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "INL/EN",
+          "net": "DRV_INL",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "nFAULT/nDRVOFF",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "VDSLVL",
+          "net": "DRV_VDS",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "CSAREF",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "SO",
+          "net": "DRV_SO",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "CSAGAIN",
+          "net": "DRV_GAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "IDRIVE1",
+          "net": "DRV_ID1",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "GVDD",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "IDRIVE2",
+          "net": "DRV_ID2",
+          "connection": "NET"
+        },
+        {
+          "number": "12",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "SN",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        },
+        {
+          "number": "14",
+          "name": "SP",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "15",
+          "name": "SL",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "16",
+          "name": "GL",
+          "net": "DRV_GL",
+          "connection": "NET"
+        },
+        {
+          "number": "17",
+          "name": "GH",
+          "net": "DRV_GH",
+          "connection": "NET"
+        },
+        {
+          "number": "18",
+          "name": "SH",
+          "net": "SW",
+          "connection": "NET"
+        },
+        {
+          "number": "19",
+          "name": "BST",
+          "net": "BOOT",
+          "connection": "NET"
+        },
+        {
+          "number": "20",
+          "name": "VDRAIN",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "VSSOP-20_L5.1-W3.0-P0.50-LS4.9-BL"
+    },
+    {
+      "ref": "U_CAN1",
+      "manufacturer_part": "TCAN332DR",
+      "supplier_part": "C73651",
+      "scope": "ON_BOARD",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "TXD",
+          "net": "CAN_TX",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "VCC",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "RXD",
+          "net": "CAN_RX",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "NC",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "6",
+          "name": "CANL",
+          "net": "CANL",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "CANH",
+          "net": "CANH",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "NC",
+          "net": null,
+          "connection": "NC"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL"
+    },
+    {
+      "ref": "U_DUMP_DRV",
+      "manufacturer_part": "UCC27511ADBVR",
+      "supplier_part": "C2676982",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "VDD",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "OUTH",
+          "net": "UCC_OUT_H",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "OUTL",
+          "net": "UCC_OUT_L",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "IN–",
+          "net": "DUMP_OFF",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "IN+",
+          "net": "12V_DRV",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "SOT-23-6_L2.9-W1.6-P0.95-LS2.9-BL"
+    },
+    {
+      "ref": "U_SC_OV",
+      "manufacturer_part": "TLV6700DDCR",
+      "supplier_part": "C2868382",
+      "scope": "ON_BOARD",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "OUTA",
+          "net": "BUS_OV_OUT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "GND",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "INA+",
+          "net": "BUS_OV_DIV",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "INB-",
+          "net": "SC_OV_DIV",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "VDD",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "OUTB",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR"
+    },
+    {
+      "ref": "U_AUX1",
+      "manufacturer_part": "URB4812YMD-10WR3",
+      "supplier_part": "",
+      "scope": "ON_BOARD_MODULE_ASSEMBLY",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "-Vin",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "+Vin",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "+Vo",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "NP",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "5",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "CTRL",
+          "net": null,
+          "connection": "NC"
+        }
+      ],
+      "manufacturer": "HiLink",
+      "footprint": "项目封装_HiLink_URB_A3"
+    },
+    {
+      "ref": "J_5V_EXT",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": "CONN-TH_2P-P7.62_C9900005791"
+    },
+    {
+      "ref": "J_BUS_POWER",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": "CONN-TH_2P-P7.62_C9900005791"
+    },
+    {
+      "ref": "J_DUMP",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": "CONN-TH_2P-P7.62_C9900005791"
+    },
+    {
+      "ref": "J_SC_POWER",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": "CONN-TH_2P-P7.62_C9900005791"
+    },
+    {
+      "ref": "F_BUS",
+      "manufacturer_part": "AMG-80",
+      "supplier_part": "",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Eaton",
+      "footprint": "F1206"
+    },
+    {
+      "ref": "F_SC",
+      "manufacturer_part": "AMG-80",
+      "supplier_part": "",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Eaton",
+      "footprint": "F1206"
+    },
+    {
+      "ref": "R_DUMP_EXT",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": ""
+    },
+    {
+      "ref": "TH_DUMP",
+      "manufacturer_part": "ATH10K1R8B3950K",
+      "supplier_part": "",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "ATI(恒光)",
+      "footprint": "RES-TH_BD1.8-L3.9-P6.50-D0.5"
+    },
+    {
+      "ref": "TH_MAIN",
+      "manufacturer_part": "MF52A103F3950 (A1)",
+      "supplier_part": "C13879",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "时恒",
+      "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
+    },
+    {
+      "ref": "TH_SC",
+      "manufacturer_part": "MF52A103F3950 (A1)",
+      "supplier_part": "C13879",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "RETAIN",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "NTC_SC",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "时恒",
+      "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
+    },
+    {
+      "ref": "PSU5_EXT",
+      "manufacturer_part": "URB4805YMD-10WR3",
+      "supplier_part": "C5365326",
+      "scope": "OFF_BOARD_EXTERNAL",
+      "action": "REWIRE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "-Vin",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "+Vin",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "+Vo",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "CTRL",
+          "net": null,
+          "connection": "NC"
+        }
+      ],
+      "manufacturer": "HI-LINK(海凌科)",
+      "footprint": "",
+      "omitted_reserved_positions": [
+        {
+          "number": "4",
+          "manufacturer_function": "NP / 空脚",
+          "reason": "官方HI-LINK C5365326库符号仅列1/2/3/5/6功能脚；4位无电气功能，不强造引脚或公共NC网。"
+        }
+      ]
+    },
+    {
+      "ref": "U_CELL_MUX1",
+      "manufacturer_part": "TMUX1511PWR",
+      "supplier_part": "C2866750",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "SEL1",
+          "net": "MUX_SEL1",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "S1",
+          "net": "AD_T1",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "D1",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "SEL2",
+          "net": "MUX_SEL2",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "S2",
+          "net": "AD_T2",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "D2",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "D3",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "S3",
+          "net": "AD_T3",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "SEL3",
+          "net": "MUX_SEL3",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "D4",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "12",
+          "name": "S4",
+          "net": "AD_T4",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "SEL4",
+          "net": "MUX_SEL4",
+          "connection": "NET"
+        },
+        {
+          "number": "14",
+          "name": "VDD",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "TSSOP-14"
+    },
+    {
+      "ref": "U_CELL_MUX2",
+      "manufacturer_part": "TMUX1511PWR",
+      "supplier_part": "C2866750",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "SEL1",
+          "net": "MUX_SEL5",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "S1",
+          "net": "AD_T5",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "D1",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "SEL2",
+          "net": "MUX_SEL6",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "S2",
+          "net": "AD_T6",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "D2",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "D3",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "S3",
+          "net": "AD_T7",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "SEL3",
+          "net": "MUX_SEL7",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "D4",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "12",
+          "name": "S4",
+          "net": "AD_T8",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "SEL4",
+          "net": "MUX_SEL8",
+          "connection": "NET"
+        },
+        {
+          "number": "14",
+          "name": "VDD",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "TSSOP-14"
+    },
+    {
+      "ref": "U_SIGNAL_ISO",
+      "manufacturer_part": "TMUX1511PWR",
+      "supplier_part": "C2866750",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "SEL1",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "S1",
+          "net": "BUS_ADC_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "D1",
+          "net": "BUS_ADC",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "SEL2",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "S2",
+          "net": "IMON_SOURCE",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "D2",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "D3",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "9",
+          "name": "S3",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "SEL3",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "11",
+          "name": "D4",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "12",
+          "name": "S4",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "13",
+          "name": "SEL4",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "14",
+          "name": "VDD",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "TSSOP-14"
+    },
+    {
+      "ref": "U_GATE_OD",
+      "manufacturer_part": "SN74LVC1G07DCKR",
+      "supplier_part": "C7830",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "NC",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "2",
+          "name": "A",
+          "net": "PA9_TIM1_CH2",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "Y",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "VCC",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TI(德州仪器)",
+      "footprint": "SC70-5"
+    },
+    {
+      "ref": "U_ISO_DRV",
+      "manufacturer_part": "LTC7001IMSE#PBF",
+      "supplier_part": "C581062",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "VCC",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "VCCUV",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "INP",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "OVLO",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "TGDN",
+          "net": "ISO_G",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "TGUP",
+          "net": "ISO_TGUP",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "TS",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "BST",
+          "net": "ISO_BST",
+          "connection": "NET"
+        },
+        {
+          "number": "10",
+          "name": "NC",
+          "net": null,
+          "connection": "NC"
+        },
+        {
+          "number": "11",
+          "name": "EP",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "ADI(亚德诺)",
+      "footprint": "MSOP-10-EP"
+    },
+    {
+      "ref": "Q_SC_ISO1",
+      "manufacturer_part": "HYG022N10NS1TA",
+      "supplier_part": "C2925050",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "G",
+          "net": "ISO_G",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "D/TAB",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HUAYI(华羿微)",
+      "footprint": "TOLL"
+    },
+    {
+      "ref": "Q_SC_ISO2",
+      "manufacturer_part": "HYG022N10NS1TA",
+      "supplier_part": "C2925050",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "G",
+          "net": "ISO_G",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "4",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "5",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "6",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "7",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "8",
+          "name": "S",
+          "net": "ISO_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "9",
+          "name": "D/TAB",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "HUAYI(华羿微)",
+      "footprint": "TOLL"
+    },
+    {
+      "ref": "D_SC_LO",
+      "manufacturer_part": "STPS30100ST",
+      "supplier_part": "C172485",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "A",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "K/TAB",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "A",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "ST(意法半导体)",
+      "footprint": "TO-220AB"
+    },
+    {
+      "ref": "D_SC_HI",
+      "manufacturer_part": "STPS30100ST",
+      "supplier_part": "C172485",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "A",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "K/TAB",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "A",
+          "net": "SC_FUSED",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "ST(意法半导体)",
+      "footprint": "TO-220AB"
+    },
+    {
+      "ref": "D_DUMP_FW",
+      "manufacturer_part": "STPS30100ST",
+      "supplier_part": "C172485",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "A",
+          "net": "DUMP_SW",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "K/TAB",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "A",
+          "net": "DUMP_SW",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "ST(意法半导体)",
+      "footprint": "TO-220AB"
+    },
+    {
+      "ref": "Q_DUMP_SW",
+      "manufacturer_part": "MMBT5551",
+      "supplier_part": "C408396",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "B",
+          "net": "DUMP_SW_BASE",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "E",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        {
+          "number": "3",
+          "name": "C",
+          "net": "DUMP_OFF",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "MDD(辰达半导体)",
+      "footprint": "SOT-23-3_L2.9-W1.6-P1.90-LS2.8-BR"
+    },
+    {
+      "ref": "C_ISO_BST",
+      "manufacturer_part": "C3225X7R2A105K200AA",
+      "supplier_part": "C2167578",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "ISO_BST",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "ISO_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "TDK",
+      "footprint": "C1210"
+    },
+    {
+      "ref": "R_ADC_A_PD",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_ADC_B_PD",
+      "manufacturer_part": "PTFR0805B10K0N9",
+      "supplier_part": "C328436",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_ARM_PD",
+      "manufacturer_part": "RMC0603100K1%N",
+      "supplier_part": "C269699",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "PA9_TIM1_CH2",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "GND_SYS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_ISO_GS",
+      "manufacturer_part": "RC0603FR-071ML",
+      "supplier_part": "C105578",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "ISO_G",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "ISO_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_ISO_TGUP",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "ISO_TGUP",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "ISO_G",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_HW_PU",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "12V_DRV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_OV_OUT",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_DUMP_SW_BASE",
+      "manufacturer_part": "RS-03K1002FT",
+      "supplier_part": "C115324",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "DUMP_PWM_LIMIT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "DUMP_SW_BASE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_BUS_OV_TOP1",
+      "manufacturer_part": "PTFR0805B255KP9",
+      "supplier_part": "C2849126",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_EXT",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_OV_MID",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_BUS_OV_TOP2",
+      "manufacturer_part": "PTFR0805B255KP9",
+      "supplier_part": "C2849126",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_OV_MID",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "BUS_OV_DIV",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "RESI(开步睿思)",
+      "footprint": "R0805"
+    },
+    {
+      "ref": "R_BUS_OV_BOT",
+      "manufacturer_part": "RT0603BRD075K11L",
+      "supplier_part": "C705788",
+      "scope": "ON_BOARD",
+      "action": "ADD",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "BUS_OV_DIV",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_MINUS",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "YAGEO(国巨)",
+      "footprint": "R0603"
+    }
+  ],
+  "mcu_gpio_net_mapping": [
+    {
+      "gpio": "PB12",
+      "signal_name": "PB12",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "5",
+      "net": "DRV_FAULT_N",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB13",
+      "signal_name": "PB13",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "6",
+      "net": "PWM_L",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB14",
+      "signal_name": "PB14",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "7",
+      "net": "SC_ADC_A",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB15",
+      "signal_name": "PB15",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "8",
+      "net": "SC_ADC_B",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PC6",
+      "signal_name": "PC6",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "9",
+      "net": "MUX_SEL1",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA8",
+      "signal_name": "PA8",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "10",
+      "net": "PWM_H",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA9",
+      "signal_name": "PA9",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "11",
+      "net": "PA9_TIM1_CH2",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA10",
+      "signal_name": "PA10",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "12",
+      "net": "DRV_FAULT_N",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA11",
+      "signal_name": "PA11",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "13",
+      "net": "CAN_RX",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA12",
+      "signal_name": "PA12",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "14",
+      "net": "CAN_TX",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA15",
+      "signal_name": "PA15",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "15",
+      "net": "MUX_SEL2",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PC10",
+      "signal_name": "PC10",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "16",
+      "net": "MUX_SEL3",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PC11",
+      "signal_name": "PC11",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "17",
+      "net": "MUX_SEL4",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB3",
+      "signal_name": "PB3",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "18",
+      "net": "MUX_SEL5",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB4",
+      "signal_name": "PB4",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "19",
+      "net": "MUX_SEL6",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB5",
+      "signal_name": "PB5",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "20",
+      "net": "MUX_SEL7",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB6",
+      "signal_name": "PB6",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "21",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PB7",
+      "signal_name": "PB7",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "22",
+      "net": "DUMP_PWM",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB8",
+      "signal_name": "PB8_BOOT0",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "23",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PB9",
+      "signal_name": "PB9",
+      "header_ref": "J_CORE_P1",
+      "header_pin": "24",
+      "net": "MUX_SEL8",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB10",
+      "signal_name": "PB10",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "5",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PB11",
+      "signal_name": "PB11",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "6",
+      "net": "NTC_MAIN",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB2",
+      "signal_name": "PB2",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "7",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PB0",
+      "signal_name": "PB0",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "9",
+      "net": "BUS_ADC",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PB1",
+      "signal_name": "PB1",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "10",
+      "net": "IMON",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA7",
+      "signal_name": "PA7",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "11",
+      "net": "IMON",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PC4",
+      "signal_name": "PC4",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "12",
+      "net": "NTC_SC",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA5",
+      "signal_name": "PA5",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "13",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PA6",
+      "signal_name": "PA6",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "14",
+      "net": "DRV_FAULT_N",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA3",
+      "signal_name": "PA3",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "15",
+      "net": "NTC_DUMP",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA4",
+      "signal_name": "PA4",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "16",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PA1",
+      "signal_name": "PA1",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "17",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PA2",
+      "signal_name": "PA2",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "18",
+      "net": "DRV_FAULT_N",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PA0",
+      "signal_name": "PA0",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "20",
+      "net": "IMON",
+      "connection": "NET"
+    },
+    {
+      "gpio": "PC14",
+      "signal_name": "PC14",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "21",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PC15",
+      "signal_name": "PC15",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "22",
+      "net": null,
+      "connection": "NC"
+    },
+    {
+      "gpio": "PC13",
+      "signal_name": "PC13",
+      "header_ref": "J_CORE_P2",
+      "header_pin": "24",
+      "net": null,
+      "connection": "NC"
+    }
+  ],
+  "coreboard_header_pinout_source": {
+    "board": "WeAct Normal STM32G431CBU6 QFN48 V1.0",
+    "source": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+    "headers": {
+      "J_CORE_P1": {
+        "1": {
+          "signal_name": "VCC",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        "2": {
+          "signal_name": "VCC",
+          "net": "5V_EXT",
+          "connection": "NET"
+        },
+        "3": {
+          "signal_name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        "4": {
+          "signal_name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        "5": {
+          "signal_name": "PB12",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        "6": {
+          "signal_name": "PB13",
+          "net": "PWM_L",
+          "connection": "NET"
+        },
+        "7": {
+          "signal_name": "PB14",
+          "net": "SC_ADC_A",
+          "connection": "NET"
+        },
+        "8": {
+          "signal_name": "PB15",
+          "net": "SC_ADC_B",
+          "connection": "NET"
+        },
+        "9": {
+          "signal_name": "PC6",
+          "net": "MUX_SEL1",
+          "connection": "NET"
+        },
+        "10": {
+          "signal_name": "PA8",
+          "net": "PWM_H",
+          "connection": "NET"
+        },
+        "11": {
+          "signal_name": "PA9",
+          "net": "PA9_TIM1_CH2",
+          "connection": "NET"
+        },
+        "12": {
+          "signal_name": "PA10",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        "13": {
+          "signal_name": "PA11",
+          "net": "CAN_RX",
+          "connection": "NET"
+        },
+        "14": {
+          "signal_name": "PA12",
+          "net": "CAN_TX",
+          "connection": "NET"
+        },
+        "15": {
+          "signal_name": "PA15",
+          "net": "MUX_SEL2",
+          "connection": "NET"
+        },
+        "16": {
+          "signal_name": "PC10",
+          "net": "MUX_SEL3",
+          "connection": "NET"
+        },
+        "17": {
+          "signal_name": "PC11",
+          "net": "MUX_SEL4",
+          "connection": "NET"
+        },
+        "18": {
+          "signal_name": "PB3",
+          "net": "MUX_SEL5",
+          "connection": "NET"
+        },
+        "19": {
+          "signal_name": "PB4",
+          "net": "MUX_SEL6",
+          "connection": "NET"
+        },
+        "20": {
+          "signal_name": "PB5",
+          "net": "MUX_SEL7",
+          "connection": "NET"
+        },
+        "21": {
+          "signal_name": "PB6",
+          "net": null,
+          "connection": "NC"
+        },
+        "22": {
+          "signal_name": "PB7",
+          "net": "DUMP_PWM",
+          "connection": "NET"
+        },
+        "23": {
+          "signal_name": "PB8_BOOT0",
+          "net": null,
+          "connection": "NC"
+        },
+        "24": {
+          "signal_name": "PB9",
+          "net": "MUX_SEL8",
+          "connection": "NET"
+        }
+      },
+      "J_CORE_P2": {
+        "1": {
+          "signal_name": "3.3V",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        "2": {
+          "signal_name": "3.3V",
+          "net": "3V3_CORE",
+          "connection": "NET"
+        },
+        "3": {
+          "signal_name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        "4": {
+          "signal_name": "GND",
+          "net": "GND_SYS",
+          "connection": "NET"
+        },
+        "5": {
+          "signal_name": "PB10",
+          "net": null,
+          "connection": "NC"
+        },
+        "6": {
+          "signal_name": "PB11",
+          "net": "NTC_MAIN",
+          "connection": "NET"
+        },
+        "7": {
+          "signal_name": "PB2",
+          "net": null,
+          "connection": "NC"
+        },
+        "8": {
+          "signal_name": "VREF+",
+          "net": null,
+          "connection": "NC"
+        },
+        "9": {
+          "signal_name": "PB0",
+          "net": "BUS_ADC",
+          "connection": "NET"
+        },
+        "10": {
+          "signal_name": "PB1",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        "11": {
+          "signal_name": "PA7",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        "12": {
+          "signal_name": "PC4",
+          "net": "NTC_SC",
+          "connection": "NET"
+        },
+        "13": {
+          "signal_name": "PA5",
+          "net": null,
+          "connection": "NC"
+        },
+        "14": {
+          "signal_name": "PA6",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        "15": {
+          "signal_name": "PA3",
+          "net": "NTC_DUMP",
+          "connection": "NET"
+        },
+        "16": {
+          "signal_name": "PA4",
+          "net": null,
+          "connection": "NC"
+        },
+        "17": {
+          "signal_name": "PA1",
+          "net": null,
+          "connection": "NC"
+        },
+        "18": {
+          "signal_name": "PA2",
+          "net": "DRV_FAULT_N",
+          "connection": "NET"
+        },
+        "19": {
+          "signal_name": "NRST",
+          "net": null,
+          "connection": "NC"
+        },
+        "20": {
+          "signal_name": "PA0",
+          "net": "IMON",
+          "connection": "NET"
+        },
+        "21": {
+          "signal_name": "PC14",
+          "net": null,
+          "connection": "NC"
+        },
+        "22": {
+          "signal_name": "PC15",
+          "net": null,
+          "connection": "NC"
+        },
+        "23": {
+          "signal_name": "VB",
+          "net": null,
+          "connection": "NC"
+        },
+        "24": {
+          "signal_name": "PC13",
+          "net": null,
+          "connection": "NC"
+        }
+      }
+    },
+    "swd_note": "PA13/SWDIO与PA14/SWCLK通过核心板独立P3调试接口使用；未纳入J_CORE_P1/P2且未并入本主板网络。"
+  },
+  "native_delta": {
+    "source_native_component_count": 167,
+    "retired_refs": [
+      "U_BAL1",
+      "U_BAL2",
+      "U_BAL3",
+      "U_BAL4",
+      "U_BAL5",
+      "U_BAL6",
+      "U_BAL7",
+      "U_BAL8",
+      "Q_BUS_P",
+      "D_QP_GS_ZENER",
+      "R_12V_PRELOAD",
+      "C_BAL6",
+      "C_BAL7",
+      "C_BAL8",
+      "C_T4_FILTER",
+      "C_T5_FILTER",
+      "C_T6_FILTER",
+      "C_T7_FILTER",
+      "C_T8_FILTER",
+      "C_TEST_FB"
+    ],
+    "added_board_refs": [
+      "U_CELL_MUX1",
+      "U_CELL_MUX2",
+      "U_SIGNAL_ISO",
+      "U_GATE_OD",
+      "U_ISO_DRV",
+      "Q_SC_ISO1",
+      "Q_SC_ISO2",
+      "D_SC_LO",
+      "D_SC_HI",
+      "D_DUMP_FW",
+      "Q_DUMP_SW",
+      "C_ISO_BST",
+      "R_ADC_A_PD",
+      "R_ADC_B_PD",
+      "R_ARM_PD",
+      "R_ISO_GS",
+      "R_ISO_TGUP",
+      "R_DUMP_HW_PU",
+      "R_DUMP_SW_BASE",
+      "R_BUS_OV_TOP1",
+      "R_BUS_OV_TOP2",
+      "R_BUS_OV_BOT"
+    ],
+    "new_external_reference": "PSU5_EXT",
+    "external_coreboard_not_counted_as_PCB_ref": "COREBOARD_WEACT",
+    "expected_final_netlist_count": 170,
+    "modified_existing_refs": [
+      {
+        "ref": "Q_MAIN_H",
+        "pins": [
+          {
+            "number": "2",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "F_SC",
+        "pins": [
+          {
+            "number": "2",
+            "from": "SC_FUSED",
+            "to": "SC_ISO_STORAGE"
+          }
+        ]
+      },
+      {
+        "ref": "J_SC_POWER",
+        "pins": [
+          {
+            "number": "1",
+            "from": "SC_FUSED",
+            "to": "SC_ISO_STORAGE"
+          }
+        ]
+      },
+      {
+        "ref": "Q_PMOS_CTRL",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PMOS_CTRL_BASE",
+            "to": "DUMP_HW_BASE"
+          },
+          {
+            "number": "3",
+            "from": "PMOS_CTRL_COLLECTOR",
+            "to": "DUMP_OFF"
+          }
+        ]
+      },
+      {
+        "ref": "R_QP_COL",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PMOS_CTRL_COLLECTOR",
+            "to": "12V_DRV"
+          },
+          {
+            "number": "2",
+            "from": "PMOS_GATE",
+            "to": "DUMP_OFF"
+          }
+        ]
+      },
+      {
+        "ref": "R_PB6_BASE",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PMOS_CTRL",
+            "to": "BUS_OV_OUT"
+          },
+          {
+            "number": "2",
+            "from": "PMOS_CTRL_BASE",
+            "to": "DUMP_HW_BASE"
+          }
+        ]
+      },
+      {
+        "ref": "R_QP_BE",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PMOS_CTRL_BASE",
+            "to": "DUMP_HW_BASE"
+          }
+        ]
+      },
+      {
+        "ref": "R_QP_GS",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PMOS_GATE",
+            "to": "MUX_SEL8"
+          },
+          {
+            "number": "2",
+            "from": "BUS_BR",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BUS_HF",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "C_SC_BULK",
+        "pins": [
+          {
+            "number": "1",
+            "from": "SC_FUSED",
+            "to": "SC_ISO_STORAGE"
+          }
+        ]
+      },
+      {
+        "ref": "C_SC_BULK2",
+        "pins": [
+          {
+            "number": "1",
+            "from": "SC_FUSED",
+            "to": "SC_ISO_STORAGE"
+          }
+        ]
+      },
+      {
+        "ref": "C_SC_HF",
+        "pins": [
+          {
+            "number": "2",
+            "from": "SC_MINUS",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BUS_FILM1",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "C_BUS_FILM2",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "C_BUS_FILM3",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_BR",
+            "to": "SC_FUSED"
+          }
+        ]
+      },
+      {
+        "ref": "U1",
+        "pins": [
+          {
+            "number": "20",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "R_PB5_PERMIT",
+        "pins": [
+          {
+            "number": "1",
+            "from": "PERMIT",
+            "to": "3V3_CORE"
+          }
+        ]
+      },
+      {
+        "ref": "R_DRV_SO_SER",
+        "pins": [
+          {
+            "number": "2",
+            "from": "IMON",
+            "to": "IMON_SOURCE"
+          }
+        ]
+      },
+      {
+        "ref": "C_DRV_SO",
+        "pins": [
+          {
+            "number": "1",
+            "from": "IMON",
+            "to": "IMON_SOURCE"
+          }
+        ]
+      },
+      {
+        "ref": "C_DRV_VDRAIN",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_BR",
+            "to": "BUS_EXT"
+          }
+        ]
+      },
+      {
+        "ref": "U_SC_OV",
+        "pins": [
+          {
+            "number": "1",
+            "from": null,
+            "to": "BUS_OV_OUT"
+          },
+          {
+            "number": "3",
+            "from": "SC_MINUS",
+            "to": "BUS_OV_DIV"
+          }
+        ]
+      },
+      {
+        "ref": "U_DUMP_DRV",
+        "pins": [
+          {
+            "number": "5",
+            "from": "GND_SYS",
+            "to": "DUMP_OFF"
+          },
+          {
+            "number": "6",
+            "from": "DUMP_IN",
+            "to": "12V_DRV"
+          }
+        ]
+      },
+      {
+        "ref": "R_DUMP_IN_SER",
+        "pins": [
+          {
+            "number": "2",
+            "from": "DUMP_IN",
+            "to": "DUMP_PWM_LIMIT"
+          }
+        ]
+      },
+      {
+        "ref": "R_DUMP_IN_PD",
+        "pins": [
+          {
+            "number": "1",
+            "from": "DUMP_IN",
+            "to": "DUMP_SW_BASE"
+          }
+        ]
+      },
+      {
+        "ref": "J_CORE_P1",
+        "pins": [
+          {
+            "number": "5",
+            "from": "NTC_DUMP",
+            "to": "DRV_FAULT_N"
+          },
+          {
+            "number": "7",
+            "from": "AD_T8",
+            "to": "SC_ADC_A"
+          },
+          {
+            "number": "8",
+            "from": "TEST_FB",
+            "to": "SC_ADC_B"
+          },
+          {
+            "number": "9",
+            "from": null,
+            "to": "MUX_SEL1"
+          },
+          {
+            "number": "11",
+            "from": null,
+            "to": "PA9_TIM1_CH2"
+          },
+          {
+            "number": "12",
+            "from": null,
+            "to": "DRV_FAULT_N"
+          },
+          {
+            "number": "15",
+            "from": null,
+            "to": "MUX_SEL2"
+          },
+          {
+            "number": "16",
+            "from": null,
+            "to": "MUX_SEL3"
+          },
+          {
+            "number": "17",
+            "from": null,
+            "to": "MUX_SEL4"
+          },
+          {
+            "number": "18",
+            "from": null,
+            "to": "MUX_SEL5"
+          },
+          {
+            "number": "19",
+            "from": null,
+            "to": "MUX_SEL6"
+          },
+          {
+            "number": "20",
+            "from": "PERMIT",
+            "to": "MUX_SEL7"
+          },
+          {
+            "number": "21",
+            "from": "PMOS_CTRL",
+            "to": null
+          },
+          {
+            "number": "24",
+            "from": null,
+            "to": "MUX_SEL8"
+          }
+        ]
+      },
+      {
+        "ref": "J_CORE_P2",
+        "pins": [
+          {
+            "number": "5",
+            "from": "TEST",
+            "to": null
+          },
+          {
+            "number": "13",
+            "from": "AD_T6",
+            "to": null
+          },
+          {
+            "number": "14",
+            "from": "AD_T7",
+            "to": "DRV_FAULT_N"
+          },
+          {
+            "number": "15",
+            "from": "AD_T4",
+            "to": "NTC_DUMP"
+          },
+          {
+            "number": "16",
+            "from": "AD_T5",
+            "to": null
+          },
+          {
+            "number": "17",
+            "from": "AD_T2",
+            "to": null
+          },
+          {
+            "number": "18",
+            "from": "AD_T3",
+            "to": "DRV_FAULT_N"
+          },
+          {
+            "number": "20",
+            "from": "AD_T1",
+            "to": "IMON"
+          }
+        ]
+      },
+      {
+        "ref": "R_BUS_HI",
+        "pins": [
+          {
+            "number": "2",
+            "from": "BUS_ADC",
+            "to": "BUS_ADC_SOURCE"
+          }
+        ]
+      },
+      {
+        "ref": "R_BUS_LO",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_ADC",
+            "to": "BUS_ADC_SOURCE"
+          }
+        ]
+      },
+      {
+        "ref": "C_BUS_ADC",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BUS_ADC",
+            "to": "BUS_ADC_SOURCE"
+          }
+        ]
+      },
+      {
+        "ref": "R_TEST_HI",
+        "pins": [
+          {
+            "number": "1",
+            "from": "TEST",
+            "to": "BUS_ADC"
+          },
+          {
+            "number": "2",
+            "from": "TEST_FB",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_TEST_LO",
+        "pins": [
+          {
+            "number": "1",
+            "from": "TEST_FB",
+            "to": "IMON"
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL1",
+        "pins": [
+          {
+            "number": "1",
+            "from": "T1",
+            "to": "3V3_CORE"
+          },
+          {
+            "number": "2",
+            "from": "SC_MINUS",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL1",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL1_IOUT",
+            "to": "T1"
+          }
+        ]
+      },
+      {
+        "ref": "C_T1_FILTER",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T1",
+            "to": "SC_ADC_A"
+          }
+        ]
+      },
+      {
+        "ref": "R_T1_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T1",
+            "to": "MUX_SEL1"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL2",
+        "pins": [
+          {
+            "number": "1",
+            "from": "T2",
+            "to": "3V3_CORE"
+          },
+          {
+            "number": "2",
+            "from": "T1",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL2",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL2_IOUT",
+            "to": "T2"
+          }
+        ]
+      },
+      {
+        "ref": "C_T2_FILTER",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T2",
+            "to": "SC_ADC_B"
+          }
+        ]
+      },
+      {
+        "ref": "R_T2_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T2",
+            "to": "MUX_SEL2"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL3",
+        "pins": [
+          {
+            "number": "1",
+            "from": "T3",
+            "to": "3V3_CORE"
+          },
+          {
+            "number": "2",
+            "from": "T2",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL3",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL3_IOUT",
+            "to": "T3"
+          }
+        ]
+      },
+      {
+        "ref": "C_T3_FILTER",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T3",
+            "to": "BUS_OV_DIV"
+          },
+          {
+            "number": "2",
+            "from": "GND_SYS",
+            "to": "SC_MINUS"
+          }
+        ]
+      },
+      {
+        "ref": "R_T3_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T3",
+            "to": "MUX_SEL3"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL4",
+        "pins": [
+          {
+            "number": "1",
+            "from": "T4",
+            "to": "3V3_CORE"
+          },
+          {
+            "number": "2",
+            "from": "T3",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL4",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL4_IOUT",
+            "to": "T4"
+          }
+        ]
+      },
+      {
+        "ref": "R_T4_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T4",
+            "to": "MUX_SEL4"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "C_BAL5",
+        "pins": [
+          {
+            "number": "1",
+            "from": "T5",
+            "to": "12V_DRV"
+          },
+          {
+            "number": "2",
+            "from": "T4",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL5",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL5_IOUT",
+            "to": "T5"
+          }
+        ]
+      },
+      {
+        "ref": "R_T5_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T5",
+            "to": "MUX_SEL5"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL6",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL6_IOUT",
+            "to": "T6"
+          }
+        ]
+      },
+      {
+        "ref": "R_T6_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T6",
+            "to": "MUX_SEL6"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL7",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL7_IOUT",
+            "to": "T7"
+          }
+        ]
+      },
+      {
+        "ref": "R_T7_TEST",
+        "pins": [
+          {
+            "number": "1",
+            "from": "AD_T7",
+            "to": "MUX_SEL7"
+          },
+          {
+            "number": "2",
+            "from": "TEST",
+            "to": "GND_SYS"
+          }
+        ]
+      },
+      {
+        "ref": "R_BAL8",
+        "pins": [
+          {
+            "number": "1",
+            "from": "BAL8_IOUT",
+            "to": "SC_PLUS"
+          }
+        ]
+      }
+    ],
+    "reconciliation": "167当前官方ENET元件 - 21实际移除refs + 24实际新增refs = 170最终选型网表实例。显式退役清单20件；另有SYS_BAT_BUS不在该清单但未进入选型BOM；选型BOM含22个ADD，另外新增外部项为PSU5_EXT, R_DUMP_EXT。COREBOARD_WEACT仅为外部组装模块，不计主板PCB元件。",
+    "removed_refs": [
+      "C_BAL6",
+      "C_BAL7",
+      "C_BAL8",
+      "C_T4_FILTER",
+      "C_T5_FILTER",
+      "C_T6_FILTER",
+      "C_T7_FILTER",
+      "C_T8_FILTER",
+      "C_TEST_FB",
+      "D_QP_GS_ZENER",
+      "Q_BUS_P",
+      "R_12V_PRELOAD",
+      "SYS_BAT_BUS",
+      "U_BAL1",
+      "U_BAL2",
+      "U_BAL3",
+      "U_BAL4",
+      "U_BAL5",
+      "U_BAL6",
+      "U_BAL7",
+      "U_BAL8"
+    ],
+    "removed_refs_not_in_retirement_ledger": [
+      "SYS_BAT_BUS"
+    ],
+    "added_refs": [
+      "C_ISO_BST",
+      "D_DUMP_FW",
+      "D_SC_HI",
+      "D_SC_LO",
+      "PSU5_EXT",
+      "Q_DUMP_SW",
+      "Q_SC_ISO1",
+      "Q_SC_ISO2",
+      "R_ADC_A_PD",
+      "R_ADC_B_PD",
+      "R_ARM_PD",
+      "R_BUS_OV_BOT",
+      "R_BUS_OV_TOP1",
+      "R_BUS_OV_TOP2",
+      "R_DUMP_EXT",
+      "R_DUMP_HW_PU",
+      "R_DUMP_SW_BASE",
+      "R_ISO_GS",
+      "R_ISO_TGUP",
+      "U_CELL_MUX1",
+      "U_CELL_MUX2",
+      "U_GATE_OD",
+      "U_ISO_DRV",
+      "U_SIGNAL_ISO"
+    ],
+    "added_refs_not_listed_as_ADD_action": [
+      "PSU5_EXT",
+      "R_DUMP_EXT"
+    ]
+  },
+  "manufacturer_source_discrepancies": [
+    {
+      "ref": "PSU5_EXT",
+      "issue": "The adopted selection BOM reverses the URB4805YMD-10WR3 input pins.",
+      "selection_BOM_pin_nets": {
+        "1": "BUS_EXT",
+        "2": "GND_SYS"
+      },
+      "manufacturer_pin_functions": {
+        "1": "-Vin",
+        "2": "+Vin"
+      },
+      "contract_pin_nets": {
+        "1": "GND_SYS",
+        "2": "BUS_EXT"
+      },
+      "evidence": "Hi-Link UR(A)B_YMD-10WR3 V1.7, p.5; pin function table, single-output (S) product.",
+      "handling": "This contract follows the manufacturer pin definition. Correct the BOM connection before native drawing; do not follow its reversed input assignment."
+    }
+  ],
+  "manufacturer_pin_sources": [
+    {
+      "ref": "J_CORE_P1/J_CORE_P2",
+      "device": "WeAct Normal STM32G431CBU6 QFN48 V1.0",
+      "document": "WeAct-QFN48-标准版-原理图.pdf",
+      "path": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+      "sha256": "57eca2e3467abd45bd6d4bc993eb11e9c83389a7c390da2543c3f20cfc2c640d",
+      "evidence": "首页P1/P2连接器物理脚号与MCU信号标签。"
+    },
+    {
+      "ref": "U_CELL_MUX1/U_CELL_MUX2/U_SIGNAL_ISO",
+      "device": "TMUX1511PWR, PW TSSOP-14",
+      "document": "TI TMUX1511 datasheet Rev B",
+      "path": "电力/稳压模块/参考资料/TMUX1511_Official.pdf",
+      "sha256": "04291b41a68347fedbbb0776aa44f500eaca65f2ca3af0e022ee60d41c7b1e9f",
+      "url": "https://www.ti.com/lit/ds/symlink/tmux1511.pdf",
+      "evidence": "Figure 4-1 top-view TSSOP-14 pin configuration and Table Pin Functions."
+    },
+    {
+      "ref": "U_GATE_OD",
+      "device": "SN74LVC1G07DCKR, DCK SC70-5",
+      "document": "TI SN74LVC1G07 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf",
+      "evidence": "DCK top-view pinout; pin 1 NC, pin 2 A, pin 3 GND, pin 4 Y, pin 5 VCC."
+    },
+    {
+      "ref": "U_ISO_DRV",
+      "device": "LTC7001IMSE#PBF, MSE MSOP-10 with exposed pad",
+      "document": "ADI LTC7001 datasheet Rev G",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/LTC7001.pdf",
+      "evidence": "MSE top-view pinout, pins 1-10 plus exposed pad (pin 11)."
+    },
+    {
+      "ref": "U_AUX1/PSU5_EXT",
+      "device": "Hi-Link URB4812YMD-10WR3 / URB4805YMD-10WR3, A3",
+      "document": "Hi-Link UR(A)B_YMD-10WR3 V1.7",
+      "path": "电力/稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+      "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d",
+      "evidence": "p.5 six-pin footprint/pin-function table, single-output S: 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL."
+    },
+    {
+      "ref": "D_SC_LO/D_SC_HI/D_DUMP_FW",
+      "device": "STPS30100ST",
+      "document": "ST STPS30100ST official datasheet",
+      "path": "电力/稳压模块/参考资料/STPS30100ST_Official.pdf",
+      "sha256": "d2ae9295b8932c9e99159f3389903a9a0f22449cb537fac13fcf75b655febd55",
+      "evidence": "TO-220AB physical pinout: pins 1/3 anode; pin 2 cathode/tab."
+    }
+  ],
+  "prepared_material_source_sha256": "6f94d72fddf97299462d456651a5e6f18a6eb767df8cc384d599e71a7da62f71",
+  "preparation_note": "采用BOM采购身份归一；已应用原生工程并经官方网表逐针核对。",
+  "native_application_note": "软件阶段按实查库符号纠正PSU5_EXT空脚占位，目标CAD引脚总数503→502，NC23→22；器件数及85条网络不变。"
+}

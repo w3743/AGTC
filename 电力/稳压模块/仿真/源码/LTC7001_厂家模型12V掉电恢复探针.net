@@ -1,0 +1,25 @@
+* ADI LTC7001 model power-loss and recovery probe; linear gate-load approximation only.
+* VCC is held at 12 V for 1 s before INP is asserted; INP remains high through VCC loss and recovery.
+.include LTC7001.sub
+Vcc vcc 0 PWL(0 0 1u 12 1.02 12 1.020001 0 1.08 0 1.080001 12 2.12 12)
+Vin inp 0 PWL(0 0 0.999999 0 1.000000 3.3 2.12 3.3)
+Xiso vcc 0 0 inp 0 gate tgup 0 bst LTC7001
+Rup tgup gate 10k
+Rgs gate 0 1Meg
+Cgs gate 0 32.1n
+Cbst bst 0 1u
+.tran 0 2.12 0 50u
+.save V(vcc) V(gate) V(bst) V(inp) V(tgup)
+.meas tran vcc_before_loss FIND V(vcc) AT=1.019
+.meas tran gate_before_loss FIND V(gate) AT=1.019
+.meas tran bst_before_loss FIND V(bst) AT=1.019
+.meas tran vcc_during_loss FIND V(vcc) AT=1.050
+.meas tran gate_during_loss FIND V(gate) AT=1.050
+.meas tran bst_during_loss FIND V(bst) AT=1.050
+.meas tran vcc_after_recovery_20ms FIND V(vcc) AT=1.100
+.meas tran gate_after_recovery_20ms FIND V(gate) AT=1.100
+.meas tran bst_after_recovery_20ms FIND V(bst) AT=1.100
+.meas tran vcc_after_recovery_1s FIND V(vcc) AT=2.100
+.meas tran gate_after_recovery_1s FIND V(gate) AT=2.100
+.meas tran bst_after_recovery_1s FIND V(bst) AT=2.100
+.end

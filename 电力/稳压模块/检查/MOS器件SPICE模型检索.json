@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "checked_date": "2026-10-29",
+  "scope": "核查当前采用的HYG022N10NS1TA和IRLB4030PBF是否有精确型号的厂家或正式渠道SPICE模型；不替换型号。",
+  "parts": [
+    {
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI",
+      "exact_manufacturer_spice_model_found": false,
+      "sources_checked": [
+        {
+          "url": "https://www.hymexa.com",
+          "type": "manufacturer_website",
+          "result": "未找到该精确料号的SPICE模型下载入口。"
+        },
+        {
+          "url": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf",
+          "type": "distributor_hosted_manufacturer_datasheet",
+          "result": "可确认HUAYI HYG022N10NS1TA数据手册存在；该文件不是SPICE模型。"
+        }
+      ],
+      "local_model": null,
+      "compatibility": "无厂家模型可导入仿真器；不能视为该器件模型已兼容或已验证。"
+    },
+    {
+      "mpn": "IRLB4030PBF",
+      "manufacturer": "Infineon Technologies",
+      "exact_manufacturer_spice_model_found": false,
+      "sources_checked": [
+        {
+          "url": "https://www.infineon.com/part/IRLB4030",
+          "type": "manufacturer_product_page",
+          "result": "确认IRLB4030产品及规格；公开页面未提供可确认的精确型号SPICE模型文件。"
+        },
+        {
+          "url": "https://www.infineon.com/design-resources/simulation-modeling/power-mosfet-simulation-models",
+          "type": "manufacturer_model_library_page",
+          "result": "厂商提供按电压类别及产品技术分类的PSpice模型库，说明模型以SIMetrix/PSpice评估，并提示模型不能覆盖所有器件实际表现。"
+        },
+        {
+          "url": "https://community.infineon.com/t5/MOSFET-Si-SiC/SPICE-MODEL/td-p/929341",
+          "type": "manufacturer_developer_community_accepted_answer",
+          "result": "Infineon版主发布官方100V N沟道MOSFET模型库链接；该回答针对BSC070N10NS5及BSC040N10NS5，并非IRLB4030PBF。"
+        }
+      ],
+      "downloaded_generic_library": {
+        "filename": "Infineon-OptiMOS_Power_MOSFET_Spice_100_V_N-Channel-SimulationModels-v04_00-EN.zip",
+        "local_path": "仿真/输入/厂家模型/Infineon-OptiMOS_Power_MOSFET_Spice_100_V_N-Channel-SimulationModels-v04_00-EN.zip",
+        "source_url": "https://www.infineon.com/dgdl/Infineon-OptiMOS_Power_MOSFET_Spice_100_V_N-Channel-SimulationModels-v04_00-EN.zip?fileId=db3a30433d346a2d013d459a89bf5736",
+        "size_bytes": 1284326,
+        "sha256": "81CAD4C128E2995CD5DA5DD398404BF9F4E29351C3FDED5313D540D32EFAAD84",
+        "archive_check": "ZIP中央目录可读，共62项。",
+        "inspected_member": "StrongIRFET/StrongIRFET_100V_LTSpice.lib",
+        "member_subcircuit_count": 218,
+        "exact_mpn_present": false,
+        "compatibility": "该文件为Infineon官方100V StrongIRFET LTspice分类库，库中无IRLB4030条目；不是IRLB4030PBF等效的精确厂家模型。"
+      },
+      "local_exact_model": null
+    }
+  ],
+  "simulation_status": {
+    "ran_waveforms_with_either_exact_mosfet_model": false,
+    "existing_related_waveforms": "现有相关结果使用理想开关、通用等效MOS或固定电容近似，不是这两颗器件的厂家模型仿真。",
+    "limited_equivalent_model_scope": [
+      "逻辑时序和导通路径筛查",
+      "按数据手册明确测试条件参数化的粗略静态导通损耗筛查"
+    ],
+    "not_reliable_for": [
+      "实际开关损耗和Miller误导通",
+      "反向恢复及寄生振铃/过冲",
+      "器件温度分布、SOA和雪崩余量",
+      "实体关断能力、制动能量承接及整车安全结论"
+    ]
+  }
+}

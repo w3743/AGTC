@@ -1,0 +1,22 @@
+* Simplified LTC7001 output only; TS=0 fixed. NOT ADI manufacturer macro model.
+* Initial BST=10V, constant 15uA charge pump approximation; no UVLO, delay or regulation.
+Icp 0 bst 15u
+Cbst bst 0 500n IC=10
+Rleak bst 0 1G
+Supper bst up ctl 0 SUP
+Rturn up gate 10k
+Sdown gate 0 ctlneg 0 SDN
+Rgs gate 0 1Meg
+* 321nC/10V = 32.1nF equivalent for two devices, NOT nonlinear gate charge model.
+Cgate gate 0 32.1n IC=0
+Vctl ctl 0 PULSE(0 3.3 10u 1n 1n 1.99m 5m)
+Bneg ctlneg 0 V={3.3-v(ctl)}
+.model SUP SW(Ron=7 Roff=1e12 Vt=1.65 Vh=0)
+.model SDN SW(Ron=4 Roff=1e12 Vt=1.65 Vh=0)
+.control
+set noaskquit
+tran 100n 3m 0 100n uic
+wrdata ltc_wave.txt v(ctl) v(gate) v(bst)
+quit
+.endc
+.end

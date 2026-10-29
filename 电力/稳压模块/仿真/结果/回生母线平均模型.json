@@ -1,0 +1,56 @@
+{
+  "status": "IDEALISED_AVERAGED_MODEL_NOT_SWITCHING_OR_HARDWARE_VALIDATION",
+  "dt_s": 2e-06,
+  "timestep_comparison": [
+    {
+      "SC_enabled": true,
+      "bus_peak_20us_V": 40.33358081825373,
+      "bus_peak_2us_V": 40.32125273827735,
+      "difference_V": 0.012328079976377637
+    },
+    {
+      "SC_enabled": false,
+      "bus_peak_20us_V": 40.36362652289425,
+      "bus_peak_2us_V": 40.32427448711045,
+      "difference_V": 0.03935203578379998
+    }
+  ],
+  "assumptions": [
+    "30kg, 15km/h, 3.9624m/s²匀减速；假设全部机械功率即时注入母线",
+    "电池充放电均为0、母线只计5.4mF",
+    "超容初始各2V、350F、无ESR；转换器理想、效率95%、充电上限20A且不可超出当时回生功率",
+    "0.82Ω理想开关；40.32V开启、38.63V关闭，阈值无误差及延迟",
+    "忽略电感、PWM、线束、驱动和固件"
+  ],
+  "cases": [
+    {
+      "enabled": true,
+      "stop_s": 1.051551248401642,
+      "bus_min_V": 37.8,
+      "bus_max_V": 40.32125273827735,
+      "bus_final_V": 39.8909440041914,
+      "cell_final_V": 2.039309065536406,
+      "regen_J": 260.41716196815906,
+      "converter_input_J": 234.29641897086725,
+      "dump_J": 25.68213498071929,
+      "bus_energy_delta_J": 0.4386080165729415,
+      "energy_residual_J": -4.1827652452752773e-13,
+      "dump_switch_transitions": 134
+    },
+    {
+      "enabled": false,
+      "stop_s": 1.051551248401642,
+      "bus_min_V": 37.8,
+      "bus_max_V": 40.32427448711045,
+      "bus_final_V": 38.68011085672563,
+      "cell_final_V": 1.9999499267569143,
+      "regen_J": 260.41716196815906,
+      "converter_input_J": 0.0,
+      "dump_J": 260.2354223332567,
+      "bus_energy_delta_J": 0.18173963489917844,
+      "energy_residual_J": 3.206768184327302e-12,
+      "dump_switch_transitions": 1188
+    }
+  ],
+  "limitations": "不能验证MOS栅极、PWM纹波、过压峰值、实际制动距离、长下坡或热能力。"
+}

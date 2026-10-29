@@ -1,0 +1,39 @@
+* TLV6700 and UCC27511 TI macro models. NPN is generic BF=100 placeholder.
+* Gate model 11.36nF constant only: no MOS nonlinearities or brake power path.
+.include tlv.lib
+.include ucc.lib
+Vdd vdd 0 12
+Cbus bus 0 5.4m IC=37.8
+Bregen 0 bus I={495.3/max(v(bus),1)}
+Sdump bus rnode gate 0 MOSideal
+Rdump rnode 0 0.82
+.model MOSideal SW(Ron=0.0043 Roff=1e9 Vt=4.5 Vh=0)
+Rtop1 bus mid 255k
+Rtop2 mid ina 255k
+Rbot ina 0 5.11k
+Cina ina 0 1n
+Vinb inb 0 .2
+Xcomp ina inb vdd 0 outa outb TLV6700
+Rhwpu vdd outa 10k
+Rbase outa hbase 10k
+Rbe hbase 0 100k
+Qhw dmpoff hbase 0 Qgeneric
+Roff vdd dmpoff 10k
+Vpwm pwm 0 0
+Rseries pwm pwmlimit 100
+Rswbase pwmlimit swbase 10k
+Rswpd swbase 0 10k
+Qsw dmpoff swbase 0 Qgeneric
+.model Qgeneric NPN (IS=1e-14 BF=100 VAF=100)
+Xgate vdd dmpoff 0 vdd outh outl UCC27511_TRANS
+Rhi outh gate 10
+Rlo outl gate 10
+Rgs gate 0 10k
+Cgs gate 0 11.36n
+.control
+set noaskquit
+tran 1u 30m 0 1u uic
+wrdata chain_wave.txt v(bus) v(outa) v(dmpoff) v(gate) v(rnode)
+quit
+.endc
+.end

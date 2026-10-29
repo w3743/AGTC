@@ -1,0 +1,116 @@
+{
+  "date": "2026-10-29",
+  "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+  "authority": "设计细节.md及本合同覆盖旧58/45子包中的冲突接法；历史子包只作来源，不相加计数。",
+  "scope": "8颗超容、9S5P、独立稳压；原理级设计。无PCB、固件、实物验收或采购授权。",
+  "afe_filter_correction": {
+    "U_AFE_MAX17853": "MAX17853ACB/V+；DCIN由12V_DRV外供，AGND/AUXGND=SC_MINUS，GNDL=GND_SYS，禁止旁路0.5mΩ分流器。",
+    "C0": "直接接AGND，取消原新增R_MAX_C0。",
+    "C1_to_C8": "各抽头经R_MAX_C1..8=1k进入Cn；旧C_BAL1..8各100nF改为Cn对AGND，不是相邻Cn之间。",
+    "SW1_to_SW8": "各抽头经旧R_BAL1..8=120Ω进入SWn；新增C_MAX_SW1..8各100nF跨SWn与SW(n-1)。",
+    "SW0": "SC_MINUS经新增R_MAX_SW0=120Ω到SW0；新增C_MAX_SW0=1µF接SW0与AGND。",
+    "unused": "Cn9..14连在最高有效C8滤波节点；SW9..14连最高有效SW8节点；CELLEN=0x00FF，TOPCELL1/2=8。不得悬空或接原始抽头绕过滤波。",
+    "balancing": "两只120Ω及内部开关串联，每节2.45V约10.1mA；不能继续报告20.4mA。仅交错不相邻通道均衡，可信采样前关均衡至少2ms。350F纠正0.1V约需58分钟量级，均衡不承担20A充电电流。",
+    "evidence": "参考资料/MAX17853_Rev6_Official.pdf，Rev6 Figure4；检查/MAX17853滤波接法核对.png。",
+    "qualification": "未用通道绑接、均衡切换和扫描寄存器需原理图逐针与最终配置读回确认；不是当前图已实现。",
+    "extra_reuse": {
+      "R_T5_LO": "AUXIN0→THRM 10k",
+      "R_T6_LO": "AUXIN1→THRM 10k",
+      "R_T7_LO": "AUXIN2→THRM 10k",
+      "R_TEST_LO": "AUXIN3→THRM 10k",
+      "C_T1_FILTER": "SHDNL→AGND 1nF"
+    }
+  },
+  "permit_open_drain": {
+    "add": [
+      "U_GATE_OD=TI SN74LVC1G07DCKR/C7830",
+      "C_GATE_OD=100nF CGA3E2X7R1H104KT0Y0S/C342998"
+    ],
+    "connections": "FF Q直接接U_GATE_OD.A；VCC=3V3_CORE；GND=GND_SYS；开漏Y接实际DRV_FAULT_N及LTC7001 INP。R_PB5_PERMIT旧1k改为CORE到实际节点上拉；保留旧R_DRV_FAULT_PD=10k到GND。取消新增R_GATE_SER=680Ω。PB5直接接FF CLK，旧47k维持CLK下拉。",
+    "logic": "Q=0使开漏Y拉低，Q=1释放。DRV8161故障可以拉低同线，无推挽争用。CORE≥3.0V时1k/10k名义高态≥2.727V，DRV VIH=2.2V前有约0.52V余量，仍须扣漏电/地差。CORE=3.6V时外部故障低态上拉电流约3.6mA。",
+    "feedback": "实际节点经SN74AUP1T14反相至PA10及PB12/TIM1_BKIN；AOE=0。能看见许可被拉低，不能区分驱动器内部过流/欠压/过温。故障后须新ARM，不能自动恢复MOE。",
+    "power_off": "G07 Ioff与10k下拉参与掉电默认态；DRV内部250k上拉仅典型值，不能把30µA漏电预算当厂家全故障保证。"
+  },
+  "power_paths": {
+    "BUS": "退役Q_BUS_P后BUS_BR与BUS_EXT明确直连，原六只900µF/80V在电气上属于主桥BUS电容。禁止仍保留旧P管同时宣称5.4mF已直连。",
+    "SC": "SC_PLUS→F_SC→SC_ISO_STORAGE→Q_ISO1.D；Q_ISO2.D→SC_FUSED；两管S=ISO_MID；G=ISO_G。HYG022 pin1=G、pins2..8=S、pin9/tab=D。",
+    "capacitors": "旧C_SC_BULK/BULK2各100µF/35V正端移至SC_ISO_STORAGE，负端仍SC_MINUS，保留原型号及数量。C_SC_HF=1µF/100V留SC_FUSED，负端改GND_SYS；旧C_BUS_FILM3=2.2µF/250V移SC_FUSED/GND_SYS。主BUS剩两只2.2µF薄膜、1µF/100V与5.4mF。取消两只35→63V替换。",
+    "clamps": [
+      {
+        "ref": "D_SC_LO",
+        "mpn": "STPS30100ST",
+        "supplier_part": "C172485",
+        "anode_pins_1_3": "GND_SYS",
+        "cathode_pin_2_tab": "SC_FUSED"
+      },
+      {
+        "ref": "D_SC_HI",
+        "mpn": "STPS30100ST",
+        "supplier_part": "C172485",
+        "anode_pins_1_3": "SC_FUSED",
+        "cathode_pin_2_tab": "BUS_EXT"
+      },
+      {
+        "ref": "D_DUMP_FREEWHEEL",
+        "mpn": "STPS30100ST",
+        "supplier_part": "C172485",
+        "anode_pins_1_3": "DUMP_LOW/Q_DUMP.D",
+        "cathode_pin_2_tab": "BUS_EXT"
+      }
+    ],
+    "clamp_screen": "80A、24µH磁能76.8mJ；含局部电容按90mJ筛查。VF=1.4V为冷态工程预算，非全温最大保证；峰112W、矩形等效0.804ms。曲线Zth≤0.2°C/W并乘2敏感性得ΔTJ≤44.8K，初温≤85°C时约129.8°C。须验证真实故障电流、热态、环路寄生、最大断流时间；IFSM不能单独证明重复能力。故障锁存不自动重试。",
+    "local_ring_screen": "SC桥侧电容以有效≥2µF、环路寄生≤100nH和80A为约束，BUS夹位69.4V加二极管压降后筛查尖峰约73V，低于1µF电容100V额定；不是布局完成或实测。续流由二极管完成，不把3.2µF当全部磁能吸收器。",
+    "current_observation": "隔离断开后SC分流器可以读0而电感仍有续流；不能用IMON=0单独证明主电感能量已清空。"
+  },
+  "central_brake": {
+    "resistor": {
+      "ref": "R_DUMP",
+      "candidate_mpn": "HEWRA0J082K500",
+      "manufacturer": "UniRoyal",
+      "value": "0.82Ω ±5% 500W",
+      "identity_status": "按厂家命名规则推导的订货候选，精确可订货SKU、库存、报价及实际安装条件未确认",
+      "piece_delta": 0,
+      "replaces": "原板外1.8Ω无精确MPN候选"
+    },
+    "low_bus_screen": "22.5V、Rmax0.861Ω时约588W，大于495.3W平动比较点；热态TCR、引线压降仍须扣。1.5倍旋转惯量敏感性743W不被此电阻单独覆盖，不能称整车制动已资格化。",
+    "high_bus_screen": "42V、Rmin0.779Ω时2264W；厂家500W系列6.25倍5s短过载试验不是连续/重复制动额定。60°C自由空气额定筛查约430W，安装散热需单独证明。",
+    "driver": "UCC27511A IN+固定12V_DRV；IN−=DUMP_OFF，旧R_DUMP_IN_PD=10k由下拉改为12V上拉。复用Q_PMOS_CTRL MMBT5551：E=GND_SYS、C=DUMP_OFF、B经旧R_TEST_HI=10k由PB7驱动，旧R_QP_BE=100k接BE。MCU高或硬OV开漏低均使IN−低而开dump。原100Ω串阻保留PB7侧。",
+    "hard_OV": "新增TLV6700DDCR/C2868382，VDD=12V_DRV并加100nF。两只新增PTFR0805B255KP9串联为BUS上臂，新增RT0603BRD075K36L 5.36k/0.1%下臂到GND；分压点接INB−，复用C_T5_FILTER=1nF滤波。OUTB开漏接DUMP_OFF；INA+接GND，OUTA暂不用，不再计PNP或二极管OR。",
+    "OV_window": "名义38.46V，按TLV参考±1%及电阻容差筛查约38.00–38.92V；输入偏流和地差另预算。5.5mV典型迟滞对应约0.53V，12mV最大约1.15V；释放可能低于满电电池电压并继续从电池取能，须由温控/总关断限制。18µs延迟最大仅对应手册规定5V和过驱条件，不能直接保证本12V接法先于FOC BOV动作。",
+    "thermal": "保留TH_DUMP原NTC用于软件限温；新增F_DUMP_THERM=LANSON TT150/C2972289，贴合电阻壳体，只串入下述BMS低功率许可回路，不串几十安dump功率线。TT150为一次性温度熔断器。",
+    "inductance": "新增D_DUMP_FREEWHEEL闭合线绕电阻/线束的关断续流，禁止默认电阻无感或让Q_DUMP反复雪崩。10kHz仅候选；实际R/L、二极管热和MOS损耗需核定，控制以BUS反馈，不直接用D×V²/R宣称吸收功率。",
+    "limits": "核心板失电但12V尚在时硬OV可动作；12V全失时无此主动制动保证。Q_DUMP短路时关栅极无效，热熔断通过BMS撤销电池供能，但仍需超容/其他回生源退出和实际热响应配合。",
+    "thermal_adoption": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+    "energy_takeover_review": "温熔只影响许可，不创造能量出口；禁止以关闭电池或唯一耗能支路替代制动能量平衡。"
+  },
+  "BMS_thermal_latch": {
+    "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+    "BQ_config": "DFETOFF Pin Config 0x92FB=0xC2，active-low BOTHOFF；U_SEQ.Q1经旧1k直接BQ pin30；原47k改下拉B0，删除Q_DFETOFF。先在FET_INIT_OFF下写入并读回配置，成功前禁止MAIN_REQ。",
+    "loop": "现TPS3809K33由PRE_CTRL_3V3供电，推挽POR_OK_N送新J_DUMP_THERM.1→电阻壳体TT150→J_DUMP_THERM.2/THERM_POR_OK；旧R_DFETOFF_GS=100k改为THERM_POR_OK到B0下拉。",
+    "buffer": "新增U_THERM_ALERT_SCHMITT=SN74LVC2G17DCKR与100nF，VCC=PRE_CTRL_3V3；一路THERM_POR_OK→U_AND2.C，另一路BQ_ALERT_IC_N→U_AND2.A；B保留BMS_LOCAL_OK，Y=MAIN_CLR_N。",
+    "connector": "新J_DUMP_THERM复用2541WV-2X01P/C41430884两针板座；配壳、端子及线束数量/价格未冻结。",
+    "behavior": "温度熔断或回路线断开→CLR低→Q1低→DFETOFF关闭充放电并使LOAD_POWER_VALID撤销。回路复原只释放CLR，不产生CLK，新ARM后才可恢复。POR来源独立于Q1，避免启动闭锁。",
+    "qualification": "全温漏电与100k默认低、ALERT新增延迟、供电排序、跨板线束EMC与短路、TT150与电阻热点热耦合待核；回路短接到3.3V/旁路熔断器不可检测。不能写成Q_DUMP短路已验证安全。",
+    "count_delta_vs_native": {
+      "new_board_instances": 9,
+      "retired_board_instances": 1,
+      "net_board_instances": 8,
+      "additional_cells": 9,
+      "thermal_fuse_counted_in_regulator_only": 1
+    }
+  },
+  "official_sources": [
+    "https://www.analog.com/media/en/technical-documentation/data-sheets/max17853.pdf",
+    "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv6700.pdf",
+    "https://www.st.com/resource/en/datasheet/stps30100st.pdf",
+    "https://www.uni-royal.cn/en/images/userfile/file/172922884214f83500eac8f32b.pdf",
+    "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf"
+  ],
+  "auxiliary_rail_release_block": "六件独立ISO_VCC供电子块只作条件候选：TPS7A4001 OUT−IN最大+0.3V；双源OR没有OUT→IN保护。两源同时跌落、有效电容、X7S相对厂商要求的适用性及全输入范围误差尚未闭合，不能据此宣布可发布。保留单路掉电计算，不增写不成立的全故障PASS。",
+  "status_before_withdrawal": "CONNECTION_CANDIDATE_NOT_NATIVE_NOT_RELEASED",
+  "current_adopted_design": false,
+  "withdrawal_reason": "用户要求先核清故障路径和简约性再加选型；原理必要性/替代/能量接管未闭合，撤回当前采用地位，保留比较数据。",
+  "current_adopted_increment_count": null
+}

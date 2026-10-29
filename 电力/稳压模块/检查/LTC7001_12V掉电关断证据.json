@@ -1,0 +1,401 @@
+{
+  "title": "LTC7001 共源隔离MOS在12V_DRV掉电时的关断闭合候选",
+  "updated": "2026-10-29",
+  "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+  "scope": "只处理LTC7001驱动Q_ISO1/Q_ISO2时，12V_DRV掉电及BUS/超容单路掉电的关断供电。无PCB、固件或实测工作。",
+  "decision": {
+    "summary": "保留LTC7001和共源双HYG022隔离MOS；用BUS_EXT与SC_ISO_STORAGE经双路二极管OR供给100V LDO，产生独立ISO_VCC。只要两路原始能源至少一路仍满足输入门槛，LTC7001就不会因12V_DRV单独掉电而失去TGDN供电状态；同时要求既有外部锁存器在12V_DRV掉电时异步清零并把INP拉低。",
+    "component_delta_local": {
+      "added_refs": [
+        "D_ISO_AUX_OR",
+        "U_ISO_AUX_LDO",
+        "C_ISO_AUX_IN",
+        "C_ISO_AUX_OUT",
+        "R_ISO_AUX_TOP",
+        "R_ISO_AUX_BOTTOM"
+      ],
+      "added_count": 6,
+      "removed_refs": [
+        "D_ISO_BST_START"
+      ],
+      "removed_count": 1,
+      "net_count_delta": 5,
+      "count_neutral_changes": [
+        "C_ISO_VCC留用一颗并从12V_DRV改接ISO_VCC。",
+        "R_ISO_GATE_SOURCE由10M改为2.2M，数量不变。",
+        "TGUP串阻采用退役组的R_QP_COL=HoAR0603-1/10W-10KR-0.1%-TCR25（LCSC C5123581）；不新增R_ISO_TGUP/100R。R_QP_COL按旧BOM已有实物引用复用，不重复计数。"
+      ],
+      "scope_note": "这是本隔离关断子块相对原隔离候选的局部差额，不是稳压板总新增数量或合并BOM。"
+    },
+    "why": "LTC7001数据手册规定VCCUV开路时VCC欠压期间TGDN拉到TS，但没有保证VCC=0时TGDN输出仍为低阻。单独OR供电让单路能源消失时IC仍处于有供电的工作条件；不把10M栅源电阻当作掉电快速关断证明。"
+  },
+  "parts": [
+    {
+      "ref": "D_ISO_AUX_OR",
+      "qty": 1,
+      "mpn": "CMPD3003C",
+      "manufacturer": "Central Semiconductor",
+      "supplier_part": null,
+      "package": "SOT-23 dual common-cathode silicon low-leakage switching diode",
+      "pins_and_nets": {
+        "pin1_anode_D2": "BUS_EXT",
+        "pin2_anode_D1": "SC_ISO_STORAGE",
+        "pin3_common_cathode": "ISO_AUX_IN"
+      },
+      "key_guarantees": {
+        "reverse_voltage_V": 180,
+        "reverse_leakage_max_uA_at_TJ150C_VR180V": 5,
+        "forward_voltage_max_V_at_1mA": 0.72,
+        "operating_TJ_C": [
+          -65,
+          150
+        ]
+      },
+      "procurement": "精确MPN已定；供应商料号、库存和价格未核。"
+    },
+    {
+      "ref": "U_ISO_AUX_LDO",
+      "qty": 1,
+      "mpn": "TPS7A4001DGNR",
+      "manufacturer": "Texas Instruments",
+      "supplier": "LCSC",
+      "supplier_part": "C55006",
+      "package": "DGN-8 with exposed PowerPAD, library pad 9",
+      "pins_and_nets": {
+        "pin1_OUT": "ISO_VCC",
+        "pin2_FB": "ISO_AUX_FB",
+        "pin3_NC": "open",
+        "pin4_GND": "GND_SYS",
+        "pin5_EN": "ISO_AUX_IN",
+        "pin6_NC": "open",
+        "pin7_NC": "open",
+        "pin8_IN": "ISO_AUX_IN",
+        "pin9_exposed_pad": "GND_SYS"
+      },
+      "setpoint": {
+        "R_ISO_AUX_TOP_ohm": 91000,
+        "R_ISO_AUX_BOTTOM_ohm": 10000,
+        "formula": "VOUT=VREF*(1+Rtop/Rbottom)",
+        "VREF_nominal_V": 1.173,
+        "VOUT_nominal_V": 11.8473
+      },
+      "key_guarantees": {
+        "recommended_VIN_V": [
+          7,
+          100
+        ],
+        "absolute_max_VIN_V": 105,
+        "recommended_IOUT_max_mA": 50,
+        "overall_accuracy_percent": 2.5,
+        "overall_accuracy_condition": "TJ=-40..125C, 100uA<=IOUT<=50mA, VOUT(NOM)+2V<=VIN<=24V",
+        "IGND_max_uA_at_IOUT_0": 65,
+        "IEN_max_uA": 1,
+        "CIN_min_uF": 1,
+        "COUT_min_uF": 4.7,
+        "RthetaJA_C_per_W": 66.7,
+        "TJ_range_C": [
+          -40,
+          125
+        ]
+      },
+      "accuracy_boundary": "在VIN>24V时，器件仍处于7..100V推荐输入范围，但TI的±2.5%全温总精度条件不覆盖该输入；不得外推此误差界。过压/夹位下仍有100V额定余量，但VCC精度下界须由制造商保证数据或重新选型闭合。"
+    },
+    {
+      "ref": "C_ISO_AUX_IN",
+      "qty": 1,
+      "mpn": "CGA9N3X7S2A106M230KB",
+      "manufacturer": "TDK",
+      "supplier": "LCSC existing common SKU",
+      "supplier_part": "C2168351",
+      "value": "10uF, 100V, X7S, ±20%",
+      "pins_and_nets": {
+        "positive_or_either": "ISO_AUX_IN",
+        "other": "GND_SYS"
+      },
+      "requirement": "全工作电压和温度下有效电容必须不少于TI要求的1uF；100V额定值覆盖69.4V夹位筛查值，但X7S的DC-bias降容需以厂家适用曲线或最小规格核实。"
+    },
+    {
+      "ref": "C_ISO_AUX_OUT",
+      "qty": 1,
+      "mpn": "CKG57NX7S2A226M500JJ",
+      "manufacturer": "TDK",
+      "supplier_part": null,
+      "value": "22uF, 100V, X7S, ±20%",
+      "pins_and_nets": {
+        "positive_or_either": "ISO_VCC",
+        "other": "GND_SYS"
+      },
+      "requirement": "全工作电压和温度下有效电容必须大于4.7uF以满足TPS7A4001稳定性要求。X7S及容量容差已知，但公开DC-bias曲线为典型值；所需有效容量不是现有资料中的全温保证值。"
+    },
+    {
+      "ref": "R_ISO_AUX_TOP",
+      "qty": 1,
+      "mpn": "RC0603FR-0791KL",
+      "manufacturer": "Yageo",
+      "supplier": "LCSC candidate",
+      "supplier_part": "C137671",
+      "value": "91kΩ, 1%",
+      "pins_and_nets": {
+        "end1": "ISO_VCC",
+        "end2": "ISO_AUX_FB"
+      }
+    },
+    {
+      "ref": "R_ISO_AUX_BOTTOM",
+      "qty": 1,
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "supplier": "LCSC existing common SKU",
+      "supplier_part": "C98220",
+      "value": "10kΩ, 1%",
+      "pins_and_nets": {
+        "end1": "ISO_AUX_FB",
+        "end2": "GND_SYS"
+      }
+    }
+  ],
+  "existing_net_changes": {
+    "C_ISO_VCC": {
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "value": "100nF",
+      "new_connection": "LTC7001 pin1 VCC/ISO_VCC to GND_SYS; local bypass"
+    },
+    "U_SC_ISO_GATE": {
+      "mpn": "LTC7001IMSE#PBF",
+      "connections": {
+        "pin1_VCC": "ISO_VCC",
+        "pin2_VCCUV": "open (nominal rising UVLO 7V)",
+        "pin3_GND_and_EP11": "GND_SYS",
+        "pin4_INP": "既有硬件许可/FF输出；12V_DRV掉电必须使其为低",
+        "pin5_OVLO": "GND_SYS",
+        "pin6_TGDN": "ISO_G直连",
+        "pin7_TGUP": "经R_QP_COL (HoAR0603-1/10W-10KR-0.1%-TCR25, LCSC C5123581)到ISO_G",
+        "pin8_TS": "ISO_MID",
+        "pin9_BST": "C_ISO_BST上端",
+        "pin10_NC": "open"
+      }
+    },
+    "C_ISO_BST": {
+      "mpn": "C3225X7R2A105K200AA",
+      "supplier_part": "C2167578",
+      "value": "1uF, 100V, X7R",
+      "connection": "LTC7001 BST pin9 to TS pin8"
+    },
+    "R_ISO_GATE_SOURCE": {
+      "old_mpn": "RS-03L1005FT",
+      "old_value": "10MΩ",
+      "candidate_mpn": "RC0603FR-072M2L",
+      "candidate_supplier_part": null,
+      "candidate_value": "2.2MΩ, 1%",
+      "connection": "ISO_G to ISO_MID",
+      "count_delta": 0,
+      "reason": "10MΩ在已知两只MOS合计200nA漏电时形成2V压降，等于HYG022最小VGS(th)，没有关断余量；2.2MΩ时为0.44V。2.2MΩ的供应商料号/报价尚未核实。"
+    },
+    "D_ISO_BST_START": {
+      "action": "remove",
+      "reason": "现有VCC到BST二极管在TS已高于VCC时不能为BST-TS提供预充；不依赖它作快速启动。采用硬件许可新ARM，不规定未有数据手册保证的启动最大时间。"
+    }
+  },
+  "guarantee_calculations": {
+    "source_operating_window": {
+      "BUS_EXT_normal_V": [
+        22.5,
+        37.8
+      ],
+      "SC_ISO_STORAGE_V": [
+        0,
+        21.6
+      ],
+      "SMCJ43A_screening_max_clamp_V": 69.4,
+      "worst_single_source_SC20_input_min_V": 19.28,
+      "worst_single_source_BUS22p5_input_min_V": 21.78,
+      "LDO_required_input_for_11p847V_output_V": 13.847,
+      "SC20_LDO_headroom_V": 5.433,
+      "max_clamp_to_LDO_100V_recommended_margin_V": 30.6,
+      "design_limit": "LDO pin8及EN pin5瞬态必须保持<=100V；OR二极管承受的BUS与SC输入差压必须<=180V。69.4V是SMCJ43A在其规定浪涌电流下的最大夹位规格筛查值，不能覆盖未建模线束过冲。"
+    },
+    "LDO_output_bounds": {
+      "nominal_V": 11.8473,
+      "calculation_at_VIN_le_24V": "11.8473V × (1±2.5%) × resistor-ratio tolerance factors for 91kΩ/10kΩ at ±1%",
+      "min_V": 11.345,
+      "max_V": 12.365,
+      "LTC7001_VCC_falling_UVLO_max_V": 6.9,
+      "margin_to_falling_UVLO_min_V": 4.445,
+      "validity": "These output bounds are guaranteed only when the TPS7A4001 input accuracy condition VIN<=24V is met and capacitors/load meet the datasheet requirements. For normal BUS>24V they are not guaranteed bounds."
+    },
+    "current_budget": {
+      "pump_output_current_min_uA": 15,
+      "pump_spec_condition": "LTC7001: VTS=20V, VBST-TS=10V",
+      "RGS_current_at_10V_uA": 4.545,
+      "two_HYG022_gate_leakage_budget_uA": 0.2,
+      "C_ISO_BST_leakage_screen_uA": 0.025,
+      "sum_known_pump_load_uA": 4.77,
+      "pump_current_margin_at_spec_point_uA": 10.23,
+      "pump_boundary": "15uA minimum is specified at the single stated TS=20V/BST-TS=10V point; do not extend this guaranteed current to TS=21.6V. 225uA total LTC supply current is typical only. Maximum VCC supply current is 50uA under its listed VCC table condition."
+    },
+    "maximum_rail_load_screen": {
+      "divider_at_VOUT_max_uA": 122.42,
+      "LTC_VCC_max_uA": 50,
+      "RGS_at_VOUT_max_uA": 5.62,
+      "HYG022_pair_leakage_uA": 0.2,
+      "Cbst_leakage_uA": 0.025,
+      "COUT_leakage_at_VOUT_max_uA_using_min_IR_22Mohm": 0.562,
+      "estimated_LDO_output_load_uA": 178.83,
+      "LDO_IGND_max_uA": 65,
+      "LDO_IEN_max_uA": 1,
+      "hot_reverse_leakage_allowance_for_idle_OR_diode_uA": 5,
+      "estimated_source_current_at_69p4V_uA_excluding_CIN_leakage": 249.83,
+      "CIN_leakage_screen_at_69p4V_uA_using_50Mohm_IR": 1.39,
+      "LDO_power_at_69p4V_mW": 14.8,
+      "junction_rise_screen_C_at_66p7C_per_W": 0.99,
+      "junction_temperature_screen_C_at_60C_ambient": 61.0,
+      "qualification": "LDO power estimate uses maximum listed IGND/IEN, full output-current screen and stated package RθJA; CIN leakage is an insulation-resistance screen, not a hot-temperature leakage guarantee."
+    },
+    "output_reservoir_screen": {
+      "COUT_nominal_uF": 22,
+      "calculated_screen_Ceff_uF": 6.864,
+      "calculation": "22uF × 0.8 tolerance × 0.78 X7S temperature factor × 0.5 assumed DC-bias retention",
+      "stored_energy_at_nominal_11p847V_mJ": 0.482,
+      "energy_above_max_falling_UVLO_6p9V_at_nominal_mJ": 0.318,
+      "energy_above_UVLO_at_min_output_11p345V_mJ": 0.278,
+      "two_HYG_typical_gate_charge_nC": 321,
+      "gate_energy_screen_at_14V_mJ": 0.00449,
+      "ideal_hold_time_min_output_to_6p9V_ms": 170.6,
+      "ideal_hold_time_nominal_to_6p9V_ms": 189.9,
+      "qualification": "50% DC-bias retention是筛查假设，不是TDK全温保证值。理想放电时间假设LDO不反灌且负载恒定；TPS7A4001输入掉电时输出端的反向放电未纳入保证，因此这不是BUS与SC同时失电时的保持时间承诺。已覆盖的是任一原始电源仍高于门槛时由OR连续供电。"
+    },
+    "turn_off_timing": {
+      "LTC_INP_falling_to_output_propagation_max_ns": 70,
+      "test_condition": "LTC7001 datasheet: VINP falling, CL=1nF, fast input edge; only driver IC condition, not system current-interruption time.",
+      "TGDN_pull_down_resistance_max_ohm": 4,
+      "pull_down_resistance_condition": "VCC=VBST=12V; this is a powered driver test condition.",
+      "HYG022_Qg_typ_nC_each": 160.5,
+      "HYG022_Qgd_typ_nC_each": 44,
+      "guarantee_limit": "HYG022 Qg/Qgd are typical, no maximum total gate charge is stated. Therefore no guaranteed complete gate discharge time or inductor-current interruption time can be calculated from these values. The 70ns propagation maximum does not include comparator/FF delay, gate discharge or clamp current decay."
+    }
+  },
+  "fault_matrix": [
+    {
+      "condition": "12V_DRV=0, BUS_EXT remains >=22.5V",
+      "result": "ISO_VCC is sourced through the BUS_EXT diode. With VIN<=24V the output lower bound is 11.345V (>6.9V falling UVLO). If BUS exceeds24V, LDO precision guarantee is not covered; raw VIN remains within recommended range only if <=100V.",
+      "required_logic": "12V_DRV loss must asynchronously clear U_ISO_ARM_FF and force U_SC_ISO_GATE.INP low; the auxiliary supply does not sense or latch 12V_DRV loss."
+    },
+    {
+      "condition": "BUS_EXT=0, SC_ISO_STORAGE=20V, including QL-short case",
+      "result": "The SC-side OR diode powers the LDO directly from the storage side upstream of Q_ISO1/Q_ISO2; VIN>=19.28V by the 0.72V-at-1mA VF screen, giving sufficient LDO headroom and VIN<=24V accuracy coverage.",
+      "required_logic": "On 12V_DRV loss the external fresh-arm latch must clear and LTC INP must be low."
+    },
+    {
+      "condition": "SC_ISO_STORAGE=0, BUS_EXT remains >=22.5V",
+      "result": "BUS branch powers LTC VCC; SC-side loss alone does not force LTC VCC to zero."
+    },
+    {
+      "condition": "BUS_EXT=0 and SC_ISO_STORAGE below 15V or both sources absent",
+      "result": "No guaranteed regulated ISO_VCC; LTC7001 TGDN at VCC=0 is unspecified. RGS only provides passive leakage bleed and no guaranteed fast-off or maximum time."
+    },
+    {
+      "condition": "D_ISO_AUX_OR open/short, LDO output short, or ISO_VCC short to ground",
+      "result": "Not covered. A shorted OR leg can cross-couple BUS and SC. The single-source matrix assumes the OR network and LDO are intact."
+    }
+  ],
+  "integration_dependencies_and_limits": [
+    "硬件许可链必须保证12V_DRV跌落触发FF异步清零；只有LTC供电连续而INP仍高会让开关继续导通。故障解除后必须重新产生PB5_ARM新边沿，禁止电源恢复自动重开。",
+    "本方案消除12V_DRV单独失电导致LTC VCC=0的状态，不宣称BUS与SC同时失电、器件供电脚短路、OR/LDO失效时的TGDN=低保证。",
+    "R_ISO_GATE_SOURCE=2.2M仅按两只HYG022各100nA最大门极漏电和C_ISO_BST绝缘电阻预算，静态VGS约0.44V；若用2uA未知漏电预算则会得到4.4V，不能声称无电源时仍低于HYG022最小阈值2V。",
+    "LTC7001 BST-TS启动泵电流/启动时间没有覆盖整个0..21.6V TS输入范围的最大启动时间保证。内部BST-TS欠压保护典型值约3.1V；新ARM时序不能承诺固定1s上限。",
+    "避免向IRLB4030施加14V自举；本节点仅驱HYG022，LTC7001 BST-TS最大列值筛查14V，低于HYG022±20V VGS绝对额定值，但不得误接到IRLB4030门极。",
+    "按当前母线TVS筛查，SMCJ43A最大夹位69.4V低于TPS7A4001推荐输入100V，余量30.6V；须把原始输入脚线束过冲限制在100V以内，105V为绝对最大值，不作为连续工作点。",
+    "未冻结的12V失效检测阈值、FF复位极性/逻辑门、LDO电容DC-bias保证与LTC泵在TS=21.6V的最小电流仍需在主原理设计中闭合。"
+  ],
+  "LT8228_component_count_comparison": {
+    "official_function_fit": "LT8228 Rev C的V2保护驱动DG2/DS2支持共源背靠背M4A/M4B，disable或故障时内部将DG2短接到DS2；从功能上可替代LTC7001及其BST-TS电荷泵驱动。",
+    "potential_local_deletions": [
+      "LTC7001及其独立VCC供电子块（本附件新增6件）",
+      "LTC7001专用C_ISO_BST",
+      "启动二极管D_ISO_BST_START",
+      "TGUP开通串阻可改由DG2限流配置承担"
+    ],
+    "must_remain_or_be_added": [
+      "系统掉电后不自动恢复的fresh-arm锁存仍需外部实现；LT8228自身过流/冷却周期会自动重试。",
+      "DG2限涌流应用仍需RDG2、CDG2配置，至少两只无源件，且其MOS电容/斜率须重新计算。",
+      "若把LT8228作为完整双向变换器主控替换现有DRV8161方案，需另计两方向电流感测、限流设定、两路补偿、开关频率/软启动/供电外围及其器件数量。"
+    ],
+    "count_conclusion": "在隔离驱动局部，LT8228确有减少LTC供电与BST外围的潜力，不能只因主芯片单价排除；但其为完整双向变换控制器，不是只换门极驱动的drop-in。未形成完整LT8228候选原理图/BOM前，无法严谨比较全板总器件数或断言总数减少。"
+  },
+  "procurement_and_cost": {
+    "cost_total": null,
+    "cost_status": "未取得这6件的同一日期、同一渠道可比报价，不报虚假的总成本或节省额。",
+    "reused_library_parts": [
+      "TPS7A4001DGNR / LCSC C55006",
+      "CGA9N3X7S2A106M230KB / LCSC C2168351",
+      "RC0603FR-0710KL / LCSC C98220"
+    ],
+    "quote_or_identity_open": [
+      "CMPD3003C供应商料号与报价未核",
+      "CKG57NX7S2A226M500JJ供应商料号与报价未核",
+      "RC0603FR-0791KL当前供应库存与报价未核",
+      "R_ISO_GATE_SOURCE=2.2MΩ候选料号供应商库存/报价未核"
+    ]
+  },
+  "official_sources": [
+    {
+      "name": "TI TPS7A4001 datasheet Rev B",
+      "url": "https://www.ti.com/lit/ds/symlink/tps7a4001.pdf",
+      "used_for": "100V input, output accuracy conditions, pinout, current, thermal resistance and input/output capacitor requirements"
+    },
+    {
+      "name": "ADI LTC7001 datasheet Rev G",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/LTC7001.pdf",
+      "used_for": "VCC UVLO, TGDN/TGUP, charge pump current, timing, bootstrap startup guidance and operating limits"
+    },
+    {
+      "name": "Central Semiconductor CMPD3003 series datasheet",
+      "url": "https://my.centralsemi.com/datasheets/CMPD3003-A-C-S.PDF",
+      "used_for": "CMPD3003C pinout, 180V reverse rating and hot reverse-leakage maximum"
+    },
+    {
+      "name": "TDK CGA9N3X7S2A106M230KB product and datasheet",
+      "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CGA9N3X7S2A106M230KB",
+      "datasheet_url": "https://product.tdk.com/info/en/documents/chara_sheet/CGA9N3X7S2A106M230KB.pdf",
+      "used_for": "10uF/100V/X7S input-cap identity and insulation-resistance data"
+    },
+    {
+      "name": "TDK CKG57NX7S2A226M500JJ product and datasheet",
+      "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=CKG57NX7S2A226M500JJ",
+      "datasheet_url": "https://product.tdk.com/info/en/documents/chara_sheet/ckg57nx7s2a226m500jj.pdf",
+      "used_for": "22uF/100V/X7S output-cap identity; DC-bias chart is typical"
+    },
+    {
+      "name": "TDK C3225X7R2A105K200AA product and datasheet",
+      "url": "https://product.tdk.com/en/search/capacitor/ceramic/mlcc/info?part_no=C3225X7R2A105K200AA",
+      "used_for": "existing 1uF/100V BST capacitor identity and insulation resistance"
+    },
+    {
+      "name": "Diodes Inc. SMCJ43A product page",
+      "url": "https://www.diodes.com/part/view/SMCJ43A",
+      "used_for": "43V working standoff, 69.4V maximum clamp screening point"
+    },
+    {
+      "name": "LT8228 datasheet Rev C",
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/LT8228.pdf",
+      "used_for": "DG2/DS2 back-to-back protection MOSFET operation, fault disable, inrush components and automatic fault retry"
+    },
+    {
+      "name": "HYG022N10NS1TA manufacturer datasheet",
+      "url": "local:电力/BMS模块/厂商资料/HYG022N10NS1TA.pdf",
+      "used_for": "HYG022 pinout, VGS ratings, gate leakage and typical Qg/Qgd; Qg=160.5nC and Qgd=44nC per MOS are typical, not maximum"
+    }
+  ],
+  "integration_status": "SOURCE_SUBPACKAGE_OVERRIDDEN_WHERE_CONFLICTS",
+  "current_connection_authority": "../原理图准备/保护与制动合并合同.json; ../设计细节.md",
+  "parent_review_release_block": {
+    "OUT_minus_IN": "TPS7A4001 maximum +0.3V; two-source input OR does not clamp OUT→IN. Simultaneous source collapse is unqualified.",
+    "capacitors": "COUT effective minimum and X7S applicability versus required low-ESR ceramic remain unqualified; no polymer-only replacement adopted.",
+    "decision": "Conditional six-part supply candidate retained for comparison/count only, not approved for final design release."
+  },
+  "status_before_withdrawal": "conditional_paper_design_not_schematic_or_hardware_verified",
+  "current_adopted_design": false,
+  "withdrawal_reason": "用户要求先核清故障路径和简约性再加选型；原理必要性/替代/能量接管未闭合，撤回当前采用地位，保留比较数据。",
+  "current_adopted_increment_count": null
+}

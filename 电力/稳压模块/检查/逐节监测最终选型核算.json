@@ -1,0 +1,1050 @@
+{
+  "schema": "sc8_cell_monitor_final_selection/v1",
+  "date": "2026-10-29",
+  "status": "PAPER_FINAL_SELECTION_NOT_NATIVE_BOM_OR_HARDWARE_VALIDATION",
+  "scope": "Independent 8S supercapacitor 0V-capable cumulative tap measurement, ADC routing, thresholds, passive 120R discharge and parking RC screening.",
+  "native_schematic_modified": false,
+  "procurement_bom_modified": false,
+  "design_documents_modified": false,
+  "decision": {
+    "cell_measurement": "Keep the existing eight cumulative 68k/10k dividers. Add two four-channel TMUX1511 banks; within each package tie D1..D4 to one independent ADC bus and use the four SPST channels as one-hot tap selectors. This is not an addressed 8:1 mux; it uses one GPIO per channel.",
+    "signal_isolation": "Use a third TMUX1511 for BUS_ADC and DRV_SO/IMON powered-off isolation. Its BUS and IMON channels are held on while 3V3_CORE is valid; when the mux supply is off, both MCU-side 10k pulldowns hold the ADC/comparator nodes low.",
+    "MAX17853_MAX17877": "WITHDRAWN_NOT_ADOPTED",
+    "cell_charge_control": "Use 2.00V measured maximum-cell threshold as the charge/standby target, 2.15V measured as warning/derate, and 2.20V measured as regenerative-charge stop. Safety bound uses uncalibrated divider tolerance, full STM32G431 ADC ET, VREFINT drift/aging/supply bounds, 80A stale-sample rise, and SC_MINUS ground return; per-tap route calibration remains required for useful telemetry but is not credited to the safety threshold.",
+    "passive_120R": "Retain R_BAL1..R_BAL8 as permanently connected cell shunts, treated as slow discharge/voltage-spread decay, not an active or capacity-tolerance balancer. Their continuous drain and limited ability at high charge current are explicit operating boundaries."
+  },
+  "evidence_reviewed": [
+    "../AGENTS.md",
+    "设计需求.md (opening sections)",
+    "设计细节.md (opening sections; prior MAX17853/77 adoption is withdrawn)",
+    "原理图准备/BOM.csv",
+    "检查/当前原理图证据.json",
+    "检查/低成本逐节监测核算.json (historical direct-ADC/test-branch baseline; not adopted)",
+    "检查/初充与掉电接口核算.json (historical candidate only; not adopted as a whole)",
+    "参考资料/TMUX1511_Official.pdf",
+    "检查/未通过项修复/BUSFIX_逐节保护资格复查.json"
+  ],
+  "cell_mux": {
+    "device": {
+      "manufacturer": "Texas Instruments",
+      "mpn": "TMUX1511PWR",
+      "package": "TSSOP-14",
+      "supplier": "LCSC",
+      "supplier_part": "C2866750",
+      "vdd": "3V3_CORE",
+      "gnd": "GND_SYS",
+      "local_bypass": "100nF from VDD to GND per device; reuse C_BAL refs listed below.",
+      "datasheet_limits": {
+        "supply_V": [
+          1.5,
+          5.5
+        ],
+        "powered_signal_max_V": 5.5,
+        "powered_off_signal_V": [
+          0.0,
+          3.6
+        ],
+        "powered_off_leakage_max_uA_per_io": 2.0,
+        "ron_max_ohm": 4.5,
+        "logic_high_min_V": 1.2,
+        "logic_low_max_V": 0.45,
+        "internal_sel_pulldown_ohm": 6000000
+      }
+    },
+    "U_CELL_MUX1": {
+      "channels": [
+        {
+          "S_pin": 2,
+          "S_net": "AD_T1",
+          "D_pin": 3,
+          "D_net": "SC_ADC_A",
+          "SEL_pin": 1,
+          "GPIO": "PC6 / P1-9"
+        },
+        {
+          "S_pin": 5,
+          "S_net": "AD_T2",
+          "D_pin": 6,
+          "D_net": "SC_ADC_A",
+          "SEL_pin": 4,
+          "GPIO": "PA15 / P1-15"
+        },
+        {
+          "S_pin": 9,
+          "S_net": "AD_T3",
+          "D_pin": 8,
+          "D_net": "SC_ADC_A",
+          "SEL_pin": 10,
+          "GPIO": "PC10 / P1-16"
+        },
+        {
+          "S_pin": 12,
+          "S_net": "AD_T4",
+          "D_pin": 11,
+          "D_net": "SC_ADC_A",
+          "SEL_pin": 13,
+          "GPIO": "PC11 / P1-17"
+        }
+      ],
+      "D_tied_pins": [
+        3,
+        6,
+        8,
+        11
+      ],
+      "adc": "PB14 / ADC1_IN5",
+      "pulldown_ref": "R_ADC_A_PD",
+      "filter_cap_ref": "C_T1_FILTER moved to SC_ADC_A-GND_SYS"
+    },
+    "U_CELL_MUX2": {
+      "channels": [
+        {
+          "S_pin": 2,
+          "S_net": "AD_T5",
+          "D_pin": 3,
+          "D_net": "SC_ADC_B",
+          "SEL_pin": 1,
+          "GPIO": "PB3 / P1-18"
+        },
+        {
+          "S_pin": 5,
+          "S_net": "AD_T6",
+          "D_pin": 6,
+          "D_net": "SC_ADC_B",
+          "SEL_pin": 4,
+          "GPIO": "PB4 / P1-19"
+        },
+        {
+          "S_pin": 9,
+          "S_net": "AD_T7",
+          "D_pin": 8,
+          "D_net": "SC_ADC_B",
+          "SEL_pin": 10,
+          "GPIO": "PB5 / P1-20 (repurpose old PERMIT GPIO)"
+        },
+        {
+          "S_pin": 12,
+          "S_net": "AD_T8",
+          "D_pin": 11,
+          "D_net": "SC_ADC_B",
+          "SEL_pin": 13,
+          "GPIO": "PB9 / P1-24"
+        }
+      ],
+      "D_tied_pins": [
+        3,
+        6,
+        8,
+        11
+      ],
+      "adc": "PB15 / ADC2_IN15",
+      "pulldown_ref": "R_ADC_B_PD",
+      "filter_cap_ref": "C_T2_FILTER moved to SC_ADC_B-GND_SYS"
+    },
+    "selection_contract": {
+      "bank_A_one_hot": "SEL1..SEL4 mutually exclusive; all-low between selections.",
+      "bank_B_one_hot": "SEL1..SEL4 mutually exclusive; all-low between selections.",
+      "paired_scan_order": [
+        [
+          "T1",
+          "T5"
+        ],
+        [
+          "T2",
+          "T6"
+        ],
+        [
+          "T3",
+          "T7"
+        ],
+        [
+          "T4",
+          "T8"
+        ]
+      ],
+      "settle_after_select_us": 100.0,
+      "fresh_scan_period_ms": 20.0,
+      "compute_cell_voltage": "Vcell[n]=Vtap[n]-Vtap[n-1], T0=GND_SYS.",
+      "unsafe_state": "If two SEL channels in the same bank are high, different taps are tied together through two switch channels. Samples are invalid; firmware must enforce all-low then one-hot."
+    }
+  },
+  "signal_isolation_mux": {
+    "ref": "U_SIGNAL_ISO",
+    "mpn": "TMUX1511PWR",
+    "supplier_part": "LCSC C2866750",
+    "pin_map": {
+      "VDD_pin14": "3V3_CORE",
+      "GND_pin7": "GND_SYS",
+      "SEL1_pin1": "3V3_CORE; channel1 on while core rail valid",
+      "S1_pin2_to_D1_pin3": "BUS_ADC_SOURCE -> BUS_ADC_MCU / PB0 ADC1_IN15",
+      "SEL2_pin4": "3V3_CORE; channel2 on while core rail valid",
+      "S2_pin5_to_D2_pin6": "IMON_SOURCE -> IMON_MCU / PB1, PA7, PA0 comparator inputs",
+      "SEL3_pin10_SEL4_pin13": "GND_SYS; unused off",
+      "S3_pin9_S4_pin12": "GND_SYS",
+      "D3_pin8_D4_pin11": "NC"
+    },
+    "host_pulldowns": [
+      {
+        "ref": "R_TEST_HI",
+        "function": "BUS_ADC_MCU to GND_SYS"
+      },
+      {
+        "ref": "R_TEST_LO",
+        "function": "IMON_MCU to GND_SYS"
+      }
+    ],
+    "source_filters_retained": [
+      "C_BUS_ADC on BUS_ADC_SOURCE",
+      "R_DRV_SO_SER=22ohm before IMON_SOURCE",
+      "C_DRV_SO=100pF on IMON_SOURCE"
+    ]
+  },
+  "gpio_allocation": {
+    "protected_reservations": [
+      {
+        "GPIO": "PA9",
+        "function": "TIM1_CH2 hardware ARM hold output -> G07A; reset/fault state low"
+      },
+      {
+        "GPIO": "PB12",
+        "function": "TIM1_BKIN plus readback of actual active-low DRV_FAULT_N"
+      },
+      {
+        "GPIO": "PA8/PB13",
+        "function": "main complementary PWM"
+      },
+      {
+        "GPIO": "PA6/PA2",
+        "function": "COMP1/COMP2 open-drain fault outputs"
+      },
+      {
+        "GPIO": "PA0/PB1/PA7",
+        "function": "COMP3+/COMP1+/COMP2+ from IMON_MCU"
+      }
+    ],
+    "monitor_pins": [
+      {
+        "GPIO": "PB0",
+        "function": "BUS_ADC_MCU / ADC1_IN15"
+      },
+      {
+        "GPIO": "PB14",
+        "function": "SC_ADC_A / ADC1_IN5"
+      },
+      {
+        "GPIO": "PB15",
+        "function": "SC_ADC_B / ADC2_IN15"
+      },
+      {
+        "GPIO": "PB11",
+        "function": "NTC_MAIN ADC"
+      },
+      {
+        "GPIO": "PC4",
+        "function": "NTC_SC / ADC2_IN5"
+      },
+      {
+        "GPIO": "PA3",
+        "function": "NTC_DUMP / ADC1_IN4 (moved off PB12)"
+      }
+    ],
+    "selector_gpio": [
+      "PC6",
+      "PA15",
+      "PC10",
+      "PC11",
+      "PB3",
+      "PB4",
+      "PB5",
+      "PB9"
+    ],
+    "unused_or_optional": [
+      "PA10 optional DRV_FAULT_N readback; otherwise free",
+      "PB10 old TEST_CTRL released"
+    ],
+    "board_variant_check": "PA9/PB6 connected-core-board solder bridges and actual core-board pinout must be read back before implementation; no carrier/core-board change is included here."
+  },
+  "bom_delta_for_measurement_and_balance": {
+    "new_physical_instances": [
+      {
+        "refs": [
+          "U_CELL_MUX1",
+          "U_CELL_MUX2",
+          "U_SIGNAL_ISO"
+        ],
+        "qty": 3,
+        "mpn": "TMUX1511PWR",
+        "manufacturer": "Texas Instruments",
+        "supplier": "LCSC",
+        "supplier_part": "C2866750",
+        "reason": "four independent SPST channels, 3.6V powered-off protection, low Ron, signal isolation"
+      },
+      {
+        "refs": [
+          "R_ADC_A_PD",
+          "R_ADC_B_PD"
+        ],
+        "qty": 2,
+        "mpn": "PTFR0805B10K0N9",
+        "value": "10k 0.1%",
+        "manufacturer": "RESI",
+        "supplier": "LCSC",
+        "supplier_part": "C328436",
+        "reason": "one host-side D-bus pull-down per cell bank"
+      }
+    ],
+    "moved_or_rewired": [
+      {
+        "refs": [
+          "R_T1_TEST",
+          "R_T2_TEST",
+          "R_T3_TEST",
+          "R_T4_TEST",
+          "R_T5_TEST",
+          "R_T6_TEST",
+          "R_T7_TEST"
+        ],
+        "part": "PTFR0805B47K0N9 47k 0.1%",
+        "new_function": "SEL1..SEL7 external pull-downs to GND_SYS; one per cell-mux channel"
+      },
+      {
+        "refs": [
+          "R_QP_GS"
+        ],
+        "part": "RMC060347K1%N 47k 1%",
+        "new_function": "SEL8 external pull-down to GND_SYS; Q_BUS_P is retired"
+      },
+      {
+        "refs": [
+          "R_TEST_HI",
+          "R_TEST_LO"
+        ],
+        "part": "PTFR0805B10K0N9 10k 0.1%",
+        "new_function": "U_SIGNAL_ISO BUS_ADC_MCU and IMON_MCU D-side pull-downs"
+      },
+      {
+        "refs": [
+          "C_T1_FILTER",
+          "C_T2_FILTER"
+        ],
+        "part": "CC0805CG100V102GN 1nF 100V C0G",
+        "new_function": "cell-bank A/B D-output filters to GND_SYS"
+      },
+      {
+        "refs": [
+          "C_BAL1",
+          "C_BAL2",
+          "C_BAL3"
+        ],
+        "part": "C0805C104K5RAC7800 100nF 50V X7R",
+        "new_function": "local VDD bypass for U_CELL_MUX1, U_CELL_MUX2, U_SIGNAL_ISO"
+      },
+      {
+        "refs": [
+          "C_BAL4",
+          "C_BAL5"
+        ],
+        "part": "C0805C104K5RAC7800 100nF 50V X7R",
+        "new_function": "reserve for parent-selected G07 and LTC local bypass"
+      },
+      {
+        "refs": [
+          "R_BAL1",
+          "R_BAL2",
+          "R_BAL3",
+          "R_BAL4",
+          "R_BAL5",
+          "R_BAL6",
+          "R_BAL7",
+          "R_BAL8"
+        ],
+        "part": "MFR25SFRE52-120R 120ohm 1% 0.25W",
+        "new_function": "permanent resistor directly across each cell: R_BAL1=T1..SC_MINUS, R_BAL2=T2..T1, ... R_BAL8=SC_PLUS..T7"
+      }
+    ],
+    "retired": [
+      {
+        "refs": [
+          "Q_BUS_P"
+        ],
+        "part": "IXTH76P10T",
+        "reason": "parent-selected bus architecture removes this P-MOS; reclaim R_QP_GS for SEL8"
+      },
+      {
+        "refs": [
+          "U_BAL1",
+          "U_BAL2",
+          "U_BAL3",
+          "U_BAL4",
+          "U_BAL5",
+          "U_BAL6",
+          "U_BAL7",
+          "U_BAL8"
+        ],
+        "part": "BW6101-C1AP",
+        "reason": "parent-selected always-connected 120R bleed; no controller IC"
+      },
+      {
+        "refs": [
+          "C_T3_FILTER",
+          "C_T4_FILTER",
+          "C_T5_FILTER",
+          "C_T6_FILTER",
+          "C_T7_FILTER",
+          "C_T8_FILTER",
+          "C_TEST_FB"
+        ],
+        "reason": "old per-tap and TEST_FB capacitors no longer used; T1/T2 capacitors moved to bank outputs"
+      },
+      {
+        "refs": [
+          "C_BAL6",
+          "C_BAL7",
+          "C_BAL8"
+        ],
+        "part": "C0805C104K5RAC7800",
+        "reason": "released; no local-bypass assignment in the adopted count"
+      }
+    ],
+    "retained_unchanged": [
+      "R_T1_HI..R_T8_HI=RT0603BRD0768KL 68k ±0.1%",
+      "R_T1_LO..R_T8_LO=PTFR0805B10K0N9 10k ±0.1%; all eight remain to limit mux S inputs",
+      "R_BUS_HI2/R_BUS_HI=150k each in series; R_BUS_LO=10k",
+      "R_DRV_SO_SER=22ohm; C_DRV_SO=100pF; C_BUS_ADC=1nF on source sides"
+    ],
+    "quantity_note": "Only this measurement/balance slice adds three mux ICs and two 10k resistors; five 100nF and two 1nF caps are moved, not newly procured. This does not replace the parent's global 22-add/19-retire BOM count."
+  },
+  "analog_network_calculation": {
+    "cell_divider": {
+      "R_hi_ohm": 68000.0,
+      "R_lo_ohm": 10000.0,
+      "D_pull_ohm": 10000.0,
+      "mux_ron_screen_ohm": 4.5,
+      "source_Rth_ohm": 8717.948717948717,
+      "tap_source_ratio": 7.8,
+      "tap_to_bank_ADC_gain": 0.06847668813867351,
+      "effective_cumulative_tap_division_ratio": 14.60351,
+      "divider_gain_tolerance_min_fraction": -0.0018616187700839504,
+      "divider_gain_tolerance_max_fraction": 0.002105482128411884,
+      "25C_cal_to_0_60C_TCR_min_fraction": -0.0016290920106799556,
+      "25C_cal_to_0_60C_TCR_max_fraction": 0.001631554207375041,
+      "bank_output_source_impedance_ohm": 4658.818325183466,
+      "bank_output_tau_us_with_1nF": 4.658818325183466,
+      "tap_values_at_2p7V_each": [
+        {
+          "tap": 1,
+          "source_AD_Tn_at_2p7V_per_cell_V": 0.34615384615384615,
+          "bank_ADC_D_at_2p7V_per_cell_V": 0.18488705797441848,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 2,
+          "source_AD_Tn_at_2p7V_per_cell_V": 0.6923076923076923,
+          "bank_ADC_D_at_2p7V_per_cell_V": 0.36977411594883697,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 3,
+          "source_AD_Tn_at_2p7V_per_cell_V": 1.0384615384615385,
+          "bank_ADC_D_at_2p7V_per_cell_V": 0.5546611739232555,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 4,
+          "source_AD_Tn_at_2p7V_per_cell_V": 1.3846153846153846,
+          "bank_ADC_D_at_2p7V_per_cell_V": 0.7395482318976739,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 5,
+          "source_AD_Tn_at_2p7V_per_cell_V": 1.7307692307692308,
+          "bank_ADC_D_at_2p7V_per_cell_V": 0.9244352898720924,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 6,
+          "source_AD_Tn_at_2p7V_per_cell_V": 2.076923076923077,
+          "bank_ADC_D_at_2p7V_per_cell_V": 1.109322347846511,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 7,
+          "source_AD_Tn_at_2p7V_per_cell_V": 2.4230769230769234,
+          "bank_ADC_D_at_2p7V_per_cell_V": 1.2942094058209295,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        },
+        {
+          "tap": 8,
+          "source_AD_Tn_at_2p7V_per_cell_V": 2.769230769230769,
+          "bank_ADC_D_at_2p7V_per_cell_V": 1.4790964637953479,
+          "safe_with_TMUV1511_power_off_3p6V_limit": true
+        }
+      ],
+      "must_keep_R_Tn_LO": "If any R_Tn_LO is omitted/moved, corresponding mux S sees raw cumulative stack voltage up to 21.6V, exceeding 5.5V signal maximum and 3.6V powered-off range. Keep all eight 10k lower legs."
+    },
+    "bus_divider": {
+      "existing_upper_series_ohm": 300000,
+      "existing_lower_ohm": 10000,
+      "prior_ratio": 31.0,
+      "loaded_ratio_with_reused_R_TEST_HI_and_mux": 61.01395,
+      "80V_source_side_ADC_V": 2.5806451612903225,
+      "80V_MCU_D_side_ADC_V": 1.3111755590319918,
+      "bus_mV_per_12bit_count_at_3p3V": 49.156746826171876,
+      "calibration_note": "Use about 61.014 V/V after mux and host-side loading; prior 31 V/V no longer applies to PB0."
+    },
+    "imon": {
+      "DRV_SO_series_resistor_ohm": 22.0,
+      "mux_ron_max_ohm": 4.5,
+      "MCU_side_pull_ohm": 10000,
+      "source_to_MCU_gain": 0.9973570039395602,
+      "attenuation_percent": 0.26429960604398284,
+      "max_3p05V_source_to_MCU_V": 3.0419388620156584,
+      "note": "About 0.264% attenuation is calibratable; apply the same gain to ADC and comparator threshold interpretation."
+    },
+    "cell_scan_timing": {
+      "ADC_clock_MHz": 60.0,
+      "sample_cycles": 640.5,
+      "sample_time_us": 10.675,
+      "conversion_cycles_total": 653.0,
+      "conversion_time_us_total": 10.883333333333333,
+      "100us_settle_in_tau": 21.464670442168824,
+      "four_parallel_bank_pairs_scan_us": 443.53333333333336,
+      "fresh_scan_period_ms_contract": 20.0,
+      "max_ADC_source_ohm_reference": 33000,
+      "source_within_reference": true
+    }
+  },
+  "power_off_and_static_load": {
+    "powered_off": {
+      "max_cell_mux_S_input_V_at_2p7V_each": 2.769230769230769,
+      "below_TMUX1511_3p6V_poweroff_limit": true,
+      "cell_bank_worst_four_off_channel_leakage_uA": 8.0,
+      "cell_bank_D_node_worst_first_order_voltage_mV_with_10k": 80.0,
+      "third_mux_each_D_node_one_channel_leakage_uA": 2.0,
+      "third_mux_each_D_node_worst_first_order_voltage_mV_with_10k": 20.0,
+      "limitation": "Mux isolates MCU pins from the tap voltage when core power is off; it does not stop the continuous R_Tn divider current or direct R_BAL bleed from discharging the supercapacitors."
+    },
+    "tap_and_bleed_current_tables": [
+      {
+        "cell_voltage_V": 2.0,
+        "tap_only_cell_currents_bottom_to_top_mA": [
+          0.923076923076923,
+          0.8974358974358975,
+          0.8461538461538461,
+          0.7692307692307693,
+          0.6666666666666666,
+          0.5384615384615384,
+          0.38461538461538464,
+          0.20512820512820512
+        ],
+        "tap_only_stack_power_mW": 10.461538461538462,
+        "direct_120R_current_per_cell_mA": 16.666666666666668,
+        "direct_120R_power_per_cell_mW": 33.333333333333336,
+        "direct_120R_power_8_cells_W": 0.26666666666666666,
+        "bottom_total_bleed_plus_tap_mA": 17.589743589743588,
+        "top_total_bleed_plus_tap_mA": 16.871794871794872,
+        "T8_added_current_while_selected_uA": 14.046500131009964
+      },
+      {
+        "cell_voltage_V": 2.15,
+        "tap_only_cell_currents_bottom_to_top_mA": [
+          0.9923076923076923,
+          0.9647435897435896,
+          0.9096153846153846,
+          0.8269230769230769,
+          0.7166666666666667,
+          0.5788461538461538,
+          0.41346153846153844,
+          0.2205128205128205
+        ],
+        "tap_only_stack_power_mW": 12.089615384615383,
+        "direct_120R_current_per_cell_mA": 17.916666666666668,
+        "direct_120R_power_per_cell_mW": 38.52083333333333,
+        "direct_120R_power_8_cells_W": 0.30816666666666664,
+        "bottom_total_bleed_plus_tap_mA": 18.90897435897436,
+        "top_total_bleed_plus_tap_mA": 18.137179487179488,
+        "T8_added_current_while_selected_uA": 15.099987640835732
+      },
+      {
+        "cell_voltage_V": 2.2,
+        "tap_only_cell_currents_bottom_to_top_mA": [
+          1.0153846153846156,
+          0.9871794871794872,
+          0.9307692307692309,
+          0.8461538461538461,
+          0.7333333333333335,
+          0.5923076923076923,
+          0.42307692307692313,
+          0.22564102564102564
+        ],
+        "tap_only_stack_power_mW": 12.658461538461541,
+        "direct_120R_current_per_cell_mA": 18.333333333333332,
+        "direct_120R_power_per_cell_mW": 40.333333333333336,
+        "direct_120R_power_8_cells_W": 0.3226666666666667,
+        "bottom_total_bleed_plus_tap_mA": 19.34871794871795,
+        "top_total_bleed_plus_tap_mA": 18.55897435897436,
+        "T8_added_current_while_selected_uA": 15.451150144110969
+      },
+      {
+        "cell_voltage_V": 2.7,
+        "tap_only_cell_currents_bottom_to_top_mA": [
+          1.2461538461538462,
+          1.2115384615384617,
+          1.1423076923076925,
+          1.0384615384615385,
+          0.9000000000000001,
+          0.726923076923077,
+          0.5192307692307693,
+          0.27692307692307694
+        ],
+        "tap_only_stack_power_mW": 19.06615384615385,
+        "direct_120R_current_per_cell_mA": 22.500000000000004,
+        "direct_120R_power_per_cell_mW": 60.75000000000001,
+        "direct_120R_power_8_cells_W": 0.48600000000000004,
+        "bottom_total_bleed_plus_tap_mA": 23.74615384615385,
+        "top_total_bleed_plus_tap_mA": 22.77692307692308,
+        "T8_added_current_while_selected_uA": 18.962775176863428
+      }
+    ],
+    "direct_bleed_time_constants": [
+      {
+        "capacitance_F": 280.0,
+        "120R_only_RC_tau_h": 9.333333333333334,
+        "voltage_after_8h_from_2p2V_ideal_V": 0.93362026048929,
+        "voltage_after_24h_from_2p2V_ideal_V": 0.16813783137968988
+      },
+      {
+        "capacitance_F": 350.0,
+        "120R_only_RC_tau_h": 11.666666666666666,
+        "voltage_after_8h_from_2p2V_ideal_V": 1.1082066461157194,
+        "voltage_after_24h_from_2p2V_ideal_V": 0.28120101858333646
+      },
+      {
+        "capacitance_F": 420.0,
+        "120R_only_RC_tau_h": 14.0,
+        "voltage_after_8h_from_2p2V_ideal_V": 1.2423798684170706,
+        "voltage_after_24h_from_2p2V_ideal_V": 0.3962030867254953
+      }
+    ],
+    "capacity_mismatch": {
+      "LICAP_capacitance_range_F": [
+        350.0,
+        420.0
+      ],
+      "at_charge_standby_target_low_cap_cell_V": 2.0,
+      "equal_charge_high_cap_cell_V": 1.6666666666666667,
+      "voltage_spread_V": 0.33333333333333326,
+      "time_to_2p00_at_20A_from_0_for_350F_s": 35.0,
+      "initial_charge_time_range_at_20A_s_for_280_350_420F": [
+        28.0,
+        35.0,
+        42.0
+      ],
+      "stored_energy_at_mismatch_target_J": 4783.333333333334,
+      "interpretation": "120R bleed current is under 0.1% of a 20A ramp and cannot correct the 0/+20% capacitance mismatch. It only dissipates energy and slowly reduces voltage differences; no active balancing claim is made."
+    },
+    "steady_state_spread": {
+      "definition": "steady DC charge current through stack; each cell's capacitive current is zero; node KCL includes each direct 120R shunt and all Tn-to-GND 78k tap branches",
+      "largest_cell_set_to_V": 2.15,
+      "worst_corner": {
+        "spread_V": 0.1566489352121354,
+        "current_A": 0.017953169530977798,
+        "cell_voltages_V": [
+          1.9933510647878645,
+          2.0635619384928554,
+          2.0698657571594925,
+          2.0793858287718687,
+          2.092136946056641,
+          2.1081389222883646,
+          2.127416622076263,
+          2.15
+        ],
+        "r_balance_ohm": [
+          118.8,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2
+        ],
+        "cell_leak_conductance_S": [
+          0.00011111111111111109,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "interpretation": "A 120R direct shunt only produces a normal-window DC equilibrium when stack charge current is about 18mA, not at a 20A-class ramp. At the low-current equilibrium, resistor tolerance, cumulative-divider return currents and leakage can leave about 157mV cell spread. Capacity affects the time to equilibrium, not its DC voltage; it can make transient spread worse."
+    },
+    "parking_rc_matrix": {
+      "model": "For node voltages X1..X8, M*dX/dt=-G*X; M is the series-capacitor nodal matrix, G contains each direct R_BAL resistor, each 78k cumulative tap resistor to GND_SYS, and an equivalent leakage conductance per cell. No source current during parking.",
+      "direct_120R_worst_mismatch_case": {
+        "initial_cell_voltage_V": 2.2,
+        "capacitances_F": [
+          350.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0
+        ],
+        "balance_resistors_ohm": [
+          118.8,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2,
+          121.2
+        ],
+        "leak_model": "each cell leakage as parallel conductance; 0.3mA at 2.7V => 111.1uS, zero leakage at 0V; sensitivity model, not a vendor I-V guarantee",
+        "cell_voltages_by_park_day_V": {
+          "1": [
+            0.23339878590169372,
+            0.3685346536484909,
+            0.37037343836286163,
+            0.3732310112334468,
+            0.3771112773089007,
+            0.38201950747893654,
+            0.3879623431782151,
+            0.39494780230158577
+          ],
+          "2": [
+            0.02295972071280079,
+            0.062015314623389384,
+            0.06260746482578407,
+            0.06355811536903086,
+            0.06486994306067562,
+            0.06654660099084403,
+            0.06859272513617942,
+            0.07101394271057632
+          ],
+          "3": [
+            0.0019114919495865723,
+            0.010465760026848826,
+            0.010610820863072893,
+            0.010850645599357552,
+            0.011186272781873348,
+            0.011619133821254804,
+            0.012151056917025685,
+            0.012784272045033324
+          ],
+          "5": [
+            -1.3736972828742481e-05,
+            0.0002992915053932452,
+            0.00030597040338637815,
+            0.00031757106582278483,
+            0.0003341805709114443,
+            0.00035592097426156706,
+            0.0003829498767525992,
+            0.0004154611525990625
+          ],
+          "7": [
+            -1.399919298431932e-06,
+            8.563541979468806e-06,
+            8.831255422661194e-06,
+            9.314385369596737e-06,
+            1.0018163211164345e-05,
+            1.0950022216846196e-05,
+            1.2119646654395806e-05,
+            1.3539035237084179e-05
+          ],
+          "8": [
+            -2.8931116482530393e-07,
+            1.4470545679179414e-06,
+            1.4993431101604086e-06,
+            1.5951992064118014e-06,
+            1.7358243788705327e-06,
+            1.922935877005341e-06,
+            2.1587797282799848e-06,
+            2.4461476516217454e-06
+          ]
+        },
+        "unclamped_linear_minimum_V": -1.3739025549768644e-05,
+        "unclamped_linear_minimum_day": 4.990972222222222,
+        "physical_reading": "No material reverse voltage in the modeled 0/+20% capacity, bounded-leakage cases. A few microvolts of negative linear tail occurs only after the entire stack is already at microvolt levels and is below model resolution; it is not evidence of a physical reverse bias. LICAP does not specify a reverse-voltage operating model, so do not extrapolate the linear model below zero."
+      },
+      "78k_tap_network_only_comparison": {
+        "initial_cell_voltage_V": 2.2,
+        "capacitances_F": [
+          350.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0,
+          420.0
+        ],
+        "balance_resistors_ohm": [
+          1e+30,
+          1e+30,
+          1e+30,
+          1e+30,
+          1e+30,
+          1e+30,
+          1e+30,
+          1e+30
+        ],
+        "leak_model": "each cell leakage as parallel conductance; 0.3mA at 2.7V => 111.1uS, zero leakage at 0V; sensitivity model, not a vendor I-V guarantee",
+        "cell_voltages_by_park_day_V": {
+          "1": [
+            1.9040608857333057,
+            2.0056365727747387,
+            2.0165841252328516,
+            2.0330885194675234,
+            2.055171909974037,
+            2.0828639049022506,
+            2.1162015923022963,
+            2.155229572981913
+          ],
+          "2": [
+            1.6364412321094886,
+            1.8276944701905435,
+            1.8483563717827103,
+            1.879668549229998,
+            1.9217165675742,
+            1.9746150484998246,
+            2.0385078752025088,
+            2.1135684492815514
+          ],
+          "3": [
+            1.394621598808568,
+            1.6647635442781135,
+            1.6940193288409646,
+            1.7385937355829952,
+            1.7986727237904647,
+            1.8745059939096222,
+            1.9664076623900293,
+            2.074757109240638
+          ],
+          "5": [
+            0.9793858688070561,
+            1.3788941042900644,
+            1.4223785382833403,
+            1.4893802278761696,
+            1.5803816530663513,
+            1.696033799755008,
+            1.837159138376995,
+            2.0047553767789825
+          ],
+          "7": [
+            0.6422667492500996,
+            1.1390031807553465,
+            1.1933554682222458,
+            1.2781065420723698,
+            1.3941409771355762,
+            1.54265814533405,
+            1.725180016374309,
+            1.943561017609019
+          ],
+          "8": [
+            0.4987224484747175,
+            1.0338947037160962,
+            1.0926115538428596,
+            1.1847397813199634,
+            1.3113974109027766,
+            1.4741041046131205,
+            1.6747925418138943,
+            1.9158228264288226
+          ]
+        },
+        "unclamped_linear_minimum_V": 0.4987224484747175,
+        "unclamped_linear_minimum_day": 8.0,
+        "physical_reading": "No material reverse voltage in the modeled 0/+20% capacity, bounded-leakage cases. A few microvolts of negative linear tail occurs only after the entire stack is already at microvolt levels and is below model resolution; it is not evidence of a physical reverse bias. LICAP does not specify a reverse-voltage operating model, so do not extrapolate the linear model below zero."
+      },
+      "takeaway": "With direct 120R per cell, storage is intentionally lost quickly (low-cap corner is about 24mV at day 2 and about 2mV at day 3 from a 2.2V start). The cumulative-tap return path did not create material reverse voltage in 0/+20% capacitance and bounded linear-leakage corners; numerical negative tail is only microvolts after all cells have already decayed to microvolts. This is a model result, not a reverse-voltage qualification."
+    }
+  },
+  "threshold_error_budget": {
+    "conditions": {
+      "ambient_C": [
+        0,
+        60
+      ],
+      "calibration_C": 25,
+      "resistor_tolerance_fraction": 0.001,
+      "resistor_TCR_bound_ppm_per_C": 25,
+      "ADC_Vref_V": 3.3,
+      "ADC_resolution_bits": 12,
+      "ADC_ET_max_LSB_per_endpoint": 7.5,
+      "ADC_INL_max_LSB_per_endpoint": 4.4,
+      "quantization_bound_LSB_per_endpoint": 0.5,
+      "VREFINT_residual_fraction": 0.0075481188118811885,
+      "VREFINT_error_basis": "ST per-device factory VREFINT calibration at 30C +/-5C; worst full-temperature spread 7.5mV divided by 1.212V typical, plus 1000ppm/1000h maximum long-term stability and 1200ppm/V maximum supply coefficient over 0.3V.",
+      "SC_MINUS_to_GND_SYS_shunt_ohm": 0.0005,
+      "charge_current_A_for_age_and_shunt": 80.0,
+      "cell_capacitance_F_for_age_sensitivity": 280.0,
+      "age_basis": "IWDG max timeout plus full scan duration; primary screen is 80A/280F (more conservative than the LICAP 350F minimum), with 50A/280F and 80A/350F comparison values included per threshold.",
+      "ADC_error_scope": "G431 ET/INL values are characterized, not production-tested. Raw ET bound sums both endpoints without cancellation. Calibrated bound requires per-tap route gain/offset calibration and per-ADC calibration."
+    },
+    "LSB_mV": 0.8056640625,
+    "one_endpoint_cell_equivalent_LSB_mV": 11.765523193359373,
+    "raw_conservative_all_cells_at_thresholds": [
+      {
+        "measured_cell_threshold_V": 2.0,
+        "adc_ET_pair_mV": 176.4828479003906,
+        "divider_tolerance_pair_mV": 63.16446385235652,
+        "divider_TCR_pair_mV_after_25C_cal": 48.946626221251236,
+        "VREFINT_residual_mV": 15.096237623762377,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "raw_total_error_mV": 370.97428439517796,
+        "raw_actual_upper_bound_V": 2.370974284395178,
+        "margin_to_2p70V_mV": 329.0257156048222,
+        "50A_280F_age_rise_mV": 17.052567998385797,
+        "50A_280F_upper_bound_V_same_other_errors": 2.3607427435961466,
+        "80A_350F_age_rise_mV_spec_min_cap": 21.827287037933818,
+        "80A_350F_upper_bound_V_same_other_errors": 2.3655174626356947
+      },
+      {
+        "measured_cell_threshold_V": 2.15,
+        "adc_ET_pair_mV": 176.4828479003906,
+        "divider_tolerance_pair_mV": 67.90179864128326,
+        "divider_TCR_pair_mV_after_25C_cal": 52.617623187845076,
+        "VREFINT_residual_mV": 16.228455445544554,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "raw_total_error_mV": 380.51483397248074,
+        "raw_actual_upper_bound_V": 2.5305148339724806,
+        "margin_to_2p70V_mV": 169.4851660275195,
+        "50A_280F_age_rise_mV": 17.052567998385797,
+        "50A_280F_upper_bound_V_same_other_errors": 2.520283293173449,
+        "80A_350F_age_rise_mV_spec_min_cap": 21.827287037933818,
+        "80A_350F_upper_bound_V_same_other_errors": 2.5250580122129973
+      },
+      {
+        "measured_cell_threshold_V": 2.2,
+        "adc_ET_pair_mV": 176.4828479003906,
+        "divider_tolerance_pair_mV": 69.48091023759217,
+        "divider_TCR_pair_mV_after_25C_cal": 53.841288843376354,
+        "VREFINT_residual_mV": 16.605861386138617,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "raw_total_error_mV": 383.695017164915,
+        "raw_actual_upper_bound_V": 2.5836950171649153,
+        "margin_to_2p70V_mV": 116.304982835085,
+        "50A_280F_age_rise_mV": 17.052567998385797,
+        "50A_280F_upper_bound_V_same_other_errors": 2.573463476365884,
+        "80A_350F_age_rise_mV_spec_min_cap": 21.827287037933818,
+        "80A_350F_upper_bound_V_same_other_errors": 2.578238195405432
+      }
+    ],
+    "per_channel_calibrated_all_cells_at_thresholds": [
+      {
+        "measured_cell_threshold_V": 2.0,
+        "ADC_INL_plus_quant_pair_mV": 115.30212729492187,
+        "divider_TCR_pair_mV_after_per_tap_25C_cal": 48.946626221251236,
+        "VREFINT_residual_mV": 15.096237623762377,
+        "MUX_RON_temperature_mismatch_bound_mV": 4.326357156601392,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "calibrated_total_error_mV": 250.95545709395418,
+        "calibrated_actual_upper_bound_V": 2.250955457093954,
+        "margin_to_2p70V_mV": 449.044542906046
+      },
+      {
+        "measured_cell_threshold_V": 2.15,
+        "ADC_INL_plus_quant_pair_mV": 115.30212729492187,
+        "divider_TCR_pair_mV_after_per_tap_25C_cal": 52.617623187845076,
+        "VREFINT_residual_mV": 16.228455445544554,
+        "MUX_RON_temperature_mismatch_bound_mV": 4.6508339433464965,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "calibrated_total_error_mV": 256.0831486690753,
+        "calibrated_actual_upper_bound_V": 2.406083148669075,
+        "margin_to_2p70V_mV": 293.916851330925
+      },
+      {
+        "measured_cell_threshold_V": 2.2,
+        "ADC_INL_plus_quant_pair_mV": 115.30212729492187,
+        "divider_TCR_pair_mV_after_per_tap_25C_cal": 53.841288843376354,
+        "VREFINT_residual_mV": 16.605861386138617,
+        "MUX_RON_temperature_mismatch_bound_mV": 4.758992872261532,
+        "SC_MINUS_GND_shunt_mV": 40.0,
+        "maximum_sample_age_rise_mV": 27.28410879741727,
+        "calibrated_total_error_mV": 257.7923791941157,
+        "calibrated_actual_upper_bound_V": 2.4577923791941156,
+        "margin_to_2p70V_mV": 242.20762080588432
+      }
+    ],
+    "decision": {
+      "2p00_charge_standby_target": "PASS in raw bound with substantial voltage headroom; normal initial charge at 20A takes 35s at 350F (28s at 280F and 42s at 420F).",
+      "2p15_warning_derate": "PASS in raw bound; upper cell remains below 2.70V under the 80A/280F maximum-age screen.",
+      "2p20_regeneration_stop": "PASS in raw uncalibrated screen with more than 110mV margin to 2.70V at 80A/280F, including 40mV ground-return error. the result relies on the listed datasheet characterization limits and the modeled 0.5mOhm SC_MINUS return. Per-tap route calibration is required for telemetry but not credited here.",
+      "hard_protection_boundary": "These MCU/ADC thresholds do not create an independent hard overvoltage trip. Direct120R is too weak to stop a failed high-current charger. Native schematic and hardware are unchanged, so no hardware-protection PASS is claimed here."
+    }
+  },
+  "watchdog_and_freshness_contract": {
+    "scan_period_ms": 20.0,
+    "refresh_rule": "Only refresh IWDG after all four paired bank slots complete, both ADC results are fresh, no ADC overrun/invalid conversion occurred, and the 8 reconstructed cell results pass range/freshness checks. Any incomplete or invalid scan does not feed IWDG.",
+    "IWDG_source": "STM32G431 LSI; datasheet range 29.5..34kHz over VDD/temp.",
+    "prescaler_divisor": 4,
+    "reload_value": 700,
+    "IWDG_min_timeout_ms": 82.47058823529412,
+    "IWDG_max_timeout_ms": 95.05084745762713,
+    "full_scan_duration_ms": 0.44353333333333333,
+    "max_last_valid_sample_to_reset_ms": 95.49438079096045,
+    "age_rise_at_50A_280F_mV": 17.052567998385797,
+    "age_rise_at_80A_280F_mV": 27.28410879741727,
+    "age_rise_at_80A_350F_mV": 21.827287037933818,
+    "limitation": "The age bound covers MCU non-progress or a missing/invalid scan when the refresh rule is implemented. It does not cover a silently plausible but wrong ADC value or a power-stage shutdown path that ignores MCU reset; those are separate hardware verification items."
+  },
+  "sources": [
+    {
+      "name": "TI TMUX1511 Rev B datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/tmux1511.pdf"
+    },
+    {
+      "name": "TI DRV8161 datasheet",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8161.pdf"
+    },
+    {
+      "name": "ST STM32G431 datasheet",
+      "url": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf"
+    },
+    {
+      "name": "ST RM0440 reference manual",
+      "url": "https://www.st.com/resource/en/reference_manual/dm00355726-stm32g4-series-advanced-arm-based-32-bit-mcus-stmicroelectronics.pdf"
+    },
+    {
+      "name": "LICAP SC0350-270-RSS datasheet",
+      "url": "https://www.licaptech.com/pdfs/datasheets/ultracapacitors/60862a8f5979e5f969df83ba_LICAP_SC0350_270_RSS_Datasheet_061120.pdf"
+    },
+    {
+      "name": "Bitwell BW6101 product/spec page (existing devices retired in parent-selected direct-120R architecture)",
+      "url": "https://bitwell.cn/productview.aspx?CateID=607&ID=269"
+    },
+    {
+      "name": "YAGEO 68k RT0603BRD0768KL spec sheet",
+      "url": "https://www.yageogroup.com/component-documentation/download/specsheet/RT0603BRD0768KL"
+    },
+    {
+      "name": "YAGEO 150k RT1206BRD07150KL spec sheet",
+      "url": "https://yageogroup.com/component-documentation/download/specsheet/RT1206BRD07150KL"
+    },
+    {
+      "name": "RESI PTFR series datasheet",
+      "url": "https://www.resistor.today/upload/file/20200703/RESI-CATALOG-2021.pdf"
+    },
+    {
+      "name": "KEMET C0805C104K5RAC7800 spec alias",
+      "url": "https://search.kemet.com/download/specsheet/C0805C104K5RAC7800"
+    }
+  ],
+  "open_items": [
+    "Paper selection only: add these refs/nets to a separately authorized native schematic revision and regenerate a fresh ENET/BOM; no such implementation occurred in this task.",
+    "Per-tap calibration coefficients and G431 ADC1/ADC2 temperature verification are required for useful cell telemetry; the 2.20V threshold safety screen does not credit per-tap route calibration, but still relies on characterized ADC ET limits and must be closed by hardware temperature/current qualification.",
+    "The 120R direct bleeders consume stored energy continuously; parked stack intentionally decays and must be recharged/initialized before the supercapacitor is counted for braking.",
+    "The 0/+20% capacity and leakage parking result is a linear lumped model. LICAP has no reverse-voltage operating guarantee; preserve a nonnegative-cell policy in firmware and verify real cells if parking discharge is part of the release qualification."
+  ]
+}

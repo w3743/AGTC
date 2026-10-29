@@ -1,0 +1,14 @@
+* TI SLUM488 PSpice transient model; compatibility/logic probe, not full dump board.
+.include ucc.lib
+Vdd vdd 0 12
+Vplus plus 0 12
+Vin minus 0 PULSE(12 0 1u 1n 1n 1u 2u)
+X1 plus minus 0 vdd out out UCC27511_TRANS
+Cgate out 0 1n
+.control
+set noaskquit
+tran 2n 4u
+wrdata ucc_wave.txt v(minus) v(out)
+quit
+.endc
+.end

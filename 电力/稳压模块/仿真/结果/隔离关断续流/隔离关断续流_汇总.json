@@ -1,0 +1,378 @@
+{
+  "status": "BOUNDED_POST_SHUTDOWN_PATH_SIMULATED_NOT_REAL_SHUTDOWN",
+  "date": "2026-10-30",
+  "simulator": "ngspice 47 portable console; batch mode; no GUI",
+  "official_ST_model": {
+    "source_url": "https://www.st.com/resource/en/spice_model/st_power_schottky_diodes_pspice_models_v6.zip",
+    "product_url": "https://www.st.com/en/diodes-and-rectifiers/stps30100st.html",
+    "resource": "Power Schottky diode PSpice models v10.0 (2023-05-05)",
+    "subcircuit": "STPS30100ST",
+    "pin_order": [
+      "1=A",
+      "2=K",
+      "3=A"
+    ],
+    "zip_sha256": "36169E895D25AE28C8B2CF6461DE0A0DA374C1F60D105DBFB8FAEE880EA76CA6",
+    "library_sha256": "633FB9263215D27C308E42FA32BE0577889347A388021460CF87DDFE9E4E7BAD",
+    "unmodified": true,
+    "ngspice_compatibility": "This exact ST PSpice subcircuit ran successfully in the supplied ngspice 47; ST does not claim ngspice validation.",
+    "limitations": [
+      "No thermal node or self-heating.",
+      "TT=0 in the ST model; reverse-recovery behavior is not represented."
+    ]
+  },
+  "electrical_boundary": {
+    "D_SC_LO": "anode=GND_SYS, cathode=SC_FUSED",
+    "D_SC_HI": "anode=SC_FUSED, cathode=BUS_EXT",
+    "inductor_current_positive_reference": "SW -> SC_FUSED",
+    "inductors": "Two series IHXL2000VZEB100M3A represented by fixed total L; both gate channels are already off and isolation FETs are open at t=0.",
+    "L_total_H_cases": [
+      1.28e-05,
+      2.4e-05
+    ],
+    "initial_current_A_cases": [
+      80.0,
+      -80.0
+    ],
+    "initial_SC_FUSED_V": 17.6,
+    "initial_BUS_V": 37.8,
+    "C_BUS_F": 0.0054,
+    "C_SC_FUSED_F": 3.2e-06,
+    "inductor_DCR_ohm": 0.00223,
+    "inductor_DCR_source": "Design detail estimate for two inductors at 100 C; fixed resistor.",
+    "SW_numerical_reference_ohm": 1000000.0,
+    "SW_numerical_reference_note": "Only resolves the otherwise floating switch node after current extinguishes; its pulse energy is integrated in the report.",
+    "bus_storage_boundary": "Only the six 900 uF/80 V bus capacitors are modeled; battery/source absorption is excluded, so this is a capacitor-only bus-voltage rise estimate.",
+    "SC_FUSED_capacitance_boundary": "2.2 uF film + 1.0 uF local HF capacitance; ideal C, initialized to the 8 x 2.20 V/cell upper normal threshold.",
+    "QH_QL_off_state": "Generic D-only body-diode equivalents, no MOS channel, Coss, Qrr, package, wiring inductance, or thermal model.",
+    "max_timestep_s": 5e-09,
+    "simulation_stop_s": 0.00015,
+    "fixed_time_step_method": "Gear, maximum step 5 ns; transient uses UIC to preserve assigned L/C initial conditions.",
+    "reported_window_start": "1 ns, after the ST PSpice junction-cap initialization impulse; energy balance uses the measured state at this first recorded point. The UIC assigned initial state is +/-80 A at t=0."
+  },
+  "cases": [
+    {
+      "case": "12p8uH_Ip80A",
+      "current_reference": "positive SW_to_SC_FUSED",
+      "L_total_H": 1.28e-05,
+      "initial_inductor_current_A": 80.0,
+      "measured_window_start_current_A": 79.9982779,
+      "initial_magnetic_energy_J": 0.04095823658858003,
+      "sample_count": 30312,
+      "analysis_window_start_s": 1.16523805e-09,
+      "last_time_s": 0.00015,
+      "current_extinguished_below_0p1A_s": 2.59466959e-05,
+      "node_voltage_V": {
+        "BUS": {
+          "initial": 37.8000016,
+          "min": 37.8000016,
+          "max": 37.9812085,
+          "final": 37.9812085
+        },
+        "SC_FUSED": {
+          "initial": 17.6264658,
+          "min": 17.6264658,
+          "max": 38.8151676,
+          "final": 38.1571169
+        },
+        "SW": {
+          "initial": -1.12669586,
+          "min": -1.12669586,
+          "max": 38.3683216,
+          "final": 38.1571169
+        }
+      },
+      "inductor_current_A": {
+        "initial": 79.9982779,
+        "min": -0.000226567626,
+        "max": 79.9982779,
+        "final": -3.89390653e-05
+      },
+      "expected_conduction_path": [
+        "D_SC_HI",
+        "Q_LOW_BODY"
+      ],
+      "energy_path_loop": "SW -> L_MAIN_A/B -> SC_FUSED -> D_SC_HI -> BUS_EXT -> C_BUS -> GND_SYS -> Q_MAIN_L body diode -> SW",
+      "branch_current_peak_A": {
+        "D_SC_LO_A_positive": 7.07547406e-05,
+        "D_SC_HI_A_positive": 77.6461898,
+        "QH_body_A_positive": 0.0078125,
+        "QL_body_A_positive": 79.9982768
+      },
+      "expected_path_lower_peak_A": 77.6461898,
+      "opposite_path_absolute_peak_A": 0.0154121777,
+      "energy_J": {
+        "initial_BUS_cap": 3.8578683265920075,
+        "final_BUS_cap": 3.8949449376252754,
+        "initial_SC_FUSED_cap": 0.0004971076745577112,
+        "final_SC_FUSED_cap": 0.0023295449121924247,
+        "final_inductor": 9.704005161201049e-15,
+        "inductor_DCR_loss": 0.00012504550923987426,
+        "SW_numeric_reference_loss": 1.8090763483208418e-07,
+        "ST_diode_conduction_loss": 0.0008496919726699606,
+        "generic_body_diode_conduction_loss": 0.0010742760807539939,
+        "balance_residual": -6.1526305671099955e-09,
+        "balance_residual_percent_of_initial_total": -1.577871212153231e-07
+      },
+      "bus_rise_V": 0.1812068999999994,
+      "energy_balance_check": true,
+      "BUS_below_40p3V_reference_check": true,
+      "SC_FUSED_and_SW_diode_clamp_check": true,
+      "energy_path_check": true,
+      "source_netlist": "12p8uH_Ip80A.cir",
+      "source_netlist_sha256": "1ECA078F7631BC4EBCD1DA96E075DB4F17FC1F450DAB704CA26C43F7A6737522",
+      "waveform": "12p8uH_Ip80A.txt",
+      "waveform_sha256": "BB84B33D7A118E539B1AC2A86E72AB42941D5C8B6104ADC31F3FDB68414FD9FD",
+      "log": "12p8uH_Ip80A.log",
+      "log_sha256": "4779ED6805EAF1D7DFF1300EDE800F9D3517118E132F09506F5D924B7A58D150"
+    },
+    {
+      "case": "12p8uH_In80A",
+      "current_reference": "negative SC_FUSED_to_SW",
+      "L_total_H": 1.28e-05,
+      "initial_inductor_current_A": -80.0,
+      "measured_window_start_current_A": -79.9980401,
+      "initial_magnetic_energy_J": 0.040957993086983724,
+      "sample_count": 30146,
+      "analysis_window_start_s": 1.1656047e-09,
+      "last_time_s": 0.00015,
+      "current_extinguished_below_0p1A_s": 2.58907082e-05,
+      "node_voltage_V": {
+        "BUS": {
+          "initial": 37.8000188,
+          "min": 37.8000188,
+          "max": 37.9925707,
+          "final": 37.9925706
+        },
+        "SC_FUSED": {
+          "initial": 17.5682171,
+          "min": -1.01460441,
+          "max": 17.5682171,
+          "final": -0.176644411
+        },
+        "SW": {
+          "initial": 38.9267137,
+          "min": -0.387262081,
+          "max": 38.941049,
+          "final": -0.176644481
+        }
+      },
+      "inductor_current_A": {
+        "initial": -79.9980401,
+        "min": -79.9980401,
+        "max": 0.000188706757,
+        "final": 9.73669695e-07
+      },
+      "expected_conduction_path": [
+        "D_SC_LO",
+        "Q_HIGH_BODY"
+      ],
+      "energy_path_loop": "GND_SYS -> D_SC_LO -> SC_FUSED -> L_MAIN_B/A -> SW -> Q_MAIN_H body diode -> BUS_EXT -> C_BUS -> GND_SYS",
+      "branch_current_peak_A": {
+        "D_SC_LO_A_positive": 77.8597196,
+        "D_SC_HI_A_positive": 6.61704944e-05,
+        "QH_body_A_positive": 79.9980011,
+        "QL_body_A_positive": 0.000188311312
+      },
+      "expected_path_lower_peak_A": 77.8597196,
+      "opposite_path_absolute_peak_A": 0.0143633202,
+      "energy_J": {
+        "initial_BUS_cap": 3.857871837456954,
+        "final_BUS_cap": 3.897275636149158,
+        "initial_SC_FUSED_cap": 0.0004938276033163718,
+        "final_SC_FUSED_cap": 4.9925196700059074e-08,
+        "final_inductor": 6.067409119752915e-18,
+        "inductor_DCR_loss": 0.00012427724198272588,
+        "SW_numeric_reference_loss": 3.9219129430751445e-08,
+        "ST_diode_conduction_loss": 0.0008543678003232343,
+        "generic_body_diode_conduction_loss": 0.0010693104661276059,
+        "balance_residual": -2.2654663801096658e-08,
+        "balance_residual_percent_of_initial_total": -5.809895711981222e-07
+      },
+      "bus_rise_V": 0.19255180000000394,
+      "energy_balance_check": true,
+      "BUS_below_40p3V_reference_check": true,
+      "SC_FUSED_and_SW_diode_clamp_check": true,
+      "energy_path_check": true,
+      "source_netlist": "12p8uH_In80A.cir",
+      "source_netlist_sha256": "B4F1476766382A98920ECED147E4456F9BEA26440E82D16A6BCA3538A7E0D007",
+      "waveform": "12p8uH_In80A.txt",
+      "waveform_sha256": "268063CF5805BAD3D5CC9D61855568269E271DD7FCB8B2A179A75F4BD18B28E4",
+      "log": "12p8uH_In80A.log",
+      "log_sha256": "0602D29B9937ADCDB602DA6B5C4FD0B24E34E27E1D2EF1085E6067329FF310AC"
+    },
+    {
+      "case": "24uH_Ip80A",
+      "current_reference": "positive SW_to_SC_FUSED",
+      "L_total_H": 2.4e-05,
+      "initial_inductor_current_A": 80.0,
+      "measured_window_start_current_A": 79.9990815,
+      "initial_magnetic_energy_J": 0.07679823649012371,
+      "sample_count": 30390,
+      "analysis_window_start_s": 1.16523809e-09,
+      "last_time_s": 0.00015,
+      "current_extinguished_below_0p1A_s": 4.83201823e-05,
+      "node_voltage_V": {
+        "BUS": {
+          "initial": 37.8000016,
+          "min": 37.8000016,
+          "max": 38.1466761,
+          "final": 38.1466761
+        },
+        "SC_FUSED": {
+          "initial": 17.626466,
+          "min": 17.626466,
+          "max": 38.8708351,
+          "final": 38.3291212
+        },
+        "SW": {
+          "initial": -1.12669866,
+          "min": -1.12669866,
+          "max": 38.5198614,
+          "final": 38.3291213
+        }
+      },
+      "inductor_current_A": {
+        "initial": 79.9990815,
+        "min": -0.000169597873,
+        "max": 79.9990815,
+        "final": -3.9255605e-05
+      },
+      "expected_conduction_path": [
+        "D_SC_HI",
+        "Q_LOW_BODY"
+      ],
+      "energy_path_loop": "SW -> L_MAIN_A/B -> SC_FUSED -> D_SC_HI -> BUS_EXT -> C_BUS -> GND_SYS -> Q_MAIN_L body diode -> SW",
+      "branch_current_peak_A": {
+        "D_SC_LO_A_positive": 4.71903004e-05,
+        "D_SC_HI_A_positive": 78.7113471,
+        "QH_body_A_positive": 0.00390625,
+        "QL_body_A_positive": 79.9990804
+      },
+      "expected_path_lower_peak_A": 78.7113471,
+      "opposite_path_absolute_peak_A": 0.0154123318,
+      "energy_J": {
+        "initial_BUS_cap": 3.8578683265920075,
+        "final_BUS_cap": 3.9289560231914407,
+        "initial_SC_FUSED_cap": 0.0004971076858386496,
+        "final_SC_FUSED_cap": 0.0023505944511428636,
+        "final_inductor": 1.8492030286992298e-14,
+        "inductor_DCR_loss": 0.00023132101012928136,
+        "SW_numeric_reference_loss": 1.4959631962049145e-07,
+        "ST_diode_conduction_loss": 0.0016328241276079875,
+        "generic_body_diode_conduction_loss": 0.001992762761196708,
+        "balance_residual": -4.3698859379171855e-09,
+        "balance_residual_percent_of_initial_total": -1.110471203619436e-07
+      },
+      "bus_rise_V": 0.3466744999999989,
+      "energy_balance_check": true,
+      "BUS_below_40p3V_reference_check": true,
+      "SC_FUSED_and_SW_diode_clamp_check": true,
+      "energy_path_check": true,
+      "source_netlist": "24uH_Ip80A.cir",
+      "source_netlist_sha256": "6C5A11A082D439CA2C81F700CCAA9DADFA0094A7952917876926CB5A1377A0F6",
+      "waveform": "24uH_Ip80A.txt",
+      "waveform_sha256": "926A52EB92BAA4CFB2FC429EB33271EDEBC88226E01605257CF66C3A0D4882D0",
+      "log": "24uH_Ip80A.log",
+      "log_sha256": "4C6AD9CEE731D88F6F0CB3A7E1ED248081ADEB45BAD1C6C79E54FCACB436C46D"
+    },
+    {
+      "case": "24uH_In80A",
+      "current_reference": "negative SC_FUSED_to_SW",
+      "L_total_H": 2.4e-05,
+      "initial_inductor_current_A": -80.0,
+      "measured_window_start_current_A": -79.9989547,
+      "initial_magnetic_energy_J": 0.07679799303711182,
+      "sample_count": 30151,
+      "analysis_window_start_s": 1.1656047e-09,
+      "last_time_s": 0.00015,
+      "current_extinguished_below_0p1A_s": 4.82524366e-05,
+      "node_voltage_V": {
+        "BUS": {
+          "initial": 37.8000188,
+          "min": 37.8000188,
+          "max": 38.1580904,
+          "final": 38.1580903
+        },
+        "SC_FUSED": {
+          "initial": 17.5682169,
+          "min": -1.01975697,
+          "max": 17.5682169,
+          "final": -0.183045848
+        },
+        "SW": {
+          "initial": 38.9267169,
+          "min": -0.373316874,
+          "max": 39.0496388,
+          "final": -0.18304604
+        }
+      },
+      "inductor_current_A": {
+        "initial": -79.9989547,
+        "min": -79.9989547,
+        "max": 0.000131517393,
+        "final": 1.12408611e-06
+      },
+      "expected_conduction_path": [
+        "D_SC_LO",
+        "Q_HIGH_BODY"
+      ],
+      "energy_path_loop": "GND_SYS -> D_SC_LO -> SC_FUSED -> L_MAIN_B/A -> SW -> Q_MAIN_H body diode -> BUS_EXT -> C_BUS -> GND_SYS",
+      "branch_current_peak_A": {
+        "D_SC_LO_A_positive": 78.8465225,
+        "D_SC_HI_A_positive": 4.59061112e-05,
+        "QH_body_A_positive": 79.9989158,
+        "QL_body_A_positive": 0.000131135893
+      },
+      "expected_path_lower_peak_A": 78.8465225,
+      "opposite_path_absolute_peak_A": 0.014363484,
+      "energy_J": {
+        "initial_BUS_cap": 3.857871837456954,
+        "final_BUS_cap": 3.931307609425976,
+        "initial_SC_FUSED_cap": 0.0004938275920727129,
+        "final_SC_FUSED_cap": 5.3609251952062575e-08,
+        "final_inductor": 1.5162834992339184e-17,
+        "inductor_DCR_loss": 0.00023051817362473032,
+        "SW_numeric_reference_loss": 7.351268423148822e-08,
+        "ST_diode_conduction_loss": 0.0016379063982534916,
+        "generic_body_diode_conduction_loss": 0.001987517163741136,
+        "balance_residual": -2.019739331238869e-08,
+        "balance_residual_percent_of_initial_total": -5.132542142405246e-07
+      },
+      "bus_rise_V": 0.3580715000000012,
+      "energy_balance_check": true,
+      "BUS_below_40p3V_reference_check": true,
+      "SC_FUSED_and_SW_diode_clamp_check": true,
+      "energy_path_check": true,
+      "source_netlist": "24uH_In80A.cir",
+      "source_netlist_sha256": "5ABF8AF4A37B845553C8E5852CE01BFEDB5DF1918A00C518C19688065F936FD3",
+      "waveform": "24uH_In80A.txt",
+      "waveform_sha256": "0D6CFEBCB840770BBBAE97192CFFE424B5064C8B509964283F7D922B62A225DA",
+      "log": "24uH_In80A.log",
+      "log_sha256": "DE485F373F434C00A58A065B568F79DFDF64D0F2E05CE1D5011F69B03BA5C03C"
+    }
+  ],
+  "checks": {
+    "all_cases_completed": true,
+    "all_expected_diode_paths_conduct": true,
+    "all_energy_balances_within_0p01_percent": true,
+    "all_BUS_peaks_below_40p3V_reference": true,
+    "all_nodes_stay_within_diode_clamp_envelope": true,
+    "runner_sha256": "F254FD5871309A1054AE27B388B32B98B0C52110B6BB1AA0445134162E637AE1",
+    "source_files": [
+      "12p8uH_Ip80A.cir",
+      "12p8uH_In80A.cir",
+      "24uH_Ip80A.cir",
+      "24uH_In80A.cir"
+    ]
+  },
+  "important_limits": [
+    "This starts after isolation and gate shutdown are complete; it does not simulate gate-driver delay, MOS turn-off, isolation opening, or fault detection.",
+    "The 80 A initial current is the design's provisional screening point, not an established continuous-current rating or validated trip threshold.",
+    "Fixed 12.8 uH and 24 uH cases bracket the documented high-current screening value and air-inductance tolerance; nonlinear saturation is not modeled.",
+    "Capacitors are ideal. No PCB/lead ESL, diode package inductance, ringing, or semiconductor thermal rise is modeled; reported node maxima are not physical switching-spike limits.",
+    "The 1 MOhm SW reference is a numerical DC path, not a board component; its simulated pulse energy is included in the balance.",
+    "The 24 uH/80 A fixed-L case stores 76.8 mJ; it is an energy screen, not a claim that the physical inductors retain 24 uH at 80 A.",
+    "This does not verify current rating, repetitive pulse thermal limits, shutdown safety, BUS battery charging acceptance, or vehicle braking performance."
+  ]
+}

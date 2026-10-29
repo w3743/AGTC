@@ -1,0 +1,44 @@
+* HYG022N10NS1TA parameterized equivalent, not a HUAYI SPICE model.
+* Scope: typical gate-charge interpolation, 25 C forward body-diode point,
+* constant Coss at the datasheet's 25 V point, and coarse channel DC path.
+* No avalanche, electrothermal, reverse-recovery, package parasitic, or SOA model.
+*
+* Data sources:
+* HUAYI HYG022N10NS1TA datasheet V1.0, local copy:
+*   电力/BMS模块/厂商资料/HYG022N10NS1TA.pdf
+*   https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf
+* Gate-charge plot: datasheet Fig. 10, VDS=50 V, ID=50 A; plateau read from graph ~4.2 V.
+* Tabulated Qg/Qgs/Qgd point: VDS=80 V, VGS=10 V, ID=50 A.
+* The gate-charge curve is a one-port Q(VGS) approximation: it does not couple
+* Miller charge to VDS. Mixed voltage conditions are intentional for screening.
+*
+* Cell pin order is D G S (not package pin order; TOLL: pin1=G, pins2-8=S, tab/pin9=D).
+* B2B pin order is D1 D2 G SMID; each body diode is SMID -> drain.
+
+* Fig. 10 has Q~51 nC at the ~4.2 V plateau start, ~44 nC through the plateau,
+* and total Qg~160.5 nC at 10 V. A finite 0.2 V width (4.2..4.4 V) smooths the
+* plotted flat plateau; this width is an explicit interpolation assumption.
+* Initial slope is Ciss=9.026 nF; remaining points are piecewise-linear fits.
+.func HYGQGS(x) { (x < 2) ? (9.026n*x) : ((x < 4.2) ? (18.052n+14.97636364n*(x-2)) : ((x < 4.4) ? (51n+220n*(x-4.2)) : (95n+11.69642857n*(x-4.4)))) }
+
+.model SW_HYG_DC SW(Ron=2.2m Roff=1T Vt=9 Vh=0.1)
+.model D_HYG_STATIC D(Is=1.5e-10 N=1.2 Rs=260u Cjo=1p TT=0)
+
+.subckt HYG022_EQ D G S
+R_GINT G GI 2.3
+C_QGS GI S Q='HYGQGS(V(GI,S))'
+* Gate-charge Q(VGS) is a one-port approximation; it does not supply Miller current to D.
+* Coss is modeled as a constant 3.510 nF to match the 25 V small-signal point only.
+C_QOSS D S Q='3.510n*V(D,S)'
+* Binary DC path only: Ron is the VGS=10 V typical RDS(on) point; Vt=9 V is
+* a use gate for the DC fixture, not an inferred physical switching threshold.
+S_CH D S GI S SW_HYG_DC
+* Static behavioral diode fit: VSD=0.83 V typical at ISD=50 A, 25 C.
+* Cjo=1 pF only regularizes the diode element; no Qrr/reverse-recovery model.
+D_BODY S D D_HYG_STATIC
+.ends HYG022_EQ
+
+.subckt HYG022_B2B D1 D2 G SMID
+X_FET1 D1 G SMID HYG022_EQ
+X_FET2 D2 G SMID HYG022_EQ
+.ends HYG022_B2B

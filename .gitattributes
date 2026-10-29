@@ -48,6 +48,15 @@
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 
 # Raw trajectory/physics data are preserved without inflating Git history.
+电力/稳压模块/仿真/结果/**/*.raw filter=lfs diff=lfs merge=lfs -text
+电力/稳压模块/仿真/结果/*波形.txt filter=lfs diff=lfs merge=lfs -text
+电力/稳压模块/仿真/结果/隔离关断续流/*.txt filter=lfs diff=lfs merge=lfs -text
+# 原始仿真日志、厂家模型和官方BOM保留原字节，以维持证据哈希。
+电力/稳压模块/仿真/结果/*.log whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+电力/稳压模块/仿真/结果/隔离关断续流/*.log whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+电力/稳压模块/仿真/结果/隔离关断续流/*.LIB whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+电力/稳压模块/仿真/输入/厂家模型/ST_Schottky_PSpice_v6/*.LIB whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+电力/稳压模块/检查/当前官方BOM.tsv whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
 算法/仿真训练环境/results/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
 算法/仿真训练环境/results/**/evaluation*.json filter=lfs diff=lfs merge=lfs -text
 算法/仿真训练环境/归档/**/results/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
