@@ -81,7 +81,6 @@ class FarRouteTests(unittest.TestCase):
         self.assertIn("已移除".encode(), body)
         self.assertEqual(self.live.depth_until, 0.0)
         self.assertIsNone(self.live.measure_input)
-        self.assertIsNone(self.live.pointcloud_input)
 
 
 if __name__ == "__main__":

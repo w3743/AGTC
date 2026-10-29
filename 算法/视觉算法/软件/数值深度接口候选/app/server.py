@@ -20,7 +20,6 @@ import cv2
 import numpy as np
 from fast_depth import FastSGBMDepth
 from lightstereo_depth import MetricDepth as NpuMetricDepth
-from pointcloud import PointCloudStream
 from realtime import HardwareSampler
 from hardware_video import HardwareVideo
 from calibration_live import CalibrationLive
@@ -80,7 +79,6 @@ def rotate_pipeline_epoch(live):
     live.measure_history.clear()
     live.frames = [deque(maxlen=6), deque(maxlen=6)]
     live.measure_input = None
-    live.pointcloud_input = None
     live.condition.notify_all()
 
 
@@ -121,7 +119,7 @@ def append_capture_frame(live, index, generation_stop, frame):
 def removed_feature_response(handler):
     return handler.json_response({
         'ok': False,
-        'message': '独立远距、NPU预览、测距标注与点云接口已移除；请使用统一深度图和 /depth.bin 数值接口',
+        'message': '独立远距、NPU预览与测距标注接口已移除；请使用统一深度图和 /depth.bin 数值接口',
     }, 410)
 
 
@@ -253,16 +251,8 @@ class Live:
                 # Keep the preview alive if this profile cannot be proven to
                 # match the current source calibration.
                 self.depth_wire_error = str(exc)
-        self.pointcloud_stream = None
-        self.pointcloud_error = None
-        try:
-            self.pointcloud_stream = PointCloudStream(calibration_path)
-        except Exception as exc:
-            self.pointcloud_error = str(exc)
         self.measure_jpeg = None
         self.measure_input = None
-        self.pointcloud_packet = None
-        self.pointcloud_input = None
         self.measure_history = deque(maxlen=180)
         self.hardware_sampler = HardwareSampler()
         self.hardware_lock = threading.Lock()
@@ -288,9 +278,6 @@ class Live:
                               depth_unit='m', depth_range_m=list(self.metric.RANGE_M),
                               alignment_message='采用已验收的固定双目标定参数',
                               mapping='深度试验已就绪；实际测距精度待验证，尚未启动建图')
-        self.state['pointcloud_calibration_id'] = (
-            self.pointcloud_stream.calibration_id if self.pointcloud_stream else None)
-        self.state['pointcloud_error'] = self.pointcloud_error
         self._start_capture_pipeline(self.stream_width, self.stream_height)
         threading.Thread(target=self.preview, daemon=True).start()
         self.depth_thread = threading.Thread(target=self.metric_work, daemon=True)
@@ -721,7 +708,6 @@ class Live:
                                 ((len(frames)-1)*1e9/(frames[-1][0]-frames[0][0])
                                  if len(frames) > 1 and frames[-1][0] > frames[0][0] else None)
                                 for frames in self.frames]],
-                        pointcloud_error=self.pointcloud_error,
                         capture_error=self.capture_error, capture_width=CAPTURE_WIDTH,
                         capture_height=CAPTURE_HEIGHT, capture_directory=str(self.store.directory),
                         calibration_target=CAPTURE_TARGET.copy(),
@@ -826,7 +812,7 @@ def serve(args):
 
         def do_GET(self):
             path = urlsplit(self.path).path
-            if path in ('/measure', '/pointcloud', '/far'):
+            if path in ('/measure', '/far'):
                 return self.redirect_depth()
             if path in ('/stereo4k', '/measure4k'):
                 self.send_response(302)
@@ -835,7 +821,7 @@ def serve(args):
                 self.send_header('Content-Length', '0')
                 self.end_headers()
                 return
-            if path in ('/measure.jpg', '/pointcloud.bin', '/range4k',
+            if path in ('/measure.jpg', '/range4k',
                         '/far.jpg', '/far/status', '/far/point', '/npu.jpg',
                         '/video/0.mp4', '/video/1.mp4'):
                 return self.removed_feature()

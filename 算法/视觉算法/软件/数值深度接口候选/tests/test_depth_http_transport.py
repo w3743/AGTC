@@ -389,7 +389,7 @@ class DepthHTTPTransportTests(unittest.TestCase):
         self.assertEqual(self.request("/depth.bin")[0], 503)
 
     def test_old_pages_redirect_to_depth_view(self):
-        for path in ("/measure", "/pointcloud", "/far"):
+        for path in ("/measure", "/far"):
             status, headers, body = self.request(path)
             self.assertEqual(status, 302)
             self.assertEqual(headers["Location"], "/?view=depth")
@@ -412,7 +412,7 @@ class DepthHTTPTransportTests(unittest.TestCase):
 
     def test_removed_feature_routes_return_410_without_activating_depth(self):
         self.live.depth_until = 0.0
-        for path in ("/measure.jpg", "/pointcloud.bin", "/range4k", "/far/point"):
+        for path in ("/measure.jpg", "/range4k", "/far/point"):
             status, _, body = self.request(path)
             self.assertEqual(status, 410)
             self.assertIn("已移除".encode(), body)
@@ -422,7 +422,6 @@ class DepthHTTPTransportTests(unittest.TestCase):
             self.assertIn("已移除".encode(), body)
         self.assertEqual(self.live.depth_until, 0.0)
         self.assertIsNone(self.live.measure_input)
-        self.assertIsNone(self.live.pointcloud_input)
 
 
 if __name__ == "__main__":

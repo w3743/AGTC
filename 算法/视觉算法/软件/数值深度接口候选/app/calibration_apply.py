@@ -125,8 +125,7 @@ def main():
             with urllib.request.urlopen('http://127.0.0.1:8088/status', timeout=2) as response:
                 state = json.load(response)
             ages = state.get('camera_age_ms') or []
-            return (state.get('calibration_id') == expected and state.get('pointcloud_calibration_id') == expected
-                    and not state.get('pointcloud_error') and len(ages) == 2
+            return (state.get('calibration_id') == expected and len(ages) == 2
                     and all(v is not None and v < 1500 for v in ages))
         except Exception:
             return False
