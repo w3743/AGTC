@@ -1,0 +1,442 @@
+{
+  "schema": "power-module MOS isolation/gate-shutdown schematic candidate delta",
+  "date": "2026-10-29",
+  "status": "candidate only; not inserted into native schematic or procurement BOM; no PCB, firmware, prototype, or physical qualification",
+  "basis": {
+    "current_bom": "电力/稳压模块/原理图准备/BOM.csv",
+    "shared_zero_charge_candidate": "电力/稳压模块/检查/0V初充器件清单.json",
+    "note": "Preserve DRV8161 power stage. The latest merged proposal retains the existing SN74LVC1G11 3-input AND and the AUP1T14 fault readback package."
+  },
+  "candidate_delta": {
+    "added_instance_count": 56,
+    "added_instance_refs": [
+      "C_AFE_AND_VDD",
+      "C_DRV_FAULT_FB",
+      "C_ISO_ARM_FF",
+      "C_ISO_BST",
+      "C_ISO_VCC",
+      "C_MAX_CPP",
+      "C_MAX_DCIN",
+      "C_MAX_HV",
+      "C_MAX_SHDNL",
+      "C_MAX_VAA",
+      "C_MAX_VDDL1",
+      "C_MAX_VDDL2",
+      "C_MAX_VDDL3",
+      "C_TPS_VDD",
+      "D_ISO_BST_START",
+      "D_SC_CLAMP",
+      "Q_ISO1",
+      "Q_ISO2",
+      "R_AFE_OK_PD",
+      "R_AFE_PERMIT_PD",
+      "R_GATE_SER",
+      "R_ISO_GATE_SOURCE",
+      "R_ISO_TGUP",
+      "R_MAX_ALERT_PU",
+      "R_MAX_AUX0_PU",
+      "R_MAX_AUX1_PU",
+      "R_MAX_AUX2_PU",
+      "R_MAX_AUX3_PU",
+      "R_MAX_AUX4_PU",
+      "R_MAX_AUX5_PU",
+      "R_MAX_C0",
+      "R_MAX_C1",
+      "R_MAX_C2",
+      "R_MAX_C3",
+      "R_MAX_C4",
+      "R_MAX_C5",
+      "R_MAX_C6",
+      "R_MAX_C7",
+      "R_MAX_C8",
+      "R_MAX_CSB_PU",
+      "R_MAX_CSB_SER",
+      "R_MAX_DCIN",
+      "R_MAX_SCLK_SER",
+      "R_MAX_SDI_SER",
+      "R_MAX_SHDNL_PD",
+      "R_MAX_SHDNL_PU",
+      "R_TPS_CWD_PU",
+      "R_TPS_RST_WDO_PU",
+      "R_TPS_WDI_PD",
+      "R_WD_OK_PD",
+      "U_AFE_AND",
+      "U_AFE_MAX17853",
+      "U_DRV_FAULT_FB",
+      "U_ISO_ARM_FF",
+      "U_SC_ISO_GATE",
+      "U_TPS3850"
+    ],
+    "removed_instance_count": 47,
+    "removed_instance_refs": [
+      "C_T1_FILTER",
+      "C_T2_FILTER",
+      "C_T3_FILTER",
+      "C_T4_FILTER",
+      "C_T5_FILTER",
+      "C_T6_FILTER",
+      "C_T7_FILTER",
+      "C_T8_FILTER",
+      "C_TEST_FB",
+      "D_QP_GS_ZENER",
+      "Q_BUS_P",
+      "Q_PMOS_CTRL",
+      "R_QP_BE",
+      "R_QP_COL",
+      "R_T1_HI",
+      "R_T1_LO",
+      "R_T1_TEST",
+      "R_T2_HI",
+      "R_T2_LO",
+      "R_T2_TEST",
+      "R_T3_HI",
+      "R_T3_LO",
+      "R_T3_TEST",
+      "R_T4_HI",
+      "R_T4_LO",
+      "R_T4_TEST",
+      "R_T5_HI",
+      "R_T5_LO",
+      "R_T5_TEST",
+      "R_T6_HI",
+      "R_T6_LO",
+      "R_T6_TEST",
+      "R_T7_HI",
+      "R_T7_LO",
+      "R_T7_TEST",
+      "R_T8_HI",
+      "R_T8_LO",
+      "R_TEST_HI",
+      "R_TEST_LO",
+      "U_BAL1",
+      "U_BAL2",
+      "U_BAL3",
+      "U_BAL4",
+      "U_BAL5",
+      "U_BAL6",
+      "U_BAL7",
+      "U_BAL8"
+    ],
+    "net_instance_delta": 9,
+    "replacement_instances_same_quantity": [
+      {
+        "ref": "C_SC_BULK",
+        "old": "100uF 35V HONOR RYHG35V100UF6*8 / LCSC C48970442",
+        "new_requirement": "100uF with voltage rating >= maximum BUS_BR plus clamp VF, ringing, and tolerance; nominal 63V candidate only if verified against this bound",
+        "qty_delta": 0,
+        "status": "replacement MPN not frozen; polymer reverse-polarity pulse suitability unresolved"
+      },
+      {
+        "ref": "C_SC_BULK2",
+        "old": "100uF 35V HONOR RYHG35V100UF6*8 / LCSC C48970442",
+        "new_requirement": "same as C_SC_BULK",
+        "qty_delta": 0,
+        "status": "replacement MPN not frozen; polymer reverse-polarity pulse suitability unresolved"
+      }
+    ],
+    "existing_refs_rewired": [
+      {
+        "ref": "R_PB6_BASE",
+        "old_function": "PMOS control base series resistor",
+        "new_function": "PB6_RUN to SN74LVC1G11 C input series resistor, 10k",
+        "part_kept": true
+      },
+      {
+        "ref": "R_QP_GS",
+        "old_function": "P-MOS gate-source bleed, 47k",
+        "new_function": "PB5_ARM to GND_SYS flip-flop CLK pull-down, 47k",
+        "part_kept": true
+      },
+      {
+        "ref": "R_PB5_PERMIT",
+        "old_function": "PB5/PERMIT series to DRV_FAULT_N",
+        "new_function": "PB5_ARM series to SN74LVC1G175 CLK, 1k unchanged",
+        "part_kept": true
+      },
+      {
+        "ref": "R_GATE_SER",
+        "old_function": "0V candidate AND Y series to DRV_FAULT_N",
+        "new_function": "SN74LVC1G175 Q series 680R to shared DRV_FAULT_N/LTC7001 INP",
+        "part_kept": true,
+        "note": "This remains a single instance already counted in the 43-instance 0V candidate; do not count twice."
+      }
+    ]
+  },
+  "candidate_composition": {
+    "zero_charge_candidate_added_refs_count": 43,
+    "zero_charge_candidate_evidence": "0V初充器件清单.json",
+    "fault_readback_added_refs": [
+      "U_DRV_FAULT_FB",
+      "C_DRV_FAULT_FB"
+    ],
+    "isolation_and_latch_added_refs": [
+      "Q_ISO1",
+      "Q_ISO2",
+      "U_SC_ISO_GATE",
+      "C_ISO_BST",
+      "D_ISO_BST_START",
+      "R_ISO_TGUP",
+      "C_ISO_VCC",
+      "R_ISO_GATE_SOURCE",
+      "D_SC_CLAMP",
+      "U_ISO_ARM_FF",
+      "C_ISO_ARM_FF"
+    ],
+    "isolation_and_latch_added_count": 11,
+    "retired_zero_charge_ADC_and_BAL_refs_count": 42,
+    "retired_old_P_MOS_group_refs": [
+      "Q_BUS_P",
+      "Q_PMOS_CTRL",
+      "R_QP_BE",
+      "R_QP_COL",
+      "D_QP_GS_ZENER"
+    ],
+    "reused_from_old_P_MOS_group_refs": [
+      "R_PB6_BASE",
+      "R_QP_GS"
+    ],
+    "total_added": 56,
+    "total_retired": 47,
+    "total_net": 9,
+    "previous_zero_charge_candidate_overrides": [
+      "R_PB5_PERMIT stays at existing 1k and is repurposed to FF CLK; do not apply the older 4.7k change.",
+      "R_DRV_FAULT_PD stays at existing 10k; do not apply the older 47k suggestion.",
+      "Keep U_AFE_AND and C_AFE_AND_VDD. AND Y now asynchronously clears the external FF instead of directly driving the DRV pin.",
+      "Keep R_AFE_OK_PD, R_WD_OK_PD, and R_AFE_PERMIT_PD; the last becomes PB6_RUN input pulldown."
+    ]
+  },
+  "new_isolation_and_latch_parts": [
+    {
+      "ref": "Q_ISO1",
+      "qty": 1,
+      "value": "HYG022N10NS1TA N-channel MOSFET",
+      "mpn": "HYG022N10NS1TA",
+      "supplier": "LCSC",
+      "supplier_part": "C2925050",
+      "connection": "pin1 G=ISO_G; pins2-8 S=ISO_MID; pin9 plus tab D=SC_ISO_STORAGE",
+      "status": "candidate; pin assignment cross-checked against original manufacturer drawing"
+    },
+    {
+      "ref": "Q_ISO2",
+      "qty": 1,
+      "value": "HYG022N10NS1TA N-channel MOSFET",
+      "mpn": "HYG022N10NS1TA",
+      "supplier": "LCSC",
+      "supplier_part": "C2925050",
+      "connection": "pin1 G=ISO_G; pins2-8 S=ISO_MID; pin9 plus tab D=SC_FUSED",
+      "status": "candidate; pin assignment cross-checked against original manufacturer drawing"
+    },
+    {
+      "ref": "U_SC_ISO_GATE",
+      "qty": 1,
+      "value": "LTC7001IMSE#PBF",
+      "mpn": "LTC7001IMSE#PBF",
+      "supplier": "LCSC",
+      "supplier_part": "C581062",
+      "connection": "VCC=12V_DRV; VCCUV=open for nominal 7V rising UVLO; OVLO=GND_SYS; GND/EP=GND_SYS; TS=ISO_MID; BST-C_ISO_BST-TS; TGUP through R_ISO_TGUP to ISO_G; TGDN directly to ISO_G; INP=FF Q gate-permit; NC floating",
+      "status": "candidate; I grade -40 to +125C"
+    },
+    {
+      "ref": "C_ISO_BST",
+      "qty": 1,
+      "value": "1uF 100V X7R",
+      "mpn": "C3225X7R2A105K200AA",
+      "supplier": "LCSC",
+      "supplier_part": "C2167578",
+      "connection": "LTC7001 BST to TS",
+      "status": "candidate; 1uF supplies Qg budget for two MOS, HYG Qg is typical and maximum total gate charge remains unqualified"
+    },
+    {
+      "ref": "D_ISO_BST_START",
+      "qty": 1,
+      "value": "low-leakage silicon diode, 1N4148W-class",
+      "mpn": "1N4148W-7-F",
+      "supplier": "TBD",
+      "supplier_part": "TBD",
+      "connection": "anode=12V_DRV/VCC; cathode=LTC7001 BST",
+      "status": "candidate; exact procurement code/price unverified; do not use Schottky due hot reverse leakage against LTC charge-pump budget"
+    },
+    {
+      "ref": "R_ISO_TGUP",
+      "qty": 1,
+      "value": "100R 1% 0603",
+      "mpn": "RC0603FR-07100RL",
+      "supplier": "existing common-part MPN",
+      "supplier_part": "TBD",
+      "connection": "LTC7001 TGUP through 100R to ISO_G; TGDN stays direct to ISO_G",
+      "status": "candidate; keeps one common 100R SKU; resistor affects turn-on only"
+    },
+    {
+      "ref": "C_ISO_VCC",
+      "qty": 1,
+      "value": "100nF 50V X7R",
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier": "LCSC",
+      "supplier_part": "C342998",
+      "connection": "12V_DRV/VCC to GND_SYS, placed at LTC7001 pin1",
+      "status": "new physical instance; same MPN as existing bypass parts"
+    },
+    {
+      "ref": "R_ISO_GATE_SOURCE",
+      "qty": 1,
+      "value": "10M 1% 0603",
+      "mpn": "RS-03L1005FT",
+      "supplier": "same MPN as BMS candidate",
+      "supplier_part": "TBD",
+      "connection": "ISO_G to ISO_MID",
+      "status": "candidate weak gate-source bleed; not a guaranteed fast power-loss turn-off path"
+    },
+    {
+      "ref": "D_SC_CLAMP",
+      "qty": 1,
+      "value": "STPS80H100TV independent dual 100V Schottky",
+      "mpn": "STPS80H100TV",
+      "supplier": "LCSC quote cited by parent",
+      "supplier_part": "C2798202",
+      "connection": "A1=GND_SYS,K1=SC_FUSED (D_LO); A2=SC_FUSED,K2=BUS_BR (D_HI)",
+      "status": "main clamp candidate; parent quote USD16.67/pc and availability concern; IFSM 700A is 10ms sinusoidal nonrepetitive rating, not by itself proof of this fault waveform"
+    },
+    {
+      "ref": "U_ISO_ARM_FF",
+      "qty": 1,
+      "value": "SN74LVC1G175DCKR",
+      "mpn": "SN74LVC1G175DCKR",
+      "supplier": "Texas Instruments",
+      "supplier_part": "TBD",
+      "connection": "VCC=3V3_CORE; GND=GND_SYS; D=3V3_CORE; CP=PB5_ARM through existing R_PB5_PERMIT 1k; /CLR=U_AFE_AND.Y; Q through existing candidate R_GATE_SER 680R to ISO_ENABLE; /Q=NC",
+      "status": "candidate; fresh rising PB5_ARM edge after fault clear is required"
+    },
+    {
+      "ref": "C_ISO_ARM_FF",
+      "qty": 1,
+      "value": "100nF 50V X7R",
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier": "LCSC",
+      "supplier_part": "C342998",
+      "connection": "SN74LVC1G175 VCC to GND_SYS, local",
+      "status": "new physical instance; same MPN as existing bypass parts"
+    }
+  ],
+  "control_contract": {
+    "gate_enable_node": "ISO_ENABLE after R_GATE_SER",
+    "gate_enable_connections": [
+      "ISO_ENABLE to DRV8161 pin4 DRV_FAULT_N/nDRVOFF",
+      "ISO_ENABLE to LTC7001 INP"
+    ],
+    "default_state": "PB6_RUN held low/high-Z on reset through R_AFE_PERMIT_PD; AFE_OK and WD_OK fail low via existing candidate pulldowns; SN74LVC1G11 Y goes low and asynchronously asserts FF /CLR; PB5_ARM held low by moved R_QP_GS; FF Q therefore defaults low when CORE logic is valid.",
+    "latch_action": "When AFE_OK, WD_OK, and PB6_RUN are all high, AND Y releases /CLR. Only a fresh PB5_ARM rising edge clocks D=3V3_CORE to Q. Any health input low asynchronously clears Q. Removing a fault does not re-arm Q; firmware must issue a new ARM edge.",
+    "current_fault_path": "For current-window faults to isolate SC, reuse G431 COMP1/COMP2 open-drain AF outputs wired active-low into AFE_OK; those outputs also feed the hardware TIM1 break path with AOE=0. Confirm actual STM32G431 output type/AF and polarity before schematic freeze. DRV8161 nFAULT itself is read by AUP1T14 to PA10 and PB12/TIM1_BKIN; it does not directly clear this FF in the present 3-input logic.",
+    "driver_readback": "Add U_DRV_FAULT_FB=SN74AUP1T14DCKR and C_DRV_FAULT_FB=100nF; DRV_FAULT_N goes to AUP input, Y to PA10 and candidate PB12/TIM1_BKIN. Do not feed AUP Y or DRV pin4 back to the same FF /CLR because Q-low/R_DRV_FAULT_PD can create a non-rearmable feedback lock.PB12 is currently assigned to NTC_DUMP in the existing pin plan; if PB12 is assigned TIM1_BKIN, move the NTC_DUMP input to PA0 as the root plan specifies. No extra component is needed, but recheck pin AF/input mapping."
+  },
+  "physical_topology_and_protection": {
+    "mosfet_pin_contract": "Both HYG022 FETs: pin1=G; pins2-8=S; pin9 and tab=D. Q_ISO1/Q_ISO2 pins2-8 share ISO_MID. Their pin9/tab drains go separately to SC_ISO_STORAGE and SC_FUSED. Both gates pin1 share ISO_G. Do not reverse D/S.",
+    "back_to_back": "Common-source series pair. ISO_MID is the common source; the outer drain nodes are storage side SC_ISO_STORAGE and bridge side SC_FUSED.",
+    "clamp_paths": [
+      {
+        "name": "D_LO",
+        "anode": "GND_SYS",
+        "cathode": "SC_FUSED",
+        "role": "provides the lower recirculation clamp after isolation when the low-side switch is shorted"
+      },
+      {
+        "name": "D_HI",
+        "anode": "SC_FUSED",
+        "cathode": "BUS_BR",
+        "role": "closes the high-side-short recirculation loop and limits SC_FUSED to approximately BUS_BR+VF"
+      }
+    ],
+    "cap_requirement": "Replace both SC_FUSED local 100uF/35V polymer capacitors by parts rated above maximum BUS_BR plus clamp forward voltage, ringing, tolerance, and transients; 63V is a candidate minimum only if this bound fits. Check negative clamp pulse versus polarized capacitor reverse-voltage rating.",
+    "pulse_screen": {
+      "assumptions": "L=20uH nominal; one-shot current examples 80A and 110A; clamp drop 0.7V illustrative, not guaranteed maximum.",
+      "energy_80A_J": 0.064,
+      "energy_110A_J": 0.121,
+      "decay_time_80A_ms_at_0p7V": 2.29,
+      "decay_time_110A_ms_at_0p7V": 3.14,
+      "qualification": "Must use actual L minimum, current ceiling including sensing/logic/gate delay, diode I2t/thermal initial condition, repetitive duty, bus maximum and wiring parasitics. IFSM rating alone does not qualify."
+    }
+  },
+  "known_unclosed_requirements": [
+    {
+      "issue": "12V_DRV recovery can auto-reenable an armed isolation switch",
+      "evidence": "If 3V3_CORE remains alive while 12V_DRV falls, FF Q may remain high. LTC7001 VCCUV disables TGDN below its UVLO but does not latch the fault; on VCC recovery, INP still high can reopen the switch.",
+      "required": "Add an independently powered 12V-loss-to-FF-/CLR path, then require a fresh PB5_ARM edge. This required path is not included or costed in current arrays; no auto-start PASS."
+    },
+    {
+      "issue": "LTC7001 TGDN at VCC=0 is not guaranteed",
+      "evidence": "ADI datasheet describes TGDN-to-TS action during UVLO and gives output resistance with powered conditions; it does not guarantee a low-impedance TGDN state at VCC=0.",
+      "residual": "R_ISO_GATE_SOURCE=10M gives only weak passive discharge and no specified turn-off time. If 12V_DRV and 3V3_CORE both disappear, fast default-off is unproven."
+    },
+    {
+      "issue": "FF Q shared high-level margin at two gate-driver inputs",
+      "evidence": "One R_GATE_SER=680R drives DRV pin4 and LTC INP in parallel. Guaranteed VOH with the 10k DRV pull-down and both input thresholds has not been closed at min 3V3, max temperature, and process corners.",
+      "residual": "Candidate only, not PASS. Do not substitute the nominal 20us DRV response for end-to-end current interruption."
+    },
+    {
+      "issue": "Total interruption time and fault energy are unqualified",
+      "evidence": "System time includes comparator/AFE detection, AND/FF, LTC7001, gate charge discharge, and inductor current decay through clamps.",
+      "residual": "DRV8161 local timing/deglitch values are not total switch-to-zero-current time. No physical qualification performed."
+    },
+    {
+      "issue": "Main clamp/cap pulse qualification",
+      "evidence": "STPS80H100TV is specified 700A IFSM for a nonrepetitive 10ms sine; capacitor reverse pulse and actual bus-fed QH-short loop are not covered by that single rating.",
+      "residual": "Candidate route only; compute full I2t/thermal and waveform margin before release."
+    },
+    {
+      "issue": "PB6_RUN high level through the reused 10k/47k network has narrow guaranteed margin",
+      "evidence": "The project-root corner estimate is approximately 2.14V at the SN74LVC1G11 RUN input, only about 0.14V above the 2.0V maximum VIH boundary before input leakage and rail/process/temperature corners.",
+      "required": "Recompute from the G431 guaranteed VOH at the actual source current, AND input VIH maximum and leakage, pull-down tolerance, and full temperature. Keep this a candidate until the margin is guaranteed or change the resistor ratio."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "candidate": "SN74HCS74 single-IC replacement",
+      "decision": "excluded from main",
+      "reason": "No suitable verified full-project power-off Ioff margin in the intended wiring; parent selected existing two-IC/AND+FF route."
+    },
+    {
+      "candidate": "BJT self-capture into DRV pin4",
+      "decision": "excluded",
+      "reason": "FF/driver series node RC can inject a transient VBE pulse and falsely clear/re-arm; not closed."
+    },
+    {
+      "candidate": "two discrete lower-cost MBR/STPS30/60100 clamp diodes",
+      "decision": "excluded from main count",
+      "reason": "Retained only as later price alternative; not included pending per-device pulse-current and thermal qualification."
+    }
+  ],
+  "procurement_and_cost": {
+    "cost_total": null,
+    "cost_total_status": "not calculated; selected BOM contains mixed known/unpriced parts and two 100uF capacitor replacements without frozen MPN",
+    "quoted_items": [
+      {
+        "mpn": "HYG022N10NS1TA",
+        "supplier_part": "LCSC C2925050",
+        "qty": 2,
+        "quoted_unit": "CNY 7.44",
+        "extended": "CNY 14.88",
+        "status": "existing cross-board candidate price; verify current"
+      },
+      {
+        "mpn": "LTC7001IMSE#PBF",
+        "supplier_part": "LCSC C581062",
+        "qty": 1,
+        "quoted_unit": "USD 6.8167",
+        "status": "prior lookup; verify current and assembly source"
+      },
+      {
+        "mpn": "STPS80H100TV",
+        "supplier_part": "LCSC C2798202",
+        "qty": 1,
+        "quoted_unit": "USD 16.67",
+        "status": "parent quote; availability concern, verify current"
+      }
+    ],
+    "note": "Do not compare mixed-currency partial quotes as a total BOM cost. Root may join this ledger to the 43-instance 0V BOM and shared readback quote."
+  },
+  "official_sources": [
+    "ADI LTC7001 Rev G datasheet: https://www.analog.com/media/en/technical-documentation/data-sheets/LTC7001.pdf",
+    "TI DRV8161 Rev C datasheet: https://www.ti.com/lit/ds/symlink/drv8161.pdf",
+    "ST STPS80H100TV datasheet: https://www.st.com/resource/en/datasheet/stps80h100.pdf",
+    "HYG022 manufacturer drawing: BMS模块/厂商资料/HYG022N10NS1TA.pdf; pinout evidence: 电力/检查/HYG022管脚核对.png"
+  ]
+}
