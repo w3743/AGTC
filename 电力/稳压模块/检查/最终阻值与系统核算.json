@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-29",
+  "status": "ADOPTED_RESISTANCE_AND_ANALYTICAL_WORKING_POINTS",
+  "scope": "阻值、支路电流、比较工况；不是电阻热/脉冲额定选型或停车实测",
+  "resistor": {
+    "ref": "R_DUMP_EXT",
+    "quantity": 1,
+    "resistance_ohm": 0.82,
+    "tolerance_fraction": 0.05,
+    "power_rating_W": null,
+    "power_rating_reason": "用户明确只要求阻值，功率和短时承受能力由用户负责；不沿用500W、1kJ或400W限制",
+    "thermal_fuse_added": false,
+    "maximum_R_for_reference_initial_power_ohm": 1.022107813446396,
+    "power_at_22p5V_high_R_W": 587.9790940766551,
+    "instantaneous_current_at_42V_low_R_A": 53.91527599486522,
+    "instantaneous_electrical_power_at_42V_low_R_W": 2264.441591784339,
+    "control": "正常由BUS反馈PWM调节；硬BUS过压可强制导通；温度不串断最终耗能支路"
+  },
+  "braking_comparison": {
+    "assumed_mass_kg": 30.0,
+    "assumed_speed_kmh": 15,
+    "reference_deceleration_m_s2": 3.9624,
+    "kinetic_energy_J": 260.41666666666674,
+    "initial_power_W": 495.30000000000007,
+    "time_s": 1.051551248401642,
+    "distance_m": 2.1907317675034212,
+    "interpretation": "M1A1参考减速度的工程比较，非用户指定1秒停车；不包含未知旋转惯量/坡度/附着或实车制动力资格"
+  },
+  "battery_peak_comparison": {
+    "series": 9,
+    "parallel": 5,
+    "cells": 45,
+    "user_cell_price_CNY": 13,
+    "additional_cells": 9,
+    "additional_cell_cost_CNY": 117,
+    "two_motor_peak_input_W": 3600,
+    "battery_peak_comparison_A_not_a_frozen_rating": 130,
+    "battery_input_at_min_bus_W": 2925.0,
+    "minimum_missing_power_at_min_bus_W": 675.0,
+    "SC_current_for_missing_power_at_17p2V_eff90_A": 43.604651162790695,
+    "empty_SC": "允许限功率慢加速，不把BMS130A比较值写成已经达标的额定"
+  },
+  "passive_balance": {
+    "existing_resistors_rewired": 8,
+    "resistance_each_ohm": 120,
+    "current_at_2p2V_mA": 18.333333333333332,
+    "pack_dissipation_at_2p2V_each_W": 0.3226666666666667,
+    "time_constant_hours_280_350_420F": [
+      9.333333333333334,
+      11.666666666666666,
+      14.0
+    ],
+    "meaning": "持续慢泄放、允许长停自放电；不同容量停车不保持等压，不能纠正一次几十秒初充中的容量差异，充电按最高单体终止"
+  },
+  "regen_window_comparison": {
+    "model": "equal cells; constant deceleration; 95% bus-to-SC efficiency; no unknown rotating inertia/slope; not qualification",
+    "measured_stop_V": 2.2,
+    "cases": [
+      {
+        "cell_C_F": 280,
+        "cell_ESR_ohm": 0.0028,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.0825235905739805,
+        "peak_charge_A": 28.28683603413606,
+        "final_OCV_each_V": 2.053116424755332,
+        "SC_input_energy_J": 247.39583333335332
+      },
+      {
+        "cell_C_F": 280,
+        "cell_ESR_ohm": 0.0056,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.152978247252642,
+        "peak_charge_A": 27.317544152257494,
+        "final_OCV_each_V": 2.0518911266732913,
+        "SC_input_energy_J": 247.39583333335332
+      },
+      {
+        "cell_C_F": 350,
+        "cell_ESR_ohm": 0.0028,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.0793928196412117,
+        "peak_charge_A": 28.28683603413606,
+        "final_OCV_each_V": 2.042599257555444,
+        "SC_input_energy_J": 247.39583333335332
+      },
+      {
+        "cell_C_F": 350,
+        "cell_ESR_ohm": 0.0056,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.152978247252642,
+        "peak_charge_A": 27.317544152257494,
+        "final_OCV_each_V": 2.041610605189153,
+        "SC_input_energy_J": 247.39583333335332
+      },
+      {
+        "cell_C_F": 420,
+        "cell_ESR_ohm": 0.0028,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.079203140895581,
+        "peak_charge_A": 28.28683603413606,
+        "final_OCV_each_V": 2.0355588237801885,
+        "SC_input_energy_J": 247.39583333335332
+      },
+      {
+        "cell_C_F": 420,
+        "cell_ESR_ohm": 0.0056,
+        "initial_OCV_each_V": 2.0,
+        "max_terminal_each_V": 2.152978247252642,
+        "peak_charge_A": 27.317544152257494,
+        "final_OCV_each_V": 2.034730205810808,
+        "SC_input_energy_J": 247.39583333335332
+      }
+    ]
+  }
+}

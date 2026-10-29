@@ -1,0 +1,19 @@
+* Shared fault wire: ideal 40-ohm open-drain driver, assumed wire capacitance.
+* Not a manufacturer model for STM32, DRV8161, LTC7001 or G07.
+Vcore core 0 3.0
+Vint internal 0 3.3
+Rup core fault 1k
+Rdown fault 0 10k
+Rltc fault 0 1Meg
+Rinternal internal fault 250k
+Cwire fault 0 1n
+Vctl ctl 0 PWL(0 0 9.999u 0 10u 3.3 11u 3.3 11.001u 0 39.999u 0 40u 3.3 44.2u 3.3 44.201u 0 79.999u 0 80u 3.3 90u 3.3 90.001u 0 120u 0)
+Sfault fault 0 ctl 0 FAULTSW
+.model FAULTSW SW(Ron=40 Roff=1e12 Vt=1.65 Vh=0)
+.control
+set noaskquit
+tran 5n 120u 0 5n
+wrdata fault_wave.txt v(ctl) v(fault)
+quit
+.endc
+.end

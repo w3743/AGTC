@@ -1,0 +1,13 @@
+const doc=await eda.dmt_SelectControl.getCurrentDocumentInfo();
+if(doc?.uuid!==__CLI__.args.target_page_uuid)throw new Error('目标页不符');
+const details=await eda.sch_Drc.check(true,false,true);
+const result={status:'OFFICIAL_DRC_AND_EXPORT',drc:details,exports:{}};
+const net=await eda.sch_ManufactureData.getNetlistFile('稳压模块.enet','EasyEDA');
+if(!net)throw new Error('官方网表导出失败');
+result.exports.netlist=await net.text();
+const svg=await eda.sch_ManufactureData.getExportDocumentFile('稳压模块.svg','SVG',undefined,'Current Schematic Page');
+if(!svg)throw new Error('SVG导出失败');
+result.exports.svg=await svg.text();
+const bom=await eda.sch_ManufactureData.getBomFile('稳压模块.csv','csv');
+if(bom)result.exports.bom=await bom.text();
+return result;

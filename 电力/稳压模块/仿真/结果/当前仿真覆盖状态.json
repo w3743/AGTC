@@ -1,0 +1,74 @@
+{
+  "status": "PARTIAL_EQUIVALENT_MODELS_REAL_SHUTDOWN_UNVERIFIED",
+  "date": "2026-10-30",
+  "outcomes": {
+    "UCC_macro_gate_checks": {
+      "default_off": true,
+      "request_on": true,
+      "request_release_off": true,
+      "second_request_on": true
+    },
+    "mux_settle_s": {
+      "high": 3.68575898e-05,
+      "low": 3.57244952e-05
+    },
+    "dump_chain_checks": {
+      "normal_off": true,
+      "hardware_on": true,
+      "hardware_release": true,
+      "software_on": true,
+      "software_release": true
+    },
+    "dump_chain_sensitivity_pass": 9,
+    "dump_chain_sensitivity_total": 9,
+    "ideal_charge_cases": 6,
+    "ltc_equivalent_cases": 4,
+    "fault_resistive_cases": 8,
+    "closed_loop_bus_peak_V": 40.3974336,
+    "fault_pulse_assumed_RC_cases": 3,
+    "HYG_parameterized_fixture_checks": 7,
+    "ltc_hyg_one_port_comparison_cases": 4,
+    "post_isolation_ST_diode_path_cases": 4,
+    "post_isolation_ST_diode_max_BUS_V": 38.1580904,
+    "ltc_official_model_local_probes": 2,
+    "ltc_recovery_with_inp_high": "gate reopened after VCC/BST recovery; external rearm hold is not verified"
+  },
+  "limitations": [
+    "LTC7001厂家模型已运行局部预充、许可撤销及12V掉电恢复；仅用线性栅荷与固定TS，真实MOS及实际控制链未验证。",
+    "DRV8161缺乏可用厂家宏模型，共享故障线仅静态及假设RC脉冲筛查，未模拟去毛刺和Break",
+    "实际MOS栅电荷/Miller、失电动态、PCB寄生、故障能量、真实固件及FOC/BMS联动尚未验证"
+  ],
+  "result_sha256": {
+    "UCC27511_分立栅极汇总.json": "021b05c144b5c3d204aca2108fe925df81a007a87249a0d8d61bf6e0f13e8f94",
+    "抽头切换_理想开关汇总.json": "6f979487904cfd9ad261922de2825d113591095a5ea9be5fa682203ea1be8379",
+    "母线过压到制动驱动_组合汇总.json": "a7146b63e3ced5e5e20b9ffece0017ac9842b19fd5227715f2d3a5b4ae55f0d4",
+    "过压制动链_模型敏感性.json": "080a6bb489a8cf7ce97ed37b72949e18db0a6c3a0c331a1ad319d02953d1cf75",
+    "初充开关模型_参数扫描.json": "2fcc29950c158a80283135e31df9f4d160fff76a419afda4802fe7c0b6f43c59",
+    "DRV快速掉电_条件时序筛查.json": "21ee1c089a6fab44a9470ea9e907ff6ef04fa94dce2f360277514861c3a08840",
+    "回生母线平均模型.json": "0dabe5af36231bd60668e7e1a08fdead15b6fb6a6289c3672bfb9e83e1e89522",
+    "LTC7001_等效栅极筛查.json": "5bd77d8939e8f7cff8a0a4a3a3df9b48297b5c4335dd71a04457da11122fa34c",
+    "故障线_静态等效扫描.json": "7313ce3403250c25e9dddb5a50cc7696c0af3e7fd2f1cb25fe7db06e34085b1e",
+    "回生硬件闭环_等效功率级汇总.json": "8acb829f51513ab2d6a173154d818c4c5cedaeafb501640e137e5c3f4cbca4de",
+    "故障线_脉冲等效扫描.json": "f9015386f9c26015ba06c8687411de80ebe92b1fba57b9dcded14a562a47abc8",
+    "HYG022_参数化等效自检.json": "5c7d8f10de28df8e12ad18b98685589d629e3e250df8a14a2c9808421b3f1eac",
+    "LTC输出_HYG非线性栅荷等效.json": "3f9dfa5fb5876de16ead4806645afa92568c0d0d73548268c33832128f06ea89",
+    "隔离关断续流/隔离关断续流_汇总.json": "cbefebf3b8ac9fb5fa6df33ee8c414aef073daee26888bcc4d538f74d543fbf2",
+    "../../检查/LTC7001_厂家模型探针本轮结果.json": "a59ac14da756ca2a17db01c7e77242aea440471b68ce2d12574ec862094f207c"
+  },
+  "power_supply_requirement": {
+    "source": "海凌科 UR(A)B_YMD-10WR3 V1.7 p3,p5",
+    "status": "CAPACITIVE_LOAD_MINIMUM_NOT_QUALIFIED",
+    "12V_min_mA_if_3_percent_of_10W": 25,
+    "5V_min_mA_if_3_percent_of_10W": 60,
+    "reason": "p3写0–100%负载，p5对容性负载要求至少3%；启动和待机最小实际负载未核证，未作补件决定。"
+  },
+  "ltc_model": {
+    "status": "OFFICIAL_MODEL_PROBES_COMPLETED_LIMITED_GATE_LOAD",
+    "vendor": "Analog Devices",
+    "sha256": "14fa9c5c68e4d4a269ba0fb0522f0b8333bf520362580ae75faf6936576fb29f",
+    "license": "用户已接受安装包随附许可。",
+    "prior_attempt": "下载解包和后台尝试发生于读取该许可前，后台探针未产生波形；已停止继续运行。",
+    "installation": "本机ARM64官方MSI拒绝安装；官方管理映像初始化后可运行LTspice，原始结果及波形已核对。",
+    "probe_summary": "检查/LTC7001_厂家模型探针本轮结果.json"
+  }
+}

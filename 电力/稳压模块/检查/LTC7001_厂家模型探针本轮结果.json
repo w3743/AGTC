@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-10-30",
+  "evidence_scope": "LTspice official LTC7001 macro-model probes; execution evidence only, not design or hardware acceptance.",
+  "runtime": {
+    "msi": {
+      "path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\工具\\ADI-LTspice-26.1.1\\官方软件缓存\\LTspice64_26.1.1_官网software路径_重试1.msi",
+      "bytes": 144698880,
+      "sha256": "F22163F15420E43A2D5C66440E038EF031A9F019A181F396B95EDCEF5EEBC357",
+      "authenticode": "Valid",
+      "product_version": "26.1.1.2",
+      "silent_per_user_install_exit_code": 1603,
+      "install_result": "LaunchConditions refused installation because the OS is ARM64; log states that this application is not supported on ARM64 architecture. The MSI was not installed."
+    },
+    "executed_binary": {
+      "path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\工具\\ADI-LTspice-26.1.1\\官方软件缓存\\admin_extract_20261029\\LTspice.exe",
+      "bytes": 70571120,
+      "sha256": "3C144A2B3EC6A30BAAC6761C502D99B95AAA40B947FF5ECA25B8FBD80D68AF72",
+      "authenticode": "Valid",
+      "file_version": "26.1.1.0",
+      "pe_machine": "AMD64/x64",
+      "execution_mode": "Official MSI administrative image binary, Windows ARM64 x64 emulation, hidden process, LTspice batch switch -b, ASCII raw switch -ascii."
+    },
+    "ltc7001_model": {
+      "source_path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\工具\\ADI-LTspice-26.1.1\\官方模型\\LTC7001\\lib\\sub\\LTC7001.sub",
+      "loaded_path_in_log": "C:\\Users\\wangj\\AppData\\Local\\LTspice\\lib\\sub\\LTC7001.sub",
+      "bytes": 2094,
+      "sha256": "14FA9C5C68E4D4A269BA0FB0522F0B8333BF520362580AE75FAF6936576FB29F",
+      "loaded_copy_matches_source": true
+    },
+    "first_run_note": "The hidden first-run usage-data dialog was set to No. After confirming it, LTspice briefly created an Installing library files dialog with IsWindowVisible=true; it was immediately hidden with SW_HIDE. Later batch runs had no visible window handle."
+  },
+  "probes": [
+    {
+      "name": "LTC7001 initial BST and gate response",
+      "source_path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\源码\\LTC7001_厂家模型初充与门极.net",
+      "source_sha256": "8255F97CE400CD36040C91E11D166F4F0B33B12169B77882B1FE0BEC24243F5F",
+      "result_directory": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\结果\\LTC7001_厂家模型探针\\原时序1s_完成",
+      "conditions": {
+        "model": "ADI LTC7001 macro-model",
+        "vcc": "0 V initially, 12 V at 1 us, held through 1.02 s",
+        "inp": "0 V until 0.999999 s; 3.3 V from 1.000000 s through 1.005999 s; then 0 V",
+        "gate_load": "TGUP to external gate through 10 kohm; 32.1 nF linear Cgs and 1 Mohm gate-to-ground resistor",
+        "bst_load": "1 uF from BST to ground; TS fixed at 0 V",
+        "analysis": "Transient to 1.02 s, max step 50 us, Normal solver, trap method, 27 C"
+      },
+      "simulation": {
+        "log_elapsed_seconds": 150.163,
+        "iterations": 48903,
+        "raw_points": 20857,
+        "raw_variables": 21,
+        "raw_final_time_seconds": 1.02
+      },
+      "measurements": {
+        "bst_pre_v_at_0_999s": 12.0894846193,
+        "gate_pre_v_at_0_999s": 1.20901541557e-08,
+        "gate_enabled_v_at_1_004s": 11.6583673178,
+        "bst_enabled_v_at_1_004s": 11.7804491629,
+        "gate_after_off_v_at_1_007s": 1.21392204591e-08
+      },
+      "waveform_ranges_v": {
+        "vcc": [0.0, 12.0],
+        "inp": [0.0, 3.3],
+        "gate": [0.0, 11.69],
+        "bst": [0.0, 12.10],
+        "tgup": [0.0, 12.09]
+      },
+      "files": {
+        "net": {
+          "bytes": 681,
+          "sha256": "8255F97CE400CD36040C91E11D166F4F0B33B12169B77882B1FE0BEC24243F5F"
+        },
+        "raw": {
+          "bytes": 10758290,
+          "sha256": "5B1C4B59620E7B76A335BF5D0E5B8D0DBDDF43DBF60C91FA74639F2BE89F70ED"
+        },
+        "log": {
+          "bytes": 878,
+          "sha256": "69C2EAA9B29C0E9563841D2FA4A014EFA699E4DAAF853EF0A2084AFAEEE0FBCA"
+        }
+      },
+      "limits": [
+        "This is a component-level LTC7001 macro-model probe, not the complete board or high-side power stage.",
+        "The external MOSFET is represented only by a linear 32.1 nF gate capacitance and resistors; no nonlinear gate charge, parasitics, bus, or actual load is included.",
+        "The result does not establish physical precharge time, fault-energy handling, board behavior, or hardware acceptance."
+      ]
+    },
+    {
+      "name": "LTC7001 12 V loss and recovery",
+      "source_path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\源码\\LTC7001_厂家模型12V掉电恢复探针.net",
+      "source_sha256": "2F932FAC4B6456E136BBB5150257AFBBAE35169F51F23366B7CCAAAEAA31524F",
+      "result_directory": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\结果\\LTC7001_厂家模型探针\\12V掉电恢复",
+      "conditions": {
+        "model": "ADI LTC7001 macro-model",
+        "vcc": "0 V initially; 12 V from 1 us to 1.02 s; 0 V starting 1.020001 s through 1.080000 s; returns to 12 V at 1.080001 s and remains at 12 V through 2.12 s",
+        "vcc_zero_interval_seconds": 0.06,
+        "inp": "0 V until 0.999999 s; rises to 3.3 V at 1.000000 s and remains at 3.3 V through 2.12 s, including the entire VCC outage and recovery; no new INP rising edge after VCC recovery",
+        "gate_load": "TGUP to external gate through 10 kohm; 32.1 nF linear Cgs and 1 Mohm gate-to-ground resistor",
+        "bst_load": "1 uF from BST to ground; TS fixed at 0 V",
+        "analysis": "Transient to 2.12 s, max step 50 us, Normal solver, trap method, 27 C; .save records VCC, gate, BST, INP, TGUP"
+      },
+      "simulation": {
+        "log_elapsed_seconds": 0.990,
+        "iterations": 99685,
+        "raw_points": 43275,
+        "raw_variables": 6,
+        "raw_final_time_seconds": 2.12
+      },
+      "measurements": {
+        "before_loss_at_1_019s": {
+          "vcc_v": 12.0,
+          "inp_v": 3.3,
+          "gate_v": 11.9053163999,
+          "bst_v": 12.0297605179
+        },
+        "during_loss_at_1_050s": {
+          "vcc_v": 0.0,
+          "inp_v": 3.3,
+          "gate_v": -6.73979347309e-21,
+          "bst_v": 1.12044610946e-12
+        },
+        "20ms_after_recovery_at_1_100s": {
+          "vcc_v": 12.0,
+          "inp_v": 3.3,
+          "gate_v": 8.99439028829e-10,
+          "bst_v": 0.599411928729
+        },
+        "about_1s_after_recovery_at_2_100s": {
+          "vcc_v": 12.0,
+          "inp_v": 3.3,
+          "gate_v": 11.9409599127,
+          "bst_v": 12.0565011884
+        }
+      },
+      "first_raw_sample_at_or_above_after_recovery": {
+        "bst_1v": {
+          "time_s": 1.11,
+          "delay_after_vcc_recovery_s": 0.029999,
+          "value_v": 1.0
+        },
+        "gate_1v": {
+          "time_s": 1.18,
+          "delay_after_vcc_recovery_s": 0.099999,
+          "value_v": 1.21
+        },
+        "bst_10v": {
+          "time_s": 1.50,
+          "delay_after_vcc_recovery_s": 0.419999,
+          "value_v": 10.0
+        },
+        "gate_10v": {
+          "time_s": 1.51,
+          "delay_after_vcc_recovery_s": 0.429999,
+          "value_v": 10.0
+        }
+      },
+      "waveform_ranges_v": {
+        "vcc": [0.0, 12.0],
+        "inp": [0.0, 3.3],
+        "gate": [0.0, 11.98],
+        "bst": [0.0, 12.10],
+        "tgup": [0.0, 12.10]
+      },
+      "files": {
+        "net": {
+          "bytes": 1136,
+          "sha256": "2F932FAC4B6456E136BBB5150257AFBBAE35169F51F23366B7CCAAAEAA31524F"
+        },
+        "raw": {
+          "bytes": 6482574,
+          "sha256": "4DAAF2038DD7C42B65CA7D7F63EE94295C8656CE7C408B01F6A33EAFA5DACA20"
+        },
+        "log": {
+          "bytes": 1272,
+          "sha256": "2C712F472E1F55C42DCB6F05F902FE7D12C86E8E59EAF0B9C4AFE0DA7BC068CD"
+        }
+      },
+      "interpretation_boundary": "INP is intentionally high throughout the power loss and recovery. The macro-model therefore reasserts gate once BST has recharged, without a new INP rising edge. This is not evidence that the board requires a fresh ARM event; the external latch/controller that must hold INP low until explicit re-arm is absent from this probe."
+    }
+  ],
+  "exploratory_short_start": {
+    "source_path": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\源码\\LTC7001_厂家模型短时启动未预充辅助探针.net",
+    "result_directory": "C:\\pioneer\\先进通用履带底盘工程\\电力\\稳压模块\\仿真\\结果\\LTC7001_厂家模型探针\\短时120ms_预充不足辅助结果",
+    "log_elapsed_seconds": 0.687,
+    "raw_points": 6269,
+    "observation": "At 19 ms, BST was 0.564882 V and gate was approximately 0 V; retained only to document that the short startup interval did not establish the precharged condition."
+  }
+}

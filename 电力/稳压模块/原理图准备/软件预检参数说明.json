@@ -1,0 +1,57 @@
+{
+  "schema": "EASYEDA_SOFTWARE_PREFLIGHT_PARAMETER_TEMPLATE_V1",
+  "status": "TEMPLATE_ONLY_DYNAMIC_BOM_NOT_EMBEDDED",
+  "target": {
+    "project": "电力/稳压模块",
+    "page_uuid": "9546dca0bc8bce7f",
+    "contract_source": "电力/稳压模块/原理图准备/软件接线输入.json"
+  },
+  "runtime_binding": {
+    "description": "由外部CLI读取contract_source后，把contract对象或包含contract与target_page_uuid的完整JSON原样传给EDA Bridge的脚本运行上下文；脚本本身不读本地文件。",
+    "preferred_argument": "__CLI__.args.contract",
+    "alternate_argument": "__CLI__.args.bom",
+    "accepted_input": [
+      "含components的contract对象；页面UUID可在contract内或外层JSON提供",
+      "包含contract对象的完整JSON对象",
+      "上述对象的JSON字符串"
+    ],
+    "cli_argument_example": {
+      "contract": "把软件接线输入.json中的完整对象或contract对象原样绑定到此处",
+      "options": {
+        "include_netlist_text": false
+      }
+    }
+  },
+  "contract_shape": {
+    "target_page_uuid": "9546dca0bc8bce7f",
+    "target_project_uuid": "可选；已知时用于核对当前工程UUID",
+    "components": [
+      {
+        "ref": "R_EXAMPLE",
+        "manufacturer_part": "精确制造商料号",
+        "supplier_part": "精确LCSC C编号；无编号时留空",
+        "manufacturer": "制造商名称",
+        "scope": "ON_BOARD或当前接线合同中定义的范围",
+        "footprint": "合同封装名",
+        "pins": [
+          {
+            "number": "1",
+            "name": "引脚名称",
+            "net": "合同网名",
+            "connection": "可选连接描述"
+          }
+        ]
+      }
+    ],
+    "options": {
+      "include_netlist_text": false
+    }
+  },
+  "execution_notes": [
+    "运行前由主生成器写入完整的170个实际元件合同；COREBOARD_WEACT不作为器件，PSU5_EXT作为原理图器件保留。",
+    "软件前预检读取当前工程/图页、器件和引脚，并只对新加或目标MPN/C编号与当前实例不符的位号执行库查询。",
+    "库查询同时按MPN与C编号核实，所有候选及UUID都会列出；候选不唯一或MPN证据不完整时不选取首条。",
+    "软件后验收检查目标器件引用集合、引脚编号集合和逐针net/NC；符号引脚名称只作为说明，不要求与BOM名称完全相同。",
+    "软件后逐针验收会始终只读导出并解析EasyEDA格式网表来比较net/NC；include_netlist_text=true时才把原始网表文本附在结果里。"
+  ]
+}

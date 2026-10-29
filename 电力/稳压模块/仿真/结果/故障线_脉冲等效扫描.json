@@ -1,0 +1,75 @@
+{
+  "status": "ASSUMED_RC_TRANSIENT_NOT_DRIVER_BEHAVIOUR",
+  "cases": [
+    {
+      "assumed_wire_cap_pF": 100,
+      "pulses": [
+        {
+          "input_pulse": "1us",
+          "v_below_0_8V_duration_s": 1.020595700000001e-06,
+          "wire_min_V": 0.115426164
+        },
+        {
+          "input_pulse": "4.2us",
+          "v_below_0_8V_duration_s": 4.220595699999999e-06,
+          "wire_min_V": 0.115426164
+        },
+        {
+          "input_pulse": "10us",
+          "v_below_0_8V_duration_s": 1.0020595699999991e-05,
+          "wire_min_V": 0.115426164
+        }
+      ]
+    },
+    {
+      "assumed_wire_cap_pF": 1000,
+      "pulses": [
+        {
+          "input_pulse": "1us",
+          "v_below_0_8V_duration_s": 1.2210000000000007e-06,
+          "wire_min_V": 0.115426164
+        },
+        {
+          "input_pulse": "4.2us",
+          "v_below_0_8V_duration_s": 4.420999999999997e-06,
+          "wire_min_V": 0.115426164
+        },
+        {
+          "input_pulse": "10us",
+          "v_below_0_8V_duration_s": 1.0220999999999996e-05,
+          "wire_min_V": 0.115426164
+        }
+      ]
+    },
+    {
+      "assumed_wire_cap_pF": 10000,
+      "pulses": [
+        {
+          "input_pulse": "1us",
+          "v_below_0_8V_duration_s": 2.5460000000000007e-06,
+          "wire_min_V": 0.306860657
+        },
+        {
+          "input_pulse": "4.2us",
+          "v_below_0_8V_duration_s": 6.450999999999996e-06,
+          "wire_min_V": 0.115469556
+        },
+        {
+          "input_pulse": "10us",
+          "v_below_0_8V_duration_s": 1.2240999999999993e-05,
+          "wire_min_V": 0.115426164
+        }
+      ]
+    }
+  ],
+  "assumptions": [
+    "CORE=3V、上拉1k、下拉10k、LTC输入下拉1M",
+    "DRV内部250k典型上拉到假设3.3V",
+    "外部开漏等效Ron=40Ω、电容100pF/1nF/10nF均是敏感性假设而非实际板参数"
+  ],
+  "limits": [
+    "仅测导线电平低于0.8V的持续时间，未模拟DRV内部1–4.2us去毛刺或门驱",
+    "不模拟TIM1 Break/G07锁存、CORE掉电反灌、短故障脉冲的实际识别或关断",
+    "10nF只是较大负载敏感性，不应当成当前PCB实测"
+  ]
+}

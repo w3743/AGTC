@@ -1,0 +1,103 @@
+{
+  "status": "CONDITIONAL_BEHAVIOURAL_TIMING_NOT_MANUFACTURER_TRANSIENT_MODEL",
+  "assumptions": [
+    "12V线性降至0",
+    "固定采用GVDD欠压典型下降阈值6.7V，不是最坏保证值",
+    "10us典型/15us最大去毛刺简化为固定延时；忽略GVDD内部动力学",
+    "4V仅对应nFAULT VOL规格的供电条件边界",
+    "假设去毛刺完成时会拉低nFAULT；不推断低于4V时线电平，不模型门极放电、开关能量、LTC7001或固件"
+  ],
+  "cases": [
+    {
+      "ramp_s": 1e-07,
+      "UV_typ_cross_s": 4.4166666666666665e-08,
+      "VDD_4V_s": 6.666666666666667e-08,
+      "assumed_deglitch_s": 1e-05,
+      "assumed_fault_s": 1.0044166666666668e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "典型10us"
+    },
+    {
+      "ramp_s": 1e-07,
+      "UV_typ_cross_s": 4.4166666666666665e-08,
+      "VDD_4V_s": 6.666666666666667e-08,
+      "assumed_deglitch_s": 1.5e-05,
+      "assumed_fault_s": 1.5044166666666667e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "最大15us"
+    },
+    {
+      "ramp_s": 5e-06,
+      "UV_typ_cross_s": 2.2083333333333335e-06,
+      "VDD_4V_s": 3.3333333333333337e-06,
+      "assumed_deglitch_s": 1e-05,
+      "assumed_fault_s": 1.2208333333333335e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "典型10us"
+    },
+    {
+      "ramp_s": 5e-06,
+      "UV_typ_cross_s": 2.2083333333333335e-06,
+      "VDD_4V_s": 3.3333333333333337e-06,
+      "assumed_deglitch_s": 1.5e-05,
+      "assumed_fault_s": 1.7208333333333333e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "最大15us"
+    },
+    {
+      "ramp_s": 1.5e-05,
+      "UV_typ_cross_s": 6.624999999999999e-06,
+      "VDD_4V_s": 1e-05,
+      "assumed_deglitch_s": 1e-05,
+      "assumed_fault_s": 1.6625e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "典型10us"
+    },
+    {
+      "ramp_s": 1.5e-05,
+      "UV_typ_cross_s": 6.624999999999999e-06,
+      "VDD_4V_s": 1e-05,
+      "assumed_deglitch_s": 1.5e-05,
+      "assumed_fault_s": 2.1625e-05,
+      "fault_occurs_before_4V": false,
+      "timing_label": "最大15us"
+    },
+    {
+      "ramp_s": 0.0001,
+      "UV_typ_cross_s": 4.4166666666666665e-05,
+      "VDD_4V_s": 6.666666666666667e-05,
+      "assumed_deglitch_s": 1e-05,
+      "assumed_fault_s": 5.4166666666666664e-05,
+      "fault_occurs_before_4V": true,
+      "timing_label": "典型10us"
+    },
+    {
+      "ramp_s": 0.0001,
+      "UV_typ_cross_s": 4.4166666666666665e-05,
+      "VDD_4V_s": 6.666666666666667e-05,
+      "assumed_deglitch_s": 1.5e-05,
+      "assumed_fault_s": 5.9166666666666664e-05,
+      "fault_occurs_before_4V": true,
+      "timing_label": "最大15us"
+    },
+    {
+      "ramp_s": 0.01,
+      "UV_typ_cross_s": 0.004416666666666667,
+      "VDD_4V_s": 0.006666666666666667,
+      "assumed_deglitch_s": 1e-05,
+      "assumed_fault_s": 0.004426666666666666,
+      "fault_occurs_before_4V": true,
+      "timing_label": "典型10us"
+    },
+    {
+      "ramp_s": 0.01,
+      "UV_typ_cross_s": 0.004416666666666667,
+      "VDD_4V_s": 0.006666666666666667,
+      "assumed_deglitch_s": 1.5e-05,
+      "assumed_fault_s": 0.004431666666666667,
+      "fault_occurs_before_4V": true,
+      "timing_label": "最大15us"
+    }
+  ],
+  "interpretation": "若估算输出在4V之后，不能从给定VOL保证推断故障线有效；即使之前也不是全温设计验收。"
+}

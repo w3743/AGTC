@@ -1,0 +1,18 @@
+* ideal hysteretic current controlled buck, 0V capacitance start; not DRV8161/MCU model
+Vbus bus 0 37.8
+Smain bus sw ctrl 0 SW
+.model SW SW(Ron=0.005 Roff=1e9 Vt=0 Vh=0.5)
+Bctrl ctrl 0 V={20-i(Vsense)}
+Df 0 sw Dfree
+.model Dfree D(Is=1e-6 N=1.1 Rs=0.01)
+Lmain sw n 20u IC=0
+Vsense n cap 0
+Csc cap 0 43.75 IC=0
+Rbleed cap 0 960
+.control
+set noaskquit
+tran 50n 1m 0 50n uic
+wrdata charge_wave.txt v(sw) i(Vsense) v(cap)
+quit
+.endc
+.end

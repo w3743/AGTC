@@ -1,0 +1,265 @@
+{
+  "evidence_type": "paper_design_selection",
+  "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+  "checked_on": "2026-10-29",
+  "scope": {
+    "change": "仅新增本JSON机器证据；不改设计需求、设计细节、原理图或BOM",
+    "objective": "母线22.5–37.8V、8S超容已满且电池不能净充电时，中央电阻提供电制动能量耗散通路；在高母线由独立于MCU的硬过压比较器接管现有Q_DUMP驱动输入。",
+    "not_claimed": [
+      "实际转动惯量、长坡或重复制动工况已知",
+      "电阻/驱动/整车已经测试、验证或通过验收",
+      "电制动独自保证停车距离、停车时间、低速停车、失电停车或驻车保持",
+      "中央硬过压可以解决MCU失效导致的停车问题",
+      "热熔断器能切断Q_DUMP的D-S短路"
+    ]
+  },
+  "source_documents": [
+    "电力/AGENTS.md",
+    "电力/稳压模块/设计需求.md",
+    "电力/稳压模块/设计细节.md",
+    "电力/稳压模块/检查/制动回生核算.json"
+  ],
+  "baseline_calculation": {
+    "assumptions": {
+      "vehicle_mass_kg": 30,
+      "initial_speed_kmh": 15,
+      "deceleration_ft_per_s2": 13,
+      "deceleration_m_per_s2": 3.9624,
+      "provenance": "用公开坦克制动参照形成的本车纸面比较，不是用户定义或实测工况"
+    },
+    "results": {
+      "initial_speed_m_per_s": 4.1667,
+      "time_s": 1.0516,
+      "distance_m": 2.1907,
+      "translational_energy_j": 260.4167,
+      "initial_mechanical_power_w": 495.3,
+      "mean_mechanical_power_w": 247.65
+    },
+    "sensitivity_only": [
+      {
+        "rotational_or_other_energy_factor": 1.5,
+        "peak_power_w": 742.95,
+        "energy_j": 390.625,
+        "is_requirement": false
+      },
+      {
+        "rotational_or_other_energy_factor": 2,
+        "peak_power_w": 990.6,
+        "energy_j": 520.8333,
+        "is_requirement": false
+      }
+    ]
+  },
+  "resistor_selection": {
+    "quantity": 1,
+    "manufacturer": "Uniroyal Electronics",
+    "series": "HEWR",
+    "order_code": "HEWRA0J082K500",
+    "order_code_derivation": {
+      "HEWR": "HEWR铝壳线绕系列",
+      "A0": "端子型",
+      "J": "±5%容差",
+      "082K": "规格规则的4位电阻码：082 × 10^-2 = 0.82Ω",
+      "500": "500W",
+      "status": "依据厂家标准14位订货码规则构造出的完整型号编码；厂家规格允许HEWR 500W、0.5Ω起始阻值。未找到该精确编码的公开LCSC库存或报价，不宣称现货或已询价"
+    },
+    "nominal_resistance_ohm": 0.82,
+    "tolerance_percent": 5,
+    "resistance_min_ohm": 0.779,
+    "resistance_max_ohm": 0.861,
+    "rated_continuous_power_w_at_25C_ambient": 500,
+    "dimensions_mm": [
+      335,
+      60,
+      30
+    ],
+    "fit_to_baseline": {
+      "bus_low_v": 22.5,
+      "power_at_bus_low_w_at_max_resistance": 587.98,
+      "baseline_peak_power_w": 495.3,
+      "power_margin_percent": 18.71,
+      "peak_current_a_at_bus_low_and_max_resistance": 26.13,
+      "judgement": "基线峰值通过纸面电阻功率比较；软件仍需按所需制动力PWM调节"
+    },
+    "high_bus_pulse_check": {
+      "nominal_hard_OVP_bus_v": 38.375,
+      "static_hard_OVP_upper_corner_including_first_order_input_bias_v": 38.87,
+      "paper_design_bus_ceiling_v": 42,
+      "power_at_42V_w_at_min_resistance": 2264.44,
+      "current_at_42V_a_at_min_resistance": 53.92,
+      "max_overload_voltage_v_at_min_resistance": 49.34,
+      "short_time_overload_limit": "厂家HEWR规格：6.25×额定功率、最长5s，且不得超过2.5×RCWV或厂家最大过载电压中较低者",
+      "power_ratio_at_42V": 4.53,
+      "power_ratio_below_6_25x_test_limit": true,
+      "judgement": "42V时电压和静态功率低于该系列列出的短时过载边界；这只覆盖规定脉冲测试条件，不能外推为连续满开、重复制动热能力或实装热通过"
+    },
+    "continuous_thermal_limit": {
+      "manufacturer_derating": "25°C环境以内按额定功率；25°C以上随环境温度线性降额，到275°C环境为0",
+      "max_continuous_power_w_at_25C_ambient": 500,
+      "max_continuous_power_w_at_60C_ambient": 430,
+      "warning": "这两个值不是脉冲重复率许可。环境温度、外壳安装面、散热器、风道和重复制动间隔需后续按实装热模型核定。"
+    },
+    "comparison": [
+      {
+        "nominal_ohm": 1,
+        "tolerance_percent": 5,
+        "max_resistance_ohm": 1.05,
+        "power_at_22_5V_w_at_max_resistance": 482.14,
+        "baseline_margin_percent": -2.66,
+        "decision": "不选：容差高阻端低于495.3W纸面基线"
+      },
+      {
+        "nominal_ohm": 0.82,
+        "tolerance_percent": 5,
+        "max_resistance_ohm": 0.861,
+        "power_at_22_5V_w_at_max_resistance": 587.98,
+        "baseline_margin_percent": 18.71,
+        "decision": "选择：单件满足基线并保留约18.7%电阻功率余量"
+      },
+      {
+        "nominal_ohm": 0.68,
+        "tolerance_percent": 5,
+        "max_resistance_ohm": 0.714,
+        "power_at_22_5V_w_at_max_resistance": 709.03,
+        "baseline_margin_percent": 43.15,
+        "decision": "不选：仍未覆盖1.5×敏感性742.95W，同时会提高最大脉冲电流；该敏感性并非已确认需求"
+      }
+    ],
+    "existing_1_8_ohm_reference": {
+      "power_at_22_5V_w": 281.25,
+      "power_at_37_8V_w": 793.8,
+      "judgement": "22.5V下低于基线495.3W，不闭合基线"
+    }
+  },
+  "hard_overvoltage": {
+    "selection": "新增专用TLV6700DDCR一颗，使用OUTB做独立高母线检测；现有TLV6700两通道继续分配给SCOV及12V欠压，不复用。",
+    "signal_path": [
+      "BUS_EXT经R_TOP=2.25MΩ、0.1%分压至TLV6700 INB−；R_BOTTOM=23.7kΩ、0.1%由INB−接GND_SYS。",
+      "TLV6700 VDD接12V_DRV、GND接GND_SYS；OUTB为开漏，INB−升过内部约400mV门限时下拉。",
+      "Q_OV=MMBT3906 PNP：发射极接12V_DRV，基极以47kΩ拉到发射极作为默认关断，并经10kΩ接OUTB；OUTB下拉时Q_OV导通，集电极产生硬过压有效高电平。",
+      "PB7和Q_OV集电极分别接一只BAT54C公共阴极双肖特基的两个阳极，公共阴极为二极管OR输出；它与PB7隔离，不把12V回灌MCU。",
+      "OR输出串联LANSON TT150一次性热熔断器后接UCC27511 IN+；UCC27511 IN−保持GND。UCC IN+侧用10kΩ下拉至GND_SYS，保证熔断器开路、PB7复位/高阻时驱动输入默认关断。",
+      "TLV6700 INA+接GND_SYS、OUTA不接；VDD就近放100nF去耦。"
+    ],
+    "threshold": {
+      "divider_top_ohm": 2250000,
+      "divider_bottom_ohm": 23700,
+      "divider_tolerance_percent": 0.1,
+      "formula": "Vtrip = VIT+ × (1 + R_TOP/R_BOTTOM)",
+      "nominal_reference_v": 0.4,
+      "nominal_bus_trip_v": 38.375,
+      "lowest_existing_FOC_BOV_reference_v": 39.209,
+      "static_margin_to_FOC_min_reference_v": 0.339,
+      "bus_trip_corner_from_reference_and_resistors_v": [
+        37.92,
+        38.84
+      ],
+      "additional_first_order_input_bias_estimate": "TI给出INB−输入偏流最大15nA（规格测试条件为VI=0.1V）；按15nA×23.7kΩ×分压比例估算约±34mV，合并后的粗略静态触发范围约37.88–38.87V。该估算不是门限保证值，未覆盖输入偏流在0.4V节点的完整条件、布线漏电、温漂耦合、噪声、启动及母线动态过冲。",
+      "internal_hysteresis": "TLV6700 Vhys典型5.5mV、最大12mV；按分压比折算为BUS约0.53V典型、约1.15V最大。下降释放电压需按所购批次/温度门限核定；不得仅用典型值断言在37.8V前必然关断。",
+      "dynamic_response": "数据手册450µs为VDD超过1.8V后的最大启动有效等待；18µs传播时间只在VDD=5V、10mV输入过驱等规定条件给出，未据此宣称小过驱或实际母线条件下有最大响应保证。BUS电容、回生电流斜率和功率级延迟未确定，因此过冲量无法从现有资料计算。"
+    },
+    "default_and_fault_behavior": {
+      "MCU_reset_or_PB7_high_impedance": "UCC IN+外部10kΩ下拉，Q_OV基极47kΩ拉到发射极；正常默认Q_DUMP关闭。",
+      "BUS_above_OVP_and_12V_DRV_valid": "比较器下拉OUTB、PNP导通，硬件绕过MCU PB7命令UCC IN+，请求Q_DUMP导通。",
+      "TLV_unpowered_or_12V_DRV_lost": "OVP比较器和驱动器均依赖12V_DRV；无12V时没有可用的中央硬过压吸能动作。UCC UVLO输出为低，但这不是独立储能电源。",
+      "TLV_startup": "OUTB低于POR时输出状态不保证；高阻时PNP关断，若启动期间OUTB短时下拉则可能误开。按42V、Rmin计算，450µs全开上界约1.02J/次；反复上电的累计热量和周期未核实。",
+      "MCU_failed_low_BUS": "本硬件只在高母线门限接管；低母线下的正常软件dump仍需MCU。不能声称MCU任意失效时均可制动。",
+      "Q_DUMP_D_S_short": "TT150串在UCC输入逻辑中，开路后只能停止正常栅极驱动命令，不能切断D-S短路电流。该故障仍需独立功率路径隔离/熔断设计与定值，不计为已解决。",
+      "thermal_trip": "TT150触发后永久开路、dump路径不可自动恢复；没有机械制动可接替。不得把温控退出解释成已经停车。"
+    }
+  },
+  "thermal_guard": {
+    "device": "LANSON TT150，LCSC C2972289，一次性热熔断器",
+    "placement": "只串联在二极管OR后的UCC27511 IN+低电流逻辑路径；不串联在电阻的高电流功率路径。",
+    "listing_specs": {
+      "rated_functioning_temperature_c": 150,
+      "tolerance": "+0/-10°C",
+      "holding_temperature_c": 122,
+      "operating_temperature_c": 146,
+      "maximum_temperature_c": 180,
+      "electrical_listing_rating": "5A、250VAC"
+    },
+    "trip_action": "按低电流信号触点开路后，由UCC IN+侧10kΩ下拉关断正常MOSFET栅极驱动。",
+    "thermal_boundary": "HEWR连续功率按环境温度降额；基线约0.5kW/260J/1.05s依赖厂家5s过载规格；若连续满开、重复频率过高或环境超出降额边界，不保证安全。TT150需与电阻壳体热耦合并按厂家要求控制焊接热，但没有该组合的热时间常数或损伤前保护验证；不能把Tf当作Q_DUMP短路或任意过载的保证保护。",
+    "existing_sensor": "TH_DUMP NTC保留供MCU测温/限制正常软件PWM；NTC的软件退出不替代TT150，也不等于停车。"
+  },
+  "existing_power_stage": {
+    "Q_DUMP": "IRLB4030，按现有设计保留；Infineon资料标称VDS=100V，故42V母线低于其VDS额定值。数据手册RDS(on)最大4.3mΩ条件为VGS=10V；按约50A计算的室温导通损耗约10.8W，仅作静态量级比较，热态RDS(on)、开关损耗、脉冲SOA、散热与重复占空未核实。",
+    "gate_driver": "现UCC27511输入合同IN+=PB7、IN−=GND、VDD=12V；新增硬OV由二极管OR并入IN+。过压通路仍依赖12V_DRV和栅极驱动器工作。"
+  },
+  "public_price_observations": {
+    "checked_without_login_or_access_bypass": true,
+    "resistor": {
+      "mpn": "HEWRA0J082K500",
+      "lcsc_exact_listing": null,
+      "public_price_usd": null,
+      "note": "未查到精确型号的可公开LCSC页面/报价；不伪造价格，需向厂家/渠道询价。"
+    },
+    "tlv6700ddcr": {
+      "lcsc_part": "C2868382",
+      "public_price_usd_each": 0.9548,
+      "price_break": "1+",
+      "observed_stock": 1608,
+      "url": "https://www.lcsc.com/ko/product-detail/comparators_texas-instruments-tlv6700ddcr_C2868382.html"
+    },
+    "thermal_fuse": {
+      "mpn": "TT150",
+      "lcsc_part": "C2972289",
+      "public_price_usd_each": 0.0826,
+      "price_break": "5+，MOQ 5",
+      "observed_stock": 205,
+      "url": "https://www.lcsc.com/product-detail/C2972289.html"
+    },
+    "diode_or": {
+      "mpn": "CBI BAT54C",
+      "lcsc_part": "C2828464",
+      "public_price_usd_each": 0.0125,
+      "price_break": "50+",
+      "note": "应核所选厂商BAT54C实际引脚为公共阴极。"
+    },
+    "pnp": {
+      "mpn": "JSCJ MMBT3906",
+      "lcsc_part": "C2143",
+      "public_price_usd_each": 0.0116,
+      "price_break": "50+"
+    },
+    "price_scope": "以上为公开网页可见参考价和页面库存快照，不含运费、税、采购交期、安装件、散热件或板级装配费；不登录，不绕过访问限制。"
+  },
+  "part_references": [
+    {
+      "claim": "HEWR/HBWR 14位订货码、阻值/功率范围、降额曲线、RCWV/最大过压与HEWR 5s过载条款",
+      "url": "https://www.uni-royal.cn/en/images/userfile/file/172922884214f83500eac8f32b.pdf"
+    },
+    {
+      "claim": "TLV6700供电、开漏OUTB极性、400mV门限、全温门限范围、迟滞、启动等待与传播条件",
+      "url": "https://www.ti.com/lit/ds/symlink/tlv6700.pdf"
+    },
+    {
+      "claim": "UCC27511A输入逻辑阈值、输入耐压、UVLO行为；项目现有UCC变体仍须对照采购型号",
+      "url": "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf"
+    },
+    {
+      "claim": "IRLB4030 100V MOSFET和RDS(on)条件",
+      "url": "https://www.infineon.com/assets/row/public/documents/24/49/infineon-irlb4030-datasheet-en.pdf?fileId=5546d462533600a4015356604640258"
+    },
+    {
+      "claim": "TT150 LCSC页、公开MOQ/价和温度参数",
+      "url": "https://www.lcsc.com/product-detail/C2972289.html"
+    }
+  ],
+  "remaining_engineering_limits": [
+    "确认HEWRA0J082K500厂家供货/精确交期/含运费实价、壳体安装和散热条件；无公开价不能声称选型降本。",
+    "核实上电及掉电全过程下TLV6700 OUTB状态、PNP输入脉冲、电阻重复热负荷和硬件阈值实测。",
+    "以实测BUS电容、回生电流上升率、母线寄生和所有功率路径计算硬OV动态过冲；不得把18µs条件值当通用最大延迟。",
+    "定义实际转动惯量、载荷、坡度、制动重复率和环境温度；1.5×/2×当前只作敏感性。",
+    "对Q_DUMP D-S短路、电阻高温切断后的无dump状态和无机械刹车的车辆停止后果，需另定义功率路径隔离/安全处置；本候选未闭合。",
+    "原理图/网表、PCB、人类实施、固件、台架与整车试验未做；本文件不构成PASS。"
+  ],
+  "integration_status": "SOURCE_SUBPACKAGE_OVERRIDDEN_WHERE_CONFLICTS",
+  "current_connection_authority": "../原理图准备/保护与制动合并合同.json; ../设计细节.md",
+  "parent_override": "采用UCC双输入+旧NPN+OUTB开漏共线，取消子包PNP/BAT54 OR；分压510k/5.36k；TT150改串BMS许可回路。HEWR电阻型号仍待订单确认。",
+  "status_before_withdrawal": "PAPER_DESIGN_CANDIDATE_NOT_HARDWARE_OR_STOPPING_VALIDATION",
+  "current_adopted_design": false,
+  "withdrawal_reason": "用户要求先核清故障路径和简约性再加选型；原理必要性/替代/能量接管未闭合，撤回当前采用地位，保留比较数据。",
+  "current_adopted_increment_count": null
+}

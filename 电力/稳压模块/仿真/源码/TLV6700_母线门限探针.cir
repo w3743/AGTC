@@ -1,0 +1,18 @@
+* TI SNVMC71A transient model: nominal BUS overvoltage divider, 12V supply
+.include tlv.lib
+Vdd vdd 0 12
+Vbus bus 0 PWL(0 37 1m 37 2m 42 3m 42 4m 37 5m 37)
+Rtop1 bus mid 255k
+Rtop2 mid ina 255k
+Rbot ina 0 5.11k
+Cina ina 0 1n
+Vinb inb 0 .2
+X1 ina inb vdd 0 outa outb TLV6700
+Rpu vdd outa 10k
+.control
+set noaskquit
+tran 2u 5m
+wrdata tlv_wave.txt v(bus) v(ina) v(outa)
+quit
+.endc
+.end
