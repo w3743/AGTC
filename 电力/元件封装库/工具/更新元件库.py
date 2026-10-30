@@ -36,6 +36,10 @@ DEFAULT_SOURCES = [
 ]
 
 ASSET_TYPES = ("SYMBOL", "FOOTPRINT", "DEVICE")
+# EasyEDA's ESCH symbol document-type IDs (also ELIB_SymbolType values).
+# Net flags and net ports are schematic connectivity primitives, not purchasable
+# component instances, even when their copied ATTR records say Add into BOM=yes.
+NON_COMPONENT_SYMBOL_DOC_TYPES = frozenset({18, 19})
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -235,6 +239,27 @@ def lookup_asset(
     return metadata
 
 
+def is_non_component_symbol(
+    identifier: Any,
+    by_local_uuid: dict[str, list[dict[str, Any]]],
+    by_official_uuid: dict[str, list[dict[str, Any]]],
+) -> bool:
+    """Identify standard net-flag/net-port symbols from their native symbol type.
+
+    EasyEDA stores these as COMPONENT instances in ESCH, so their instance BOM
+    attributes alone are not enough to decide whether they represent a physical
+    part. The referenced SYMBOL document's META.docType is the authoritative
+    ELIB_SymbolType ID (18=NET_FLAG, 19=NET_PORT).
+    """
+    if not is_nonempty(identifier):
+        return False
+    sections = by_local_uuid.get(str(identifier)) or by_official_uuid.get(str(identifier)) or []
+    if not sections:
+        return False
+    doc_types = [section.get("meta", {}).get("docType") for section in sections]
+    return bool(doc_types) and all(doc_type in NON_COMPONENT_SYMBOL_DOC_TYPES for doc_type in doc_types)
+
+
 def extract_instance_attributes(records: list[dict[str, Any]], component_id: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     raw_records: list[dict[str, Any]] = []
     attrs: dict[str, Any] = {}
@@ -396,6 +421,12 @@ def get_components(parsed: dict[str, Any], device_map: dict[str, list[dict[str, 
             if not isinstance(device_attrs, dict):
                 device_attrs = {}
             effective = effective_attributes(device_attrs, instance_attrs)
+            symbol_id = first_nonempty(effective, "Symbol")
+            if not is_nonempty(symbol_id) and device_section:
+                symbol_id = first_nonempty(device_attrs, "Symbol")
+            if is_non_component_symbol(symbol_id, by_symbol, by_symbol_official):
+                excluded += 1
+                continue
             bom_flag = display(effective.get("Add into BOM")).strip().casefold()
             if bom_flag != "yes":
                 excluded += 1
@@ -412,9 +443,6 @@ def get_components(parsed: dict[str, Any], device_map: dict[str, list[dict[str, 
             if not device_section:
                 missing_device += 1
 
-            symbol_id = first_nonempty(effective, "Symbol")
-            if not is_nonempty(symbol_id) and device_section:
-                symbol_id = first_nonempty(device_attrs, "Symbol")
             footprint_id = first_nonempty(instance_attrs, "Footprint")
             if not is_nonempty(footprint_id):
                 footprint_id = first_nonempty(device_attrs, "Footprint")
