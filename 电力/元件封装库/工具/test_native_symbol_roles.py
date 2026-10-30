@@ -36,10 +36,11 @@ def _section(
 
 
 class NativeSymbolRolesTest(unittest.TestCase):
-    def test_net_flags_and_ports_are_excluded_but_real_no_pcb_part_is_kept(self) -> None:
+    def test_net_flags_ports_and_offpage_are_excluded_but_real_no_pcb_part_is_kept(self) -> None:
         sections = [
             _section("SYMBOL", "sym-flag", "GND", {"docType": 18}),
             _section("SYMBOL", "sym-port", "CAN", {"docType": 19}, "official-port"),
+            _section("SYMBOL", "sym-offpage", "OFFPAGE_OUT", {"docType": 25}),
             _section("SYMBOL", "sym-component", "Connector", {"docType": 2}),
             _section(
                 "DEVICE",
@@ -51,6 +52,12 @@ class NativeSymbolRolesTest(unittest.TestCase):
                 "DEVICE",
                 "dev-port",
                 "CAN port device",
+                {"attributes": {"Add into BOM": "yes", "Convert to PCB": "yes"}},
+            ),
+            _section(
+                "DEVICE",
+                "dev-offpage",
+                "Off-page connector",
                 {"attributes": {"Add into BOM": "yes", "Convert to PCB": "yes"}},
             ),
             _section(
@@ -103,6 +110,18 @@ class NativeSymbolRolesTest(unittest.TestCase):
                 "Global Net Name": "CAN_H",
             },
         )
+        add_component(
+            "offpage-instance",
+            "dev-offpage",
+            "sym-offpage",
+            {
+                "Add into BOM": "yes",
+                "Convert to PCB": "yes",
+                "Designator": "",
+                "Manufacturer Part": "",
+                "Global Net Name": "BUS_EXT",
+            },
+        )
         # Same BOM/global-net attributes, but this is an actual type-2 device.
         add_component(
             "component-instance",
@@ -126,14 +145,66 @@ class NativeSymbolRolesTest(unittest.TestCase):
 
         instances, counts = LIBRARY_SYNC.get_components(parsed, {})
 
-        self.assertEqual(counts["component_count"], 3)
+        self.assertEqual(counts["component_count"], 4)
         self.assertEqual(counts["bom_instance_count"], 1)
-        self.assertEqual(counts["excluded_non_bom_count"], 2)
+        self.assertEqual(counts["excluded_non_bom_count"], 3)
         self.assertEqual(len(instances), 1)
         self.assertEqual(instances[0]["ref"], "J_ABSTRACT")
         self.assertEqual(instances[0]["pcb"], "no")
         self.assertIsNone(instances[0]["mpn"])
         self.assertEqual(instances[0]["attrs"]["effective"]["Global Net Name"], "INTERFACE_STATUS")
+
+
+class NativeMultiPageStatsTest(unittest.TestCase):
+    def test_same_module_sources_aggregate_stats_but_keep_per_source_evidence(self) -> None:
+        sources = [
+            {"module": "稳压模块", "path": "regulator/page1.esch2"},
+            {"module": "稳压模块", "path": "regulator/page2.esch2"},
+        ]
+        source_stats = {
+            ("稳压模块", "regulator/page1.esch2"): {
+                "component_count": 54,
+                "bom_instance_count": 54,
+                "excluded_non_bom_count": 5,
+                "missing_device_binding_count": 1,
+                "missing_symbol_binding_count": 0,
+                "missing_footprint_binding_count": 0,
+            },
+            ("稳压模块", "regulator/page2.esch2"): {
+                "component_count": 46,
+                "bom_instance_count": 46,
+                "excluded_non_bom_count": 3,
+                "missing_device_binding_count": 0,
+                "missing_symbol_binding_count": 1,
+                "missing_footprint_binding_count": 2,
+            },
+        }
+
+        module_order = LIBRARY_SYNC.unique_module_order(sources)
+        module_stats = LIBRARY_SYNC.aggregate_module_stats(source_stats, module_order)
+        parsed_sources = [
+            {
+                **source,
+                "sha256_before": before,
+                "sha256_after_parse": before,
+                "pages": [{"title": "page"}],
+            }
+            for source, before in zip(sources, ("a" * 64, "b" * 64))
+        ]
+        evidence_rows = LIBRARY_SYNC.build_source_evidence_rows(
+            parsed_sources, ["a" * 64, "b" * 64], source_stats
+        )
+
+        self.assertEqual(module_order, ["稳压模块"])
+        self.assertEqual(len(module_stats), 1)
+        self.assertEqual(module_stats[0]["component_count"], 100)
+        self.assertEqual(module_stats[0]["bom_instance_count"], 100)
+        self.assertEqual(module_stats[0]["excluded_non_bom_count"], 8)
+        self.assertEqual([row["component_count"] for row in evidence_rows], [54, 46])
+        self.assertEqual([row["bom_instance_count"] for row in evidence_rows], [54, 46])
+        self.assertEqual([row["path"] for row in evidence_rows], [source["path"] for source in sources])
+        self.assertEqual([row["sha256"] for row in evidence_rows], ["a" * 64, "b" * 64])
+        self.assertTrue(all(row["unchanged"] for row in evidence_rows))
 
 
 if __name__ == "__main__":

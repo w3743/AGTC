@@ -3,6 +3,8 @@
 // 仅调用SCH/DMT API，不触及PCB。目标unique-id由实际导出反查，不用离线位号冒充内部ID。
 const args = typeof __CLI__ !== 'undefined' ? __CLI__.args : undefined;
 if (!args?.contract?.components) throw new Error('请将软件接线输入.json作为CLI --args传入');
+if (Array.isArray(args.contract.drawing?.pages) && args.contract.drawing.pages.length > 1)
+  throw new Error('MULTI_PAGE_MUTATION_UNSUPPORTED: 当前多页原理图请使用多页官方验收.js；本脚本会按单页清理并自动接线，已拒绝执行');
 const page = args.target_page_uuid || '9546dca0bc8bce7f';
 await eda.dmt_EditorControl.openDocument(page);
 const doc = await eda.dmt_SelectControl.getCurrentDocumentInfo();
