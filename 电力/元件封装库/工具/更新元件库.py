@@ -27,19 +27,49 @@ EVIDENCE_PATH = LIB_ROOT / "检查" / "同步证据.json"
 
 # 配置文件缺失时的显式安全来源；不递归搜索工程、归档或临时目录。
 DEFAULT_SOURCES = [
-    {"module": "BMS模块", "path": "BMS模块/eda工程文件/sch/Schematic1/P1.esch2"},
-    {"module": "FOC驱动模块", "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2"},
+    {
+        "module": "BMS模块",
+        "path": "BMS模块/sch/Schematic1/P1.esch2"
+    },
+    {
+        "module": "FOC驱动模块",
+        "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2"
+    },
     {
         "module": "稳压模块",
-        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
+        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2"
     },
+    {
+        "module": "稳压模块",
+        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/02 门极驱动与硬保护.esch2"
+    },
+    {
+        "module": "稳压模块",
+        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/03 模拟采样.esch2"
+    },
+    {
+        "module": "稳压模块",
+        "path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2"
+    },
+    {
+        "module": "水泵驱动模块",
+        "path": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2"
+    }
 ]
 
 ASSET_TYPES = ("SYMBOL", "FOOTPRINT", "DEVICE")
 # EasyEDA's ESCH symbol document-type IDs (also ELIB_SymbolType values).
-# Net flags and net ports are schematic connectivity primitives, not purchasable
-# component instances, even when their copied ATTR records say Add into BOM=yes.
-NON_COMPONENT_SYMBOL_DOC_TYPES = frozenset({18, 19})
+# Net flags, net ports, and off-page connectors are schematic connectivity
+# primitives, not purchasable component instances, even if copied ATTRs say yes.
+NON_COMPONENT_SYMBOL_DOC_TYPES = frozenset({18, 19, 25})
+SOURCE_COUNT_FIELDS = (
+    "component_count",
+    "bom_instance_count",
+    "excluded_non_bom_count",
+    "missing_device_binding_count",
+    "missing_symbol_binding_count",
+    "missing_footprint_binding_count",
+)
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -249,7 +279,7 @@ def is_non_component_symbol(
     EasyEDA stores these as COMPONENT instances in ESCH, so their instance BOM
     attributes alone are not enough to decide whether they represent a physical
     part. The referenced SYMBOL document's META.docType is the authoritative
-    ELIB_SymbolType ID (18=NET_FLAG, 19=NET_PORT).
+    ELIB_SymbolType ID (18=NET_FLAG, 19=NET_PORT, 25=OFF_PAGE_CONNECTOR).
     """
     if not is_nonempty(identifier):
         return False
@@ -541,6 +571,62 @@ def get_components(parsed: dict[str, Any], device_map: dict[str, list[dict[str, 
         "missing_footprint_binding_count": int(missing_footprint),
     }
     return instances, counts
+
+
+def unique_module_order(sources: list[dict[str, str]]) -> list[str]:
+    """Return module names once each, preserving the configured source order."""
+    return list(dict.fromkeys(item["module"] for item in sources))
+
+
+def aggregate_module_stats(
+    source_stats: dict[tuple[str, str], dict[str, Any]], module_order: list[str]
+) -> list[dict[str, Any]]:
+    """Sum page/source counters into one stable summary row per module."""
+    result: list[dict[str, Any]] = []
+    for module in module_order:
+        counts = [
+            values
+            for (source_module, _source_path), values in source_stats.items()
+            if source_module == module
+        ]
+        result.append(
+            {
+                "module": module,
+                **{
+                    field: sum(int(values.get(field, 0) or 0) for values in counts)
+                    for field in SOURCE_COUNT_FIELDS
+                },
+            }
+        )
+    return result
+
+
+def build_source_evidence_rows(
+    parsed_sources: list[dict[str, Any]],
+    final_source_hashes: list[str],
+    source_stats: dict[tuple[str, str], dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Build evidence per native source file, not from its module aggregate."""
+    if len(parsed_sources) != len(final_source_hashes):
+        raise ValueError("source与最终SHA256数量不一致")
+    result: list[dict[str, Any]] = []
+    for parsed, final_sha in zip(parsed_sources, final_source_hashes):
+        key = (parsed["module"], parsed["path"])
+        counts = source_stats[key]
+        result.append(
+            {
+                "module": parsed["module"],
+                "path": parsed["path"],
+                "sha256": parsed["sha256_before"],
+                "sha256_after_parse": parsed["sha256_after_parse"],
+                "sha256_after_generation": final_sha,
+                "unchanged": parsed["sha256_before"] == final_sha,
+                "page_count": len(parsed["pages"]),
+                "component_count": counts["component_count"],
+                "bom_instance_count": counts["bom_instance_count"],
+            }
+        )
+    return result
 
 
 def build_parts(instances: list[dict[str, Any]], module_order: list[str]) -> list[dict[str, Any]]:
@@ -1011,13 +1097,14 @@ def generate() -> int:
         path = resolve_source(item["path"])
         parsed_sources.append(parse_source(path, item["module"], item["path"]))
 
-    module_order = [item["module"] for item in sources]
+    module_order = unique_module_order(sources)
     all_instances: list[dict[str, Any]] = []
-    module_stats: list[dict[str, Any]] = []
+    source_stats: dict[tuple[str, str], dict[str, Any]] = {}
     for parsed in parsed_sources:
         instances, counts = get_components(parsed, {})
         all_instances.extend(instances)
-        module_stats.append({"module": parsed["module"], **counts})
+        source_stats[(parsed["module"], parsed["path"])] = counts
+    module_stats = aggregate_module_stats(source_stats, module_order)
     # 保证稳定顺序；位号缺失时已回退到原生partId或component id。
     module_rank = {module: index for index, module in enumerate(module_order)}
     all_instances.sort(key=lambda item: (module_rank.get(item["module"], 999), item["ref"].casefold(), item["component_id"]))
@@ -1027,7 +1114,8 @@ def generate() -> int:
     missing_mpn_count = sum(not is_nonempty(item.get("mpn")) for item in all_instances)
     missing_manufacturer_count = sum(not is_nonempty(item.get("manufacturer")) for item in all_instances)
     summary = {
-        "module_count": len(sources),
+        "module_count": len(module_order),
+        "source_file_count": len(parsed_sources),
         "bom_instance_count": len(all_instances),
         "part_count": len(parts),
         "shared_model_count": int(shared_model_count),
@@ -1114,20 +1202,7 @@ def generate() -> int:
         "generated_at_utc": generated_at,
         "config": config_label,
         "config_sha256": config_hash,
-        "sources": [
-            {
-                "module": parsed["module"],
-                "path": parsed["path"],
-                "sha256": parsed["sha256_before"],
-                "sha256_after_parse": parsed["sha256_after_parse"],
-                "sha256_after_generation": final_sha,
-                "unchanged": parsed["sha256_before"] == final_sha,
-                "page_count": len(parsed["pages"]),
-                "component_count": next(item["component_count"] for item in module_stats if item["module"] == parsed["module"]),
-                "bom_instance_count": next(item["bom_instance_count"] for item in module_stats if item["module"] == parsed["module"]),
-            }
-            for parsed, final_sha in zip(parsed_sources, final_source_hashes)
-        ],
+        "sources": build_source_evidence_rows(parsed_sources, final_source_hashes, source_stats),
         "summary": summary,
         "asset_reference_count": len(asset_refs),
         "asset_file_count": asset_index["asset_count"],
