@@ -26,12 +26,12 @@
     },
     "中央元件索引": {
       "path": "电力/元件封装库/索引/元件总表.json",
-      "sha256": "63796ac8d6bdabbdaf2395a6f798525cc620465a86c1deb10374902c47d651a8",
+      "sha256": "523f7711e05efae2feb5c99ea38921e9a2bf2cd81fbe86cccb9caab9a74bffc9",
       "role": "read-only exact per-designator MPN/manufacturer/C-code cross-check"
     },
     "BMS采购补充": {
       "path": "电力/元件封装库/索引/采购补充.json",
-      "sha256": "c83896b1389252838f83ae171fff3a6c61bbd2b372c9e81aebc37e4cf77f79f7",
+      "sha256": "63fee3b0e8643b341bcf73e70bc8d523d9a4df5d80c6cfef970895a78fbb22d1",
       "role": "BMS external accessory source; already represented in BMS BOM/input, no duplicate add"
     },
     "BMS核价输入": {
@@ -1796,16 +1796,6 @@
               "supplier_part": null,
               "quantity": 1,
               "references": [
-                "J_5V_EXT"
-              ],
-              "reason": "missing_exact_mpn"
-            },
-            {
-              "manufacturer_part": null,
-              "manufacturer": null,
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
                 "J_BUS_POWER"
               ],
               "reason": "missing_exact_mpn"
@@ -1906,6 +1896,16 @@
                 "C_NTC_SC"
               ],
               "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
+            },
+            {
+              "manufacturer_part": null,
+              "manufacturer": "HanElectricity(瀚源)",
+              "supplier_part": "C41430884",
+              "quantity": 1,
+              "references": [
+                "J_5V_EXT"
+              ],
+              "reason": "missing_exact_mpn"
             },
             {
               "manufacturer_part": "URB4812YMD-10WR3",
@@ -2439,16 +2439,6 @@
                   "supplier_part": null,
                   "quantity": 1,
                   "references": [
-                    "J_5V_EXT"
-                  ],
-                  "reason": "missing_exact_mpn"
-                },
-                {
-                  "manufacturer_part": null,
-                  "manufacturer": null,
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
                     "J_BUS_POWER"
                   ],
                   "reason": "missing_exact_mpn"
@@ -2493,6 +2483,16 @@
                     "F_SC"
                   ],
                   "reason": "no_verified_lcsc_code"
+                },
+                {
+                  "manufacturer_part": null,
+                  "manufacturer": "HanElectricity(瀚源)",
+                  "supplier_part": "C41430884",
+                  "quantity": 1,
+                  "references": [
+                    "J_5V_EXT"
+                  ],
+                  "reason": "missing_exact_mpn"
                 }
               ]
             }
@@ -2928,60 +2928,6 @@
         }
       },
       "sku_demands": [
-        {
-          "manufacturer_part": null,
-          "manufacturer": null,
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "REGULATOR": 1
-          },
-          "references_by_module": {
-            "REGULATOR": [
-              "J_5V_EXT"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "REGULATOR": {
-              "BOARD_INTERFACE_PACKAGE_PENDING": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "REGULATOR": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "REGULATOR": {
-              "external_accessory": [
-                "J_5V_EXT"
-              ]
-            }
-          },
-          "scopes": [
-            "BOARD_INTERFACE_PACKAGE_PENDING"
-          ],
-          "identity_notes": [
-            "manufacturer_unresolved",
-            "missing_exact_mpn",
-            "no_verified_lcsc_code",
-            "procurement_status=two_pin_power_symbol_placeholder"
-          ],
-          "quote_match_status": "missing_exact_mpn",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 1
-        },
         {
           "manufacturer_part": null,
           "manufacturer": null,
@@ -6606,6 +6552,62 @@
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
           "unpriced_quantity": 0
+        },
+        {
+          "manufacturer_part": null,
+          "manufacturer": "HanElectricity(瀚源)",
+          "supplier_part": "C41430884",
+          "supplier": "LCSC_CN",
+          "source_supplier_part": null,
+          "source_supplier_parts": [
+            null
+          ],
+          "supplier_part_resolution_sources": [
+            "current_central_index"
+          ],
+          "supplier_code_verified_from_quote": false,
+          "quantity_required": 1,
+          "quantity_by_module": {
+            "REGULATOR": 1
+          },
+          "references_by_module": {
+            "REGULATOR": [
+              "J_5V_EXT"
+            ]
+          },
+          "quantity_by_scope_by_module": {
+            "REGULATOR": {
+              "BOARD_INTERFACE_PACKAGE_PENDING": 1
+            }
+          },
+          "quantity_by_scope_bucket_by_module": {
+            "REGULATOR": {
+              "external_accessory": 1
+            }
+          },
+          "references_by_scope_bucket_by_module": {
+            "REGULATOR": {
+              "external_accessory": [
+                "J_5V_EXT"
+              ]
+            }
+          },
+          "scopes": [
+            "BOARD_INTERFACE_PACKAGE_PENDING"
+          ],
+          "identity_notes": [
+            "manufacturer_filled_from_current_central_index",
+            "missing_exact_mpn",
+            "procurement_status=two_pin_power_symbol_placeholder",
+            "supplier_code_filled_from_current_central_index"
+          ],
+          "quote_match_status": "missing_exact_mpn",
+          "quote": null,
+          "installed_value_cny": null,
+          "purchase": null,
+          "stock_status": "not_queried",
+          "stock_shortage": false,
+          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "2541WV-2X01P",
@@ -21720,16 +21722,6 @@
               "supplier_part": null,
               "quantity": 1,
               "references": [
-                "J_5V_EXT"
-              ],
-              "reason": "missing_exact_mpn"
-            },
-            {
-              "manufacturer_part": null,
-              "manufacturer": null,
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
                 "J_BUS_POWER"
               ],
               "reason": "missing_exact_mpn"
@@ -21830,6 +21822,16 @@
                 "C_NTC_SC"
               ],
               "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
+            },
+            {
+              "manufacturer_part": null,
+              "manufacturer": "HanElectricity(瀚源)",
+              "supplier_part": "C41430884",
+              "quantity": 1,
+              "references": [
+                "J_5V_EXT"
+              ],
+              "reason": "missing_exact_mpn"
             },
             {
               "manufacturer_part": "URB4812YMD-10WR3",
@@ -22363,16 +22365,6 @@
                   "supplier_part": null,
                   "quantity": 1,
                   "references": [
-                    "J_5V_EXT"
-                  ],
-                  "reason": "missing_exact_mpn"
-                },
-                {
-                  "manufacturer_part": null,
-                  "manufacturer": null,
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
                     "J_BUS_POWER"
                   ],
                   "reason": "missing_exact_mpn"
@@ -22417,6 +22409,16 @@
                     "F_SC"
                   ],
                   "reason": "no_verified_lcsc_code"
+                },
+                {
+                  "manufacturer_part": null,
+                  "manufacturer": "HanElectricity(瀚源)",
+                  "supplier_part": "C41430884",
+                  "quantity": 1,
+                  "references": [
+                    "J_5V_EXT"
+                  ],
+                  "reason": "missing_exact_mpn"
                 }
               ]
             }
@@ -22852,60 +22854,6 @@
         }
       },
       "sku_demands": [
-        {
-          "manufacturer_part": null,
-          "manufacturer": null,
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "REGULATOR": 1
-          },
-          "references_by_module": {
-            "REGULATOR": [
-              "J_5V_EXT"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "REGULATOR": {
-              "BOARD_INTERFACE_PACKAGE_PENDING": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "REGULATOR": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "REGULATOR": {
-              "external_accessory": [
-                "J_5V_EXT"
-              ]
-            }
-          },
-          "scopes": [
-            "BOARD_INTERFACE_PACKAGE_PENDING"
-          ],
-          "identity_notes": [
-            "manufacturer_unresolved",
-            "missing_exact_mpn",
-            "no_verified_lcsc_code",
-            "procurement_status=two_pin_power_symbol_placeholder"
-          ],
-          "quote_match_status": "missing_exact_mpn",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 1
-        },
         {
           "manufacturer_part": null,
           "manufacturer": null,
@@ -26654,6 +26602,62 @@
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
           "unpriced_quantity": 0
+        },
+        {
+          "manufacturer_part": null,
+          "manufacturer": "HanElectricity(瀚源)",
+          "supplier_part": "C41430884",
+          "supplier": "LCSC_CN",
+          "source_supplier_part": null,
+          "source_supplier_parts": [
+            null
+          ],
+          "supplier_part_resolution_sources": [
+            "current_central_index"
+          ],
+          "supplier_code_verified_from_quote": false,
+          "quantity_required": 1,
+          "quantity_by_module": {
+            "REGULATOR": 1
+          },
+          "references_by_module": {
+            "REGULATOR": [
+              "J_5V_EXT"
+            ]
+          },
+          "quantity_by_scope_by_module": {
+            "REGULATOR": {
+              "BOARD_INTERFACE_PACKAGE_PENDING": 1
+            }
+          },
+          "quantity_by_scope_bucket_by_module": {
+            "REGULATOR": {
+              "external_accessory": 1
+            }
+          },
+          "references_by_scope_bucket_by_module": {
+            "REGULATOR": {
+              "external_accessory": [
+                "J_5V_EXT"
+              ]
+            }
+          },
+          "scopes": [
+            "BOARD_INTERFACE_PACKAGE_PENDING"
+          ],
+          "identity_notes": [
+            "manufacturer_filled_from_current_central_index",
+            "missing_exact_mpn",
+            "procurement_status=two_pin_power_symbol_placeholder",
+            "supplier_code_filled_from_current_central_index"
+          ],
+          "quote_match_status": "missing_exact_mpn",
+          "quote": null,
+          "installed_value_cny": null,
+          "purchase": null,
+          "stock_status": "not_queried",
+          "stock_shortage": false,
+          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "2541WV-2X01P",
@@ -40826,20 +40830,6 @@
     {
       "module": "REGULATOR",
       "references": [
-        "J_5V_EXT"
-      ],
-      "manufacturer": null,
-      "manufacturer_part": null,
-      "supplier_part": null,
-      "quantity": 1,
-      "scope": [
-        "BOARD_INTERFACE_PACKAGE_PENDING"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "REGULATOR",
-      "references": [
         "J_BUS_POWER"
       ],
       "manufacturer": null,
@@ -40919,6 +40909,20 @@
       "quantity": 2,
       "scope": [
         "OFF_BOARD_EXTERNAL"
+      ],
+      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
+    },
+    {
+      "module": "REGULATOR",
+      "references": [
+        "J_5V_EXT"
+      ],
+      "manufacturer": "HanElectricity(瀚源)",
+      "manufacturer_part": null,
+      "supplier_part": "C41430884",
+      "quantity": 1,
+      "scope": [
+        "BOARD_INTERFACE_PACKAGE_PENDING"
       ],
       "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
     },
@@ -51501,56 +51505,6 @@
       {
         "module": "REGULATOR",
         "references": [
-          "J_5V_EXT"
-        ],
-        "manufacturer_part": null,
-        "manufacturer": null,
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "J_5V_EXT"
-          ]
-        },
-        "source": "电力/稳压模块/原理图准备/BOM.csv",
-        "source_row": 159,
-        "identity_notes": [
-          "manufacturer_unresolved",
-          "missing_exact_mpn",
-          "no_verified_lcsc_code",
-          "procurement_status=two_pin_power_symbol_placeholder"
-        ],
-        "sources": [
-          {
-            "path": "电力/稳压模块/原理图准备/BOM.csv",
-            "row": 159
-          }
-        ],
-        "quantity_by_scope": {
-          "BOARD_INTERFACE_PACKAGE_PENDING": 1
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 1
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
-        "scopes": [
-          "BOARD_INTERFACE_PACKAGE_PENDING"
-        ],
-        "populations": [
-          "current_BOM_identity_incomplete"
-        ]
-      },
-      {
-        "module": "REGULATOR",
-        "references": [
           "J_BUS_POWER"
         ],
         "manufacturer_part": null,
@@ -52142,6 +52096,58 @@
         ],
         "populations": [
           "current_BOM_target; CAD carrier excluded"
+        ]
+      },
+      {
+        "module": "REGULATOR",
+        "references": [
+          "J_5V_EXT"
+        ],
+        "manufacturer_part": null,
+        "manufacturer": "HanElectricity(瀚源)",
+        "supplier": "LCSC_CN",
+        "supplier_part": "C41430884",
+        "source_supplier_part": null,
+        "supplier_part_resolution_source": "current_central_index",
+        "supplier_code_verified_from_quote": false,
+        "quantity": 1,
+        "scope_bucket": "external_accessory",
+        "references_by_scope_bucket": {
+          "external_accessory": [
+            "J_5V_EXT"
+          ]
+        },
+        "source": "电力/稳压模块/原理图准备/BOM.csv",
+        "source_row": 159,
+        "identity_notes": [
+          "manufacturer_filled_from_current_central_index",
+          "missing_exact_mpn",
+          "procurement_status=two_pin_power_symbol_placeholder",
+          "supplier_code_filled_from_current_central_index"
+        ],
+        "sources": [
+          {
+            "path": "电力/稳压模块/原理图准备/BOM.csv",
+            "row": 159
+          }
+        ],
+        "quantity_by_scope": {
+          "BOARD_INTERFACE_PACKAGE_PENDING": 1
+        },
+        "quantity_by_scope_bucket": {
+          "external_accessory": 1
+        },
+        "source_supplier_parts": [
+          null
+        ],
+        "supplier_part_resolution_sources": [
+          "current_central_index"
+        ],
+        "scopes": [
+          "BOARD_INTERFACE_PACKAGE_PENDING"
+        ],
+        "populations": [
+          "current_BOM_identity_incomplete"
         ]
       },
       {

@@ -3,13 +3,13 @@
     "schema_version": 1,
     "title": "稳压模块最终逐针连接合同",
     "date": "2026-10-30",
-    "status": "APPLIED_NATIVE_FOUR_PAGE_IDENTITY_PIN_NET_NC_PASS_DRC_CLEAR_SOURCE_STABLE",
-    "basis": "四页原生原理图已保存、关闭并只读重开；164个制造身份属性、487针网络/NC逐针核对零差异；四页官方DRC均为[]，原生工程源文件哈希稳定。",
+    "status": "APPLIED_NATIVE_PHYSICAL_INTERFACES_PIN_NET_NC_PASS_DRC_CLEAR_SOURCE_STABLE",
+    "basis": "最终四页官方只读读回；166实例、515针、21 NC、84网；159个保护实例逐针及稳定身份零差；四页官方DRC为空。机械孔形和整板载流能力不由该针网验收证明。",
     "sources": [
       {
         "description": "selected adopted parts BOM",
         "path": "电力/稳压模块/原理图准备/选型BOM.csv",
-        "sha256": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59"
+        "sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682"
       },
       {
         "description": "approved selected instance/count ledger",
@@ -44,12 +44,12 @@
       {
         "description": "current official full-book ENET export",
         "path": "电力/稳压模块/检查/当前官方网表.enet",
-        "sha256": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821"
+        "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a"
       },
       {
         "description": "current official full-book BOM export",
         "path": "电力/稳压模块/检查/当前官方BOM.tsv",
-        "sha256": "4a89bee459aaab6a02667b5e49377d077622aa3c95026b6a3e5911719c6a98a0"
+        "sha256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4"
       }
     ],
     "pin_semantics": {
@@ -60,16 +60,15 @@
       "power_module_pin_source": "Hi-Link manufacturer drawing identifies single-output pins 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL; pin 6 is left floating per the selected auto-enable interface. PSU5_EXT官方5脚符号不包含空脚位置4；U_AUX1现有6脚载体的4脚仍明确NC。"
     },
     "scope": {
-      "selected_BOM_rows": 172,
-      "components_array_count": 164,
+      "selected_BOM_rows": 174,
+      "components_array_count": 166,
       "excluded_non_PCB_assembly_ref": "COREBOARD_WEACT",
       "excluded_reason": "WeAct核心板为插接式外部模块，主板上实体的J_CORE_P1/J_CORE_P2已逐针列出，核心板不作为重复的PCB元件。",
       "included_scopes": {
-        "ON_BOARD": 158,
-        "ON_BOARD_MODULE_ASSEMBLY": 1,
-        "BOARD_INTERFACE_PACKAGE_PENDING": 5
+        "ON_BOARD": 165,
+        "ON_BOARD_MODULE_ASSEMBLY": 1
       },
-      "note": "原生合同仅包含板上器件及抽象接口；图外实物采购需求保留在选型BOM。抽象功率接口不等于机械型号或额定能力已确定。",
+      "note": "159个保护实例逐针/属性守恒；6个兴飞TT端子和J_5V_EXT为已选物理接口。六端子库焊盘与原厂推荐孔形不一致，机械/PCB实现仍待人工确认。",
       "excluded_external_procurement_refs": [
         "COREBOARD_WEACT",
         "F_BUS",
@@ -5848,48 +5847,49 @@
       },
       {
         "ref": "J_5V_EXT",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+        "manufacturer_part": "2541WV-2X01P",
+        "supplier_part": "C41430884",
+        "scope": "ON_BOARD",
         "action": "RETAIN",
         "pins": [
           {
             "number": "1",
-            "name": "1",
+            "name": "5V",
             "net": "5V_EXT",
             "connection": "NET"
           },
           {
             "number": "2",
-            "name": "2",
+            "name": "GND",
             "net": "GND_SYS",
             "connection": "NET"
           }
         ],
-        "manufacturer": "",
-        "footprint": "CONN-TH_2P-P7.62_C9900005791",
+        "manufacturer": "HanElectricity(瀚源)",
+        "footprint": "HDR-TH_2541WV-2X01P",
+        "note": "5V外接接口采用 2541WV-2X01P / C41430884；2脚输出为5V_EXT/GND_SYS。5V配合线端精确料号与价格待询价。",
         "native_binding": {
-          "device_uuid": "1ecef1391c1359f3",
-          "device_name": "2PINA-power",
-          "footprint_uuid": "be111a58ef1079a9",
-          "footprint_name": "CONN-TH_2P-P7.62_C9900005791",
-          "convert_to_pcb": "no",
+          "device_uuid": "32ff01e575a80938",
+          "device_name": "2541WV-2X01P",
+          "footprint_uuid": "925042ac7ffdd330",
+          "footprint_name": "HDR-TH_2541WV-2X01P",
+          "convert_to_pcb": "yes",
           "add_into_bom": "yes"
         },
         "native_manufacturing_properties": {
-          "Manufacturer": "",
-          "Manufacturer Part": "",
+          "Manufacturer": "HanElectricity(瀚源)",
+          "Manufacturer Part": "2541WV-2X01P",
           "Supplier": "LCSC",
-          "Supplier Part": ""
+          "Supplier Part": "C41430884"
         },
-        "native_drawing_symbol_uuid": "aa04000000000010"
+        "native_drawing_symbol_uuid": "aa04000000000011"
       },
       {
-        "ref": "J_BUS_POWER",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
-        "action": "REWIRE",
+        "ref": "J_BUS_POS",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
         "pins": [
           {
             "number": "1",
@@ -5900,39 +5900,190 @@
           {
             "number": "2",
             "name": "2",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          }
+        ],
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "BUS 正极端子；6个端子脚同网 BUS_EXT，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
+        "native_binding": {
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
+          "add_into_bom": "yes"
+        },
+        "native_manufacturing_properties": {
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
+          "Supplier": "LCSC",
+          "Supplier Part": "C19724595"
+        },
+        "native_drawing_symbol_uuid": "da51000000000001"
+      },
+      {
+        "ref": "J_BUS_GND",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
+        "pins": [
+          {
+            "number": "1",
+            "name": "1",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
             "net": "GND_SYS",
             "connection": "NET"
           }
         ],
-        "manufacturer": "",
-        "footprint": "CONN-TH_2P-P7.62_C9900005791",
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "BUS 回流端子；6个端子脚同网 GND_SYS，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
         "native_binding": {
-          "device_uuid": "1ecef1391c1359f3",
-          "device_name": "2PINA-power",
-          "footprint_uuid": "be111a58ef1079a9",
-          "footprint_name": "CONN-TH_2P-P7.62_C9900005791",
-          "convert_to_pcb": "no",
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
           "add_into_bom": "yes"
         },
         "native_manufacturing_properties": {
-          "Manufacturer": "",
-          "Manufacturer Part": "",
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
           "Supplier": "LCSC",
-          "Supplier Part": ""
+          "Supplier Part": "C19724595"
         },
-        "native_drawing_symbol_uuid": "11a1a1a100000006"
+        "native_drawing_symbol_uuid": "da51000000000001"
       },
       {
-        "ref": "J_DUMP",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
-        "action": "REWIRE",
+        "ref": "J_DUMP_BUS",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
         "pins": [
           {
             "number": "1",
             "name": "1",
             "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
+            "net": "BUS_EXT",
+            "connection": "NET"
+          }
+        ],
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "制动电阻 BUS 端子；6个端子脚同网 BUS_EXT，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
+        "native_binding": {
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
+          "add_into_bom": "yes"
+        },
+        "native_manufacturing_properties": {
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
+          "Supplier": "LCSC",
+          "Supplier Part": "C19724595"
+        },
+        "native_drawing_symbol_uuid": "da51000000000002"
+      },
+      {
+        "ref": "J_DUMP_SW",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
+        "pins": [
+          {
+            "number": "1",
+            "name": "1",
+            "net": "DUMP_SW",
             "connection": "NET"
           },
           {
@@ -5940,32 +6091,120 @@
             "name": "2",
             "net": "DUMP_SW",
             "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "DUMP_SW",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "DUMP_SW",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "DUMP_SW",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
+            "net": "DUMP_SW",
+            "connection": "NET"
           }
         ],
-        "manufacturer": "",
-        "footprint": "CONN-TH_2P-P7.62_C9900005791",
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "制动电阻开关端子；6个端子脚同网 DUMP_SW，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
         "native_binding": {
-          "device_uuid": "1ecef1391c1359f3",
-          "device_name": "2PINA-power",
-          "footprint_uuid": "be111a58ef1079a9",
-          "footprint_name": "CONN-TH_2P-P7.62_C9900005791",
-          "convert_to_pcb": "no",
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
           "add_into_bom": "yes"
         },
         "native_manufacturing_properties": {
-          "Manufacturer": "",
-          "Manufacturer Part": "",
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
           "Supplier": "LCSC",
-          "Supplier Part": ""
+          "Supplier Part": "C19724595"
         },
-        "native_drawing_symbol_uuid": "11a1a1a100000005"
+        "native_drawing_symbol_uuid": "da51000000000001"
       },
       {
-        "ref": "J_SC_POWER",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
-        "action": "REWIRE",
+        "ref": "J_FUSE_SC",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
+        "pins": [
+          {
+            "number": "1",
+            "name": "1",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          }
+        ],
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "超容保险前端子；6个端子脚同网 SC_PLUS，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
+        "native_binding": {
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
+          "add_into_bom": "yes"
+        },
+        "native_manufacturing_properties": {
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
+          "Supplier": "LCSC",
+          "Supplier Part": "C19724595"
+        },
+        "native_drawing_symbol_uuid": "da51000000000001"
+      },
+      {
+        "ref": "J_FUSE_ISO",
+        "manufacturer_part": "TT56145145-1520",
+        "supplier_part": "C19724595",
+        "scope": "ON_BOARD",
+        "action": "ADD_INTERFACE",
         "pins": [
           {
             "number": "1",
@@ -5976,27 +6215,52 @@
           {
             "number": "2",
             "name": "2",
-            "net": "SC_MINUS",
+            "net": "SC_ISO_STORAGE",
+            "connection": "NET"
+          },
+          {
+            "number": "3",
+            "name": "3",
+            "net": "SC_ISO_STORAGE",
+            "connection": "NET"
+          },
+          {
+            "number": "4",
+            "name": "4",
+            "net": "SC_ISO_STORAGE",
+            "connection": "NET"
+          },
+          {
+            "number": "5",
+            "name": "5",
+            "net": "SC_ISO_STORAGE",
+            "connection": "NET"
+          },
+          {
+            "number": "6",
+            "name": "6",
+            "net": "SC_ISO_STORAGE",
             "connection": "NET"
           }
         ],
-        "manufacturer": "",
-        "footprint": "CONN-TH_2P-P7.62_C9900005791",
+        "manufacturer": "XFCN(兴飞)",
+        "footprint": "TH_6P-TT56145145-1500",
+        "note": "超容保险后返回端子；6个端子脚同网 SC_ISO_STORAGE，不得把6脚解释成6路电流端。兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 135A 是单个端子元件额定，不代表整板、铜箔、螺栓、线耳或连接器组件已通过 135A 验证。仿真中的 80A 仅为模型假设；整车 160A 是系统/双电机口径，不得当作稳压支路必经电流。稳压支路连续/峰值电流及温升边界仍按设计需求和后续实测/PCB核算确定。",
         "native_binding": {
-          "device_uuid": "1ecef1391c1359f3",
-          "device_name": "2PINA-power",
-          "footprint_uuid": "be111a58ef1079a9",
-          "footprint_name": "CONN-TH_2P-P7.62_C9900005791",
-          "convert_to_pcb": "no",
+          "device_uuid": "aec987342b587c1f",
+          "device_name": "TT56145145-1520",
+          "footprint_uuid": "567b601c57e53685",
+          "footprint_name": "TH_6P-TT56145145-1500",
+          "convert_to_pcb": "yes",
           "add_into_bom": "yes"
         },
         "native_manufacturing_properties": {
-          "Manufacturer": "",
-          "Manufacturer Part": "",
+          "Manufacturer": "XFCN(兴飞)",
+          "Manufacturer Part": "TT56145145-1520",
           "Supplier": "LCSC",
-          "Supplier Part": ""
+          "Supplier Part": "C19724595"
         },
-        "native_drawing_symbol_uuid": "11a1a1a100000003"
+        "native_drawing_symbol_uuid": "da51000000000002"
       },
       {
         "ref": "U_CELL_MUX1",
@@ -7229,45 +7493,6 @@
           "Supplier Part": "C705788"
         },
         "native_drawing_symbol_uuid": "2cb477c0a2b89000"
-      },
-      {
-        "ref": "J_SC_FUSE",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
-        "action": "ADD_INTERFACE",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "SC_PLUS",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "SC_ISO_STORAGE",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "",
-        "footprint": "CONN-TH_2P-P7.62_C9900005791",
-        "note": "板外F_SC的两个高电流端：1接超容原始正端SC_PLUS，2为保险后返回SC_ISO_STORAGE；符号载体封装不代表实际选型。",
-        "native_binding": {
-          "device_uuid": "1ecef1391c1359f3",
-          "device_name": "2PINA-power",
-          "footprint_uuid": "be111a58ef1079a9",
-          "footprint_name": "CONN-TH_2P-P7.62_C9900005791",
-          "convert_to_pcb": "no",
-          "add_into_bom": "yes"
-        },
-        "native_manufacturing_properties": {
-          "Manufacturer": "",
-          "Manufacturer Part": "",
-          "Supplier": "",
-          "Supplier Part": ""
-        },
-        "native_drawing_symbol_uuid": "11a1a1a100000004"
       }
     ],
     "mcu_gpio_net_mapping": [
@@ -7869,7 +8094,7 @@
       ],
       "new_external_reference": "PSU5_EXT",
       "external_coreboard_not_counted_as_PCB_ref": "COREBOARD_WEACT",
-      "expected_final_netlist_count": 164,
+      "expected_final_netlist_count": 166,
       "modified_existing_refs": [
         {
           "ref": "Q_MAIN_H",
@@ -8671,17 +8896,20 @@
       ],
       "historical_after_selected_wiring_count": 170,
       "interface_only_removed_refs": [
-        "F_BUS",
-        "F_SC",
-        "R_DUMP_EXT",
-        "TH_SC",
-        "TH_MAIN",
-        "TH_DUMP",
-        "PSU5_EXT"
+        "J_BUS_POWER",
+        "J_DUMP",
+        "J_SC_FUSE",
+        "J_SC_POWER"
       ],
       "added_interface_refs": [
-        "J_SC_FUSE"
-      ]
+        "J_BUS_POS",
+        "J_BUS_GND",
+        "J_DUMP_BUS",
+        "J_DUMP_SW",
+        "J_FUSE_SC",
+        "J_FUSE_ISO"
+      ],
+      "current_interface_reconciliation": "当前接口版：旧合同4个高电流抽象口移除，新增6个六针同网TT端子，J_5V_EXT保留并选用2541WV；旧合同外其余159实例逐针/身份检查守恒。"
     },
     "manufacturer_source_discrepancies": [
       {
@@ -8701,6 +8929,12 @@
         },
         "evidence": "Hi-Link UR(A)B_YMD-10WR3 V1.7, p.5; pin function table, single-output (S) product.",
         "handling": "This contract follows the manufacturer pin definition. Correct the BOM connection before native drawing; do not follow its reversed input assignment."
+      },
+      {
+        "ref": "J_BUS_POS/J_BUS_GND/J_DUMP_BUS/J_DUMP_SW/J_FUSE_SC/J_FUSE_ISO",
+        "issue": "EasyEDA/官方器件库封装采用Ø3圆孔；兴飞原厂机械推荐图为矩形孔，孔形存在不一致。",
+        "handling": "保留差异记录；PCB/结构实施前核实实际端子本体、孔形、间距与载流路径，不把两种孔形描述为一致。",
+        "evidence": "电力/稳压模块/检查/本轮兴飞厂商图纸.pdf 与 电力/稳压模块/检查/本轮兴飞端子只读库.json"
       }
     ],
     "manufacturer_pin_sources": [
@@ -8752,31 +8986,45 @@
         "evidence": "TO-220AB physical pinout: pins 1/3 anode; pin 2 cathode/tab."
       }
     ],
-    "prepared_material_source_sha256": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59",
-    "preparation_note": "选型采购身份与数量保持；Device/Footprint为最终官方ENET载体绑定UUID，所有164项原生properties及绑定由单次全书ENET核对。四页保存重开、逐针身份与网络/NC审查通过。",
-    "native_application_note": "四页原理图最终保存、关闭并只读重开；164实例制造身份零差异、487针网络/NC零差异、21 NC、84网、39跨页网；四页官方DRC结果均为[]。24项Symbol UUID及68项PinName改变只属于绘图载体；当前客户端4.1.93不支持getCurrentProjectAllNets，连接依据为单次全书官方ENET。",
+    "prepared_material_source_sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682",
+    "preparation_note": "以最终官方全书ENET重建当前接口BOM及逐针合同；历史BOM.csv与冻结迁移证据保持不变。",
+    "native_application_note": "四页官方读回166实例、515针、21 NC、84网；159个保护实例逐针/属性零差；六个新端子各6针同网；四页DRC=[]。135A为元件额定，不是整板/系统验证；孔形差异、线耳螺栓和实物载流仍待确认。",
     "interface_only_revision": {
-      "user_instruction": "板外器件只用留好接口",
+      "user_instruction": "仅更换板级外接接口的物理实现，保留其他159个实例及全部针网",
       "removed_native_refs": [
-        "F_BUS",
-        "F_SC",
-        "R_DUMP_EXT",
-        "TH_SC",
-        "TH_MAIN",
-        "TH_DUMP",
-        "PSU5_EXT"
+        "J_BUS_POWER",
+        "J_DUMP",
+        "J_SC_FUSE",
+        "J_SC_POWER"
       ],
-      "added_interface": {
-        "ref": "J_SC_FUSE",
-        "pins": {
-          "1": "SC_PLUS",
-          "2": "SC_ISO_STORAGE"
-        }
+      "added_interface_refs": [
+        "J_BUS_POS",
+        "J_BUS_GND",
+        "J_DUMP_BUS",
+        "J_DUMP_SW",
+        "J_FUSE_SC",
+        "J_FUSE_ISO"
+      ],
+      "retained_and_physically_selected_ref": "J_5V_EXT",
+      "terminal_mpn": "TT56145145-1520",
+      "terminal_supplier_part": "C19724595",
+      "terminal_pin_nets": {
+        "J_BUS_POS": "BUS_EXT",
+        "J_BUS_GND": "GND_SYS",
+        "J_DUMP_BUS": "BUS_EXT",
+        "J_DUMP_SW": "DUMP_SW",
+        "J_FUSE_SC": "SC_PLUS",
+        "J_FUSE_ISO": "SC_ISO_STORAGE"
       },
-      "expected_components": 164,
-      "expected_pins": 487,
+      "terminal_pin_count_each": 6,
+      "expected_components": 166,
+      "expected_pins": 515,
       "expected_nc": 21,
-      "procurement_policy": "板外实物仍保留采购需求，不计入原生实例；板载U_AUX1和SC1–8保留。"
+      "expected_nets": 84,
+      "procurement_policy": "LCSC 实时美元 1+ 单价 $0.5477/只，6只合计 $3.2862；人民币商城单价未核实，须询价，不得按汇率换算写成人民币实价。6颗 M5 螺栓、6只 M5 线耳及1套 5V 配合线端均待精确料号/报价。",
+      "mechanical_discrepancy": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。",
+      "readback_path": "电力/稳压模块/检查/接线实施/物理接口最终官方读回.json",
+      "readback_sha256": "2fcbd03f695300c069d9f2ed6b6fe35a7d28c133c82970d07330ddb6bddacc0c"
     },
     "drawing": {
       "layout": "FOUR_FUNCTIONAL_PAGES",
@@ -8804,10 +9052,12 @@
             "D_DUMP_FW",
             "D_SC_HI",
             "D_SC_LO",
-            "J_BUS_POWER",
-            "J_DUMP",
-            "J_SC_FUSE",
-            "J_SC_POWER",
+            "J_BUS_GND",
+            "J_BUS_POS",
+            "J_DUMP_BUS",
+            "J_DUMP_SW",
+            "J_FUSE_ISO",
+            "J_FUSE_SC",
             "L_MAIN_A",
             "L_MAIN_B",
             "Q_DUMP",
@@ -9257,12 +9507,12 @@
           ]
         }
       ],
-      "baseline_commit": "bf075c98d5370b85c2afba4c644772832c0c6181",
+      "baseline_commit": "1078c0375fcd38928679bbbd884de67d0daa03c8",
       "identity_policy": "MPN/Supplier/Footprint/真实Pin Number与连接保持；允许明确记录功能式绘图Symbol及Pin Name调整。"
     },
     "native_identity_verification": {
       "status": "PASS",
-      "component_count": 164,
+      "component_count": 166,
       "identity_difference_count": 0,
       "identity_compared_properties": [
         "Device",
@@ -9273,7 +9523,7 @@
         "Convert to PCB",
         "Add into BOM"
       ],
-      "pin_count": 487,
+      "pin_count": 515,
       "pin_net_nc_difference_count": 0,
       "explicit_nc_count": 21,
       "net_count": 84,
@@ -9282,23 +9532,23 @@
       "symbol_pin_name_change_count": 68,
       "drawing_change_policy": "Symbol UUID and Symbol Pin Name changes are drawing-carrier changes; MPN, manufacturer, supplier part, Device/Footprint binding, real pin numbers, nets, and NC remain unchanged.",
       "official_full_book_enet": {
-        "path": "電力/稳压模块/检查/当前官方网表.enet",
-        "sha256": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821"
+        "path": "电力/稳压模块/检查/当前官方网表.enet",
+        "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a"
       },
       "official_full_book_bom": {
-        "path": "電力/稳压模块/检查/当前官方BOM.tsv",
-        "sha256": "4a89bee459aaab6a02667b5e49377d077622aa3c95026b6a3e5911719c6a98a0"
+        "path": "电力/稳压模块/检查/当前官方BOM.tsv",
+        "sha256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4"
       },
       "selected_bom": {
         "path": "电力/稳压模块/原理图准备/选型BOM.csv",
-        "sha256": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59"
+        "sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682"
       },
       "native_source_files_sha256": {
-        "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": "b31d570e4f70267fd1e6c198b8fba3925b940264801da0e157c0aedb89189e25",
-        "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2": "12ab275ced3dac4a04ec91aae035239e37f0137fecfe482ed723efa49ef981c2",
+        "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": "29813e1f3aea89b497839b052bf8c4594712bebfd0932af5c00db8d76fdd58fc",
+        "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2": "cc9be4ea65c2c8c5273b110fd3427ae0c3a90b68ec18e698fcd00324161c4a5c",
         "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/02 门极驱动与硬保护.esch2": "678d9d4a131681e857bcb1a12f070eadab5301d396cf4fe45b181661bcdae032",
         "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/03 模拟采样.esch2": "cb2a5ce479d8e7c74d301fbd5632545eedda17a78099233470dba1edde1d3124",
-        "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2": "7be11515755b9638e001500b5233785427c0f37ac6724df41cdbfb3c970cca5d"
+        "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2": "6250dd4ca44e5737934dac02df7d96d7f37edbde19f49764b028605f1fc44b32"
       },
       "source_stable_after_read_only_reopen_close": true,
       "final_session_closed": true,
@@ -9332,20 +9582,75 @@
         "official_readback": "电力/稳压模块/检查/接线实施/四页最终官方读回.json",
         "pin_and_identity_check": "电力/稳压模块/检查/接线实施/四页最终逐针核对.json",
         "source_stability": "电力/稳压模块/检查/接线实施/四页最终关闭稳定.json"
-      }
+      },
+      "protected_instance_count": 159,
+      "protected_pin_count": 477,
+      "protected_instance_identity_comparison": "PASS; all protected physical identities and pins preserved; one documented J_NTC_SC Description Unicode repair; Channel ID is platform-assigned",
+      "documented_description_normalizations": [
+        {
+          "ref": "J_NTC_SC",
+          "property": "Description",
+          "before": "额定��流:3A（旧ENET文本中2个U+FFFD）",
+          "after": "额定电流:3A",
+          "reason": "仅修复旧ENET描述字符串的乱码；器件身份与全部引脚不变。"
+        }
+      ],
+      "source_readback": {
+        "path": "电力/稳压模块/检查/接线实施/物理接口最终官方读回.json",
+        "sha256": "2fcbd03f695300c069d9f2ed6b6fe35a7d28c133c82970d07330ddb6bddacc0c"
+      },
+      "mechanical_interface_status": "PART_SELECTED; Ø3 ROUND LIBRARY HOLES VS RECTANGULAR MANUFACTURER RECOMMENDATION REVIEW PENDING"
+    },
+    "historical_interface_only_revision": {
+      "user_instruction": "板外器件只用留好接口",
+      "removed_native_refs": [
+        "F_BUS",
+        "F_SC",
+        "R_DUMP_EXT",
+        "TH_SC",
+        "TH_MAIN",
+        "TH_DUMP",
+        "PSU5_EXT"
+      ],
+      "added_interface": {
+        "ref": "J_SC_FUSE",
+        "pins": {
+          "1": "SC_PLUS",
+          "2": "SC_ISO_STORAGE"
+        }
+      },
+      "expected_components": 164,
+      "expected_pins": 487,
+      "expected_nc": 21,
+      "procurement_policy": "板外实物仍保留采购需求，不计入原生实例；板载U_AUX1和SC1–8保留。"
+    },
+    "historical_native_delta_interface_fields": {
+      "expected_final_netlist_count": 164,
+      "interface_only_removed_refs": [
+        "F_BUS",
+        "F_SC",
+        "R_DUMP_EXT",
+        "TH_SC",
+        "TH_MAIN",
+        "TH_DUMP",
+        "PSU5_EXT"
+      ],
+      "added_interface_refs": [
+        "J_SC_FUSE"
+      ]
     }
   },
   "target_page_uuid": "9546dca0bc8bce7f",
-  "selected_bom_sha256": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59",
-  "target_enet_sha256": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821",
+  "selected_bom_sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682",
+  "target_enet_sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a",
   "target_schematic_uuid": "539d677ac9095954",
-  "target_enet_path": "电力/稳压模块/检查/当前官方网表.enet",
-  "official_bom_sha256": "4a89bee459aaab6a02667b5e49377d077622aa3c95026b6a3e5911719c6a98a0",
+  "target_enet_path": "电力/稳压模块/原理图准备/目标连接网表.enet",
+  "official_bom_sha256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4",
   "official_bom_path": "电力/稳压模块/检查/当前官方BOM.tsv",
-  "contract_sha256": "485f99d9d261c23e4b4b91e88874c5909fa81b6e863210ab3b665df1209a4c82",
+  "contract_sha256": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53",
   "native_identity_verification": {
     "status": "PASS",
-    "component_count": 164,
+    "component_count": 166,
     "identity_difference_count": 0,
     "identity_compared_properties": [
       "Device",
@@ -9356,7 +9661,7 @@
       "Convert to PCB",
       "Add into BOM"
     ],
-    "pin_count": 487,
+    "pin_count": 515,
     "pin_net_nc_difference_count": 0,
     "explicit_nc_count": 21,
     "net_count": 84,
@@ -9365,23 +9670,23 @@
     "symbol_pin_name_change_count": 68,
     "drawing_change_policy": "Symbol UUID and Symbol Pin Name changes are drawing-carrier changes; MPN, manufacturer, supplier part, Device/Footprint binding, real pin numbers, nets, and NC remain unchanged.",
     "official_full_book_enet": {
-      "path": "電力/稳压模块/检查/当前官方网表.enet",
-      "sha256": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821"
+      "path": "电力/稳压模块/检查/当前官方网表.enet",
+      "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a"
     },
     "official_full_book_bom": {
-      "path": "電力/稳压模块/检查/当前官方BOM.tsv",
-      "sha256": "4a89bee459aaab6a02667b5e49377d077622aa3c95026b6a3e5911719c6a98a0"
+      "path": "电力/稳压模块/检查/当前官方BOM.tsv",
+      "sha256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4"
     },
     "selected_bom": {
       "path": "电力/稳压模块/原理图准备/选型BOM.csv",
-      "sha256": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59"
+      "sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682"
     },
     "native_source_files_sha256": {
-      "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": "b31d570e4f70267fd1e6c198b8fba3925b940264801da0e157c0aedb89189e25",
-      "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2": "12ab275ced3dac4a04ec91aae035239e37f0137fecfe482ed723efa49ef981c2",
+      "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3": "29813e1f3aea89b497839b052bf8c4594712bebfd0932af5c00db8d76fdd58fc",
+      "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2": "cc9be4ea65c2c8c5273b110fd3427ae0c3a90b68ec18e698fcd00324161c4a5c",
       "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/02 门极驱动与硬保护.esch2": "678d9d4a131681e857bcb1a12f070eadab5301d396cf4fe45b181661bcdae032",
       "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/03 模拟采样.esch2": "cb2a5ce479d8e7c74d301fbd5632545eedda17a78099233470dba1edde1d3124",
-      "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2": "7be11515755b9638e001500b5233785427c0f37ac6724df41cdbfb3c970cca5d"
+      "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2": "6250dd4ca44e5737934dac02df7d96d7f37edbde19f49764b028605f1fc44b32"
     },
     "source_stable_after_read_only_reopen_close": true,
     "final_session_closed": true,
@@ -9415,6 +9720,23 @@
       "official_readback": "电力/稳压模块/检查/接线实施/四页最终官方读回.json",
       "pin_and_identity_check": "电力/稳压模块/检查/接线实施/四页最终逐针核对.json",
       "source_stability": "电力/稳压模块/检查/接线实施/四页最终关闭稳定.json"
-    }
+    },
+    "protected_instance_count": 159,
+    "protected_pin_count": 477,
+    "protected_instance_identity_comparison": "PASS; all protected physical identities and pins preserved; one documented J_NTC_SC Description Unicode repair; Channel ID is platform-assigned",
+    "documented_description_normalizations": [
+      {
+        "ref": "J_NTC_SC",
+        "property": "Description",
+        "before": "额定��流:3A（旧ENET文本中2个U+FFFD）",
+        "after": "额定电流:3A",
+        "reason": "仅修复旧ENET描述字符串的乱码；器件身份与全部引脚不变。"
+      }
+    ],
+    "source_readback": {
+      "path": "电力/稳压模块/检查/接线实施/物理接口最终官方读回.json",
+      "sha256": "2fcbd03f695300c069d9f2ed6b6fe35a7d28c133c82970d07330ddb6bddacc0c"
+    },
+    "mechanical_interface_status": "PART_SELECTED; Ø3 ROUND LIBRARY HOLES VS RECTANGULAR MANUFACTURER RECOMMENDATION REVIEW PENDING"
   }
 }
