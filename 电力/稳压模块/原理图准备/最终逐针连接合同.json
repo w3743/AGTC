@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "title": "稳压模块最终逐针连接合同",
-  "date": "2026-10-29",
-  "status": "APPLIED_NATIVE_PIN_ACCEPTANCE_PASS_DRC_ONE_BOUNDARY_WARNING",
-  "basis": "目标逐针合同已应用到原生原理图，保存重开后官方网表及NC标记核对通过；DRC保留BUS_SOURCE单端边界警告。",
+  "date": "2026-10-30",
+  "status": "APPLIED_NATIVE_PIN_ACCEPTANCE_PASS_DRC_CLEAR",
+  "basis": "板外仅留接口的原生原理图完成保存重开；官方逐针/NC核对通过，官方DRC原始数组为空。",
   "sources": [
     {
       "description": "selected adopted parts BOM",
       "path": "电力/稳压模块/原理图准备/选型BOM.csv",
-      "sha256": "3fedc4abd29a4dce8e60c6cc8812bc54d5d5e0290b2a044710bf0ecc2b805539"
+      "sha256": "6c18c84b2e36480d490fefe65fc3d35fc8442cce1a9c3607ffa00e86fdbf145f"
     },
     {
       "description": "approved selected instance/count ledger",
@@ -49,17 +49,26 @@
     "power_module_pin_source": "Hi-Link manufacturer drawing identifies single-output pins 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL; pin 6 is left floating per the selected auto-enable interface. PSU5_EXT官方5脚符号不包含空脚位置4；U_AUX1现有6脚载体的4脚仍明确NC。"
   },
   "scope": {
-    "selected_BOM_rows": 171,
-    "components_array_count": 170,
+    "selected_BOM_rows": 172,
+    "components_array_count": 164,
     "excluded_non_PCB_assembly_ref": "COREBOARD_WEACT",
     "excluded_reason": "WeAct核心板为插接式外部模块，主板上实体的J_CORE_P1/J_CORE_P2已逐针列出，核心板不作为重复的PCB元件。",
     "included_scopes": {
       "ON_BOARD": 158,
       "ON_BOARD_MODULE_ASSEMBLY": 1,
-      "BOARD_INTERFACE_PACKAGE_PENDING": 4,
-      "OFF_BOARD_EXTERNAL": 7
+      "BOARD_INTERFACE_PACKAGE_PENDING": 5
     },
-    "note": "OFF_BOARD_EXTERNAL及BOARD_INTERFACE_PACKAGE_PENDING条目保留为网表/接口合同；这不表示它们是主板上器件。J_5V_EXT等连接器型号待定仅影响封装，不改变本合同的物理脚编号和net。"
+    "note": "原生合同仅包含板上器件及抽象接口；图外实物采购需求保留在选型BOM。抽象功率接口不等于机械型号或额定能力已确定。",
+    "excluded_external_procurement_refs": [
+      "COREBOARD_WEACT",
+      "F_BUS",
+      "F_SC",
+      "PSU5_EXT",
+      "R_DUMP_EXT",
+      "TH_DUMP",
+      "TH_MAIN",
+      "TH_SC"
+    ]
   },
   "components": [
     {
@@ -3864,192 +3873,6 @@
       "footprint": "CONN-TH_2P-P7.62_C9900005791"
     },
     {
-      "ref": "F_BUS",
-      "manufacturer_part": "AMG-80",
-      "supplier_part": "",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "REWIRE",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "BUS_SOURCE",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "BUS_EXT",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "Eaton",
-      "footprint": "F1206"
-    },
-    {
-      "ref": "F_SC",
-      "manufacturer_part": "AMG-80",
-      "supplier_part": "",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "REWIRE",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "SC_PLUS",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "SC_ISO_STORAGE",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "Eaton",
-      "footprint": "F1206"
-    },
-    {
-      "ref": "R_DUMP_EXT",
-      "manufacturer_part": "",
-      "supplier_part": "",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "REWIRE",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "BUS_EXT",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "DUMP_SW",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "",
-      "footprint": ""
-    },
-    {
-      "ref": "TH_DUMP",
-      "manufacturer_part": "ATH10K1R8B3950K",
-      "supplier_part": "",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "RETAIN",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "NTC_DUMP",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "GND_SYS",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "ATI(恒光)",
-      "footprint": "RES-TH_BD1.8-L3.9-P6.50-D0.5"
-    },
-    {
-      "ref": "TH_MAIN",
-      "manufacturer_part": "MF52A103F3950 (A1)",
-      "supplier_part": "C13879",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "RETAIN",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "NTC_MAIN",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "GND_SYS",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "时恒",
-      "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
-    },
-    {
-      "ref": "TH_SC",
-      "manufacturer_part": "MF52A103F3950 (A1)",
-      "supplier_part": "C13879",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "RETAIN",
-      "pins": [
-        {
-          "number": "1",
-          "name": "1",
-          "net": "NTC_SC",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "2",
-          "net": "GND_SYS",
-          "connection": "NET"
-        }
-      ],
-      "manufacturer": "时恒",
-      "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
-    },
-    {
-      "ref": "PSU5_EXT",
-      "manufacturer_part": "URB4805YMD-10WR3",
-      "supplier_part": "C5365326",
-      "scope": "OFF_BOARD_EXTERNAL",
-      "action": "REWIRE",
-      "pins": [
-        {
-          "number": "1",
-          "name": "-Vin",
-          "net": "GND_SYS",
-          "connection": "NET"
-        },
-        {
-          "number": "2",
-          "name": "+Vin",
-          "net": "BUS_EXT",
-          "connection": "NET"
-        },
-        {
-          "number": "3",
-          "name": "+Vo",
-          "net": "5V_EXT",
-          "connection": "NET"
-        },
-        {
-          "number": "5",
-          "name": "GND",
-          "net": "GND_SYS",
-          "connection": "NET"
-        },
-        {
-          "number": "6",
-          "name": "CTRL",
-          "net": null,
-          "connection": "NC"
-        }
-      ],
-      "manufacturer": "HI-LINK(海凌科)",
-      "footprint": "",
-      "omitted_reserved_positions": [
-        {
-          "number": "4",
-          "manufacturer_function": "NP / 空脚",
-          "reason": "官方HI-LINK C5365326库符号仅列1/2/3/5/6功能脚；4位无电气功能，不强造引脚或公共NC网。"
-        }
-      ]
-    },
-    {
       "ref": "U_CELL_MUX1",
       "manufacturer_part": "TMUX1511PWR",
       "supplier_part": "C2866750",
@@ -4950,6 +4773,30 @@
       ],
       "manufacturer": "YAGEO(国巨)",
       "footprint": "R0603"
+    },
+    {
+      "ref": "J_SC_FUSE",
+      "manufacturer_part": "",
+      "supplier_part": "",
+      "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+      "action": "ADD_INTERFACE",
+      "pins": [
+        {
+          "number": "1",
+          "name": "1",
+          "net": "SC_PLUS",
+          "connection": "NET"
+        },
+        {
+          "number": "2",
+          "name": "2",
+          "net": "SC_ISO_STORAGE",
+          "connection": "NET"
+        }
+      ],
+      "manufacturer": "",
+      "footprint": "CONN-TH_2P-P7.62_C9900005791",
+      "note": "板外F_SC的两个高电流端：1接超容原始正端SC_PLUS，2为保险后返回SC_ISO_STORAGE；符号载体封装不代表实际选型。"
     }
   ],
   "mcu_gpio_net_mapping": [
@@ -5551,7 +5398,7 @@
     ],
     "new_external_reference": "PSU5_EXT",
     "external_coreboard_not_counted_as_PCB_ref": "COREBOARD_WEACT",
-    "expected_final_netlist_count": 170,
+    "expected_final_netlist_count": 164,
     "modified_existing_refs": [
       {
         "ref": "Q_MAIN_H",
@@ -6294,7 +6141,7 @@
         ]
       }
     ],
-    "reconciliation": "167当前官方ENET元件 - 21实际移除refs + 24实际新增refs = 170最终选型网表实例。显式退役清单20件；另有SYS_BAT_BUS不在该清单但未进入选型BOM；选型BOM含22个ADD，另外新增外部项为PSU5_EXT, R_DUMP_EXT。COREBOARD_WEACT仅为外部组装模块，不计主板PCB元件。",
+    "reconciliation": "历史接线选型阶段：167当前官方ENET元件 - 21实际移除refs + 24实际新增refs = 170最终选型网表实例。显式退役清单20件；另有SYS_BAT_BUS不在该清单但未进入选型BOM；选型BOM含22个ADD，另外新增外部项为PSU5_EXT, R_DUMP_EXT。COREBOARD_WEACT仅为外部组装模块，不计主板PCB元件。；本轮另移除7个板外实物实例、增加1个保险抽象接口，当前最终原生实例为164。",
     "removed_refs": [
       "C_BAL6",
       "C_BAL7",
@@ -6350,6 +6197,19 @@
     "added_refs_not_listed_as_ADD_action": [
       "PSU5_EXT",
       "R_DUMP_EXT"
+    ],
+    "historical_after_selected_wiring_count": 170,
+    "interface_only_removed_refs": [
+      "F_BUS",
+      "F_SC",
+      "R_DUMP_EXT",
+      "TH_SC",
+      "TH_MAIN",
+      "TH_DUMP",
+      "PSU5_EXT"
+    ],
+    "added_interface_refs": [
+      "J_SC_FUSE"
     ]
   },
   "manufacturer_source_discrepancies": [
@@ -6421,7 +6281,30 @@
       "evidence": "TO-220AB physical pinout: pins 1/3 anode; pin 2 cathode/tab."
     }
   ],
-  "prepared_material_source_sha256": "6f94d72fddf97299462d456651a5e6f18a6eb767df8cc384d599e71a7da62f71",
+  "prepared_material_source_sha256": "6c18c84b2e36480d490fefe65fc3d35fc8442cce1a9c3607ffa00e86fdbf145f",
   "preparation_note": "采用BOM采购身份归一；已应用原生工程并经官方网表逐针核对。",
-  "native_application_note": "软件阶段按实查库符号纠正PSU5_EXT空脚占位，目标CAD引脚总数503→502，NC23→22；器件数及85条网络不变。"
+  "native_application_note": "前阶段PSU5_EXT符号纠正为5脚后为170器件/502针/22NC；本轮板外仅接口改版及图面整理完成，最终164器件/487针/21NC，官方DRC为空。",
+  "interface_only_revision": {
+    "user_instruction": "板外器件只用留好接口",
+    "removed_native_refs": [
+      "F_BUS",
+      "F_SC",
+      "R_DUMP_EXT",
+      "TH_SC",
+      "TH_MAIN",
+      "TH_DUMP",
+      "PSU5_EXT"
+    ],
+    "added_interface": {
+      "ref": "J_SC_FUSE",
+      "pins": {
+        "1": "SC_PLUS",
+        "2": "SC_ISO_STORAGE"
+      }
+    },
+    "expected_components": 164,
+    "expected_pins": 487,
+    "expected_nc": 21,
+    "procurement_policy": "板外实物仍保留采购需求，不计入原生实例；板载U_AUX1和SC1–8保留。"
+  }
 }

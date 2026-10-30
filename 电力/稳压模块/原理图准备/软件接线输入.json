@@ -1,5 +1,76 @@
 {
   "contract": {
+    "schema_version": 1,
+    "title": "稳压模块最终逐针连接合同",
+    "date": "2026-10-30",
+    "status": "APPLIED_NATIVE_PIN_ACCEPTANCE_PASS_DRC_CLEAR",
+    "basis": "板外仅留接口的原生原理图完成保存重开；官方逐针/NC核对通过，官方DRC原始数组为空。",
+    "sources": [
+      {
+        "description": "selected adopted parts BOM",
+        "path": "电力/稳压模块/原理图准备/选型BOM.csv",
+        "sha256": "6c18c84b2e36480d490fefe65fc3d35fc8442cce1a9c3607ffa00e86fdbf145f"
+      },
+      {
+        "description": "approved selected instance/count ledger",
+        "path": "电力/稳压模块/检查/最终选型清单.json",
+        "sha256": "da47e695893056feab86f6a64ad5c5633a1d3644dc6df5b651e1c8a495d64cf1"
+      },
+      {
+        "description": "original official netlist before this reconnection",
+        "path": "电力/稳压模块/检查/接线前网表基线.enet",
+        "sha256": "56cd64e0afeb66f8c91d9c97c4cf68c73573aff9a955feb5e8f553950e9d4f70"
+      },
+      {
+        "description": "WeAct Normal QFN48 V1.0 manufacturer schematic",
+        "path": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+        "sha256": "57eca2e3467abd45bd6d4bc993eb11e9c83389a7c390da2543c3f20cfc2c640d"
+      },
+      {
+        "description": "TI TMUX1511 official datasheet",
+        "path": "电力/稳压模块/参考资料/TMUX1511_Official.pdf",
+        "sha256": "04291b41a68347fedbbb0776aa44f500eaca65f2ca3af0e022ee60d41c7b1e9f"
+      },
+      {
+        "description": "approved driver and dump physical pin evidence",
+        "path": "电力/稳压模块/检查/驱动关断隔离与硬件dump最终选型核算.json",
+        "sha256": "bbcc4b619752a5fe48dcca7d99efca57aa5d1f73513bc02290e087ac550948ac"
+      },
+      {
+        "description": "Hi-Link official UR(A)B_YMD-10WR3 V1.7, module pin function and six-pin package view (p.5)",
+        "path": "电力/稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+        "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d"
+      }
+    ],
+    "pin_semantics": {
+      "NET": "物理脚连接到net字段所列网名。",
+      "NC": "该物理脚单独悬空；net为null；不与其他NC脚短接。",
+      "core_header_view": "WeAct官方V1.0原理图中的P1/P2编号，pin 1在左列顶部；奇数脚自上而下沿左列，偶数脚自上而下沿右列。",
+      "package_contact_note": "多脚并联焊盘按每个实际引脚号码分别列出；封装端子名含TAB表示该引脚与外露散热片为同一电气节点。",
+      "power_module_pin_source": "Hi-Link manufacturer drawing identifies single-output pins 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL; pin 6 is left floating per the selected auto-enable interface. PSU5_EXT官方5脚符号不包含空脚位置4；U_AUX1现有6脚载体的4脚仍明确NC。"
+    },
+    "scope": {
+      "selected_BOM_rows": 172,
+      "components_array_count": 164,
+      "excluded_non_PCB_assembly_ref": "COREBOARD_WEACT",
+      "excluded_reason": "WeAct核心板为插接式外部模块，主板上实体的J_CORE_P1/J_CORE_P2已逐针列出，核心板不作为重复的PCB元件。",
+      "included_scopes": {
+        "ON_BOARD": 158,
+        "ON_BOARD_MODULE_ASSEMBLY": 1,
+        "BOARD_INTERFACE_PACKAGE_PENDING": 5
+      },
+      "note": "原生合同仅包含板上器件及抽象接口；图外实物采购需求保留在选型BOM。抽象功率接口不等于机械型号或额定能力已确定。",
+      "excluded_external_procurement_refs": [
+        "COREBOARD_WEACT",
+        "F_BUS",
+        "F_SC",
+        "PSU5_EXT",
+        "R_DUMP_EXT",
+        "TH_DUMP",
+        "TH_MAIN",
+        "TH_SC"
+      ]
+    },
     "components": [
       {
         "ref": "C_12V_IN",
@@ -3803,192 +3874,6 @@
         "footprint": "CONN-TH_2P-P7.62_C9900005791"
       },
       {
-        "ref": "F_BUS",
-        "manufacturer_part": "AMG-80",
-        "supplier_part": "",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "REWIRE",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "BUS_SOURCE",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "BUS_EXT",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "Eaton",
-        "footprint": "F1206"
-      },
-      {
-        "ref": "F_SC",
-        "manufacturer_part": "AMG-80",
-        "supplier_part": "",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "REWIRE",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "SC_PLUS",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "SC_ISO_STORAGE",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "Eaton",
-        "footprint": "F1206"
-      },
-      {
-        "ref": "R_DUMP_EXT",
-        "manufacturer_part": "",
-        "supplier_part": "",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "REWIRE",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "BUS_EXT",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "DUMP_SW",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "",
-        "footprint": ""
-      },
-      {
-        "ref": "TH_DUMP",
-        "manufacturer_part": "ATH10K1R8B3950K",
-        "supplier_part": "",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "RETAIN",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "NTC_DUMP",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "GND_SYS",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "ATI(恒光)",
-        "footprint": "RES-TH_BD1.8-L3.9-P6.50-D0.5"
-      },
-      {
-        "ref": "TH_MAIN",
-        "manufacturer_part": "MF52A103F3950 (A1)",
-        "supplier_part": "C13879",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "RETAIN",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "NTC_MAIN",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "GND_SYS",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "时恒",
-        "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
-      },
-      {
-        "ref": "TH_SC",
-        "manufacturer_part": "MF52A103F3950 (A1)",
-        "supplier_part": "C13879",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "RETAIN",
-        "pins": [
-          {
-            "number": "1",
-            "name": "1",
-            "net": "NTC_SC",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "2",
-            "net": "GND_SYS",
-            "connection": "NET"
-          }
-        ],
-        "manufacturer": "时恒",
-        "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3"
-      },
-      {
-        "ref": "PSU5_EXT",
-        "manufacturer_part": "URB4805YMD-10WR3",
-        "supplier_part": "C5365326",
-        "scope": "OFF_BOARD_EXTERNAL",
-        "action": "REWIRE",
-        "pins": [
-          {
-            "number": "1",
-            "name": "-Vin",
-            "net": "GND_SYS",
-            "connection": "NET"
-          },
-          {
-            "number": "2",
-            "name": "+Vin",
-            "net": "BUS_EXT",
-            "connection": "NET"
-          },
-          {
-            "number": "3",
-            "name": "+Vo",
-            "net": "5V_EXT",
-            "connection": "NET"
-          },
-          {
-            "number": "5",
-            "name": "GND",
-            "net": "GND_SYS",
-            "connection": "NET"
-          },
-          {
-            "number": "6",
-            "name": "CTRL",
-            "net": null,
-            "connection": "NC"
-          }
-        ],
-        "manufacturer": "HI-LINK(海凌科)",
-        "footprint": "",
-        "omitted_reserved_positions": [
-          {
-            "number": "4",
-            "manufacturer_function": "NP / 空脚",
-            "reason": "官方HI-LINK C5365326库符号仅列1/2/3/5/6功能脚；4位无电气功能，不强造引脚或公共NC网。"
-          }
-        ]
-      },
-      {
         "ref": "U_CELL_MUX1",
         "manufacturer_part": "TMUX1511PWR",
         "supplier_part": "C2866750",
@@ -4889,10 +4774,1542 @@
         ],
         "manufacturer": "YAGEO(国巨)",
         "footprint": "R0603"
+      },
+      {
+        "ref": "J_SC_FUSE",
+        "manufacturer_part": "",
+        "supplier_part": "",
+        "scope": "BOARD_INTERFACE_PACKAGE_PENDING",
+        "action": "ADD_INTERFACE",
+        "pins": [
+          {
+            "number": "1",
+            "name": "1",
+            "net": "SC_PLUS",
+            "connection": "NET"
+          },
+          {
+            "number": "2",
+            "name": "2",
+            "net": "SC_ISO_STORAGE",
+            "connection": "NET"
+          }
+        ],
+        "manufacturer": "",
+        "footprint": "CONN-TH_2P-P7.62_C9900005791",
+        "note": "板外F_SC的两个高电流端：1接超容原始正端SC_PLUS，2为保险后返回SC_ISO_STORAGE；符号载体封装不代表实际选型。"
       }
-    ]
+    ],
+    "mcu_gpio_net_mapping": [
+      {
+        "gpio": "PB12",
+        "signal_name": "PB12",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "5",
+        "net": "DRV_FAULT_N",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB13",
+        "signal_name": "PB13",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "6",
+        "net": "PWM_L",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB14",
+        "signal_name": "PB14",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "7",
+        "net": "SC_ADC_A",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB15",
+        "signal_name": "PB15",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "8",
+        "net": "SC_ADC_B",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PC6",
+        "signal_name": "PC6",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "9",
+        "net": "MUX_SEL1",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA8",
+        "signal_name": "PA8",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "10",
+        "net": "PWM_H",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA9",
+        "signal_name": "PA9",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "11",
+        "net": "PA9_TIM1_CH2",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA10",
+        "signal_name": "PA10",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "12",
+        "net": "DRV_FAULT_N",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA11",
+        "signal_name": "PA11",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "13",
+        "net": "CAN_RX",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA12",
+        "signal_name": "PA12",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "14",
+        "net": "CAN_TX",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA15",
+        "signal_name": "PA15",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "15",
+        "net": "MUX_SEL2",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PC10",
+        "signal_name": "PC10",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "16",
+        "net": "MUX_SEL3",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PC11",
+        "signal_name": "PC11",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "17",
+        "net": "MUX_SEL4",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB3",
+        "signal_name": "PB3",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "18",
+        "net": "MUX_SEL5",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB4",
+        "signal_name": "PB4",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "19",
+        "net": "MUX_SEL6",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB5",
+        "signal_name": "PB5",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "20",
+        "net": "MUX_SEL7",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB6",
+        "signal_name": "PB6",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "21",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PB7",
+        "signal_name": "PB7",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "22",
+        "net": "DUMP_PWM",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB8",
+        "signal_name": "PB8_BOOT0",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "23",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PB9",
+        "signal_name": "PB9",
+        "header_ref": "J_CORE_P1",
+        "header_pin": "24",
+        "net": "MUX_SEL8",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB10",
+        "signal_name": "PB10",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "5",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PB11",
+        "signal_name": "PB11",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "6",
+        "net": "NTC_MAIN",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB2",
+        "signal_name": "PB2",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "7",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PB0",
+        "signal_name": "PB0",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "9",
+        "net": "BUS_ADC",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PB1",
+        "signal_name": "PB1",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "10",
+        "net": "IMON",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA7",
+        "signal_name": "PA7",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "11",
+        "net": "IMON",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PC4",
+        "signal_name": "PC4",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "12",
+        "net": "NTC_SC",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA5",
+        "signal_name": "PA5",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "13",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PA6",
+        "signal_name": "PA6",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "14",
+        "net": "DRV_FAULT_N",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA3",
+        "signal_name": "PA3",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "15",
+        "net": "NTC_DUMP",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA4",
+        "signal_name": "PA4",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "16",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PA1",
+        "signal_name": "PA1",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "17",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PA2",
+        "signal_name": "PA2",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "18",
+        "net": "DRV_FAULT_N",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PA0",
+        "signal_name": "PA0",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "20",
+        "net": "IMON",
+        "connection": "NET"
+      },
+      {
+        "gpio": "PC14",
+        "signal_name": "PC14",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "21",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PC15",
+        "signal_name": "PC15",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "22",
+        "net": null,
+        "connection": "NC"
+      },
+      {
+        "gpio": "PC13",
+        "signal_name": "PC13",
+        "header_ref": "J_CORE_P2",
+        "header_pin": "24",
+        "net": null,
+        "connection": "NC"
+      }
+    ],
+    "coreboard_header_pinout_source": {
+      "board": "WeAct Normal STM32G431CBU6 QFN48 V1.0",
+      "source": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+      "headers": {
+        "J_CORE_P1": {
+          "1": {
+            "signal_name": "VCC",
+            "net": "5V_EXT",
+            "connection": "NET"
+          },
+          "2": {
+            "signal_name": "VCC",
+            "net": "5V_EXT",
+            "connection": "NET"
+          },
+          "3": {
+            "signal_name": "GND",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          "4": {
+            "signal_name": "GND",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          "5": {
+            "signal_name": "PB12",
+            "net": "DRV_FAULT_N",
+            "connection": "NET"
+          },
+          "6": {
+            "signal_name": "PB13",
+            "net": "PWM_L",
+            "connection": "NET"
+          },
+          "7": {
+            "signal_name": "PB14",
+            "net": "SC_ADC_A",
+            "connection": "NET"
+          },
+          "8": {
+            "signal_name": "PB15",
+            "net": "SC_ADC_B",
+            "connection": "NET"
+          },
+          "9": {
+            "signal_name": "PC6",
+            "net": "MUX_SEL1",
+            "connection": "NET"
+          },
+          "10": {
+            "signal_name": "PA8",
+            "net": "PWM_H",
+            "connection": "NET"
+          },
+          "11": {
+            "signal_name": "PA9",
+            "net": "PA9_TIM1_CH2",
+            "connection": "NET"
+          },
+          "12": {
+            "signal_name": "PA10",
+            "net": "DRV_FAULT_N",
+            "connection": "NET"
+          },
+          "13": {
+            "signal_name": "PA11",
+            "net": "CAN_RX",
+            "connection": "NET"
+          },
+          "14": {
+            "signal_name": "PA12",
+            "net": "CAN_TX",
+            "connection": "NET"
+          },
+          "15": {
+            "signal_name": "PA15",
+            "net": "MUX_SEL2",
+            "connection": "NET"
+          },
+          "16": {
+            "signal_name": "PC10",
+            "net": "MUX_SEL3",
+            "connection": "NET"
+          },
+          "17": {
+            "signal_name": "PC11",
+            "net": "MUX_SEL4",
+            "connection": "NET"
+          },
+          "18": {
+            "signal_name": "PB3",
+            "net": "MUX_SEL5",
+            "connection": "NET"
+          },
+          "19": {
+            "signal_name": "PB4",
+            "net": "MUX_SEL6",
+            "connection": "NET"
+          },
+          "20": {
+            "signal_name": "PB5",
+            "net": "MUX_SEL7",
+            "connection": "NET"
+          },
+          "21": {
+            "signal_name": "PB6",
+            "net": null,
+            "connection": "NC"
+          },
+          "22": {
+            "signal_name": "PB7",
+            "net": "DUMP_PWM",
+            "connection": "NET"
+          },
+          "23": {
+            "signal_name": "PB8_BOOT0",
+            "net": null,
+            "connection": "NC"
+          },
+          "24": {
+            "signal_name": "PB9",
+            "net": "MUX_SEL8",
+            "connection": "NET"
+          }
+        },
+        "J_CORE_P2": {
+          "1": {
+            "signal_name": "3.3V",
+            "net": "3V3_CORE",
+            "connection": "NET"
+          },
+          "2": {
+            "signal_name": "3.3V",
+            "net": "3V3_CORE",
+            "connection": "NET"
+          },
+          "3": {
+            "signal_name": "GND",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          "4": {
+            "signal_name": "GND",
+            "net": "GND_SYS",
+            "connection": "NET"
+          },
+          "5": {
+            "signal_name": "PB10",
+            "net": null,
+            "connection": "NC"
+          },
+          "6": {
+            "signal_name": "PB11",
+            "net": "NTC_MAIN",
+            "connection": "NET"
+          },
+          "7": {
+            "signal_name": "PB2",
+            "net": null,
+            "connection": "NC"
+          },
+          "8": {
+            "signal_name": "VREF+",
+            "net": null,
+            "connection": "NC"
+          },
+          "9": {
+            "signal_name": "PB0",
+            "net": "BUS_ADC",
+            "connection": "NET"
+          },
+          "10": {
+            "signal_name": "PB1",
+            "net": "IMON",
+            "connection": "NET"
+          },
+          "11": {
+            "signal_name": "PA7",
+            "net": "IMON",
+            "connection": "NET"
+          },
+          "12": {
+            "signal_name": "PC4",
+            "net": "NTC_SC",
+            "connection": "NET"
+          },
+          "13": {
+            "signal_name": "PA5",
+            "net": null,
+            "connection": "NC"
+          },
+          "14": {
+            "signal_name": "PA6",
+            "net": "DRV_FAULT_N",
+            "connection": "NET"
+          },
+          "15": {
+            "signal_name": "PA3",
+            "net": "NTC_DUMP",
+            "connection": "NET"
+          },
+          "16": {
+            "signal_name": "PA4",
+            "net": null,
+            "connection": "NC"
+          },
+          "17": {
+            "signal_name": "PA1",
+            "net": null,
+            "connection": "NC"
+          },
+          "18": {
+            "signal_name": "PA2",
+            "net": "DRV_FAULT_N",
+            "connection": "NET"
+          },
+          "19": {
+            "signal_name": "NRST",
+            "net": null,
+            "connection": "NC"
+          },
+          "20": {
+            "signal_name": "PA0",
+            "net": "IMON",
+            "connection": "NET"
+          },
+          "21": {
+            "signal_name": "PC14",
+            "net": null,
+            "connection": "NC"
+          },
+          "22": {
+            "signal_name": "PC15",
+            "net": null,
+            "connection": "NC"
+          },
+          "23": {
+            "signal_name": "VB",
+            "net": null,
+            "connection": "NC"
+          },
+          "24": {
+            "signal_name": "PC13",
+            "net": null,
+            "connection": "NC"
+          }
+        }
+      },
+      "swd_note": "PA13/SWDIO与PA14/SWCLK通过核心板独立P3调试接口使用；未纳入J_CORE_P1/P2且未并入本主板网络。"
+    },
+    "native_delta": {
+      "source_native_component_count": 167,
+      "retired_refs": [
+        "U_BAL1",
+        "U_BAL2",
+        "U_BAL3",
+        "U_BAL4",
+        "U_BAL5",
+        "U_BAL6",
+        "U_BAL7",
+        "U_BAL8",
+        "Q_BUS_P",
+        "D_QP_GS_ZENER",
+        "R_12V_PRELOAD",
+        "C_BAL6",
+        "C_BAL7",
+        "C_BAL8",
+        "C_T4_FILTER",
+        "C_T5_FILTER",
+        "C_T6_FILTER",
+        "C_T7_FILTER",
+        "C_T8_FILTER",
+        "C_TEST_FB"
+      ],
+      "added_board_refs": [
+        "U_CELL_MUX1",
+        "U_CELL_MUX2",
+        "U_SIGNAL_ISO",
+        "U_GATE_OD",
+        "U_ISO_DRV",
+        "Q_SC_ISO1",
+        "Q_SC_ISO2",
+        "D_SC_LO",
+        "D_SC_HI",
+        "D_DUMP_FW",
+        "Q_DUMP_SW",
+        "C_ISO_BST",
+        "R_ADC_A_PD",
+        "R_ADC_B_PD",
+        "R_ARM_PD",
+        "R_ISO_GS",
+        "R_ISO_TGUP",
+        "R_DUMP_HW_PU",
+        "R_DUMP_SW_BASE",
+        "R_BUS_OV_TOP1",
+        "R_BUS_OV_TOP2",
+        "R_BUS_OV_BOT"
+      ],
+      "new_external_reference": "PSU5_EXT",
+      "external_coreboard_not_counted_as_PCB_ref": "COREBOARD_WEACT",
+      "expected_final_netlist_count": 164,
+      "modified_existing_refs": [
+        {
+          "ref": "Q_MAIN_H",
+          "pins": [
+            {
+              "number": "2",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "F_SC",
+          "pins": [
+            {
+              "number": "2",
+              "from": "SC_FUSED",
+              "to": "SC_ISO_STORAGE"
+            }
+          ]
+        },
+        {
+          "ref": "J_SC_POWER",
+          "pins": [
+            {
+              "number": "1",
+              "from": "SC_FUSED",
+              "to": "SC_ISO_STORAGE"
+            }
+          ]
+        },
+        {
+          "ref": "Q_PMOS_CTRL",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PMOS_CTRL_BASE",
+              "to": "DUMP_HW_BASE"
+            },
+            {
+              "number": "3",
+              "from": "PMOS_CTRL_COLLECTOR",
+              "to": "DUMP_OFF"
+            }
+          ]
+        },
+        {
+          "ref": "R_QP_COL",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PMOS_CTRL_COLLECTOR",
+              "to": "12V_DRV"
+            },
+            {
+              "number": "2",
+              "from": "PMOS_GATE",
+              "to": "DUMP_OFF"
+            }
+          ]
+        },
+        {
+          "ref": "R_PB6_BASE",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PMOS_CTRL",
+              "to": "BUS_OV_OUT"
+            },
+            {
+              "number": "2",
+              "from": "PMOS_CTRL_BASE",
+              "to": "DUMP_HW_BASE"
+            }
+          ]
+        },
+        {
+          "ref": "R_QP_BE",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PMOS_CTRL_BASE",
+              "to": "DUMP_HW_BASE"
+            }
+          ]
+        },
+        {
+          "ref": "R_QP_GS",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PMOS_GATE",
+              "to": "MUX_SEL8"
+            },
+            {
+              "number": "2",
+              "from": "BUS_BR",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BUS_HF",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "C_SC_BULK",
+          "pins": [
+            {
+              "number": "1",
+              "from": "SC_FUSED",
+              "to": "SC_ISO_STORAGE"
+            }
+          ]
+        },
+        {
+          "ref": "C_SC_BULK2",
+          "pins": [
+            {
+              "number": "1",
+              "from": "SC_FUSED",
+              "to": "SC_ISO_STORAGE"
+            }
+          ]
+        },
+        {
+          "ref": "C_SC_HF",
+          "pins": [
+            {
+              "number": "2",
+              "from": "SC_MINUS",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BUS_FILM1",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "C_BUS_FILM2",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "C_BUS_FILM3",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_BR",
+              "to": "SC_FUSED"
+            }
+          ]
+        },
+        {
+          "ref": "U1",
+          "pins": [
+            {
+              "number": "20",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "R_PB5_PERMIT",
+          "pins": [
+            {
+              "number": "1",
+              "from": "PERMIT",
+              "to": "3V3_CORE"
+            }
+          ]
+        },
+        {
+          "ref": "R_DRV_SO_SER",
+          "pins": [
+            {
+              "number": "2",
+              "from": "IMON",
+              "to": "IMON_SOURCE"
+            }
+          ]
+        },
+        {
+          "ref": "C_DRV_SO",
+          "pins": [
+            {
+              "number": "1",
+              "from": "IMON",
+              "to": "IMON_SOURCE"
+            }
+          ]
+        },
+        {
+          "ref": "C_DRV_VDRAIN",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_BR",
+              "to": "BUS_EXT"
+            }
+          ]
+        },
+        {
+          "ref": "U_SC_OV",
+          "pins": [
+            {
+              "number": "1",
+              "from": null,
+              "to": "BUS_OV_OUT"
+            },
+            {
+              "number": "3",
+              "from": "SC_MINUS",
+              "to": "BUS_OV_DIV"
+            }
+          ]
+        },
+        {
+          "ref": "U_DUMP_DRV",
+          "pins": [
+            {
+              "number": "5",
+              "from": "GND_SYS",
+              "to": "DUMP_OFF"
+            },
+            {
+              "number": "6",
+              "from": "DUMP_IN",
+              "to": "12V_DRV"
+            }
+          ]
+        },
+        {
+          "ref": "R_DUMP_IN_SER",
+          "pins": [
+            {
+              "number": "2",
+              "from": "DUMP_IN",
+              "to": "DUMP_PWM_LIMIT"
+            }
+          ]
+        },
+        {
+          "ref": "R_DUMP_IN_PD",
+          "pins": [
+            {
+              "number": "1",
+              "from": "DUMP_IN",
+              "to": "DUMP_SW_BASE"
+            }
+          ]
+        },
+        {
+          "ref": "J_CORE_P1",
+          "pins": [
+            {
+              "number": "5",
+              "from": "NTC_DUMP",
+              "to": "DRV_FAULT_N"
+            },
+            {
+              "number": "7",
+              "from": "AD_T8",
+              "to": "SC_ADC_A"
+            },
+            {
+              "number": "8",
+              "from": "TEST_FB",
+              "to": "SC_ADC_B"
+            },
+            {
+              "number": "9",
+              "from": null,
+              "to": "MUX_SEL1"
+            },
+            {
+              "number": "11",
+              "from": null,
+              "to": "PA9_TIM1_CH2"
+            },
+            {
+              "number": "12",
+              "from": null,
+              "to": "DRV_FAULT_N"
+            },
+            {
+              "number": "15",
+              "from": null,
+              "to": "MUX_SEL2"
+            },
+            {
+              "number": "16",
+              "from": null,
+              "to": "MUX_SEL3"
+            },
+            {
+              "number": "17",
+              "from": null,
+              "to": "MUX_SEL4"
+            },
+            {
+              "number": "18",
+              "from": null,
+              "to": "MUX_SEL5"
+            },
+            {
+              "number": "19",
+              "from": null,
+              "to": "MUX_SEL6"
+            },
+            {
+              "number": "20",
+              "from": "PERMIT",
+              "to": "MUX_SEL7"
+            },
+            {
+              "number": "21",
+              "from": "PMOS_CTRL",
+              "to": null
+            },
+            {
+              "number": "24",
+              "from": null,
+              "to": "MUX_SEL8"
+            }
+          ]
+        },
+        {
+          "ref": "J_CORE_P2",
+          "pins": [
+            {
+              "number": "5",
+              "from": "TEST",
+              "to": null
+            },
+            {
+              "number": "13",
+              "from": "AD_T6",
+              "to": null
+            },
+            {
+              "number": "14",
+              "from": "AD_T7",
+              "to": "DRV_FAULT_N"
+            },
+            {
+              "number": "15",
+              "from": "AD_T4",
+              "to": "NTC_DUMP"
+            },
+            {
+              "number": "16",
+              "from": "AD_T5",
+              "to": null
+            },
+            {
+              "number": "17",
+              "from": "AD_T2",
+              "to": null
+            },
+            {
+              "number": "18",
+              "from": "AD_T3",
+              "to": "DRV_FAULT_N"
+            },
+            {
+              "number": "20",
+              "from": "AD_T1",
+              "to": "IMON"
+            }
+          ]
+        },
+        {
+          "ref": "R_BUS_HI",
+          "pins": [
+            {
+              "number": "2",
+              "from": "BUS_ADC",
+              "to": "BUS_ADC_SOURCE"
+            }
+          ]
+        },
+        {
+          "ref": "R_BUS_LO",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_ADC",
+              "to": "BUS_ADC_SOURCE"
+            }
+          ]
+        },
+        {
+          "ref": "C_BUS_ADC",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BUS_ADC",
+              "to": "BUS_ADC_SOURCE"
+            }
+          ]
+        },
+        {
+          "ref": "R_TEST_HI",
+          "pins": [
+            {
+              "number": "1",
+              "from": "TEST",
+              "to": "BUS_ADC"
+            },
+            {
+              "number": "2",
+              "from": "TEST_FB",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_TEST_LO",
+          "pins": [
+            {
+              "number": "1",
+              "from": "TEST_FB",
+              "to": "IMON"
+            }
+          ]
+        },
+        {
+          "ref": "C_BAL1",
+          "pins": [
+            {
+              "number": "1",
+              "from": "T1",
+              "to": "3V3_CORE"
+            },
+            {
+              "number": "2",
+              "from": "SC_MINUS",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL1",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL1_IOUT",
+              "to": "T1"
+            }
+          ]
+        },
+        {
+          "ref": "C_T1_FILTER",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T1",
+              "to": "SC_ADC_A"
+            }
+          ]
+        },
+        {
+          "ref": "R_T1_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T1",
+              "to": "MUX_SEL1"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BAL2",
+          "pins": [
+            {
+              "number": "1",
+              "from": "T2",
+              "to": "3V3_CORE"
+            },
+            {
+              "number": "2",
+              "from": "T1",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL2",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL2_IOUT",
+              "to": "T2"
+            }
+          ]
+        },
+        {
+          "ref": "C_T2_FILTER",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T2",
+              "to": "SC_ADC_B"
+            }
+          ]
+        },
+        {
+          "ref": "R_T2_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T2",
+              "to": "MUX_SEL2"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BAL3",
+          "pins": [
+            {
+              "number": "1",
+              "from": "T3",
+              "to": "3V3_CORE"
+            },
+            {
+              "number": "2",
+              "from": "T2",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL3",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL3_IOUT",
+              "to": "T3"
+            }
+          ]
+        },
+        {
+          "ref": "C_T3_FILTER",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T3",
+              "to": "BUS_OV_DIV"
+            },
+            {
+              "number": "2",
+              "from": "GND_SYS",
+              "to": "SC_MINUS"
+            }
+          ]
+        },
+        {
+          "ref": "R_T3_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T3",
+              "to": "MUX_SEL3"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BAL4",
+          "pins": [
+            {
+              "number": "1",
+              "from": "T4",
+              "to": "3V3_CORE"
+            },
+            {
+              "number": "2",
+              "from": "T3",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL4",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL4_IOUT",
+              "to": "T4"
+            }
+          ]
+        },
+        {
+          "ref": "R_T4_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T4",
+              "to": "MUX_SEL4"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "C_BAL5",
+          "pins": [
+            {
+              "number": "1",
+              "from": "T5",
+              "to": "12V_DRV"
+            },
+            {
+              "number": "2",
+              "from": "T4",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL5",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL5_IOUT",
+              "to": "T5"
+            }
+          ]
+        },
+        {
+          "ref": "R_T5_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T5",
+              "to": "MUX_SEL5"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL6",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL6_IOUT",
+              "to": "T6"
+            }
+          ]
+        },
+        {
+          "ref": "R_T6_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T6",
+              "to": "MUX_SEL6"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL7",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL7_IOUT",
+              "to": "T7"
+            }
+          ]
+        },
+        {
+          "ref": "R_T7_TEST",
+          "pins": [
+            {
+              "number": "1",
+              "from": "AD_T7",
+              "to": "MUX_SEL7"
+            },
+            {
+              "number": "2",
+              "from": "TEST",
+              "to": "GND_SYS"
+            }
+          ]
+        },
+        {
+          "ref": "R_BAL8",
+          "pins": [
+            {
+              "number": "1",
+              "from": "BAL8_IOUT",
+              "to": "SC_PLUS"
+            }
+          ]
+        }
+      ],
+      "reconciliation": "历史接线选型阶段：167当前官方ENET元件 - 21实际移除refs + 24实际新增refs = 170最终选型网表实例。显式退役清单20件；另有SYS_BAT_BUS不在该清单但未进入选型BOM；选型BOM含22个ADD，另外新增外部项为PSU5_EXT, R_DUMP_EXT。COREBOARD_WEACT仅为外部组装模块，不计主板PCB元件。；本轮另移除7个板外实物实例、增加1个保险抽象接口，当前最终原生实例为164。",
+      "removed_refs": [
+        "C_BAL6",
+        "C_BAL7",
+        "C_BAL8",
+        "C_T4_FILTER",
+        "C_T5_FILTER",
+        "C_T6_FILTER",
+        "C_T7_FILTER",
+        "C_T8_FILTER",
+        "C_TEST_FB",
+        "D_QP_GS_ZENER",
+        "Q_BUS_P",
+        "R_12V_PRELOAD",
+        "SYS_BAT_BUS",
+        "U_BAL1",
+        "U_BAL2",
+        "U_BAL3",
+        "U_BAL4",
+        "U_BAL5",
+        "U_BAL6",
+        "U_BAL7",
+        "U_BAL8"
+      ],
+      "removed_refs_not_in_retirement_ledger": [
+        "SYS_BAT_BUS"
+      ],
+      "added_refs": [
+        "C_ISO_BST",
+        "D_DUMP_FW",
+        "D_SC_HI",
+        "D_SC_LO",
+        "PSU5_EXT",
+        "Q_DUMP_SW",
+        "Q_SC_ISO1",
+        "Q_SC_ISO2",
+        "R_ADC_A_PD",
+        "R_ADC_B_PD",
+        "R_ARM_PD",
+        "R_BUS_OV_BOT",
+        "R_BUS_OV_TOP1",
+        "R_BUS_OV_TOP2",
+        "R_DUMP_EXT",
+        "R_DUMP_HW_PU",
+        "R_DUMP_SW_BASE",
+        "R_ISO_GS",
+        "R_ISO_TGUP",
+        "U_CELL_MUX1",
+        "U_CELL_MUX2",
+        "U_GATE_OD",
+        "U_ISO_DRV",
+        "U_SIGNAL_ISO"
+      ],
+      "added_refs_not_listed_as_ADD_action": [
+        "PSU5_EXT",
+        "R_DUMP_EXT"
+      ],
+      "historical_after_selected_wiring_count": 170,
+      "interface_only_removed_refs": [
+        "F_BUS",
+        "F_SC",
+        "R_DUMP_EXT",
+        "TH_SC",
+        "TH_MAIN",
+        "TH_DUMP",
+        "PSU5_EXT"
+      ],
+      "added_interface_refs": [
+        "J_SC_FUSE"
+      ]
+    },
+    "manufacturer_source_discrepancies": [
+      {
+        "ref": "PSU5_EXT",
+        "issue": "The adopted selection BOM reverses the URB4805YMD-10WR3 input pins.",
+        "selection_BOM_pin_nets": {
+          "1": "BUS_EXT",
+          "2": "GND_SYS"
+        },
+        "manufacturer_pin_functions": {
+          "1": "-Vin",
+          "2": "+Vin"
+        },
+        "contract_pin_nets": {
+          "1": "GND_SYS",
+          "2": "BUS_EXT"
+        },
+        "evidence": "Hi-Link UR(A)B_YMD-10WR3 V1.7, p.5; pin function table, single-output (S) product.",
+        "handling": "This contract follows the manufacturer pin definition. Correct the BOM connection before native drawing; do not follow its reversed input assignment."
+      }
+    ],
+    "manufacturer_pin_sources": [
+      {
+        "ref": "J_CORE_P1/J_CORE_P2",
+        "device": "WeAct Normal STM32G431CBU6 QFN48 V1.0",
+        "document": "WeAct-QFN48-标准版-原理图.pdf",
+        "path": "电力/参考资料/STM32G431CBU6核心板/WeAct-QFN48-标准版-原理图.pdf",
+        "sha256": "57eca2e3467abd45bd6d4bc993eb11e9c83389a7c390da2543c3f20cfc2c640d",
+        "evidence": "首页P1/P2连接器物理脚号与MCU信号标签。"
+      },
+      {
+        "ref": "U_CELL_MUX1/U_CELL_MUX2/U_SIGNAL_ISO",
+        "device": "TMUX1511PWR, PW TSSOP-14",
+        "document": "TI TMUX1511 datasheet Rev B",
+        "path": "电力/稳压模块/参考资料/TMUX1511_Official.pdf",
+        "sha256": "04291b41a68347fedbbb0776aa44f500eaca65f2ca3af0e022ee60d41c7b1e9f",
+        "url": "https://www.ti.com/lit/ds/symlink/tmux1511.pdf",
+        "evidence": "Figure 4-1 top-view TSSOP-14 pin configuration and Table Pin Functions."
+      },
+      {
+        "ref": "U_GATE_OD",
+        "device": "SN74LVC1G07DCKR, DCK SC70-5",
+        "document": "TI SN74LVC1G07 datasheet",
+        "url": "https://www.ti.com/lit/ds/symlink/sn74lvc1g07.pdf",
+        "evidence": "DCK top-view pinout; pin 1 NC, pin 2 A, pin 3 GND, pin 4 Y, pin 5 VCC."
+      },
+      {
+        "ref": "U_ISO_DRV",
+        "device": "LTC7001IMSE#PBF, MSE MSOP-10 with exposed pad",
+        "document": "ADI LTC7001 datasheet Rev G",
+        "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/LTC7001.pdf",
+        "evidence": "MSE top-view pinout, pins 1-10 plus exposed pad (pin 11)."
+      },
+      {
+        "ref": "U_AUX1/PSU5_EXT",
+        "device": "Hi-Link URB4812YMD-10WR3 / URB4805YMD-10WR3, A3",
+        "document": "Hi-Link UR(A)B_YMD-10WR3 V1.7",
+        "path": "电力/稳压模块/参考资料/海凌科_URAB_YMD-10WR3_V1.7.pdf",
+        "sha256": "1c55e95b4c6457f75984519c61ba2c544b15f9e65016e8ebf4cc286b545ff49d",
+        "evidence": "p.5 six-pin footprint/pin-function table, single-output S: 1=-Vin, 2=+Vin, 3=+Vo, 4=NP, 5=GND, 6=CTRL."
+      },
+      {
+        "ref": "D_SC_LO/D_SC_HI/D_DUMP_FW",
+        "device": "STPS30100ST",
+        "document": "ST STPS30100ST official datasheet",
+        "path": "电力/稳压模块/参考资料/STPS30100ST_Official.pdf",
+        "sha256": "d2ae9295b8932c9e99159f3389903a9a0f22449cb537fac13fcf75b655febd55",
+        "evidence": "TO-220AB physical pinout: pins 1/3 anode; pin 2 cathode/tab."
+      }
+    ],
+    "prepared_material_source_sha256": "6c18c84b2e36480d490fefe65fc3d35fc8442cce1a9c3607ffa00e86fdbf145f",
+    "preparation_note": "采用BOM采购身份归一；已应用原生工程并经官方网表逐针核对。",
+    "native_application_note": "前阶段PSU5_EXT符号纠正为5脚后为170器件/502针/22NC；本轮板外仅接口改版及图面整理完成，最终164器件/487针/21NC，官方DRC为空。",
+    "interface_only_revision": {
+      "user_instruction": "板外器件只用留好接口",
+      "removed_native_refs": [
+        "F_BUS",
+        "F_SC",
+        "R_DUMP_EXT",
+        "TH_SC",
+        "TH_MAIN",
+        "TH_DUMP",
+        "PSU5_EXT"
+      ],
+      "added_interface": {
+        "ref": "J_SC_FUSE",
+        "pins": {
+          "1": "SC_PLUS",
+          "2": "SC_ISO_STORAGE"
+        }
+      },
+      "expected_components": 164,
+      "expected_pins": 487,
+      "expected_nc": 21,
+      "procurement_policy": "板外实物仍保留采购需求，不计入原生实例；板载U_AUX1和SC1–8保留。"
+    }
   },
   "target_page_uuid": "9546dca0bc8bce7f",
-  "selected_bom_sha256": "6f94d72fddf97299462d456651a5e6f18a6eb767df8cc384d599e71a7da62f71",
-  "target_enet_sha256": "876a783c815053e47a887664b1d0b5999588d2584741e5b38a1174aa82caa4df"
+  "selected_bom_sha256": "6c18c84b2e36480d490fefe65fc3d35fc8442cce1a9c3607ffa00e86fdbf145f",
+  "target_enet_sha256": "a8d92920e471fc598ea4e8e7d280fcb54773984ab71b3ea325efaceebb588963"
 }

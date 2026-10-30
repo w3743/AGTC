@@ -3,6 +3,9 @@ import csv, hashlib, json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+current_contract = ROOT / '原理图准备/最终逐针连接合同.json'
+if current_contract.exists() and json.loads(current_contract.read_text(encoding='utf-8-sig')).get('interface_only_revision'):
+    raise SystemExit('当前已采用板外仅接口合同；本脚本仅重建2026-10-29的171条历史选型，不能覆盖当前选型BOM。请维护原理图准备/选型BOM.csv。')
 BASE = ROOT / '原理图准备/BOM.csv'
 rows = list(csv.DictReader(BASE.open(encoding='utf-8-sig')))
 original = {r['Reference']: r.copy() for r in rows}
