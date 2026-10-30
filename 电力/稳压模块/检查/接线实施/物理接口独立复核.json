@@ -1,0 +1,746 @@
+{
+  "schema": "agtc.physical-interface-independent-review/v1",
+  "reviewedAt": "2026-10-30",
+  "status": "PASS_WITH_EXPLICIT_FOOTPRINT_LIMITATION",
+  "reviewerMethod": "从当前HEAD/官方ENET、官方读回、关闭稳定记录、逐针记录、合同、BOM及验收摘要进行独立只读解析与SHA核对；未运行EDA。",
+  "reference": {
+    "branch": "fix/regulator-physical-interfaces",
+    "head": "1078c0375fcd38928679bbbd884de67d0daa03c8",
+    "baseline": "HEAD / PR46基线"
+  },
+  "scope": {
+    "readOnly": true,
+    "edaRun": false,
+    "bomAndConnectionContractContent": "AUDITED_IN_METADATA_REVIEW",
+    "otherFilesModifiedByThisReview": false
+  },
+  "reviewInputs": [
+    {
+      "file": "电力/稳压模块/检查/当前官方网表.enet",
+      "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a"
+    },
+    {
+      "file": "电力/稳压模块/检查/接线实施/物理接口最终官方读回.json",
+      "sha256": "2fcbd03f695300c069d9f2ed6b6fe35a7d28c133c82970d07330ddb6bddacc0c"
+    },
+    {
+      "file": "电力/稳压模块/检查/接线实施/物理接口最终关闭稳定.json",
+      "sha256": "57239bb65c089d3892e2a0c8e62dd21c41058f36048982281d327b0af4a6c631"
+    },
+    {
+      "file": "电力/稳压模块/检查/接线实施/物理接口最终逐针对照.json",
+      "sha256": "24004f99343d4aba0797e768864c03e533c56159b6337a70beadd9f8a22e6da0"
+    }
+  ],
+  "netlistComparison": {
+    "baseline": {
+      "components": 164,
+      "pins": 487,
+      "explicitNC": 21,
+      "uniqueNets": 84
+    },
+    "final": {
+      "components": 166,
+      "pins": 515,
+      "explicitNC": 21,
+      "uniqueNets": 84,
+      "pages": [
+        {
+          "name": "01 主功率与超容",
+          "components": 56,
+          "pins": 156,
+          "explicitNC": 0
+        },
+        {
+          "name": "02 门极驱动与硬保护",
+          "components": 46,
+          "pins": 132,
+          "explicitNC": 2
+        },
+        {
+          "name": "03 模拟采样",
+          "components": 41,
+          "pins": 125,
+          "explicitNC": 2
+        },
+        {
+          "name": "04 控制通信与辅助供电",
+          "components": 23,
+          "pins": 102,
+          "explicitNC": 17
+        }
+      ]
+    },
+    "netNameSetUnchanged": true,
+    "retainedRefs": 160,
+    "retainedPins": 479,
+    "retainedPinNetDifferences": 0,
+    "retainedNCDifferences": 0,
+    "removedRefs": [
+      "J_BUS_POWER",
+      "J_DUMP",
+      "J_SC_FUSE",
+      "J_SC_POWER"
+    ],
+    "addedRefs": [
+      "J_BUS_GND",
+      "J_BUS_POS",
+      "J_DUMP_BUS",
+      "J_DUMP_SW",
+      "J_FUSE_ISO",
+      "J_FUSE_SC"
+    ],
+    "countReconciliation": "164 - 4 removed + 6 added = 166; 487 - 8 removed interface pins + 36 terminal pins = 515.",
+    "deviceIdentityComparison": {
+      "unchangedRetainedIdentityCount": 159,
+      "changedIdentityRefs": [
+        {
+          "ref": "J_5V_EXT",
+          "change": "Abstract carrier replaced by selected physical part",
+          "manufacturer": "HanElectricity(瀚源)",
+          "manufacturerPart": "2541WV-2X01P",
+          "supplierPart": "C41430884",
+          "device": "32ff01e575a80938",
+          "footprint": "925042ac7ffdd330"
+        }
+      ],
+      "identityFieldsCompared": [
+        "Device",
+        "Footprint",
+        "Symbol",
+        "Manufacturer",
+        "Manufacturer Part",
+        "Supplier",
+        "Supplier Part",
+        "LCSC Part Name",
+        "Selected Footprint",
+        "FootprintName",
+        "DeviceName"
+      ]
+    },
+    "nonIdentityMetadataDifferences": {
+      "internalChannelIdOnlyChangedRefs": 158,
+      "displayTextCorrection": {
+        "ref": "J_NTC_SC",
+        "field": "Description",
+        "baseline": "额定��流:3A",
+        "final": "额定电流:3A",
+        "identityOrPinNetChange": false
+      }
+    }
+  },
+  "singlePoleTerminals": [
+    {
+      "ref": "J_BUS_POS",
+      "replacementFor": "J_BUS_POWER pin 1",
+      "expectedNet": "BUS_EXT",
+      "actualPins": {
+        "1": "BUS_EXT",
+        "2": "BUS_EXT",
+        "3": "BUS_EXT",
+        "4": "BUS_EXT",
+        "5": "BUS_EXT",
+        "6": "BUS_EXT"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    },
+    {
+      "ref": "J_BUS_GND",
+      "replacementFor": "J_BUS_POWER pin 2",
+      "expectedNet": "GND_SYS",
+      "actualPins": {
+        "1": "GND_SYS",
+        "2": "GND_SYS",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "GND_SYS",
+        "6": "GND_SYS"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    },
+    {
+      "ref": "J_DUMP_BUS",
+      "replacementFor": "J_DUMP pin 1",
+      "expectedNet": "BUS_EXT",
+      "actualPins": {
+        "1": "BUS_EXT",
+        "2": "BUS_EXT",
+        "3": "BUS_EXT",
+        "4": "BUS_EXT",
+        "5": "BUS_EXT",
+        "6": "BUS_EXT"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    },
+    {
+      "ref": "J_DUMP_SW",
+      "replacementFor": "J_DUMP pin 2",
+      "expectedNet": "DUMP_SW",
+      "actualPins": {
+        "1": "DUMP_SW",
+        "2": "DUMP_SW",
+        "3": "DUMP_SW",
+        "4": "DUMP_SW",
+        "5": "DUMP_SW",
+        "6": "DUMP_SW"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    },
+    {
+      "ref": "J_FUSE_SC",
+      "replacementFor": "J_SC_FUSE pin 1",
+      "expectedNet": "SC_PLUS",
+      "actualPins": {
+        "1": "SC_PLUS",
+        "2": "SC_PLUS",
+        "3": "SC_PLUS",
+        "4": "SC_PLUS",
+        "5": "SC_PLUS",
+        "6": "SC_PLUS"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    },
+    {
+      "ref": "J_FUSE_ISO",
+      "replacementFor": "J_SC_FUSE pin 2",
+      "expectedNet": "SC_ISO_STORAGE",
+      "actualPins": {
+        "1": "SC_ISO_STORAGE",
+        "2": "SC_ISO_STORAGE",
+        "3": "SC_ISO_STORAGE",
+        "4": "SC_ISO_STORAGE",
+        "5": "SC_ISO_STORAGE",
+        "6": "SC_ISO_STORAGE"
+      },
+      "ncPins": 0,
+      "manufacturerPart": "TT56145145-1520",
+      "supplierPart": "C19724595",
+      "device": "aec987342b587c1f",
+      "footprint": "567b601c57e53685"
+    }
+  ],
+  "scFusePath": {
+    "baselineJ_SC_FUSE": {
+      "pin1": "SC_PLUS",
+      "pin2": "SC_ISO_STORAGE"
+    },
+    "finalBoardTerminals": {
+      "SC_PLUS": "J_FUSE_SC pins 1-6",
+      "SC_ISO_STORAGE": "J_FUSE_ISO pins 1-6"
+    },
+    "netsRemainDistinct": true,
+    "externalF_SCInCurrentBoardNetlist": false,
+    "externalFuseBridgeRequiredBetweenThesePosts": true,
+    "jScPowerRemoved": {
+      "baselinePin1": "SC_ISO_STORAGE",
+      "baselinePin2": "SC_MINUS",
+      "finalRefExists": false
+    },
+    "assessment": "J_SC_POWER删除没有短接或切断SC_PLUS到SC_ISO_STORAGE之间的板外保险接口；原J_SC_POWER的独立SC_ISO_STORAGE/SC_MINUS接口本身已删除，不在此处宣称仍保留。"
+  },
+  "external5V": {
+    "ref": "J_5V_EXT",
+    "manufacturer": "HanElectricity(瀚源)",
+    "manufacturerPart": "2541WV-2X01P",
+    "supplierPart": "C41430884",
+    "currentRating": "3A",
+    "pitch": "2.54mm",
+    "mounting": "Through-hole",
+    "actualPins": {
+      "1": "5V_EXT",
+      "2": "GND_SYS"
+    },
+    "netsUnchangedFromBaseline": true
+  },
+  "designRuleCheck": {
+    "sourceReadbackErrors": [],
+    "pages": [
+      {
+        "uuid": "9546dca0bc8bce7f",
+        "page": "01 主功率与超容",
+        "drcErrors": 0
+      },
+      {
+        "uuid": "28c1f3740a9b8e02",
+        "page": "02 门极驱动与硬保护",
+        "drcErrors": 0
+      },
+      {
+        "uuid": "28c1f3740a9b8e03",
+        "page": "03 模拟采样",
+        "drcErrors": 0
+      },
+      {
+        "uuid": "28c1f3740a9b8e04",
+        "page": "04 控制通信与辅助供电",
+        "drcErrors": 0
+      }
+    ],
+    "totalDrcErrors": 0
+  },
+  "crossPageNets": {
+    "count": 39,
+    "uniqueNames": 39,
+    "allEndpointsVerifiedAgainstCurrentOfficialEnetPins": true,
+    "allPageRefsVerifiedAgainstOfficialReadback": true,
+    "eachNetHasMultiplePagesAndMarkers": true,
+    "names": [
+      "12V_DRV",
+      "3V3_CORE",
+      "BUS_ADC",
+      "BUS_EXT",
+      "DRV_FAULT_N",
+      "DRV_GH",
+      "DRV_GL",
+      "DUMP_PWM",
+      "GND_SYS",
+      "IMON",
+      "IMON_SOURCE",
+      "ISO_G",
+      "ISO_MID",
+      "ISO_TGUP",
+      "MUX_SEL1",
+      "MUX_SEL2",
+      "MUX_SEL3",
+      "MUX_SEL4",
+      "MUX_SEL5",
+      "MUX_SEL6",
+      "MUX_SEL7",
+      "MUX_SEL8",
+      "PA9_TIM1_CH2",
+      "PWM_H",
+      "PWM_L",
+      "SC_ADC_A",
+      "SC_ADC_B",
+      "SC_MINUS",
+      "SC_PLUS",
+      "SW",
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "UCC_OUT_H",
+      "UCC_OUT_L"
+    ],
+    "methodNote": "当前EasyEDA客户端4.1.93不支持项目级getCurrentProjectAllNets；以整本官方ENET和四页官方逐页pin/marker读回逐端核对。"
+  },
+  "footprintReview": {
+    "footprintUuid": "567b601c57e53685",
+    "footprintName": "TH_6P-TT56145145-1500",
+    "actualPadCount": 6,
+    "actualHoles": {
+      "plated": true,
+      "holeType": "ROUND",
+      "internalWidth": 118.11,
+      "internalHeight": 118.11,
+      "conversion": "internal mil × 0.0254",
+      "diameterMm": 3.0,
+      "centerSpacingMm": {
+        "x": 13.0,
+        "y": 12.5
+      }
+    },
+    "manufacturerRecommendation": {
+      "source": "https://www.xfconn.com/uploads/soft/20240903/4-240Z31F234113.pdf",
+      "pattern": "rectangular through-hole",
+      "holeWidthMm": 2.5,
+      "holeHeightMm": 2.0,
+      "centerSpacingMm": {
+        "x": 13.0,
+        "y": 12.5
+      }
+    },
+    "comparison": "CENTER_SPACING_MATCHES_BUT_HOLE_SHAPE_AND_SIZE_DIFFER",
+    "compatibilityClaim": "NOT_CLAIMED",
+    "pending": "PCB footprint and mechanical fit require human verification; no matched-footprint or assembly-fit claim."
+  },
+  "persistenceAndHashes": {
+    "closeStability": {
+      "stable": true,
+      "finalSessionClosed": true,
+      "savedAndReadOnlyReopenHashesEqual": true
+    },
+    "sourceFiles": [
+      {
+        "file": "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+        "sha256": "29813e1f3aea89b497839b052bf8c4594712bebfd0932af5c00db8d76fdd58fc",
+        "savedHashMatchesCurrent": true
+      },
+      {
+        "file": "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2",
+        "sha256": "cc9be4ea65c2c8c5273b110fd3427ae0c3a90b68ec18e698fcd00324161c4a5c",
+        "savedHashMatchesCurrent": true
+      },
+      {
+        "file": "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/02 门极驱动与硬保护.esch2",
+        "sha256": "678d9d4a131681e857bcb1a12f070eadab5301d396cf4fe45b181661bcdae032",
+        "savedHashMatchesCurrent": true
+      },
+      {
+        "file": "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/03 模拟采样.esch2",
+        "sha256": "cb2a5ce479d8e7c74d301fbd5632545eedda17a78099233470dba1edde1d3124",
+        "savedHashMatchesCurrent": true
+      },
+      {
+        "file": "电力/稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2",
+        "sha256": "6250dd4ca44e5737934dac02df7d96d7f37edbde19f49764b028605f1fc44b32",
+        "savedHashMatchesCurrent": true
+      }
+    ],
+    "netlistHashes": {
+      "baselineHEADSha256": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821",
+      "finalRecordedSha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a",
+      "finalActualSha256MatchesRecorded": true
+    },
+    "exportHashes": [
+      {
+        "file": "电力/稳压模块/检查/当前官方网表.enet",
+        "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_01_主功率与超容.svg",
+        "sha256": "6b1f0d74fb8f966c90b09422406cbb00cde0d118beb6d9c39b202b9ba3e5ba53",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_02_门极驱动与硬保护.svg",
+        "sha256": "17bc88b27b2234c08d2b475fca15318c76a8b6b71d507174c07aca4a9502ecf6",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_03_模拟采样.svg",
+        "sha256": "03a600410337180a8caf406d2c106f0bbbc4563791a4ecc5d786da561f4374fd",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_04_控制通信与辅助供电.svg",
+        "sha256": "fc150298e490612259c3d8c68152faad30f3c9c534cee28e86ff9127cfd4c1c4",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_01_主功率与超容.png",
+        "sha256": "a835298bf9a9f3f8e8c20d27b60baa6f40331ac988f2363bbf497a657f7c6d50",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_02_门极驱动与硬保护.png",
+        "sha256": "2ac8bdf5c8a6f1631145e94d5ccaa3e3afc34997b9e8de2bdcbff2030b3cf658",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_03_模拟采样.png",
+        "sha256": "a319af794ee3fd2cf954110a78e88f79358750aa87fd8503480c014a065a4064",
+        "matchesRecord": true
+      },
+      {
+        "file": "电力/稳压模块/检查/当前图面_04_控制通信与辅助供电.png",
+        "sha256": "2227516a3e3b757b210cda967d4c57e9d1b3b7240e6b0c0947e2e0da8793634a",
+        "matchesRecord": true
+      }
+    ],
+    "bomAndContract": {
+      "status": "AUDITED_IN_METADATA_REVIEW",
+      "officialBOMSHA256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4",
+      "selectedBOMSHA256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682",
+      "contractSHA256": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53",
+      "softwareInputSHA256": "e119bbbd954d3e3156ab34eab414f7408278ea72aed0e069a4d612b99c71832d",
+      "acceptanceMetadataSHA256": "92557f738ef55121ff8fd18972ac0d40bae48d610a3859879b81a17c073eac02",
+      "actualLibraryBindingMetadataSHA256": "f7bd23c7c9151b592630a5016a3464ccfe499ae00b62ec1dd9f3357381017a23"
+    }
+  },
+  "metadataReview": {
+    "reviewedAt": "2026-10-30",
+    "status": "PASS",
+    "scope": {
+      "readOnly": true,
+      "edaRun": false,
+      "onlyThisReviewFileWritten": true,
+      "bomAndContractAudited": true
+    },
+    "authoritativeFiles": [
+      {
+        "file": "电力/稳压模块/检查/当前官方网表.enet",
+        "sha256": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a"
+      },
+      {
+        "file": "电力/稳压模块/检查/当前官方BOM.tsv",
+        "sha256": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4"
+      },
+      {
+        "file": "电力/稳压模块/原理图准备/选型BOM.csv",
+        "sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682"
+      },
+      {
+        "file": "电力/稳压模块/原理图准备/最终逐针连接合同.json",
+        "sha256": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53"
+      },
+      {
+        "file": "电力/稳压模块/原理图准备/软件接线输入.json",
+        "sha256": "e119bbbd954d3e3156ab34eab414f7408278ea72aed0e069a4d612b99c71832d"
+      },
+      {
+        "file": "电力/稳压模块/检查/原理图最终验收.json",
+        "sha256": "92557f738ef55121ff8fd18972ac0d40bae48d610a3859879b81a17c073eac02"
+      },
+      {
+        "file": "电力/稳压模块/原理图准备/实际元件库绑定.json",
+        "sha256": "f7bd23c7c9151b592630a5016a3464ccfe499ae00b62ec1dd9f3357381017a23"
+      }
+    ],
+    "bomAndNetlist": {
+      "selectedBOM": {
+        "rows": 174,
+        "uniqueReferences": 174,
+        "referencesMatchingOfficialENET": 166,
+        "externalProcurementReferences": 8,
+        "externalReferenceList": [
+          "COREBOARD_WEACT",
+          "F_BUS",
+          "F_SC",
+          "PSU5_EXT",
+          "R_DUMP_EXT",
+          "TH_DUMP",
+          "TH_MAIN",
+          "TH_SC"
+        ],
+        "referenceSetReconciles": true,
+        "identityMismatches": 0,
+        "pinNetMismatches": 0,
+        "embeddedENETIdentityMismatches": 0,
+        "staleENETSourceSHArows": 0
+      },
+      "officialBOM": {
+        "aggregateLines": 54,
+        "quantitySum": 166,
+        "designatorReferences": 166,
+        "uniqueDesignatorReferences": 166,
+        "identityMismatches": 0
+      },
+      "officialENETComponentCount": 166,
+      "contractComponentCount": 166,
+      "contractUniqueReferenceCount": 166,
+      "contractIdentityFieldsCompared": [
+        "Manufacturer Part",
+        "Supplier Part",
+        "Manufacturer",
+        "Selected Footprint",
+        "Device UUID/name",
+        "Footprint UUID/name",
+        "Symbol UUID"
+      ],
+      "contractIdentityMismatchCount": 0,
+      "officialPinCount": 515,
+      "contractPinCount": 515,
+      "contractPinNetNCMismatchCount": 0,
+      "selectedBOMFootprintMapping": "选型BOM Footprint 对应ENET FootprintName（原生封装名称）；合同 footprint 对应ENET Selected Footprint别名；合同 native_binding.footprint_name/UUID分别匹配ENET FootprintName/Footprint UUID。"
+    },
+    "drawingContract": {
+      "pageRefCount": 166,
+      "uniquePageRefCount": 166,
+      "duplicateRefs": 0,
+      "missingContractRefs": 0,
+      "extraPageRefs": 0,
+      "pages": [
+        {
+          "uuid": "9546dca0bc8bce7f",
+          "title": "01 主功率与超容",
+          "refCount": 56
+        },
+        {
+          "uuid": "28c1f3740a9b8e02",
+          "title": "02 门极驱动与硬保护",
+          "refCount": 46
+        },
+        {
+          "uuid": "28c1f3740a9b8e03",
+          "title": "03 模拟采样",
+          "refCount": 41
+        },
+        {
+          "uuid": "28c1f3740a9b8e04",
+          "title": "04 控制通信与辅助供电",
+          "refCount": 23
+        }
+      ],
+      "crossPageNetsDerivedFromCurrentPinMap": 39,
+      "crossPageNetsDeclared": 39,
+      "crossPageNames": [
+        "12V_DRV",
+        "3V3_CORE",
+        "BUS_ADC",
+        "BUS_EXT",
+        "DRV_FAULT_N",
+        "DRV_GH",
+        "DRV_GL",
+        "DUMP_PWM",
+        "GND_SYS",
+        "IMON",
+        "IMON_SOURCE",
+        "ISO_G",
+        "ISO_MID",
+        "ISO_TGUP",
+        "MUX_SEL1",
+        "MUX_SEL2",
+        "MUX_SEL3",
+        "MUX_SEL4",
+        "MUX_SEL5",
+        "MUX_SEL6",
+        "MUX_SEL7",
+        "MUX_SEL8",
+        "PA9_TIM1_CH2",
+        "PWM_H",
+        "PWM_L",
+        "SC_ADC_A",
+        "SC_ADC_B",
+        "SC_MINUS",
+        "SC_PLUS",
+        "SW",
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "UCC_OUT_H",
+        "UCC_OUT_L"
+      ],
+      "crossPagePageSetMismatches": 0
+    },
+    "interfaceSelection": {
+      "physicalInterfaceEntities": 7,
+      "newlyAddedTTTerminalRefs": [
+        "J_BUS_POS",
+        "J_BUS_GND",
+        "J_DUMP_BUS",
+        "J_DUMP_SW",
+        "J_FUSE_SC",
+        "J_FUSE_ISO"
+      ],
+      "retainedRefWithSelectedPhysicalPart": "J_5V_EXT",
+      "distinctPartModels": 2,
+      "newPartModelKinds": 1,
+      "TTModel": {
+        "manufacturerPart": "TT56145145-1520",
+        "supplierPart": "C19724595",
+        "count": 6,
+        "newModelKind": true
+      },
+      "fiveVModel": {
+        "ref": "J_5V_EXT",
+        "manufacturerPart": "2541WV-2X01P",
+        "supplierPart": "C41430884",
+        "quantity": 1,
+        "existingSharedLibraryAssetAtHEAD": true,
+        "assetPath": "电力/元件封装库/共享仓库/库/原生片段/DEVICE/c24c8b75339b56c39f177957733c0fa1ac914573d66eb9ebab3d8905fa4cc1df.jsonl",
+        "pins": {
+          "1": "5V_EXT",
+          "2": "GND_SYS"
+        }
+      },
+      "acceptanceCounts": {
+        "new_physical_selections": 1,
+        "new_physical_components": 7,
+        "interpretedAs": "one new part model kind (TT) and seven physical interface component entities (six terminals plus J_5V_EXT)",
+        "consistent": true
+      }
+    },
+    "sourceAndMetadataChecks": {
+      "currentHEAD": "1078c0375fcd38928679bbbd884de67d0daa03c8",
+      "acceptanceBaseline": "1078c0375fcd38928679bbbd884de67d0daa03c8",
+      "contractDrawingBaseline": "1078c0375fcd38928679bbbd884de67d0daa03c8",
+      "bothBaselinesEqualHEAD": true,
+      "softwareInputSHARecordedByAcceptanceMatchesActual": true,
+      "softwareEmbeddedContractExactlyMatchesStandalone": true,
+      "contractSHARecordedBySoftwareAcceptanceAndBindingMatchesActual": true,
+      "allSoftwareAcceptanceAndLibraryBindingSourceHashesMatchActual": true,
+      "contractDeclaredSources": {
+        "count": 9,
+        "allPathsResolveAndSHA256Match": true
+      },
+      "actualBindingSourceSHA": {
+        "fileCount": 6,
+        "allPathsResolveAndSHA256Match": true,
+        "currentNativeBindingsContractReferenceMatchesActual": true,
+        "recordCount": 166,
+        "notesCountCurrent": true,
+        "currentNote": "官方保存、关闭并重开后已核对166实例、515引脚与21个NC。"
+      },
+      "acceptanceNativeSourceFiles": {
+        "count": 5,
+        "allSHA256Match": true
+      },
+      "sourceReferenceCheck": {
+        "reportedStatus": "PASS",
+        "reportedContractSources": 9,
+        "verifiedContractSources": 9,
+        "reportedCurrentBindingSources": 5,
+        "verifiedNativeSourceFiles": 5,
+        "actualStatusConsistent": true
+      },
+      "acceptanceEvidence": {
+        "pathEntries": 10,
+        "allPathsResolveAndSHA256Match": true
+      },
+      "failedSourceSHARefs": [],
+      "failedBindingSHARefs": [],
+      "failedNativeSourceSHARefs": [],
+      "failedEvidencePaths": [],
+      "failedCrossDocumentSHARefs": [],
+      "softwareInputSHA256": "e119bbbd954d3e3156ab34eab414f7408278ea72aed0e069a4d612b99c71832d",
+      "finalContractSHA256": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53",
+      "actualBindingMetadataSHA256": "f7bd23c7c9151b592630a5016a3464ccfe499ae00b62ec1dd9f3357381017a23"
+    },
+    "footprintClarification": {
+      "officialFootprintUuid": "567b601c57e53685",
+      "officialFootprintName": "TH_6P-TT56145145-1500",
+      "actualHoleCount": 6,
+      "actualHoleType": "ROUND",
+      "actualHoleDiameterMm": 3.0,
+      "centerSpacingMm": {
+        "x": 13.0,
+        "y": 12.5
+      },
+      "manufacturerRecommendedHoleShape": "rectangular through-hole",
+      "manufacturerRecommendedHoleMm": {
+        "width": 2.5,
+        "height": 2.0
+      },
+      "manufacturerCenterSpacingMm": {
+        "x": 13.0,
+        "y": 12.5
+      },
+      "compatibilityClaim": "NOT_CLAIMED",
+      "status": "CENTERS_MATCH_BUT_HOLE_SHAPE_AND_SIZE_DIFFER; human PCB/mechanical verification pending."
+    },
+    "resolvedDuringReview": [
+      "此前父级修正了验收摘要和合同绘图baseline字段；最终两者均等于当前HEAD。",
+      "此前父级修正实际元件库绑定摘要旧计数；最终文案为166实例、515引脚、21个NC。",
+      "此前父级修正绑定source_sha256中合同条目的旧SHA并重同步验收摘要；最终绑定表、软件输入和验收记录均引用当前合同SHA。"
+    ]
+  }
+}

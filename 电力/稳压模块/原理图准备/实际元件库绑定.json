@@ -1,25 +1,28 @@
 {
-  "status": "NATIVE_APPLIED_OFFICIAL_PIN_ACCEPTANCE_PASS",
+  "status": "NATIVE_BINDINGS_PRESENT_MECHANICAL_GEOMETRY_REVIEW_PENDING",
   "date": "2026-10-30",
   "client_version": "4.1.93",
   "counts": {
-    "REUSE_EXISTING_NATIVE_DEVICE": 111,
-    "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER": 53
+    "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER": 53,
+    "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING": 7,
+    "REUSE_EXISTING_NATIVE_DEVICE": 106
   },
-  "component_count": 164,
+  "component_count": 166,
   "unresolved_device_identities": [],
   "source_sha256": {
-    "电力/稳压模块/原理图准备/选型BOM.csv": "bf69b4fcfcc94118cda599096ca777605f64e485b04e62199c0199b9c9505b59",
-    "电力/稳压模块/检查/当前官方网表.enet": "5c83886227a1cad3a521f2a9a64f46f61d164ca7b3a287a57322824529d5b821",
-    "电力/稳压模块/检查/当前官方BOM.tsv": "4a89bee459aaab6a02667b5e49377d077622aa3c95026b6a3e5911719c6a98a0",
+    "电力/稳压模块/原理图准备/选型BOM.csv": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682",
+    "电力/稳压模块/检查/当前官方网表.enet": "b79455d620192fb2cf651ddbe3ec3b7066c1f416269c75fdf10e82d8affbcf7a",
+    "电力/稳压模块/检查/当前官方BOM.tsv": "4abbea788f75c635500b90671aa322ac44888e5dd2796cc5c745ce3ec87fc3a4",
     "电力/稳压模块/检查/最终选型清单.json": "1676ccfe373fd07e339fe40f5706a528be660fe687e3d562a528abd3f7462d1d",
-    "电力/稳压模块/检查/驱动关断隔离与硬件dump最终选型核算.json": "5d911739be8d562df701691e2c0907893072d9d5616e6467658329dc58161f9b"
+    "电力/稳压模块/检查/驱动关断隔离与硬件dump最终选型核算.json": "5d911739be8d562df701691e2c0907893072d9d5616e6467658329dc58161f9b",
+    "电力/稳压模块/原理图准备/最终逐针连接合同.json": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53"
   },
   "notes": [
-    "库项用于原生工程，官方保存重开后已核对全部164实例、487引脚与21个NC。",
+    "库项用于原生工程，官方保存、关闭并重开后已核对166实例、515引脚与21个NC。",
     "抽象接口Convert to PCB=No；符号载体封装不代表实际接插件选型。",
     "historical_source_sha256 preserves the earlier preparation-stage hashes only; they are historical provenance, not the current source set. Current source file hashes are listed in source_sha256.",
-    "For OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER, components[].device_uuid is the official catalog source Device UUID (with library_uuid identifying its source library), not the project-local Device UUID. Project-local Device/Footprint UUIDs and drawing Symbol UUID are recorded in the current final contract components[].native_binding/native_drawing_symbol_uuid. All 53 source-UUID versus local-Device-UUID differences are expected; do not overwrite the official source UUID."
+    "For OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER, components[].device_uuid is the official catalog source Device UUID (with library_uuid identifying its source library), not the project-local Device UUID. Project-local Device/Footprint UUIDs and drawing Symbol UUID are recorded in the current final contract components[].native_binding/native_drawing_symbol_uuid. All 53 source-UUID versus local-Device-UUID differences are expected; do not overwrite the official source UUID.",
+    "本轮6个TT器件与J_5V_EXT的Device/Footprint来自最终官方ENET；Ø3圆孔/矩形推荐孔差异与系统级载流均未由绑定记录证明。"
   ],
   "components": [
     {
@@ -550,6 +553,31 @@
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
     },
     {
+      "ref": "C_ISO_BST",
+      "procurement_mpn": "C3225X7R2A105K200AA",
+      "procurement_manufacturer": "TDK",
+      "supplier_part": "C2167578",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "efaeb1e3bde84d4499a909a9f9baef21",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "b3531f37d75d4db09e863cecfddc0d23",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "d98380dbde964cff944f829800b236c1",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
       "ref": "C_NTC_DUMP",
       "procurement_mpn": "0603B104K160NT",
       "procurement_manufacturer": "FH(风华)",
@@ -770,6 +798,143 @@
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
     },
     {
+      "ref": "D_DUMP_FW",
+      "procurement_mpn": "STPS30100ST",
+      "procurement_manufacturer": "ST(意法半导体)",
+      "supplier_part": "C172485",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3"
+      ],
+      "native_applied": true,
+      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "98be2a8fee534be798c907763165fb1d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "D_SC_HI",
+      "procurement_mpn": "STPS30100ST",
+      "procurement_manufacturer": "ST(意法半导体)",
+      "supplier_part": "C172485",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3"
+      ],
+      "native_applied": true,
+      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "98be2a8fee534be798c907763165fb1d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "D_SC_LO",
+      "procurement_mpn": "STPS30100ST",
+      "procurement_manufacturer": "ST(意法半导体)",
+      "supplier_part": "C172485",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3"
+      ],
+      "native_applied": true,
+      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "98be2a8fee534be798c907763165fb1d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "J_5V_EXT",
+      "procurement_mpn": "2541WV-2X01P",
+      "procurement_manufacturer": "HanElectricity(瀚源)",
+      "supplier_part": "C41430884",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "32ff01e575a80938",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "OFFICIAL_NATIVE_2P_PIN_NETS_MATCH",
+      "note": "Selected 2541WV-2X01P / C41430884 from final official ENET."
+    },
+    {
+      "ref": "J_BUS_GND",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
+    },
+    {
+      "ref": "J_BUS_POS",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
+    },
+    {
       "ref": "J_CAN",
       "procurement_mpn": "B3B-XH-A(LF)(SN)",
       "procurement_manufacturer": "JST",
@@ -877,6 +1042,90 @@
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
       "binding": "REUSE_EXISTING_NATIVE_DEVICE",
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
+    },
+    {
+      "ref": "J_DUMP_BUS",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
+    },
+    {
+      "ref": "J_DUMP_SW",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
+    },
+    {
+      "ref": "J_FUSE_ISO",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
+    },
+    {
+      "ref": "J_FUSE_SC",
+      "procurement_mpn": "TT56145145-1520",
+      "procurement_manufacturer": "XFCN(兴飞)",
+      "supplier_part": "C19724595",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "native_applied": true,
+      "device_uuid": "aec987342b587c1f",
+      "library_uuid": null,
+      "binding": "OFFICIAL_NATIVE_DEVICE_FOOTPRINT_BINDING",
+      "geometry_pin_verification": "PIN_NETS_MATCH; ROUND_Ø3_VS_RECTANGULAR_MANUFACTURER_HOLE_REVIEW_PENDING",
+      "note": "兴飞 TT56145145-1520 元件目录额定 135A；该元件额定不等于整板连续/峰值载流验证。官方库焊盘图为 Ø3 圆孔，原厂推荐孔形为矩形，孔形不一致，PCB/结构配合仍待人工确认。 Native ENET does not expose the owning library UUID; not inferred."
     },
     {
       "ref": "J_NTC_DUMP",
@@ -999,6 +1248,32 @@
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
     },
     {
+      "ref": "Q_DUMP_SW",
+      "procurement_mpn": "MMBT5551",
+      "procurement_manufacturer": "MDD(辰达半导体)",
+      "supplier_part": "C408396",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3"
+      ],
+      "native_applied": true,
+      "device_uuid": "f7f17a35ca194afdbda992d103e80c1c",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "ae2bf03bd595485b92f4aa67aaa3743c",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "078e43bc93394f49815211c4fd533d19",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
       "ref": "Q_MAIN_H",
       "procurement_mpn": "IRLB4030PBF",
       "procurement_manufacturer": "Infineon(英飞凌)",
@@ -1053,6 +1328,145 @@
       },
       "footprint": {
         "uuid": "078e43bc93394f49815211c4fd533d19",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "Q_SC_ISO1",
+      "procurement_mpn": "HYG022N10NS1TA",
+      "procurement_manufacturer": "HUAYI(华羿微)",
+      "supplier_part": "C2925050",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "native_applied": true,
+      "device_uuid": "72f44b11027f4f00ad6210e6490dc8e7",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "992811325d4240078c3d0ec9919b7c97",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "ae68bf96a0ea4cd286f165c1e2f44505",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "Q_SC_ISO2",
+      "procurement_mpn": "HYG022N10NS1TA",
+      "procurement_manufacturer": "HUAYI(华羿微)",
+      "supplier_part": "C2925050",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "native_applied": true,
+      "device_uuid": "72f44b11027f4f00ad6210e6490dc8e7",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "992811325d4240078c3d0ec9919b7c97",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "ae68bf96a0ea4cd286f165c1e2f44505",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_ADC_A_PD",
+      "procurement_mpn": "PTFR0805B10K0N9",
+      "procurement_manufacturer": "RESI(开步睿思)",
+      "supplier_part": "C328436",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "174c85e346374eb3a678bc8d76c5ead6",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "127368c96b4c45e2bbbdc20d126652ba",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_ADC_B_PD",
+      "procurement_mpn": "PTFR0805B10K0N9",
+      "procurement_manufacturer": "RESI(开步睿思)",
+      "supplier_part": "C328436",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "174c85e346374eb3a678bc8d76c5ead6",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "127368c96b4c45e2bbbdc20d126652ba",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_ARM_PD",
+      "procurement_mpn": "RMC0603100K1%N",
+      "procurement_manufacturer": "Tyohm(幸亚电阻)",
+      "supplier_part": "C269699",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "e78687933cd54a68b95e75fa28dfee3d",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "2d3341779c574f04b2ca08e849296a78",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
         "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
       },
       "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
@@ -1233,6 +1647,81 @@
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
       "binding": "REUSE_EXISTING_NATIVE_DEVICE",
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
+    },
+    {
+      "ref": "R_BUS_OV_BOT",
+      "procurement_mpn": "RT0603BRD075K11L",
+      "procurement_manufacturer": "YAGEO(国巨)",
+      "supplier_part": "C705788",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "049385e1acff4f6a8bc03901b63cdff0",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "da97adcb5ace45de8739d25e02875c38",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_BUS_OV_TOP1",
+      "procurement_mpn": "PTFR0805B255KP9",
+      "procurement_manufacturer": "RESI(开步睿思)",
+      "supplier_part": "C2849126",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "63224a9fd4a6498f93ad2c4ba968b74d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_BUS_OV_TOP2",
+      "procurement_mpn": "PTFR0805B255KP9",
+      "procurement_manufacturer": "RESI(开步睿思)",
+      "supplier_part": "C2849126",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "63224a9fd4a6498f93ad2c4ba968b74d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     },
     {
       "ref": "R_CAN_TERM",
@@ -1429,6 +1918,31 @@
       "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     },
     {
+      "ref": "R_DUMP_HW_PU",
+      "procurement_mpn": "RS-03K1002FT",
+      "procurement_manufacturer": "FH(风华)",
+      "supplier_part": "C115324",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "76d105d271254800b23e914f247a8575",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
       "ref": "R_DUMP_IN_PD",
       "procurement_mpn": "RS-03K1002FT",
       "procurement_manufacturer": "FH(风华)",
@@ -1500,6 +2014,81 @@
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
       "binding": "REUSE_EXISTING_NATIVE_DEVICE",
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
+    },
+    {
+      "ref": "R_DUMP_SW_BASE",
+      "procurement_mpn": "RS-03K1002FT",
+      "procurement_manufacturer": "FH(风华)",
+      "supplier_part": "C115324",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "76d105d271254800b23e914f247a8575",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_ISO_GS",
+      "procurement_mpn": "RC0603FR-071ML",
+      "procurement_manufacturer": "YAGEO(国巨)",
+      "supplier_part": "C105578",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "bc2e4cd70e5e422283434c6e2e781c5a",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "93c417e526fb4127ba6b16d70001429a",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+    },
+    {
+      "ref": "R_ISO_TGUP",
+      "procurement_mpn": "RS-03K1002FT",
+      "procurement_manufacturer": "FH(风华)",
+      "supplier_part": "C115324",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "2"
+      ],
+      "native_applied": true,
+      "device_uuid": "76d105d271254800b23e914f247a8575",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "50b4943912284dab97752312e589e9e2",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     },
     {
       "ref": "R_NTC_DUMP_PU",
@@ -2505,68 +3094,6 @@
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
     },
     {
-      "ref": "U_CAN1",
-      "procurement_mpn": "TCAN332DR",
-      "procurement_manufacturer": "TI(德州仪器)",
-      "supplier_part": "C73651",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8"
-      ],
-      "native_applied": true,
-      "device_uuid": "bb4c1bea5828cd30",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
-      "ref": "U_DUMP_DRV",
-      "procurement_mpn": "UCC27511ADBVR",
-      "procurement_manufacturer": "TI(德州仪器)",
-      "supplier_part": "C2676982",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "native_applied": true,
-      "device_uuid": "3dd7ae652f59b10f",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
-      "ref": "U_SC_OV",
-      "procurement_mpn": "TLV6700DDCR",
-      "procurement_manufacturer": "TI(德州仪器)",
-      "supplier_part": "C2868382",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6"
-      ],
-      "native_applied": true,
-      "device_uuid": "97dba06d3b008ccf",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
       "ref": "U_AUX1",
       "procurement_mpn": "URB4812YMD-10WR3",
       "procurement_manufacturer": "HiLink",
@@ -2588,65 +3115,23 @@
       "note": "固定HI-LINK海凌科12V采购身份；保留现有自定义6脚载体，不换成金升阳等同名模块。"
     },
     {
-      "ref": "J_5V_EXT",
-      "procurement_mpn": "",
-      "procurement_manufacturer": "",
-      "supplier_part": "",
-      "convert_to_PCB": "No",
+      "ref": "U_CAN1",
+      "procurement_mpn": "TCAN332DR",
+      "procurement_manufacturer": "TI(德州仪器)",
+      "supplier_part": "C73651",
+      "convert_to_PCB": "Yes",
       "expected_pins": [
         "1",
-        "2"
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
       ],
       "native_applied": true,
-      "device_uuid": "1ecef1391c1359f3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
-      "ref": "J_BUS_POWER",
-      "procurement_mpn": "",
-      "procurement_manufacturer": "",
-      "supplier_part": "",
-      "convert_to_PCB": "No",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "1ecef1391c1359f3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
-      "ref": "J_DUMP",
-      "procurement_mpn": "",
-      "procurement_manufacturer": "",
-      "supplier_part": "",
-      "convert_to_PCB": "No",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "1ecef1391c1359f3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
-    },
-    {
-      "ref": "J_SC_POWER",
-      "procurement_mpn": "",
-      "procurement_manufacturer": "",
-      "supplier_part": "",
-      "convert_to_PCB": "No",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "1ecef1391c1359f3",
+      "device_uuid": "bb4c1bea5828cd30",
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
       "binding": "REUSE_EXISTING_NATIVE_DEVICE",
       "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
@@ -2726,41 +3211,24 @@
       "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     },
     {
-      "ref": "U_SIGNAL_ISO",
-      "procurement_mpn": "TMUX1511PWR",
+      "ref": "U_DUMP_DRV",
+      "procurement_mpn": "UCC27511ADBVR",
       "procurement_manufacturer": "TI(德州仪器)",
-      "supplier_part": "C2866750",
+      "supplier_part": "C2676982",
       "convert_to_PCB": "Yes",
       "expected_pins": [
         "1",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
         "2",
         "3",
         "4",
         "5",
-        "6",
-        "7",
-        "8",
-        "9"
+        "6"
       ],
       "native_applied": true,
-      "device_uuid": "5a996874d0514f7ea66d2851adcd38ca",
+      "device_uuid": "3dd7ae652f59b10f",
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "eca9989eab414b3085c88318b7f64729",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "0ed85a9919db4ee9a11244d42ebeb18a",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
+      "binding": "REUSE_EXISTING_NATIVE_DEVICE",
+      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
     },
     {
       "ref": "U_GATE_OD",
@@ -2825,10 +3293,10 @@
       "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     },
     {
-      "ref": "Q_SC_ISO1",
-      "procurement_mpn": "HYG022N10NS1TA",
-      "procurement_manufacturer": "HUAYI(华羿微)",
-      "supplier_part": "C2925050",
+      "ref": "U_SC_OV",
+      "procurement_mpn": "TLV6700DDCR",
+      "procurement_manufacturer": "TI(德州仪器)",
+      "supplier_part": "C2868382",
       "convert_to_PCB": "Yes",
       "expected_pins": [
         "1",
@@ -2836,453 +3304,50 @@
         "3",
         "4",
         "5",
-        "6",
-        "7",
-        "8",
-        "9"
+        "6"
       ],
       "native_applied": true,
-      "device_uuid": "72f44b11027f4f00ad6210e6490dc8e7",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "992811325d4240078c3d0ec9919b7c97",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "ae68bf96a0ea4cd286f165c1e2f44505",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "Q_SC_ISO2",
-      "procurement_mpn": "HYG022N10NS1TA",
-      "procurement_manufacturer": "HUAYI(华羿微)",
-      "supplier_part": "C2925050",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9"
-      ],
-      "native_applied": true,
-      "device_uuid": "72f44b11027f4f00ad6210e6490dc8e7",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "992811325d4240078c3d0ec9919b7c97",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "ae68bf96a0ea4cd286f165c1e2f44505",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "D_SC_LO",
-      "procurement_mpn": "STPS30100ST",
-      "procurement_manufacturer": "ST(意法半导体)",
-      "supplier_part": "C172485",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3"
-      ],
-      "native_applied": true,
-      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "98be2a8fee534be798c907763165fb1d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "D_SC_HI",
-      "procurement_mpn": "STPS30100ST",
-      "procurement_manufacturer": "ST(意法半导体)",
-      "supplier_part": "C172485",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3"
-      ],
-      "native_applied": true,
-      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "98be2a8fee534be798c907763165fb1d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "D_DUMP_FW",
-      "procurement_mpn": "STPS30100ST",
-      "procurement_manufacturer": "ST(意法半导体)",
-      "supplier_part": "C172485",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3"
-      ],
-      "native_applied": true,
-      "device_uuid": "d17a1064aa7b45fcb3a8b96a860959c3",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "8402c672b5c04f1fa526b76658dfcb4e",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "98be2a8fee534be798c907763165fb1d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "Q_DUMP_SW",
-      "procurement_mpn": "MMBT5551",
-      "procurement_manufacturer": "MDD(辰达半导体)",
-      "supplier_part": "C408396",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2",
-        "3"
-      ],
-      "native_applied": true,
-      "device_uuid": "f7f17a35ca194afdbda992d103e80c1c",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "ae2bf03bd595485b92f4aa67aaa3743c",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "078e43bc93394f49815211c4fd533d19",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "C_ISO_BST",
-      "procurement_mpn": "C3225X7R2A105K200AA",
-      "procurement_manufacturer": "TDK",
-      "supplier_part": "C2167578",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "efaeb1e3bde84d4499a909a9f9baef21",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "b3531f37d75d4db09e863cecfddc0d23",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "d98380dbde964cff944f829800b236c1",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_ADC_A_PD",
-      "procurement_mpn": "PTFR0805B10K0N9",
-      "procurement_manufacturer": "RESI(开步睿思)",
-      "supplier_part": "C328436",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "174c85e346374eb3a678bc8d76c5ead6",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "127368c96b4c45e2bbbdc20d126652ba",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_ADC_B_PD",
-      "procurement_mpn": "PTFR0805B10K0N9",
-      "procurement_manufacturer": "RESI(开步睿思)",
-      "supplier_part": "C328436",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "174c85e346374eb3a678bc8d76c5ead6",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "127368c96b4c45e2bbbdc20d126652ba",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_ARM_PD",
-      "procurement_mpn": "RMC0603100K1%N",
-      "procurement_manufacturer": "Tyohm(幸亚电阻)",
-      "supplier_part": "C269699",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "e78687933cd54a68b95e75fa28dfee3d",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "2d3341779c574f04b2ca08e849296a78",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_ISO_GS",
-      "procurement_mpn": "RC0603FR-071ML",
-      "procurement_manufacturer": "YAGEO(国巨)",
-      "supplier_part": "C105578",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "bc2e4cd70e5e422283434c6e2e781c5a",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "93c417e526fb4127ba6b16d70001429a",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_ISO_TGUP",
-      "procurement_mpn": "RS-03K1002FT",
-      "procurement_manufacturer": "FH(风华)",
-      "supplier_part": "C115324",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "76d105d271254800b23e914f247a8575",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_DUMP_HW_PU",
-      "procurement_mpn": "RS-03K1002FT",
-      "procurement_manufacturer": "FH(风华)",
-      "supplier_part": "C115324",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "76d105d271254800b23e914f247a8575",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_DUMP_SW_BASE",
-      "procurement_mpn": "RS-03K1002FT",
-      "procurement_manufacturer": "FH(风华)",
-      "supplier_part": "C115324",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "76d105d271254800b23e914f247a8575",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "306884e5839d4b6bbf7c1529f3de650d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_BUS_OV_TOP1",
-      "procurement_mpn": "PTFR0805B255KP9",
-      "procurement_manufacturer": "RESI(开步睿思)",
-      "supplier_part": "C2849126",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "63224a9fd4a6498f93ad2c4ba968b74d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_BUS_OV_TOP2",
-      "procurement_mpn": "PTFR0805B255KP9",
-      "procurement_manufacturer": "RESI(开步睿思)",
-      "supplier_part": "C2849126",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "eb46cd102d4c4c078e4e87cc5a01e9d5",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "63224a9fd4a6498f93ad2c4ba968b74d",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "6cfdf2d0c1ca4752bd1a0125f55b71e9",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "R_BUS_OV_BOT",
-      "procurement_mpn": "RT0603BRD075K11L",
-      "procurement_manufacturer": "YAGEO(国巨)",
-      "supplier_part": "C705788",
-      "convert_to_PCB": "Yes",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "049385e1acff4f6a8bc03901b63cdff0",
-      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
-      "symbol": {
-        "type": 2,
-        "uuid": "da97adcb5ace45de8739d25e02875c38",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "footprint": {
-        "uuid": "50b4943912284dab97752312e589e9e2",
-        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
-      },
-      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
-      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
-    },
-    {
-      "ref": "J_SC_FUSE",
-      "procurement_mpn": "",
-      "procurement_manufacturer": "",
-      "supplier_part": "",
-      "convert_to_PCB": "No",
-      "expected_pins": [
-        "1",
-        "2"
-      ],
-      "native_applied": true,
-      "device_uuid": "1ecef1391c1359f3",
+      "device_uuid": "97dba06d3b008ccf",
       "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
       "binding": "REUSE_EXISTING_NATIVE_DEVICE",
-      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH",
-      "note": "抽象板外保险功率接口；两针载体仅供原理图，Convert to PCB=No。"
+      "geometry_pin_verification": "EXISTING_PIN_NUMBERS_MATCH"
+    },
+    {
+      "ref": "U_SIGNAL_ISO",
+      "procurement_mpn": "TMUX1511PWR",
+      "procurement_manufacturer": "TI(德州仪器)",
+      "supplier_part": "C2866750",
+      "convert_to_PCB": "Yes",
+      "expected_pins": [
+        "1",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "native_applied": true,
+      "device_uuid": "5a996874d0514f7ea66d2851adcd38ca",
+      "library_uuid": "0819f05c4eef4c71ace90d822a990e87",
+      "symbol": {
+        "type": 2,
+        "uuid": "eca9989eab414b3085c88318b7f64729",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "footprint": {
+        "uuid": "0ed85a9919db4ee9a11244d42ebeb18a",
+        "libraryUuid": "0819f05c4eef4c71ace90d822a990e87"
+      },
+      "binding": "OFFICIAL_LIBRARY_EXACT_MPN_SUPPLIER",
+      "geometry_pin_verification": "REQUIRED_AT_PLACEMENT"
     }
   ],
   "historical_source_sha256": {
@@ -3293,8 +3358,8 @@
   },
   "current_native_bindings_source": {
     "path": "电力/稳压模块/原理图准备/最终逐针连接合同.json",
-    "sha256": "485f99d9d261c23e4b4b91e88874c5909fa81b6e863210ab3b665df1209a4c82",
+    "sha256": "096c5efedb1a87d75f2cb4692a51283299b191557623020dc26113e0b105ff53",
     "authority": "contract.components[].native_binding",
-    "note": "Current project-local Device/Footprint UUID and names are recorded here; native_drawing_symbol_uuid records the current drawing carrier."
+    "note": "Device/Footprint UUID取最终官方ENET；library_uuid未在ENET提供时留空，不以空值推断库UUID。"
   }
 }
