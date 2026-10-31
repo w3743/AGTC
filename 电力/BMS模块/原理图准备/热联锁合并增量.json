@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-29",
+  "status": "WITHDRAWN_AS_CURRENT_SELECTION_COMPARISON_ONLY",
+  "scope": "BMS功率增强与稳压中央制动热联锁合并增量",
+  "source_peak_subpackage": "9S5P增量清单.json",
+  "connection_authority": "../../稳压模块/原理图准备/保护与制动合并合同.json#BMS_thermal_latch",
+  "new_refs": [
+    "Q_CHG4",
+    "Q_DSG4",
+    "R_G_CHG4",
+    "R_G_DSG4",
+    "R_GS_CHG4",
+    "R_GS_DSG4",
+    "U_THERM_ALERT_SCHMITT",
+    "C_THERM_ALERT_SCHMITT",
+    "J_DUMP_THERM"
+  ],
+  "retired_refs": [
+    "Q_DFETOFF"
+  ],
+  "reused_ref": "R_DFETOFF_GS 100k移作THERM_POR_OK下拉；原47k改DFETOFF下拉；原1k接Q1与DFETOFF",
+  "new_thermal_parts": [
+    {
+      "ref": "U_THERM_ALERT_SCHMITT",
+      "mpn": "SN74LVC2G17DCKR",
+      "supplier_part": null,
+      "qty": 1
+    },
+    {
+      "ref": "C_THERM_ALERT_SCHMITT",
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "qty": 1
+    },
+    {
+      "ref": "J_DUMP_THERM",
+      "mpn": "2541WV-2X01P",
+      "supplier_part": "C41430884",
+      "qty": 1
+    }
+  ],
+  "counts": {
+    "new_board": 9,
+    "retired_board": 1,
+    "net_board": 8,
+    "cells_added": 9,
+    "thermal_fuse_regulator_count_only": 1
+  },
+  "cost": {
+    "currency": "CNY",
+    "known_peak_six_parts_and_cells_subtotal": "131.9792",
+    "thermal_new_three_parts": null,
+    "retired_Q_DFETOFF_credit": null,
+    "complete_net_increment": null,
+    "formula": "131.9792 + U_THERM_ALERT_SCHMITT + C_THERM_ALERT_SCHMITT + J_DUMP_THERM - Q_DFETOFF + 适用板外配套/组包/税运差额",
+    "warning": "未知不记0；TT150在稳压外置制动组件另计一次。"
+  },
+  "qualification": [
+    "0xC2首次配置/读回及禁止MAIN_REQ",
+    "PRE_CTRL与REG1掉电排序",
+    "100k默认低的全温漏电",
+    "ALERT增加延迟",
+    "温熔实际热耦合与MOS短路总能量",
+    "端口长线EMC/短路；未检测旁路熔断器"
+  ],
+  "native_and_procurement_bom_modified": false,
+  "status_before_withdrawal": "CONNECTION_CANDIDATE_NOT_NATIVE_NOT_CONFIGURED",
+  "current_adopted_design": false,
+  "withdrawal_reason": "用户要求先核清故障路径和简约性再加选型；原理必要性/替代/能量接管未闭合，撤回当前采用地位，保留比较数据。",
+  "current_adopted_increment_count": null
+}

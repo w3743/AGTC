@@ -26,17 +26,17 @@
     },
     "中央元件索引": {
       "path": "电力/元件封装库/索引/元件总表.json",
-      "sha256": "523f7711e05efae2feb5c99ea38921e9a2bf2cd81fbe86cccb9caab9a74bffc9",
+      "sha256": "56a6bf8510b9d3693b35cd67b7b32ba98cf1ecded3f87e36f7be2dd640896c16",
       "role": "read-only exact per-designator MPN/manufacturer/C-code cross-check"
     },
     "BMS采购补充": {
       "path": "电力/元件封装库/索引/采购补充.json",
-      "sha256": "63fee3b0e8643b341bcf73e70bc8d523d9a4df5d80c6cfef970895a78fbb22d1",
+      "sha256": "8be08d2d177d0df7802d0150f4d789f1bf22dbe1c5234d79b582a18f8d7688b7",
       "role": "BMS external accessory source; already represented in BMS BOM/input, no duplicate add"
     },
     "BMS核价输入": {
       "path": "电力/元件封装库/检查/商城核价/BMS.json",
-      "sha256": "18bf3130a59074f46d1009340dd40559f4669b9d7306de01536ddb9ec2c9a0d8",
+      "sha256": "b723e1bd3016ac39edbd0af7baf1bcc32b71013974e0bc438aac9e8082fcd8f8",
       "role": "module normalized procurement identity and price-audit input"
     },
     "BMS当前BOM": {
@@ -46,17 +46,17 @@
     },
     "FOC核价输入": {
       "path": "电力/元件封装库/检查/商城核价/FOC.json",
-      "sha256": "8a87c64f7048641c3f3e6b5d8111f4ecbe74685c7a870f03ddb1c1f78e8d4d11",
+      "sha256": "ef265efe6f7dcc6527b86e07699bf7d56ced42433198f7cda5fab537081fb356",
       "role": "module normalized procurement identity and price-audit input"
     },
     "FOC当前BOM": {
       "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-      "sha256": "07fba7e40a15ea0fce0bea3892fc1856bed96862d634bf0f98fcb40091171f04",
+      "sha256": "ecb73b92b0d8124af5f4bd1fa10264021022b3c0d2abfe13e0b3e32d9e0910c0",
       "role": "current source of purchase quantities"
     },
     "FOC装配补充": {
       "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_双板装配补充.csv",
-      "sha256": "7a39392a5672ab567c7f9f644cada8edf7d2433fc1d17580be9e9e06d6db81bf",
+      "sha256": "9ad665dc224c95f59feee2db5634a53b31ead18dfbf3b1fcd9f61f158ae4e7fa",
       "role": "population overrides and additive off-board purchase lines"
     },
     "REGULATOR核价输入": {
@@ -104,11 +104,11 @@
         ]
       },
       "FOC": {
-        "input_items": 62,
-        "current_bom_rows": 91,
-        "native_bom_qty_per_board": 156,
-        "current_a_total_including_external_mate": 157,
-        "current_b_total_including_external_mate": 156,
+        "input_items": 54,
+        "current_bom_rows": 80,
+        "native_bom_qty_per_board": 140,
+        "current_a_total_including_external_mate": 141,
+        "current_b_total_including_external_mate": 140,
         "bias_rows": 1,
         "supplement_rows": 2
       },
@@ -236,12 +236,12 @@
             {
               "manufacturer_part": "CJP300J8R2J",
               "manufacturer": null,
-              "supplier_part": "C269699",
+              "supplier_part": null,
               "quantity": 1,
               "references": [
                 "R_PRE"
               ],
-              "reason": "manufacturer_unresolved"
+              "reason": "no_verified_lcsc_code"
             },
             {
               "manufacturer_part": "1384-BK",
@@ -711,12 +711,12 @@
                 {
                   "manufacturer_part": "CJP300J8R2J",
                   "manufacturer": null,
-                  "supplier_part": "C269699",
+                  "supplier_part": null,
                   "quantity": 1,
                   "references": [
                     "R_PRE"
                   ],
-                  "reason": "manufacturer_unresolved"
+                  "reason": "no_verified_lcsc_code"
                 },
                 {
                   "manufacturer_part": "1384-BK",
@@ -905,24 +905,14 @@
           }
         },
         "FOC-A": {
-          "demand_quantity": 157,
-          "sku_count": 63,
-          "verified_quoted_sku_count": 27,
-          "verified_installed_subtotal_cny": 93.351525,
+          "demand_quantity": 141,
+          "sku_count": 55,
+          "verified_quoted_sku_count": 23,
+          "verified_installed_subtotal_cny": 67.388825,
           "complete_module_total_cny": null,
-          "unpriced_sku_count": 36,
-          "unpriced_quantity": 91,
+          "unpriced_sku_count": 32,
+          "unpriced_quantity": 83,
           "unpriced_items": [
-            {
-              "manufacturer_part": "Eaton CBBF-60",
-              "manufacturer": null,
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "F_BRAKE"
-              ],
-              "reason": "no_verified_lcsc_code"
-            },
             {
               "manufacturer_part": "Jumper3",
               "manufacturer": null,
@@ -934,16 +924,6 @@
                 "JP_HC"
               ],
               "reason": "manufacturer_unresolved"
-            },
-            {
-              "manufacturer_part": null,
-              "manufacturer": "Anderson Power Products",
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "J_BRAKE_R"
-              ],
-              "reason": "missing_exact_mpn"
             },
             {
               "manufacturer_part": "DFLS1100-7",
@@ -969,9 +949,8 @@
               "manufacturer_part": "HC-XH2.54-2AW-M",
               "manufacturer": "Hongcheng (虹成)",
               "supplier_part": "C53454752",
-              "quantity": 3,
+              "quantity": 2,
               "references": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ],
@@ -1100,13 +1079,12 @@
               "manufacturer_part": "C1608X7R1A104K080AE",
               "manufacturer": "TDK",
               "supplier_part": null,
-              "quantity": 7,
+              "quantity": 6,
               "references": [
                 "C_HALL_VCC2",
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ],
@@ -1215,40 +1193,18 @@
               "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
             },
             {
-              "manufacturer_part": "UCC27511ADBVR",
-              "manufacturer": "TI(德州仪器)",
-              "supplier_part": "C2676982",
-              "quantity": 1,
-              "references": [
-                "U4"
-              ],
-              "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-            },
-            {
               "manufacturer_part": "MFE04542-T1",
               "manufacturer": "TML / 特米勒",
               "supplier_part": "C499680",
-              "quantity": 6,
+              "quantity": 5,
               "references": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
               ],
               "reason": "quote_manufacturer_does_not_match_current_identity"
-            },
-            {
-              "manufacturer_part": "LPS0300H2R00FB",
-              "manufacturer": "Vishay Sfernice",
-              "supplier_part": null,
-              "quantity": 2,
-              "references": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ],
-              "reason": "no_verified_lcsc_code"
             },
             {
               "manufacturer_part": "PT0603FR-070R82L",
@@ -1329,18 +1285,18 @@
               "reason": "no_verified_lcsc_code"
             }
           ],
-          "query_failure_sku_count": 16,
-          "query_failure_quantity": 41,
-          "identity_unresolved_sku_count": 20,
+          "query_failure_sku_count": 15,
+          "query_failure_quantity": 40,
+          "identity_unresolved_sku_count": 17,
           "stock_shortage_sku_count": 0,
           "stock_unknown_sku_count": 1,
           "scope_breakdown": {
             "on_board": {
-              "demand_quantity": 148,
-              "verified_quoted_sku_count": 26,
-              "verified_installed_subtotal_cny": 91.367425,
-              "unpriced_sku_count": 31,
-              "unpriced_quantity": 83,
+              "demand_quantity": 136,
+              "verified_quoted_sku_count": 22,
+              "verified_installed_subtotal_cny": 65.404725,
+              "unpriced_sku_count": 30,
+              "unpriced_quantity": 79,
               "complete_scope_total_cny": null,
               "unpriced_items": [
                 {
@@ -1369,9 +1325,8 @@
                   "manufacturer_part": "HC-XH2.54-2AW-M",
                   "manufacturer": "Hongcheng (虹成)",
                   "supplier_part": "C53454752",
-                  "quantity": 3,
+                  "quantity": 2,
                   "references": [
-                    "J_TEMP",
                     "J_TEMP_MOS",
                     "J_TEMP_MOTOR"
                   ],
@@ -1488,13 +1443,12 @@
                   "manufacturer_part": "C1608X7R1A104K080AE",
                   "manufacturer": "TDK",
                   "supplier_part": null,
-                  "quantity": 7,
+                  "quantity": 6,
                   "references": [
                     "C_HALL_VCC2",
                     "C_U7",
                     "U1_VREF_C",
                     "U3_C1",
-                    "U4_C1",
                     "U5_C",
                     "U5_VIO_C"
                   ],
@@ -1603,24 +1557,13 @@
                   "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
                 },
                 {
-                  "manufacturer_part": "UCC27511ADBVR",
-                  "manufacturer": "TI(德州仪器)",
-                  "supplier_part": "C2676982",
-                  "quantity": 1,
-                  "references": [
-                    "U4"
-                  ],
-                  "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-                },
-                {
                   "manufacturer_part": "MFE04542-T1",
                   "manufacturer": "TML / 特米勒",
                   "supplier_part": "C499680",
-                  "quantity": 6,
+                  "quantity": 5,
                   "references": [
                     "J_BUS_N",
                     "J_BUS_P",
-                    "J_DUMP_SW",
                     "J_MOTOR_U",
                     "J_MOTOR_V",
                     "J_MOTOR_W"
@@ -1717,33 +1660,13 @@
               "unpriced_items": []
             },
             "external_accessory": {
-              "demand_quantity": 9,
+              "demand_quantity": 5,
               "verified_quoted_sku_count": 1,
               "verified_installed_subtotal_cny": 1.9841,
-              "unpriced_sku_count": 5,
-              "unpriced_quantity": 8,
+              "unpriced_sku_count": 2,
+              "unpriced_quantity": 4,
               "complete_scope_total_cny": null,
               "unpriced_items": [
-                {
-                  "manufacturer_part": "Eaton CBBF-60",
-                  "manufacturer": null,
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "F_BRAKE"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": null,
-                  "manufacturer": "Anderson Power Products",
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "J_BRAKE_R"
-                  ],
-                  "reason": "missing_exact_mpn"
-                },
                 {
                   "manufacturer_part": "Eaton CBBF-100",
                   "manufacturer": "Eaton Bussmann",
@@ -1763,17 +1686,6 @@
                     "CBUS1",
                     "CBUS2",
                     "CBUS3"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": "LPS0300H2R00FB",
-                  "manufacturer": "Vishay Sfernice",
-                  "supplier_part": null,
-                  "quantity": 2,
-                  "references": [
-                    "R_DUMP_A",
-                    "R_DUMP_B"
                   ],
                   "reason": "no_verified_lcsc_code"
                 }
@@ -3324,15 +3236,13 @@
         {
           "manufacturer_part": "CJP300J8R2J",
           "manufacturer": null,
-          "supplier_part": "C269699",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C269699",
+          "supplier_part": null,
+          "supplier": null,
+          "source_supplier_part": null,
           "source_supplier_parts": [
-            "C269699"
+            null
           ],
-          "supplier_part_resolution_sources": [
-            "BMS_price_audit_input"
-          ],
+          "supplier_part_resolution_sources": [],
           "supplier_code_verified_from_quote": false,
           "quantity_required": 1,
           "quantity_by_module": {
@@ -3365,57 +3275,6 @@
           ],
           "identity_notes": [
             "ambiguous_manufacturer_candidates",
-            "manufacturer_unresolved"
-          ],
-          "quote_match_status": "manufacturer_unresolved",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 1
-        },
-        {
-          "manufacturer_part": "Eaton CBBF-60",
-          "manufacturer": null,
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "FOC-A": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "F_BRAKE"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "F_BRAKE"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
             "manufacturer_unresolved",
             "no_verified_lcsc_code"
           ],
@@ -3743,58 +3602,6 @@
           "stock_status": "not_queried",
           "stock_shortage": false,
           "unpriced_quantity": 2
-        },
-        {
-          "manufacturer_part": null,
-          "manufacturer": "Anderson Power Products",
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "FOC-A": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "J_BRAKE_R"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "J_BRAKE_R"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
-            "missing_exact_mpn",
-            "no_verified_lcsc_code"
-          ],
-          "quote_match_status": "missing_exact_mpn",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "AT3H74-CuH-S",
@@ -6886,31 +6693,29 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 3,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 3
+            "FOC-A": 2
           },
           "references_by_module": {
             "FOC-A": [
-              "J_TEMP",
               "J_TEMP_MOS",
               "J_TEMP_MOTOR"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 3
+              "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
             "FOC-A": {
               "on_board": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ]
@@ -6926,7 +6731,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 3
+          "unpriced_quantity": 2
         },
         {
           "manufacturer_part": "RYHG35V100UF6*8",
@@ -7323,7 +7128,7 @@
         },
         {
           "manufacturer_part": "IRLB4030PBF",
-          "manufacturer": "Infineon",
+          "manufacturer": "Infineon(英飞凌)",
           "supplier_part": "C2663",
           "supplier": "LCSC_CN",
           "source_supplier_part": "C2663",
@@ -7334,42 +7139,27 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 3,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 1,
             "REGULATOR": 2
           },
           "references_by_module": {
-            "FOC-A": [
-              "Q7"
-            ],
             "REGULATOR": [
               "Q_MAIN_H",
               "Q_MAIN_L"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "Q7"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "Q_MAIN_H",
@@ -7378,7 +7168,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [],
@@ -7415,10 +7204,10 @@
             "identity_evidence": null,
             "raw_evidence": "Root browser visible 最新价格 / 库存总量 / 最小起订量; exact product MPN and C-code matched."
           },
-          "installed_value_cny": 77.1,
+          "installed_value_cny": 51.4,
           "purchase": {
-            "cash_cost_at_required_order_lot_cny": 77.1,
-            "purchase_quantity": 3,
+            "cash_cost_at_required_order_lot_cny": 51.4,
+            "purchase_quantity": 2,
             "unit_price_cny": 25.7,
             "tier_min_quantity": 1,
             "overbuy_quantity": 0,
@@ -11235,10 +11024,10 @@
             "verified_quote_identity"
           ],
           "supplier_code_verified_from_quote": true,
-          "quantity_required": 18,
+          "quantity_required": 17,
           "quantity_by_module": {
             "BMS": 11,
-            "FOC-A": 5,
+            "FOC-A": 4,
             "PUMP": 2
           },
           "references_by_module": {
@@ -11259,8 +11048,7 @@
               "U1_DVDD_C",
               "U1_VCP_C",
               "U1_VGLS_C",
-              "U3_C2",
-              "U4_C2"
+              "U3_C2"
             ],
             "PUMP": [
               "C_DRV_DVDD",
@@ -11272,7 +11060,7 @@
               "on_board": 11
             },
             "FOC-A": {
-              "FOC_BOM": 5
+              "FOC_BOM": 4
             },
             "PUMP": {
               "ON_BOARD": 2
@@ -11283,7 +11071,7 @@
               "on_board": 11
             },
             "FOC-A": {
-              "on_board": 5
+              "on_board": 4
             },
             "PUMP": {
               "on_board": 2
@@ -11310,8 +11098,7 @@
                 "U1_DVDD_C",
                 "U1_VCP_C",
                 "U1_VGLS_C",
-                "U3_C2",
-                "U4_C2"
+                "U3_C2"
               ]
             },
             "PUMP": {
@@ -11371,10 +11158,10 @@
             "identity_evidence": "可见立创商城商品页同时显示商品型号CL10B105KA8NNNC、品牌SAMSUNG(三星)、商品编号C29936；规格参数可见1uF、±10%、25V、X7R、0603。",
             "raw_evidence": "可见AX/页面原文：CL10B105KA8NNNC当前没有现货库存，但支持订货。最新价格：10+ ￥0.1253；100+ ￥0.0983；300+ ￥0.0863；1000+ ￥0.0774；4000+ ￥0.0621（￥248.4/圆盘）；8000+ ￥0.0597（￥238.8/圆盘）。购买数量：4000个/圆盘，最小起订量10个。库存区显示在途：820,000，3个工作日内发货。现货库存记0，在途独立记录；未观测下单倍数。"
           },
-          "installed_value_cny": 2.2554,
+          "installed_value_cny": 2.1301,
           "purchase": {
-            "cash_cost_at_required_order_lot_cny": 2.2554,
-            "purchase_quantity": 18,
+            "cash_cost_at_required_order_lot_cny": 2.1301,
+            "purchase_quantity": 17,
             "unit_price_cny": 0.1253,
             "tier_min_quantity": 10,
             "overbuy_quantity": 0,
@@ -12157,9 +11944,9 @@
           ],
           "supplier_part_resolution_sources": [],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 7,
+          "quantity_required": 6,
           "quantity_by_module": {
-            "FOC-A": 7
+            "FOC-A": 6
           },
           "references_by_module": {
             "FOC-A": [
@@ -12167,19 +11954,18 @@
               "C_U7",
               "U1_VREF_C",
               "U3_C1",
-              "U4_C1",
               "U5_C",
               "U5_VIO_C"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 7
+              "FOC_BOM": 6
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 7
+              "on_board": 6
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -12189,7 +11975,6 @@
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ]
@@ -12207,7 +11992,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 7
+          "unpriced_quantity": 6
         },
         {
           "manufacturer_part": "C1608X7R1C474K080AC",
@@ -14508,41 +14293,26 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
+          "quantity_required": 1,
           "quantity_by_module": {
-            "FOC-A": 1,
             "REGULATOR": 1
           },
           "references_by_module": {
-            "FOC-A": [
-              "U4"
-            ],
             "REGULATOR": [
               "U_DUMP_DRV"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 1
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 1
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "U4"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "U_DUMP_DRV"
@@ -14550,7 +14320,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [],
@@ -14560,7 +14329,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 2
+          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "MFE04542-T1",
@@ -14575,15 +14344,14 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 6,
+          "quantity_required": 5,
           "quantity_by_module": {
-            "FOC-A": 6
+            "FOC-A": 5
           },
           "references_by_module": {
             "FOC-A": [
               "J_BUS_N",
               "J_BUS_P",
-              "J_DUMP_SW",
               "J_MOTOR_U",
               "J_MOTOR_V",
               "J_MOTOR_W"
@@ -14591,12 +14359,12 @@
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 6
+              "FOC_BOM": 5
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 6
+              "on_board": 5
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -14604,7 +14372,6 @@
               "on_board": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
@@ -14621,7 +14388,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 6
+          "unpriced_quantity": 5
         },
         {
           "manufacturer_part": "CC0805CG100V102GN",
@@ -16277,59 +16044,6 @@
           "unpriced_quantity": 1
         },
         {
-          "manufacturer_part": "LPS0300H2R00FB",
-          "manufacturer": "Vishay Sfernice",
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
-          "quantity_by_module": {
-            "FOC-A": 2
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_DUMP_A",
-              "R_DUMP_B"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 2
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 2
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
-            "no_verified_lcsc_code"
-          ],
-          "quote_match_status": "no_verified_lcsc_code",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 2
-        },
-        {
           "manufacturer_part": "WeAct Normal STM32G431CBU6 QFN48 core board",
           "manufacturer": "WeAct",
           "supplier_part": null,
@@ -16835,33 +16549,31 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 3,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 3
+            "FOC-A": 2
           },
           "references_by_module": {
             "FOC-A": [
               "R_BUCK_CLAMP_BUS",
-              "R_BUCK_VALID_PD",
-              "R_THERM_SER"
+              "R_BUCK_VALID_PD"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 3
+              "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
             "FOC-A": {
               "on_board": [
                 "R_BUCK_CLAMP_BUS",
-                "R_BUCK_VALID_PD",
-                "R_THERM_SER"
+                "R_BUCK_VALID_PD"
               ]
             }
           },
@@ -16906,13 +16618,13 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0158; 1000+ CNY 0.0127; 5000+ CNY 0.0112; 10000+ CNY 0.0104; 50000+ CNY 0.0098; MOQ: 100; stock: 7946900"
           },
-          "installed_value_cny": 0.0474,
+          "installed_value_cny": 0.0316,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 1.58,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0158,
             "tier_min_quantity": 100,
-            "overbuy_quantity": 97,
+            "overbuy_quantity": 98,
             "status": "order_multiple_unknown_assumed_piece_quantity",
             "order_multiple_known": false,
             "moq": 100,
@@ -17045,9 +16757,9 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 18,
+          "quantity_required": 16,
           "quantity_by_module": {
-            "FOC-A": 18
+            "FOC-A": 16
           },
           "references_by_module": {
             "FOC-A": [
@@ -17058,8 +16770,6 @@
               "R_CAN_STB_PU",
               "R_CAN_TX_PU",
               "R_DRV_EN_PD",
-              "R_DUMP_GATE_PD",
-              "R_DUMP_INP_PD",
               "R_GS_UH",
               "R_GS_UL",
               "R_GS_VH",
@@ -17073,12 +16783,12 @@
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 18
+              "FOC_BOM": 16
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 18
+              "on_board": 16
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -17091,8 +16801,6 @@
                 "R_CAN_STB_PU",
                 "R_CAN_TX_PU",
                 "R_DRV_EN_PD",
-                "R_DUMP_GATE_PD",
-                "R_DUMP_INP_PD",
                 "R_GS_UH",
                 "R_GS_UL",
                 "R_GS_VH",
@@ -17146,13 +16854,13 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0215; 1000+ CNY 0.0161; 5000+ CNY 0.0132; 10000+ CNY 0.0115; 50000+ CNY 0.0097; MOQ: 100; stock: 1875000"
           },
-          "installed_value_cny": 0.387,
+          "installed_value_cny": 0.344,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 2.15,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0215,
             "tier_min_quantity": 100,
-            "overbuy_quantity": 82,
+            "overbuy_quantity": 84,
             "status": "order_multiple_unknown_assumed_piece_quantity",
             "order_multiple_known": false,
             "moq": 100,
@@ -17168,7 +16876,7 @@
         },
         {
           "manufacturer_part": "RC0603FR-0710RL",
-          "manufacturer": "Yageo",
+          "manufacturer": "YAGEO(国巨)",
           "supplier_part": "C109318",
           "supplier": "LCSC_CN",
           "source_supplier_part": "C109318",
@@ -17179,42 +16887,27 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 3,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 1,
             "REGULATOR": 2
           },
           "references_by_module": {
-            "FOC-A": [
-              "R_DUMP_GATE"
-            ],
             "REGULATOR": [
               "R_DUMP_OH",
               "R_DUMP_OL"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_DUMP_GATE"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "R_DUMP_OH",
@@ -17223,7 +16916,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [
@@ -17270,13 +16962,13 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0372; 1000+ CNY 0.0275; 5000+ CNY 0.0232; 10000+ CNY 0.02; 50000+ CNY 0.0187; 100000+ CNY 0.0179; MOQ: 100; stock: 5252700"
           },
-          "installed_value_cny": 0.1116,
+          "installed_value_cny": 0.0744,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 3.72,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0372,
             "tier_min_quantity": 100,
-            "overbuy_quantity": 97,
+            "overbuy_quantity": 98,
             "status": "order_multiple_unknown_assumed_piece_quantity",
             "order_multiple_known": false,
             "moq": 100,
@@ -17285,106 +16977,6 @@
             "order_multiple": null,
             "stock_status": "sufficient_at_observation",
             "stock_quantity": 5252700
-          },
-          "stock_status": "sufficient_at_observation",
-          "stock_shortage": false,
-          "unpriced_quantity": 0
-        },
-        {
-          "manufacturer_part": "RC0603FR-0712KL",
-          "manufacturer": "Yageo",
-          "supplier_part": "C114659",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C114659",
-          "source_supplier_parts": [
-            "C114659"
-          ],
-          "supplier_part_resolution_sources": [
-            "current_BOM"
-          ],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "FOC-A": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_THERM_TOP"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_THERM_TOP"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [],
-          "quote_match_status": "verified_exact_quote",
-          "quote": {
-            "quote_id": "LCSC_CN-C114659-20261021",
-            "source_url": "https://item.szlcsc.com/115903.html",
-            "captured_at_utc": "2026-10-21T04:18:12.454000Z",
-            "currency": "CNY",
-            "price_tiers": [
-              {
-                "min_quantity": 100,
-                "unit_price": 0.0232
-              },
-              {
-                "min_quantity": 1000,
-                "unit_price": 0.0175
-              },
-              {
-                "min_quantity": 5000,
-                "unit_price": 0.0146
-              },
-              {
-                "min_quantity": 10000,
-                "unit_price": 0.0132
-              },
-              {
-                "min_quantity": 50000,
-                "unit_price": 0.0114
-              }
-            ],
-            "moq": 100,
-            "order_multiple": null,
-            "stock_quantity": 1156300,
-            "availability": "in_stock_snapshot",
-            "tax_status": "not_supplied_in_compact_batch",
-            "shipping_included": null,
-            "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
-            "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0232; 1000+ CNY 0.0175; 5000+ CNY 0.0146; 10000+ CNY 0.0132; 50000+ CNY 0.0114; MOQ: 100; stock: 1156300"
-          },
-          "installed_value_cny": 0.0232,
-          "purchase": {
-            "cash_cost_at_required_order_lot_cny": 2.32,
-            "purchase_quantity": 100,
-            "unit_price_cny": 0.0232,
-            "tier_min_quantity": 100,
-            "overbuy_quantity": 99,
-            "status": "order_multiple_unknown_assumed_piece_quantity",
-            "order_multiple_known": false,
-            "moq": 100,
-            "moq_basis": "recorded_quote_field",
-            "moq_known": true,
-            "order_multiple": null,
-            "stock_status": "sufficient_at_observation",
-            "stock_quantity": 1156300
           },
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
@@ -17705,106 +17297,6 @@
             "order_multiple": null,
             "stock_status": "sufficient_at_observation",
             "stock_quantity": 105900
-          },
-          "stock_status": "sufficient_at_observation",
-          "stock_shortage": false,
-          "unpriced_quantity": 0
-        },
-        {
-          "manufacturer_part": "RC0603FR-0720KL",
-          "manufacturer": "Yageo",
-          "supplier_part": "C105575",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C105575",
-          "source_supplier_parts": [
-            "C105575"
-          ],
-          "supplier_part_resolution_sources": [
-            "current_BOM"
-          ],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 1,
-          "quantity_by_module": {
-            "FOC-A": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_THERM_BOT"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_THERM_BOT"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [],
-          "quote_match_status": "verified_exact_quote",
-          "quote": {
-            "quote_id": "LCSC_CN-C105575-20261021",
-            "source_url": "https://item.szlcsc.com/106790.html",
-            "captured_at_utc": "2026-10-21T04:18:09.911000Z",
-            "currency": "CNY",
-            "price_tiers": [
-              {
-                "min_quantity": 100,
-                "unit_price": 0.0182
-              },
-              {
-                "min_quantity": 1000,
-                "unit_price": 0.0138
-              },
-              {
-                "min_quantity": 5000,
-                "unit_price": 0.0117
-              },
-              {
-                "min_quantity": 10000,
-                "unit_price": 0.0105
-              },
-              {
-                "min_quantity": 50000,
-                "unit_price": 0.0095
-              }
-            ],
-            "moq": 100,
-            "order_multiple": null,
-            "stock_quantity": 3155000,
-            "availability": "in_stock_snapshot",
-            "tax_status": "not_supplied_in_compact_batch",
-            "shipping_included": null,
-            "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
-            "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0182; 1000+ CNY 0.0138; 5000+ CNY 0.0117; 10000+ CNY 0.0105; 50000+ CNY 0.0095; MOQ: 100; stock: 3155000"
-          },
-          "installed_value_cny": 0.0182,
-          "purchase": {
-            "cash_cost_at_required_order_lot_cny": 1.82,
-            "purchase_quantity": 100,
-            "unit_price_cny": 0.0182,
-            "tier_min_quantity": 100,
-            "overbuy_quantity": 99,
-            "status": "order_multiple_unknown_assumed_piece_quantity",
-            "order_multiple_known": false,
-            "moq": 100,
-            "moq_basis": "recorded_quote_field",
-            "moq_known": true,
-            "order_multiple": null,
-            "stock_status": "sufficient_at_observation",
-            "stock_quantity": 3155000
           },
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
@@ -19235,11 +18727,11 @@
           "note": "首轮采购现金风险示例；按合并需求与已声明MOQ/阶梯估算，不代表建议替换或最低系统成本"
         }
       ],
-      "verified_installed_subtotal_cny": 692.475577,
+      "verified_installed_subtotal_cny": 666.512877,
       "complete_installed_total_cny": null,
-      "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 861.099525,
-      "known_sku_overbuy_quantity": 3517,
-      "known_sku_cash_overbuy_vs_installed_value_cny": 168.623948,
+      "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 831.134225,
+      "known_sku_overbuy_quantity": 3323,
+      "known_sku_cash_overbuy_vs_installed_value_cny": 164.621348,
       "complete_minimum_cash_purchase_cny": null,
       "all_current_skus_have_verified_quotes": false,
       "all_required_quantities_and_identities_known": false,
@@ -19247,14 +18739,14 @@
       "stock_shortage_sku_count": 1,
       "stock_unknown_sku_count": 4,
       "stock_review_sku_count": 4,
-      "unpriced_sku_count": 107,
-      "unpriced_quantity": 285,
+      "unpriced_sku_count": 104,
+      "unpriced_quantity": 277,
       "cost_scope": "当前BOM采购件+板外配套；不含PCB、SMT、运输；税费仅按报价页明确字段记录，不推算",
       "partial_cost_semantics": "已核价SKU的实装折算小计/最低现金估算；未核价SKU数量保留，完整总价为null"
     },
     "actual_vehicle": {
       "scenario": "actual_vehicle",
-      "label": "整车电力模块组合：BMS×1 + FOC-A×1 + FOC-B×1 + 稳压×1 + 水泵×1（不含36节电芯、2台电机等整车其他物料）",
+      "label": "整车电力模块组合：BMS×1 + FOC-A×1 + FOC-B×1 + 稳压×1 + 水泵×1（不含电芯、2台电机等整车其他物料）",
       "module_multipliers": {
         "BMS": 1,
         "FOC-A": 1,
@@ -19285,12 +18777,12 @@
             {
               "manufacturer_part": "CJP300J8R2J",
               "manufacturer": null,
-              "supplier_part": "C269699",
+              "supplier_part": null,
               "quantity": 1,
               "references": [
                 "R_PRE"
               ],
-              "reason": "manufacturer_unresolved"
+              "reason": "no_verified_lcsc_code"
             },
             {
               "manufacturer_part": "1384-BK",
@@ -19760,12 +19252,12 @@
                 {
                   "manufacturer_part": "CJP300J8R2J",
                   "manufacturer": null,
-                  "supplier_part": "C269699",
+                  "supplier_part": null,
                   "quantity": 1,
                   "references": [
                     "R_PRE"
                   ],
-                  "reason": "manufacturer_unresolved"
+                  "reason": "no_verified_lcsc_code"
                 },
                 {
                   "manufacturer_part": "1384-BK",
@@ -19954,24 +19446,14 @@
           }
         },
         "FOC-A": {
-          "demand_quantity": 157,
-          "sku_count": 63,
-          "verified_quoted_sku_count": 27,
-          "verified_installed_subtotal_cny": 93.351525,
+          "demand_quantity": 141,
+          "sku_count": 55,
+          "verified_quoted_sku_count": 23,
+          "verified_installed_subtotal_cny": 67.388825,
           "complete_module_total_cny": null,
-          "unpriced_sku_count": 36,
-          "unpriced_quantity": 91,
+          "unpriced_sku_count": 32,
+          "unpriced_quantity": 83,
           "unpriced_items": [
-            {
-              "manufacturer_part": "Eaton CBBF-60",
-              "manufacturer": null,
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "F_BRAKE"
-              ],
-              "reason": "no_verified_lcsc_code"
-            },
             {
               "manufacturer_part": "Jumper3",
               "manufacturer": null,
@@ -19983,16 +19465,6 @@
                 "JP_HC"
               ],
               "reason": "manufacturer_unresolved"
-            },
-            {
-              "manufacturer_part": null,
-              "manufacturer": "Anderson Power Products",
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "J_BRAKE_R"
-              ],
-              "reason": "missing_exact_mpn"
             },
             {
               "manufacturer_part": "DFLS1100-7",
@@ -20018,9 +19490,8 @@
               "manufacturer_part": "HC-XH2.54-2AW-M",
               "manufacturer": "Hongcheng (虹成)",
               "supplier_part": "C53454752",
-              "quantity": 3,
+              "quantity": 2,
               "references": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ],
@@ -20149,13 +19620,12 @@
               "manufacturer_part": "C1608X7R1A104K080AE",
               "manufacturer": "TDK",
               "supplier_part": null,
-              "quantity": 7,
+              "quantity": 6,
               "references": [
                 "C_HALL_VCC2",
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ],
@@ -20264,40 +19734,18 @@
               "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
             },
             {
-              "manufacturer_part": "UCC27511ADBVR",
-              "manufacturer": "TI(德州仪器)",
-              "supplier_part": "C2676982",
-              "quantity": 1,
-              "references": [
-                "U4"
-              ],
-              "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-            },
-            {
               "manufacturer_part": "MFE04542-T1",
               "manufacturer": "TML / 特米勒",
               "supplier_part": "C499680",
-              "quantity": 6,
+              "quantity": 5,
               "references": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
               ],
               "reason": "quote_manufacturer_does_not_match_current_identity"
-            },
-            {
-              "manufacturer_part": "LPS0300H2R00FB",
-              "manufacturer": "Vishay Sfernice",
-              "supplier_part": null,
-              "quantity": 2,
-              "references": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ],
-              "reason": "no_verified_lcsc_code"
             },
             {
               "manufacturer_part": "PT0603FR-070R82L",
@@ -20378,18 +19826,18 @@
               "reason": "no_verified_lcsc_code"
             }
           ],
-          "query_failure_sku_count": 16,
-          "query_failure_quantity": 41,
-          "identity_unresolved_sku_count": 20,
+          "query_failure_sku_count": 15,
+          "query_failure_quantity": 40,
+          "identity_unresolved_sku_count": 17,
           "stock_shortage_sku_count": 0,
           "stock_unknown_sku_count": 1,
           "scope_breakdown": {
             "on_board": {
-              "demand_quantity": 148,
-              "verified_quoted_sku_count": 26,
-              "verified_installed_subtotal_cny": 91.367425,
-              "unpriced_sku_count": 31,
-              "unpriced_quantity": 83,
+              "demand_quantity": 136,
+              "verified_quoted_sku_count": 22,
+              "verified_installed_subtotal_cny": 65.404725,
+              "unpriced_sku_count": 30,
+              "unpriced_quantity": 79,
               "complete_scope_total_cny": null,
               "unpriced_items": [
                 {
@@ -20418,9 +19866,8 @@
                   "manufacturer_part": "HC-XH2.54-2AW-M",
                   "manufacturer": "Hongcheng (虹成)",
                   "supplier_part": "C53454752",
-                  "quantity": 3,
+                  "quantity": 2,
                   "references": [
-                    "J_TEMP",
                     "J_TEMP_MOS",
                     "J_TEMP_MOTOR"
                   ],
@@ -20537,13 +19984,12 @@
                   "manufacturer_part": "C1608X7R1A104K080AE",
                   "manufacturer": "TDK",
                   "supplier_part": null,
-                  "quantity": 7,
+                  "quantity": 6,
                   "references": [
                     "C_HALL_VCC2",
                     "C_U7",
                     "U1_VREF_C",
                     "U3_C1",
-                    "U4_C1",
                     "U5_C",
                     "U5_VIO_C"
                   ],
@@ -20652,24 +20098,13 @@
                   "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
                 },
                 {
-                  "manufacturer_part": "UCC27511ADBVR",
-                  "manufacturer": "TI(德州仪器)",
-                  "supplier_part": "C2676982",
-                  "quantity": 1,
-                  "references": [
-                    "U4"
-                  ],
-                  "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-                },
-                {
                   "manufacturer_part": "MFE04542-T1",
                   "manufacturer": "TML / 特米勒",
                   "supplier_part": "C499680",
-                  "quantity": 6,
+                  "quantity": 5,
                   "references": [
                     "J_BUS_N",
                     "J_BUS_P",
-                    "J_DUMP_SW",
                     "J_MOTOR_U",
                     "J_MOTOR_V",
                     "J_MOTOR_W"
@@ -20766,33 +20201,13 @@
               "unpriced_items": []
             },
             "external_accessory": {
-              "demand_quantity": 9,
+              "demand_quantity": 5,
               "verified_quoted_sku_count": 1,
               "verified_installed_subtotal_cny": 1.9841,
-              "unpriced_sku_count": 5,
-              "unpriced_quantity": 8,
+              "unpriced_sku_count": 2,
+              "unpriced_quantity": 4,
               "complete_scope_total_cny": null,
               "unpriced_items": [
-                {
-                  "manufacturer_part": "Eaton CBBF-60",
-                  "manufacturer": null,
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "F_BRAKE"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": null,
-                  "manufacturer": "Anderson Power Products",
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "J_BRAKE_R"
-                  ],
-                  "reason": "missing_exact_mpn"
-                },
                 {
                   "manufacturer_part": "Eaton CBBF-100",
                   "manufacturer": "Eaton Bussmann",
@@ -20812,17 +20227,6 @@
                     "CBUS1",
                     "CBUS2",
                     "CBUS3"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": "LPS0300H2R00FB",
-                  "manufacturer": "Vishay Sfernice",
-                  "supplier_part": null,
-                  "quantity": 2,
-                  "references": [
-                    "R_DUMP_A",
-                    "R_DUMP_B"
                   ],
                   "reason": "no_verified_lcsc_code"
                 }
@@ -20831,24 +20235,14 @@
           }
         },
         "FOC-B": {
-          "demand_quantity": 156,
-          "sku_count": 63,
-          "verified_quoted_sku_count": 27,
-          "verified_installed_subtotal_cny": 93.329925,
+          "demand_quantity": 140,
+          "sku_count": 55,
+          "verified_quoted_sku_count": 23,
+          "verified_installed_subtotal_cny": 67.367225,
           "complete_module_total_cny": null,
-          "unpriced_sku_count": 36,
-          "unpriced_quantity": 91,
+          "unpriced_sku_count": 32,
+          "unpriced_quantity": 83,
           "unpriced_items": [
-            {
-              "manufacturer_part": "Eaton CBBF-60",
-              "manufacturer": null,
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "F_BRAKE"
-              ],
-              "reason": "no_verified_lcsc_code"
-            },
             {
               "manufacturer_part": "Jumper3",
               "manufacturer": null,
@@ -20860,16 +20254,6 @@
                 "JP_HC"
               ],
               "reason": "manufacturer_unresolved"
-            },
-            {
-              "manufacturer_part": null,
-              "manufacturer": "Anderson Power Products",
-              "supplier_part": null,
-              "quantity": 1,
-              "references": [
-                "J_BRAKE_R"
-              ],
-              "reason": "missing_exact_mpn"
             },
             {
               "manufacturer_part": "DFLS1100-7",
@@ -20895,9 +20279,8 @@
               "manufacturer_part": "HC-XH2.54-2AW-M",
               "manufacturer": "Hongcheng (虹成)",
               "supplier_part": "C53454752",
-              "quantity": 3,
+              "quantity": 2,
               "references": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ],
@@ -21026,13 +20409,12 @@
               "manufacturer_part": "C1608X7R1A104K080AE",
               "manufacturer": "TDK",
               "supplier_part": null,
-              "quantity": 7,
+              "quantity": 6,
               "references": [
                 "C_HALL_VCC2",
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ],
@@ -21141,40 +20523,18 @@
               "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
             },
             {
-              "manufacturer_part": "UCC27511ADBVR",
-              "manufacturer": "TI(德州仪器)",
-              "supplier_part": "C2676982",
-              "quantity": 1,
-              "references": [
-                "U4"
-              ],
-              "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-            },
-            {
               "manufacturer_part": "MFE04542-T1",
               "manufacturer": "TML / 特米勒",
               "supplier_part": "C499680",
-              "quantity": 6,
+              "quantity": 5,
               "references": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
               ],
               "reason": "quote_manufacturer_does_not_match_current_identity"
-            },
-            {
-              "manufacturer_part": "LPS0300H2R00FB",
-              "manufacturer": "Vishay Sfernice",
-              "supplier_part": null,
-              "quantity": 2,
-              "references": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ],
-              "reason": "no_verified_lcsc_code"
             },
             {
               "manufacturer_part": "PT0603FR-070R82L",
@@ -21255,18 +20615,18 @@
               "reason": "no_verified_lcsc_code"
             }
           ],
-          "query_failure_sku_count": 16,
-          "query_failure_quantity": 41,
-          "identity_unresolved_sku_count": 20,
+          "query_failure_sku_count": 15,
+          "query_failure_quantity": 40,
+          "identity_unresolved_sku_count": 17,
           "stock_shortage_sku_count": 0,
           "stock_unknown_sku_count": 1,
           "scope_breakdown": {
             "on_board": {
-              "demand_quantity": 147,
-              "verified_quoted_sku_count": 26,
-              "verified_installed_subtotal_cny": 91.345825,
-              "unpriced_sku_count": 31,
-              "unpriced_quantity": 83,
+              "demand_quantity": 135,
+              "verified_quoted_sku_count": 22,
+              "verified_installed_subtotal_cny": 65.383125,
+              "unpriced_sku_count": 30,
+              "unpriced_quantity": 79,
               "complete_scope_total_cny": null,
               "unpriced_items": [
                 {
@@ -21295,9 +20655,8 @@
                   "manufacturer_part": "HC-XH2.54-2AW-M",
                   "manufacturer": "Hongcheng (虹成)",
                   "supplier_part": "C53454752",
-                  "quantity": 3,
+                  "quantity": 2,
                   "references": [
-                    "J_TEMP",
                     "J_TEMP_MOS",
                     "J_TEMP_MOTOR"
                   ],
@@ -21414,13 +20773,12 @@
                   "manufacturer_part": "C1608X7R1A104K080AE",
                   "manufacturer": "TDK",
                   "supplier_part": null,
-                  "quantity": 7,
+                  "quantity": 6,
                   "references": [
                     "C_HALL_VCC2",
                     "C_U7",
                     "U1_VREF_C",
                     "U3_C1",
-                    "U4_C1",
                     "U5_C",
                     "U5_VIO_C"
                   ],
@@ -21529,24 +20887,13 @@
                   "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
                 },
                 {
-                  "manufacturer_part": "UCC27511ADBVR",
-                  "manufacturer": "TI(德州仪器)",
-                  "supplier_part": "C2676982",
-                  "quantity": 1,
-                  "references": [
-                    "U4"
-                  ],
-                  "reason": "no_current_public_quote_for_exact_C_code_and_MPN"
-                },
-                {
                   "manufacturer_part": "MFE04542-T1",
                   "manufacturer": "TML / 特米勒",
                   "supplier_part": "C499680",
-                  "quantity": 6,
+                  "quantity": 5,
                   "references": [
                     "J_BUS_N",
                     "J_BUS_P",
-                    "J_DUMP_SW",
                     "J_MOTOR_U",
                     "J_MOTOR_V",
                     "J_MOTOR_W"
@@ -21643,33 +20990,13 @@
               "unpriced_items": []
             },
             "external_accessory": {
-              "demand_quantity": 9,
+              "demand_quantity": 5,
               "verified_quoted_sku_count": 1,
               "verified_installed_subtotal_cny": 1.9841,
-              "unpriced_sku_count": 5,
-              "unpriced_quantity": 8,
+              "unpriced_sku_count": 2,
+              "unpriced_quantity": 4,
               "complete_scope_total_cny": null,
               "unpriced_items": [
-                {
-                  "manufacturer_part": "Eaton CBBF-60",
-                  "manufacturer": null,
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "F_BRAKE"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": null,
-                  "manufacturer": "Anderson Power Products",
-                  "supplier_part": null,
-                  "quantity": 1,
-                  "references": [
-                    "J_BRAKE_R"
-                  ],
-                  "reason": "missing_exact_mpn"
-                },
                 {
                   "manufacturer_part": "Eaton CBBF-100",
                   "manufacturer": "Eaton Bussmann",
@@ -21689,17 +21016,6 @@
                     "CBUS1",
                     "CBUS2",
                     "CBUS3"
-                  ],
-                  "reason": "no_verified_lcsc_code"
-                },
-                {
-                  "manufacturer_part": "LPS0300H2R00FB",
-                  "manufacturer": "Vishay Sfernice",
-                  "supplier_part": null,
-                  "quantity": 2,
-                  "references": [
-                    "R_DUMP_A",
-                    "R_DUMP_B"
                   ],
                   "reason": "no_verified_lcsc_code"
                 }
@@ -23250,15 +22566,13 @@
         {
           "manufacturer_part": "CJP300J8R2J",
           "manufacturer": null,
-          "supplier_part": "C269699",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C269699",
+          "supplier_part": null,
+          "supplier": null,
+          "source_supplier_part": null,
           "source_supplier_parts": [
-            "C269699"
+            null
           ],
-          "supplier_part_resolution_sources": [
-            "BMS_price_audit_input"
-          ],
+          "supplier_part_resolution_sources": [],
           "supplier_code_verified_from_quote": false,
           "quantity_required": 1,
           "quantity_by_module": {
@@ -23291,72 +22605,6 @@
           ],
           "identity_notes": [
             "ambiguous_manufacturer_candidates",
-            "manufacturer_unresolved"
-          ],
-          "quote_match_status": "manufacturer_unresolved",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 1
-        },
-        {
-          "manufacturer_part": "Eaton CBBF-60",
-          "manufacturer": null,
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
-          "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "F_BRAKE"
-            ],
-            "FOC-B": [
-              "F_BRAKE"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 1
-            },
-            "FOC-B": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "F_BRAKE"
-              ]
-            },
-            "FOC-B": {
-              "external_accessory": [
-                "F_BRAKE"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
             "manufacturer_unresolved",
             "no_verified_lcsc_code"
           ],
@@ -23366,7 +22614,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 2
+          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "Jumper3",
@@ -23697,73 +22945,6 @@
             "no_verified_lcsc_code"
           ],
           "quote_match_status": "no_verified_lcsc_code",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 2
-        },
-        {
-          "manufacturer_part": null,
-          "manufacturer": "Anderson Power Products",
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
-          "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "J_BRAKE_R"
-            ],
-            "FOC-B": [
-              "J_BRAKE_R"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 1
-            },
-            "FOC-B": {
-              "external_accessory": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "J_BRAKE_R"
-              ]
-            },
-            "FOC-B": {
-              "external_accessory": [
-                "J_BRAKE_R"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
-            "missing_exact_mpn",
-            "no_verified_lcsc_code"
-          ],
-          "quote_match_status": "missing_exact_mpn",
           "quote": null,
           "installed_value_cny": null,
           "purchase": null,
@@ -26936,50 +26117,46 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 6,
+          "quantity_required": 4,
           "quantity_by_module": {
-            "FOC-A": 3,
-            "FOC-B": 3
+            "FOC-A": 2,
+            "FOC-B": 2
           },
           "references_by_module": {
             "FOC-A": [
-              "J_TEMP",
               "J_TEMP_MOS",
               "J_TEMP_MOTOR"
             ],
             "FOC-B": [
-              "J_TEMP",
               "J_TEMP_MOS",
               "J_TEMP_MOTOR"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             },
             "FOC-B": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 3
+              "on_board": 2
             },
             "FOC-B": {
-              "on_board": 3
+              "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
             "FOC-A": {
               "on_board": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ]
             },
             "FOC-B": {
               "on_board": [
-                "J_TEMP",
                 "J_TEMP_MOS",
                 "J_TEMP_MOTOR"
               ]
@@ -26995,7 +26172,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 6
+          "unpriced_quantity": 4
         },
         {
           "manufacturer_part": "RYHG35V100UF6*8",
@@ -27417,7 +26594,7 @@
         },
         {
           "manufacturer_part": "IRLB4030PBF",
-          "manufacturer": "Infineon",
+          "manufacturer": "Infineon(英飞凌)",
           "supplier_part": "C2663",
           "supplier": "LCSC_CN",
           "source_supplier_part": "C2663",
@@ -27428,57 +26605,27 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 4,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1,
             "REGULATOR": 2
           },
           "references_by_module": {
-            "FOC-A": [
-              "Q7"
-            ],
-            "FOC-B": [
-              "Q7"
-            ],
             "REGULATOR": [
               "Q_MAIN_H",
               "Q_MAIN_L"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
-            "FOC-B": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "Q7"
-              ]
-            },
-            "FOC-B": {
-              "on_board": [
-                "Q7"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "Q_MAIN_H",
@@ -27487,7 +26634,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [],
@@ -27524,10 +26670,10 @@
             "identity_evidence": null,
             "raw_evidence": "Root browser visible 最新价格 / 库存总量 / 最小起订量; exact product MPN and C-code matched."
           },
-          "installed_value_cny": 102.8,
+          "installed_value_cny": 51.4,
           "purchase": {
-            "cash_cost_at_required_order_lot_cny": 102.8,
-            "purchase_quantity": 4,
+            "cash_cost_at_required_order_lot_cny": 51.4,
+            "purchase_quantity": 2,
             "unit_price_cny": 25.7,
             "tier_min_quantity": 1,
             "overbuy_quantity": 0,
@@ -31523,11 +30669,11 @@
             "verified_quote_identity"
           ],
           "supplier_code_verified_from_quote": true,
-          "quantity_required": 23,
+          "quantity_required": 21,
           "quantity_by_module": {
             "BMS": 11,
-            "FOC-A": 5,
-            "FOC-B": 5,
+            "FOC-A": 4,
+            "FOC-B": 4,
             "PUMP": 2
           },
           "references_by_module": {
@@ -31548,15 +30694,13 @@
               "U1_DVDD_C",
               "U1_VCP_C",
               "U1_VGLS_C",
-              "U3_C2",
-              "U4_C2"
+              "U3_C2"
             ],
             "FOC-B": [
               "U1_DVDD_C",
               "U1_VCP_C",
               "U1_VGLS_C",
-              "U3_C2",
-              "U4_C2"
+              "U3_C2"
             ],
             "PUMP": [
               "C_DRV_DVDD",
@@ -31568,10 +30712,10 @@
               "on_board": 11
             },
             "FOC-A": {
-              "FOC_BOM": 5
+              "FOC_BOM": 4
             },
             "FOC-B": {
-              "FOC_BOM": 5
+              "FOC_BOM": 4
             },
             "PUMP": {
               "ON_BOARD": 2
@@ -31582,10 +30726,10 @@
               "on_board": 11
             },
             "FOC-A": {
-              "on_board": 5
+              "on_board": 4
             },
             "FOC-B": {
-              "on_board": 5
+              "on_board": 4
             },
             "PUMP": {
               "on_board": 2
@@ -31612,8 +30756,7 @@
                 "U1_DVDD_C",
                 "U1_VCP_C",
                 "U1_VGLS_C",
-                "U3_C2",
-                "U4_C2"
+                "U3_C2"
               ]
             },
             "FOC-B": {
@@ -31621,8 +30764,7 @@
                 "U1_DVDD_C",
                 "U1_VCP_C",
                 "U1_VGLS_C",
-                "U3_C2",
-                "U4_C2"
+                "U3_C2"
               ]
             },
             "PUMP": {
@@ -31682,10 +30824,10 @@
             "identity_evidence": "可见立创商城商品页同时显示商品型号CL10B105KA8NNNC、品牌SAMSUNG(三星)、商品编号C29936；规格参数可见1uF、±10%、25V、X7R、0603。",
             "raw_evidence": "可见AX/页面原文：CL10B105KA8NNNC当前没有现货库存，但支持订货。最新价格：10+ ￥0.1253；100+ ￥0.0983；300+ ￥0.0863；1000+ ￥0.0774；4000+ ￥0.0621（￥248.4/圆盘）；8000+ ￥0.0597（￥238.8/圆盘）。购买数量：4000个/圆盘，最小起订量10个。库存区显示在途：820,000，3个工作日内发货。现货库存记0，在途独立记录；未观测下单倍数。"
           },
-          "installed_value_cny": 2.8819,
+          "installed_value_cny": 2.6313,
           "purchase": {
-            "cash_cost_at_required_order_lot_cny": 2.8819,
-            "purchase_quantity": 23,
+            "cash_cost_at_required_order_lot_cny": 2.6313,
+            "purchase_quantity": 21,
             "unit_price_cny": 0.1253,
             "tier_min_quantity": 10,
             "overbuy_quantity": 0,
@@ -32542,10 +31684,10 @@
           ],
           "supplier_part_resolution_sources": [],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 14,
+          "quantity_required": 12,
           "quantity_by_module": {
-            "FOC-A": 7,
-            "FOC-B": 7
+            "FOC-A": 6,
+            "FOC-B": 6
           },
           "references_by_module": {
             "FOC-A": [
@@ -32553,7 +31695,6 @@
               "C_U7",
               "U1_VREF_C",
               "U3_C1",
-              "U4_C1",
               "U5_C",
               "U5_VIO_C"
             ],
@@ -32562,25 +31703,24 @@
               "C_U7",
               "U1_VREF_C",
               "U3_C1",
-              "U4_C1",
               "U5_C",
               "U5_VIO_C"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 7
+              "FOC_BOM": 6
             },
             "FOC-B": {
-              "FOC_BOM": 7
+              "FOC_BOM": 6
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 7
+              "on_board": 6
             },
             "FOC-B": {
-              "on_board": 7
+              "on_board": 6
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -32590,7 +31730,6 @@
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ]
@@ -32601,7 +31740,6 @@
                 "C_U7",
                 "U1_VREF_C",
                 "U3_C1",
-                "U4_C1",
                 "U5_C",
                 "U5_VIO_C"
               ]
@@ -32619,7 +31757,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 14
+          "unpriced_quantity": 12
         },
         {
           "manufacturer_part": "C1608X7R1C474K080AC",
@@ -35126,56 +34264,26 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 3,
+          "quantity_required": 1,
           "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1,
             "REGULATOR": 1
           },
           "references_by_module": {
-            "FOC-A": [
-              "U4"
-            ],
-            "FOC-B": [
-              "U4"
-            ],
             "REGULATOR": [
               "U_DUMP_DRV"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 1
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
-            "FOC-B": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 1
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "U4"
-              ]
-            },
-            "FOC-B": {
-              "on_board": [
-                "U4"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "U_DUMP_DRV"
@@ -35183,7 +34291,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [],
@@ -35193,7 +34300,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 3
+          "unpriced_quantity": 1
         },
         {
           "manufacturer_part": "MFE04542-T1",
@@ -35208,16 +34315,15 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 12,
+          "quantity_required": 10,
           "quantity_by_module": {
-            "FOC-A": 6,
-            "FOC-B": 6
+            "FOC-A": 5,
+            "FOC-B": 5
           },
           "references_by_module": {
             "FOC-A": [
               "J_BUS_N",
               "J_BUS_P",
-              "J_DUMP_SW",
               "J_MOTOR_U",
               "J_MOTOR_V",
               "J_MOTOR_W"
@@ -35225,7 +34331,6 @@
             "FOC-B": [
               "J_BUS_N",
               "J_BUS_P",
-              "J_DUMP_SW",
               "J_MOTOR_U",
               "J_MOTOR_V",
               "J_MOTOR_W"
@@ -35233,18 +34338,18 @@
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 6
+              "FOC_BOM": 5
             },
             "FOC-B": {
-              "FOC_BOM": 6
+              "FOC_BOM": 5
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 6
+              "on_board": 5
             },
             "FOC-B": {
-              "on_board": 6
+              "on_board": 5
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -35252,7 +34357,6 @@
               "on_board": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
@@ -35262,7 +34366,6 @@
               "on_board": [
                 "J_BUS_N",
                 "J_BUS_P",
-                "J_DUMP_SW",
                 "J_MOTOR_U",
                 "J_MOTOR_V",
                 "J_MOTOR_W"
@@ -35279,7 +34382,7 @@
           "purchase": null,
           "stock_status": "not_queried",
           "stock_shortage": false,
-          "unpriced_quantity": 12
+          "unpriced_quantity": 10
         },
         {
           "manufacturer_part": "CC0805CG100V102GN",
@@ -36935,76 +36038,6 @@
           "unpriced_quantity": 1
         },
         {
-          "manufacturer_part": "LPS0300H2R00FB",
-          "manufacturer": "Vishay Sfernice",
-          "supplier_part": null,
-          "supplier": null,
-          "source_supplier_part": null,
-          "source_supplier_parts": [
-            null
-          ],
-          "supplier_part_resolution_sources": [],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 4,
-          "quantity_by_module": {
-            "FOC-A": 2,
-            "FOC-B": 2
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_DUMP_A",
-              "R_DUMP_B"
-            ],
-            "FOC-B": [
-              "R_DUMP_A",
-              "R_DUMP_B"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 2
-            },
-            "FOC-B": {
-              "FOC_BOM": 2
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": 2
-            },
-            "FOC-B": {
-              "external_accessory": 2
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "external_accessory": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ]
-            },
-            "FOC-B": {
-              "external_accessory": [
-                "R_DUMP_A",
-                "R_DUMP_B"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [
-            "no_verified_lcsc_code"
-          ],
-          "quote_match_status": "no_verified_lcsc_code",
-          "quote": null,
-          "installed_value_cny": null,
-          "purchase": null,
-          "stock_status": "not_queried",
-          "stock_shortage": false,
-          "unpriced_quantity": 4
-        },
-        {
           "manufacturer_part": "WeAct Normal STM32G431CBU6 QFN48 core board",
           "manufacturer": "WeAct",
           "supplier_part": null,
@@ -37540,52 +36573,48 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 6,
+          "quantity_required": 4,
           "quantity_by_module": {
-            "FOC-A": 3,
-            "FOC-B": 3
+            "FOC-A": 2,
+            "FOC-B": 2
           },
           "references_by_module": {
             "FOC-A": [
               "R_BUCK_CLAMP_BUS",
-              "R_BUCK_VALID_PD",
-              "R_THERM_SER"
+              "R_BUCK_VALID_PD"
             ],
             "FOC-B": [
               "R_BUCK_CLAMP_BUS",
-              "R_BUCK_VALID_PD",
-              "R_THERM_SER"
+              "R_BUCK_VALID_PD"
             ]
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             },
             "FOC-B": {
-              "FOC_BOM": 3
+              "FOC_BOM": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 3
+              "on_board": 2
             },
             "FOC-B": {
-              "on_board": 3
+              "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
             "FOC-A": {
               "on_board": [
                 "R_BUCK_CLAMP_BUS",
-                "R_BUCK_VALID_PD",
-                "R_THERM_SER"
+                "R_BUCK_VALID_PD"
               ]
             },
             "FOC-B": {
               "on_board": [
                 "R_BUCK_CLAMP_BUS",
-                "R_BUCK_VALID_PD",
-                "R_THERM_SER"
+                "R_BUCK_VALID_PD"
               ]
             }
           },
@@ -37630,13 +36659,13 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0158; 1000+ CNY 0.0127; 5000+ CNY 0.0112; 10000+ CNY 0.0104; 50000+ CNY 0.0098; MOQ: 100; stock: 7946900"
           },
-          "installed_value_cny": 0.0948,
+          "installed_value_cny": 0.0632,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 1.58,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0158,
             "tier_min_quantity": 100,
-            "overbuy_quantity": 94,
+            "overbuy_quantity": 96,
             "status": "order_multiple_unknown_assumed_piece_quantity",
             "order_multiple_known": false,
             "moq": 100,
@@ -37769,10 +36798,10 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 36,
+          "quantity_required": 32,
           "quantity_by_module": {
-            "FOC-A": 18,
-            "FOC-B": 18
+            "FOC-A": 16,
+            "FOC-B": 16
           },
           "references_by_module": {
             "FOC-A": [
@@ -37783,8 +36812,6 @@
               "R_CAN_STB_PU",
               "R_CAN_TX_PU",
               "R_DRV_EN_PD",
-              "R_DUMP_GATE_PD",
-              "R_DUMP_INP_PD",
               "R_GS_UH",
               "R_GS_UL",
               "R_GS_VH",
@@ -37803,8 +36830,6 @@
               "R_CAN_STB_PU",
               "R_CAN_TX_PU",
               "R_DRV_EN_PD",
-              "R_DUMP_GATE_PD",
-              "R_DUMP_INP_PD",
               "R_GS_UH",
               "R_GS_UL",
               "R_GS_VH",
@@ -37818,18 +36843,18 @@
           },
           "quantity_by_scope_by_module": {
             "FOC-A": {
-              "FOC_BOM": 18
+              "FOC_BOM": 16
             },
             "FOC-B": {
-              "FOC_BOM": 18
+              "FOC_BOM": 16
             }
           },
           "quantity_by_scope_bucket_by_module": {
             "FOC-A": {
-              "on_board": 18
+              "on_board": 16
             },
             "FOC-B": {
-              "on_board": 18
+              "on_board": 16
             }
           },
           "references_by_scope_bucket_by_module": {
@@ -37842,8 +36867,6 @@
                 "R_CAN_STB_PU",
                 "R_CAN_TX_PU",
                 "R_DRV_EN_PD",
-                "R_DUMP_GATE_PD",
-                "R_DUMP_INP_PD",
                 "R_GS_UH",
                 "R_GS_UL",
                 "R_GS_VH",
@@ -37864,8 +36887,6 @@
                 "R_CAN_STB_PU",
                 "R_CAN_TX_PU",
                 "R_DRV_EN_PD",
-                "R_DUMP_GATE_PD",
-                "R_DUMP_INP_PD",
                 "R_GS_UH",
                 "R_GS_UL",
                 "R_GS_VH",
@@ -37919,13 +36940,13 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0215; 1000+ CNY 0.0161; 5000+ CNY 0.0132; 10000+ CNY 0.0115; 50000+ CNY 0.0097; MOQ: 100; stock: 1875000"
           },
-          "installed_value_cny": 0.774,
+          "installed_value_cny": 0.688,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 2.15,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0215,
             "tier_min_quantity": 100,
-            "overbuy_quantity": 64,
+            "overbuy_quantity": 68,
             "status": "order_multiple_unknown_assumed_piece_quantity",
             "order_multiple_known": false,
             "moq": 100,
@@ -37941,7 +36962,7 @@
         },
         {
           "manufacturer_part": "RC0603FR-0710RL",
-          "manufacturer": "Yageo",
+          "manufacturer": "YAGEO(国巨)",
           "supplier_part": "C109318",
           "supplier": "LCSC_CN",
           "source_supplier_part": "C109318",
@@ -37952,57 +36973,27 @@
             "current_BOM"
           ],
           "supplier_code_verified_from_quote": false,
-          "quantity_required": 4,
+          "quantity_required": 2,
           "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1,
             "REGULATOR": 2
           },
           "references_by_module": {
-            "FOC-A": [
-              "R_DUMP_GATE"
-            ],
-            "FOC-B": [
-              "R_DUMP_GATE"
-            ],
             "REGULATOR": [
               "R_DUMP_OH",
               "R_DUMP_OL"
             ]
           },
           "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            },
             "REGULATOR": {
               "ON_BOARD": 2
             }
           },
           "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
-            "FOC-B": {
-              "on_board": 1
-            },
             "REGULATOR": {
               "on_board": 2
             }
           },
           "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_DUMP_GATE"
-              ]
-            },
-            "FOC-B": {
-              "on_board": [
-                "R_DUMP_GATE"
-              ]
-            },
             "REGULATOR": {
               "on_board": [
                 "R_DUMP_OH",
@@ -38011,7 +37002,6 @@
             }
           },
           "scopes": [
-            "FOC_BOM",
             "ON_BOARD"
           ],
           "identity_notes": [
@@ -38058,126 +37048,11 @@
             "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
             "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0372; 1000+ CNY 0.0275; 5000+ CNY 0.0232; 10000+ CNY 0.02; 50000+ CNY 0.0187; 100000+ CNY 0.0179; MOQ: 100; stock: 5252700"
           },
-          "installed_value_cny": 0.1488,
+          "installed_value_cny": 0.0744,
           "purchase": {
             "cash_cost_at_required_order_lot_cny": 3.72,
             "purchase_quantity": 100,
             "unit_price_cny": 0.0372,
-            "tier_min_quantity": 100,
-            "overbuy_quantity": 96,
-            "status": "order_multiple_unknown_assumed_piece_quantity",
-            "order_multiple_known": false,
-            "moq": 100,
-            "moq_basis": "recorded_quote_field",
-            "moq_known": true,
-            "order_multiple": null,
-            "stock_status": "sufficient_at_observation",
-            "stock_quantity": 5252700
-          },
-          "stock_status": "sufficient_at_observation",
-          "stock_shortage": false,
-          "unpriced_quantity": 0
-        },
-        {
-          "manufacturer_part": "RC0603FR-0712KL",
-          "manufacturer": "Yageo",
-          "supplier_part": "C114659",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C114659",
-          "source_supplier_parts": [
-            "C114659"
-          ],
-          "supplier_part_resolution_sources": [
-            "current_BOM"
-          ],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
-          "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_THERM_TOP"
-            ],
-            "FOC-B": [
-              "R_THERM_TOP"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
-            "FOC-B": {
-              "on_board": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_THERM_TOP"
-              ]
-            },
-            "FOC-B": {
-              "on_board": [
-                "R_THERM_TOP"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [],
-          "quote_match_status": "verified_exact_quote",
-          "quote": {
-            "quote_id": "LCSC_CN-C114659-20261021",
-            "source_url": "https://item.szlcsc.com/115903.html",
-            "captured_at_utc": "2026-10-21T04:18:12.454000Z",
-            "currency": "CNY",
-            "price_tiers": [
-              {
-                "min_quantity": 100,
-                "unit_price": 0.0232
-              },
-              {
-                "min_quantity": 1000,
-                "unit_price": 0.0175
-              },
-              {
-                "min_quantity": 5000,
-                "unit_price": 0.0146
-              },
-              {
-                "min_quantity": 10000,
-                "unit_price": 0.0132
-              },
-              {
-                "min_quantity": 50000,
-                "unit_price": 0.0114
-              }
-            ],
-            "moq": 100,
-            "order_multiple": null,
-            "stock_quantity": 1156300,
-            "availability": "in_stock_snapshot",
-            "tax_status": "not_supplied_in_compact_batch",
-            "shipping_included": null,
-            "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
-            "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0232; 1000+ CNY 0.0175; 5000+ CNY 0.0146; 10000+ CNY 0.0132; 50000+ CNY 0.0114; MOQ: 100; stock: 1156300"
-          },
-          "installed_value_cny": 0.0464,
-          "purchase": {
-            "cash_cost_at_required_order_lot_cny": 2.32,
-            "purchase_quantity": 100,
-            "unit_price_cny": 0.0232,
             "tier_min_quantity": 100,
             "overbuy_quantity": 98,
             "status": "order_multiple_unknown_assumed_piece_quantity",
@@ -38187,7 +37062,7 @@
             "moq_known": true,
             "order_multiple": null,
             "stock_status": "sufficient_at_observation",
-            "stock_quantity": 1156300
+            "stock_quantity": 5252700
           },
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
@@ -38571,121 +37446,6 @@
             "order_multiple": null,
             "stock_status": "sufficient_at_observation",
             "stock_quantity": 105900
-          },
-          "stock_status": "sufficient_at_observation",
-          "stock_shortage": false,
-          "unpriced_quantity": 0
-        },
-        {
-          "manufacturer_part": "RC0603FR-0720KL",
-          "manufacturer": "Yageo",
-          "supplier_part": "C105575",
-          "supplier": "LCSC_CN",
-          "source_supplier_part": "C105575",
-          "source_supplier_parts": [
-            "C105575"
-          ],
-          "supplier_part_resolution_sources": [
-            "current_BOM"
-          ],
-          "supplier_code_verified_from_quote": false,
-          "quantity_required": 2,
-          "quantity_by_module": {
-            "FOC-A": 1,
-            "FOC-B": 1
-          },
-          "references_by_module": {
-            "FOC-A": [
-              "R_THERM_BOT"
-            ],
-            "FOC-B": [
-              "R_THERM_BOT"
-            ]
-          },
-          "quantity_by_scope_by_module": {
-            "FOC-A": {
-              "FOC_BOM": 1
-            },
-            "FOC-B": {
-              "FOC_BOM": 1
-            }
-          },
-          "quantity_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": 1
-            },
-            "FOC-B": {
-              "on_board": 1
-            }
-          },
-          "references_by_scope_bucket_by_module": {
-            "FOC-A": {
-              "on_board": [
-                "R_THERM_BOT"
-              ]
-            },
-            "FOC-B": {
-              "on_board": [
-                "R_THERM_BOT"
-              ]
-            }
-          },
-          "scopes": [
-            "FOC_BOM"
-          ],
-          "identity_notes": [],
-          "quote_match_status": "verified_exact_quote",
-          "quote": {
-            "quote_id": "LCSC_CN-C105575-20261021",
-            "source_url": "https://item.szlcsc.com/106790.html",
-            "captured_at_utc": "2026-10-21T04:18:09.911000Z",
-            "currency": "CNY",
-            "price_tiers": [
-              {
-                "min_quantity": 100,
-                "unit_price": 0.0182
-              },
-              {
-                "min_quantity": 1000,
-                "unit_price": 0.0138
-              },
-              {
-                "min_quantity": 5000,
-                "unit_price": 0.0117
-              },
-              {
-                "min_quantity": 10000,
-                "unit_price": 0.0105
-              },
-              {
-                "min_quantity": 50000,
-                "unit_price": 0.0095
-              }
-            ],
-            "moq": 100,
-            "order_multiple": null,
-            "stock_quantity": 3155000,
-            "availability": "in_stock_snapshot",
-            "tax_status": "not_supplied_in_compact_batch",
-            "shipping_included": null,
-            "identity_evidence": "Compact-row identity_verified=true and exact productId, MPN, C-code, and manufacturer match with the current canonical product mapping.",
-            "raw_evidence": "compact_browser_transcription; tiers: 100+ CNY 0.0182; 1000+ CNY 0.0138; 5000+ CNY 0.0117; 10000+ CNY 0.0105; 50000+ CNY 0.0095; MOQ: 100; stock: 3155000"
-          },
-          "installed_value_cny": 0.0364,
-          "purchase": {
-            "cash_cost_at_required_order_lot_cny": 1.82,
-            "purchase_quantity": 100,
-            "unit_price_cny": 0.0182,
-            "tier_min_quantity": 100,
-            "overbuy_quantity": 98,
-            "status": "order_multiple_unknown_assumed_piece_quantity",
-            "order_multiple_known": false,
-            "moq": 100,
-            "moq_basis": "recorded_quote_field",
-            "moq_known": true,
-            "order_multiple": null,
-            "stock_status": "sufficient_at_observation",
-            "stock_quantity": 3155000
           },
           "stock_status": "sufficient_at_observation",
           "stock_shortage": false,
@@ -40292,11 +39052,11 @@
           "note": "首轮采购现金风险示例；按合并需求与已声明MOQ/阶梯估算，不代表建议替换或最低系统成本"
         }
       ],
-      "verified_installed_subtotal_cny": 785.805502,
+      "verified_installed_subtotal_cny": 733.880102,
       "complete_installed_total_cny": null,
-      "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 950.540725,
-      "known_sku_overbuy_quantity": 3466,
-      "known_sku_cash_overbuy_vs_installed_value_cny": 164.735223,
+      "known_sku_cash_estimate_assuming_declared_MOQ_and_piece_step_cny": 894.750125,
+      "known_sku_overbuy_quantity": 3278,
+      "known_sku_cash_overbuy_vs_installed_value_cny": 160.870023,
       "complete_minimum_cash_purchase_cny": null,
       "all_current_skus_have_verified_quotes": false,
       "all_required_quantities_and_identities_known": false,
@@ -40304,8 +39064,8 @@
       "stock_shortage_sku_count": 1,
       "stock_unknown_sku_count": 4,
       "stock_review_sku_count": 4,
-      "unpriced_sku_count": 107,
-      "unpriced_quantity": 376,
+      "unpriced_sku_count": 104,
+      "unpriced_quantity": 360,
       "cost_scope": "当前BOM采购件+板外配套；不含PCB、SMT、运输；税费仅按报价页明确字段记录，不推算",
       "partial_cost_semantics": "已核价SKU的实装折算小计/最低现金估算；未核价SKU数量保留，完整总价为null"
     }
@@ -40322,7 +39082,7 @@
     "additional_quantity_included": 0,
     "configuration_status": "single_current_configuration_only; no active 16-piece alternative",
     "source": "电力/稳压模块/原理图准备/BOM.csv",
-    "note": "按用户最新决定仅保留当前8只，后续采购唯一配置也是8只，增量0，用于启动瞬态助力；不要求持续1秒，实际启动持续时间尚未确定。先前16只数量已撤回，不作为候选或建议。"
+    "note": "当前设计目标使用现有8只，增量0；超容首要承接制动回生，有余电时辅助启动。先前16只方案已撤回；如重新采购须另行核价。"
   },
   "large_or_off_board_items_included_once": [
     {
@@ -40346,7 +39106,7 @@
       ],
       "manufacturer": null,
       "manufacturer_part": "CJP300J8R2J",
-      "supplier_part": "C269699",
+      "supplier_part": null,
       "quantity": 1,
       "scope": [
         "external_accessory"
@@ -40656,34 +39416,6 @@
     {
       "module": "FOC-A",
       "references": [
-        "F_BRAKE"
-      ],
-      "manufacturer": null,
-      "manufacturer_part": "Eaton CBBF-60",
-      "supplier_part": null,
-      "quantity": 1,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-A",
-      "references": [
-        "J_BRAKE_R"
-      ],
-      "manufacturer": "Anderson Power Products",
-      "manufacturer_part": null,
-      "supplier_part": null,
-      "quantity": 1,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-A",
-      "references": [
         "J_LOAD_POWER_VALID配对线端"
       ],
       "manufacturer": "DEGSON",
@@ -40720,49 +39452,6 @@
       "manufacturer_part": "PEH200PJ5100MB2",
       "supplier_part": null,
       "quantity": 3,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-A",
-      "references": [
-        "R_DUMP_A",
-        "R_DUMP_B"
-      ],
-      "manufacturer": "Vishay Sfernice",
-      "manufacturer_part": "LPS0300H2R00FB",
-      "supplier_part": null,
-      "quantity": 2,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-B",
-      "references": [
-        "F_BRAKE"
-      ],
-      "manufacturer": null,
-      "manufacturer_part": "Eaton CBBF-60",
-      "supplier_part": null,
-      "quantity": 1,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-B",
-      "references": [
-        "J_BRAKE_R"
-      ],
-      "manufacturer": "Anderson Power Products",
-      "manufacturer_part": null,
-      "supplier_part": null,
-      "quantity": 1,
       "scope": [
         "FOC_BOM"
       ],
@@ -40807,21 +39496,6 @@
       "manufacturer_part": "PEH200PJ5100MB2",
       "supplier_part": null,
       "quantity": 3,
-      "scope": [
-        "FOC_BOM"
-      ],
-      "note": "已包含在上方当前BOM数量中，仅作大型/板外件分列，不重复加到合计"
-    },
-    {
-      "module": "FOC-B",
-      "references": [
-        "R_DUMP_A",
-        "R_DUMP_B"
-      ],
-      "manufacturer": "Vishay Sfernice",
-      "manufacturer_part": "LPS0300H2R00FB",
-      "supplier_part": null,
-      "quantity": 2,
       "scope": [
         "FOC_BOM"
       ],
@@ -41141,10 +39815,10 @@
         ],
         "manufacturer_part": "CJP300J8R2J",
         "manufacturer": null,
-        "supplier": "LCSC_CN",
-        "supplier_part": "C269699",
-        "source_supplier_part": "C269699",
-        "supplier_part_resolution_source": "BMS_price_audit_input",
+        "supplier": null,
+        "supplier_part": null,
+        "source_supplier_part": null,
+        "supplier_part_resolution_source": null,
         "supplier_code_verified_from_quote": false,
         "quantity": 1,
         "scope_bucket": "external_accessory",
@@ -41157,7 +39831,8 @@
         "source_row": null,
         "identity_notes": [
           "ambiguous_manufacturer_candidates",
-          "manufacturer_unresolved"
+          "manufacturer_unresolved",
+          "no_verified_lcsc_code"
         ],
         "sources": [
           {
@@ -41172,11 +39847,9 @@
           "external_accessory": 1
         },
         "source_supplier_parts": [
-          "C269699"
+          null
         ],
-        "supplier_part_resolution_sources": [
-          "BMS_price_audit_input"
-        ],
+        "supplier_part_resolution_sources": [],
         "scopes": [
           "external_accessory"
         ],
@@ -44960,54 +43633,6 @@
       {
         "module": "FOC-A",
         "references": [
-          "F_BRAKE"
-        ],
-        "manufacturer_part": "Eaton CBBF-60",
-        "manufacturer": null,
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "F_BRAKE"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 16,
-        "identity_notes": [
-          "manufacturer_unresolved",
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 16
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 1
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
           "JP_HA",
           "JP_HB",
           "JP_HC"
@@ -45029,14 +43654,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 18,
+        "source_row": 17,
         "identity_notes": [
           "manufacturer_unresolved"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 18
+            "row": 17
           }
         ],
         "quantity_by_scope": {
@@ -45051,54 +43676,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM"
         ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "J_BRAKE_R"
-        ],
-        "manufacturer_part": null,
-        "manufacturer": "Anderson Power Products",
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "J_BRAKE_R"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 19,
-        "identity_notes": [
-          "missing_exact_mpn",
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 19
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 1
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
         "scopes": [
           "FOC_BOM"
         ],
@@ -45173,12 +43750,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 25,
+        "source_row": 22,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 25
+            "row": 22
           }
         ],
         "quantity_by_scope": {
@@ -45220,14 +43797,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 69,
+        "source_row": 59,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 69
+            "row": 59
           }
         ],
         "quantity_by_scope": {
@@ -45267,14 +43844,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 17,
+        "source_row": 16,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 17
+            "row": 16
           }
         ],
         "quantity_by_scope": {
@@ -45344,7 +43921,6 @@
       {
         "module": "FOC-A",
         "references": [
-          "J_TEMP",
           "J_TEMP_MOS",
           "J_TEMP_MOTOR"
         ],
@@ -45355,37 +43931,32 @@
         "source_supplier_part": "C53454752",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 3,
+        "quantity": 2,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
-            "J_TEMP",
             "J_TEMP_MOS",
             "J_TEMP_MOTOR"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 32,
+        "source_row": 29,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 32
+            "row": 29
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 33
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 34
+            "row": 30
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 3
+          "FOC_BOM": 2
         },
         "quantity_by_scope_bucket": {
-          "on_board": 3
+          "on_board": 2
         },
         "source_supplier_parts": [
           "C53454752"
@@ -45430,12 +44001,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 35,
+        "source_row": 31,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 35
+            "row": 31
           }
         ],
         "quantity_by_scope": {
@@ -45446,53 +44017,6 @@
         },
         "source_supplier_parts": [
           "C6419630"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "Q7"
-        ],
-        "manufacturer_part": "IRLB4030PBF",
-        "manufacturer": "Infineon",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C2663",
-        "source_supplier_part": "C2663",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "Q7"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 36,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 36
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C2663"
         ],
         "supplier_part_resolution_sources": [
           "current_BOM"
@@ -45524,12 +44048,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 22,
+        "source_row": 20,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 22
+            "row": 20
           }
         ],
         "quantity_by_scope": {
@@ -45571,12 +44095,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 24,
+        "source_row": 21,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 24
+            "row": 21
           }
         ],
         "quantity_by_scope": {
@@ -45620,16 +44144,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 26,
+        "source_row": 23,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 26
+            "row": 23
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 27
+            "row": 24
           }
         ],
         "quantity_by_scope": {
@@ -45726,12 +44250,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 42,
+        "source_row": 37,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 42
+            "row": 37
           }
         ],
         "quantity_by_scope": {
@@ -45820,12 +44344,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 56,
+        "source_row": 49,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 56
+            "row": 49
           }
         ],
         "quantity_by_scope": {
@@ -45871,12 +44395,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 37,
+        "source_row": 32,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 37
+            "row": 32
           }
         ],
         "quantity_by_scope": {
@@ -45918,12 +44442,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 38,
+        "source_row": 33,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 38
+            "row": 33
           }
         ],
         "quantity_by_scope": {
@@ -46012,12 +44536,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 80,
+        "source_row": 70,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 80
+            "row": 70
           }
         ],
         "quantity_by_scope": {
@@ -46045,8 +44569,7 @@
           "U1_DVDD_C",
           "U1_VCP_C",
           "U1_VGLS_C",
-          "U3_C2",
-          "U4_C2"
+          "U3_C2"
         ],
         "manufacturer_part": "CL10B105KA8NNNC",
         "manufacturer": "SAMSUNG(三星)",
@@ -46055,31 +44578,30 @@
         "source_supplier_part": "C29936",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 5,
+        "quantity": 4,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "U1_DVDD_C",
             "U1_VCP_C",
             "U1_VGLS_C",
-            "U3_C2",
-            "U4_C2"
+            "U3_C2"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 76,
+        "source_row": 66,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 76
+            "row": 66
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 5
+          "FOC_BOM": 4
         },
         "quantity_by_scope_bucket": {
-          "on_board": 5
+          "on_board": 4
         },
         "source_supplier_parts": [
           "C29936"
@@ -46114,12 +44636,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 70,
+        "source_row": 60,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 70
+            "row": 60
           }
         ],
         "quantity_by_scope": {
@@ -46235,7 +44757,7 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 64
+            "row": 54
           }
         ],
         "quantity_by_scope": {
@@ -46315,7 +44837,6 @@
           "C_U7",
           "U1_VREF_C",
           "U3_C1",
-          "U4_C1",
           "U5_C",
           "U5_VIO_C"
         ],
@@ -46326,7 +44847,7 @@
         "source_supplier_part": null,
         "supplier_part_resolution_source": null,
         "supplier_code_verified_from_quote": false,
-        "quantity": 7,
+        "quantity": 6,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
@@ -46334,7 +44855,6 @@
             "C_U7",
             "U1_VREF_C",
             "U3_C1",
-            "U4_C1",
             "U5_C",
             "U5_VIO_C"
           ]
@@ -46355,22 +44875,22 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 81
+            "row": 71
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 87
+            "row": 77
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 90
+            "row": 79
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 7
+          "FOC_BOM": 6
         },
         "quantity_by_scope_bucket": {
-          "on_board": 7
+          "on_board": 6
         },
         "source_supplier_parts": [
           null
@@ -46405,16 +44925,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 68,
+        "source_row": 58,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 68
+            "row": 58
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 77
+            "row": 67
           }
         ],
         "quantity_by_scope": {
@@ -46456,14 +44976,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 75,
+        "source_row": 65,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 75
+            "row": 65
           }
         ],
         "quantity_by_scope": {
@@ -46518,11 +45038,11 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 83
+            "row": 73
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 91
+            "row": 80
           }
         ],
         "quantity_by_scope": {
@@ -46562,12 +45082,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 67,
+        "source_row": 57,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 67
+            "row": 57
           }
         ],
         "quantity_by_scope": {
@@ -46628,11 +45148,11 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 66
+            "row": 56
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 78
+            "row": 68
           }
         ],
         "quantity_by_scope": {
@@ -46676,12 +45196,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 65,
+        "source_row": 55,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 65
+            "row": 55
           }
         ],
         "quantity_by_scope": {
@@ -46738,7 +45258,7 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 79
+            "row": 69
           }
         ],
         "quantity_by_scope": {
@@ -46780,12 +45300,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 63,
+        "source_row": 53,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 63
+            "row": 53
           }
         ],
         "quantity_by_scope": {
@@ -46827,12 +45347,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 89,
+        "source_row": 78,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 89
+            "row": 78
           }
         ],
         "quantity_by_scope": {
@@ -46874,12 +45394,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 86,
+        "source_row": 76,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 86
+            "row": 76
           }
         ],
         "quantity_by_scope": {
@@ -46921,12 +45441,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 92,
+        "source_row": 81,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 92
+            "row": 81
           }
         ],
         "quantity_by_scope": {
@@ -46970,12 +45490,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 82,
+        "source_row": 72,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 82
+            "row": 72
           }
         ],
         "quantity_by_scope": {
@@ -47000,56 +45520,8 @@
       {
         "module": "FOC-A",
         "references": [
-          "U4"
-        ],
-        "manufacturer_part": "UCC27511ADBVR",
-        "manufacturer": "TI(德州仪器)",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C2676982",
-        "source_supplier_part": "C2676982",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "U4"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 88,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 88
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C2676982"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
           "J_BUS_N",
           "J_BUS_P",
-          "J_DUMP_SW",
           "J_MOTOR_U",
           "J_MOTOR_V",
           "J_MOTOR_W"
@@ -47061,52 +45533,47 @@
         "source_supplier_part": "C499680",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 6,
+        "quantity": 5,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "J_BUS_N",
             "J_BUS_P",
-            "J_DUMP_SW",
             "J_MOTOR_U",
             "J_MOTOR_V",
             "J_MOTOR_W"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 20,
+        "source_row": 18,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 20
+            "row": 18
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 21
+            "row": 19
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 23
+            "row": 25
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 28
+            "row": 26
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 29
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 30
+            "row": 27
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 6
+          "FOC_BOM": 5
         },
         "quantity_by_scope_bucket": {
-          "on_board": 6
+          "on_board": 5
         },
         "source_supplier_parts": [
           "C499680"
@@ -47114,55 +45581,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM"
         ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "R_DUMP_A",
-          "R_DUMP_B"
-        ],
-        "manufacturer_part": "LPS0300H2R00FB",
-        "manufacturer": "Vishay Sfernice",
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 2,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "R_DUMP_A",
-            "R_DUMP_B"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 50,
-        "identity_notes": [
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 50
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 2
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 2
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
         "scopes": [
           "FOC_BOM"
         ],
@@ -47190,12 +45608,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 31,
+        "source_row": 28,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 31
+            "row": 28
           }
         ],
         "quantity_by_scope": {
@@ -47237,14 +45655,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 73,
+        "source_row": 63,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 73
+            "row": 63
           }
         ],
         "quantity_by_scope": {
@@ -47268,8 +45686,7 @@
         "module": "FOC-A",
         "references": [
           "R_BUCK_CLAMP_BUS",
-          "R_BUCK_VALID_PD",
-          "R_THERM_SER"
+          "R_BUCK_VALID_PD"
         ],
         "manufacturer_part": "RC0603FR-07100KL",
         "manufacturer": "YAGEO(国巨)",
@@ -47278,33 +45695,28 @@
         "source_supplier_part": "C14675",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 3,
+        "quantity": 2,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "R_BUCK_CLAMP_BUS",
-            "R_BUCK_VALID_PD",
-            "R_THERM_SER"
+            "R_BUCK_VALID_PD"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 46,
+        "source_row": 41,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 46
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 61
+            "row": 41
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 3
+          "FOC_BOM": 2
         },
         "quantity_by_scope_bucket": {
-          "on_board": 3
+          "on_board": 2
         },
         "source_supplier_parts": [
           "C14675"
@@ -47329,8 +45741,6 @@
           "R_CAN_STB_PU",
           "R_CAN_TX_PU",
           "R_DRV_EN_PD",
-          "R_DUMP_GATE_PD",
-          "R_DUMP_INP_PD",
           "R_GS_UH",
           "R_GS_UL",
           "R_GS_VH",
@@ -47348,7 +45758,7 @@
         "source_supplier_part": "C98220",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 18,
+        "quantity": 16,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
@@ -47359,8 +45769,6 @@
             "R_CAN_STB_PU",
             "R_CAN_TX_PU",
             "R_DRV_EN_PD",
-            "R_DUMP_GATE_PD",
-            "R_DUMP_INP_PD",
             "R_GS_UH",
             "R_GS_UL",
             "R_GS_VH",
@@ -47373,124 +45781,30 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 39,
+        "source_row": 34,
         "identity_notes": [],
         "sources": [
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 34
+          },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 39
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 44
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 58
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 18
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 18
-        },
-        "source_supplier_parts": [
-          "C98220"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "R_DUMP_GATE"
-        ],
-        "manufacturer_part": "RC0603FR-0710RL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C109318",
-        "source_supplier_part": "C109318",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_DUMP_GATE"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 51,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 51
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 1
+          "FOC_BOM": 16
         },
         "quantity_by_scope_bucket": {
-          "on_board": 1
+          "on_board": 16
         },
         "source_supplier_parts": [
-          "C109318"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "R_THERM_TOP"
-        ],
-        "manufacturer_part": "RC0603FR-0712KL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C114659",
-        "source_supplier_part": "C114659",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_THERM_TOP"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 62,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 62
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C114659"
+          "C98220"
         ],
         "supplier_part_resolution_sources": [
           "current_BOM"
@@ -47522,12 +45836,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 49,
+        "source_row": 44,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 49
+            "row": 44
           }
         ],
         "quantity_by_scope": {
@@ -47587,24 +45901,24 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 48,
+        "source_row": 43,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 43
+          },
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 46
+          },
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 47
+          },
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 48
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 53
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 54
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 55
           }
         ],
         "quantity_by_scope": {
@@ -47649,18 +45963,18 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 57,
+        "source_row": 50,
         "identity_notes": [
           "supplier_code_verified_from_quote"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 57
+            "row": 50
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 71
+            "row": 61
           }
         ],
         "quantity_by_scope": {
@@ -47676,53 +45990,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM",
           "verified_quote_identity"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-A",
-        "references": [
-          "R_THERM_BOT"
-        ],
-        "manufacturer_part": "RC0603FR-0720KL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C105575",
-        "source_supplier_part": "C105575",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_THERM_BOT"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 60,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 60
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C105575"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
         ],
         "scopes": [
           "FOC_BOM"
@@ -47751,12 +46018,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 40,
+        "source_row": 35,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 40
+            "row": 35
           }
         ],
         "quantity_by_scope": {
@@ -47798,12 +46065,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 59,
+        "source_row": 52,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 59
+            "row": 52
           }
         ],
         "quantity_by_scope": {
@@ -47845,14 +46112,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 74,
+        "source_row": 64,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 74
+            "row": 64
           }
         ],
         "quantity_by_scope": {
@@ -47892,12 +46159,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 45,
+        "source_row": 40,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 45
+            "row": 40
           }
         ],
         "quantity_by_scope": {
@@ -47941,14 +46208,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 84,
+        "source_row": 74,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 84
+            "row": 74
           }
         ],
         "quantity_by_scope": {
@@ -47990,14 +46257,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 72,
+        "source_row": 62,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 72
+            "row": 62
           }
         ],
         "quantity_by_scope": {
@@ -48041,12 +46308,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 41,
+        "source_row": 36,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 41
+            "row": 36
           }
         ],
         "quantity_by_scope": {
@@ -48094,16 +46361,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 43,
+        "source_row": 38,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 43
+            "row": 38
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 47
+            "row": 42
           }
         ],
         "quantity_by_scope": {
@@ -48155,12 +46422,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 52,
+        "source_row": 45,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 52
+            "row": 45
           }
         ],
         "quantity_by_scope": {
@@ -48204,14 +46471,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 85,
+        "source_row": 75,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 85
+            "row": 75
           }
         ],
         "quantity_by_scope": {
@@ -48236,54 +46503,6 @@
       {
         "module": "FOC-B",
         "references": [
-          "F_BRAKE"
-        ],
-        "manufacturer_part": "Eaton CBBF-60",
-        "manufacturer": null,
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "F_BRAKE"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 16,
-        "identity_notes": [
-          "manufacturer_unresolved",
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 16
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 1
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
           "JP_HA",
           "JP_HB",
           "JP_HC"
@@ -48305,14 +46524,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 18,
+        "source_row": 17,
         "identity_notes": [
           "manufacturer_unresolved"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 18
+            "row": 17
           }
         ],
         "quantity_by_scope": {
@@ -48327,54 +46546,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM"
         ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "J_BRAKE_R"
-        ],
-        "manufacturer_part": null,
-        "manufacturer": "Anderson Power Products",
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "J_BRAKE_R"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 19,
-        "identity_notes": [
-          "missing_exact_mpn",
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 19
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 1
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
         "scopes": [
           "FOC_BOM"
         ],
@@ -48449,12 +46620,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 25,
+        "source_row": 22,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 25
+            "row": 22
           }
         ],
         "quantity_by_scope": {
@@ -48496,14 +46667,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 69,
+        "source_row": 59,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 69
+            "row": 59
           }
         ],
         "quantity_by_scope": {
@@ -48543,14 +46714,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 17,
+        "source_row": 16,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 17
+            "row": 16
           }
         ],
         "quantity_by_scope": {
@@ -48620,7 +46791,6 @@
       {
         "module": "FOC-B",
         "references": [
-          "J_TEMP",
           "J_TEMP_MOS",
           "J_TEMP_MOTOR"
         ],
@@ -48631,37 +46801,32 @@
         "source_supplier_part": "C53454752",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 3,
+        "quantity": 2,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
-            "J_TEMP",
             "J_TEMP_MOS",
             "J_TEMP_MOTOR"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 32,
+        "source_row": 29,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 32
+            "row": 29
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 33
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 34
+            "row": 30
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 3
+          "FOC_BOM": 2
         },
         "quantity_by_scope_bucket": {
-          "on_board": 3
+          "on_board": 2
         },
         "source_supplier_parts": [
           "C53454752"
@@ -48706,12 +46871,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 35,
+        "source_row": 31,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 35
+            "row": 31
           }
         ],
         "quantity_by_scope": {
@@ -48722,53 +46887,6 @@
         },
         "source_supplier_parts": [
           "C6419630"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "Q7"
-        ],
-        "manufacturer_part": "IRLB4030PBF",
-        "manufacturer": "Infineon",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C2663",
-        "source_supplier_part": "C2663",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "Q7"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 36,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 36
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C2663"
         ],
         "supplier_part_resolution_sources": [
           "current_BOM"
@@ -48800,12 +46918,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 22,
+        "source_row": 20,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 22
+            "row": 20
           }
         ],
         "quantity_by_scope": {
@@ -48847,12 +46965,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 24,
+        "source_row": 21,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 24
+            "row": 21
           }
         ],
         "quantity_by_scope": {
@@ -48896,16 +47014,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 26,
+        "source_row": 23,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 26
+            "row": 23
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 27
+            "row": 24
           }
         ],
         "quantity_by_scope": {
@@ -49002,12 +47120,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 42,
+        "source_row": 37,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 42
+            "row": 37
           }
         ],
         "quantity_by_scope": {
@@ -49096,12 +47214,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 56,
+        "source_row": 49,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 56
+            "row": 49
           }
         ],
         "quantity_by_scope": {
@@ -49147,12 +47265,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 37,
+        "source_row": 32,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 37
+            "row": 32
           }
         ],
         "quantity_by_scope": {
@@ -49194,12 +47312,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 38,
+        "source_row": 33,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 38
+            "row": 33
           }
         ],
         "quantity_by_scope": {
@@ -49288,12 +47406,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 80,
+        "source_row": 70,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 80
+            "row": 70
           }
         ],
         "quantity_by_scope": {
@@ -49321,8 +47439,7 @@
           "U1_DVDD_C",
           "U1_VCP_C",
           "U1_VGLS_C",
-          "U3_C2",
-          "U4_C2"
+          "U3_C2"
         ],
         "manufacturer_part": "CL10B105KA8NNNC",
         "manufacturer": "SAMSUNG(三星)",
@@ -49331,31 +47448,30 @@
         "source_supplier_part": "C29936",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 5,
+        "quantity": 4,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "U1_DVDD_C",
             "U1_VCP_C",
             "U1_VGLS_C",
-            "U3_C2",
-            "U4_C2"
+            "U3_C2"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 76,
+        "source_row": 66,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 76
+            "row": 66
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 5
+          "FOC_BOM": 4
         },
         "quantity_by_scope_bucket": {
-          "on_board": 5
+          "on_board": 4
         },
         "source_supplier_parts": [
           "C29936"
@@ -49390,12 +47506,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 70,
+        "source_row": 60,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 70
+            "row": 60
           }
         ],
         "quantity_by_scope": {
@@ -49511,7 +47627,7 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 64
+            "row": 54
           }
         ],
         "quantity_by_scope": {
@@ -49591,7 +47707,6 @@
           "C_U7",
           "U1_VREF_C",
           "U3_C1",
-          "U4_C1",
           "U5_C",
           "U5_VIO_C"
         ],
@@ -49602,7 +47717,7 @@
         "source_supplier_part": null,
         "supplier_part_resolution_source": null,
         "supplier_code_verified_from_quote": false,
-        "quantity": 7,
+        "quantity": 6,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
@@ -49610,7 +47725,6 @@
             "C_U7",
             "U1_VREF_C",
             "U3_C1",
-            "U4_C1",
             "U5_C",
             "U5_VIO_C"
           ]
@@ -49631,22 +47745,22 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 81
+            "row": 71
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 87
+            "row": 77
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 90
+            "row": 79
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 7
+          "FOC_BOM": 6
         },
         "quantity_by_scope_bucket": {
-          "on_board": 7
+          "on_board": 6
         },
         "source_supplier_parts": [
           null
@@ -49681,16 +47795,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 68,
+        "source_row": 58,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 68
+            "row": 58
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 77
+            "row": 67
           }
         ],
         "quantity_by_scope": {
@@ -49732,14 +47846,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 75,
+        "source_row": 65,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 75
+            "row": 65
           }
         ],
         "quantity_by_scope": {
@@ -49794,11 +47908,11 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 83
+            "row": 73
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 91
+            "row": 80
           }
         ],
         "quantity_by_scope": {
@@ -49838,12 +47952,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 67,
+        "source_row": 57,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 67
+            "row": 57
           }
         ],
         "quantity_by_scope": {
@@ -49904,11 +48018,11 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 66
+            "row": 56
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 78
+            "row": 68
           }
         ],
         "quantity_by_scope": {
@@ -49952,12 +48066,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 65,
+        "source_row": 55,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 65
+            "row": 55
           }
         ],
         "quantity_by_scope": {
@@ -50014,7 +48128,7 @@
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 79
+            "row": 69
           }
         ],
         "quantity_by_scope": {
@@ -50056,12 +48170,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 63,
+        "source_row": 53,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 63
+            "row": 53
           }
         ],
         "quantity_by_scope": {
@@ -50103,12 +48217,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 89,
+        "source_row": 78,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 89
+            "row": 78
           }
         ],
         "quantity_by_scope": {
@@ -50150,12 +48264,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 86,
+        "source_row": 76,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 86
+            "row": 76
           }
         ],
         "quantity_by_scope": {
@@ -50197,12 +48311,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 92,
+        "source_row": 81,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 92
+            "row": 81
           }
         ],
         "quantity_by_scope": {
@@ -50246,12 +48360,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 82,
+        "source_row": 72,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 82
+            "row": 72
           }
         ],
         "quantity_by_scope": {
@@ -50276,56 +48390,8 @@
       {
         "module": "FOC-B",
         "references": [
-          "U4"
-        ],
-        "manufacturer_part": "UCC27511ADBVR",
-        "manufacturer": "TI(德州仪器)",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C2676982",
-        "source_supplier_part": "C2676982",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "U4"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 88,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 88
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C2676982"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
           "J_BUS_N",
           "J_BUS_P",
-          "J_DUMP_SW",
           "J_MOTOR_U",
           "J_MOTOR_V",
           "J_MOTOR_W"
@@ -50337,52 +48403,47 @@
         "source_supplier_part": "C499680",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 6,
+        "quantity": 5,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "J_BUS_N",
             "J_BUS_P",
-            "J_DUMP_SW",
             "J_MOTOR_U",
             "J_MOTOR_V",
             "J_MOTOR_W"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 20,
+        "source_row": 18,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 20
+            "row": 18
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 21
+            "row": 19
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 23
+            "row": 25
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 28
+            "row": 26
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 29
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 30
+            "row": 27
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 6
+          "FOC_BOM": 5
         },
         "quantity_by_scope_bucket": {
-          "on_board": 6
+          "on_board": 5
         },
         "source_supplier_parts": [
           "C499680"
@@ -50390,55 +48451,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM"
         ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "R_DUMP_A",
-          "R_DUMP_B"
-        ],
-        "manufacturer_part": "LPS0300H2R00FB",
-        "manufacturer": "Vishay Sfernice",
-        "supplier": null,
-        "supplier_part": null,
-        "source_supplier_part": null,
-        "supplier_part_resolution_source": null,
-        "supplier_code_verified_from_quote": false,
-        "quantity": 2,
-        "scope_bucket": "external_accessory",
-        "references_by_scope_bucket": {
-          "external_accessory": [
-            "R_DUMP_A",
-            "R_DUMP_B"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 50,
-        "identity_notes": [
-          "no_verified_lcsc_code"
-        ],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 50
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 2
-        },
-        "quantity_by_scope_bucket": {
-          "external_accessory": 2
-        },
-        "source_supplier_parts": [
-          null
-        ],
-        "supplier_part_resolution_sources": [],
         "scopes": [
           "FOC_BOM"
         ],
@@ -50466,12 +48478,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 31,
+        "source_row": 28,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 31
+            "row": 28
           }
         ],
         "quantity_by_scope": {
@@ -50513,14 +48525,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 73,
+        "source_row": 63,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 73
+            "row": 63
           }
         ],
         "quantity_by_scope": {
@@ -50544,8 +48556,7 @@
         "module": "FOC-B",
         "references": [
           "R_BUCK_CLAMP_BUS",
-          "R_BUCK_VALID_PD",
-          "R_THERM_SER"
+          "R_BUCK_VALID_PD"
         ],
         "manufacturer_part": "RC0603FR-07100KL",
         "manufacturer": "YAGEO(国巨)",
@@ -50554,33 +48565,28 @@
         "source_supplier_part": "C14675",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 3,
+        "quantity": 2,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
             "R_BUCK_CLAMP_BUS",
-            "R_BUCK_VALID_PD",
-            "R_THERM_SER"
+            "R_BUCK_VALID_PD"
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 46,
+        "source_row": 41,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 46
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 61
+            "row": 41
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 3
+          "FOC_BOM": 2
         },
         "quantity_by_scope_bucket": {
-          "on_board": 3
+          "on_board": 2
         },
         "source_supplier_parts": [
           "C14675"
@@ -50605,8 +48611,6 @@
           "R_CAN_STB_PU",
           "R_CAN_TX_PU",
           "R_DRV_EN_PD",
-          "R_DUMP_GATE_PD",
-          "R_DUMP_INP_PD",
           "R_GS_UH",
           "R_GS_UL",
           "R_GS_VH",
@@ -50624,7 +48628,7 @@
         "source_supplier_part": "C98220",
         "supplier_part_resolution_source": "current_BOM",
         "supplier_code_verified_from_quote": false,
-        "quantity": 18,
+        "quantity": 16,
         "scope_bucket": "on_board",
         "references_by_scope_bucket": {
           "on_board": [
@@ -50635,8 +48639,6 @@
             "R_CAN_STB_PU",
             "R_CAN_TX_PU",
             "R_DRV_EN_PD",
-            "R_DUMP_GATE_PD",
-            "R_DUMP_INP_PD",
             "R_GS_UH",
             "R_GS_UL",
             "R_GS_VH",
@@ -50649,124 +48651,30 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 39,
+        "source_row": 34,
         "identity_notes": [],
         "sources": [
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 34
+          },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 39
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 44
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 58
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 18
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 18
-        },
-        "source_supplier_parts": [
-          "C98220"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "R_DUMP_GATE"
-        ],
-        "manufacturer_part": "RC0603FR-0710RL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C109318",
-        "source_supplier_part": "C109318",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_DUMP_GATE"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 51,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 51
           }
         ],
         "quantity_by_scope": {
-          "FOC_BOM": 1
+          "FOC_BOM": 16
         },
         "quantity_by_scope_bucket": {
-          "on_board": 1
+          "on_board": 16
         },
         "source_supplier_parts": [
-          "C109318"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "R_THERM_TOP"
-        ],
-        "manufacturer_part": "RC0603FR-0712KL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C114659",
-        "source_supplier_part": "C114659",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_THERM_TOP"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 62,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 62
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C114659"
+          "C98220"
         ],
         "supplier_part_resolution_sources": [
           "current_BOM"
@@ -50798,12 +48706,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 49,
+        "source_row": 44,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 49
+            "row": 44
           }
         ],
         "quantity_by_scope": {
@@ -50861,20 +48769,20 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 48,
+        "source_row": 43,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 43
+          },
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
+            "row": 46
+          },
+          {
+            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
             "row": 48
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 53
-          },
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 55
           }
         ],
         "quantity_by_scope": {
@@ -50918,18 +48826,18 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 57,
+        "source_row": 50,
         "identity_notes": [
           "supplier_code_verified_from_quote"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 57
+            "row": 50
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 71
+            "row": 61
           }
         ],
         "quantity_by_scope": {
@@ -50945,53 +48853,6 @@
         "supplier_part_resolution_sources": [
           "current_BOM",
           "verified_quote_identity"
-        ],
-        "scopes": [
-          "FOC_BOM"
-        ],
-        "populations": [
-          "current FOC BOM; off-board items kept"
-        ]
-      },
-      {
-        "module": "FOC-B",
-        "references": [
-          "R_THERM_BOT"
-        ],
-        "manufacturer_part": "RC0603FR-0720KL",
-        "manufacturer": "Yageo",
-        "supplier": "LCSC_CN",
-        "supplier_part": "C105575",
-        "source_supplier_part": "C105575",
-        "supplier_part_resolution_source": "current_BOM",
-        "supplier_code_verified_from_quote": false,
-        "quantity": 1,
-        "scope_bucket": "on_board",
-        "references_by_scope_bucket": {
-          "on_board": [
-            "R_THERM_BOT"
-          ]
-        },
-        "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 60,
-        "identity_notes": [],
-        "sources": [
-          {
-            "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 60
-          }
-        ],
-        "quantity_by_scope": {
-          "FOC_BOM": 1
-        },
-        "quantity_by_scope_bucket": {
-          "on_board": 1
-        },
-        "source_supplier_parts": [
-          "C105575"
-        ],
-        "supplier_part_resolution_sources": [
-          "current_BOM"
         ],
         "scopes": [
           "FOC_BOM"
@@ -51020,12 +48881,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 40,
+        "source_row": 35,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 40
+            "row": 35
           }
         ],
         "quantity_by_scope": {
@@ -51067,12 +48928,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 59,
+        "source_row": 52,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 59
+            "row": 52
           }
         ],
         "quantity_by_scope": {
@@ -51114,14 +48975,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 74,
+        "source_row": 64,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 74
+            "row": 64
           }
         ],
         "quantity_by_scope": {
@@ -51161,12 +49022,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 45,
+        "source_row": 40,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 45
+            "row": 40
           }
         ],
         "quantity_by_scope": {
@@ -51210,14 +49071,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 84,
+        "source_row": 74,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 84
+            "row": 74
           }
         ],
         "quantity_by_scope": {
@@ -51259,14 +49120,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 72,
+        "source_row": 62,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 72
+            "row": 62
           }
         ],
         "quantity_by_scope": {
@@ -51310,12 +49171,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 41,
+        "source_row": 36,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 41
+            "row": 36
           }
         ],
         "quantity_by_scope": {
@@ -51363,16 +49224,16 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 43,
+        "source_row": 38,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 43
+            "row": 38
           },
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 47
+            "row": 42
           }
         ],
         "quantity_by_scope": {
@@ -51424,12 +49285,12 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 52,
+        "source_row": 45,
         "identity_notes": [],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 52
+            "row": 45
           }
         ],
         "quantity_by_scope": {
@@ -51473,14 +49334,14 @@
           ]
         },
         "source": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-        "source_row": 85,
+        "source_row": 75,
         "identity_notes": [
           "no_verified_lcsc_code"
         ],
         "sources": [
           {
             "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv",
-            "row": 85
+            "row": 75
           }
         ],
         "quantity_by_scope": {

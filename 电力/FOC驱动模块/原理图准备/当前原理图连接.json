@@ -1,7 +1,7 @@
 {
-  "document": "2026-10-21 FOC P1 current saved source connectivity snapshot; official ENET and API geometry agree on 169 components / 506 pins / 102 nets. Reopen after save NOT_VERIFIED. Exported RSO_W temperature-coefficient text is corrupted in API ENET only; saved P1 remains valid. Electrical qualification remains OPEN.",
+  "document": "2026-10-30 current post-removal connection contract; official save/reopen and pin comparison PASS; 153 components, 467 pins. NC verified separately.",
   "pageUuid": "90aa6c46493624cf",
-  "scope": "169-component/506-pin source snapshot from the saved official native project; compared against the official raw ENET and API geometry. Static connectivity matches the 169/506/15-NC/491-connected/102-net contract. Post-save reopen via a new API session was NOT_VERIFIED after two REQUEST_TIMEOUT results. Raw ENET contains two U+FFFD in RSO_W Temperature Coefficient; native P1 retains ±100ppm/℃, so not all exported attributes match. This does not qualify electrical behavior, BOM sourcing, thresholds, hardware, firmware, thermal/pulse capability, or PCB; external dump resistors and harness parts are excluded from PCB conversion.",
+  "scope": "Current P1 after removal of local dump. See 检查/本地耗能删减_官方复核.json; electrical/thermal/hardware validation remains open.",
   "components": [
     {
       "ref": "CBUS1",
@@ -329,18 +329,6 @@
       "supplierId": "C552486"
     },
     {
-      "ref": "F_BRAKE",
-      "pins": {
-        "1": "BUS",
-        "2": "DUMP_RES_UP"
-      },
-      "manufacturerId": "Eaton CBBF-60",
-      "addIntoBom": true,
-      "addIntoPcb": false,
-      "supplierId": "",
-      "value": "60A/58V EXT"
-    },
-    {
       "ref": "F_MAIN",
       "pins": {
         "1": "PACK+",
@@ -389,18 +377,6 @@
       "supplierId": "C2940050"
     },
     {
-      "ref": "J_BRAKE_R",
-      "pins": {
-        "1": "DUMP_RES_UP",
-        "2": "DUMP_SW"
-      },
-      "manufacturerId": "",
-      "addIntoBom": true,
-      "addIntoPcb": false,
-      "supplierId": "",
-      "value": "SB50_P992_5900_PAIR"
-    },
-    {
       "ref": "J_BUS_N",
       "pins": {
         "1": "GND_SYS",
@@ -437,19 +413,6 @@
       "addIntoBom": true,
       "addIntoPcb": true,
       "supplierId": "C144394"
-    },
-    {
-      "ref": "J_DUMP_SW",
-      "pins": {
-        "1": "DUMP_SW",
-        "2": "DUMP_SW",
-        "3": "DUMP_SW",
-        "4": "DUMP_SW"
-      },
-      "manufacturerId": "MFE04542-T1",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C499680"
     },
     {
       "ref": "J_HALL",
@@ -503,7 +466,7 @@
         "21": "",
         "22": "",
         "23": "",
-        "24": "DUMP_THERM_OK_GPIO"
+        "24": ""
       },
       "manufacturerId": "JXT-PM2.54-2X12P-A9",
       "addIntoBom": true,
@@ -600,17 +563,6 @@
       "supplierId": "C19271374"
     },
     {
-      "ref": "J_TEMP",
-      "pins": {
-        "1": "DUMP_5V",
-        "2": "DUMP_THERM_OK"
-      },
-      "manufacturerId": "HC-XH2.54-2AW-M",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C53454752"
-    },
-    {
       "ref": "J_TEMP_MOS",
       "pins": {
         "1": "TEMP_MOS_NODE",
@@ -703,18 +655,6 @@
       "addIntoBom": true,
       "addIntoPcb": true,
       "supplierId": "C6419630"
-    },
-    {
-      "ref": "Q7",
-      "pins": {
-        "1": "DUMP_GATE",
-        "2": "DUMP_SW",
-        "3": "GND_SYS"
-      },
-      "manufacturerId": "IRLB4030PBF",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C2663"
     },
     {
       "ref": "Q_BOV_NPN",
@@ -1038,66 +978,6 @@
       "ref": "R_DRV_EN_PD",
       "pins": {
         "1": "DRV_ENABLE",
-        "2": "GND_SYS"
-      },
-      "manufacturerId": "RC0603FR-0710KL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C98220",
-      "value": "10kΩ"
-    },
-    {
-      "ref": "R_DUMP_A",
-      "pins": {
-        "1": "DUMP_RES_UP",
-        "2": "DUMP_SW"
-      },
-      "manufacturerId": "LPS0300H2R00FB",
-      "addIntoBom": true,
-      "addIntoPcb": false,
-      "supplierId": "",
-      "value": "2Ω/300W EXT"
-    },
-    {
-      "ref": "R_DUMP_B",
-      "pins": {
-        "1": "DUMP_RES_UP",
-        "2": "DUMP_SW"
-      },
-      "manufacturerId": "LPS0300H2R00FB",
-      "addIntoBom": true,
-      "addIntoPcb": false,
-      "supplierId": "",
-      "value": "2Ω/300W EXT"
-    },
-    {
-      "ref": "R_DUMP_GATE",
-      "pins": {
-        "1": "DUMP_DRV_OUT",
-        "2": "DUMP_GATE"
-      },
-      "manufacturerId": "RC0603FR-0710RL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C109318",
-      "value": "10Ω"
-    },
-    {
-      "ref": "R_DUMP_GATE_PD",
-      "pins": {
-        "1": "DUMP_GATE",
-        "2": "GND_SYS"
-      },
-      "manufacturerId": "RC0603FR-0710KL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C98220",
-      "value": "10kΩ"
-    },
-    {
-      "ref": "R_DUMP_INP_PD",
-      "pins": {
-        "1": "DUMP_THERM_OK",
         "2": "GND_SYS"
       },
       "manufacturerId": "RC0603FR-0710KL",
@@ -1572,42 +1452,6 @@
       "value": "1kΩ"
     },
     {
-      "ref": "R_THERM_BOT",
-      "pins": {
-        "1": "THERM_SENSE",
-        "2": "GND_SYS"
-      },
-      "manufacturerId": "RC0603FR-0720KL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C105575",
-      "value": "20kΩ"
-    },
-    {
-      "ref": "R_THERM_SER",
-      "pins": {
-        "1": "THERM_SENSE",
-        "2": "DUMP_THERM_OK_GPIO"
-      },
-      "manufacturerId": "RC0603FR-07100KL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C14675",
-      "value": "100kΩ"
-    },
-    {
-      "ref": "R_THERM_TOP",
-      "pins": {
-        "1": "DUMP_THERM_OK",
-        "2": "THERM_SENSE"
-      },
-      "manufacturerId": "RC0603FR-0712KL",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C114659",
-      "value": "12kΩ"
-    },
-    {
       "ref": "U1",
       "pins": {
         "1": "GND_SYS",
@@ -2060,54 +1904,6 @@
       "note": "跨板统一1uF +/-10% 25V X7R 0603；Samsung在产；C29936。原厂DC偏压曲线仅为典型值，偏压有效容量/驱动纹波与瞬态验收OPEN。商城10+0.1253元，MOQ10，订购倍数未知，当前无现货/可预订，所示3工作日不保证交期；未采购。"
     },
     {
-      "ref": "U4",
-      "pins": {
-        "1": "DUMP_5V",
-        "2": "DUMP_DRV_OUT",
-        "3": "DUMP_DRV_OUT",
-        "4": "GND_SYS",
-        "5": "BUSOV_N",
-        "6": "DUMP_THERM_OK"
-      },
-      "manufacturerId": "UCC27511ADBVR",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C2676982",
-      "note": "UCC27511 dump gate driver VDD=DUMP_5V; IN-=BUSOV_N, IN+=DUMP_THERM_OK. UVLO holds output low; hardware thermal/gate path acceptance remains open."
-    },
-    {
-      "ref": "U4_C1",
-      "pins": {
-        "1": "DUMP_5V",
-        "2": "GND_SYS"
-      },
-      "manufacturerId": "C1608X7R1A104K080AE",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "",
-      "value": "0.1uF/5V"
-    },
-    {
-      "ref": "U4_C2",
-      "pins": {
-        "1": "DUMP_5V",
-        "2": "GND_SYS"
-      },
-      "manufacturerId": "CL10B105KA8NNNC",
-      "addIntoBom": true,
-      "addIntoPcb": true,
-      "supplierId": "C29936",
-      "value": "1uF/25V",
-      "manufacturer": "SAMSUNG(三星)",
-      "source": "https://product.samsungsem.com/cn/mlcc/CL10B105KA8NNN.do",
-      "qualification": "schematic_selected; hardware_qualification_OPEN",
-      "mpn": "CL10B105KA8NNNC",
-      "package": "0603",
-      "libraryName": "CL10B105KA8NNNC",
-      "deviceUuid": "f163a20c57a3458ab2a8fc303e5e2cb6",
-      "note": "跨板统一1uF +/-10% 25V X7R 0603；Samsung在产；C29936。原厂DC偏压曲线仅为典型值，偏压有效容量/驱动纹波与瞬态验收OPEN。商城10+0.1253元，MOQ10，订购倍数未知，当前无现货/可预订，所示3工作日不保证交期；未采购。"
-    },
-    {
       "ref": "U5",
       "pins": {
         "1": "FDCAN1_TX",
@@ -2232,194 +2028,5 @@
       "supplierId": "C2868382",
       "note": "TLV6700 B channel uses its internal 400mV reference for BUS_OV; qualification remains open."
     }
-  ],
-  "candidate_BOV_reference_option_20261021": {
-    "status": "implemented_in_current_saved_native_source; pin connectivity verified against official ENET and API geometry; post-save reopen NOT_VERIFIED",
-    "basis": "Native source saved true. New official ENET and API geometry agree on 169 components / 506 pins / 102 nets and all expected pin changes. New-session reopen timed out twice, so it is NOT_VERIFIED. The official ENET contains an RSO_W Temperature Coefficient text serialization defect (two U+FFFD) while saved P1 retains ±100ppm/℃; preserve raw export without normalization.",
-    "baseline_source_sha256": {
-      "P1_esch2": "1B0236C2760177BBE8619CC8FABB9257E040224D713285B8932B6C40D5A345F1",
-      "official_ENET": "F9A60EFEDE72D927B34456F352788A91807FF69765CD438DE8322D637DB91284"
-    },
-    "expected_after_source_change": {
-      "components": 169,
-      "pins": 506,
-      "nets": 102,
-      "connected_pins": 491,
-      "unconnected_pins": 15,
-      "calculation": "Confirmed by official ENET component pin maps and API geometry: 170 + U7 + C_U7 - R_OVREF_TOP - R_OVREF_BOT - R_OV_HYS = 169; 504 + 6 + 2 - 6 = 506; U3 pin13 and U7 pin1 are NC, leaving 15 NC/491 connected; V_OV_REF is removed so 103 - 1 = 102 nets."
-    },
-    "candidate_bom_delta": {
-      "per_board_added": [
-        {
-          "ref": "U7",
-          "manufacturer_part": "TLV6700DDCR",
-          "supplier_id": "C2868382",
-          "quantity": 1,
-          "description": "Use TLV6700 B comparator and internal 400mV reference; project MPN already used at regulator U_SC_OV."
-        },
-        {
-          "ref": "C_U7",
-          "manufacturer_part": "C1608X7R1A104K080AE",
-          "value": "100nF",
-          "supplier_id": "",
-          "quantity": 1,
-          "description": "Local VDD bypass DUMP_5V to GND_SYS."
-        }
-      ],
-      "per_board_removed_refs": [
-        "R_OVREF_TOP",
-        "R_OVREF_BOT",
-        "R_OV_HYS"
-      ],
-      "per_board_changed": {
-        "ref": "R_OVTOP",
-        "from_mpn": "RT0603BRD07162KL",
-        "from_value": "162kΩ",
-        "to_mpn": "RC0603FR-071ML",
-        "to_value": "1.00MΩ",
-        "tolerance": "±1%",
-        "tcr": "±100ppm/°C",
-        "reuse": "Existing FOC U1_BUCK_RCL MPN."
-      },
-      "per_board_net_physical_delta": -1,
-      "two_board_added": 4,
-      "two_board_removed": 6,
-      "two_board_net_physical_delta": -2,
-      "unique_project_mpn_delta": 0,
-      "official_bom": "Current official API export written verbatim; 91 grouped rows / 156 board pieces. SHA256 7A6788F96E9E82A276CED672C02DA30BB3509B3EEB92C1B8CBB80E8005D8AB43. R_OVTOP sourcing field is corrected to C105578; no price/MOQ evidence."
-    },
-    "connections": {
-      "U7_TLV6700DDCR": {
-        "1_OUTA": "NC",
-        "2_GND": "GND_SYS",
-        "3_INA+": "GND_SYS",
-        "4_INB-": "VBUS_OV_SENSE",
-        "5_VDD": "DUMP_5V",
-        "6_OUTB": "BUSOV_N"
-      },
-      "C_U7": {
-        "1": "DUMP_5V",
-        "2": "GND_SYS",
-        "mpn": "C1608X7R1A104K080AE",
-        "value": "100nF"
-      },
-      "R_OVTOP": {
-        "1": "BUS",
-        "2": "VBUS_OV_SENSE",
-        "mpn": "RC0603FR-071ML",
-        "value": "1.00MΩ"
-      },
-      "R_OVBOT": {
-        "1": "VBUS_OV_SENSE",
-        "2": "GND_SYS",
-        "retain": true,
-        "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
-        "value": "10.0kΩ"
-      },
-      "C_OV_SENSE": {
-        "1": "VBUS_OV_SENSE",
-        "2": "GND_SYS",
-        "retain": true,
-        "mpn": "C1608C0G1H102J080AA",
-        "value": "1nF"
-      },
-      "R_OV_PU": {
-        "1": "DUMP_5V",
-        "2": "BUSOV_N",
-        "retain": true,
-        "mpn": "RC0603FR-074K7L"
-      },
-      "U3_TLV1704AIPWR": {
-        "10_4IN-": "GND_SYS",
-        "11_4IN+": "DUMP_5V",
-        "13_4OUT": "NC",
-        "retain_three_phase_channels": true
-      },
-      "U4_UCC27511ADBVR": {
-        "1_VDD": "DUMP_5V",
-        "2_OUT_H": "DUMP_DRV_OUT",
-        "3_OUT_L": "DUMP_DRV_OUT",
-        "4_GND": "GND_SYS",
-        "5_IN-": "BUSOV_N",
-        "6_IN+": "DUMP_THERM_OK",
-        "retain": true
-      },
-      "removed_net": "V_OV_REF"
-    },
-    "threshold_screen": {
-      "divider_ratio_total": {
-        "min": 99.0132,
-        "max": 103.2783
-      },
-      "Rtop_ohm_full_corner": {
-        "min": 983565,
-        "max": 1020100
-      },
-      "Rbottom_ohm_full_corner": {
-        "min": 9973.76625,
-        "max": 10035.025
-      },
-      "turn_on_V": {
-        "min": 39.209,
-        "max": 41.724
-      },
-      "release_V": {
-        "min": 38.318,
-        "max": 41.311
-      },
-      "internal_thresholds": {
-        "VIT_plus_mV": [
-          396,
-          404
-        ],
-        "VIT_minus_mV": [
-          387,
-          400
-        ],
-        "hysteresis_mV_typ": 5.5,
-        "hysteresis_mV_max": 12,
-        "hysteresis_minimum": "not specified"
-      },
-      "comparisons": {
-        "9S_full_charge_V": 37.8,
-        "lowest_turn_on_margin_V": 1.409,
-        "SMCJ40A_minimum_breakdown_V": 44.4,
-        "highest_turn_on_margin_V": 2.676
-      },
-      "caveat": "Independent divider/reference corner envelopes, not paired same-board turn-on/release values. Does not include INB- input current at 0.4V (not specified by TI at this condition), actual high-line DUMP_5V, parasitic effects, or hardware transients; screening only."
-    },
-    "hysteresis_and_filter": {
-      "external_feedback": "Remove old 200k BUSOV_N-to-V_OV_REF resistor; it cannot be reused at VBUS_OV_SENSE because value and active polarity are wrong. Do not assume TLV6700 minimum hysteresis; it is unspecified.",
-      "internal_hysteresis_bus_equivalent_V": {
-        "typical_at_nominal_ratio": 0.556,
-        "maximum_from_full_ratio_max": 1.239,
-        "minimum": "not guaranteed"
-      },
-      "C_OV_SENSE": "Retain 1nF C0G. New divider Thevenin resistance ≈9.90kΩ; τ≈9.90µs; 10–90%≈21.8µs. Filtering is not guaranteed DC hysteresis."
-    },
-    "logic_and_failure_states": {
-      "normal_bus": "U7 OUTB high impedance; R_OV_PU raises BUSOV_N; U4 IN- high, so with DUMP_THERM_OK high output is low and Q7 is off.",
-      "overvoltage_and_thermal_contact_closed": "U7 OUTB pulls BUSOV_N low; U4 IN+ high and IN- low, DUMP_DRV_OUT high, Q7 on. Existing Q_BOV_PNP/BC847C path independently asserts BREAK_N.",
-      "thermal_contact_open": "U4 IN+ is pulled low; Q7 off even during BOV. Overvoltage still asserts BREAK_N through the separate BOV transistor path.",
-      "U7_unpowered_DUMP5_alive": "OUTB goes high impedance; BUSOV_N is pulled high, so local BOV fails open.",
-      "DUMP5_lost": "UCC27511A output is held low below its maximum 4.65V rising UVLO; dump path unavailable.",
-      "U7_startup": "Output is guaranteed correct only after VDD exceeds 1.8V for up to 450µs; a BUS already above threshold during rail startup is an unresolved detection delay.",
-      "MCU_state": "MCU GPIO is monitoring only; MCU high/low does not gate local BOV."
-    },
-    "remaining_physical_inputs": [
-      "Battery/BMS rejection regenerative BUS envelope: peak, slew rate, duration and repeated pulses.",
-      "Maximum-speed motor open-circuit and regenerative voltage/current envelope.",
-      "Exact external resistor pulse curve, thermal switch trip/reset temperatures and harness/fuse behavior.",
-      "DUMP_5V and Q7 VGS at 40–46V BUS, during high-temperature steady dump and startup/transient."
-    ],
-    "qualification": "Implemented connectivity only. Saved native source plus official ENET/geometry agree; new-session reopen after save NOT_VERIFIED. No physical, thermal, transient or full-temperature qualification. 1.8kW/1s per board and 3.6kW/1s two boards remain paper sizing targets, not a validated sink capability.",
-    "export_attribute_defect": {
-      "ref": "RSO_W",
-      "property": "Temperature Coefficient",
-      "native_P1": "±100ppm/℃",
-      "official_ENET": "��100ppm/℃",
-      "native_file_has_U+FFFD": false,
-      "action": "Preserve exact raw official ENET export; do not silently normalize. This is a property text serialization defect, not a pin-net difference."
-    }
-  }
+  ]
 }

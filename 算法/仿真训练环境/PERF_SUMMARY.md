@@ -6,7 +6,7 @@
 
 当前主线为 Windows 11 ARM64 / RTX Spark N1X 主机上的 Ubuntu 24.04 ARM64 WSL2、Newton MuJoCo Warp V6、普通 eager GPU、NOT_GUARANTEED。Native V2 协议已冻结，protocol SHA256 为 83db5a6e512d7d7244bc47ddf2059720c757504270e9bbf9129d0c7d8f92f87e；当前 task SHA256 为 209016904867c97633eb006cbb8f52fc75d95f82d74463e7f1d05ad49ecbc1b2。源码 commit 7d8a167f，raw source manifest 6026336cad5b961e2fe95885d6010781ae75e59e792d1715988bda45d35e8938。
 
-V6 1/3/64-world preregistered physics gate 已通过；同身份 resume 与 64→1 strict-evaluation smoke 已通过。正式 run native_v2_formal_v6_live_20261025_224005 于 2026-10-25 22:40:05 北京时间启动，目前仍 active，最终 300 轮门尚未通过。23:06:51 仅记录 CPU viewer 切换，不是 iteration 采样；本文不写易过时的当前 iteration。
+V6 1/3/64-world preregistered physics gate 已通过；同身份 resume 与 64→1 strict-evaluation smoke 已通过。正式 run native_v2_formal_v6_live_20261025_224005 于 2026-10-25 22:40:05 北京时间启动，当时记录为 active，最终 300 轮门尚无通过记录。后续工作区缺少该运行目录，当前运行状态不能由此历史记录确认；见[训练结果汇总](训练结果汇总.md)。23:06:51 仅记录 CPU viewer 切换，不是 iteration 采样。
 
 完整配方、依赖限制和历史失败见[迁移与验收说明](native/MIGRATION_ACCEPTANCE.md)。固定入口为 native/train/run_native_v2_trial.sh；评估使用 native/train/run_eval_v2.sh。禁止把 V1/XPBD 命令或模型当作当前正式 V2。
 

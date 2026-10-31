@@ -3,6 +3,50 @@
   "revision": "0.1-candidate + electrical-review-20261011",
   "date": "2026-10-22",
   "status": "候选网表骨架；供仿真/原理图起步，不是投板、实测或安全验收冻结",
+  "supersession_notice": {
+    "status": "SUPERSEDED_FOR_CURRENT_P1_LOCAL_ENERGY_DUMP",
+    "as_of": "2026-10-30",
+    "current_machine_evidence": "../检查/当前原理图证据.json",
+    "current_official_exports": {
+      "enet": "../eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+      "bom": "../eda工程文件/导出/当前交付/FOC_G431_BOM.csv"
+    },
+    "scope": "本文件保留删减前的选型与计算背景；其中描述的本地BUS耗能斩波、外接制动电阻组及其热联锁拓扑，已不属于2026-10-30现行P1。不得据此认定当前P1装有本地回馈能量吸收支路。",
+    "removed_from_current_p1": [
+      "R_DUMP_A",
+      "R_DUMP_B",
+      "F_BRAKE",
+      "J_BRAKE_R",
+      "J_DUMP_SW",
+      "Q7",
+      "R_DUMP_GATE",
+      "R_DUMP_GATE_PD",
+      "U4",
+      "U4_C1",
+      "U4_C2",
+      "J_TEMP",
+      "R_DUMP_INP_PD",
+      "R_THERM_TOP",
+      "R_THERM_BOT",
+      "R_THERM_SER"
+    ],
+    "retained_current_functions": [
+      "现行P1仍有名为DUMP_5V的电源网，连接U6与U3/U7；该网名沿用旧命名，不表示本地耗能开关或电阻支路仍存在。",
+      "U7 BUS过压比较器、BUSOV_N及其经BOV分立管到BREAK_N的桥臂关断请求保留；它不再驱动已移除的本地斩波器。"
+    ],
+    "current_energy_sink_boundary": "现行P1没有板载Q7耗能开关及电阻组功率回路。回馈能量由共享母线或其他系统级路径吸收的能力须另行确认，本文件中的本地电阻组额定/脉冲/热核算不构成现行实现或验收证据。",
+    "historical_sections_to_not_read_as_current": [
+      "scope.architecture中的每板本地BUS过压泄放支路",
+      "power_bridge_connections中R_DUMP_A/B、F_BRAKE、J_BRAKE_R、J_DUMP_SW与Q7的功率连接",
+      "analog_and_protection.safe_rail与dump_thermal_status中U4/J_TEMP及其使能路径",
+      "analog_and_protection.bus_overvoltage中BUSOV_N驱动Q7的旧连接描述",
+      "analog_and_protection.four_quadrant_operation中的本地dump动作描述",
+      "external_energy_dump_candidate及其电阻组、熔断器、连接器、热核算和故障策略",
+      "bov_reference_option_candidate_20261021中U4/Q7的本地斩波连接与状态描述",
+      "safe_rail_budget与shared_bus_integration中把本地dump作为现行负载或功能的描述",
+      "components数组及其他IC/MOSFET/故障策略条目中引用上述已移除器件或网络的内容"
+    ]
+  },
   "scope": {
     "boards": 1,
     "architecture": "每电机一块FOC，六MOS三相桥，低边三分流，双向四象限回馈，共享BUS；每板独立本地BUS过压泄放支路",

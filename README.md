@@ -21,8 +21,6 @@ AGTC（Advanced General-purpose Tracked Chassis）面向户外应用，围绕履
 | 文件 | 用途 |
 | --- | --- |
 | `README.md` | 工程入口、目录导航和获取方法。 |
-| `AGENTS.md` | 项目协作与 Git 工作约定。 |
-| `项目协作.md` | 项目协作与工程状态相关说明。 |
 | `.gitattributes` | Git LFS、文本和原始证据空白处理规则。 |
 | `.gitignore` | 不纳入版本管理的本地文件规则。 |
 | `.gitleaksignore` | 历史凭据扫描忽略指纹；PR 检查使用独立扫描策略。 |
