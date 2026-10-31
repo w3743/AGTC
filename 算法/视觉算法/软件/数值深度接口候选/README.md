@@ -1,6 +1,6 @@
 # RK3588 统一深度输出
 
-本目录直接文件：`deploy_candidate.py` 是早期候选部署脚本，`server.patch` 是服务端补丁记录，`README.md` 是状态与接口说明。`app/` 和 `tests/` 的直接文件分别见其 README；`evidence/` 保留原始实验与部署证据。
+本目录直接文件：`deploy_candidate.py` 是早期候选部署脚本，`server.patch` 是服务端补丁记录，`README.md` 是状态与接口说明。`app/` 和 `tests/` 的文件用途统一列于本文；`evidence/` 保留原始实验与部署证据。
 
 本目录名沿用“数值深度接口候选”。单深度/ISP直出/NPU监控已部署；latest 缓存新鲜度修正已按审核授权完成受控部署与板端验证，活动 server.py 为已审 SHA d08db78fcea4e9d6169d7c8ca86c585fc28621a466c693fcd7e61fe132193034。2026-10-21 按用户最新要求，常态运行改为 ISP 按需尺寸直出，浏览器仅保留一份实时深度图；相机预览、设备状态和标定保留。
 
@@ -165,3 +165,40 @@ adb shell systemctl is-active rk-lightstereo.service
 [optimization-result.json](evidence/optimization-result.json) 保存上一阶段32组CPU、RKNN及原生ROI对比和当时部署SHA。其远距/4K并行数据是历史实验结果，相关生产分支现已按用户要求移除；不能当作当前仍有远距输出。原生ROI、C++/NPU吞吐也不构成真实距离精度。
 
 当前仅具备室内条件，尚未完成独立量具误差验收、户外运动植物与光照突变、联动短曝光/硬同步/HDR、相机到车体/云台外参、时钟映射、长期热稳定性和 sensor-to-action 延迟验证。本轮不操作训练进程；训练和整链验收状态由相应责任对话维护。
+
+## 应用文件（app/）
+
+部分应用模块是离线实验，测试结果以实际输出为准。
+
+| 文件 | 用途 |
+| --- | --- |
+| `server.py` | 板端双目采集和伪彩深度服务。 |
+| `index.html`、`ui.css`、`ui.js` | 主网页及共享样式、交互。 |
+| `calibration.html`、`calibration_nav.js` | 在线标定页面及导航。 |
+| `calibration.npz` | 保存的相机标定参数。 |
+| `calibration.py`、`calibration_live.py`、`calibration_apply.py` | 标定计算、在线协调与参数切换。 |
+| `depth.py`、`fast_depth.py` | 校正双目深度和 CPU SGBM 深度处理。 |
+| `depth_wire.py`、`depth_adapter.py` | 数值深度帧编码与离线消费适配。 |
+| `benchmark_depth.py`、`benchmark_npu.py` | 固定图像深度性能与板端 RKNN 推理基准。 |
+| `lightstereo_depth.py`、`lightstereo_depth.preparallel.py` | LightStereo NPU 深度后端及并行前的历史版本。 |
+| `hardware.html`、`hardware_video.py` | 硬件状态页面和板端视频流。 |
+| `native_roi.py`、`roi_depth.py`、`range4k.py` | 高分辨率 ROI 深度实验及原始图像到深度网格的坐标映射。 |
+| `npu_live.py` | 按需 NPU 深度预览实验。 |
+| `pointcloud.py` | 遗留点云实现，当前服务不调用。 |
+| `probe_depth.py` | 采样和保存数值深度 HTTP 数据。 |
+| `realtime.py` | 界面叠加和板端资源采样辅助逻辑。 |
+
+## 测试文件（tests/）
+
+数值深度、图像处理和板端接口测试；结果以实际输出为准。
+
+| 文件 | 用途 |
+| --- | --- |
+| `test_depth_adapter.py` | 深度数据消费适配测试。 |
+| `test_depth_benchmark.py`、`test_depth_npu_benchmark.py` | CPU 深度与 NPU 基准测试。 |
+| `test_depth_contract_acceptance.py` | 深度接口契约验收检查。 |
+| `test_depth_http_transport.py`、`test_depth_producer_http.py` | HTTP 传输与生产者接口检查。 |
+| `test_far_routes.py` | 远距相关路由测试。 |
+| `test_hardware_monitor.py` | 硬件监测接口测试。 |
+| `test_native_roi.py`、`test_roi_depth.py` | ROI 深度处理测试。 |
+| `test_pointcloud_geometry.py` | 遗留点云模块的几何测试。 |

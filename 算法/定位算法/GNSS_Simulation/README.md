@@ -52,6 +52,8 @@ python checks/check_physics_limits.py # 解析极限：Fresnel 反射、双射�
 
 ```
 gnss_sim/
+  __init__.py       Python 包入口
+  config.py         场景、探针、实验与定位模式配置
   geodesy.py         WGS84 坐标/时间基准、ENU 局部坐标系、仰角映射
   constellation.py   GPS/BDS-3/Galileo/GLONASS 星座构造与 J2 轨道传播、DOP
   models.py          误差源物理模型
@@ -69,7 +71,7 @@ gnss_sim/
 run_sim.py           6 组实验的主入口
 make_figures.py      9 张结果图
 report.py            中文分析报告生成
-checks/              三个模型自检脚本
+checks/              四个模型自检脚本、两个诊断脚本及一个冒烟脚本
 results/             仿真输出 CSV
 figures/             图
 ```

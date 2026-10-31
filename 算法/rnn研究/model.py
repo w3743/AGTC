@@ -76,8 +76,15 @@ class PlasticRNN(nn.Module):
         self.eta_raw = nn.Parameter(torch.tensor(0.0))
         self.decay_logit = nn.Parameter(torch.tensor(math.log(0.8 / 0.2)))
         self.scale_raw = nn.Parameter(torch.tensor(math.log(math.expm1(1.5))))
+        # A zero logit means 50% retention, not an absence of memory.
+        # Learn retention from prediction loss without an L2 pull toward 0.5.
         self.optimizer = torch.optim.Adam(
-            self.parameters(), lr=learning_rate, weight_decay=1e-4
+            [
+                {"params": [p for name, p in self.named_parameters() if name != "decay_logit"]},
+                {"params": [self.decay_logit], "weight_decay": 0.0},
+            ],
+            lr=learning_rate,
+            weight_decay=1e-4,
         )
         self.optimizer_updates = 0
         self.last_training_loss: float | None = None

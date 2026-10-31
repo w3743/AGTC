@@ -238,6 +238,15 @@ class PlasticRNNContractTests(unittest.TestCase):
         self.assertEqual(model.updates_per_press, 1)
         self.assertEqual(model.optimizer.param_groups[0]["lr"], 0.015)
         self.assertEqual(model.optimizer.param_groups[0]["weight_decay"], 1e-4)
+        self.assertEqual(len(model.optimizer.param_groups), 2)
+        retention_group = model.optimizer.param_groups[1]
+        self.assertEqual(retention_group["lr"], 0.015)
+        self.assertEqual(retention_group["weight_decay"], 0.0)
+        self.assertEqual([id(p) for p in retention_group["params"]], [id(model.decay_logit)])
+        self.assertEqual(
+            {id(p) for p in model.optimizer.param_groups[0]["params"]},
+            {id(p) for name, p in model.named_parameters() if name != "decay_logit"},
+        )
         for name, value in reference.state_dict().items():
             self.assertTrue(torch.equal(value, model.state_dict()[name]), name)
 
@@ -279,6 +288,37 @@ class PlasticRNNContractTests(unittest.TestCase):
         self.assertEqual(float(model.input_weights[0, 0].detach()), 0.0)
         model.train_on_history([0, 1])
         self.assertNotEqual(float(model.input_weights[0, 0].detach()), 0.0)
+
+    def test_retention_has_no_regularization_drift_with_zero_task_gradient(self) -> None:
+        model = PlasticRNN(seed=SEED)
+        before = model.decay_logit.detach().clone()
+        # Zero tensors (rather than None) make Adam execute its update path.
+        for _ in range(10):
+            for parameter in model.parameters():
+                parameter.grad = torch.zeros_like(parameter)
+            model.optimizer.step()
+        self.assertTrue(torch.equal(model.decay_logit.detach(), before))
+        self.assertAlmostEqual(float(model.trace_decay.detach()), 0.8, places=6)
+
+        # The former all-parameter decay produces drift even without task signal.
+        old_parameter = torch.nn.Parameter(before.clone())
+        old_optimizer = torch.optim.Adam([old_parameter], lr=0.015, weight_decay=1e-4)
+        for _ in range(10):
+            old_parameter.grad = torch.zeros_like(old_parameter)
+            old_optimizer.step()
+        self.assertLess(float(old_parameter.detach()), float(before))
+
+    def test_retention_still_learns_from_prediction_loss(self) -> None:
+        model = PlasticRNN(seed=SEED, updates_per_press=1)
+        # Enable the trace's effect so retention can influence predictions.
+        with torch.no_grad():
+            model.eta_raw.fill_(0.5)
+        before = model.decay_logit.detach().clone()
+        model.train_on_history([0, 1, 0, 0, 1, 1, 0, 1])
+        self.assertIsNotNone(model.decay_logit.grad)
+        self.assertTrue(torch.isfinite(model.decay_logit.grad).all())
+        self.assertGreater(abs(float(model.decay_logit.grad)), 1e-12)
+        self.assertFalse(torch.equal(model.decay_logit.detach(), before))
 
     def test_shared_fast_edge_gain_has_gradient_and_changes(self) -> None:
         model = PlasticRNN(seed=SEED)
