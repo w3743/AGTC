@@ -15,12 +15,11 @@ STM32G431CBU6 为 STM32G431CB，UFQFPN48 封装；具体引脚和电气条件以
 
 ## WeAct Studio 核心板公开参考
 
-以下来自 [WeActStudio.STM32G431CoreBoard](https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard)，固定来源提交 `0af1943ee21bf7d5e172a2bfc6480d44aa229de3`。仓库同时包含 CBU6 和 CBT6；这里选取对应 CxUx 的 QFN48 图纸，标准版与长版均保留。图纸是板级参考，不代表本工程已有实物或经过电气验收。
+以下来自 [WeActStudio.STM32G431CoreBoard](https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard)，固定来源提交 `0af1943ee21bf7d5e172a2bfc6480d44aa229de3`。仓库同时包含 CBU6 和 CBT6；这里选取对应 CxUx 的 QFN48 标准版图纸。图纸是板级参考，不代表本工程已有实物或经过电气验收。
 
 | 版本 | 原理图 | 外形 |
 | --- | --- | --- |
 | 标准版 V1.0 | [原理图](WeAct-QFN48-标准版-原理图.pdf) | [外形图](WeAct-QFN48-标准版-外形.pdf) |
-| 长版 V1.0 | [原理图](WeAct-QFN48-长版-原理图.pdf) | [外形图](WeAct-QFN48-长版-外形.pdf) |
 
 [WeAct 原始中文说明](WeAct-README原文.md) 为仓库原文摘存，文中的相对图片与目录链接需在上游仓库查看。软件例程和其他封装版本也可从上游仓库获取。
 

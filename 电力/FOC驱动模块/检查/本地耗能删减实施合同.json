@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-30",
+  "decision": "USER_REQUEST_REMOVE_FOC_LOCAL_BRAKE_RESISTORS",
+  "implementation_status": "IMPLEMENTED_OFFICIAL_SAVE_REOPEN_ENET_DRC_BOM",
+  "p1_sha256_before": "bf1028015395d6747fe0e3f6ebd0dc4c8c29eccc88ea282c89638d3442b4bae7",
+  "remove_required": [
+    "R_DUMP_A",
+    "R_DUMP_B"
+  ],
+  "remove_branch_candidates": [
+    "F_BRAKE",
+    "J_BRAKE_R",
+    "J_DUMP_SW",
+    "Q7",
+    "R_DUMP_GATE",
+    "R_DUMP_GATE_PD",
+    "U4",
+    "U4_C1",
+    "U4_C2",
+    "J_TEMP",
+    "R_DUMP_INP_PD",
+    "R_THERM_TOP",
+    "R_THERM_BOT",
+    "R_THERM_SER"
+  ],
+  "preserve": [
+    "U6",
+    "U3",
+    "U7",
+    "U3_C1",
+    "U3_C2",
+    "R_OV_PU",
+    "R_BOV_PNP_B",
+    "Q_BOV_PNP",
+    "R_BOV_DRIVE",
+    "Q_BOV_NPN",
+    "R_BOV_NPN_PD",
+    "R_BREAK_PU",
+    "J_PWR_SENSE"
+  ],
+  "notes": [
+    "Retain DUMP_5V: it supplies negative phase overcurrent and BOV protection.",
+    "Clean associated disconnected wires and ports; inspect DRC and exported netlist after saving and reopening.",
+    "Central dump depends on 12V and connected power path; complete stopping not established."
+  ],
+  "quantity_delta_vehicle": {
+    "LPS0300H2R00FB": -4
+  },
+  "cost_net": null,
+  "verification": "本地耗能删减_官方复核.json"
+}

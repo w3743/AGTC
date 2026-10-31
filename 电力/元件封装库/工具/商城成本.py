@@ -66,7 +66,7 @@ SCENARIOS = {
         "modules": {"BMS": 1, "FOC-A": 1, "REGULATOR": 1, "PUMP": 1},
     },
     "actual_vehicle": {
-        "label": "整车电力模块组合：BMS×1 + FOC-A×1 + FOC-B×1 + 稳压×1 + 水泵×1（不含36节电芯、2台电机等整车其他物料）",
+        "label": "整车电力模块组合：BMS×1 + FOC-A×1 + FOC-B×1 + 稳压×1 + 水泵×1（不含电芯、2台电机等整车其他物料）",
         "modules": {"BMS": 1, "FOC-A": 1, "FOC-B": 1, "REGULATOR": 1, "PUMP": 1},
     },
 }
@@ -1317,7 +1317,7 @@ def build_outputs() -> tuple[dict[str, Any], str]:
         "additional_quantity_included": 0,
         "configuration_status": "single_current_configuration_only; no active 16-piece alternative",
         "source": "电力/稳压模块/原理图准备/BOM.csv",
-        "note": "按用户最新决定仅保留当前8只，后续采购唯一配置也是8只，增量0，用于启动瞬态助力；不要求持续1秒，实际启动持续时间尚未确定。先前16只数量已撤回，不作为候选或建议。",
+        "note": "当前设计目标使用现有8只，增量0；超容首要承接制动回生，有余电时辅助启动。先前16只方案已撤回；如重新采购须另行核价。",
     }
 
     # Add source binding checks and input quantities as audit facts, not as current timestamps.
@@ -1337,12 +1337,22 @@ def build_outputs() -> tuple[dict[str, Any], str]:
 
     quantity_a = sum(x["quantity"] for x in module_demands["FOC-A"])
     quantity_b = sum(x["quantity"] for x in module_demands["FOC-B"])
-    expected_a = 157  # 156 native BOM pieces + one wire-side mate
-    expected_b = 156  # 155 native BOM pieces + one wire-side mate
+    foc_basis = inputs["FOC"].get("quantityBasis", {})
+    foc_native_a = as_int(foc_basis.get("FOC_AActual", 156))
+    foc_native_b = as_int(foc_basis.get("FOC_BActual", 155))
+    foc_mates = as_int(foc_basis.get("extraExternalMatePlugUnits", 2))
+    foc_mates_a = foc_mates // 2
+    foc_mates_b = foc_mates - foc_mates_a
+    expected_a = foc_native_a + foc_mates_a
+    expected_b = foc_native_b + foc_mates_b
     if quantity_a != expected_a:
-        input_issues.append(f"FOC-A当前采购数为{quantity_a}，预期156板内/板外BOM+1线端配套={expected_a}")
+        input_issues.append(
+            f"FOC-A当前采购数为{quantity_a}，预期原生实装{foc_native_a}+线端配套{foc_mates_a}={expected_a}"
+        )
     if quantity_b != expected_b:
-        input_issues.append(f"FOC-B当前采购数为{quantity_b}，预期155板内/板外BOM+1线端配套={expected_b}")
+        input_issues.append(
+            f"FOC-B当前采购数为{quantity_b}，预期原生实装{foc_native_b}+线端配套{foc_mates_b}={expected_b}"
+        )
     if bms_total != 271:
         input_issues.append(f"BMS输入当前采购数为{bms_total}，既有核对基线为271")
     if supercap_current != 8:
@@ -1461,7 +1471,9 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines = [
         "# 当前商城成本",
         "",
-        "本页由 `工具/商城成本.py` 从当前BOM、模块核价输入和统一商城报价表确定性生成。只将精确MPN、厂家、已验证LCSC C码三者一致且有当前公开人民币价梯的SKU计入已核价小计。",
+        "本页由 `工具/商城成本.py` 从下方列出的原生BOM、模块核价输入和统一商城报价表确定性生成。只将精确MPN、厂家、已验证LCSC C码三者一致且有记录人民币价梯的SKU计入已核价小计。",
+        "",
+        "**使用边界：稳压核价输入仍绑定原 `原理图准备/BOM.csv`，未覆盖新版 `选型BOM.csv`；BMS原生亦未完成9S5P升级。报价日期以各条记录为准，不代表今天可成交价格。本页不能作为现行整车总价或新版稳压总价。** 本次新旧口径核对见 [电力器件成本复核](../../检查/电力器件成本复核_20261030.json)。",
         "",
         "完整总价在存在未核价SKU、身份/数量不确定或现金约束缺失时保持 `null`。本页不把部分小计称为总价，也不包括PCB、SMT、运费；没有报价明确说明的税费不推算。",
         "库存快照中的 `zero_snapshot`、`unknown`、`out_of_stock` 仅列待复核；只有报价标为在售且有正的已知库存数、数量低于采购批量时才计为确证库存不足。",
@@ -1481,7 +1493,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         for issue in data["input_validation"]["input_issues"]:
             lines.append(f"- {issue}")
     else:
-        lines.extend(["", "## 输入校验", "", "核价输入声明的当前BOM绑定、数量基线与当前源文件检查一致。"])
+        lines.extend(["", "## 输入校验", "", "核价输入声明的原生BOM绑定、数量基线与对应源文件检查一致；不代表已覆盖新版选型BOM。"])
 
     lines.extend(["", "## 场景汇总", ""])
     for key, scenario in data["scenarios"].items():
@@ -1554,7 +1566,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "### 超级电容配置",
         "",
-        f"当前及后续采购配置均为 {data['supercapacitor_candidate_sensitivity']['current_bom_quantity']} 只，新增量0，用于启动瞬态助力；不要求持续1秒，实际启动持续时间尚未确定。此前16只方案已撤回，不再作为有效候选或建议。超级电容已按当前BOM计入场景成本，不另加数量。",
+        f"当前BOM记录 {data['supercapacitor_candidate_sensitivity']['current_bom_quantity']} 只，设计目标沿用现有8只，增量0；主要用于承接制动回生，有余电时辅助启动。此前16只方案已撤回。超容已列入数量统计，但无已核实单价时不会计入已核价小计；如重新采购应另行询价。",
         "",
         "## 已验证报价与逐SKU明细",
         "",
