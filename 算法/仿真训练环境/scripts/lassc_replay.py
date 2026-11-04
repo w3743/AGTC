@@ -95,27 +95,36 @@ def _golden_vectors() -> tuple[dict[str, dict[str, Any]], str]:
     return {item["name"]: item for item in fixture["vectors"]}, digest
 
 
+def _feed_drive_fixture(assembler, vectors, *, side, received_monotonic):
+    for name in ("boot_epoch_left", "state_left", "quality_left"):
+        vector = vectors[name]
+        can_id = int(vector["id"], 16)
+        data = bytes.fromhex(vector["data_hex"])
+        if side == "right":
+            # Synthetic right-side sample, with CRC bound to the right CAN ID.
+            can_id += 1
+            crc = drive_crc16_ccitt_false(can_id, len(data), data[:6])
+            data = data[:6] + crc.to_bytes(2, "little")
+        if assembler.feed_can_frame(can_id, data, received_monotonic=received_monotonic) is None:
+            raise ValueError(f"{side} fixture CAN frame {name} was not decoded")
+
+
 def build_telemetry_snapshot(
     episode_time: float,
     host_monotonic: float,
     *,
     estimator,
+    assembler: TelemetryAssembler | None = None,
     gimbal_q: tuple[float, float] = (0.10, 0.20),
     gimbal_qd: tuple[float, float] = (0.01, -0.02),
     attitude_yaw_rad: float = 0.0,
 ) -> tuple[FeedbackSnapshot, dict[str, Any]]:
     """Feed real protocol decoders with deterministic checked-in QA payloads."""
     vectors, golden_sha = _golden_vectors()
-    assembler = TelemetryAssembler(sensor_timeout_s=0.5, motor_timeout_s=0.1)
-
-    for name in ("boot_epoch_left", "state_left", "quality_left"):
-        vector = vectors[name]
-        result = assembler.feed_can_frame(
-            int(vector["id"], 16), bytes.fromhex(vector["data_hex"]),
-            received_monotonic=host_monotonic,
-        )
-        if name in ("state_left", "quality_left") and result is None:
-            raise ValueError(f"golden CAN vector {name} was not decoded")
+    if assembler is None:
+        assembler = TelemetryAssembler(sensor_timeout_s=0.5)
+    for side in ("left", "right"):
+        _feed_drive_fixture(assembler, vectors, side=side, received_monotonic=host_monotonic)
 
     # These are the exact ATK frame layouts covered by test_telemetry.py. A
     # parameterized yaw quaternion keeps the QA pose measured through the real
@@ -154,6 +163,7 @@ def build_telemetry_snapshot(
     return snapshot, {
         "can_golden_sha256": golden_sha,
         "can_vectors_fed": ["boot_epoch_left", "state_left", "quality_left"],
+        "synthetic_right_feedback": True,
         "atk_groups_decoded": sorted(frame["group"] for frame in decoded_atk),
         "gimbal_units": {axis["source"]: dict(axis["units"]) for axis in gimbal},
         "feedback_sample_type": type(sample).__name__,
@@ -443,11 +453,14 @@ def _decode_invalid_fixture(adapter_module, metadata, payload,
 
 def _action_codec_check(cfg: Config) -> dict[str, Any]:
     vectors, _ = _golden_vectors()
+    assembler = TelemetryAssembler()
+    for side in ("left", "right"):
+        _feed_drive_fixture(assembler, vectors, side=side, received_monotonic=1.0)
     rpm_per_action = cfg.max_speed / (2.0 * math.pi * 0.03) * 60.0 * 4.0
     action = np.asarray([1200.0 / rpm_per_action, -1500.0 / rpm_per_action, 0.25, -0.5],
                         dtype=np.float64)
     command = action_commands(action, session_id=0x1234, sequence=0x7E,
-                              ttl_10ms=10, cfg=cfg, drive_radius_m=0.03, reduction=4.0)
+                              ttl_10ms=10, cfg=cfg, telemetry=assembler, now_monotonic=1.0)
     by_name = vectors
     left = command["drive_packets"][0]
     right = command["drive_packets"][1]
@@ -582,8 +595,10 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
         if source_pose is None:
             raise ValueError("exact source-time PoseHistory lookup failed")
 
+        current_assembler = TelemetryAssembler(sensor_timeout_s=0.5)
         current_feedback, current_telemetry = build_telemetry_snapshot(
             consume_episode, 100.0 + consume_episode, estimator=current_estimator,
+            assembler=current_assembler,
             gimbal_q=(0.11 + index * 0.005, 0.19 - index * 0.004),
             attitude_yaw_rad=0.6,
         )
@@ -602,7 +617,7 @@ def run_replay(checkpoint: str | Path, *, output: str | Path,
             raise ValueError("real checkpoint produced an invalid normalized action")
         policy_commands = action_commands(
             action, session_id=0x4242, sequence=index + 1, ttl_10ms=10,
-            cfg=cfg, drive_radius_m=0.03, reduction=4.0,
+            cfg=cfg, telemetry=current_assembler, now_monotonic=consume_ns / 1e9,
         )
         for packet, side in zip(policy_commands["drive_packets"], ("left", "right")):
             if (packet["can_id"] != (0x501 if side == "left" else 0x502)

@@ -1,0 +1,79 @@
+{
+  "status": "HOLD，仅原理图候选增量，禁止生成投产BOM或用作可上电网表",
+  "base": {
+    "path": "../归档/精简预充合闸候选/精简候选_P1.enet",
+    "sha256": "3813a9189720186eb35cb4cbd5ff690745a4587cde5d7b9bb33db15d85286586"
+  },
+  "verified": {
+    "TPS2490DGSR": {
+      "1": "B0，仅禁能审图态，待最终 EN 许可接线",
+      "2": "PRE_TPS_VREF",
+      "3": "PRE_TPS_PROG",
+      "4": "PRE_TPS_TIMER",
+      "5": "B0",
+      "6": "NC，仅供参考，不接主路许可",
+      "7": "PRE_LIN_OUT",
+      "8": "PRE_LINEAR_GATE",
+      "9": "PRE_TPS_SENSE",
+      "10": "BATT+_FUSED"
+    },
+    "passives": [
+      {
+        "value": "47 kΩ",
+        "nets": [
+          "PRE_TPS_VREF",
+          "PRE_TPS_PROG"
+        ]
+      },
+      {
+        "value": "56 mΩ，总偏差≤±1.5%，Kelvin取样",
+        "nets": [
+          "BATT+_FUSED",
+          "PRE_TPS_SENSE"
+        ]
+      },
+      {
+        "value": "CT有效47–55 µF，料号及漏电待定",
+        "nets": [
+          "PRE_TPS_TIMER",
+          "B0"
+        ]
+      }
+    ],
+    "linear_fet": {
+      "mpn": "CSD19536KTT",
+      "gate": "PRE_LINEAR_GATE",
+      "drain": "PRE_TPS_SENSE",
+      "source": "PRE_LIN_OUT"
+    },
+    "base_changes": [
+      {
+        "pin": "Q_PRE1.2",
+        "from": "BATT+_FUSED",
+        "to": "PRE_LIN_OUT"
+      },
+      {
+        "pin": "Q_PRE2.2",
+        "from": "QPRE_SW",
+        "to": "PACK+"
+      },
+      {
+        "ref": "R_PRE",
+        "action": "脱离预充支路。测试支路未定稿，不装配或接线"
+      }
+    ],
+    "retain": [
+      "Q_PRE1.3/Q_PRE2.3 QPRE_SRC，共源",
+      "Q_PRE1.1/Q_PRE2.1 QPRE_G",
+      "U_PRE_SENSE.3 BATT+_FUSED / .4 PACK+",
+      "U_LPV_CONFIRM 保留 MAIN_PROVEN 硬门"
+    ]
+  },
+  "blocked": [
+    "禁能审图态须同时保持 P-MOS 驱动禁止及 MAIN_PROVEN 为低，不能按原驱动直接上电",
+    "最终 EN 默认低和 P-MOS 独立硬撤销接线",
+    "方向检测静态及动态预算与接口",
+    "探测负载、隔离实证、绝对Kelvin与硬超时",
+    "输入去耦与OUT负尖峰钳位的选料和实装"
+  ]
+}

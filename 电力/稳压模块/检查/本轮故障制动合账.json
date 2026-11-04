@@ -1,0 +1,156 @@
+{
+  "status": "screening_only_not_guarantee",
+  "source_netlist_sha256": "161f056f6a787682ac41b1caac71d30ef196e61618f026affbd2a3a44071a735",
+  "handoff_sha256": {
+    "BMS模块": "11408bf02812a23d332e8b7ae4b91328ce7ee62bce689ba8c5432eeefec4ee1d",
+    "FOC驱动模块": "86878c8ca15203ffdc3a5905ad6c1c008a107c14e5d3a54b7ba9c3342482f4b6"
+  },
+  "resistor": {
+    "ohm_nominal": 0.82,
+    "ohm_min": 0.7789999999999999,
+    "ohm_max": 0.861,
+    "assumptions": "constant resistance, ideal switch, no wiring, no thermal change; no real power or pulse rating known",
+    "static_full_on": [
+      {
+        "V": 22.5,
+        "current_A_min": 26.13240418118467,
+        "current_A_max": 28.883183568677794,
+        "power_W_min": 587.9790940766551,
+        "power_W_max": 649.8716302952504
+      },
+      {
+        "V": 37.8,
+        "current_A_min": 43.90243902439024,
+        "current_A_max": 48.52374839537869,
+        "power_W_min": 1659.512195121951,
+        "power_W_max": 1834.1976893453143
+      },
+      {
+        "V": 39.209,
+        "current_A_min": 45.538908246225326,
+        "current_A_max": 50.33247753530168,
+        "power_W_min": 1785.5350534262489,
+        "power_W_max": 1973.4861116816437
+      },
+      {
+        "V": 40.3,
+        "current_A_min": 46.80603948896631,
+        "current_A_max": 51.73299101412067,
+        "power_W_min": 1886.2833914053424,
+        "power_W_max": 2084.839537869063
+      },
+      {
+        "V": 40.81,
+        "current_A_min": 47.39837398373984,
+        "current_A_max": 52.387676508344036,
+        "power_W_min": 1934.327642276423,
+        "power_W_max": 2137.9410783055205
+      },
+      {
+        "V": 42.0,
+        "current_A_min": 48.78048780487805,
+        "current_A_max": 53.91527599486522,
+        "power_W_min": 2048.7804878048782,
+        "power_W_max": 2264.441591784339
+      }
+    ],
+    "example_300W_only": {
+      "allowed_duty_40p3V_average_only": 0.14389596635654428,
+      "minimum_period_s_for_260p4167J_average_only": 0.8680555555555558
+    }
+  },
+  "capacitor_comparison": [
+    {
+      "C_F": 0.024,
+      "v_start_V": 37.8,
+      "v_comparison_V": 40.3,
+      "energy_J": 2.343,
+      "net_input_W": 500,
+      "ideal_time_s": 0.004686
+    },
+    {
+      "C_F": 0.024,
+      "v_start_V": 37.8,
+      "v_comparison_V": 39.209,
+      "energy_J": 1.3020681720000067,
+      "net_input_W": 500,
+      "ideal_time_s": 0.0026041363440000133
+    },
+    {
+      "C_F": 0.05286,
+      "v_start_V": 37.8,
+      "v_comparison_V": 40.3,
+      "energy_J": 5.1604575,
+      "net_input_W": 495.3,
+      "ideal_time_s": 0.010418852210781343
+    },
+    {
+      "C_F": 0.05286,
+      "v_start_V": 37.8,
+      "v_comparison_V": 39.209,
+      "energy_J": 2.8678051488300143,
+      "net_input_W": 495.3,
+      "ideal_time_s": 0.005790036642095728
+    },
+    {
+      "C_F": 0.0054156,
+      "v_start_V": 37.8,
+      "v_comparison_V": 40.3,
+      "energy_J": 0.52869795,
+      "net_input_W": 500,
+      "ideal_time_s": 0.0010573959
+    }
+  ],
+  "mechanical_comparison": {
+    "assumptions": "30kg, 15km/h, constant deceleration 3.9624m/s2; gravitational slope added, no inertia, losses or rolling resistance; not user stopping requirement",
+    "scenarios": [
+      {
+        "grade_degrees": 0,
+        "stop_s": 1.051551248401642,
+        "distance_m": 2.1907317675034212,
+        "mechanical_initial_W": 495.3,
+        "mechanical_energy_J": 260.41666666666674
+      },
+      {
+        "grade_degrees": 10,
+        "stop_s": 1.051551248401642,
+        "distance_m": 2.1907317675034212,
+        "mechanical_initial_W": 708.1633626896754,
+        "mechanical_energy_J": 372.33503405431657
+      },
+      {
+        "grade_degrees": 20,
+        "stop_s": 1.051551248401642,
+        "distance_m": 2.1907317675034212,
+        "mechanical_initial_W": 914.5589798180837,
+        "mechanical_energy_J": 480.8528184823191
+      }
+    ]
+  },
+  "sc_initial_charge": {
+    "series_cells": 8,
+    "F_per_cell": 350,
+    "equivalent_F": 43.75,
+    "target_cell_V": 2,
+    "sc_current_A": 20,
+    "ideal_time_s": 35,
+    "ideal_energy_J": 5600,
+    "terminal_power_W": 320
+  },
+  "required_formulas": {
+    "node_balance": "P_regen + P_other_sources = P_battery_net + P_sc_bus + P_dump + P_other_load + dE_bus/dt + losses",
+    "battery_limit": "0 <= I_battery_net <= min(16 A, qualified fresh CCL), shared once",
+    "dc_link_energy": "E = integral V dQ; for constant effective C, ΔE=0.5*C*(Vlimit^2-Vstart^2)",
+    "sc_energy": "E_sc=0.5*sum(C_i*(V_i_end^2-V_i_start^2)); stop at highest qualified cell limit",
+    "resistor_energy": "E_R = integral i_R(t)^2 * R(T,t) dt",
+    "precharge": "C_eff(V,T,t)*dV/dt=(Vpack-V)/Rpre-I_REG(V,t)-I_other(V,t)",
+    "repeat": "P_avg= sum(E_pulses)/period <= installed derated continuous rating; thermal transient and individual pulse limits also required"
+  },
+  "cautions": [
+    "The given voltages are comparison points, not guaranteed safe maximums.",
+    "The circuit has no verified brake resistor pulse, temperature, lifetime or continuous rating.",
+    "FOC end-to-end BOV response and central 12 V failure timing are not bounded.",
+    "Capacitance tolerances are initial values and exclude temperature, aging, DC bias, wiring and module input capacitance.",
+    "No local dump is credited after a FOC feeder disconnect; gate shutdown alone does not dissipate energy."
+  ]
+}

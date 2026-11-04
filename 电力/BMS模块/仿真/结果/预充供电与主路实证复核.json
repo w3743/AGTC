@@ -1,0 +1,146 @@
+{
+  "status": "ISOLATED_HOLD",
+  "candidate": {
+    "sha256": "3813a9189720186eb35cb4cbd5ff690745a4587cde5d7b9bb33db15d85286586",
+    "pin_nets": {
+      "U_PRE_5V_POR": {
+        "2": "PRE_SENSE5_OK",
+        "3": "VOUT_5V"
+      },
+      "U_PRE_AND": {
+        "8": "PRE_RAILS_OK",
+        "9": "POR_OK_N",
+        "10": "PRE_SENSE5_OK"
+      },
+      "U_PRE_ARM": {
+        "1": "PRE_REQ",
+        "6": "PRE_RUN_OK"
+      },
+      "U_SEQ": {
+        "1": "MAIN_CLR_N",
+        "5": "FET_RELEASE",
+        "11": "PRE_REQ"
+      },
+      "J_CORE_P1": {
+        "15": "TMR_ACTIVE",
+        "22": "MAIN_REQ"
+      },
+      "J_CORE_P2": {
+        "5": "BQ_I2C_SCL",
+        "6": "BQ_I2C_SDA",
+        "14": "MAIN_PROVEN",
+        "17": "PRE_DONE"
+      },
+      "U1": {
+        "18": "SRP",
+        "20": "SRN",
+        "42": "BQ_PACK",
+        "43": "DSG",
+        "45": "CHG",
+        "48": "VC16_FILT"
+      },
+      "R_PACK": {
+        "1": "PACK+",
+        "2": "BQ_PACK"
+      },
+      "R_VC16": {
+        "1": "TAP_B9",
+        "2": "VC16_FILT"
+      },
+      "RSHUNT": {
+        "1": "B0",
+        "2": "PACK-"
+      }
+    },
+    "sense_endpoints": [
+      "U_PRE_CMP.3",
+      "U_PRE_CMP.6",
+      "U_PRE_SENSE.1"
+    ]
+  },
+  "power_window": {
+    "status": "CONDITIONAL_STATIC_ONLY_DYNAMIC_OPEN",
+    "as_built_4p63_rising_max_V": 4.793438999999999,
+    "pin_compatible_4p55_falling_min_V": 4.459,
+    "pin_compatible_4p55_rising_max_V": 4.710615,
+    "falling_threshold_V": [
+      4.5384810058520175,
+      4.685194295662318
+    ],
+    "rising_threshold_V": [
+      4.553240817382286,
+      4.723822229187783
+    ],
+    "rising_margin_at_4p75_V": 0.026177770812217283,
+    "falling_drop_plus_error_limit_V": 0.038481005852017525,
+    "turnoff_example_s_at_1V_per_ms_after_10mV_error": 2.8481005852017524e-05,
+    "ct_charge_only_s": [
+      0.15042857142857144,
+      0.364235294117647
+    ],
+    "open_drain_logic_high_min_at_4p75_V": 2.3035696760937494,
+    "passive_logic_node_max_at_1p5_V": 0.79949282390625,
+    "reset_sink_upper_A": 0.00036003966041561075,
+    "allocation_A": 0.00425,
+    "model_available_charge_time_s": 5.266878164523367,
+    "model_identified_cap_upper_F": 0.079783824,
+    "normal_timing_model_by_rail_V": {
+      "4.5": {
+        "inner_gap_V": 0.07481732193074571,
+        "charge_time_s": 5.25312382635792,
+        "remaining_time_s": 0.013754338165446356,
+        "constant_current_limit_A": 0.004317028169137165,
+        "capacitance_limit_F_at_allocated_current": 0.07999272326293423
+      },
+      "4.75": {
+        "inner_gap_V": 0.08280344042296273,
+        "charge_time_s": 5.097794019874907,
+        "remaining_time_s": 0.16908414464845922,
+        "constant_current_limit_A": 0.005165610471782301,
+        "capacitance_limit_F_at_allocated_current": 0.08243010189691553
+      }
+    }
+  },
+  "main_path_proof": {
+    "status": "FAIL_EXISTING_SIGNALS",
+    "common_observation_at_equalized_zero_load": {
+      "main_FET_drive_requested": true,
+      "PRE_DONE": true,
+      "TMR_ACTIVE": true,
+      "stack_and_pack_ideal_V": [
+        37.8,
+        37.8
+      ],
+      "total_shunt_current_A": 0,
+      "consistent_physical_main_path_states": [
+        "low_resistance",
+        "open_with_precharge_on"
+      ]
+    },
+    "precharge_only_steady_drop_V_at_allocated_current": [
+      0.030955512499999997,
+      0.0400335125
+    ],
+    "example_2mohm_main_path_drop_V_at_allocated_current": 8.500000000000002e-06,
+    "common_0p5mohm_shunt_drop_V_at_allocated_current": 2.1250000000000004e-06,
+    "BQ_worst_case_absolute_difference_error_V_minus40_to85C": 1.0,
+    "fixture_reference_only": {
+      "pulse_A": 0.1,
+      "pulse_s": 0.04,
+      "minimum_precharge_only_increment_V": 0.04844890899458807,
+      "increment_measured_acceptance_ceiling_V": 0.02,
+      "increment_total_error_budget_V": 0.01,
+      "also_require_both_main_bank_VGS": true,
+      "autonomous_proof_source_implemented": false
+    }
+  },
+  "sources": {
+    "TPS3890": "https://www.ti.com/lit/ds/symlink/tps3890.pdf",
+    "TLV809E": "https://www.ti.com/lit/ds/symlink/tlv809e.pdf",
+    "INA600": "https://www.ti.com/lit/gpn/ina600",
+    "SN74LVC08A": "https://www.ti.com/lit/ds/symlink/sn74lvc08a.pdf",
+    "SN74LVC1G17": "https://www.ti.com/lit/ds/symlink/sn74lvc1g17.pdf",
+    "BQ76952": "https://www.ti.com/lit/gpn/bq76952",
+    "BQ76952_TRM": "https://www.ti.com/lit/pdf/sluuby2"
+  }
+}

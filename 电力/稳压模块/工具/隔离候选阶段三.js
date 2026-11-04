@@ -1,0 +1,12 @@
+await eda.dmt_EditorControl.openDocument('28c1f3740a9b8e02');
+await new Promise(r=>setTimeout(r,1800));
+let all=await eda.sch_PrimitiveComponent.getAll(undefined,false);
+let old=all.find(x=>x.getState_Designator()==='R_QP_COL');
+if(!old)throw Error('missing pullup');
+const [x,y,rot]=[old.getState_X(),old.getState_Y(),old.getState_Rotation()];
+if(!await eda.sch_PrimitiveComponent.delete(old))throw Error('delete failed');
+let c=await eda.sch_PrimitiveComponent.create({libraryUuid:'0819f05c4eef4c71ace90d822a990e87',uuid:'cbe662ffe3274f6e8d6ac8bdabe45072'},x,y,undefined,rot,false,true,true);
+if(!c)throw Error('create failed');
+await eda.sch_PrimitiveComponent.modify(c,{designator:'R_QP_COL',name:'30kΩ'});
+const save=await eda.sch_Document.save();
+return {pullup:'30kΩ',save,status:'REVIEW_ONLY_UNWIRED'};
