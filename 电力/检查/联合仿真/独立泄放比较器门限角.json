@@ -1,0 +1,68 @@
+{
+  "status": "CONDITIONAL_COMPONENT_BUDGET_NOT_HARDWARE_QUALIFICATION",
+  "body_temperature_constraint_c": [
+    0,
+    85
+  ],
+  "ambient_requirement_c": [
+    0,
+    60
+  ],
+  "resistors": [
+    {
+      "function": "bus_upper_main",
+      "ohm": 143000,
+      "initial_tolerance": 0.001,
+      "tcr_budget_ppm_per_c": 25,
+      "mpn": "PTFR0805B143KP9"
+    },
+    {
+      "function": "bus_upper_trim",
+      "ohm": 600,
+      "initial_tolerance": 0.01,
+      "tcr_budget_ppm_per_c": 100,
+      "mpn": "CRCW0805600RFKEAHP"
+    },
+    {
+      "function": "bus_bottom",
+      "ohm": 10000,
+      "initial_tolerance": 0.001,
+      "tcr_budget_ppm_per_c": 25,
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25"
+    },
+    {
+      "function": "feedback",
+      "ohm": 6800000,
+      "initial_tolerance": 0.01,
+      "tcr_budget_ppm_per_c": 200,
+      "mpn": "RC0603FR-076M8L"
+    }
+  ],
+  "reference_total_error_budget_fraction": 0.0011,
+  "comparator_offset_budget_v": 0.004,
+  "comparator_input_bias_budget_a": 1.2e-09,
+  "rising_range_v": [
+    38.16179860974392,
+    38.74058989409242
+  ],
+  "release_range_v": [
+    37.88496821334952,
+    38.619137268951455
+  ],
+  "latest_trip_to_39p009_energy_j": 0.5515617406341794,
+  "no_absorption_time_at_450p03w_s": 0.001225611049561539,
+  "zero_regen_min_release_to_37p8_energy_j": 0.16996648079548954,
+  "ideal_full_current_release_delay_budget_s": 9.225010849180142e-05,
+  "conditions": [
+    "Exact resistor TCRs and body temperature, including adjacent power-device heating, must meet these allocations. No assumption that 60 C ambient is the component temperature.",
+    "TLV1811 has no internal hysteresis. The external 6.8 Mohm positive feedback is included, with 1% and 200 ppm/C allocations.",
+    "Offset/output-drop bounds are datasheet test-condition values used as an application budget. Actual 6 V held-rail floor through operating supply, common mode, temperature, load and reference errors require complete threshold sweeps.",
+    "Output low 0..0.25 V and output high 5.75..13.2 V are qualification envelopes, not a claim that every supply is 13.2 V.",
+    "Latest trip differs slightly from the historical 38.7382808 V comparison because the actual 600 ohm resistor is 1% and temperature coefficients are explicit. Do not rewrite frozen old simulation results as current evidence.",
+    "The zero-regen release time is an ideal energy comparison, not a physical switch-off guarantee. Measure comparator/driver/gate, branch current and battery current after net regen is removed."
+  ],
+  "sources": [
+    "https://www.ti.com/document-viewer/TLV1811/datasheet/GUID-XXXXXXXX-SF0T-XXXX-XXXX-000000283538",
+    "https://www.ti.com/document-viewer/TLV1811/datasheet/GUID-21EE9DF7-0441-4429-8C7D-65598439B616"
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "status": "PAPER_BUDGETS_PASS_MEASUREMENT_AND_NATIVE_REVIEW_REQUIRED",
+  "scope": {
+    "defined_running_fault": "BMS main and old 12 V/CORE/CAN withdrawn; downstream BUS positive and return conductors retained. The independent supply remains connected.",
+    "supply_input_loss_recovery": "BUS falls then rises through 14 V; measure all source, reference and supervisor startup time.",
+    "cold_high_bus_start": "Hard READY handshake must prevent traction and commanded regen until the independent chain is ready. A cold 37.8 V source plus immediate 450 W injection has insufficient startup energy margin.",
+    "excluded_additional_fault": "Independent regulator forced to zero with BUS still healthy is a separate internal supply fault. No 3 m stopping credit is assigned to it.",
+    "vehicle_stop_qualification": "HOLD; neither this calculation nor the reset timer proves motor torque or a 3 m stop."
+  },
+  "selected_parts": {
+    "supply": "LT3010EMS8E#PBF",
+    "supervisor": "TPS3760A012DYYR",
+    "reference": "REF5025ID, high grade; AI standard grade is not an equivalent",
+    "comparator": "TLV1811DBVR",
+    "ctr": "2.2 nF C0G, total effective 1.98–2.42 nF on CTR/MR pin 9; CTS pin 10 unpopulated",
+    "feedforward": "2.2 nF C0G, same SKU as CTR; minimum 1.98 nF > 1.592 nF required by the LT3010 application condition",
+    "rail_slew": "Two FH RAG-06K22R0FT, 22 ohm 1% 0.5 W, in series; >=10 uF effective at the common driver/supervisor node",
+    "uv_divider_ohms": [
+      120000,
+      10000
+    ],
+    "hard_ready": "Reuse the existing GUARD-driven READY LED sink, with a series BC847C enabled by HW_READY through 10k and a 100k base pull-down. HW_READY pull-up is 4.7k, external pull-down 100k.",
+    "analogue_hold": "Diode and >=10 uF effective supply both REF5025 and TLV1811",
+    "resistor_temperature": "Source feedback and POR divider <=25 ppm/C, body 0..85 C; slew resistance budget <=200 ppm/C. Initial tolerance and drift are added, not conflated."
+  },
+  "paper_checks": {
+    "shared_supply_low_voltage_order": true,
+    "release_headroom_with_ideal_gate_step": true,
+    "rise_slew_below_100mv_per_us": true,
+    "analogue_hold_exceeds_full_ctr_discharge_and_detection": true,
+    "reference_initial_temp_line_inside_total_budget": true,
+    "recovery_budget_inside_450w_energy_window": true,
+    "ctr_and_internal_start_fit_recovery_budget": true,
+    "maximum_capacitance_charge_and_reset_fit_recovery_budget": true
+  },
+  "threshold_corners": {
+    "fall_v": [
+      10.236628503740649,
+      10.564631503759399
+    ],
+    "release_v": [
+      10.440565261845386,
+      10.776728345864662
+    ]
+  },
+  "rail": {
+    "source_v": [
+      11.629088207294265,
+      12.471934408208018
+    ],
+    "continuous_output_current_budget_ma": 16.0,
+    "minimum_driver_supply_v": 10.909600207294265,
+    "ideal_300nc_gate_step_v": 0.029999999999999995,
+    "minimum_margin_to_release_v": 0.10287186142960358,
+    "maximum_rising_slew_v_per_us": 0.03067484662576687,
+    "per_slew_resistor_peak_voltage_v": 6.7452,
+    "per_slew_resistor_five_second_overload_voltage_v": 8.25,
+    "slew_resistor_scope": "Peak-voltage comparison only against the vendor five-second short-overload test condition. Full high-capacitance startup current, pulse duration/energy, hot-board behavior and repeated starts remain qualifications; the LT3010 50 mA rating is not a peak-current upper bound.",
+    "ready_low_max_v": 0.3,
+    "ucc_low_guarantee_v": 1.0,
+    "required_ready_high_v": 2.4,
+    "maximum_supervisor_sink_ma": 2.836879432624113,
+    "hard_ready_base_current_measurement_min_ma": 0.5,
+    "hard_ready_led_current_measurement_ma": [
+      5.0,
+      6.9
+    ],
+    "ready_load_note": "High-level loading and measured READY must meet the UCC input threshold, without treating its typical internal pull-down as a guarantee."
+  },
+  "source_thermal": {
+    "output_current_budget_a": 0.016,
+    "ground_current_budget_a": 0.0033,
+    "input_current_budget_a": 0.0193,
+    "maximum_comparison_input_v": 39.009,
+    "dissipation_w": 0.5668082886832917,
+    "ambient_max_c": 60.0,
+    "operating_junction_max_c": 125.0,
+    "effective_theta_ja_upper_bound_without_margin_c_per_w": 114.67722208331931,
+    "junction_at_62c_per_w_reference_c": 95.14211389836409,
+    "scope": "DC sizing only. The exposed pad must be soldered to GND copper. Actual PCB thermal resistance, source pulse/short behavior, input peaks and capacitor charging remain qualifications; the 62 C/W copper reference is not a finished-board guarantee."
+  },
+  "timing": {
+    "ctr_min_s": 0.002033712400060604,
+    "ctr_max_s": 0.003887992709934925,
+    "maximum_cold_start_plus_ctr_s": 0.005887992709934925,
+    "full_discharge_fault_duration_lower_bound_s": 0.00019439963549674626,
+    "deep_overdrive_supply_v": 8.18930280299252,
+    "analogue_min_at_deep_trip_v_with_diode_budget": 6.93930280299252,
+    "analogue_floor_v": 6.0,
+    "analogue_current_budget_ma": 3.0,
+    "conditional_hold_s": 0.003131009343308401,
+    "hold_margin_s": 0.002919609707811655,
+    "hold_scope": "Requires verified diode drop/leakage, effective capacitance, load and recharge. For repeated glitches, measure the held node minimum and enforce the qualified waveform envelope.",
+    "reference_establishment": "Measure REF within 2.49725–2.50275 V before every READY rise, across zero/residual initial charge, actual load and 0–60 C ambient with component self-heating included."
+  },
+  "energy_recovery": {
+    "capacitance_f": 0.05286,
+    "comparison_net_regen_w": 450.03,
+    "latest_dump_trip_budget_v": 38.74058989409242,
+    "bus14_to_latest_dump_threshold_j": 34.48674426019582,
+    "bus22p5_to_latest_dump_threshold_j": 26.286836760195822,
+    "bus14_to_ready_measurement_max_s": 0.05,
+    "available_time_at_450w_s": 0.07663210066039114,
+    "margin_at_50ms_s": 0.026632100660391136,
+    "maximum_net_regen_for_50ms_recovery_w": 689.7348852039164,
+    "cold_37p8v_to_threshold_at_450w_s": 0.004228124925440154,
+    "ready_to_actual_current_max_s": 0.0005,
+    "scope": "Power, effective BUS capacitance and response bounds must be replaced by qualified system corners. Recovery does not establish vehicle stopping capability."
+  },
+  "maximum_capacitance_startup": {
+    "bank_capacitance_high_f": 0.00012185399999999998,
+    "direct_source_capacitance_high_f": 3.036e-06,
+    "source_available_current_floor_a": 0.05,
+    "load_budget_during_charge_a": 0.01,
+    "pre_ready_load_reason": "The 16 mA running budget includes 6 mA gate charge at 300 nC and 20 kHz. RESET holds IN+ low before READY, so only the other full 10 mA is allocated during charging. Reference output charging is additionally budgeted as charge, not hidden in DC current.",
+    "current_limited_phase_s": 0.028576859520290876,
+    "constant_voltage_taper_s": 0.008201151759035125,
+    "direct_source_cap_charge_allowance_s": 0.0008826477949336346,
+    "reference_output_charge_allowance_s": 0.0008485215938511324,
+    "intrinsic_source_turn_on_delay_budget_s": 0.002,
+    "full_recovery_upper_comparison_s": 0.04639717337804569,
+    "margin_to_50ms_s": 0.003602826621954311,
+    "old_22nf_counterexample_min_charge_plus_timer_s": 0.07818058617360889,
+    "scope": "Conditional charge bound with zero initial charge, initial tolerance +20%, X7R temperature +15%, and pre-READY 10 mA load. Source turn-on <=2 ms and >=50 mA available charging current are qualification conditions, not measured or full-startup datasheet guarantees. Full BUS14-to-READY <=50 ms is the governing physical criterion. The old 22 nF timer fails this allocated worst corner; changing to 2.2 nF adds no components."
+  },
+  "measurements": [
+    "Actual REF settling before READY, driver threshold, held analogue supply and reset recovery over the specified cold/residual/brownout waveform envelope.",
+    "Source startup: BUS rising through 14 V to valid READY <=50 ms at the stated energy corner; cold BUS step to 22.5 V with concurrent injection separately.",
+    "Old-rail loss: new source and return remain functional, without unintended backfeed or a new reset during the defined main fault.",
+    "Qualified independent chain: threshold to branch current matching net regen <=0.5 ms, near-bridge voltage and release current/energy within approved bounds."
+  ],
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tps3760.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "https://www.ti.com/lit/ds/symlink/ref50.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv1811.pdf",
+    "https://www.analog.com/media/en/technical-documentation/data-sheets/lt3010-3010-5.pdf"
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "status": "HOLD_NOMINAL_COMPONENT_TRANSIENT_ONLY",
+  "source_models": {
+    "ucc.lib": [
+      "slvmcj6",
+      "eb78c0ce0d9cf2dd5bbc5f937bbfc6cc38c95215e035feaeb3950672e8c05c6d"
+    ],
+    "ref.lib": [
+      "slim161a",
+      "97baf1b53f3d07255c485c6f12ac40b4d6c62dacfc727a9abb7ba43f6bb0d057"
+    ],
+    "cmp.lib": [
+      "snom762a",
+      "8a273cb9af327982356c4cd0071dd9a5183cd84967ed16a1f7c2c9b8db1124e8"
+    ]
+  },
+  "runtime_sha256": "22d5cae2bd32b2e39157a8d27bf457122f68285b72a9ebefdf41551b628233ab",
+  "diode_model_sha256": "633fb9263215d27c308e42fa32be0577889347a388021460cf87ddfe9e4e7bad",
+  "cases": [
+    {
+      "name": "cold_0c",
+      "temperature_c": 0,
+      "samples": 46453,
+      "reference_mode": "vendor_macro",
+      "end_s": 0.03,
+      "deck_sha256": "6a1e306fedea3b7ebe0cfeb7c1584c4e5e50fc4653f9645765e10876e054bbe8",
+      "max_gate_while_ready_low_v": 0.000973780885,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 0.000973780885,
+      "first_ready_s": 0.0240005011,
+      "ref_at_first_ready_v": 2.50080051,
+      "minimum_ref_while_ready_v": 2.50080051,
+      "maximum_ref_while_ready_v": 2.500802,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": 11.2698538,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    },
+    {
+      "name": "qualification_sag_and_full_reset",
+      "temperature_c": 25,
+      "samples": 79524,
+      "reference_mode": "vendor_macro",
+      "end_s": 0.071,
+      "deck_sha256": "0518a77c7d026377085445979e76daa401add444b36f898c56970f2df6704e0a",
+      "max_gate_while_ready_low_v": 0.00097590788,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 0.00097590788,
+      "first_ready_s": 0.0240005011,
+      "ref_at_first_ready_v": 2.50083032,
+      "minimum_ref_while_ready_v": 2.50083032,
+      "maximum_ref_while_ready_v": 2.50083187,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": 10.7683782,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    },
+    {
+      "name": "negative_control_permission_bypassed",
+      "temperature_c": 25,
+      "samples": 12856,
+      "reference_mode": "vendor_macro",
+      "end_s": 0.005,
+      "deck_sha256": "121a37010a6d501ac01599aa7e8f000dc77455ea2e003cc7cf1ff2437c9b4027",
+      "max_gate_while_ready_low_v": 0.00097590788,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 0.00097590788,
+      "first_ready_s": 0.00122920704,
+      "ref_at_first_ready_v": 0.000406326929,
+      "minimum_ref_while_ready_v": 0.000406326929,
+      "maximum_ref_while_ready_v": 2.51603586,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": null,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    }
+  ],
+  "model_failures": [
+    {
+      "name": "cold_60c",
+      "error": "Incomplete transient at 0.00140586816 s\nNote: gnd in a subcircuit is not set to 0 automatically\n\nNote: Compatibility modes selected: ps\n\n\nCircuit: agtc startup and active brake dump, vendor macros\n\nReducing trtol to 1 for xspice 'A' devices\nDoing analysis at TEMP = 60.000000 and TNOM = 27.000000\n\nUsing SPARSE 1.3 as Direct Linear Solver\nOperating point simulation skipped by 'uic',\n  now using transient initial conditions.\n Reference value :  1.06129e-03\n\nNo. of Data Rows : 2781\nngspice-47 done\ndoAnalyses: TRAN:  Timestep too small; time = 0.00140587, timestep = 1.25e-18: trouble with node \"e.x_ucc.e_u1_u1_e1#branch\"\n\n\ntran simulation(s) aborted\n"
+    },
+    {
+      "name": "warm_supply_retained_old_domain_withdrawn",
+      "error": "Incomplete transient at 0.00106662711 s\nNote: gnd in a subcircuit is not set to 0 automatically\n\nNote: Compatibility modes selected: ps\n\n\nCircuit: agtc startup and active brake dump, vendor macros\n\nReducing trtol to 1 for xspice 'A' devices\nDoing analysis at TEMP = 25.000000 and TNOM = 27.000000\n\nUsing SPARSE 1.3 as Direct Linear Solver\nOperating point simulation skipped by 'uic',\n  now using transient initial conditions.\n Reference value :  1.88058e-04\n Reference value :  4.44111e-04\n Reference value :  7.40420e-04\n\nNo. of Data Rows : 7789\nngspice-47 done\ndoAnalyses: TRAN:  Timestep too small; time = 0.00106663, timestep = 1.25e-18: trouble with node \"e.x_ucc.e_u1_u1_e1#branch\"\n\n\ntran simulation(s) aborted\n"
+    },
+    {
+      "name": "cold_60c_imposed_reference",
+      "error": "Incomplete transient at 0.00105749546 s\nNote: gnd in a subcircuit is not set to 0 automatically\n\nNote: Compatibility modes selected: ps\n\n\nCircuit: agtc startup and active brake dump, vendor macros\n\nReducing trtol to 1 for xspice 'A' devices\nDoing analysis at TEMP = 60.000000 and TNOM = 27.000000\n\nUsing SPARSE 1.3 as Direct Linear Solver\nOperating point simulation skipped by 'uic',\n  now using transient initial conditions.\n\nNo. of Data Rows : 1759\nngspice-47 done\ndoAnalyses: TRAN:  Timestep too small; time = 0.0010575, timestep = 1.25e-18: trouble with node \"e.x_ucc.e_u1_u1_e1#branch\"\n\n\ntran simulation(s) aborted\n"
+    },
+    {
+      "name": "warm_supply_retained_old_domain_withdrawn_imposed_reference",
+      "error": "Incomplete transient at 0.00297676057 s\nNote: gnd in a subcircuit is not set to 0 automatically\n\nNote: Compatibility modes selected: ps\n\n\nCircuit: agtc startup and active brake dump, vendor macros\n\nReducing trtol to 1 for xspice 'A' devices\nDoing analysis at TEMP = 25.000000 and TNOM = 27.000000\n\nUsing SPARSE 1.3 as Direct Linear Solver\nOperating point simulation skipped by 'uic',\n  now using transient initial conditions.\n Reference value :  2.97637e-04\n Reference value :  7.85870e-04\n\nNo. of Data Rows : 10149\nngspice-47 done\ndoAnalyses: TRAN:  Timestep too small; time = 0.00297676, timestep = 1.25e-18: trouble with node \"e.x_ucc.e_u1_u1_e2#branch\"\n\n\ntran simulation(s) aborted\n"
+    }
+  ],
+  "imposed_reference_sensitivity_cases": [
+    {
+      "name": "cold_0c",
+      "temperature_c": 0,
+      "samples": 46967,
+      "reference_mode": "imposed_sensitivity_waveform",
+      "end_s": 0.03,
+      "deck_sha256": "922d0f959e282fba40923a29d307b9a1a3a8b96bf89b30769b78d73a15b058f1",
+      "max_gate_while_ready_low_v": 0.000973780885,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 0.000973780885,
+      "first_ready_s": 0.0240005011,
+      "ref_at_first_ready_v": 2.5,
+      "minimum_ref_while_ready_v": 2.5,
+      "maximum_ref_while_ready_v": 2.5,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": 11.1868495,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    },
+    {
+      "name": "qualification_sag_and_full_reset",
+      "temperature_c": 25,
+      "samples": 79689,
+      "reference_mode": "imposed_sensitivity_waveform",
+      "end_s": 0.071,
+      "deck_sha256": "7c3bd84ae26bebf0c24728307c0d6b9ad53c38269539dc39e506305fb2e81ad8",
+      "max_gate_while_ready_low_v": 0.00097590788,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 0.00097590788,
+      "first_ready_s": 0.0240005011,
+      "ref_at_first_ready_v": 2.5,
+      "minimum_ref_while_ready_v": 2.5,
+      "maximum_ref_while_ready_v": 2.5,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": 10.2111915,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    },
+    {
+      "name": "negative_control_permission_bypassed",
+      "temperature_c": 25,
+      "samples": 12588,
+      "reference_mode": "imposed_sensitivity_waveform",
+      "end_s": 0.005,
+      "deck_sha256": "00d9980cefa935b11957b1e96b99ad3fe88a209acece37671f3d334fe6f925f4",
+      "max_gate_while_ready_low_v": 0.00097590788,
+      "false_gate_samples_before_permission": 0,
+      "max_gate_v": 11.6924489,
+      "first_ready_s": 0.00123549433,
+      "ref_at_first_ready_v": 0.117747163,
+      "minimum_ref_while_ready_v": 0.117747163,
+      "maximum_ref_while_ready_v": 2.0,
+      "maximum_bus_v": 37.7999998,
+      "minimum_analogue_during_injected_sag_v": null,
+      "threshold_to_net_current_s": null,
+      "model_bounds": "Supply and supervisor permission are imposed waveforms. Diode, BJT and power switch remain proxies. Vendor models are nominal and do not certify tolerances, physical rail faults or thermal capacity."
+    }
+  ],
+  "numerical_scope": "Unconverged coupled REF5025 cases remain explicit. Separate imposed reference ramps exercise the comparator/driver and passive supply. They give waveform sensitivity and do not replace REF5025 qualification.",
+  "scope": "Local component cross-check, not the final all-board vehicle simulation. Real independent supply, supervisor, optocoupler, power MOS and measurements remain required."
+}
