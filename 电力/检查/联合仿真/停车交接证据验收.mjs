@@ -693,8 +693,9 @@ function validatePropagationAttachment(sources, directory, limits, errors) {
       if (edgeList.some((edge, index) => index > 0 && edge.time_s < edgeList[index - 1].time_s)) {
         errors.push(`${label}: BQ alert→CLR→FET_RELEASE→LPV→PC10→software timing order is invalid`);
       }
-      if (mainRows.slice(edgeList[4].index).some(row => row.pc10_v < attachment.pc10_high_min_v ||
-          row.software_fault_latched !== 1 || row.traction_inhibited !== 1) ||
+      if (mainRows.slice(edgeList[4].index).some(row => row.pc10_v < attachment.pc10_high_min_v) ||
+          mainRows.slice(edgeList[5].index).some(row => row.software_fault_latched !== 1) ||
+          mainRows.slice(edgeList[6].index).some(row => row.traction_inhibited !== 1) ||
           mainRows.slice(edgeList[2].index).some(row => row.fet_release_active !== 0) ||
           mainRows.slice(edgeList[3].index).some(row => row.load_power_valid_active !== 0)) {
         errors.push(`${label}: fault and revoke states must persist after measured transitions`);
