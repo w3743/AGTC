@@ -1,0 +1,51 @@
+{
+  "qualification": "HOLD",
+  "selected_prototype": "Reuse TPS386000RGPR and TLV76033DBZR types on an independent domain; wire-OR resets, same filtered VDD pulls READY up, external pull-down, no READY reservoir capacitor.",
+  "windows": {
+    "supply_12_uv_assert_v": [
+      10.869594727722774,
+      11.539181136363638
+    ],
+    "supply_12_uv_release_v": [
+      10.96572344059406,
+      11.824635681818181
+    ],
+    "reference_uv_assert_v": [
+      2.3668456156318687,
+      2.425244703455956
+    ],
+    "reference_uv_release_v": [
+      2.3877757205269736,
+      2.4852446033558557
+    ]
+  },
+  "startup": {
+    "ct_open_release_ms_min_typ_max": [
+      14,
+      20,
+      24
+    ],
+    "datasheet_por_ramp_min_us_per_v": 15,
+    "100ohm_1uF_effective_min_ramp_us_per_v_for_3p432V_ideal_step": 28.846153846153847,
+    "reset_load_at_0p9v_0p2v_ready_with_10k_uA": 70.0,
+    "datasheet_test_current_at_0p9v_uA": 15,
+    "ready_high_v_typical_3p3_with_200k_input": 2.8695652173913038,
+    "ucc_in_plus_guaranteed_low_and_high_v": [
+      1.0,
+      2.4
+    ],
+    "qualification": "Filtered ramp satisfies a slew comparison, not output-current guarantee during POR."
+  },
+  "reference_counterexample": {
+    "acceptable_ref_lower_bound_screen_v": 2.47,
+    "valid_ref_min_screen_v": 2.49725,
+    "required_divider_factor_at_least": 6.237373737373738,
+    "allowed_divider_factor_at_most": 6.0320048309178755,
+    "conclusion": "No overlapping divider factor even with ideal resistors. A 2.445 V plateau can count as valid on some units. For combined supply brownout, verify 12 V UV disarms before REF exits the safe range and restarts the whole delay. Independent REF drift is not covered by this comparator threshold alone."
+  },
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tps386000.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv760.pdf"
+  ]
+}

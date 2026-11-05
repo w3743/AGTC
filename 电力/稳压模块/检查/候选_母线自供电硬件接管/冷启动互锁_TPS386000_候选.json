@@ -1,0 +1,120 @@
+{
+  "status": "HOLD_COMPONENT_PROTOTYPE_NOT_POWER_APPROVED",
+  "selection": "TPS386000RGPR + TLV76033DBZR；独立12V_HW供电，3V3_MON本地上拉，监控3V3_MON、12V_HW和REF_2V5",
+  "pin_nets": {
+    "TLV76033DBZR": {
+      "2 IN": "12V_HW",
+      "1 OUT": "3V3_MON",
+      "3 GND": "GND_SYS"
+    },
+    "UCC27511A": {
+      "1 VDD": "12V_HW",
+      "5 IN-": "DUMP_OFF_HW",
+      "6 IN+": "HW_READY",
+      "4 GND": "GND_SYS"
+    },
+    "TPS386000RGPR": {
+      "5 CT1": "NC",
+      "14 VDD": "3V3_F",
+      "20 WDI": "GND_SYS",
+      "3 CT3": "NC",
+      "16 RESET2": "HW_READY",
+      "9 SENSE2": "12V_DIV",
+      "10 SENSE1": "3V3_DIV",
+      "11 NC": "GND_SYS",
+      "8 SENSE3": "3V3_F",
+      "17 RESET3": "NC",
+      "15 RESET1": "HW_READY",
+      "12 GND": "GND_SYS",
+      "7 SENSE4L": "REF_L_DIV",
+      "19 WDO": "NC",
+      "PAD": "GND_SYS",
+      "1 MR": "3V3_F经100k",
+      "18 RESET4": "HW_READY",
+      "4 CT2": "NC",
+      "13 VREF": "NC，不连接REF_2V5",
+      "2 CT4": "NC",
+      "6 SENSE4H": "REF_H_DIV"
+    }
+  },
+  "resistors": [
+    "RPU 10k 3V3_F→HW_READY",
+    "RPD 100k HW_READY→GND_SYS",
+    "RMR 100k 3V3_F→MR",
+    "RF 100Ω 3V3_MON→3V3_F",
+    "R1H 61.9k 3V3_F→3V3_DIV",
+    "R1L 10k 3V3_DIV→GND",
+    "R2H 270k 12V_HW→12V_DIV",
+    "R2L 10k 12V_DIV→GND",
+    "RLH 49.9k 0.1% REF_2V5→REF_L_DIV",
+    "RLL 10k 0.1% REF_L_DIV→GND",
+    "RHH 56.2k REF_2V5→REF_H_DIV",
+    "RHL 10k REF_H_DIV→GND"
+  ],
+  "capacitors": [
+    "CIN 1uF 25V 12V_HW→GND",
+    "COUT 1uF 10V 3V3_MON→GND",
+    "CF 2.2uF 10V 3V3_F→GND; 全角有效电容至少1uF",
+    "CBYP 100nF 10V 3V3_F→GND；HW_READY不接电容"
+  ],
+  "nominal": {
+    "rail_12_uv_trip": "11.2V falling; rising 11.298–11.48V using hysteresis bounds",
+    "ref_uv_trip": "2.396V falling; rising 2.4170–2.4559V nominal resistor ratios",
+    "delay": "CT open: 14–24 ms, 20 ms typical, datasheet test conditions. Fault assertion not 14–24 ms.",
+    "rail_uv_trip": "2.876V falling; rising requires +3.5mV to +10mV at sense, nominal hysteresis not specified",
+    "ready_nominal": "3.3V × (100k并联200k)/(10k + (100k并联200k))=2.87V；200k是UCC功能图所示非保证极限，忽略输出漏电",
+    "threshold_note": "above values nominal resistor ratios and 400mV center; exclude 396–404mV threshold, resistor tolerance and ±25nA input current",
+    "ref_ov_trip": "2.648V rising; release 2.5818–2.6248V from hysteresis range",
+    "ref_release_worst_estimate": "49.9k/10k各0.1%，(0.404+0.010)V × [1+49.9k×1.001/(10k×0.999)] + 25nA×49.9k×1.001 ≈2.4853V；输入电流按25nA全流经上电阻保守近似，仍须全角审查"
+  },
+  "startup": [
+    "100Ω和2.2uF标称RC=220us；有效电容>=1uF时理想3.3V阶跃初始斜率<=0.033V/us，即>=30us/V。器件偏差、局部斜率、残压和供电注入必须验证。",
+    "10k上拉使VDD=0.9V时复位电流约70–90uA；数据手册0.9V上电复位VOL<=0.2V只在15uA条件规定，不能证明此阶段默认关闭。",
+    "稳态12V已建立、RESET拉低时上拉电流约0.33mA，100Ω压降约33mV；3.3V跌至约3.267V（不计其他负载），名义高于自身欠压释放约2.90–2.95V，但LDO电压、负载和电阻全角未闭合。",
+    "CT开放，无外部延时电容；短棕断、低残压、快速重复上电需验证重新复位与完整延时。",
+    "SENSE绝对额定-0.3至7V不受VDD限制；监控器断电时分压约0.4V正常低于绝对上限但高于VDD，违反推荐工作范围。输入泄漏、反向供电及复位输出状态须验证；无证据支持增加保护元件。"
+  ],
+  "limitations": [
+    "低参考跌落触发名义2.396V，无法保证在2.47V安全界限前关断；必须验证关联棕断时12V监控先于REF进入不安全区，且不能将该证据外推到REF独立漂移。",
+    "REF低分压需0.1%电阻；若采用1%，最坏释放约2.52V，会阻止正常2.497V参考。",
+    "READY高电平约2.87V依赖UCC内部200k功能图标称；器件漏电和输入内部阻值全角未保证。",
+    "0.9V启动复位点需要70–90uA而手册仅保证15uA；禁止宣称默认关闭已证明。",
+    "12V独立源的预充负担、启动浪涌、反灌及与真实BMS握手仍未定。旧请求仍由GUARD光耦AND控制，旧轨和独立轨不可直接并联。",
+    "原生CAD、DRC、低温高温、短暂掉电和硬件实测均未完成。"
+  ],
+  "delta_vs_prior_dual_TLV": {
+    "note": "相对双域隔离旧双TLV候选的互锁局部，51.1k和其10k移除；数量待实物网表核对，未含保护与价格。",
+    "add": [
+      "TPS386000RGPR ×1",
+      "TLV76033DBZR ×1",
+      "100Ω ×1",
+      "10k ×1 (RPU)",
+      "100k ×2 (RPD,RMR)",
+      "61.9k ×1",
+      "49.9k 0.1% ×1",
+      "10k 0.1% ×1",
+      "56.2k ×1",
+      "10k ×2",
+      "1uF ×2",
+      "2.2uF ×1",
+      "100nF ×1"
+    ],
+    "remove": [
+      "TLV6703DDCR ×2",
+      "51.1k ×1",
+      "10k ×1",
+      "47k ×1",
+      "1M ×1",
+      "100nF ×3"
+    ],
+    "reuse": [
+      "270k ×1",
+      "10k ×1"
+    ]
+  },
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tps386000.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv760.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf"
+  ]
+}
