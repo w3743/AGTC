@@ -132,6 +132,9 @@ function simulatePb0Pb7Stop(delayS, extraBusSourceW, capture = false) {
   let dumpPendingAt = null, pwmEnableAt = null;
   let firstThreshold = null, firstEffective = null, firstCompare = null, firstFocBov = null;
   let maxBus = vBus, maxCurrent = 0, maxBusAbsorbW = 0, maxResistorPowerW = 0;
+  const absorbWindowN = Math.round(period / dt);
+  const absorbWindow = Array(absorbWindowN).fill(0);
+  let absorbWindowJ = 0, absorbWindowIndex = 0, max50usBusAbsorbW = 0;
   let eMech = 0, eOther = 0, eBusAbsorb = 0, eResistor = 0;
   let maxNetEnergyAboveTrigger = 0, netEnergyAt39 = null;
   let pwmSwitchOn = false;
@@ -188,6 +191,11 @@ function simulatePb0Pb7Stop(delayS, extraBusSourceW, capture = false) {
     maxCurrent = Math.max(maxCurrent, iDump);
     maxBusAbsorbW = Math.max(maxBusAbsorbW, pBusAbsorb);
     maxResistorPowerW = Math.max(maxResistorPowerW, pResistor);
+    absorbWindowJ += rl.busEnergyJ - absorbWindow[absorbWindowIndex];
+    absorbWindow[absorbWindowIndex] = rl.busEnergyJ;
+    absorbWindowIndex = (absorbWindowIndex + 1) % absorbWindowN;
+    max50usBusAbsorbW = Math.max(max50usBusAbsorbW,
+      absorbWindowJ / (absorbWindowN * dt));
     if (firstCompare === null && vBus >= compareV) firstCompare = t + dt;
     if (firstFocBov === null && vBus >= bus.foc_earliest_paper_bov_rising_v) firstFocBov = t + dt;
     if (firstThreshold !== null) {
@@ -231,7 +239,8 @@ function simulatePb0Pb7Stop(delayS, extraBusSourceW, capture = false) {
     maximum_bus_v: maxBus,
     passed_39p009_model_comparison: maxBus < compareV,
     branch_peak_current_a: maxCurrent,
-    bus_absorption_peak_w_model_only: maxBusAbsorbW,
+    bus_absorption_1us_step_peak_w_model_only: maxBusAbsorbW,
+    bus_absorption_50us_average_peak_w_model_only: max50usBusAbsorbW,
     resistor_instantaneous_power_peak_w_model_only: maxResistorPowerW,
     resistor_energy_j_model_only: eResistor,
     mechanical_regen_energy_j_model_only: eMech,
@@ -303,8 +312,10 @@ function earlyCandidateTiming(delayS, extraBusSourceW, candidateTripV) {
     net_injection_peak_w: pPeak,
     no_absorption_window_s: windowS,
     current_ramp_to_match_s_after_switching: rampToBalanceS,
+    maximum_delay_to_first_effective_current_s: Math.max(0, windowS - rampToBalanceS),
+    maximum_total_delay_to_source_matching_absorption_s: windowS,
     candidate_release_and_rearm_behavior: 'NOT MODELED: no release threshold or latch/rearm details supplied.',
-    status: 'HOLD: the 38.742 V latest threshold is a conditional threshold input. Candidate R/L, powered domain, actual comparator/driver delay, MOS current waveform, and release/fault behavior are absent.'
+    status: 'HOLD: the corrected 38.738 V latest threshold is a conditional threshold input. Candidate R/L, powered domain, actual comparator/driver delay, MOS current waveform, and release/fault behavior are absent.'
   };
 }
 
@@ -383,7 +394,13 @@ const falseDump = {
     vBus0 / bus.dump_resistor_range_ohm[0],
   full_on_resistor_power_w_at_37p8v_and_minimum_resistance:
     vBus0 * vBus0 / bus.dump_resistor_range_ohm[0],
-  early_hard_candidate_false_dump_status: 'UNKNOWN: only latest action is supplied; minimum action and release threshold are absent.'
+  early_hard_candidate_minimum_action_v: input.independent_hard_early_candidate.on_range_v_reported[0],
+  early_hard_candidate_minimum_release_v: input.independent_hard_early_candidate.release_min_v_reported_v,
+  early_hard_candidate_static_false_dump_at_37p8_possible:
+    input.independent_hard_early_candidate.on_range_v_reported[0] <= vBus0 ||
+    input.independent_hard_early_candidate.release_min_v_reported_v < vBus0,
+  early_hard_candidate_false_dump_status:
+    'The supplied static corners are above 37.8 V; a static threshold false dump is not indicated in this screen. Startup, brownout, signal loss, and dynamic rearm states remain HOLD.'
 };
 
 const result = {
@@ -456,6 +473,29 @@ const result = {
     at_foc_bov: 'The motor torque path may be cut. Break is not an energy sink; post-Break torque, body-diode flow and vehicle stop distance are unmodeled.',
     status: 'HOLD: no qualified central absorption or post-Break stopping behavior.'
   },
+  communication_loss: {
+    dual_rejection_default: 'Battery and supercapacitor absorption are both forced to 0 W immediately in this model.',
+    pb0_local_bus_sense: 'The PB0 bus-voltage loop is modeled as local and does not need CAN while LPV/CORE and its reference are healthy.',
+    software_default_on_can_timeout: 'NOT ESTABLISHED: firmware timeout, permit revocation, and PWM command default were not imported as guaranteed state transitions.',
+    if_lpv_core_remains_alive: 'Use the PB0/PB7 behavior-model cases above; their electrical result is MODEL PASS ONLY.',
+    if_lpv_core_is_revoked: 'PB0/PB7 is blocked and the old 40.32 V TLV fallback remains later than the FOC 39.209 V paper lower corner.',
+    status: 'HOLD: the CAN-loss to LPV/CORE/PB7 state path has no end-to-end timing or default-state proof.'
+  },
+  central_12v_sag: {
+    active_dump_credit_w: 0,
+    condition: 'Once 12V_DRV falls below the real driver/comparator operating guarantee, neither PB7 nor the old TLV path is credited.',
+    measurement_boundary: '12V_DRV, DUMP_5V, DUMP_OFF, Q_DUMP VGS/VDS, resistor current, BREAK_N, six PWM/VGS and motor phase currents must be time-aligned.',
+    post_foc_bov_behavior: 'The FOC local BOV may request Break, but post-Break back-EMF/body-diode current and vehicle stopping are not modeled.',
+    status: 'HOLD: no guaranteed brownout threshold, response delay, dump hold-up or post-Break energy envelope is supplied.'
+  },
+  dual_refusal_trigger: {
+    battery_ccl_a_credited: 0,
+    battery_pack_net_charge_hard_limit_a: assumption.battery_pack_net_charge_hard_limit_a,
+    supercapacitor_absorption_w_credited: 0,
+    timing: 'Both absorption quotas are removed at the start of the modeled brake event, with no stale-CAN or in-flight absorption credit.',
+    handoff: 'Central PB0/PB7 is bus-voltage-triggered in the LPV/CORE-alive model. Actual CCL/SC refusal recognition and transition delay are not measured.',
+    status: 'HOLD for physical refusal recognition and takeover; the behavior model applies the zero-absorption state directly.'
+  },
   false_dump_and_startup: falseDump,
   independent_hard_candidate_threshold_ranges: {
     candidate_type: input.independent_hard_early_candidate.candidate_type,
@@ -472,15 +512,24 @@ const result = {
     source_path: '电力/检查/联合仿真/双拒充泄放电路复跑.json',
     status: 'Read-only cross-check from parent; script does not execute or require this file.',
     given_case: '390 W constant, 38.50 V trigger, 1 ohm, 40 uH, 160 us first effective current, 30 us every 50 us.',
-    reported_bus_peak_v: 38.5337387,
-    reported_bus_at_1ms_v: 38.476256,
-    reported_wire_current_peak_a: 28.2846029,
+    cases: [
+      {
+        trigger_v: 38.5, constant_net_injection_w: 390,
+        reported_bus_peak_v: 38.5337387, reported_bus_at_1ms_v: 38.476256,
+        reported_wire_current_peak_a: 28.2846029
+      },
+      {
+        trigger_v: 38.738, constant_net_injection_w: 390,
+        reported_bus_peak_v: 38.7714518, reported_bus_at_1ms_v: 38.7117498,
+        reported_wire_current_peak_a: 28.4594172
+      }
+    ],
     comparison_limit_v: compareV,
     use_limit: 'Supports only the stated first-millisecond SPICE case; it does not prove the 420–450 W sensitivity, candidate hardware delay, long stop, MOS SOA, resistor thermal rating or full vehicle stop.'
   },
   result_conclusions: [
     'With LPV/CORE available, the reduced PB0/PB7 model keeps the bus below the 39.009 V comparison line across the 0–100 ms delay sensitivities and 0/30 W concurrent source sensitivities; this is MODEL PASS ONLY.',
-    'The corrected independent hard candidate uses a 38.738 V latest rising corner (38.742 V is retained only as an older sensitivity), giving about 0.556 J to 39.009 V. Under the 30 kg, 100 ms, +30 W comparison, peak net injection is about 450 W and the zero-absorption window is about 1.24 ms. A first-current delay of 0.30 ms would consume about 0.135 J and leave about 0.421 J before the bus limit; the reused 1 ohm/40 uH screening loop then needs about 12 us after effective switch-on to reach source-matching current. Candidate-specific gate path, delay, release behavior and thermal limits are still absent, so status is HOLD.',
+    'The corrected independent hard candidate uses the 38.7383 V latest rising corner (38.742 V is retained only as an older sensitivity), giving about 0.556 J to 39.009 V. Under the 30 kg, 100 ms, +30 W comparison, peak net injection is about 450 W and the zero-absorption window is about 1.24 ms. With the reused 1 ohm/40 uH screening loop, matching this input takes about 14 us after effective switch current starts; the maximum total threshold-to-matching-absorption time is about 1.22 ms, leaving roughly 1.22 ms for comparator/gate delay before first current. A 0.30 ms first-current delay consumes about 0.135 J and leaves about 0.421 J before current begins. Candidate-specific gate path, delay, release behavior and thermal limits are still absent, so status is HOLD.',
     'The legacy 40.32 V central threshold is later than both 39.009 V and the FOC paper BOV lower corner of 39.209 V. Under LPV/CORE revocation, PB0/PB7 is not credited and the 3 m stop cannot be demonstrated after the FOC Break path acts.',
     'The LTC2965 candidate initial-corner action range extends to 39.704 V and release range down to 37.243 V. This fails early threshold ordering and can false-dump at a 37.8 V full-battery bus; its specified 80 us response point is not this 40x low-overdrive circuit.',
     'A 30 kg mass, flat tire contact, constant deceleration after a zero-force delay, equal FOC split, ideal mechanical-to-bus conversion, and 52.86 mF common capacitance are comparison assumptions. They do not qualify actual motor torque, 3 m stopping, resistor pulse/repetition heat, MOS SOA, local BOV behavior or physical wiring.'
@@ -535,7 +584,7 @@ console.log(JSON.stringify({
   cases: result.lpv_core_alive_dual_rejection_cases.length,
   latest_bus_v: Math.max(...result.lpv_core_alive_dual_rejection_cases.map(x =>
     x.pb0_pb7_system_behavior.maximum_bus_v)),
-  threshold_window_j_early: result.energy_window_comparisons.early_latest_38p742_to_limit_energy_j,
+  threshold_window_j_early: result.energy_window_comparisons.early_latest_38p738_to_limit_energy_j,
   source_missing_count: ledger.filter(x => !x.exists).length,
   result: path.join(HERE, '15kmh_3m_双拒充早泄放结果.json')
 }, null, 2));
