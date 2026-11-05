@@ -1,0 +1,81 @@
+{
+  "status": "HOLD_CIRCUIT_AND_BENCH",
+  "source": "TPS7A4001DGNR, same type as FOC U2/U6, powered from BMS downstream BUS",
+  "feedback_ohms": [
+    93100,
+    10000
+  ],
+  "feedback_resistor_tolerance": 0.001,
+  "nominal_12_hw_v": 12.093630000000001,
+  "rail_design_range_v": [
+    11.700355552657344,
+    12.488277226816818
+  ],
+  "supervisor_divider_comparison": {
+    "parts_ohms": [
+      267000,
+      10000
+    ],
+    "tolerance": 0.001,
+    "fall_v": [
+      10.941406400274728,
+      11.219076870195194
+    ],
+    "release_v": [
+      11.038169686988015,
+      11.496611404729727
+    ],
+    "minimum_rail_margin_to_release_after_ideal_gate_step_v": 0.13991436069357377,
+    "scope": "TPS386000 12 V sense corner only. The interlock is not qualified."
+  },
+  "design_budgets": {
+    "static_load_ma": 8.0,
+    "combined_gate_charge_nc": 300.0,
+    "event_frequency_khz": 20.0,
+    "total_output_ma": 14.0,
+    "effective_input_cap_min_uf": 1,
+    "effective_output_cap_min_uf": 4.7,
+    "ideal_gate_step_v": 0.06382978723404255,
+    "power_at_39p009v_w": 0.38485660726279725,
+    "estimated_tj_at_60c_using_jedec_c": 85.66993570442858,
+    "energy_in_10uf_at_12v_mj": 0.7200000000000001
+  },
+  "shutdown_paper_limit": {
+    "max_out_minus_in_v": 0.3,
+    "counterexample_v": 12.488277226816818,
+    "reason": "With abrupt BUS hard-low and bare LDO, CIN follows BUS while COUT retains voltage.",
+    "decision": "Exclude the bare TPS7A4001 topology from hard-drop qualification."
+  },
+  "reverse_safe_source_candidate": {
+    "mpn": "LT3010EMS8E#PBF",
+    "feedback_ohms": [
+      84500,
+      10000
+    ],
+    "nominal_v_without_adjust_bias": 12.048749999999998,
+    "steady_voltage_corner_v": [
+      11.668765584415587,
+      12.438520361911909
+    ],
+    "minimum_rail_margin_to_release_after_ideal_gate_step_v": 0.10832439245181646,
+    "power_comparison_w": 0.5114929818181817,
+    "estimated_tj_at_60c_with_62c_per_w_copper_reference_c": 91.71256487272727,
+    "ground_current_budget_ma": 3.3,
+    "scope": "Vendor supports input grounded with output held. The voltage corner uses the vendor ADJ reference range and 100 nA screening allowance for ADJ bias; verify actual capacitance, dropout, reverse leakage, input inrush and package thermals.",
+    "cost": "ADI family 1k-unit list starting at USD 2.63; actual MPN and delivered pricing pending."
+  },
+  "bench_dependencies": [
+    "12 V load and total gate charge at actual gate voltage, gate frequency and temperature",
+    "12 V ramp, ripple and minimum, effective capacitors and board temperature",
+    "inrush with existing precharge, BUS collapse, residual-voltage restart and old-rail fault isolation"
+  ],
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tps7a4001.pdf",
+    "https://www.ti.com/lit/ds/symlink/tps386000.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "https://www.hlktech.net/index.php?id=980",
+    "https://www.ti.com/product/LM5164",
+    "https://www.analog.com/en/products/lt3010.html",
+    "https://www.analog.com/media/en/technical-documentation/data-sheets/lt3010-3010-5.pdf"
+  ]
+}
