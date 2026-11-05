@@ -94,6 +94,8 @@ const lowVoltage100ms=reference.filter(c=>c.initial_bus_v===22.5&&c.foc_bus_cuto
  c.detection_build_s===0.10&&c.dump_mode==='independent_downstream_bus');
 if(!lowVoltage100ms.some(c=>c.aux_shed_at_s!==null&&c.stop_within_3m)||
  !lowVoltage100ms.some(c=>c.aux_shed_at_s===null&&!c.stopped)) throw new Error('Missing pump shed sensitivity');
+if(!lowVoltage100ms.some(c=>c.aux_load_profile==='pump_shed_65ms'&&c.stop_within_3m)||
+ !lowVoltage100ms.some(c=>c.aux_load_profile==='pump_shed_75ms'&&!c.stopped)) throw new Error('Pump-shed limit comparison failed');
 const energyWindow = (high,low)=>0.5*input.bus.capacitance_f*(high**2-low**2);
 const result = {
  schema:'agtc-dual-rejection-power-loss-v3',
@@ -114,6 +116,7 @@ const result = {
   effective_bus_capacitance_f:input.bus.capacitance_f,
   bus_energy_22p5_to_15_j:+energyWindow(22.5,15).toFixed(4),
   bus_energy_22p5_to_18_j:+energyWindow(22.5,18).toFixed(4),
+  ideal_latest_70w_to_5w_shed_for_100ms_zero_regen_s:+((energyWindow(22.5,18)-0.1*5)/(70-5)).toFixed(6),
   bus_energy_37p8_to_39p009_j:+energyWindow(39.009,37.8).toFixed(4),
   translation_kinetic_energy_j:+(0.5*mass*v0*v0).toFixed(4),
   fixed_braking_force_n:+(mass*input.braking.fixed_100ms_deceleration_m_s2).toFixed(4),

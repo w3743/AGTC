@@ -17,9 +17,11 @@
     {"name": "aux_5w", "initial_w": 5},
     {"name": "aux_30w", "initial_w": 30},
     {"name": "pump_retained_70w", "initial_w": 70},
-    {"name": "pump_shed_50ms", "initial_w": 70, "shed_delay_s": 0.05, "after_shed_w": 5}
+    {"name": "pump_shed_50ms", "initial_w": 70, "shed_delay_s": 0.05, "after_shed_w": 5},
+    {"name": "pump_shed_65ms", "initial_w": 70, "shed_delay_s": 0.065, "after_shed_w": 5},
+    {"name": "pump_shed_75ms", "initial_w": 70, "shed_delay_s": 0.075, "after_shed_w": 5}
   ],
-  "auxiliary_load_basis": "5 W baseline; 30 W inherited bounded sensitivity; 70 W stress above the pump design input of approximately 21 V x 3 A plus logic. The 50 ms load-shedding transition is a proposed requirement, not measured or modeled at the pump switch level.",
+  "auxiliary_load_basis": "5 W baseline; 30 W inherited bounded sensitivity; 70 W stress above the pump design input of approximately 21 V x 3 A plus logic. The 50/65/75 ms load-shedding transitions are comparison points, not measured or modeled at the pump switch level.",
   "bus": {
     "capacitance_f": 0.05286,
     "initial_v": 37.8,
@@ -114,6 +116,14 @@
     {
       "path": "电力/稳压模块/检查/候选_母线自供电硬件接管/双域隔离_针网与净增.json",
       "role": "independent dump and per-FOC Buck hold candidate only; its dynamics are not represented"
+    },
+    {
+      "path": "电力/稳压模块/检查/候选_母线自供电硬件接管/单光耦_三输入门_针网与数量.json",
+      "role": "reduced part count comparison, no power or timing credit"
+    },
+    {
+      "path": "电力/检查/联合仿真/FOC本地保持电路筛查.json",
+      "role": "separate RT/SD node simulation, no actual FOC torque or supply credit"
     }
   ],
   "sequence_timing_status": "0/5/10/20/30 ms are synthetic ordering sensitivities only, not specified event latencies or hardware timing guarantees.",
