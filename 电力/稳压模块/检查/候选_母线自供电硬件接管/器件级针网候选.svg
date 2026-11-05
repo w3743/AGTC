@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="1200" viewBox="0 0 1700 1200"><rect width="1700" height="1200" fill="white"/><style>text{font:19px 'Microsoft YaHei',sans-serif;fill:#162b42}.h{font-size:28px;font-weight:bold}.s{font-size:17px}.n{font-family:Consolas,'Microsoft YaHei',monospace;font-size:19px}.box{fill:#f5f9ff;stroke:#294f77;stroke-width:2}.warn{fill:#fff1e5;stroke:#9a461e;stroke-width:2}</style>
+<text x="25" y="42" class="h">已否决：直接绕过 GUARD 的旧试算图，禁止采用</text><text x="25" y="70">独立单电源、比较器持续导通迟滞；这是针网候选，不是已验证原生工程或上电图</text>
+<rect x="25" y="90" width="1650" height="240" class="box"/><text x="40" y="120">① 独立母线供电：复用原模块型号（增加一只，不拆用旧模块）</text>
+<text x="45" y="155" class="n">BUS_EXT ── F_HW (TBD) ── BUS_HW ── U_HW pin2 +Vin</text>
+<text x="45" y="185" class="n">GND_SYS ─────────────────────────── U_HW pin1 −Vin ; pin5 −Vo → GND_SYS</text>
+<text x="45" y="215" class="n">U_HW pin3 +Vo = 12V_HW ; pin4 NC ; pin6 CTRL NC (仅沿用原工程符号，厂家封装待实证)</text>
+<text x="45" y="245" class="n">C_IN 1µF/100V: BUS_HW→GND_SYS ; C_OUT 1µF/25V + 100nF/25V: 12V_HW→GND_SYS</text>
+<text x="45" y="275">U_HW：URB4812YMD-10WR3（型号同原 U_AUX1；品牌、针序需按实际采购件核对）。12V_HW 不与原 12V_PROT 连接。</text>
+<text x="45" y="305" class="s">输入保护、熔丝型号、反接和热插拔待定；新电源短路隔离、输入瞬变和输出倒灌未验证。</text>
+<rect x="25" y="345" width="1650" height="305" class="box"/><text x="40" y="375">② 独立比较与迟滞（静态试算的同一拓扑）</text>
+<text x="45" y="410" class="n">BUS_EXT ── R_H1 143kΩ ── R_H2 600Ω ──┬── SENSE ── U_CMP pin3 IN+</text>
+<text x="45" y="440" class="n">                                           ├── R_L 10kΩ ── GND_SYS</text>
+<text x="45" y="470" class="n">                                           └── R_FB 6.8MΩ ── CMP_OUT</text>
+<text x="45" y="500" class="n">U_REF REF5025 SOIC-8: pin2→12V_HW, pin4→GND_SYS, pin6→REF_2V5→U_CMP pin4 IN−</text>
+<text x="45" y="530" class="n">U_REF pin1/8 DNC, pin3/5/7 NC; C_REF_IN 1µF: pin2→GND; C_REF_OUT 1µF: pin6→GND</text>
+<text x="45" y="560" class="n">U_CMP TLV1811 DBV: pin1→CMP_OUT, pin2→GND_SYS, pin5→12V_HW ; C_CMP 100nF: pin5→GND</text>
+<text x="45" y="590" class="n">CMP_OUT ── R_G 1kΩ ── Q_HW AO3400A pin1 G ; Q_HW pin2 S→GND ; pin3 D→DUMP_OFF</text>
+<text x="45" y="620" class="n">R_GPD 100kΩ: Q_HW G→GND_SYS ; 输入升高到门槛时 Q_HW 持续拉低，直至迟滞释放</text>
+<rect x="25" y="665" width="1650" height="190" class="warn"/><text x="40" y="695">③ UCC 原生节点修改：候选会绕过原 GUARD_OK，必须重新验证保护职责</text>
+<text x="45" y="730" class="n">U_DUMP_DRV pin1：断开 12V_PROT，接 12V_HW；pin4→GND_SYS；pin2/3→原各 10Ω→GATE_DUMP</text>
+<text x="45" y="760" class="n">pin5→原 DUMP_OFF；将 R_QP_COL 10k 的 pin1 从 12V_PROT 改至 12V_HW，pin2 保持 DUMP_OFF</text>
+<text x="45" y="790" class="n">pin6：断开 GUARD_OK，R_EN 10k 接 12V_HW，R_EN_PD 100k 接 GND_SYS；不连接旧许可网</text>
+<text x="45" y="820">启动过程中基准和比较器输出未监督：目前不能保证上电默认关；原 DUMP_OFF 旧支路及旧 12V 短路反灌仍未证。</text>
+<rect x="25" y="870" width="1650" height="165" class="box"/><text x="40" y="900">④ FOC-A / FOC-B 每板各加一套（仅供电保持；不得视为牵引授权）</text>
+<text x="45" y="935" class="n">本板待分配 GPIO ── 4.7kΩ ── Q_HOLD BC847C pin1 B；100kΩ 从 B 到 GND_SYS</text>
+<text x="45" y="965" class="n">Q_HOLD pin2 E→GND_SYS；pin3 C→BUCK_CLAMP_BASE（并联原 Q_BUCK_RELEASE 的 C）</text>
+<text x="45" y="995">现有 Q_BUCK_RELEASE：1=BUCK_RELEASE_BASE、2=GND_SYS、3=BUCK_CLAMP_BASE；不回接共享 LPV。</text>
+<text x="45" y="1022" class="s">GPIO 冷启动默认低，仅原主路确认且本地条件满足后建立保持；接口、逻辑安全及固件未实现。</text>
+<text x="25" y="1085">功率回路保持原图：BUS_EXT → 0.82Ω → DUMP_SW → IRLB4030 → GND_SYS；续流二极管及原栅极电阻保留。</text><text x="25" y="1115">阈值筛查 38.164–38.738 V；39.009 V 上限；0.5 ms 指越阈到支路实际电流匹配，并非门极命令。</text><text x="25" y="1145">所有元件选型、耐压、成本、供电次序、比较器时序、驱动/绕过保护、热和实体停车验证均未闭合；不得上电。</text></svg>

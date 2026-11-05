@@ -1,0 +1,143 @@
+{
+  "schema": "agtc-dual-rejection-power-loss-input-v1",
+  "scope": "Coupled fault screen: battery and supercapacitor reject regen, central 12V/CORE/CAN revoked, BMS main path opened, with simultaneous and skewed event orders; compare actual installed FOC torque credit with one- and two-FOC local-brake counterfactuals.",
+  "vehicle": {
+    "initial_speed_kmh": 15,
+    "stop_distance_m": 3,
+    "mass_kg": 30,
+    "mass_status": "comparison assumption inherited from 15kmh_3m model; not user-confirmed"
+  },
+  "braking": {
+    "fixed_100ms_deceleration_m_s2": 3.360215,
+    "fixed_budget_delay_s": 0.1,
+    "elapsed_delay_sweep": [0.05, 0.1, 0.15],
+    "per_delay_required_deceleration_reported": true
+  },
+  "auxiliary_load_profiles": [
+    {"name": "aux_5w", "initial_w": 5},
+    {"name": "aux_30w", "initial_w": 30},
+    {"name": "pump_retained_70w", "initial_w": 70},
+    {"name": "pump_shed_50ms", "initial_w": 70, "shed_delay_s": 0.05, "after_shed_w": 5},
+    {"name": "pump_shed_65ms", "initial_w": 70, "shed_delay_s": 0.065, "after_shed_w": 5},
+    {"name": "pump_shed_75ms", "initial_w": 70, "shed_delay_s": 0.075, "after_shed_w": 5}
+  ],
+  "auxiliary_load_basis": "5 W baseline; 30 W inherited bounded sensitivity; 70 W stress above the pump design input of approximately 21 V x 3 A plus logic. The 50/65/75 ms load-shedding transitions are comparison points, not measured or modeled at the pump switch level.",
+  "bus": {
+    "capacitance_f": 0.05286,
+    "initial_v": 37.8,
+    "initial_bus_sweep_v": [22.5, 37.8],
+    "comparison_limit_v": 39.009,
+    "foc_paper_bov_v": 39.209,
+    "local_cutoff_sensitivity_v": [30, 18, 15]
+  },
+  "dump": {
+    "early_on_v": 38.738280818179966,
+    "early_off_v": 37.88849391597611,
+    "legacy_on_v": 40.32,
+    "legacy_off_v": 38.63,
+    "independent_supply_floor_v": 18,
+    "resistance_ohm": 0.82,
+    "rating_status": "unidentified/unqualified; no thermal credit"
+  },
+  "sequences": [
+    {
+      "name": "simultaneous_all_revoked",
+      "open_s": 0,
+      "rail12_s": 0,
+      "core_s": 0,
+      "can_s": 0
+    },
+    {
+      "name": "main_opens_after_braking_begins",
+      "open_s": 0.175,
+      "rail12_s": 0.18,
+      "core_s": 0.185,
+      "can_s": 0
+    },
+    {
+      "name": "main_open_first",
+      "open_s": 0,
+      "rail12_s": 0.005,
+      "core_s": 0.01,
+      "can_s": 0.02
+    },
+    {
+      "name": "old_rails_revoked_first",
+      "open_s": 0.02,
+      "rail12_s": 0,
+      "core_s": 0,
+      "can_s": 0
+    },
+    {
+      "name": "can_then_core_then_12v_then_main",
+      "open_s": 0.03,
+      "rail12_s": 0.02,
+      "core_s": 0.01,
+      "can_s": 0
+    }
+  ],
+  "sources": [
+    {
+      "path": "电力/检查/联合仿真/15kmh_3m_双拒充早泄放输入.json",
+      "role": "vehicle and bus comparison parameters"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充硬门槛核算.json",
+      "role": "threshold energy and stopping delay cross-check"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充泄放电路复跑.json",
+      "role": "1ms circuit-level power path cross-check, not control/thermal guarantee"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计细节.md",
+      "role": "current FOC bus, power and local protection boundaries"
+    },
+    {
+      "path": "固件/foc_driver/BusinessLayer/Inc/bl_motor.h",
+      "role": "existing firmware motor start voltage gate"
+    },
+    {
+      "path": "固件/foc_driver/BusinessLayer/Src/bl_motor.c",
+      "role": "existing coast behavior on stop/power fault"
+    },
+    {
+      "path": "电力/稳压模块/设计细节.md",
+      "role": "dump powered-domain and LPV/CORE behavior"
+    },
+    {
+      "path": "电力/BMS模块/设计细节.md",
+      "role": "BMS main-path topology and pack-side current/charge acceptance boundaries"
+    },
+    {
+      "path": "电力/水泵驱动模块/设计细节.md",
+      "role": "pump operating power input used to bound retained-auxiliary load sensitivity"
+    },
+    {
+      "path": "电力/稳压模块/检查/候选_母线自供电硬件接管/双域隔离_针网与净增.json",
+      "role": "independent dump and per-FOC Buck hold candidate only; its dynamics are not represented"
+    },
+    {
+      "path": "电力/稳压模块/检查/候选_母线自供电硬件接管/单光耦_三输入门_针网与数量.json",
+      "role": "reduced part count comparison, no power or timing credit"
+    },
+    {
+      "path": "电力/检查/联合仿真/FOC本地保持电路筛查.json",
+      "role": "separate RT/SD node simulation, no actual FOC torque or supply credit"
+    },
+    {
+      "path": "电力/检查/联合仿真/FOC断电供电尾段筛查.json",
+      "role": "native local power and capacitor tail evidence, no positive supply credit"
+    },
+    {
+      "path": "电力/检查/联合仿真/FOC双机低阶扭矩筛查.json",
+      "role": "dq sensitivity motor parameters, zero qualified braking torque lower bound"
+    },
+    {
+      "path": "电力/检查/联合仿真/独立泄放启动建流.json",
+      "role": "vendor macro conditional first current evidence; cold and brownout readiness remain unqualified"
+    }
+  ],
+  "sequence_timing_status": "0/5/10/20/30 ms are synthetic ordering sensitivities only, not specified event latencies or hardware timing guarantees.",
+  "local_brake_candidate_status": "Counterfactual only: assumes each FOC has qualified local control/driver power and maintained torque after central 12V/CORE/CAN revocation and BMS main opening; current installed boards do not establish this. No torque may be credited for actual design."
+}

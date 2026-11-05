@@ -1,0 +1,33 @@
+{
+  "status": "REJECTED_LED_REVERSE_VOLTAGE_DO_NOT_BUILD",
+  "baseline": "双域隔离候选净增39件/车，不含未设计保护",
+  "pins": {
+    "legacy": "GUARD_OK → 2.2kΩ ±1% → VO617A pin1 A; pin2 K → DUMP_OFF。原网络其余连接保留。",
+    "new": "12V_HW → 47kΩ ±1% → DUMP_OFF_HW → VO617A pin4 C; pin3 E → GND_SYS。Q_HW BC847C pin3 C 接 DUMP_OFF_HW，pin2 E 接 GND，pin1 B 经22k接 CMP_OUT、经100k接地。",
+    "UCC": "pin1 12V_HW; pin2/3 原输出; pin4 GND_SYS; pin5 DUMP_OFF_HW; pin6 HW_READY。"
+  },
+  "logic": "新域有效且 HW_READY 时，新硬件过压 OR (旧 GUARD 高 AND 旧 DUMP_OFF 低) 请求泄放。电平、故障及启动须验证。",
+  "comparison": {
+    "removed": {
+      "VO617A": 1,
+      "1k_LED电阻": 1
+    },
+    "retained": "2.2k LED电阻、两个TLV6703监督、旧GUARD及原功率支路",
+    "net_piece_change": -2,
+    "net_added_per_vehicle": 37,
+    "cost_CNY": null
+  },
+  "limits": [
+    "GUARD_OK 驱动结构、电压、全部原负载未知，不能假设可供光耦 LED 电流；双光耦原候选自身亦未证明。",
+    "DUMP_OFF 下拉器件须承受 LED 电流，验证低电平、失电注入及故障。",
+    "12V_HW 与 12V_PROT 不直接连接；共用 GND_SYS，光耦不构成电源安全隔离。逐项验证非供电端注入和反灌。",
+    "核实光耦 CTR 分档、温度、寿命、漏电及短路；UCC 输入电流、阈值与延迟。",
+    "输入保护、监督器默认关、基准过高、阈值容差、功率热及制动表现未闭合。",
+    "2.2k 和47k建议±1%，额定功率和工作电压待选；其余参数继承原候选且未指定的仍待选。"
+  ],
+  "reuse": "保留 Q_DUMP、续流二极管、泄放电阻及 UCC 输出，不增加第二功率级；不能直接并接旧域至新域或删除监督。",
+  "foc": "每块FOC的BC847C保持支路保留，直至证明原路径在失电及故障时能满足制动状态；GPIO默认态与集电极电流待验证。",
+  "pump": "保留原EN/状态及其保护职责；核实拓扑、默认态和系统依赖后再考虑精简。",
+  "native_project_modified": false,
+  "rejection": "空闲时 DUMP_OFF 上拉至约12V而 GUARD_OK 为0或3.3V，LED可能遭受过大的反向电压；此方案不可实施。另见替代候选。"
+}

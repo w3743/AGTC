@@ -1,0 +1,117 @@
+{
+  "review_date": "2026-11-05",
+  "status": "REVIEW_COMPLETE_CANDIDATE_NOT_IMPLEMENTED",
+  "scope": "仅复核FOC本地Buck保持与LOAD_POWER_VALID失效通知；假设主故障为双拒充叠加BMS主路许可撤销及旧12V/CORE/CAN失电，而独立BUS取电12V仍可用。",
+  "source_freshness": {
+    "current_native_p1": {
+      "path": "eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+      "sha256": "6849ee32de9226c8c458d6eb35cd86bb9bac0d6893b80c55128955acfb5f511e",
+      "cross_check": "与设计细节.md所记录当前P1 SHA一致；原生P1包含U7/TLV6700且不含R_OVREF_TOP/R_OV_HYS/R_OVREF_BOT。"
+    },
+    "current_delivery_enet": {
+      "path": "eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+      "sha256": "71b980f2b57d0ccf45b1528d3cddb9ce58efe4aa0edc013eabfd94e87dc95211",
+      "population": "153器件/467脚；与设计细节.md记录一致。J_MCU_L.9、.16、.17均NC；当前J_LOAD_POWER_VALID/Q_BUCK网络见下文。"
+    },
+    "provided_actual_readback_is_stale": {
+      "path": "检查/当前源/FOC_G431_P1_actual_readback.json",
+      "sha256": "e036993552d7cac7c268764693029caa17206b24fc1ce27d62c23d500a3ae066",
+      "reason": "170器件/504脚；含R_OVREF_TOP/R_OV_HYS/R_OVREF_BOT，缺少当前源中的U7/C_U7；与现行P1/交付ENET不一致。"
+    },
+    "provided_reopen_enet_is_stale": {
+      "path": "检查/当前源/FOC_G431_P1_reopen.enet",
+      "sha256": "461d100605ab9d8f7056879b8286c6d30f78488053b80a88886beb9d31f6e8e6",
+      "reason": "169器件/506脚；保留已删去的本地制动器件（如Q7/J_DUMP_SW等），且J_MCU_L.24仍为DUMP_THERM_OK_GPIO；不等于现行153/467 ENET。"
+    },
+    "old_reopen_record": {
+      "path": "检查/当前源/当前重开复核.json",
+      "as_of": "2026-10-22",
+      "source_p1_sha256": "1b0236c2760177bbe8619cc8fabb9257e040224d713285b8932b6c40d5a345f1",
+      "reason": "其源P1哈希不是当前6849ee32…；不能作为本轮现行源的重开证据。"
+    }
+  },
+  "confirmed_current_pin_contract": {
+    "J_MCU_L.9": {
+      "current_native_net": "NC",
+      "WeAct_normal_QFN48_V1_0": "P1-9 = PC6, STM32 UFQFPN48 pad 29",
+      "board_load_conflict": "核心板PC6还连蓝色D1及5.1kΩ到地；3.3V下额外负载上界约0.65mA。FOC当前IOC未配置PC6，也未分配给其他FOC功能。固件不得沿用PC6 LED翻转。"
+    },
+    "J_MCU_L.16": {
+      "current_native_net": "NC",
+      "WeAct_normal_QFN48_V1_0": "P1-16 = PC10, STM32 UFQFPN48 pad 39",
+      "availability": "推荐作为LPV失效通知输入；本板当前ENET为NC，foc_driver.ioc未配置PC10。ST DS12589 Rev6表12标为FT（普通5V容忍I/O），UFQFPN48 pad39。"
+    },
+    "J_MCU_L.17": {
+      "current_native_net": "NC",
+      "WeAct_normal_QFN48_V1_0": "P1-17 = PC11",
+      "availability": "备选空闲GPIO；优先PC10即可。"
+    },
+    "current_LPV_and_clamp": {
+      "J_LOAD_POWER_VALID.1": "LOAD_EN_BIAS_EXT；FOC-A唯一R_LOAD_VALID_BIAS=1kΩ由SAFE_5V偏置，FOC-B该位DNP",
+      "J_LOAD_POWER_VALID.2": "LOAD_POWER_VALID，BMS隔离光耦的正逻辑输出：高=许可，低/断线=无许可",
+      "R_BUCK_VALID_BASE": "LOAD_POWER_VALID至BUCK_RELEASE_BASE，4.7kΩ",
+      "R_BUCK_VALID_PD": "BUCK_RELEASE_BASE至GND_SYS，100kΩ",
+      "Q_BUCK_RELEASE": "E=GND_SYS；C=BUCK_CLAMP_BASE；高LPV时释放本地夹位",
+      "Q_BUCK_CLAMP": "B=BUCK_CLAMP_BASE；C=BUCK_RT_SD；LPV无效时把Buck RT/SD夹低"
+    }
+  },
+  "hold_before_arm": {
+    "candidate_circuit": "每板新增一个BC847C Q_HOLD：C接BUCK_CLAMP_BASE，E接GND_SYS，B由PC6/P1-9经4.7kΩ驱动，并以100kΩ下拉；与原Q_BUCK_RELEASE仅在BUCK_CLAMP_BASE汇合。该保持只维持本板Buck，不拉高LPV、不反供BMS或另一板，也不代表牵引ARM。此候选尚未并入当前原生ENET。",
+    "required_sequence": [
+      "冷启动时PC6保持低/高阻；在BMS实际主路已证明、LPV有效且本地供电/采样/保护/泄放就绪后，先置PC6高建立本板Buck保持。",
+      "确认本地保持已生效后才允许新ARM；禁止等LPV撤销或旧5V开始塌落后才置PC6。现有5V直连电容约21us保持筛查值，远不足以等待软件响应后再接管。",
+      "LPV撤销后保持PC6高并通过本地状态输入触发制动；停稳后撤销保持。复位、掉电及未获新ARM时默认PC6低，不自动重启。"
+    ],
+    "pc6_conflict_result": "没有发现与FOC现行功能的复用冲突；存在核心板LED/D1电阻负载，需纳入GPIO电流并接受LED随保持状态点亮。实物核心板版本/排针方向仍须连续性核对。"
+  },
+  "load_power_valid_mcu_notification": {
+    "current_gap": "现行LOAD_POWER_VALID仅进Q_BUCK_RELEASE基极网络，MCU无独立读回；不能靠CAN失效时再询问CAN。",
+    "reuse_check": "不能把Q_BUCK_RELEASE集电极直接当逻辑缓冲输出：它接BUCK_CLAMP_BASE，受Q_BUCK_CLAMP基极/偏置钳在约VBE量级；BUCK_RT_SD则不是MCU安全逻辑节点。当前源未见可直接复用的空闲逻辑缓冲。",
+    "minimum_candidate_wiring": {
+      "Q_LPV_MCU": "新增BC847C；E接GND_SYS；B经47kΩ接J_LOAD_POWER_VALID.2/LOAD_POWER_VALID；C接新信号LPV_FAIL_MCU。",
+      "R_LPV_MCU_PU": "10kΩ从LPV_FAIL_MCU上拉至MCU_3V3。",
+      "MCU_route": "LPV_FAIL_MCU接J_MCU_L.16/P1-16/PC10。不能把5V LOAD_POWER_VALID直接接MCU：PC10虽为FT，ST DS12589 Rev6表14对非FT_c输入给VIN≤min(VDD,VDDA)+4.0V；VDD=VDDA=0时上限4.0V，而SAFE_5V最高5.25V。当前发射支路两板都连接时估算3.192–3.943V也只留下约57mV边界，某一接收负载缺失时输出可更高。不得把光耦隔离侧接到BMS B0/CORE地。",
+      "logic": "LPV有效高时Q_LPV_MCU导通，PC10低；LPV低、开路或许可撤销时Q_LPV_MCU关闭，PC10被MCU_3V3上拉为高（故障）。PC10采用上升沿EXTI，无延时去抖；软件立即锁存本地失电事件、撤销正向牵引并进入已验证停车状态，恢复需显式新ARM。"
+    },
+    "buffer_sizing_and_limits": {
+      "LPV_source_and_existing_load": "BMS当前LOAD_POWER_VALID由VO617A-2X007T发射侧输出，接收偏置唯一由FOC-A的R_LOAD_VALID_BIAS=1kΩ ±1%从SAFE_5V提供，FOC-A/B两只4.7kΩ基阻并接；SAFE_5V范围4.75–5.25V。BMS文档当前双板接收负载估算约1.046–1.425mA，VO617A全温CTR/VCE边界尚未证明。",
+      "47k_candidate_calc": "推荐47kΩ ±1%而非100kΩ。按LOW LPV=3.158V、VBE(max)=0.85V、RB(max)=47.47kΩ，新增基流约48.6µA；在两板负载条件下，候选计算LPV低角约3.158V（相对原约3.192V下降约34mV）。按最保守源端5.25V、VBE(min)=0.55V、RB(min)=46.53kΩ，支路电流上界约101µA。PC10上拉10kΩ ±1%、MCU_3V3最高3.6V时，集电极需灌电流至多约0.364mA；按低角48.6µA基流，强迫β约7.5。作比较，100kΩ基阻约23µA、强迫β约15.7。",
+      "formal_drive_margin": "Nexperia BC847C数据表给出的VCE(sat)最大200mV条件是IC=10mA、IB=0.5mA；不覆盖本电路约0.36mA集电极/49µA基流点。因此47kΩ是有较强筛查余量的确定候选，但低PC10电平、光耦负载及传播延迟必须在0/25/60°C、两板实际人口、SAFE_5V两端和掉电顺序下测量；通过前不宣称逻辑阈值与全温饱和已保证。",
+      "powered_off_isolation": "NPN集电极与PC10之间没有5V通路，PC10仅由本地MCU_3V3上拉；需实际测MCU_3V3=0、LPV=5.25V及反向掉电状态下PC10不被抬高/反灌。"
+    },
+    "electrical_checks": [
+      "按BMS定义的双板人口，在SAFE_5V=4.75/5.25V、0/25/60°C及光耦LED最小实测电流下测LPV、两只Q_BUCK_RELEASE及新增Q_LPV_MCU状态；确认新增约49–101µA负载后原两板许可仍可靠，PC10低于实际G431 VIL。",
+      "LPV低/断线、FOC MCU复位、MCU_3V3掉电时，确认PC10不被5V反灌；正常5V/3V3以及各自掉电顺序下测引脚电压/注入电流，PC10外部电压不超过ST表14对当时VDD/VDDA的限制。",
+      "PC10上升沿用无CAN的EXTI锁存；接口事件到软件故障锁存/撤销正向牵引请求的候选上限为1ms（下一控制周期），不允许轮询慢周期或滤波消隐。该值必须服从系统停车能量预算，若预算更短则按更短值验收。"
+    ],
+    "bms_fault_propagation_and_scope": {
+      "current_bms_source": {
+        "p1_path": "../BMS模块/sch/Schematic1/P1.esch2",
+        "p1_sha256": "bdba7a90f7a4bbbdf0d03ac986a015a66336af80b713635e28921e73b03e890e",
+        "official_current_enet_path": "../BMS模块/检查/当前源/跨板并料_当前.enet",
+        "official_current_enet_sha256": "537caa4389b5fae40fe5508d4ae1c194f69ed53982c99c0fb8fe04959f53c6eb",
+        "scope": "现行根P1与其官方重开导出ENET；ENET 226位号/740脚，BMS设计细节记录与live API逐脚网名差异0。不是撤回的TT150热联锁候选快照。"
+      },
+      "current_bms_chain": "当前ENET实际拓扑：U1 BQ7695202 pin25 ALERT→BQ_ALERT_IC_N→U_AND2(SN74LVC1G11) pin1 A；U_AND2 pin3 B接BMS_LOCAL_OK、pin6 C与VCC同接PRE_CTRL_3V3，pin4 Y输出MAIN_CLR_N；MAIN_CLR_N接U_SEQ(SN74LVC74A) pin1 active-low 1CLR#；U_SEQ pin5 1Q为FET_RELEASE；FET_RELEASE经R_DFETOFF_GATE=1kΩ驱Q_DFETOFF，并经R_LOAD_POWER_VALID_GATE=1kΩ驱Q_LOAD_POWER_VALID_DRV，后者控制U_LOAD_POWER_VALID=VO617A-2X007T LED；接收侧pin3输出LOAD_POWER_VALID。该硬件逻辑传播路径在现行网表存在，独立于已撤回TT150热联锁采用地位。",
+      "physical_main_path_boundary": "FET_RELEASE/LPV是逻辑许可，不是主MOS导通、主电流连续或PACK稳定的物理反馈。若BQ本地保护先开主路而CORE/旧5V/光耦LED尚未掉电，FET_RELEASE/LPV可能在一段时间内仍为高，PC10不会即时报告；若开路原因未触发该BMS许可清除链，LPV也可能保持高。PC4/BUS_ADC只观察BUS电压，不能在BUS仍被电池/中央泄放保持时证明主路连续。",
+      "timing_acceptance": "当前ENET只证明拓扑存在，不证明某个实际主路故障会配置/触发BQ ALERT，也不证明传播时序。必须在真实BQ本地保护/主路切断路径上测从主路电流实际中断到LPV_FAIL_MCU/PC10上升的最坏时间；先以≤1ms作为候选接口验收上限，并与系统能量/停车预算取更严者。PC10上升至软件锁存/正向牵引撤销请求≤1ms。若对应主路开断不触发ALERT/LPV下降或传播超限，现有LPV通知不闭合这一事件；应复用可实测证明的BMS本地故障传播，若无则需新增隔离主路故障信号。不能以CAN超时替代。",
+      "scope_limit": "此输入只证明LPV许可撤销/线路低或断线被看见；不宣称所有实际主路开断都会立即或必然由它报告。本复核只覆盖已定义的主故障，不扩为任意独立故障组合。"
+    }
+  },
+  "closure_split": {
+    "closed_by_source_and_design_arithmetic": [
+      "现行连接器NC可提供PC6/P1-9与PC10/P1-16候选端点；PC6不是现行FOC功能脚且有已知LED负载。",
+      "PC10为UFQFPN48 pad39/FT脚，但FT标记不放宽VDD=VDDA=0时的4.0V绝对最大输入；5.25V LPV不能直连。",
+      "现行LPV网络与Q_BUCK_RELEASE/Q_BUCK_CLAMP拓扑不向MCU提供通知；现有Q_BUCK_RELEASE输出不可直接用作逻辑高。",
+      "保持请求必须在ARM前且LPV仍有效时建立，并在整个运行期间保留至停稳；21us旧5V保持不能作为软件事后接管窗口。",
+      "最少通知候选为BC847C+47kΩ基阻+10kΩ至本地MCU_3V3；已有BMS FET_RELEASE→LPV逻辑链可传播BQ alert，但未证明物理主路开断至通知的时延。"
+    ],
+    "requires_native_change_and_or_physical_measurement": [
+      "把Q_HOLD及LPV到PC10的缓冲网络并入原理图、官方保存重开、更新ENET/BOM并核对FOC-A/FOC-B唯一偏置人口。",
+      "以实物确认WeAct V1.0核心板、J_MCU_L方向、P1-9/P1-16连续性及PC6 LED电流；不把候选板图当成装机确认。",
+      "0–60°C及最快/最慢上电、复位/残压条件下验证PC6默认释放、LPV有效时预置保持、LPV撤销后Buck和MCU供电连续及PC10边沿；记录同一时间轴上的LPV、PC6、BUCK_RT_SD、5V_BUCK、MCU_3V3、PC10、ARM、PWM/VGS、相电流、近桥BUS与泄放状态。",
+      "验证LPV光耦最坏CTR/延迟、GPIO中断到停车控制延迟与制动能量窗口；通过前继续HOLD，不声称实车停车或制动性能已证明。"
+    ]
+  },
+  "modification_scope": "只新增本复核JSON；未修改原生EDA工程、设计需求/细节文档或固件。"
+}

@@ -1,0 +1,24 @@
+{
+  "status": "HOLD_SOURCE_SHEET_ONLY_NOT_POWER_APPROVED",
+  "component": "LT3010EMS8E#PBF，可调型，MS8E，非-5；非#W车规型号",
+  "pin_map": {"1 OUT":"12V_HW_TEST", "2 ADJ":"ADJ", "3 NC":"NC", "4 GND":"GND_SYS", "5 SHDN":"BUS_BMS_DOWNSTREAM", "6 NC":"NC", "7 NC":"NC", "8 IN":"BUS_BMS_DOWNSTREAM", "9 EP":"GND_SYS；焊接散热铜"},
+  "components": [
+    {"ref":"R_TOP","value":"84.5kΩ 0.1%","nets":["12V_HW_TEST","ADJ"]},
+    {"ref":"R_BOT","value":"10.0kΩ 0.1%","nets":["ADJ","GND_SYS"]},
+    {"ref":"C_FF","value":"4.7nF，实际有效值严格大于1.592nF，额定电压及温度选型待定","nets":["12V_HW_TEST","ADJ"]},
+    {"ref":"C_IN","value":"有效值至少1µF；100V额定为初选，实际输入瞬态、电压降额待定","nets":["BUS_BMS_DOWNSTREAM","GND_SYS"]},
+    {"ref":"C_OUT","value":"有效值至少4.7µF；额定电压及直流偏压降额待定","nets":["12V_HW_TEST","GND_SYS"]},
+    {"ref":"J_TEST","value":"双端测试接口；未连接互锁","pins":{"1":"12V_HW_TEST","2":"GND_SYS"}}
+  ],
+  "design_notes": [
+    "输出标称1.275×(1+84.5/10)=12.04875V；未计ADJ偏流、阻值误差和参考精度，非保证范围。",
+    "C_FF为可调型号规定的稳定性/瞬态电容，与上分压并联；10kHz容抗必须小于10kΩ，即有效电容严格大于1.592nF；4.7nF为标称示例，需验证偏压和全温有效值。",
+    "仅估算300nC/4.7µF=63.8mV理想电容压降，未计ESR、响应时间、已有负载、额外电容及布线；这不是实际阶跃保证。",
+    "制造商明确描述IN接地、OUT由外部维持时可阻止从OUT反灌到IN；反向电流数值有典型条件，不应推作全角零漏电。",
+    "SHDN与IN短接符合手册未使用时连接VIN的指引；并非安全使能或上电复位设计。",
+    "额定50mA不代表实际热预算通过；须核对22.5–37.8V及瞬态、所有连续与峰值负荷、热耗散、启动浪涌和BMS分支保护。",
+    "未闭合：早期母线可用性、反向与瞬态全角、LDO稳定性具体器件、实际负载、热、布局、BMS握手及整个制动功能安全；未接任何互锁，不可通电。"
+  ],
+  "source": "https://www.analog.com/media/en/technical-documentation/data-sheets/lt3010-3010-5.pdf",
+  "cost": "尚无该型号实际采购报价；厂商产品系列起始价格不代表本器件成交价。"
+}

@@ -1,0 +1,24 @@
+{
+ "status":"INCOMPLETE_HOLD_NO_POWER_OR_MANUFACTURING",
+ "snapshot_type":"桥接断连前的实时API逐块ENET片段摘要，非保存重开证明；断连后必须重新打开候选工程并导出完整ENET核对。",
+ "project":"sc-regulator/sc-regulator.eprj3",
+ "page06":"06 HW takeover INCOMPLETE HOLD，uuid 862a3cdf397374d2；跨块线网分步布置，整页和PDF可读性未复核",
+ "verified_before_disconnect":[
+  "LT3010 OUT=12V_SRC，IN与SHDN=BUS_HW_FUSED，GND/EP=GND_SYS；输入电容到BUS_HW_FUSED/GND，直接源输出电容到12V_SRC/GND。84.5k上端与2.2nF上端=12V_SRC；ADJ、84.5k下端、2.2nF下端及10k上端同LDO_ADJ，10k下端GND。",
+  "12V_SRC经两只22Ω串联至12V_HW，驱动bank两只C49118556并接12V_HW/GND；两电阻使用R1206载体、目标FH RAG-06K22R0FT、供应商ID UNVERIFIED，需核对封装及脉冲。",
+  "TPS3760 VDD=12V_HW、GND8/13=GND_SYS、SENSE与120k/10k中点、RESET=HW_READY、CTR=2.2nF/GND、CTS未接；4.7k READY上拉和100k下拉。",
+  "1N4148W C2099 A=12V_HW、K=12V_ANALOG_HOLD；两C49118556与REF5025ID、TLV1811供电均接保持轨；REF输出、CMP IN−与输出电容同网；CMP IN+接BUS分压、CMP OUT接6.8M反馈及22k基极电阻。",
+  "BC847C Q_HW_CMP E=GND、C=DUMP_OFF_HW，基极由CMP_OUT经22k并100k下拉；DUMP_OFF_HW经47k上拉12V_HW。",
+  "新VO617A载体目标-2X007T，采购编码UNVERIFIED，A=DUMP_LED_A、K=DUMP_LED_K、C=DUMP_OFF_HW、E=GND；旧Q_DUMP_SW D=DUMP_LED_K，旧R_QP_COL更换1.8k 0805连接12V_PROT与DUMP_LED_A；旧Q_PMOS_CTRL C独立DUMP_OFF_OLD。",
+  "UCC27511A VDD=12V_HW、IN−=DUMP_OFF_HW、IN+=HW_READY，HF电容到12V_HW/GND；原旧1µF bulk移除，新源侧2.2µF承接。上述page02改接已实时读回，断连后是否持久化待重开。",
+  "Q_READY_LED E→READY_RETURN_HW，新Q_READY_HW C→READY_RETURN_HW、E→GND，B经10k由HW_READY驱动并100k下拉；旧Q_READY_LED B与READY光耦管脚保持。外报READY低VDD正确性及BMS接收尚未关闭，不能称整车READY已生效。"
+ ],
+ "known_incomplete":[
+  "旧U_DUMP_SW_ALLOW（1G08）仍存在，新U_LEGACY_AND（1G11）输出暂用DUMP_PWM_ALLOWED_NEW、尚未接旧DUMP_PWM_ALLOWED；桥接断连时拟删旧门的请求未送达，须先重开核实。",
+  "BUS_HW_FUSED尚无保险或上游实际连接；SCHURTER 3403.0266.23精确库未找到，需真实器件/正确封装后放置，不以2410保险载体冒充。",
+  "READY外报低压误报/接收端逻辑待系统合同，保持HOLD。",
+  "06及历史05页须按用户四功能页要求迁移合并到01–04，再保存重开与完整逐针ENET、BOM、官方DRC和PDF视觉复核；不得声称已完成。",
+  "原生页面目前HOLD，无任何制造、上电或停车性能批准。"
+ ],
+ "communication":"桥接本地服务因执行层阻止后台启动未恢复；未尝试换通道绕过。"
+}

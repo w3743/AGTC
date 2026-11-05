@@ -1,0 +1,46 @@
+{
+  "status": "CANDIDATE_PRECHARGE_BUDGET_ONLY_HOLD",
+  "source_sha256": {
+    "联合行为模型输入.json": "b34d25cb55d8a8ccfc8ca6a7ce77a6cf9dc2a2b883237e836f3ce5da67d581c1"
+  },
+  "original_noncapacitive_allocation_a": 0.099,
+  "independent_branch_input_current_budget_a": 0.0193,
+  "new_total_noncapacitive_allocation_a": 0.1183,
+  "new_direct_input_capacitance_high_f": 3.036e-06,
+  "downstream_capacitance_high_allocation_f": 0.00012792599999999997,
+  "downstream_charging_input_charge_upper_bound_c": 0.0015954846811044184,
+  "downstream_charging_energy_from_37p8v_upper_bound_j": 0.06030932094574701,
+  "additional_direct_input_cap_energy_at_37p8v_j": 0.0021689791199999992,
+  "minimum_net_precharge_current_before_target_a": 0.13503333333333334,
+  "cases": [
+    {
+      "pack_v": 22.5,
+      "old_charge_time_s": 2.600102830472583,
+      "new_charge_time_s": 2.676216637892043,
+      "extra_cap_charge_delay_upper_bound_s": 0.011815487640862146,
+      "sequence_upper_comparison_s": 3.024032125532905,
+      "shortest_timer_s": 5.592878164523366,
+      "timer_margin_s": 2.5688460389904613
+    },
+    {
+      "pack_v": 37.8,
+      "old_charge_time_s": 4.362336923350266,
+      "new_charge_time_s": 4.489026571422982,
+      "extra_cap_charge_delay_upper_bound_s": 0.011815487640862146,
+      "sequence_upper_comparison_s": 4.836842059063844,
+      "shortest_timer_s": 5.592878164523366,
+      "timer_margin_s": 0.7560361054595219
+    }
+  ],
+  "paper_timer_comparison_met": true,
+  "bound_conditions": [
+    "99 mA is the old candidate allocation, not a measured whole-vehicle load inventory.",
+    "New 19.3 mA already includes the 16 mA output budget and 3.3 mA GND-current allowance; do not add analogue current twice.",
+    "The output-bank charging charge is added separately, not falsely treated as direct BUS capacitance. Current limit and series resistance are the existing TPS2490 candidate assumptions.",
+    "Capacitor allocation and total DC load must cover the final native BOM; any larger replacement must rerun this calculation.",
+    "Capacitance high corners include initial +20% and X7R temperature +15%; no credit is taken for DC-bias reduction.",
+    "New input protection DC resistance, source turn-on profile, minimum TPS current, FET SOA, current-limit peak and actual load enable timing still need qualified evidence.",
+    "Existing safe main-closure proof and READY handshake remain mandatory. Positive timer margin is not main-path proof or precharge qualification.",
+    "This is a local supply-budget calculation; it is not the final all-board stopping simulation."
+  ]
+}
