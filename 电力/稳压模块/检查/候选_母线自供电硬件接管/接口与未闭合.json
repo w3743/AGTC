@@ -1,0 +1,9 @@
+{
+ "status":"HOLD_INTERFACE_ONLY_NOT_MANUFACTURABLE",
+ "native_project":"not created: independent converter, startup interlock, power OR and FOC interface are not selected or validated; an apparently wired project would imply unsupported implementation",
+ "baseline":"候选_AO3400A软件泄放对照/重开官方.enet",
+ "native_pins":{"U_DUMP_DRV":{"1":"12V_PROT","2":"UCC_OUT_H","3":"UCC_OUT_L","4":"GND_SYS","5":"DUMP_OFF","6":"GUARD_OK"},"Q_DUMP":{"1":"GATE_DUMP","2":"DUMP_SW","3":"GND_SYS"},"D_DUMP_FW":{"1":"DUMP_SW","2":"BUS_EXT","3":"DUMP_SW"}},
+ "required_modifications":["Isolate UCC pin 1 from 12V_PROT and feed from reverse-blocked power OR with independent BUS-derived supply.","Isolate UCC pins 5 and 6 from their existing nets; combine individually conditioned old and independent requests with default-off logic; preserve old guard semantics and prohibit backfeed.","Supply monitor and comparator from independent domain, supervise supply and reference startup and reset, and establish local ARM distinct from precharge permission.","Split FOC Buck power enable from traction enable without tying LPV permanently high; independently sustain braking control and deny propulsion."],
+ "target":{"bus_ceiling_V":39.009,"modeled_threshold_rising_V":[38.16401999067418,38.738280818179966],"current_establishment_target_ms":0.5,"target_not_acceptance":true},
+ "unresolved":["Actual circuit topology and parts for converter, input transient and reverse protection, power OR, reference supervision, logic and ARM","Comparator pin netlist and complete resistor network actual component selection","Power loss backfeed, startup states, minimum bus voltage and timing","FOC LM5008A permission split and firmware contract","Line impedance and spike, driver switching, resistor, MOSFET, diode and wiring pulse and repetitive thermal qualification","Vehicle fault braking torque and 3 m physical qualification"]
+}
