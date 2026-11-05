@@ -1,0 +1,165 @@
+{
+  "schema": "agtc-joint-regeneration-15kmh-3m-v1",
+  "scope": "Whole-vehicle reduced-order dual-FOC regenerative stop and early central dump timing comparison. This is a power/energy behavior model, not a switched circuit or vehicle qualification result.",
+  "confirmed_vehicle_request": {
+    "ground_condition": "flat",
+    "initial_speed_kmh": 15,
+    "stop_distance_m_from_brake_request": 3,
+    "includes_brake_build_delay_distance": true
+  },
+  "engineering_assumptions_only": {
+    "mass_kg": 30,
+    "mass_source": "Existing project comparison input; not independently confirmed by the user in this task.",
+    "mechanical_brake_available": false,
+    "rotational_inertia_and_rolling_drag": "excluded",
+    "dual_foc_regeneration_split": "equal power split between FOC-A and FOC-B",
+    "mechanical_to_bus_efficiency": 1.0,
+    "brake_build_delay_sweep": [0, 0.02, 0.05, 0.1],
+    "brake_build_delay_note": "Sensitivity points only; no actual FOC torque build time or torque ramp has been released.",
+    "supercapacitor_absorption_w": 0,
+    "battery_net_charge_absorption_w": 0,
+    "unconfirmed_auxiliary_sink_w": 0,
+    "mppt_injection_base_w": 0,
+    "mppt_injection_sensitivity_w": 30,
+    "mppt_note": "30 W is only a bounded injection sensitivity because current topology/enable state is not available."
+  },
+  "bus_comparison": {
+    "effective_common_bus_capacitance_f": 0.05286,
+    "initial_bus_v": 37.8,
+    "bus_comparison_limit_v": 39.009,
+    "foc_earliest_paper_bov_rising_v": 39.209,
+    "dump_resistor_nominal_ohm": 0.82,
+    "dump_resistor_range_ohm": [0.779, 0.861]
+  },
+  "current_pb0_pb7_behavior_candidate": {
+    "pb0_nominal_on_v": 38.25,
+    "pb0_nominal_off_v": 38.1,
+    "pb0_total_error_comparison_v": 0.25,
+    "modeled_worst_common_offset_on_v": 38.5,
+    "modeled_worst_common_offset_off_v": 38.35,
+    "release_threshold_note": "38.35 V preserves the nominal 0.15 V hysteresis under a shared +0.25 V offset. Independent full-corner hysteresis and actual calibrated threshold are not guaranteed.",
+    "pb7_frequency_hz": 20000,
+    "pb7_duty_command": 0.8,
+    "first_request_phase_delay_s": 0.00015,
+    "per_period_gate_opening_loss_s": 0.00001,
+    "effective_on_time_per_period_s": 0.00003,
+    "freewheel_time_per_period_s": 0.00002,
+    "hot_total_series_resistance_ohm": 1.0,
+    "loop_inductance_h": 0.00004,
+    "freewheel_drop_v": 1.0,
+    "initial_branch_current_a": 0,
+    "notes": [
+      "The PB7 timing and R/L/FV values are inherited conditional screening inputs from current regulator design details, not guaranteed component limits.",
+      "PB0 static threshold is FAIL pending calibrated VREF/ADC behavior and correction of the current firmware conversion issue."
+    ]
+  },
+  "legacy_hard_tlv_candidate": {
+    "on_v_nominal": 40.32,
+    "off_v_nominal": 38.63,
+    "resistor_nominal_ohm": 0.82,
+    "model": "ideal instantaneous hysteretic switch into the nominal resistor; comparator, driver, switch, wiring and inductance delays excluded"
+  },
+  "ltc2965_candidate": {
+    "nominal_on_v": 38.662,
+    "nominal_off_v": 38.279,
+    "on_range_v": [37.623, 39.704],
+    "off_range_v": [37.243, 39.318],
+    "range_status": "Independent initial-corner screen; not a guaranteed installed threshold.",
+    "response_bound_note": "The cited 80 us datasheet maximum applies to a specified 10x range and overdrive condition, not this candidate's 40x range and low overdrive."
+  },
+  "independent_hard_early_candidate": {
+    "latest_on_v_reported_v": 38.738,
+    "older_threshold_sensitivity_v": 38.742,
+    "candidate_type": "TLV1811 + REF5025 independent push-pull threshold screen, 143.6 kOhm upper divider",
+    "on_range_v_reported": [38.16401999067418, 38.738280818179966],
+    "release_range_v_reported": [37.88849391597611, 38.50412640050253],
+    "release_min_v_reported_v": 37.88849391597611,
+    "zero_regeneration_release_window_s_reported": 0.00009606456345554085,
+    "comparator_to_gate_delay_s": null,
+    "gate_to_effective_current_delay_s": null,
+    "candidate_resistor_ohm": null,
+    "candidate_loop_inductance_h": null,
+    "status": "HOLD",
+    "comparison_proxy": {
+      "resistance_ohm": 1.0,
+      "inductance_h": 0.00004,
+      "note": "Reuse of existing hot PB0/PB7 loop screening point only; not evidence for the new candidate."
+    }
+  },
+  "power_path_states": [
+    {
+      "name": "dual_refusal_lpv_core_alive",
+      "battery_and_supercap_absorption_w": 0,
+      "lpv_core_alive": true,
+      "central_12v_alive": true,
+      "software_pb0_pb7_available": true,
+      "expected_path": "PB0 local BUS threshold to PB7 PWM, with existing TLV hard backup"
+    },
+    {
+      "name": "bms_disconnect_or_lpv_core_revoked_central_12v_alive",
+      "battery_and_supercap_absorption_w": 0,
+      "lpv_core_alive": false,
+      "central_12v_alive": true,
+      "software_pb0_pb7_available": false,
+      "expected_path": "Only existing 40.32 V TLV hardware fallback is credited; the PB0/PB7 software path is disabled by the LPV/CORE hard gate."
+    },
+    {
+      "name": "central_12v_lost",
+      "battery_and_supercap_absorption_w": 0,
+      "lpv_core_alive": false,
+      "central_12v_alive": false,
+      "software_pb0_pb7_available": false,
+      "expected_path": "No central active dump is credited; FOC local BOV/Break may stop PWM, but post-Break mechanical braking and body-diode energy are unresolved."
+    }
+  ],
+  "sources": [
+    {
+      "path": "电力/稳压模块/设计细节.md",
+      "role": "PB0/PB7 target thresholds, hot R/L timing screen, TLV 40.32 V nominal behavior, PB0 static error status"
+    },
+    {
+      "path": "电力/稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
+      "role": "Current regulator project root; identity only"
+    },
+    {
+      "path": "电力/稳压模块/检查/本轮磁盘读回.enet",
+      "role": "Current regulator official readback netlist; identity only"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计细节.md",
+      "role": "Dual-FOC bus/BOV comparison and existing 15 km/h, 3 m vehicle engineering context"
+    },
+    {
+      "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+      "role": "Current dual-FOC delivered topology identity; same revision instantiated twice"
+    },
+    {
+      "path": "电力/FOC驱动模块/计算/拒充停驱残余能量.json",
+      "role": "Existing 39.009 V shared-bus comparison boundary"
+    },
+    {
+      "path": "电力/检查/联合仿真/联合行为模型.mjs",
+      "role": "Prior four-board model implementation, read-only reference"
+    },
+    {
+      "path": "电力/检查/联合仿真/联合行为模型输入.json",
+      "role": "Prior four-board model input and source binding, read-only reference"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充硬门槛核算.py",
+      "role": "Independent threshold-energy and 3 m delay arithmetic cross-check; read-only"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充硬门槛核算.json",
+      "role": "Independent threshold-energy and 3 m delay arithmetic result; read-only"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充泄放电路复跑.py",
+      "role": "Parent's independent ngspice_con circuit rerun source; read-only, not an executable dependency of this system model"
+    },
+    {
+      "path": "电力/检查/联合仿真/双拒充泄放电路复跑.json",
+      "role": "Parent's independent ngspice_con circuit result; read-only cross-check and not a qualification guarantee"
+    }
+  ]
+}

@@ -65,6 +65,26 @@ def downhill_window(grade, dt=DT):
     return brake(5 / 3.6, 1.0, grade, low, dt)
 
 
+def launch_gap_window(start_v, battery_a, inductance_h, dt=0.0001):
+    bus_v = 22.5
+    gap_w = 3600 - bus_v * battery_a
+    terminal_w = gap_w / EFFICIENCY
+    voltage = start_v
+    elapsed = 0.0
+    while voltage**2 > 4 * SC_ESR * terminal_w:
+        current = 2 * terminal_w / (voltage + sqrt(voltage**2 - 4 * SC_ESR * terminal_w))
+        terminal_v = voltage - current * SC_ESR
+        duty = 1 - terminal_v / bus_v
+        ripple = terminal_v * duty / (inductance_h * 20_000)
+        if current + ripple / 2 >= 80:
+            break
+        voltage -= current * dt / SC_CAP
+        elapsed += dt
+    return {'start_cell_v': start_v / 8, 'battery_current_comparison_a': battery_a,
+            'sc_output_required_w': gap_w, 'inductance_h': inductance_h,
+            'time_until_80a_peak_comparison_s': elapsed, 'end_cell_rest_v': voltage / 8}
+
+
 def main():
     flat = [brake(TOP_SPEED, distance) for distance in (2.0, 3.0, 5.0)]
     downhill = [downhill_window(grade) for grade in (0.2, 0.3)]
@@ -93,6 +113,12 @@ def main():
                  'each_motor_torque_nm_ideal': MASS * TOP_SPEED / t * 0.03 / 8,
                  'sc_bus_energy_if_gap_held_j': supply_gap_w * t}
                 for t in (1, 2, 3)
+            ],
+            'constant_gap_scope': '理想 CCM Boost，母线固定22.5V，电感20kHz，80A为比较峰值。未计温升、控制动态、实际加速轨迹及其他负载。',
+            'constant_gap_supply_windows': [
+                launch_gap_window(start_v, battery_a, inductance)
+                for start_v in (16.0, 17.2) for battery_a in (100, 130)
+                for inductance in (12.8e-6, 20e-6, 24e-6)
             ],
         },
         'flat_braking_sc_only': flat,
