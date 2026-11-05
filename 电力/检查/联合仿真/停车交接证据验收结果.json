@@ -16,6 +16,8 @@
     "setup.firmware_build_hash missing",
     "setup.board_revision_ids missing",
     "setup.motor_serials missing",
+    "setup.firmware_build_hash must be SHA-256",
+    "setup.grade_percent must be measured numeric grade",
     "setup.braking_torque_sign must identify the measured forward-braking torque sign",
     "setup.mass_kg must be positive and measured or bounded",
     "setup.tire_radius_m must be positive and measured or bounded",
@@ -41,7 +43,14 @@
     "acceptance_limits.dump_temp_max_c must be positive",
     "acceptance_limits.stopped_speed_max_abs_mps must be positive",
     "acceptance_limits.required_stop_dwell_s must be positive",
+    "acceptance_limits.no_load_abs_current_max_a must be positive",
+    "acceptance_limits.brownout_rail_trip_max_v must be positive",
+    "acceptance_limits.brownout_rail_recover_min_v must be positive",
     "acceptance limit source documents need path, claim, and SHA-256",
+    "acceptance limit sources must explicitly cover no_load_abs_current_max_a",
+    "acceptance limit sources must explicitly cover brownout_rail_trip_max_v",
+    "acceptance limit sources must explicitly cover brownout_rail_recover_min_v",
+    "configuration_sources must contain exactly one foc_bms_propagation_local_rail_reset attachment",
     "cold_start: must be measured with synthetic=false",
     "cold_start: CSV path and SHA-256 required",
     "brownout: must be measured with synthetic=false",
@@ -64,5 +73,6 @@
     "upstream_cut_no_load: CSV path and SHA-256 required"
   ],
   "case_summaries": {},
-  "scope": "Intake validation only; no simulation or release approval."
+  "scope": "Intake validation only; no simulation or release approval.",
+  "electrical_attachment_summary": null
 }

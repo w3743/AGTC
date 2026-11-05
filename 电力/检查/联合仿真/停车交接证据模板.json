@@ -1,5 +1,5 @@
 {
-  "schema": "agtc-parking-handoff-evidence-v2",
+  "schema": "agtc-parking-handoff-evidence-v3",
   "evidence_class": "template_not_measurement",
   "status": "HOLD",
   "setup": {
@@ -19,7 +19,7 @@
     "braking_torque_sign": null,
     "reverse_test_approved": false
   },
-  "instrumentation": {"clock_sync_uncertainty_ms": null, "calibration_certificates": []},
+  "instrumentation": {"clock_sync_uncertainty_ms": null, "clock_sync_uncertainty_semantics": "maximum pairwise relative event-time error; sample quantization is added separately", "calibration_certificates": []},
   "configuration_sources": [],
   "acceptance_limits": {
     "bus_max_v": null,
@@ -36,6 +36,9 @@
     "phase_rms_max_a": null,
     "phase_rms_max_b": null,
     "dump_temp_max_c": null,
+    "no_load_abs_current_max_a": null,
+    "brownout_rail_trip_max_v": null,
+    "brownout_rail_recover_min_v": null,
     "torque_min_abs_nm": null,
     "stopped_speed_max_abs_mps": null,
     "required_stop_dwell_s": null,
@@ -43,7 +46,7 @@
   },
   "cases": {
     "cold_start": {"test_kind":"cold_start","evidence_type":"missing","synthetic":true,"measured_ambient_temp_c":null,"cold_soak_hours":null,"power_cycle_record":null,"trace_csv":null,"sha256":null},
-    "brownout": {"test_kind":"brownout","evidence_type":"missing","synthetic":true,"trace_csv":null,"sha256":null},
+    "brownout": {"test_kind":"brownout","evidence_type":"missing","synthetic":true,"browned_out_rail":null,"trace_csv":null,"sha256":null},
     "low_bus_dual_foc": {"test_kind":"low_bus_dual_foc","evidence_type":"missing","synthetic":true,"bus_start_tolerance_v":null,"buildup_end_s":null,"trace_csv":null,"sha256":null},
     "low_speed_stop": {"test_kind":"low_speed_stop","evidence_type":"missing","synthetic":true,"buildup_end_s":null,"distance_uncertainty_m":null,"trace_csv":null,"sha256":null},
     "dual_refusal_main_first": {"test_kind":"dual_refusal_main_first","evidence_type":"missing","synthetic":true,"buildup_end_s":null,"distance_uncertainty_m":null,"trace_csv":null,"sha256":null},

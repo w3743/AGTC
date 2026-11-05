@@ -227,7 +227,16 @@ const httpServer = createServer(async (req, res) => {
 });
 
 // ─── WebSocket Server ───────────────────────────────────────────────
-const wss = new WebSocketServer({ server: httpServer, verifyClient: ({ req }, done) => { const o = req.headers.origin; const allowed = req.url === '/eda' && (!o || o === 'null' || /^https:\/\/(pro\.)?(lceda\.cn|easyeda\.com)(:\d+)?$/.test(o)); done(allowed, allowed ? 200 : 403); } });
+const wss = new WebSocketServer({
+  server: httpServer,
+  verifyClient: ({ req }, done) => {
+    const origin = req.headers.origin;
+    const allowedOrigin = !origin || origin === 'null' || origin === 'https://client'
+      || /^https:\/\/(pro\.)?(lceda\.cn|easyeda\.com)(:\d+)?$/.test(origin);
+    const allowed = req.url === '/eda' && allowedOrigin;
+    done(allowed, allowed ? 200 : 403);
+  },
+});
 
 wss.on('connection', (ws, req) => {
   const clientType = req.url === '/eda' ? 'eda' : 'agent';

@@ -104,7 +104,13 @@ def main():
     if not all(paper_checks.values()):
         raise ValueError(f'Interlock design-budget failure: {paper_checks}')
     result = {
-        'status': 'PAPER_BUDGETS_PASS_MEASUREMENT_AND_NATIVE_REVIEW_REQUIRED',
+        'status': 'EIGHT_LOCAL_BUDGETS_PASS_EXTERNAL_READY_DESIGN_OPEN_HOLD',
+        'external_ready_design_open': {
+            'failure_path': 'With old 12V_PROT healthy and TPS3760 VDD below its 2.7 V guaranteed RESET-low region, undefined HW_READY can bias the series NPN and falsely illuminate the external READY optocoupler.',
+            'existing_uvlo_scope': 'UCC UVLO inhibits its own output in this region; it does not prove that the separately powered external READY LED remains off.',
+            'required_resolution': 'Qualify the external READY sink against low VDD, retaining GUARD_OK and the main-only BMS interlock without blocking the precharge bootstrap. Exact parts and native implementation remain under review.',
+            'eight_checks_scope': 'The eight local rail/timing/energy comparisons below do not close this external READY path.',
+        },
         'scope': {
             'defined_running_fault': 'BMS main and old 12 V/CORE/CAN withdrawn; downstream BUS positive and return conductors retained. The independent supply remains connected.',
             'supply_input_loss_recovery': 'BUS falls then rises through 14 V; measure all source, reference and supervisor startup time.',
@@ -140,7 +146,7 @@ def main():
             'ready_low_max_v': 0.3,
             'ucc_low_guarantee_v': 1.0,
             'required_ready_high_v': 2.4,
-            'maximum_supervisor_sink_ma': 13.2 / (4700 * 0.99) * 1e3,
+            'maximum_supervisor_sink_ma': 13.2 / (4700 * (1 - slew_error_budget)) * 1e3,
             'hard_ready_base_current_measurement_min_ma': 0.5,
             'hard_ready_led_current_measurement_ma': [5.0, 6.9],
             'ready_load_note': 'High-level loading and measured READY must meet the UCC input threshold, without treating its typical internal pull-down as a guarantee.',

@@ -11,17 +11,28 @@ const behaviorStep=0.0005, horizon=5, delaySweep=input.braking.elapsed_delay_swe
 const focBovV=input.bus.foc_paper_bov_v;
 if(!Number.isFinite(focBovV)||focBovV<=input.bus.comparison_limit_v) throw new Error('Invalid FOC BOV input');
 const sourceLedger=input.sources.map(s=>{const p=path.resolve(here,'../../..',s.path);return {path:s.path,role:s.role,exists:fs.existsSync(p),sha256:fs.existsSync(p)?sha(fs.readFileSync(p)):null};});
-function electricalBrake(speed,bus,commandNm,motor){
+function electricalBrake(speed,bus,commandNm,motor,angleErrorDeg=0,modulation=1){
  const omega=4*speed/0.03, omegaE=7*omega;
  const emf=omegaE*motor.kt_nm_per_a/(1.5*7);
- const cross=omegaE*motor.lq_h, resistance=motor.r_phase_ohm;
- const quadratic=cross**2+resistance**2, center=emf*resistance;
- const discriminant=center**2-quadratic*(emf**2-bus**2/3);
- if(discriminant<0)return {torque:0,copper:0};
- const span=Math.sqrt(discriminant), lower=Math.max(0,(center-span)/quadratic);
- const current=Math.min(motor.iq_peak_a,(center+span)/quadratic,commandNm/motor.kt_nm_per_a);
- if(current<lower)return {torque:0,copper:0};
- return {torque:motor.kt_nm_per_a*current,copper:1.5*resistance*current**2};
+ const resistance=motor.r_phase_ohm, angle=angleErrorDeg*Math.PI/180;
+ // Commanded Id=0 with an angle error gives real d/q components. Intersect
+ // both error-sign voltage intervals; never combine one sign's favorable
+ // voltage with the other sign's torque. EMF and torque share the same flux.
+ let lower=0, upper=motor.iq_peak_a;
+ for(const signed of [-angle,angle]){
+  const a=resistance*Math.sin(signed)+omegaE*motor.lq_h*Math.cos(signed);
+  const b=omegaE*(motor.ld_h??motor.lq_h)*Math.sin(signed)-resistance*Math.cos(signed);
+  const quadratic=a*a+b*b, center=-emf*b;
+  const discriminant=center**2-quadratic*(emf**2-modulation**2*bus**2/3);
+  if(discriminant<0)return {torque:0,copper:0,current:0,voltageLimited:true};
+  const span=Math.sqrt(discriminant);
+  lower=Math.max(lower,(center-span)/quadratic);
+  upper=Math.min(upper,(center+span)/quadratic);
+ }
+ const current=Math.min(upper,commandNm/(motor.kt_nm_per_a*Math.cos(angle)));
+ if(current<lower)return {torque:0,copper:0,current:0,voltageLimited:true};
+ return {torque:motor.kt_nm_per_a*current*Math.cos(angle),copper:1.5*resistance*current**2,current,
+  voltageLimited:current+1e-9<commandNm/(motor.kt_nm_per_a*Math.cos(angle))};
 }
 function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode,physics){
  const dt=physics?.step??behaviorStep, movingMass=mass*(physics?.massFactor??1);
@@ -36,6 +47,7 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
  let edump=0,eload=0,ereg=0,packSource=0,maxV=Vinit,minMovingV=Vinit,maxDumpPower=0,firstTrip=null,first39=null,firstBov=null,firstCut=null,stoppedAt=null, torqueEndedByCut=false;
  const trace=[], steps=Math.ceil(horizon/dt);
  let pendingDumpAt=null, maxBusDrawFromMotors=0;
+ let maximumPhaseCurrent=0,minimumDeliveredTorque=null,voltageLimitedTime=0,unbuildableTime=0;
  const legacy=dumpMode==='legacy_40p32_rails_revoked';
  const onV=legacy?input.dump.legacy_on_v:input.dump.early_on_v;
  const offV=legacy?input.dump.legacy_off_v:input.dump.early_off_v;
@@ -61,19 +73,30 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
   if(brakeAllowed&&physics){
    const availability=v*3.6<physics.hallBelowKmh?physics.hallFraction:1;
    const commandNm=movingMass*aPer*0.03/(4*brakeCount)*availability;
-   const point=electricalBrake(v,V,commandNm,physics.motor);
+   const angle=v*3.6<(physics.sectorBelowKmh??0)?physics.sectorAngleDeg:physics.angleErrorDeg;
+   const point=electricalBrake(v,V,commandNm,physics.motor,angle??0,physics.modulation??1);
+   maximumPhaseCurrent=Math.max(maximumPhaseCurrent,point.current);
+   if(commandNm>0){
+    minimumDeliveredTorque=minimumDeliveredTorque===null?point.torque:Math.min(minimumDeliveredTorque,point.torque);
+    if(point.voltageLimited)voltageLimitedTime+=dt;
+    if(point.torque===0)unbuildableTime+=dt;
+   }
    a=point.torque*brakeCount*4/(0.03*movingMass);
    motorCopper=point.copper*brakeCount;
   }
   const moveDt=a>0?Math.min(dt,v/a):dt;
   const vn=Math.max(0,v-a*moveDt);
-  const pReg=.5*movingMass*(v*v-vn*vn)*eta/dt-motorCopper*moveDt/dt;
+  const mechanicalRemoved=.5*movingMass*(v*v-vn*vn)/dt;
+  const terminalPower=mechanicalRemoved-motorCopper*moveDt/dt;
+  // In the dq cases, copper is removed once at the motor. Apply the
+  // subsequent conversion efficiency according to power-flow direction.
+  const pReg=physics?(terminalPower>=0?terminalPower*eta:terminalPower/eta):mechanicalRemoved*eta;
   const pMotorDraw=Math.max(0,-pReg);
   maxBusDrawFromMotors=Math.max(maxBusDrawFromMotors,pMotorDraw);
   const netMotorPower=afterOpen?Math.max(-E/dt,pReg):pReg;
-  const loadDemand=shedAt!==null&&t>=shedAt?load.after_shed_w:load.initial_w;
+  const loadDemand=(shedAt!==null&&t>=shedAt?load.after_shed_w:load.initial_w)+(physics?.fixedAuxW??0);
   const pLoad=afterOpen?Math.min(loadDemand,E/dt+netMotorPower):loadDemand;
-  const pDump=dumpOn?Math.min(V*V/input.dump.resistance_ohm,Math.max(0,E/dt+netMotorPower-pLoad)):0;
+  const pDump=dumpOn?Math.min(V*V/(physics?.dumpResistanceOhm??input.dump.resistance_ohm),Math.max(0,E/dt+netMotorPower-pLoad)):0;
   const pPack=afterOpen?0:Math.max(0,(Einitial-E)/dt-netMotorPower+pLoad+pDump);
   maxDumpPower=Math.max(maxDumpPower,pDump);
   E=Math.max(0,E+(netMotorPower-pLoad-pDump+pPack)*dt);
@@ -101,7 +124,13 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
   battery_absorption_w:0,supercap_absorption_w:0,stop_within_3m:stoppedAt!==null&&x<=stopD+1e-6,
   overvoltage_comparison_pass:Math.max(maxV,finalV)<input.bus.comparison_limit_v,
   ...(physics?{physics:{name:physics.name,mass_factor:physics.massFactor,hall_below_kmh:physics.hallBelowKmh,
-   hall_torque_fraction:physics.hallFraction,dump_delay_s:physics.dumpDelay,maximum_motor_draw_w:+maxBusDrawFromMotors.toFixed(3)},
+   hall_torque_fraction:physics.hallFraction,dump_delay_s:physics.dumpDelay,maximum_motor_draw_w:+maxBusDrawFromMotors.toFixed(3),
+   fixed_control_and_source_power_w:physics.fixedAuxW??0,modulation:physics.modulation??1,
+   high_speed_angle_error_deg:physics.angleErrorDeg??0,sector_below_kmh:physics.sectorBelowKmh??null,
+   sector_angle_error_deg:physics.sectorAngleDeg??null,ideal_zero_speed_clamp:true,
+   dump_resistance_ohm:physics.dumpResistanceOhm??input.dump.resistance_ohm,
+   maximum_phase_peak_current_a:maximumPhaseCurrent,minimum_delivered_torque_per_motor_nm:minimumDeliveredTorque,
+   requested_torque_voltage_limited_time_s:voltageLimitedTime,requested_torque_unbuildable_time_s:unbuildableTime},
    ...(physics.saveTrace?{trace}: {})}:{})};
 }
 const cases=[];
@@ -140,6 +169,33 @@ for(const [name,motor] of Object.entries(motorCases)){
  }
 }
 if(!physicsCases.every(c=>Math.abs(c.BUS_energy_balance_error_j)<0.02))throw new Error('Coupled motor and BUS energy balance failed');
+// New-design preparation sweep. It deliberately retains a failing low-speed
+// feedback case and an unshed pump; this is not final native/vehicle approval.
+const kvBudget=JSON.parse(fs.readFileSync(path.join(here,'FOC_KV口径与低压建扭.json'),'utf8'));
+const sourceBudget=JSON.parse(fs.readFileSync(path.join(here,'同域泄放互锁核算.json'),'utf8'));
+const comparatorBudget=JSON.parse(fs.readFileSync(path.join(here,'独立泄放比较器门限角.json'),'utf8'));
+const nextCases=[];
+const selectedMotor={r_phase_ohm:0.020,ld_h:50e-6,lq_h:50e-6,
+ kt_nm_per_a:kvBudget.constants.dc_bus_kv_with_sinusoidal_phase_peak_current,iq_peak_a:20};
+const oldOn=input.dump.early_on_v,oldOff=input.dump.early_off_v;
+input.dump.early_on_v=comparatorBudget.rising_range_v[1];
+input.dump.early_off_v=comparatorBudget.release_range_v[0];
+for(const sequence of input.sequences)for(const bus of [22.5,37.8])
+ for(const angle of [2,5])for(const shed of [0.015,0.020,0.050])
+  for(const hall of ['bounded_sector','tail_unavailable'])for(const conversion of [0.8,1]){
+   const load={name:`pump70_to5_at_${shed*1000}ms`,initial_w:70,shed_delay_s:shed,after_shed_w:5};
+   // Include both FOC control loads plus the independently budgeted source.
+   const fixedAuxW=2*1.2+bus*sourceBudget.source_thermal.input_current_budget_a;
+   nextCases.push(run(sequence,'brake_request',0.05,bus,load,conversion,18,2,'independent_downstream_bus',{
+    step:0.00005,motor:selectedMotor,name:`DCbus_KV_angle${angle}_${hall}`,massFactor:1,
+    hallBelowKmh:hall==='tail_unavailable'?0.5:0,hallFraction:hall==='tail_unavailable'?0:1,
+    sectorBelowKmh:1,sectorAngleDeg:35,angleErrorDeg:angle,modulation:0.95,
+    dumpDelay:0.0005,dumpResistanceOhm:0.82*1.05,fixedAuxW,
+   }));
+  }
+input.dump.early_on_v=oldOn;input.dump.early_off_v=oldOff;
+if(!nextCases.every(c=>Math.abs(c.BUS_energy_balance_error_j)<0.02))throw new Error('New preparation energy balance failed');
+if(nextCases.some(c=>c.physics.name.endsWith('tail_unavailable')&&c.stopped))throw new Error('Missing tail must not be reported stopped');
 if(!reference.some(c=>c.stopped&&c.stop_within_3m)||!reference.some(c=>!c.stopped)) throw new Error('Missing conditional comparison');
 if(!batteryOnCases.some(c=>c.first_dump_threshold_s!==null&&c.first_dump_threshold_s<0.175)) throw new Error('Missing braking before BMS opening');
 const lowVoltage100ms=reference.filter(c=>c.initial_bus_v===22.5&&c.foc_bus_cutoff_v===18&&
@@ -150,7 +206,7 @@ if(!lowVoltage100ms.some(c=>c.aux_load_profile==='pump_shed_65ms'&&c.stop_within
  !lowVoltage100ms.some(c=>c.aux_load_profile==='pump_shed_75ms'&&!c.stopped)) throw new Error('Pump-shed limit comparison failed');
 const energyWindow = (high,low)=>0.5*input.bus.capacitance_f*(high**2-low**2);
 const result = {
- schema:'agtc-dual-rejection-power-loss-v3',
+ schema:'agtc-dual-rejection-power-loss-v4-preparation',
  qualification:'HOLD',
  input_file:'双拒充叠加断电联合仿真输入.json',
  source_ledger:sourceLedger,
@@ -163,6 +219,7 @@ const result = {
   torque:'Actual installed FOC torque is uncredited. Candidate force is a constant-deceleration assumption, with no rotational inertia, slip, actual torque-speed/current map, or body-diode tail. One healthy FOC has half the total modeled force and no yaw model.',
   sequence:'Input timings are sensitivity points; CAN loss is a separate trigger. Aux demand is fixed or steps from 70 W to 5 W, an idealized pump load-shed requirement. Positive pack source and all modeled loads are integrated.',
   coupled_motor:'These cases use the dq voltage limit and signed bus power with copper losses. Motor data, Hall derate, local rail availability and dump delay are sensitivities, not verified hardware bounds. No positive actual braking torque is credited. Trace FOC state only indicates that the assumed BUS cut has not latched.',
+  new_preparation:'The new sweep links phase-peak Kt and flux under the DC-bus KV hypothesis, intersects both angle-error voltage intervals at 95% modulation, uses 35-degree sector uncertainty below 1 km/h, includes source and two FOC control consumption, and applies conversion loss after motor copper according to flow direction. Warm independent source and functioning local rails are imposed. Speed is ideally clamped at zero: actual stop detection, reversal prevention, switching/current-loop dynamics, body-diode currents, source startup and native readiness are not proven.',
   results:'The full case_rows table uses column names listed in case_fields. No-stop rows have null stop distance. The 5 s coasting distance is illustrative.',
  },
  boundaries:{
@@ -183,6 +240,11 @@ const result = {
  coupled_motor_comparison_pass_count:physicsCases.filter(c=>c.stop_within_3m&&c.overvoltage_comparison_pass).length,
  coupled_motor_trace_fields:['time_s','common_bus_v','speed_kmh','distance_m','deceleration_m_s2','signed_motor_bus_power_w','dump_w','auxiliary_demand_w','candidate_FOC_bus_above_cut'],
  coupled_motor_cases:physicsCases,
+ new_preparation_scope:'Conditional engineering envelope only; not the final all-board native verification or a measured 3 m stop.',
+ new_preparation_dependencies:[...['FOC_KV口径与低压建扭.json','同域泄放互锁核算.json','独立泄放比较器门限角.json'].map(p=>({path:p,sha256:sha(fs.readFileSync(path.join(here,p)))})),
+  {path:'双拒充叠加断电联合仿真.mjs',sha256:sha(fs.readFileSync(fileURLToPath(import.meta.url)))}],
+ new_preparation_counts:{total:nextCases.length,stop_and_voltage_comparison_met:nextCases.filter(c=>c.stop_within_3m&&c.overvoltage_comparison_pass).length},
+ new_preparation_cases:nextCases,
  representative_cases:reference,
  overall:'HOLD: actual two-FOC torque, independent power and gate timing, local voltage, load shutdown, battery isolation, and thermal capability are not qualified.',
  case_fields:Object.keys(cases[0]),
