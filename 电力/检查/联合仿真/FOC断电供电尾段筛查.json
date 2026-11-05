@@ -1,0 +1,331 @@
+{
+  "qualification": "HOLD",
+  "schema": "agtc-foc-local-power-tail-screen-v1",
+  "purpose": "Native-netlist anchored repeatable screen for dual FOC local-rail loss/hold through a parameterized parking tail; this is not gate-drive or vehicle stop validation.",
+  "source": {
+    "path": "电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_P1.enet",
+    "sha256": "71b980f2b57d0ccf45b1528d3cddb9ce58efe4aa0edc013eabfd94e87dc95211"
+  },
+  "verified_native_paths": {
+    "drv8353rs": {
+      "ref": "U1",
+      "VM": "BUS",
+      "5v_buck_output": "5V_BUCK",
+      "buck_architecture": "TI DRV835x official datasheet identifies the integrated buck as LM5008A; internal packaged implementation is not interchangeable with standalone LM5008A external specifications without qualification",
+      "integrated_buck_inductor": "220uH",
+      "input_bus_capacitors": [
+        "2.2uF",
+        "C3225X7R2A104K200AE"
+      ],
+      "output_feedback": [
+        "3.01k/1%",
+        "3.01k/1%"
+      ],
+      "series_ripple_resistor": "0.82Ω",
+      "rcl": "1.00M/1%"
+    },
+    "local_rails": {
+      "5V_BUCK": "DRV8353RS integrated Buck from BUS; its output currently disabled by native RT/SD clamp when LOAD_POWER_VALID path requests clamp",
+      "MCU_3V3": "WeAct core-board rail; native board provides 100nF CAN VIO decoupling only, core-board capacitance and load unknown",
+      "SAFE_5V": "BUS -> U2 TPS7A4001 -> SAFE_5V -> MCU ADC/COMP divider; no independent stored-energy source",
+      "DUMP_5V": "BUS -> U6 TPS7A4001 -> comparator rails U3/U7 and BOV chain; no independent stored-energy source"
+    },
+    "hall": {
+      "connector_supply": "5V_BUCK",
+      "signals": "HALL_A/B/C have direct and divider paths; pullups to MCU_3V3; Hall device current and whether its VCC is powered during tail are not established"
+    },
+    "bms_loss_trigger": {
+      "signal": "LOAD_POWER_VALID",
+      "path": "R_BUCK_VALID_BASE -> Q_BUCK_RELEASE -> Q_BUCK_CLAMP -> BUCK_RT_SD",
+      "actual_physical_logic_and_timing": "native topology verified; delivered waveform, voltage threshold, optocoupler transfer, transistor storage, and system loss ordering are not measured; no GPIO or firmware trigger assumed"
+    },
+    "bov": {
+      "path": "BUS -> U6 DUMP_5V -> U7 BUSOV_N -> Q_BOV_PNP/Q_BOV_NPN -> BREAK_N",
+      "meaning": "BOV commands hardware Break; it does not keep 5V_BUCK/MCU_3V3 alive and does not provide absorption power"
+    },
+    "candidate_pc6": {
+      "status": "not connected in current native netlist",
+      "evidence": "J_MCU_L pin 9 has empty net; historical footprint evidence maps pin 9 to PC6. Candidate only pending exact WeAct core-board revision/pinout and isolated-use verification. No firmware or wiring is presumed."
+    }
+  },
+  "capacitor_inventory": {
+    "5V_BUCK_direct": [
+      {
+        "ref": "U1_BUCK_COUT2",
+        "value": "470nF",
+        "capacitance_f": 4.7000000000000005e-7
+      },
+      {
+        "ref": "C_HALL_VCC1",
+        "value": "10uF/10V",
+        "capacitance_f": 0.000009999999999999999
+      },
+      {
+        "ref": "C_HALL_VCC2",
+        "value": "100nF/10V",
+        "capacitance_f": 1.0000000000000001e-7
+      },
+      {
+        "ref": "U5_C",
+        "value": "0.1uF/10V",
+        "capacitance_f": 1e-7
+      }
+    ],
+    "5V_BUCK_ripple_node_behind_0p82ohm": [
+      {
+        "ref": "U1_BUCK_COUT1",
+        "value": "22uF",
+        "capacitance_f": 0.000022
+      }
+    ],
+    "SAFE_5V": [
+      {
+        "ref": "U2_COUT",
+        "value": "C3225X7R1A106K160AE",
+        "capacitance_f": null,
+        "note": "value not machine-parsable; check source annotation"
+      }
+    ],
+    "DUMP_5V": [
+      {
+        "ref": "U6_COUT",
+        "value": "10uF/10V",
+        "capacitance_f": 0.000009999999999999999
+      },
+      {
+        "ref": "U3_C1",
+        "value": "0.1uF/5V",
+        "capacitance_f": 1e-7
+      },
+      {
+        "ref": "U3_C2",
+        "value": "1uF",
+        "capacitance_f": 0.000001
+      },
+      {
+        "ref": "C_U7",
+        "value": "100nF",
+        "capacitance_f": 1.0000000000000001e-7
+      }
+    ],
+    "5V_direct_total_f": 0.000010670000000000001,
+    "5V_optimistic_total_f": 0.00003267,
+    "SAFE_total_f": 0,
+    "DUMP_total_f": 0.000011200000000000001
+  },
+  "load_inputs": [
+    {
+      "name": "normal budget (existing design note)",
+      "current_a": 0.24,
+      "basis": "5V buck load budget: 60mA core board equivalent + 80mA CAN + 50mA Hall + 50mA margin; estimate, not measured"
+    },
+    {
+      "name": "CAN dominant budget (existing design note)",
+      "current_a": 0.27,
+      "basis": "existing design note estimate"
+    },
+    {
+      "name": "transient model peak stress only (not continuous load)",
+      "current_a": 0.366554,
+      "basis": "existing model inductor peak; stress case only, not 5V continuous load or steady hold budget"
+    }
+  ],
+  "cap_only_hold_estimates": [
+    {
+      "name": "normal budget (existing design note)",
+      "current_a": 0.24,
+      "conservative_direct_5v_capacitance_f": 0.000010670000000000001,
+      "direct_cap_energy_5v_to_4v5_j": 0.000025341250000000004,
+      "ideal_hold_to_4v5_s_direct_only": 0.000021117708333333338,
+      "optimistic_with_ripple_capacitance_f": 0.00003267,
+      "ideal_hold_to_4v5_s_instant_parallel_upper_bound": 0.000064659375,
+      "caveat": "5V rail loss threshold is not measured; 22uF cap is behind 0.82ohm ripple resistor, so parallel-cap result is an optimistic upper bound. Capacitor derating, ESR, regulator dynamics, MCU 3V3 core-board input/load, Hall sink current, and 5V startup/load transient are not modeled."
+    },
+    {
+      "name": "CAN dominant budget (existing design note)",
+      "current_a": 0.27,
+      "conservative_direct_5v_capacitance_f": 0.000010670000000000001,
+      "direct_cap_energy_5v_to_4v5_j": 0.000025341250000000004,
+      "ideal_hold_to_4v5_s_direct_only": 0.0000187712962962963,
+      "optimistic_with_ripple_capacitance_f": 0.00003267,
+      "ideal_hold_to_4v5_s_instant_parallel_upper_bound": 0.00005747499999999999,
+      "caveat": "5V rail loss threshold is not measured; 22uF cap is behind 0.82ohm ripple resistor, so parallel-cap result is an optimistic upper bound. Capacitor derating, ESR, regulator dynamics, MCU 3V3 core-board input/load, Hall sink current, and 5V startup/load transient are not modeled."
+    },
+    {
+      "name": "transient model peak stress only (not continuous load)",
+      "current_a": 0.366554,
+      "conservative_direct_5v_capacitance_f": 0.000010670000000000001,
+      "direct_cap_energy_5v_to_4v5_j": 0.000025341250000000004,
+      "ideal_hold_to_4v5_s_direct_only": 0.000013826748582746337,
+      "optimistic_with_ripple_capacitance_f": 0.00003267,
+      "ideal_hold_to_4v5_s_instant_parallel_upper_bound": 0.00004233550854717176,
+      "caveat": "5V rail loss threshold is not measured; 22uF cap is behind 0.82ohm ripple resistor, so parallel-cap result is an optimistic upper bound. Capacitor derating, ESR, regulator dynamics, MCU 3V3 core-board input/load, Hall sink current, and 5V startup/load transient are not modeled."
+    }
+  ],
+  "hold_energy_to_supply_5v_for_parking_tail": [
+    {
+      "hold_s": 0.1,
+      "load_cases": [
+        {
+          "name": "normal budget (existing design note)",
+          "current_a": 0.24,
+          "energy_j_at_5v": 0.12,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.05052631578947368
+        },
+        {
+          "name": "CAN dominant budget (existing design note)",
+          "current_a": 0.27,
+          "energy_j_at_5v": 0.135,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.056842105263157895
+        },
+        {
+          "name": "transient model peak stress only (not continuous load)",
+          "current_a": 0.366554,
+          "energy_j_at_5v": 0.18327700000000002,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.07716926315789474
+        }
+      ]
+    },
+    {
+      "hold_s": 1,
+      "load_cases": [
+        {
+          "name": "normal budget (existing design note)",
+          "current_a": 0.24,
+          "energy_j_at_5v": 1.2,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.5052631578947369
+        },
+        {
+          "name": "CAN dominant budget (existing design note)",
+          "current_a": 0.27,
+          "energy_j_at_5v": 1.35,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.5684210526315789
+        },
+        {
+          "name": "transient model peak stress only (not continuous load)",
+          "current_a": 0.366554,
+          "energy_j_at_5v": 1.83277,
+          "equivalent_capacitance_f_for_5v_to_4v5": 0.7716926315789474
+        }
+      ]
+    },
+    {
+      "hold_s": 3,
+      "load_cases": [
+        {
+          "name": "normal budget (existing design note)",
+          "current_a": 0.24,
+          "energy_j_at_5v": 3.5999999999999996,
+          "equivalent_capacitance_f_for_5v_to_4v5": 1.5157894736842104
+        },
+        {
+          "name": "CAN dominant budget (existing design note)",
+          "current_a": 0.27,
+          "energy_j_at_5v": 4.050000000000001,
+          "equivalent_capacitance_f_for_5v_to_4v5": 1.705263157894737
+        },
+        {
+          "name": "transient model peak stress only (not continuous load)",
+          "current_a": 0.366554,
+          "energy_j_at_5v": 5.49831,
+          "equivalent_capacitance_f_for_5v_to_4v5": 2.315077894736842
+        }
+      ]
+    },
+    {
+      "hold_s": 10,
+      "load_cases": [
+        {
+          "name": "normal budget (existing design note)",
+          "current_a": 0.24,
+          "energy_j_at_5v": 12,
+          "equivalent_capacitance_f_for_5v_to_4v5": 5.052631578947368
+        },
+        {
+          "name": "CAN dominant budget (existing design note)",
+          "current_a": 0.27,
+          "energy_j_at_5v": 13.5,
+          "equivalent_capacitance_f_for_5v_to_4v5": 5.684210526315789
+        },
+        {
+          "name": "transient model peak stress only (not continuous load)",
+          "current_a": 0.366554,
+          "energy_j_at_5v": 18.3277,
+          "equivalent_capacitance_f_for_5v_to_4v5": 7.716926315789474
+        }
+      ]
+    }
+  ],
+  "lpv_loss_delay_sweep": [
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 0,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    },
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 0.005,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    },
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 0.02,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    },
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 0.05,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    },
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 0.1,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    },
+    {
+      "input_lpv_loss_delay_after_brake_request_s": 1,
+      "boards_expected_to_receive_direct_native_RT_SD_clamp_on_signal_loss": [
+        "A",
+        "B"
+      ],
+      "rt_sd_delay_s": null,
+      "result": "parameter only: no actual input event timing or netlist-backed threshold/propagation guarantee is assumed"
+    }
+  ],
+  "parking_tail_interface": {
+    "consumes": "per-board BUS(t), LPV(t), 5V_BUCK(t), MCU_3V3(t), SAFE_5V(t), DUMP_5V(t), and actual standstill time from parent coupled vehicle model; feed parent BUS trace/stop time when available",
+    "present_data_limit": "existing vehicle co-simulation reports aggregate rows over a 5 s horizon but does not export BUS(t), local rail waveforms, MCU reset, Hall validity, or actual motor body-diode tail; this screen therefore exposes an input contract and capacitor/power bounds instead of inventing a shared time trace",
+    "board_interference": "run cases A hold only, B hold only, both hold, neither hold. Hardware input is shared LOAD_POWER_VALID; two boards share BUS/GND and one A-side 1k bias per population contract. Independent local holds must not source LOAD_POWER_VALID or each other; cross-current and ground displacement need bench measurement."
+  },
+  "limits": [
+    "No code or wiring maps PC6 or any other GPIO to local hold; candidate stuck-high can defeat cold-start/fault default-off unless a separate hardware actual-main-path interlock is proven.",
+    "366.554mA is a modeled inductor transient peak used only as a stress case; it is not a continuous load or steady hold budget. Buck startup current upper bound previously screened at 0.685A exceeds 0.610A maximum limit point; cold-start qualification remains open.",
+    "No 3V3 budget/capacitance, MCU BOR waveform, Hall sensor supply/current, SAFE/DUMP dropout trajectory, DRV8353 UVLO/shutdown behavior, gate VGS, torque, or regenerative diode current inferred here.",
+    "Local control power alone is insufficient to credit stopping torque: integrated vehicle model gives zero actual installed-FOC braking credit, and brake continuation after main path opens is counterfactual."
+  ],
+  "official_sources": {
+    "TI_DRV8353": "https://www.ti.com/lit/ds/symlink/drv8353.pdf",
+    "TI_LM5008A": "https://www.ti.com/lit/ds/symlink/lm5008a.pdf",
+    "note": "TI DRV835x datasheet identifies the integrated buck architecture as LM5008A. Standalone LM5008A electrical limits are not automatically transferable to the integrated driver implementation."
+  }
+}

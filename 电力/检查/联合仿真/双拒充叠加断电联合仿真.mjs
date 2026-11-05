@@ -4,13 +4,27 @@ import fs from 'node:fs'; import path from 'node:path'; import crypto from 'node
 import {fileURLToPath} from 'node:url';
 const here=path.dirname(fileURLToPath(import.meta.url));
 const input=JSON.parse(fs.readFileSync(path.join(here,'双拒充叠加断电联合仿真输入.json'),'utf8'));
+const torqueEvidence=JSON.parse(fs.readFileSync(path.join(here,'FOC双机低阶扭矩筛查.json'),'utf8'));
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
 const v0=input.vehicle.initial_speed_kmh/3.6, mass=input.vehicle.mass_kg, stopD=input.vehicle.stop_distance_m;
-const dt=0.0005, horizon=5, delaySweep=input.braking.elapsed_delay_sweep;
+const behaviorStep=0.0005, horizon=5, delaySweep=input.braking.elapsed_delay_sweep;
 const focBovV=input.bus.foc_paper_bov_v;
 if(!Number.isFinite(focBovV)||focBovV<=input.bus.comparison_limit_v) throw new Error('Invalid FOC BOV input');
 const sourceLedger=input.sources.map(s=>{const p=path.resolve(here,'../../..',s.path);return {path:s.path,role:s.role,exists:fs.existsSync(p),sha256:fs.existsSync(p)?sha(fs.readFileSync(p)):null};});
-function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode){
+function electricalBrake(speed,bus,commandNm,motor){
+ const omega=4*speed/0.03, omegaE=7*omega;
+ const emf=omegaE*motor.kt_nm_per_a/(1.5*7);
+ const cross=omegaE*motor.lq_h, resistance=motor.r_phase_ohm;
+ const quadratic=cross**2+resistance**2, center=emf*resistance;
+ const discriminant=center**2-quadratic*(emf**2-bus**2/3);
+ if(discriminant<0)return {torque:0,copper:0};
+ const span=Math.sqrt(discriminant), lower=Math.max(0,(center-span)/quadratic);
+ const current=Math.min(motor.iq_peak_a,(center+span)/quadratic,commandNm/motor.kt_nm_per_a);
+ if(current<lower)return {torque:0,copper:0};
+ return {torque:motor.kt_nm_per_a*current,copper:1.5*resistance*current**2};
+}
+function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode,physics){
+ const dt=physics?.step??behaviorStep, movingMass=mass*(physics?.massFactor??1);
  const open=seq.open_s, railLoss=Math.min(seq.rail12_s,seq.core_s);
  const trigger=triggerMode==='brake_request'?0:seq.can_s;
  const onset=trigger+detectBuild;
@@ -20,7 +34,8 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
  const aPer=aFixed*brakeCount/2;
  let E=.5*input.bus.capacitance_f*Vinit*Vinit, Einitial=E, v=v0, x=0, t=0, dumpOn=false, focCut=false;
  let edump=0,eload=0,ereg=0,packSource=0,maxV=Vinit,minMovingV=Vinit,maxDumpPower=0,firstTrip=null,first39=null,firstBov=null,firstCut=null,stoppedAt=null, torqueEndedByCut=false;
- let trace=[]; const steps=Math.ceil(horizon/dt);
+ const trace=[], steps=Math.ceil(horizon/dt);
+ let pendingDumpAt=null, maxBusDrawFromMotors=0;
  const legacy=dumpMode==='legacy_40p32_rails_revoked';
  const onV=legacy?input.dump.legacy_on_v:input.dump.early_on_v;
  const offV=legacy?input.dump.legacy_off_v:input.dump.early_off_v;
@@ -28,7 +43,11 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
   t=k*dt; const V=Math.sqrt(2*E/input.bus.capacitance_f); maxV=Math.max(maxV,V);
   const afterOpen=t>=open;
   const dumpPowered=dumpMode==='independent_downstream_bus' ? V>input.dump.independent_supply_floor_v : t<railLoss;
-  if(!dumpOn&&dumpPowered&&V>=onV){dumpOn=true;if(firstTrip===null)firstTrip=t;}
+  if(!dumpOn&&dumpPowered&&V>=onV){
+   if(pendingDumpAt===null)pendingDumpAt=t;
+   if(firstTrip===null)firstTrip=t;
+   if(t-pendingDumpAt+1e-12>=(physics?.dumpDelay??0))dumpOn=true;
+  }else if(!dumpPowered||V<onV){pendingDumpAt=null;}
   if(dumpOn&&(!dumpPowered||V<=offV))dumpOn=false;
   if(firstCut===null&&V<=cutV) firstCut=t;
   if(V>=focBovV&&firstBov===null)firstBov=t;
@@ -37,18 +56,32 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
   if(brakeCount>0&&v>0&&(V>=focBovV||V<=cutV)){
    focCut=true;torqueEndedByCut=true;
   }
-  const a=t>=onset&&!focCut&&v>0?aPer:0;
+  const brakeAllowed=t>=onset&&!focCut&&v>0&&brakeCount>0;
+  let a=brakeAllowed?aPer:0, motorCopper=0;
+  if(brakeAllowed&&physics){
+   const availability=v*3.6<physics.hallBelowKmh?physics.hallFraction:1;
+   const commandNm=movingMass*aPer*0.03/(4*brakeCount)*availability;
+   const point=electricalBrake(v,V,commandNm,physics.motor);
+   a=point.torque*brakeCount*4/(0.03*movingMass);
+   motorCopper=point.copper*brakeCount;
+  }
   const moveDt=a>0?Math.min(dt,v/a):dt;
   const vn=Math.max(0,v-a*moveDt);
-  const pReg=.5*mass*(v*v-vn*vn)*eta/dt;
+  const pReg=.5*movingMass*(v*v-vn*vn)*eta/dt-motorCopper*moveDt/dt;
+  const pMotorDraw=Math.max(0,-pReg);
+  maxBusDrawFromMotors=Math.max(maxBusDrawFromMotors,pMotorDraw);
+  const netMotorPower=afterOpen?Math.max(-E/dt,pReg):pReg;
   const loadDemand=shedAt!==null&&t>=shedAt?load.after_shed_w:load.initial_w;
-  const pLoad=afterOpen?Math.min(loadDemand,E/dt+pReg):loadDemand;
-  const pDump=dumpOn?Math.min(V*V/input.dump.resistance_ohm,Math.max(0,E/dt+pReg-pLoad)):0;
-  const pPack=afterOpen?0:Math.max(0,(Einitial-E)/dt-pReg+pLoad+pDump);
+  const pLoad=afterOpen?Math.min(loadDemand,E/dt+netMotorPower):loadDemand;
+  const pDump=dumpOn?Math.min(V*V/input.dump.resistance_ohm,Math.max(0,E/dt+netMotorPower-pLoad)):0;
+  const pPack=afterOpen?0:Math.max(0,(Einitial-E)/dt-netMotorPower+pLoad+pDump);
   maxDumpPower=Math.max(maxDumpPower,pDump);
-  E=Math.max(0,E+(pReg-pLoad-pDump+pPack)*dt);
+  E=Math.max(0,E+(netMotorPower-pLoad-pDump+pPack)*dt);
   packSource+=pPack*dt;
-  edump+=pDump*dt; eload+=pLoad*dt; ereg+=pReg*dt;
+  edump+=pDump*dt; eload+=pLoad*dt; ereg+=netMotorPower*dt;
+  if(physics?.saveTrace&&t<=2&&k%Math.round(0.01/dt)===0){
+   trace.push([t,V,v*3.6,x,a,netMotorPower,pDump,loadDemand,!focCut].map(v=>typeof v==='number'?+v.toFixed(5):v));
+  }
   x+=(v+vn)*.5*moveDt;
   if(a>0&&v<=a*dt&&stoppedAt===null)stoppedAt=t+moveDt;
   v=stoppedAt===null?vn:0;
@@ -66,7 +99,10 @@ function run(seq,triggerMode,detectBuild,Vinit,load,eta,cutV,brakeCount,dumpMode
   regen_energy_to_BUS_j:+ereg.toFixed(4),aux_energy_j:+eload.toFixed(4),dump_resistor_energy_j:+edump.toFixed(4),
   dump_resistor_peak_power_screen_w:+maxDumpPower.toFixed(1),BUS_energy_balance_error_j:+balance.toExponential(3),
   battery_absorption_w:0,supercap_absorption_w:0,stop_within_3m:stoppedAt!==null&&x<=stopD+1e-6,
-  overvoltage_comparison_pass:Math.max(maxV,finalV)<input.bus.comparison_limit_v};
+  overvoltage_comparison_pass:Math.max(maxV,finalV)<input.bus.comparison_limit_v,
+  ...(physics?{physics:{name:physics.name,mass_factor:physics.massFactor,hall_below_kmh:physics.hallBelowKmh,
+   hall_torque_fraction:physics.hallFraction,dump_delay_s:physics.dumpDelay,maximum_motor_draw_w:+maxBusDrawFromMotors.toFixed(3)},
+   ...(physics.saveTrace?{trace}: {})}:{})};
 }
 const cases=[];
 for(const seq of input.sequences) for(const trigger of ['brake_request','can_fault']) for(const delay of delaySweep)
@@ -88,6 +124,22 @@ const reference = cases.filter(c=>c.sequence==='simultaneous_all_revoked'&&c.tri
 const batteryOnCases = cases.filter(c=>c.sequence==='main_opens_after_braking_begins');
 const candidateCases = cases.filter(c=>c.active_foc_count===2&&c.dump_mode==='independent_downstream_bus');
 const onCasesPass = candidateCases.filter(c=>c.stop_within_3m&&c.overvoltage_comparison_pass);
+const physicsCases=[];
+const pumpShed=input.auxiliary_load_profiles.find(c=>c.name==='pump_shed_50ms');
+const motorCases=torqueEvidence.assumed_parameter_cases_not_measurements;
+for(const [name,motor] of Object.entries(motorCases)){
+ for(const sequence of input.sequences.filter(c=>['simultaneous_all_revoked','main_opens_after_braking_begins'].includes(c.name))){
+  for(const bus of [22.5,37.8])for(const massFactor of [1,1.5]){
+   for(const [hallBelowKmh,hallFraction] of [[0,1],[1,0.5],[0.5,0]]){
+    physicsCases.push(run(sequence,'brake_request',0.05,bus,pumpShed,0.8,18,2,'independent_downstream_bus',
+     {step:0.00005, motor, name, massFactor, hallBelowKmh, hallFraction, dumpDelay:0.0005,
+      saveTrace:sequence.open_s===0&&massFactor===1&&name==='central_sensitivity'&&
+       (hallBelowKmh===0||bus===37.8&&hallFraction===0)}));
+   }
+  }
+ }
+}
+if(!physicsCases.every(c=>Math.abs(c.BUS_energy_balance_error_j)<0.02))throw new Error('Coupled motor and BUS energy balance failed');
 if(!reference.some(c=>c.stopped&&c.stop_within_3m)||!reference.some(c=>!c.stopped)) throw new Error('Missing conditional comparison');
 if(!batteryOnCases.some(c=>c.first_dump_threshold_s!==null&&c.first_dump_threshold_s<0.175)) throw new Error('Missing braking before BMS opening');
 const lowVoltage100ms=reference.filter(c=>c.initial_bus_v===22.5&&c.foc_bus_cutoff_v===18&&
@@ -103,13 +155,14 @@ const result = {
  input_file:'双拒充叠加断电联合仿真输入.json',
  source_ledger:sourceLedger,
  model:{
-  dt_s:dt,horizon_s:horizon,delay_sweep:delaySweep,
+  dt_s:behaviorStep,horizon_s:horizon,delay_sweep:delaySweep,
   fixed_deceleration_m_s2:input.braking.fixed_100ms_deceleration_m_s2,
   pre_open:'Ideal pack can source to the initial bus voltage floor but cannot absorb power. The model also covers BMS opening after braking begins.',
   post_open:'Capacitor supports auxiliaries plus modeled regen and dump. FOC candidate torque latches off on paper BOV or selected cutoff. Independent dump has its own 18 V comparison supply floor.',
   dump:'Ideal hysteretic resistor. Gate/current timing, local parasitics and thermal qualification are outside this model.',
   torque:'Actual installed FOC torque is uncredited. Candidate force is a constant-deceleration assumption, with no rotational inertia, slip, actual torque-speed/current map, or body-diode tail. One healthy FOC has half the total modeled force and no yaw model.',
   sequence:'Input timings are sensitivity points; CAN loss is a separate trigger. Aux demand is fixed or steps from 70 W to 5 W, an idealized pump load-shed requirement. Positive pack source and all modeled loads are integrated.',
+  coupled_motor:'These cases use the dq voltage limit and signed bus power with copper losses. Motor data, Hall derate, local rail availability and dump delay are sensitivities, not verified hardware bounds. No positive actual braking torque is credited. Trace FOC state only indicates that the assumed BUS cut has not latched.',
   results:'The full case_rows table uses column names listed in case_fields. No-stop rows have null stop distance. The 5 s coasting distance is illustrative.',
  },
  boundaries:{
@@ -126,6 +179,10 @@ const result = {
  },
  checks,
  counts:{two_FOC_independent_dump:candidateCases.length,two_FOC_model_stop_and_voltage_pass:onCasesPass.length},
+ coupled_motor_case_count:physicsCases.length,
+ coupled_motor_comparison_pass_count:physicsCases.filter(c=>c.stop_within_3m&&c.overvoltage_comparison_pass).length,
+ coupled_motor_trace_fields:['time_s','common_bus_v','speed_kmh','distance_m','deceleration_m_s2','signed_motor_bus_power_w','dump_w','auxiliary_demand_w','candidate_FOC_bus_above_cut'],
+ coupled_motor_cases:physicsCases,
  representative_cases:reference,
  overall:'HOLD: actual two-FOC torque, independent power and gate timing, local voltage, load shutdown, battery isolation, and thermal capability are not qualified.',
  case_fields:Object.keys(cases[0]),
