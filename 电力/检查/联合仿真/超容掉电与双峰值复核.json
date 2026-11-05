@@ -1,0 +1,241 @@
+{
+  "qualification": "HOLD",
+  "input_sha256": {
+    "电力\\稳压模块\\仿真\\源码\\隔离关断后电感续流.py": "F254FD5871309A1054AE27B388B32B98B0C52110B6BB1AA0445134162E637AE1",
+    "电力\\稳压模块\\仿真\\输入\\厂家模型\\ST_Schottky_PSpice_v6\\ST_POWER_SCHOTTKY_V10.LIB": "633FB9263215D27C308E42FA32BE0577889347A388021460CF87DDFE9E4E7BAD",
+    "电力\\FOC驱动模块\\仿真\\tools\\ngspice-47-portable\\Spice64\\bin\\ngspice_con.exe": "22D5CAE2BD32B2E39157A8D27BF457122F68285B72A9EBEFDF41551B628233AB",
+    "电力\\稳压模块\\检查\\候选_预充与超容隔离_R1\\候选官方.enet": "0C799603D113F29B288747AFB9A64EA101D4EBEB217F062E6B2B4A415A38177A",
+    "电力\\BMS模块\\设计需求.md": "45EB2E4155EEE2791202C490F516E95BF9AE955A904D6326D52B53497534D6C5"
+  },
+  "isolation_scope": "80A 恒定注入解析段 + 主桥已关断的原厂 Schottky 续流网表。另比较主桥可独立先关而隔离开关仍导通的分支，超容以固定电压源表示。未建模门驱响应、线束尖峰、热、MOS Coss/Qrr 或其他负载源。",
+  "ti_timeout_datasheet": "https://www.ti.com/lit/ds/symlink/tpsi3052-q1.pdf",
+  "timing_scope": "20/30µs 为敏感性比较，40µs 为原前段预算，300µs 为 TPSI3052 主电源失电典型比较点，无最大值。",
+  "local_bus_f": 0.00486,
+  "initial_bus_v": 37.8,
+  "comparison_limit_v": 39.009,
+  "isolated_bus_injection_a": 80.0,
+  "tail_energy_j": 0.07680000000000001,
+  "max_injection_duration_us_with_full_tail_energy": 48.707917474654714,
+  "isolation_cases": [
+    {
+      "pre_open_injection_us": 20,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.12921810699588,
+      "ngspice_peak_v": 38.5236702,
+      "all_inductor_energy_peak_v": 38.54143499822583,
+      "tail_current_at_end_a": 1.12068243e-06,
+      "margin_to_comparison_v": 0.48532980000000236,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 20,
+      "inductor_initial_a": 80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.12921810699588,
+      "ngspice_peak_v": 38.5108674,
+      "all_inductor_energy_peak_v": 38.54143499822583,
+      "tail_current_at_end_a": -3.96162444e-05,
+      "margin_to_comparison_v": 0.49813259999999815,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 20,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 17.6,
+      "bus_at_open_v": 38.12921810699588,
+      "ngspice_peak_v": 38.8463848,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -1.75999972e-05,
+      "margin_to_comparison_v": 0.16261519999999763,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 20,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 21.6,
+      "bus_at_open_v": 38.12921810699588,
+      "ngspice_peak_v": 39.001675,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -2.16000059e-05,
+      "margin_to_comparison_v": 0.00732500000000158,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 30,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.29382716049383,
+      "ngspice_peak_v": 38.6866844,
+      "all_inductor_energy_peak_v": 38.70429093614013,
+      "tail_current_at_end_a": 1.11913642e-06,
+      "margin_to_comparison_v": 0.32231560000000314,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 30,
+      "inductor_initial_a": 80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.29382716049383,
+      "ngspice_peak_v": 38.6738277,
+      "all_inductor_energy_peak_v": 38.70429093614013,
+      "tail_current_at_end_a": -3.97776132e-05,
+      "margin_to_comparison_v": 0.33517230000000353,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 30,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 17.6,
+      "bus_at_open_v": 38.29382716049383,
+      "ngspice_peak_v": 39.0057602,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -1.75999966e-05,
+      "margin_to_comparison_v": 0.0032398000000029015,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 30,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 21.6,
+      "bus_at_open_v": 38.29382716049383,
+      "ngspice_peak_v": 39.158609,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -2.16000054e-05,
+      "margin_to_comparison_v": -0.1496089999999981,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 40,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.45843621399177,
+      "ngspice_peak_v": 38.8497113,
+      "all_inductor_energy_peak_v": 38.86716164446895,
+      "tail_current_at_end_a": 1.11760806e-06,
+      "margin_to_comparison_v": 0.15928869999999762,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 40,
+      "inductor_initial_a": 80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 38.45843621399177,
+      "ngspice_peak_v": 38.8368007,
+      "all_inductor_energy_peak_v": 38.86716164446895,
+      "tail_current_at_end_a": -3.99390121e-05,
+      "margin_to_comparison_v": 0.1721993000000026,
+      "voltage_screen": "PASS",
+      "physical_qualification": "HOLD"
+    },
+    {
+      "pre_open_injection_us": 40,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 17.6,
+      "bus_at_open_v": 38.45843621399177,
+      "ngspice_peak_v": 39.1652104,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -1.75999971e-05,
+      "margin_to_comparison_v": -0.15621039999999908,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 40,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 21.6,
+      "bus_at_open_v": 38.45843621399177,
+      "ngspice_peak_v": 39.3156739,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -2.16000053e-05,
+      "margin_to_comparison_v": -0.30667389999999983,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 300,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 42.73827160493827,
+      "ngspice_peak_v": 43.0924453,
+      "all_inductor_energy_peak_v": 43.10643569177435,
+      "tail_current_at_end_a": 1.08319769e-06,
+      "margin_to_comparison_v": -4.083445300000001,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 300,
+      "inductor_initial_a": 80.0,
+      "sc_stack_still_connected_v": null,
+      "bus_at_open_v": 42.73827160493827,
+      "ngspice_peak_v": 43.0781311,
+      "all_inductor_energy_peak_v": 43.10643569177435,
+      "tail_current_at_end_a": -4.41446988e-05,
+      "margin_to_comparison_v": -4.0691311,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 300,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 17.6,
+      "bus_at_open_v": 42.73827160493827,
+      "ngspice_peak_v": 43.3327504,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -1.75999924e-05,
+      "margin_to_comparison_v": -4.3237504000000015,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    },
+    {
+      "pre_open_injection_us": 300,
+      "inductor_initial_a": -80.0,
+      "sc_stack_still_connected_v": 21.6,
+      "bus_at_open_v": 42.73827160493827,
+      "ngspice_peak_v": 43.4364427,
+      "all_inductor_energy_peak_v": null,
+      "tail_current_at_end_a": -2.16000005e-05,
+      "margin_to_comparison_v": -4.4274427,
+      "voltage_screen": "FAIL",
+      "physical_qualification": "FAIL_IN_COMPARISON"
+    }
+  ],
+  "dual_foc_scope": "理想功率下界，130A 未获验证。忽略主路及转换损失、其他负载和包压降，持续时间待定。",
+  "dual_foc_cases": [
+    {
+      "bus_v": 22.5,
+      "ideal_dual_foc_total_a": 160.0,
+      "min_sc_bus_output_w_at_candidate_battery_current": 675.0
+    },
+    {
+      "bus_v": 27.0,
+      "ideal_dual_foc_total_a": 133.33333333333334,
+      "min_sc_bus_output_w_at_candidate_battery_current": 90.0
+    },
+    {
+      "bus_v": 27.692307692307693,
+      "ideal_dual_foc_total_a": 130.0,
+      "min_sc_bus_output_w_at_candidate_battery_current": 0
+    },
+    {
+      "bus_v": 32.4,
+      "ideal_dual_foc_total_a": 111.11111111111111,
+      "min_sc_bus_output_w_at_candidate_battery_current": 0
+    },
+    {
+      "bus_v": 37.8,
+      "ideal_dual_foc_total_a": 95.23809523809524,
+      "min_sc_bus_output_w_at_candidate_battery_current": 0
+    }
+  ]
+}

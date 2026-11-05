@@ -1,0 +1,121 @@
+{
+  "status": "HOLD_MEASUREMENT_REQUIRED_NOT_POWER_APPROVED",
+  "scope": "同域上电互锁器件级交接候选；仅纸面参数与验收门槛，尚非原生原理图或验收通过。",
+  "components_and_pin_nets": {
+    "U_POR TPS3760A012DYYR": {
+      "1 VDD": "12V_HW",
+      "2 NC": "NC",
+      "3 SENSE": "POR_SENSE",
+      "4 NC": "NC",
+      "5 NC": "NC",
+      "6 RESET_N": "HW_READY",
+      "7 NC": "NC",
+      "8 GND": "GND_SYS",
+      "9 CTR_MR": "CTR",
+      "10 CTS": "NC",
+      "11 NC": "NC",
+      "12 NC": "NC",
+      "13 GND": "GND_SYS",
+      "14 NC": "NC"
+    },
+    "U_DRV UCC27511ADBVR": {
+      "1 VDD": "12V_HW",
+      "2 OUTH": "原栅极源出路径",
+      "3 OUTL": "原栅极灌入路径",
+      "4 GND": "GND_SYS",
+      "5 IN-": "DUMP_OFF_HW",
+      "6 IN+": "HW_READY"
+    },
+    "U_REF REF5025_SOIC8": {
+      "1": "DNC",
+      "2 VIN": "12V_ANALOG_HOLD",
+      "3": "NC",
+      "4 GND": "GND_SYS",
+      "5": "NC",
+      "6 VOUT": "REF_2V5",
+      "7": "NC",
+      "8": "DNC",
+      "exact_part": "REF5025ID"
+    },
+    "U_CMP TLV1811DBV": {
+      "1 OUT": "CMP_OUT",
+      "2 GND": "GND_SYS",
+      "3 IN+": "BUS_SENSE",
+      "4 IN-": "REF_2V5",
+      "5 V+": "12V_ANALOG_HOLD"
+    },
+    "Q_HW BC847C": {
+      "1 B": "HW_BASE",
+      "2 E": "GND_SYS",
+      "3 C": "DUMP_OFF_HW"
+    },
+    "U_OPTO VO617A-2": {
+      "1 A": "旧域12V_PROT经1.8k",
+      "2 K": "Q_DUMP_SW D",
+      "3 E": "GND_SYS",
+      "4 C": "DUMP_OFF_HW"
+    },
+    "Q_READY_HW BC847C": {
+      "1 B": "READY_HW_BASE",
+      "2 E": "GND_SYS",
+      "3 C": "READY_RETURN_HW"
+    },
+    "D_HOLD 1N4148W C2099": {
+      "A": "12V_HW",
+      "K": "12V_ANALOG_HOLD"
+    }
+  },
+  "passives": {
+    "R_POR_TOP": "12V_HW→120kΩ 0.1%→POR_SENSE",
+    "R_POR_BOT": "POR_SENSE→10kΩ 0.1%→GND_SYS",
+    "C_CTR": "CTR→2.2nF C0G→GND，工作全角有效1.98–2.42nF；FH 0603CG222J500NT/C2991172 与Cff同SKU",
+    "C_POR": "12V_HW→100nF→GND_SYS，靠近TPS；与UCC同一供电网络，不加串联滤波",
+    "R_READY": "12V_HW→4.7kΩ→HW_READY",
+    "R_READY_PD": "HW_READY→100kΩ→GND_SYS",
+    "R_SLEW": "12V_SRC→R_SLEW1 22Ω→R_SLEW2 22Ω→12V_HW；FH RAG-06K22R0FT，1%，0.5W各一只",
+    "C_SRC": "12V_SRC→GND_SYS，有效≥1µF，符合LT3010稳定要求",
+    "C_DRV": "12V_HW→GND_SYS，有效≥10µF",
+    "C_HOLD": "12V_ANALOG_HOLD→GND_SYS，有效≥10µF，全角/偏压；另加100nF靠近各IC",
+    "C_REF": "REF_2V5→GND_SYS，1µF有效起并满足REF5025稳定条件；C_NR/其他引脚依原候选且须具体核对",
+    "R_BUS_TOP": "BUS_EXT→143kΩ→节点→600Ω→BUS_SENSE",
+    "R_BUS_BOT": "BUS_SENSE→10kΩ→GND_SYS",
+    "R_FB": "CMP_OUT→6.8MΩ→BUS_SENSE",
+    "R_BASE": "CMP_OUT→22kΩ→HW_BASE",
+    "R_BASE_PD": "HW_BASE→100kΩ→GND_SYS",
+    "R_OFF": "12V_HW→47kΩ→DUMP_OFF_HW",
+    "legacy": "12V_PROT→1.8kΩ→光耦LED→Q_DUMP_SW D；Q_DUMP_SW由3输入门PWM∧LPV_QUAL∧GUARD_OK驱动，细节以单光耦三输入门针网为基础；新旧域仅光耦耦合、共地。",
+    "hard_ready": "原Q_READY_LED发射极由GND_SYS改接READY_RETURN_HW；新BC847C C接READY_RETURN_HW、E接GND_SYS，HW_READY→10k→B且B→100k→GND。保留R_READY_BASE 1k GUARD_OK→READY_BASE、R_READY_LED 1.8k 12V_PROT→READY_LED_A及原READY光耦；新增BC847C×1、10k×1、100k×1。",
+    "C_HW_FF": "12V_SRC→2.2nF C0G→LDO_ADJ；FH 0603CG222J500NT/C2991172，全角有效≥1.98nF"
+  },
+  "paper_checks": {
+    "POR": "同轨≥2.7V时RESET低≤0.3V@5mA；4.7k上拉最坏2.84mA小于5mA，UCC低输入保证≤1V。1.4V点仅15µA保证，此时UCC低于UVLO。TPS上电/UVLO保证要求VDD斜率≤100mV/µs。",
+    "rise_slew": "RAG 22Ω×2，高角44.968Ω；参考及电阻温漂、源全角下最低源11.6291V，16mA压降与理想300nC阶跃后驱动节点约10.8796V，相对释放最高10.7767V余0.1029V。正充斜率最大须按最小R/C计算；硬短下降斜率与重复脉冲需验证。",
+    "threshold": "120k/10k 0.1%并含温漂至器件体温85°C：跌落10.2366–10.5646V，释放10.4406–10.7767V；以联合仿真最新版为准。",
+    "delay": "CTR全角有效1.98–2.42nF时RC项约2.03–3.85ms，加空容延迟约3.89ms最大；另含上电最多2ms。短故障未充分放电可缩短恢复延迟。",
+    "hold_example": "最迟深过驱检测12V_HW约8.212V，二极管最大压降预算1.25V后保持节点6.962V；有效10µF、总负载及反漏≤3mA、地板6V时理想保持3.207ms；须扣ESR并验证实际节点，覆盖2.2nF CTR重计所需故障时长与检测时间。重复跌落按实际最低节点及恢复能力判定。",
+    "limits": "TPS 17µs检测上限对应0.8V阈值、20%过驱、CTS开放；浅过驱不能外推。REF5025启动200µs仅典型，不能作为释放前就绪保证。TLV1811 200µs表格为25°C典型，文本描述上电POR最长200µs，不外推其他条件。"
+  },
+  "MEASUREMENT_REQUIRED": [
+    "限定REF5025ID、实际负载、电容及0–60°C范围，核验所有允许冷启动、残压、掉电与恢复波形下READY上升前REF进入2.49725–2.50275V。",
+    "验证12V共同节点下降斜率、模拟保持节点最低电压、重复跌落与CTR放电；核源输出负载≤16mA、模拟负载≤3mA。",
+    "硬READY全角门限与实际输入负载：HW_READY高≥2.4V、新BC847C基极电流≥0.5mA、LED电流5–6.9mA；确认旧故障与新ARM行为。",
+    "BUS恢复越过14V至READY≤50ms（450.03W净回灌、52.86mF有效等约束）；独立链已就绪越泄放阈值至支路电流匹配≤0.5ms。",
+    "确认旧域掉电时独立源保持、隔离反灌、实际电流和停车能力。"
+  ],
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tps3760.pdf",
+    "https://www.ti.com/lit/ds/symlink/ucc27511a.pdf",
+    "https://www.ti.com/lit/ds/symlink/ref50.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv1811.pdf"
+  ],
+  "implementation_required": [
+    "选定满足实际有效电容、二极管额定及负载的具体器件；制作原生工程并回读、DRC；在工具连接后实施，当前未通过。",
+    "PC6保持GPIO须在ARM前置高；硬READY低时禁止牵引及主动回灌，恢复后须新ARM。",
+    "未新增针对REF独立内部漂移的监控。"
+  ],
+  "timing_contract": {
+    "recovery": "BUS向上越过14V至READY≤50ms；联合仿真条件预算46.397ms，源自身启动≤2ms、充电可供50mA及预就绪≤10mA均待资格验证",
+    "running": "独立链已就绪，越泄放阈值至支路电流匹配≤0.5ms",
+    "cold": "冷启动READY前不得牵引或主动回灌"
+  }
+}

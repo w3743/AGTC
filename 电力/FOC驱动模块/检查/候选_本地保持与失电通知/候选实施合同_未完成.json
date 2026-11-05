@@ -1,0 +1,20 @@
+{
+ "status":"PREPARED_COPY_NOT_IMPLEMENTED_HOLD",
+ "source_p1_sha256":"6849ee32de9226c8c458d6eb35cd86bb9bac0d6893b80c55128955acfb5f511e",
+ "source_delivery_enet_sha256":"71b980f2b57d0ccf45b1528d3cddb9ce58efe4aa0edc013eabfd94e87dc95211",
+ "project_metadata_lfs_object_sha256":"d0df98eb1d3507f2fd418e24d250c6daa23914db0069d4be17caeff920d5225d",
+ "candidate_project":"FOC_G431_Driver/FOC_G431_Driver.eprj3",
+ "target_nets":{
+   "J_MCU_L.9":"FOC_HOLD_GPIO（P1.9 PC6，移除NC标记）",
+   "Q_HOLD":"BC847C B=FOC_HOLD_BASE，E=GND_SYS，C=BUCK_CLAMP_BASE",
+   "R_HOLD_BASE":"FOC_HOLD_GPIO→4.7k→FOC_HOLD_BASE",
+   "R_HOLD_PD":"FOC_HOLD_BASE→100k→GND_SYS",
+   "Q_LPV":"BC847C B=LPV_DETECT_BASE，E=GND_SYS，C=LPV_FAIL_MCU",
+   "R_LPV_BASE":"LOAD_POWER_VALID→47k→LPV_DETECT_BASE",
+   "R_LPV_PULLUP":"MCU_3V3→10k→LPV_FAIL_MCU",
+   "J_MCU_L.16":"LPV_FAIL_MCU（P1.16 PC10，移除NC标记）"
+ },
+ "population":"每板6件；A板唯一R_LOAD_VALID_BIAS=1k，B板该位DNP，原理图必须表达而非并联两片偏置。",
+ "ordering":"PC6在ARM前且LPV仍有效时置高并保持到停稳；PC10通知LPV许可撤销，不代表已证明检测全部物理主路开断。",
+ "not_completed":["尚未创建6件或接线","尚未重开回读、DRC、BOM或视觉检查","未改变固件或PCB；实测与系统停车能力仍HOLD"]
+}

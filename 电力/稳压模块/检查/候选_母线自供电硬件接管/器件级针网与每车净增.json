@@ -1,0 +1,18 @@
+{
+ "status":"REJECTED_BYPASSES_GUARD_DO_NOT_USE",
+ "proposal":"One additional independent BUS-powered URB4812YMD-10WR3, do not OR with or load old 12V_PROT. Isolate UCC pin1 and pin6; move R_QP_COL pullup to independent domain; AO3400A draws DUMP_OFF low. Continuous hysteretic comparator; preserve old DUMP_OFF transistors but all backfeed paths require analysis.",
+ "source_pins_warning":"Candidate uses existing native U_AUX1 symbol 1 -Vin, 2 +Vin, 3 +Vo, 4 NC, 5 output GND, 6 CTRL NC. Existing source attributes name HiLink while MORNSUN sells identical model string; manufacturer, package, CTRL and exact pinout must be resolved before procurement or physical connection.",
+ "candidate_nets":{
+  "U_HW":{"1":"GND_SYS","2":"BUS_HW","3":"12V_HW","4":"NC","5":"GND_SYS","6":"NC"},
+  "U_REF_REF5025_SOIC8":{"1":"DNC","2":"12V_HW","3":"NC","4":"GND_SYS","5":"NC","6":"REF_2V5","7":"NC","8":"DNC"},
+  "U_CMP_TLV1811DBV":{"1":"CMP_OUT","2":"GND_SYS","3":"SENSE","4":"REF_2V5","5":"12V_HW"},
+  "Q_HW_AO3400A":{"1":"HW_GATE","2":"GND_SYS","3":"DUMP_OFF"},
+  "R_H1":"BUS_EXT -> 143k -> SENSE_MID","R_H2":"SENSE_MID -> 600 -> SENSE","R_L":"SENSE -> 10k -> GND_SYS","R_FB":"CMP_OUT -> 6.8M -> SENSE","R_G":"CMP_OUT -> 1k -> HW_GATE","R_GPD":"HW_GATE -> 100k -> GND_SYS",
+  "UCC_changes":"pin1 12V_PROT -> 12V_HW; pin6 GUARD_OK -> UCC_EN_HW; pin5 remains DUMP_OFF; pin2 pin3 pin4 unchanged",
+  "R_QP_COL_change":"pin1 12V_PROT -> 12V_HW; pin2 remains DUMP_OFF",
+  "UCC_EN_HW":"12V_HW -> 10k -> UCC_EN_HW -> 100k -> GND_SYS",
+  "per_FOC":"GPIO_UNASSIGNED -> 4.7k -> Q_HOLD BC847C pin1 B; pin1 -> 100k -> GND_SYS; pin2 E -> GND_SYS; pin3 C -> BUCK_CLAMP_BASE; Q_BUCK_RELEASE retained"
+ },
+ "vehicle_component_delta":{"added":{"URB4812YMD-10WR3":1,"input_fuse_TBD":1,"1uF_100V":1,"1uF_25V":3,"100nF_25V":2,"REF5025_SOIC8":1,"TLV1811DBV":1,"AO3400A":1,"BC847C":2,"143k_precision":1,"600R_precision":1,"10k_precision":1,"6.8M_precision":1,"1k":1,"10k":1,"100k":4,"4.7k":2},"removed":{},"reconnected":{"R_QP_COL":1},"net_added_pieces":25,"net_cost_CNY":null,"cost_note":"No verified current prices, exact module manufacturer, fuse or all precision resistor part IDs; no numeric price or savings claimed. Count excludes not-yet-designed input protection and supervision."},
+ "blocking":["No defined startup default-off: comparator and reference startup and pin6 supply-following may produce unwanted dump; dedicated supervisor/interlock required","Pin6 bypasses original GUARD_OK and may defeat original protections; protect or explicitly reassign all safety functions before implementation","Exact module manufacturer/pinout and load/temperature/short conditions not bound; input fuse, reverse polarity, hot plug, surge protection incomplete","Old DUMP_OFF branches may backfeed original 12V when hard shorted or unpowered, requiring full pin and fault analysis","Precision resistor endpoints, input fault, reference output capacitor, layout and output slew need datasheet and simulation qualification","FOC transistor collector current from R_BUCK_CLAMP_BUS at bus maximum, base drive, GPIO ownership, latch conditions and common ground need qualification","0.5 ms from threshold crossing to actual current matching, 100uH cable model, FET diode and resistor repetitive heat, BUS overshoot and 3m physical stop are unproven","Official native project/DRC and pin-net readback were not produced"]
+}

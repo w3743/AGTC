@@ -1,0 +1,25 @@
+{
+  "status": "HOLD_NOT_NATIVE_CAD_NOT_TESTED",
+  "review": "# 母线自供电泄放：上电、隔离和 0.5 ms 核查\n\n状态：HOLD；这是器件级审查及参数化模型，不是已闭合电路、原生 CAD、DRC 或实测通过。既有双域隔离图保留为候选，不可直接上电。\n\n## 关键结论\n\n1. 12V_HW 不得和 12V_PROT 硬连或二极管并联后再声称不反灌：旧轨硬短路时电源域必须独立。原 GUARD 继续约束旧请求通路；独立超压泄放通路绕过旧 GUARD 属于有意的独立保护，需系统安全评审，不能因此改变旧请求的保护条件。两个光耦传递旧请求和旧 GUARD，隔离信号且两域共地时没有直流供电通道；仍要检查 GUARD 可提供 LED 电流、光耦 CTR/漏电、温度老化与短路故障。任何其他跨域引脚及元件寄生路径均须逐一排查，不能只凭此连接宣称故障隔离通过。\n2. UCC27511A 独立供电及 IN+（6 脚）应采用硬件低态默认关，而不是依赖 MCU 或未供电比较器。现有 HW_READY 的 47k 上拉、1M 下拉不构成默认关；TLV6703 上电时 VDD 超过 1.8 V 后需至少 150 µs 才能保证正确，低于 0.8 V 输出未定义；UCC 上电阈值在整个标称温区可低至 3.7 V，两个器件跨越阈值的次序不受现有电路保证。\n3. 供电源当前只写 URB4812YMD，未定 10W/20W 等完整料号。公开 20WR3 数据给出启动 10 ms 典型值、热插拔不允许，不能用于保证冷上电 0.5 ms，更不能用于证明 9S 带载启动浪涌。须确认真正来源、厂商与版本，选择保护及测量最大启动时间、电流并纳入预充预算。不存在已被核实的独立 Buck 备选或 PGOOD 证明。\n4. 0.5 ms 必须说明起点与电流终点。若从冷母线上电算，现方案不支持；若从已稳定且已授权的硬件检测起算，暂仅得到理想电感模型，非器件角保证或实测。\n\n## 可进一步验证的启动互锁草案\n\n在既有两 TLV6703 监控 12V_HW 和 REF_2V5 的基础上，以独立供电域 RC 和下拉确保 UCC IN+ 在启动初期保持低，再由两监控器共同钳位释放；例如 10k 上拉至 12V_HW、10k 下拉至 GND_SYS、1 µF 对地接 IN+，两 OUT 并联钳位。静态 12 V 时分压 6 V；TLV 输出拉低电流约 1.2 mA。理想瞬间 12 V 上电且电容初始零电压时，时间常数 5 ms，升至 1 V 需约 0.91 ms。此数字仅示意：应计算电阻/电容偏差、输入漏电、最小/最大门限、任意 VDD 斜坡、掉电残压、重复上电与电容失效；需增加经验证的快速放电/复位路径，确保低压监控失效时 IN+ 及时关断，避免电容残留电压导致重新上电抢先开启。不能用典型监控传播时间当最坏值，也不能将这组器件声明为已验证的最终最小电路。缓慢斜坡时监控器可靠状态的条件需按其手册和实测验证。参考欠压监测无法证明参考过压、建立时间及漂移均正常。\n\n独立比较器输出经 22k 驱动 BC847C 拉低 UCC IN−（5 脚）的极性需结合实际 TLV1811 输入接法和完整阈值反馈网络复核；上拉、输出漏电、电流增益及驱动门限须做全温角分析。UCC 输出侧 MOSFET 栅极下拉在驱动器无电/欠压时应确保关断并验证 VGS、电源反灌与门极钳位。监控关闭通路应独立于旧域硬短路；任何比较器、监控器和驱动失电时的引脚绝对额定值均需逐针审查。\n\n## 响应时间和预充预算\n\n理想电路假设 BUS 电压恒定、总串联 L = 100 µH、总 R = 0.82 Ω，忽略开关压降，则 τ = L/R = 0.12195 ms，电流 I(t)=V/R·(1−exp(−t/τ))。达到该模型稳态电流 95% 需 0.365 ms，0.5 ms 内仅余 0.135 ms 给传感、驱动及全部其他延时。若电感、阻值、电压及 MOSFET 压降存在偏差，须重新计算；目标电流本身、母线瞬态和最大延迟未闭合。关断电流的消退由实际续流回路及其压降决定，不能仅以开通模型证明快速释放；须识别续流拓扑并计算/测量电流降至指定值的最坏时间及能量。\n\n1 µF 输入电容在 37.8 V 储能约 0.714 mJ；这既不是输入浪涌的上限，也不含模块内部电容、转换器启动能量及损耗。现有模型 99 mA 非电容负载是已有负担，新增模块的启动和稳态输入电流必须单列，验证预充电阻功率、释放窗口及不能卡住预充；预充期间是否允许启动也必须由系统决定。\n\n## 继续闭合的验收证据\n\n- 确定带电源角、温度和负载的模块完整料号、规格书及最大上电时间、输入电流和电容；核查输入保护、反接、浪涌和热插拔约束。\n- 逐引脚网表、器件电压及全温极限；冷启动、慢斜坡、掉电、短暂掉电后重启、参考开短路、旧轨硬拉低、光耦开短路和共地路径的状态与波形。\n- 明确检测阈值、实际电流目标及释放终点，测量从事件到栅极和电流的最大延迟、峰值及重复热；独立保护不可单凭本计算用于车辆。\n- 完成原生设计、独立复核、DRC、器件实测及整车故障制动验证。价格和新增器件净数在电路定版之前不得声称已确定。\n\n资料：\n- https://www.ti.com/lit/ds/symlink/tlv6703.pdf\n- https://www.ti.com/lit/ds/symlink/ucc27511a.pdf\n- https://www.ti.com/lit/ds/symlink/tlv1811.pdf\n- https://www.mornsun-power.com/html/pdf/URB4812YMD-10WR3.html （具体版本待核）\n- https://www.alldatasheet.co.kr/html-pdf/1106411/MORNSUN/URB4812YMD-20WR3/709/2/URB4812YMD-20WR3.html （20WR3 数据副本，最终须核对制造商原版）\r\n",
+  "interlock_candidate": {
+    "topology": "12V_HW -> 10k -> HW_READY/IN+; IN+ -> 10k -> GND_SYS and 1uF -> GND_SYS; both TLV6703 OUT -> IN+",
+    "target": "suppress startup glitch, not validated",
+    "resistor_tolerance": "unassigned",
+    "capacitance_tolerance_and_dc_bias": "unassigned",
+    "nominal_ideal_instant_12V_start_seconds_to_1V": 0.0009116,
+    "nominal_tau_seconds": 0.005,
+    "caution": "Reset discharge, slow ramp and brownout residual voltage not closed. Do not power."
+  },
+  "timing_model": {
+    "L_H": 0.0001,
+    "R_ohm": 0.82,
+    "tau_ms": 0.121951,
+    "time_to_95_percent_ms": 0.365333,
+    "budget_left_ms": 0.134667,
+    "assumptions": "constant voltage; ideal switch; no extra series R; target 95% of steady state",
+    "valid_for_release": false
+  },
+  "rail_fault": "Old 12V_PROT hard short must not load 12V_HW; two optical channels isolate old GUARD and old request, no rail power OR",
+  "native_cad": "not completed",
+  "bench": "not completed"
+}

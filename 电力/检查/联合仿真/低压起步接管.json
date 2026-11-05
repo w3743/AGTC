@@ -1,0 +1,727 @@
+{
+  "schema": "agtc-low-voltage-launch-takeover-v1",
+  "status": "MODEL_SCREEN_ONLY_HOLD",
+  "model": "flat ground, ideal constant acceleration, translation only; no rolling/aero/rotational inertia, bus sag, motor map, torque/current control, thermal model, or uncertainty margin",
+  "assumptions": {
+    "target_speed_kmh": 15.0,
+    "wheel_radius_m": 0.03,
+    "gear_ratio": 4.0,
+    "motor_count": 2,
+    "drivetrain_efficiency_screen": 0.9,
+    "efficiency_is_measured": false,
+    "initial_speed_kmh": 0.0,
+    "power_trajectory": "P_mech(t)=m*(v_final/T)^2*t; P_electrical=P_mech/eta"
+  },
+  "configuration_layers": {
+    "theoretical_9s_hardware_voltage": {
+      "range_v": [
+        22.5,
+        37.8
+      ],
+      "meaning": "pack electrochemical/configuration range only; does not prove load voltage, available current, or FOC compatibility"
+    },
+    "native_bms_hardware": {
+      "series_parallel": "9S4P",
+      "main_mosfet_banks": "3+3",
+      "main_fuse_label_a": 100,
+      "discharge_current_rating_a": null,
+      "evidence_paths": [
+        "电力/BMS模块/BMS-9S4P.eprj3",
+        "电力/BMS模块/设计细节.md",
+        "电力/BMS模块/原理图准备/BOM.csv"
+      ],
+      "status": "existing source is 9S4P; 100A fuse is not a BMS discharge rating; 130A not established"
+    },
+    "current_foc_software": {
+      "bus_min_v": 30.0,
+      "bus_max_v": 58.0,
+      "source_path": "固件/foc_driver/BusinessLayer/Inc/bl_motor.h",
+      "status": "22.5V is below configured software bus minimum; low-voltage launch unavailable in current firmware as written",
+      "additional_blocker": "source comments state no speed loop, torque command, or reliable self-start strategy; voltage-mode ramp is not a battery power limiter"
+    },
+    "user_target_battery": {
+      "series_parallel": "9S5P",
+      "cells": 45,
+      "peak_current_candidate_a": 130,
+      "candidate_is_implemented": false,
+      "status": "design target/candidate only; not current hardware or qualified rating",
+      "source_paths": [
+        "电力/BMS模块/设计需求.md",
+        "电力/BMS模块/设计细节.md"
+      ]
+    }
+  },
+  "supercapacitor_state_semantics": {
+    "regen_charge_rejected_or_charge_limit_zero": "means no credit for accepting regenerative current; does not itself prohibit discharging the capacitor through the bidirectional converter",
+    "startup_discharge": "separate permission and limit, requiring valid cell voltages, converter direction/state, temperature, and local current limit",
+    "zero_or_unavailable_supercap": "battery-only power-limited launch is the intended fallback, but current FOC 30V minimum and missing closed-loop limits prevent claiming it works at 22.5V today"
+  },
+  "battery_power_comparison_at_22p5v": [
+    {
+      "pack_current_a": 60.0,
+      "bus_power_at_22p5v_w": 1350.0,
+      "ideal_cell_current_a": {
+        "4P": 15.0,
+        "5P": 12.0
+      },
+      "constant_3p6_kw_shortfall_w": 2250.0,
+      "status": "continuous_design_input_only_not_qualified",
+      "max_mechanical_traction_power_w_at_90pct_screen": 1215.0
+    },
+    {
+      "pack_current_a": 100.0,
+      "bus_power_at_22p5v_w": 2250.0,
+      "ideal_cell_current_a": {
+        "4P": 25.0,
+        "5P": 20.0
+      },
+      "constant_3p6_kw_shortfall_w": 1350.0,
+      "status": "native_main_fuse_label_and_legacy_comparison_only_not_discharge_rating",
+      "max_mechanical_traction_power_w_at_90pct_screen": 2025.0
+    },
+    {
+      "pack_current_a": 130.0,
+      "bus_power_at_22p5v_w": 2925.0,
+      "ideal_cell_current_a": {
+        "4P": 32.5,
+        "5P": 26.0
+      },
+      "constant_3p6_kw_shortfall_w": 675.0,
+      "status": "9S5P_engineering_candidate_not_implemented_or_qualified",
+      "max_mechanical_traction_power_w_at_90pct_screen": 2632.5
+    }
+  ],
+  "cell_current_screen": "EVE 30P specifies 30 A maximum discharge in the cited cell datasheet. Ideal sharing is only an arithmetic screen. Pack temperature, imbalance, interconnect and protection limits remain open.",
+  "constant_acceleration_profiles": [
+    {
+      "mass_kg": 15.0,
+      "duration_s": 0.5,
+      "constant_acceleration_m_s2": 8.333333333333334,
+      "wheel_force_n": 125.00000000000001,
+      "ideal_each_motor_shaft_torque_nm": 0.46875000000000006,
+      "friction_coefficient_minimum_flat_no_losses": 0.8497635108149403,
+      "translation_energy_j": 130.20833333333337,
+      "mechanical_peak_power_w": 520.8333333333335,
+      "input_peak_power_w_at_90pct_screen": 578.7037037037038,
+      "peak_battery_current_a_at_22p5v_screen": 25.7201646090535,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.125,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        },
+        {
+          "time_s": 0.375,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 390.625,
+          "input_power_w_at_90pct_screen": 434.027778,
+          "battery_current_a_at_22p5v_screen": 19.290123
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 520.833333,
+          "input_power_w_at_90pct_screen": 578.703704,
+          "battery_current_a_at_22p5v_screen": 25.720165
+        }
+      ]
+    },
+    {
+      "mass_kg": 15.0,
+      "duration_s": 1.0,
+      "constant_acceleration_m_s2": 4.166666666666667,
+      "wheel_force_n": 62.50000000000001,
+      "ideal_each_motor_shaft_torque_nm": 0.23437500000000003,
+      "friction_coefficient_minimum_flat_no_losses": 0.42488175540747014,
+      "translation_energy_j": 130.20833333333337,
+      "mechanical_peak_power_w": 260.41666666666674,
+      "input_peak_power_w_at_90pct_screen": 289.3518518518519,
+      "peak_battery_current_a_at_22p5v_screen": 12.86008230452675,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 65.104167,
+          "input_power_w_at_90pct_screen": 72.337963,
+          "battery_current_a_at_22p5v_screen": 3.215021
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 195.3125,
+          "input_power_w_at_90pct_screen": 217.013889,
+          "battery_current_a_at_22p5v_screen": 9.645062
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        }
+      ]
+    },
+    {
+      "mass_kg": 15.0,
+      "duration_s": 2.0,
+      "constant_acceleration_m_s2": 2.0833333333333335,
+      "wheel_force_n": 31.250000000000004,
+      "ideal_each_motor_shaft_torque_nm": 0.11718750000000001,
+      "friction_coefficient_minimum_flat_no_losses": 0.21244087770373507,
+      "translation_energy_j": 130.20833333333337,
+      "mechanical_peak_power_w": 130.20833333333337,
+      "input_peak_power_w_at_90pct_screen": 144.67592592592595,
+      "peak_battery_current_a_at_22p5v_screen": 6.430041152263375,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 32.552083,
+          "input_power_w_at_90pct_screen": 36.168981,
+          "battery_current_a_at_22p5v_screen": 1.60751
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 65.104167,
+          "input_power_w_at_90pct_screen": 72.337963,
+          "battery_current_a_at_22p5v_screen": 3.215021
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 97.65625,
+          "input_power_w_at_90pct_screen": 108.506944,
+          "battery_current_a_at_22p5v_screen": 4.822531
+        },
+        {
+          "time_s": 2.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        }
+      ]
+    },
+    {
+      "mass_kg": 15.0,
+      "duration_s": 3.0,
+      "constant_acceleration_m_s2": 1.388888888888889,
+      "wheel_force_n": 20.833333333333336,
+      "ideal_each_motor_shaft_torque_nm": 0.078125,
+      "friction_coefficient_minimum_flat_no_losses": 0.14162725180249006,
+      "translation_energy_j": 130.20833333333337,
+      "mechanical_peak_power_w": 86.80555555555557,
+      "input_peak_power_w_at_90pct_screen": 96.45061728395063,
+      "peak_battery_current_a_at_22p5v_screen": 4.2866941015089175,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 21.701389,
+          "input_power_w_at_90pct_screen": 24.112654,
+          "battery_current_a_at_22p5v_screen": 1.071674
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 43.402778,
+          "input_power_w_at_90pct_screen": 48.225309,
+          "battery_current_a_at_22p5v_screen": 2.143347
+        },
+        {
+          "time_s": 2.25,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 65.104167,
+          "input_power_w_at_90pct_screen": 72.337963,
+          "battery_current_a_at_22p5v_screen": 3.215021
+        },
+        {
+          "time_s": 3.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 86.805556,
+          "input_power_w_at_90pct_screen": 96.450617,
+          "battery_current_a_at_22p5v_screen": 4.286694
+        }
+      ]
+    },
+    {
+      "mass_kg": 30.0,
+      "duration_s": 0.5,
+      "constant_acceleration_m_s2": 8.333333333333334,
+      "wheel_force_n": 250.00000000000003,
+      "ideal_each_motor_shaft_torque_nm": 0.9375000000000001,
+      "friction_coefficient_minimum_flat_no_losses": 0.8497635108149403,
+      "translation_energy_j": 260.41666666666674,
+      "mechanical_peak_power_w": 1041.666666666667,
+      "input_peak_power_w_at_90pct_screen": 1157.4074074074076,
+      "peak_battery_current_a_at_22p5v_screen": 51.440329218107,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.125,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 520.833333,
+          "input_power_w_at_90pct_screen": 578.703704,
+          "battery_current_a_at_22p5v_screen": 25.720165
+        },
+        {
+          "time_s": 0.375,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 781.25,
+          "input_power_w_at_90pct_screen": 868.055556,
+          "battery_current_a_at_22p5v_screen": 38.580247
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 1041.666667,
+          "input_power_w_at_90pct_screen": 1157.407407,
+          "battery_current_a_at_22p5v_screen": 51.440329
+        }
+      ]
+    },
+    {
+      "mass_kg": 30.0,
+      "duration_s": 1.0,
+      "constant_acceleration_m_s2": 4.166666666666667,
+      "wheel_force_n": 125.00000000000001,
+      "ideal_each_motor_shaft_torque_nm": 0.46875000000000006,
+      "friction_coefficient_minimum_flat_no_losses": 0.42488175540747014,
+      "translation_energy_j": 260.41666666666674,
+      "mechanical_peak_power_w": 520.8333333333335,
+      "input_peak_power_w_at_90pct_screen": 578.7037037037038,
+      "peak_battery_current_a_at_22p5v_screen": 25.7201646090535,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 390.625,
+          "input_power_w_at_90pct_screen": 434.027778,
+          "battery_current_a_at_22p5v_screen": 19.290123
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 520.833333,
+          "input_power_w_at_90pct_screen": 578.703704,
+          "battery_current_a_at_22p5v_screen": 25.720165
+        }
+      ]
+    },
+    {
+      "mass_kg": 30.0,
+      "duration_s": 2.0,
+      "constant_acceleration_m_s2": 2.0833333333333335,
+      "wheel_force_n": 62.50000000000001,
+      "ideal_each_motor_shaft_torque_nm": 0.23437500000000003,
+      "friction_coefficient_minimum_flat_no_losses": 0.21244087770373507,
+      "translation_energy_j": 260.41666666666674,
+      "mechanical_peak_power_w": 260.41666666666674,
+      "input_peak_power_w_at_90pct_screen": 289.3518518518519,
+      "peak_battery_current_a_at_22p5v_screen": 12.86008230452675,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 65.104167,
+          "input_power_w_at_90pct_screen": 72.337963,
+          "battery_current_a_at_22p5v_screen": 3.215021
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 195.3125,
+          "input_power_w_at_90pct_screen": 217.013889,
+          "battery_current_a_at_22p5v_screen": 9.645062
+        },
+        {
+          "time_s": 2.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        }
+      ]
+    },
+    {
+      "mass_kg": 30.0,
+      "duration_s": 3.0,
+      "constant_acceleration_m_s2": 1.388888888888889,
+      "wheel_force_n": 41.66666666666667,
+      "ideal_each_motor_shaft_torque_nm": 0.15625,
+      "friction_coefficient_minimum_flat_no_losses": 0.14162725180249006,
+      "translation_energy_j": 260.41666666666674,
+      "mechanical_peak_power_w": 173.61111111111114,
+      "input_peak_power_w_at_90pct_screen": 192.90123456790127,
+      "peak_battery_current_a_at_22p5v_screen": 8.573388203017835,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 43.402778,
+          "input_power_w_at_90pct_screen": 48.225309,
+          "battery_current_a_at_22p5v_screen": 2.143347
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 86.805556,
+          "input_power_w_at_90pct_screen": 96.450617,
+          "battery_current_a_at_22p5v_screen": 4.286694
+        },
+        {
+          "time_s": 2.25,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 3.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 173.611111,
+          "input_power_w_at_90pct_screen": 192.901235,
+          "battery_current_a_at_22p5v_screen": 8.573388
+        }
+      ]
+    },
+    {
+      "mass_kg": 45.0,
+      "duration_s": 0.5,
+      "constant_acceleration_m_s2": 8.333333333333334,
+      "wheel_force_n": 375.0,
+      "ideal_each_motor_shaft_torque_nm": 1.40625,
+      "friction_coefficient_minimum_flat_no_losses": 0.8497635108149403,
+      "translation_energy_j": 390.625,
+      "mechanical_peak_power_w": 1562.5,
+      "input_peak_power_w_at_90pct_screen": 1736.111111111111,
+      "peak_battery_current_a_at_22p5v_screen": 77.1604938271605,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.125,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 390.625,
+          "input_power_w_at_90pct_screen": 434.027778,
+          "battery_current_a_at_22p5v_screen": 19.290123
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 781.25,
+          "input_power_w_at_90pct_screen": 868.055556,
+          "battery_current_a_at_22p5v_screen": 38.580247
+        },
+        {
+          "time_s": 0.375,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 1171.875,
+          "input_power_w_at_90pct_screen": 1302.083333,
+          "battery_current_a_at_22p5v_screen": 57.87037
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 1562.5,
+          "input_power_w_at_90pct_screen": 1736.111111,
+          "battery_current_a_at_22p5v_screen": 77.160494
+        }
+      ]
+    },
+    {
+      "mass_kg": 45.0,
+      "duration_s": 1.0,
+      "constant_acceleration_m_s2": 4.166666666666667,
+      "wheel_force_n": 187.5,
+      "ideal_each_motor_shaft_torque_nm": 0.703125,
+      "friction_coefficient_minimum_flat_no_losses": 0.42488175540747014,
+      "translation_energy_j": 390.625,
+      "mechanical_peak_power_w": 781.25,
+      "input_peak_power_w_at_90pct_screen": 868.0555555555555,
+      "peak_battery_current_a_at_22p5v_screen": 38.58024691358025,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.25,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 195.3125,
+          "input_power_w_at_90pct_screen": 217.013889,
+          "battery_current_a_at_22p5v_screen": 9.645062
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 390.625,
+          "input_power_w_at_90pct_screen": 434.027778,
+          "battery_current_a_at_22p5v_screen": 19.290123
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 585.9375,
+          "input_power_w_at_90pct_screen": 651.041667,
+          "battery_current_a_at_22p5v_screen": 28.935185
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 781.25,
+          "input_power_w_at_90pct_screen": 868.055556,
+          "battery_current_a_at_22p5v_screen": 38.580247
+        }
+      ]
+    },
+    {
+      "mass_kg": 45.0,
+      "duration_s": 2.0,
+      "constant_acceleration_m_s2": 2.0833333333333335,
+      "wheel_force_n": 93.75,
+      "ideal_each_motor_shaft_torque_nm": 0.3515625,
+      "friction_coefficient_minimum_flat_no_losses": 0.21244087770373507,
+      "translation_energy_j": 390.625,
+      "mechanical_peak_power_w": 390.625,
+      "input_peak_power_w_at_90pct_screen": 434.02777777777777,
+      "peak_battery_current_a_at_22p5v_screen": 19.290123456790123,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.5,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 97.65625,
+          "input_power_w_at_90pct_screen": 108.506944,
+          "battery_current_a_at_22p5v_screen": 4.822531
+        },
+        {
+          "time_s": 1.0,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 195.3125,
+          "input_power_w_at_90pct_screen": 217.013889,
+          "battery_current_a_at_22p5v_screen": 9.645062
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 292.96875,
+          "input_power_w_at_90pct_screen": 325.520833,
+          "battery_current_a_at_22p5v_screen": 14.467593
+        },
+        {
+          "time_s": 2.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 390.625,
+          "input_power_w_at_90pct_screen": 434.027778,
+          "battery_current_a_at_22p5v_screen": 19.290123
+        }
+      ]
+    },
+    {
+      "mass_kg": 45.0,
+      "duration_s": 3.0,
+      "constant_acceleration_m_s2": 1.388888888888889,
+      "wheel_force_n": 62.50000000000001,
+      "ideal_each_motor_shaft_torque_nm": 0.23437500000000003,
+      "friction_coefficient_minimum_flat_no_losses": 0.14162725180249006,
+      "translation_energy_j": 390.625,
+      "mechanical_peak_power_w": 260.41666666666674,
+      "input_peak_power_w_at_90pct_screen": 289.3518518518519,
+      "peak_battery_current_a_at_22p5v_screen": 12.86008230452675,
+      "samples": [
+        {
+          "time_s": 0.0,
+          "speed_kmh": 0.0,
+          "mechanical_power_w": 0.0,
+          "input_power_w_at_90pct_screen": 0.0,
+          "battery_current_a_at_22p5v_screen": 0.0
+        },
+        {
+          "time_s": 0.75,
+          "speed_kmh": 3.75,
+          "mechanical_power_w": 65.104167,
+          "input_power_w_at_90pct_screen": 72.337963,
+          "battery_current_a_at_22p5v_screen": 3.215021
+        },
+        {
+          "time_s": 1.5,
+          "speed_kmh": 7.5,
+          "mechanical_power_w": 130.208333,
+          "input_power_w_at_90pct_screen": 144.675926,
+          "battery_current_a_at_22p5v_screen": 6.430041
+        },
+        {
+          "time_s": 2.25,
+          "speed_kmh": 11.25,
+          "mechanical_power_w": 195.3125,
+          "input_power_w_at_90pct_screen": 217.013889,
+          "battery_current_a_at_22p5v_screen": 9.645062
+        },
+        {
+          "time_s": 3.0,
+          "speed_kmh": 15.0,
+          "mechanical_power_w": 260.416667,
+          "input_power_w_at_90pct_screen": 289.351852,
+          "battery_current_a_at_22p5v_screen": 12.860082
+        }
+      ]
+    }
+  ],
+  "blocking_inputs": [
+    "measured loaded vehicle mass and effective wheel radius",
+    "motor torque-speed and phase/bus-current maps including reliable zero-speed start",
+    "measured BMS/battery low-SOC cold/hot V-I limit and bus sag",
+    "qualified current limit, duration, sharing, fuse/wiring/connector and thermal envelope",
+    "FOC undervoltage threshold requalification plus closed-loop torque/power ramp and fault behavior",
+    "auxiliary startup load and supercapacitor discharge-direction limits"
+  ],
+  "source_hashes": [
+    {
+      "path": "固件/foc_driver/BusinessLayer/Inc/bl_motor.h",
+      "sha256": "c6756680002538e7fc9ecc89cee6ff76c9a821ec4131a6e5ba818371eac55a0e"
+    },
+    {
+      "path": "电力/BMS模块/设计细节.md",
+      "sha256": "f6b0128a525028ec7cf9de0f0c5fb2944896391983e47aa6c93de324e6770f06"
+    },
+    {
+      "path": "电力/BMS模块/BMS-9S4P.eprj3",
+      "sha256": "c330acd889ba6c4f94dc5abfef36ee7dee85d8890f6abf69cc426ccb4897c148"
+    },
+    {
+      "path": "电力/BMS模块/原理图准备/BOM.csv",
+      "sha256": "665c9d5c1bde1e44a2aa0fb1a162d1281688810316eee891c23ac5af3a1bb7ba"
+    },
+    {
+      "path": "电力/BMS模块/设计需求.md",
+      "sha256": "fbe6a7c541a942f6dd0f303d285ecc05c2718e0bb213991cf6625f4f21304812"
+    },
+    {
+      "path": "电力/参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+      "sha256": "2fed34c1b91992f1d3483b2440160de4baaba0bac724c8ddbc212501cc335e9e"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计需求.md",
+      "sha256": "c4e6ad820cf047fc43d4ac5d39b6e70ae6d222dbf9fc31a63b2659500add3be1"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计细节.md",
+      "sha256": "79fd84211855bf2191711a3ca6a6b21446cc1786b433b83ee50bc4939d57d348"
+    }
+  ]
+}

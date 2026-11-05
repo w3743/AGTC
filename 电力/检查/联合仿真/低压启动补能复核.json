@@ -1,0 +1,688 @@
+{
+  "schema_version": "agtc-low-voltage-launch-braking-window.v2",
+  "status": "HOLD_NOT_QUALIFIED",
+  "run_date_local": "2026-11-05",
+  "scope": "15 km/h flat start-to-speed electrical supply envelope plus 15 km/h, 3 m flat stop with zero battery-charge and zero central-dump credit",
+  "source_hashes": [
+    {
+      "path": "电力/基本设计.md",
+      "sha256": "f9458719c98d85c4e541ea4ec0eefc3a4c03e1ae3aedea531f298379c4b72234"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计需求.md",
+      "sha256": "f2578c03ef17128f1fa6e4567f1b7ef4131b479d1cb1ef30b3923484196c2703"
+    },
+    {
+      "path": "电力/FOC驱动模块/设计细节.md",
+      "sha256": "98cc53e7475769a3d3b9b9a2643b89876d715f5b722f72aa6afabac7e796e79b"
+    },
+    {
+      "path": "电力/稳压模块/设计需求.md",
+      "sha256": "b8be80f53c30efc412e4573ab3c594dc17665b6b560eda9bf927bf71473c4d4d"
+    },
+    {
+      "path": "电力/稳压模块/设计细节.md",
+      "sha256": "eb6a622560e58e2e9fd38afb740d899e62d5dc463d7db67a904749f8e7048742"
+    },
+    {
+      "path": "电力/稳压模块/原理图准备/选型BOM.csv",
+      "sha256": "191c86155e35be26744c4e12174b2163740f20c4a86fc34998a0171a1cb2c682"
+    },
+    {
+      "path": "电力/检查/联合仿真/起步停车与下坡包络.py",
+      "sha256": "9b6b61b93bc7786efa57051a6571daf5e063f145f0387a662c6682a040cce4e5"
+    },
+    {
+      "path": "电力/参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+      "sha256": "1dd20fc10c139db51df5072e2c106c64ecdb604ebce3af2d04ae44ca41a2852d"
+    },
+    {
+      "path": "电力/稳压模块/参考资料/LICAP_SC0350-270-RSS_英文2021.pdf",
+      "sha256": "738765ca1c504a99713c8c6283404b3e03a518d3396862fdff8dc5397320053d"
+    }
+  ],
+  "manufacturer_evidence": {
+    "LICAP_SC0350_270_RSS": {
+      "url": "https://www.licaptech.com/pdfs/datasheets/ultracapacitors/60862a8f5979e5f969df83ba_LICAP_SC0350_270_RSS_Datasheet_061120.pdf",
+      "rated_capacitance_f": 350.0,
+      "capacitance_tolerance": "0/+20%",
+      "maximum_initial_dc_esr_ohm": 0.0028,
+      "endurance_condition": "rated voltage, 65°C, 1500 h",
+      "endurance_change_limits": {
+        "capacitance_drop_max_fraction": 0.2,
+        "esr_increase_max_fraction_of_max_initial": 1.0
+      },
+      "cycle_life_condition": "rated voltage to 50% voltage, constant current, 25°C",
+      "projected_cycle_life": 1000000,
+      "cycle_change_limits": {
+        "capacitance_drop_max_fraction": 0.2,
+        "esr_increase_max_fraction_of_max_initial": 1.0
+      },
+      "screen_mapping": {
+        "cell_capacitance_f": 280.0,
+        "cell_esr_ohm": 0.0056
+      },
+      "qualification_limit": "datasheet life projections/limits do not predict the actual service life or validate a pack; balancing, temperature, ripple, cycle profile, aging and cell mismatch remain untested"
+    },
+    "Vishay_IHXL2000VZEB100M3A": {
+      "url": "https://www.vishay.com/docs/34681/ihxl2000vz-3a.pdf",
+      "per_part_inductance_h": 1e-05,
+      "tolerance_at_100khz": 0.2,
+      "per_part_dcr_25c_typ_ohm": 0.00082,
+      "per_part_dcr_25c_max_ohm": 0.00086,
+      "per_part_heat_rating_typ_a_at_40c_rise": 83.0,
+      "per_part_heat_rating_typ_a_at_80c_rise": 118.0,
+      "per_part_saturation_current_typ_a_at_20pct_inductance_drop": 83.0,
+      "per_part_saturation_current_typ_a_at_30pct_inductance_drop": 123.0,
+      "max_part_temperature_c": 155.0,
+      "existing_series_pair_nominal_h": 2e-05,
+      "project_bias_screen_at_80a_h": 1.28e-05,
+      "qualification_limit": "manufacturer heat/saturation currents are typical datasheet points, not guaranteed design current in this assembly; ambient 60°C, core loss, ripple, layout, thermal coupling and cooling still require qualification"
+    },
+    "Infineon_IRLB4030PBF": {
+      "url": "https://www.infineon.com/dgdl/irlb4030pbf.pdf?fileId=5546d462533600a4015356604640258",
+      "rds_on_max_ohm_at_vgs10_tj25": 0.0043,
+      "max_continuous_drain_current_at_25c_a": 180.0,
+      "max_continuous_drain_current_at_100c_a": 130.0,
+      "max_junction_temperature_c": 175.0,
+      "qualification_limit": "single-device absolute/current ratings do not qualify the two-switch converter, PCB, gate-drive voltage, switching loss, SOA, cooling or fault response"
+    },
+    "EVE_INR18650_30P_local_manufacturer_spec": {
+      "source_file": "电力/参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+      "max_cell_discharge_current_a": 30.0,
+      "temperature_note": "maximum discharge specification states 30A (10C), 75°C cut-off; operating discharge temperature lists -20 to 60°C ambient, with recommended release below 60°C after re-discharge",
+      "five_parallel_cell_current_at_130a_pack_a": 26.0,
+      "five_parallel_cell_current_at_160a_pack_a": 32.0,
+      "qualification_limit": "30A cell value does not establish pack/BMS/cell-tab thermal qualification; current sharing, low-SOC DC resistance and pack sag are not modeled"
+    }
+  },
+  "comparison_assumptions": {
+    "mass_kg": 30.0,
+    "target_speed_kmh": 15.0,
+    "wheel_radius_m": 0.03,
+    "gear_ratio": 4.0,
+    "motor_count": 2,
+    "pack_voltage_v": [
+      22.5,
+      37.8
+    ],
+    "pack_current_a": 130.0,
+    "pack_current_status": "130A is an unimplemented engineering candidate; current BMS source is not the 9S5P/130A configuration",
+    "dual_foc_input_peak_w": 3600.0,
+    "sc_cells_series": 8,
+    "sc_eol_screen_capacitance_f_per_cell": 280.0,
+    "sc_eol_screen_esr_ohm_per_cell": 0.0056,
+    "sc_charge_current_a": 20.0,
+    "converter_efficiency": {
+      "value": 0.95,
+      "status": "assumed comparison only; actual power-stage efficiency unknown"
+    },
+    "inductor_pair_bias_screen_h": 1.28e-05,
+    "pwm_frequency_hz": {
+      "value": 20000.0,
+      "source": "existing regulator firmware BSP configuration",
+      "status": "configuration value, not a measured switching waveform"
+    },
+    "inductor_peak_current_a": {
+      "value": 80.0,
+      "status": "screen point; not a qualified converter limit"
+    },
+    "bus_capacitance_f": 0.05286,
+    "bus_start_v": 37.8,
+    "bus_limit_comparison_v": 39.009,
+    "bus_limit_status": "low-side FOC BOV comparison threshold, not a safe maximum rating",
+    "braking_response_delay_s": 0.05,
+    "braking_sources_credited": {
+      "battery_net_charge": 0.0,
+      "central_dump": 0.0,
+      "mechanical_brake": 0.0,
+      "sc_dc_dc": "only; efficiency and current are assumed"
+    },
+    "not_modeled": [
+      "battery sag/DCIR and BMS trip/thermal",
+      "actual motor torque-speed-current curve",
+      "tire friction/weight transfer",
+      "rotor and gearbox inertia",
+      "drive efficiency",
+      "rolling resistance/aero",
+      "switched converter and control delay",
+      "MOS/diode switching and reverse-recovery losses",
+      "PCB/connector/inductor thermal network",
+      "cell imbalance and temperature gradients",
+      "mechanical brake (none exists)"
+    ]
+  },
+  "derived_electrical_baseline": {
+    "battery_power_at_22p5v_130a_w": 2925.0,
+    "dual_foc_peak_gap_bus_w": 675.0,
+    "supercap_terminal_input_required_at_95pct_w": 710.5263157894738,
+    "ideal_full_peak_pack_current_at_22p5v_a": 160.0,
+    "ideal_full_peak_pack_current_at_37p8v_a": 95.23809523809524,
+    "battery_cell_current_at_130a_pack_a": 26.0,
+    "battery_cell_current_at_160a_pack_a": 32.0,
+    "motor_torque_constant_ideal_nm_per_a": 0.0353677651315323,
+    "each_motor_torque_from_80a_if_current_definition_matches_kv_a": 2.829421210522584,
+    "motor_rpm_at_15kmh_with_60mm_wheel_and_4to1": 5305.164769729846,
+    "maximum_full_peak_duration_by_initial_cell_voltage": [
+      {
+        "initial_cell_v": 2.0,
+        "max_duration_at_0p5ms_model_step_s": 1.5344999999998865,
+        "limiting_step": {
+          "ok": false,
+          "failure_time_s": 1.5344999999998865,
+          "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+          "initial_cell_v": 2.0,
+          "cell_v_at_failure": 1.6756174195345728,
+          "current_avg_a": 69.09042952075788,
+          "current_peak_a": 80.0000053503213,
+          "ripple_pp_a": 21.819151659126845,
+          "available_bus_w": 674.9972603256566,
+          "requested_bus_w": 675.0,
+          "inductance_h": 1.28e-05,
+          "frequency_hz": 20000.0
+        }
+      },
+      {
+        "initial_cell_v": 2.15,
+        "max_duration_at_0p5ms_model_step_s": 2.382999999999963,
+        "limiting_step": {
+          "ok": false,
+          "failure_time_s": 2.382999999999963,
+          "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+          "initial_cell_v": 2.15,
+          "cell_v_at_failure": 1.6755446529112417,
+          "current_avg_a": 69.09052529267531,
+          "current_peak_a": 80.00000535956544,
+          "ripple_pp_a": 21.818960133780255,
+          "available_bus_w": 674.9597374808968,
+          "requested_bus_w": 675.0,
+          "inductance_h": 1.28e-05,
+          "frequency_hz": 20000.0
+        }
+      },
+      {
+        "initial_cell_v": 2.2,
+        "max_duration_at_0p5ms_model_step_s": 2.6840000000000637,
+        "limiting_step": {
+          "ok": false,
+          "failure_time_s": 2.6840000000000637,
+          "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+          "initial_cell_v": 2.2,
+          "cell_v_at_failure": 1.675605686302745,
+          "current_avg_a": 69.09044495940351,
+          "current_peak_a": 80.00000535181115,
+          "ripple_pp_a": 21.81912078481527,
+          "available_bus_w": 674.9912099441747,
+          "requested_bus_w": 675.0,
+          "inductance_h": 1.28e-05,
+          "frequency_hz": 20000.0
+        }
+      }
+    ],
+    "full_peak_hold_checks_starting_at_2v_cell": [
+      {
+        "ok": true,
+        "initial_cell_v": 2.0,
+        "duration_s": 0.5,
+        "final_cell_ocv_v": 1.9036194485556206,
+        "minimum_cell_ocv_v": 1.9036194485556206,
+        "max_sc_avg_current_a": 55.989631925625794,
+        "max_inductor_ripple_pp_a": 21.59677489399611,
+        "max_estimated_switch_peak_a": 66.78801937262385,
+        "low_voltage_gap_bus_w": 675.0,
+        "sc_converter_input_w_at_95pct": 710.5263157894738,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0,
+        "braking_from_post_launch": {
+          "ok": false,
+          "response_delay_s": 0.05,
+          "stop_distance_from_request_m": 3.0,
+          "distance_during_delay_m": 0.20833333333333337,
+          "active_braking_distance_m": 2.7916666666666665,
+          "active_braking_time_s": 1.3399999999999999,
+          "total_request_to_stop_s": 1.39,
+          "constant_deceleration_m_s2": 3.1094527363184086,
+          "peak_mechanical_braking_power_w": 388.6815920398011,
+          "ideal_each_motor_braking_torque_nm": 0.34981343283582095,
+          "translation_energy_j": 260.41666666666674,
+          "initial_cell_ocv_v": 1.9036194485556206,
+          "final_cell_ocv_v": 1.9584101302965116,
+          "maximum_cell_terminal_v": 2.038833734269883,
+          "max_sc_charge_current_a": 20.0,
+          "peak_unabsorbed_bus_energy_j": 4.008894407571154,
+          "bus_peak_v": 39.75575049725661,
+          "bus_limit_comparison_v": 39.009,
+          "bus_margin_v": -0.7467504972566061,
+          "bus_energy_headroom_at_start_j": 2.4543448008300115
+        }
+      },
+      {
+        "ok": true,
+        "initial_cell_v": 2.0,
+        "duration_s": 1.0,
+        "final_cell_ocv_v": 1.7993032292442583,
+        "minimum_cell_ocv_v": 1.7993032292442583,
+        "max_sc_avg_current_a": 61.108121497160205,
+        "max_inductor_ripple_pp_a": 21.943928543731698,
+        "max_estimated_switch_peak_a": 72.08008576902606,
+        "low_voltage_gap_bus_w": 675.0,
+        "sc_converter_input_w_at_95pct": 710.5263157894738,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0,
+        "braking_from_post_launch": {
+          "ok": false,
+          "response_delay_s": 0.05,
+          "stop_distance_from_request_m": 3.0,
+          "distance_during_delay_m": 0.20833333333333337,
+          "active_braking_distance_m": 2.7916666666666665,
+          "active_braking_time_s": 1.3399999999999999,
+          "total_request_to_stop_s": 1.39,
+          "constant_deceleration_m_s2": 3.1094527363184086,
+          "peak_mechanical_braking_power_w": 388.6815920398011,
+          "ideal_each_motor_braking_torque_nm": 0.34981343283582095,
+          "translation_energy_j": 260.41666666666674,
+          "initial_cell_ocv_v": 1.7993032292442583,
+          "final_cell_ocv_v": 1.8569245067517635,
+          "maximum_cell_terminal_v": 1.9428746578156555,
+          "max_sc_charge_current_a": 20.0,
+          "peak_unabsorbed_bus_energy_j": 7.382030668333632,
+          "bus_peak_v": 41.32971064229425,
+          "bus_limit_comparison_v": 39.009,
+          "bus_margin_v": -2.3207106422942516,
+          "bus_energy_headroom_at_start_j": 2.4543448008300115
+        }
+      },
+      {
+        "ok": true,
+        "initial_cell_v": 2.0,
+        "duration_s": 1.39,
+        "final_cell_ocv_v": 1.7106001710975842,
+        "minimum_cell_ocv_v": 1.7106001710975842,
+        "max_sc_avg_current_a": 66.55149678121244,
+        "max_inductor_ripple_pp_a": 21.972656199295088,
+        "max_estimated_switch_peak_a": 77.51187984473525,
+        "low_voltage_gap_bus_w": 675.0,
+        "sc_converter_input_w_at_95pct": 710.5263157894738,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0,
+        "braking_from_post_launch": {
+          "ok": false,
+          "response_delay_s": 0.05,
+          "stop_distance_from_request_m": 3.0,
+          "distance_during_delay_m": 0.20833333333333337,
+          "active_braking_distance_m": 2.7916666666666665,
+          "active_braking_time_s": 1.3399999999999999,
+          "total_request_to_stop_s": 1.39,
+          "constant_deceleration_m_s2": 3.1094527363184086,
+          "peak_mechanical_braking_power_w": 388.6815920398011,
+          "ideal_each_motor_braking_torque_nm": 0.34981343283582095,
+          "translation_energy_j": 260.41666666666674,
+          "initial_cell_ocv_v": 1.7106001710975842,
+          "final_cell_ocv_v": 1.7708631360826004,
+          "maximum_cell_terminal_v": 1.8612430282404029,
+          "max_sc_charge_current_a": 20.0,
+          "peak_unabsorbed_bus_energy_j": 11.054101384255436,
+          "bus_peak_v": 42.977676624216414,
+          "bus_limit_comparison_v": 39.009,
+          "bus_margin_v": -3.968676624216414,
+          "bus_energy_headroom_at_start_j": 2.4543448008300115
+        }
+      },
+      {
+        "ok": true,
+        "initial_cell_v": 2.0,
+        "duration_s": 1.5,
+        "final_cell_ocv_v": 1.684090168228517,
+        "minimum_cell_ocv_v": 1.684090168228517,
+        "max_sc_avg_current_a": 68.4509250264308,
+        "max_inductor_ripple_pp_a": 21.972656199295088,
+        "max_estimated_switch_peak_a": 79.37543599732163,
+        "low_voltage_gap_bus_w": 675.0,
+        "sc_converter_input_w_at_95pct": 710.5263157894738,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0,
+        "braking_from_post_launch": {
+          "ok": false,
+          "response_delay_s": 0.05,
+          "stop_distance_from_request_m": 3.0,
+          "distance_during_delay_m": 0.20833333333333337,
+          "active_braking_distance_m": 2.7916666666666665,
+          "active_braking_time_s": 1.3399999999999999,
+          "total_request_to_stop_s": 1.39,
+          "constant_deceleration_m_s2": 3.1094527363184086,
+          "peak_mechanical_braking_power_w": 388.6815920398011,
+          "ideal_each_motor_braking_torque_nm": 0.34981343283582095,
+          "translation_energy_j": 260.41666666666674,
+          "initial_cell_ocv_v": 1.684090168228517,
+          "final_cell_ocv_v": 1.7451894434347588,
+          "maximum_cell_terminal_v": 1.8368044539427621,
+          "max_sc_charge_current_a": 20.0,
+          "peak_unabsorbed_bus_energy_j": 12.294970635371232,
+          "bus_peak_v": 43.52045449807397,
+          "bus_limit_comparison_v": 39.009,
+          "bus_margin_v": -4.511454498073967,
+          "bus_energy_headroom_at_start_j": 2.4543448008300115
+        }
+      },
+      {
+        "ok": false,
+        "failure_time_s": 1.5344999999998865,
+        "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+        "initial_cell_v": 2.0,
+        "cell_v_at_failure": 1.6756174195345728,
+        "current_avg_a": 69.09042952075788,
+        "current_peak_a": 80.0000053503213,
+        "ripple_pp_a": 21.819151659126845,
+        "available_bus_w": 674.9972603256566,
+        "requested_bus_w": 675.0,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0
+      },
+      {
+        "ok": false,
+        "failure_time_s": 1.5344999999998865,
+        "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+        "initial_cell_v": 2.0,
+        "cell_v_at_failure": 1.6756174195345728,
+        "current_avg_a": 69.09042952075788,
+        "current_peak_a": 80.0000053503213,
+        "ripple_pp_a": 21.819151659126845,
+        "available_bus_w": 674.9972603256566,
+        "requested_bus_w": 675.0,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0
+      },
+      {
+        "ok": false,
+        "failure_time_s": 1.5344999999998865,
+        "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+        "initial_cell_v": 2.0,
+        "cell_v_at_failure": 1.6756174195345728,
+        "current_avg_a": 69.09042952075788,
+        "current_peak_a": 80.0000053503213,
+        "ripple_pp_a": 21.819151659126845,
+        "available_bus_w": 674.9972603256566,
+        "requested_bus_w": 675.0,
+        "inductance_h": 1.28e-05,
+        "frequency_hz": 20000.0
+      }
+    ],
+    "traction_constant_acceleration_profiles": [
+      {
+        "duration_s": 0.5,
+        "constant_acceleration_m_s2": 8.333333333333334,
+        "minimum_tire_friction_coefficient_flat": 0.8497635108149403,
+        "total_wheel_force_n": 250.00000000000003,
+        "each_motor_shaft_torque_nm_ideal_gears": 0.9375000000000001,
+        "mechanical_peak_total_power_w": 1041.666666666667,
+        "mechanical_energy_j": 260.41666666666674,
+        "input_peak_total_w_at_90pct_drive_efficiency_screen": 1157.4074074074076,
+        "input_peak_total_w_at_80pct_drive_efficiency_screen": 1302.0833333333337
+      },
+      {
+        "duration_s": 1.0,
+        "constant_acceleration_m_s2": 4.166666666666667,
+        "minimum_tire_friction_coefficient_flat": 0.42488175540747014,
+        "total_wheel_force_n": 125.00000000000001,
+        "each_motor_shaft_torque_nm_ideal_gears": 0.46875000000000006,
+        "mechanical_peak_total_power_w": 520.8333333333335,
+        "mechanical_energy_j": 260.41666666666674,
+        "input_peak_total_w_at_90pct_drive_efficiency_screen": 578.7037037037038,
+        "input_peak_total_w_at_80pct_drive_efficiency_screen": 651.0416666666669
+      },
+      {
+        "duration_s": 2.0,
+        "constant_acceleration_m_s2": 2.0833333333333335,
+        "minimum_tire_friction_coefficient_flat": 0.21244087770373507,
+        "total_wheel_force_n": 62.50000000000001,
+        "each_motor_shaft_torque_nm_ideal_gears": 0.23437500000000003,
+        "mechanical_peak_total_power_w": 260.41666666666674,
+        "mechanical_energy_j": 260.41666666666674,
+        "input_peak_total_w_at_90pct_drive_efficiency_screen": 289.3518518518519,
+        "input_peak_total_w_at_80pct_drive_efficiency_screen": 325.5208333333334
+      },
+      {
+        "duration_s": 3.0,
+        "constant_acceleration_m_s2": 1.388888888888889,
+        "minimum_tire_friction_coefficient_flat": 0.14162725180249006,
+        "total_wheel_force_n": 41.66666666666667,
+        "each_motor_shaft_torque_nm_ideal_gears": 0.15625,
+        "mechanical_peak_total_power_w": 173.61111111111114,
+        "mechanical_energy_j": 260.41666666666674,
+        "input_peak_total_w_at_90pct_drive_efficiency_screen": 192.90123456790127,
+        "input_peak_total_w_at_80pct_drive_efficiency_screen": 217.0138888888889
+      }
+    ],
+    "interpretation": "3.6kW is a peak supply-capability envelope, not a physical constant load from zero speed. Traction profile table gives inertial lower-bound force/power for chosen ramps; actual ramp cannot be uniquely qualified without friction, torque/current map, losses and inertia."
+  },
+  "power_stage_screen": {
+    "bom_counts": {
+      "path": "电力/稳压模块/原理图准备/选型BOM.csv",
+      "counts_by_exact_mpn": {
+        "IHXL2000VZEB100M3A": 2,
+        "IRLB4030PBF": 3,
+        "SC0350-270-RSS": 8
+      }
+    },
+    "inductor_pair_nominal_h": 2e-05,
+    "inductor_no_bias_tolerance_total_h": [
+      1.6e-05,
+      2.4e-05
+    ],
+    "inductor_pair_dcr_max_at_25c_ohm": 0.00172,
+    "inductor_pair_dcr_estimate_at_100c_ohm": 0.00222697,
+    "inductor_pair_copper_loss_at_52a_100c_est_w": 6.02172688,
+    "inductor_pair_copper_loss_at_80a_100c_est_w": 14.252608,
+    "inductor_ripple_peak_screen_by_frequency": [
+      {
+        "frequency_hz": 10000.0,
+        "ripple_pp_a_at_worst_duty_22p5v_12p8uH": 43.9453125
+      },
+      {
+        "frequency_hz": 20000.0,
+        "ripple_pp_a_at_worst_duty_22p5v_12p8uH": 21.97265625
+      },
+      {
+        "frequency_hz": 40000.0,
+        "ripple_pp_a_at_worst_duty_22p5v_12p8uH": 10.986328125
+      }
+    ],
+    "ir lb4030_static_loss_screen": {
+      "one_device_at_52a_w_25c_rds_max": 11.6272,
+      "one_device_at_80a_w_25c_rds_max": 27.52,
+      "two_device_full_current_simultaneous_upper_sensitivity_at_80a_w": 55.04,
+      "interpretation": "ideal complementary half-bridge total conduction loss depends on current duty split; static bound uses RDS(on) maximum at 25°C and omits temperature increase, switching/deadtime/diode/core/contact losses. The datasheet 180A/130A ratings are not board ratings."
+    },
+    "power_stage_conclusion": "Existing parts are the zero-addition candidate. At 2.0V/cell, the 675W bus gap is conditionally supportable for a bounded interval in this average screen; no full converter capability is qualified because switch model, control, temperature and component/package/PCB thermal limits remain open."
+  },
+  "joint_launch_braking_window": {
+    "start_to_15kmh_full_peak_duration_s": [
+      {
+        "duration_s": 0.5,
+        "status": "candidate_window_only",
+        "initial_cell_v_low_grid": 2.06,
+        "initial_cell_v_high_grid": 2.17,
+        "grid_step_v": 0.01,
+        "passing_points": 12,
+        "points_tested": 121,
+        "lowest_point": {
+          "initial_cell_v": 2.06,
+          "post_launch_cell_v": 1.9678408504640248,
+          "post_brake_cell_v": 2.021019796877402,
+          "bus_peak_v": 39.002242712806655,
+          "launch_max_current_peak_a": 63.933778117003314
+        },
+        "highest_point": {
+          "initial_cell_v": 2.17,
+          "post_launch_cell_v": 2.0845197558066184,
+          "post_brake_cell_v": 2.134995304973604,
+          "bus_peak_v": 38.151178864076016,
+          "launch_max_current_peak_a": 59.28379586859401
+        },
+        "midpoint_sample": {
+          "initial_cell_v": 2.12,
+          "post_launch_cell_v": 2.0316337917483898,
+          "post_brake_cell_v": 2.083300324510166,
+          "bus_peak_v": 38.428262887416544,
+          "launch_max_current_peak_a": 61.318820832803034
+        }
+      },
+      {
+        "duration_s": 1.0,
+        "status": "candidate_window_only",
+        "initial_cell_v_low_grid": 2.1500000000000004,
+        "initial_cell_v_high_grid": 2.2,
+        "grid_step_v": 0.01,
+        "passing_points": 6,
+        "points_tested": 121,
+        "lowest_point": {
+          "initial_cell_v": 2.1500000000000004,
+          "post_launch_cell_v": 1.9714587987703147,
+          "post_brake_cell_v": 2.024549681255935,
+          "bus_peak_v": 38.964955063710555,
+          "launch_max_current_peak_a": 63.78413108199594
+        },
+        "highest_point": {
+          "initial_cell_v": 2.2,
+          "post_launch_cell_v": 2.027547981746652,
+          "post_brake_cell_v": 2.079308883844196,
+          "bus_peak_v": 38.45966070126956,
+          "launch_max_current_peak_a": 61.48431521103389
+        },
+        "midpoint_sample": {
+          "initial_cell_v": 2.1799999999999997,
+          "post_launch_cell_v": 2.00517504864523,
+          "post_brake_cell_v": 2.057458646340295,
+          "bus_peak_v": 38.644667234397616,
+          "launch_max_current_peak_a": 62.38382014986857
+        }
+      },
+      {
+        "duration_s": 1.39,
+        "status": "NO_COMMON_WINDOW_ON_10mV_GRID",
+        "points_tested": 121
+      },
+      {
+        "duration_s": 1.5,
+        "status": "NO_COMMON_WINDOW_ON_10mV_GRID",
+        "points_tested": 121
+      },
+      {
+        "duration_s": 2.0,
+        "status": "NO_COMMON_WINDOW_ON_10mV_GRID",
+        "points_tested": 121
+      },
+      {
+        "duration_s": 2.5,
+        "status": "NO_COMMON_WINDOW_ON_10mV_GRID",
+        "points_tested": 121
+      },
+      {
+        "duration_s": 3.0,
+        "status": "NO_FULL_PEAK_LAUNCH_AT_2P2V_SCREEN",
+        "best_case": {
+          "ok": false,
+          "failure_time_s": 2.6840000000000637,
+          "reason": "full_peak_bus_supplement_exceeds_80A_peak_screen_or_power_limit",
+          "initial_cell_v": 2.2,
+          "cell_v_at_failure": 1.675605686302745,
+          "current_avg_a": 69.09044495940351,
+          "current_peak_a": 80.00000535181115,
+          "ripple_pp_a": 21.81912078481527,
+          "available_bus_w": 674.9912099441747,
+          "requested_bus_w": 675.0,
+          "inductance_h": 1.28e-05,
+          "frequency_hz": 20000.0
+        }
+      }
+    ],
+    "three_meter_stop_at_2v_cell_no_added_delay": {
+      "ok": true,
+      "response_delay_s": 0.0,
+      "stop_distance_from_request_m": 3.0,
+      "distance_during_delay_m": 0.0,
+      "active_braking_distance_m": 3.0,
+      "active_braking_time_s": 1.44,
+      "total_request_to_stop_s": 1.44,
+      "constant_deceleration_m_s2": 2.893518518518519,
+      "peak_mechanical_braking_power_w": 361.6898148148149,
+      "ideal_each_motor_braking_torque_nm": 0.32552083333333337,
+      "translation_energy_j": 260.41666666666674,
+      "initial_cell_ocv_v": 2.0,
+      "final_cell_ocv_v": 2.0525371940926056,
+      "maximum_cell_terminal_v": 2.1152142857142926,
+      "max_sc_charge_current_a": 20.0,
+      "peak_unabsorbed_bus_energy_j": 0.06816569296262902,
+      "bus_peak_v": 37.834099738535464,
+      "bus_limit_comparison_v": 39.009,
+      "bus_margin_v": 1.1749002614645363,
+      "bus_energy_headroom_at_start_j": 2.4543448008300115
+    },
+    "three_meter_stop_at_2v_cell_with_50ms_response_delay": {
+      "ok": true,
+      "response_delay_s": 0.05,
+      "stop_distance_from_request_m": 3.0,
+      "distance_during_delay_m": 0.20833333333333337,
+      "active_braking_distance_m": 2.7916666666666665,
+      "active_braking_time_s": 1.3399999999999999,
+      "total_request_to_stop_s": 1.39,
+      "constant_deceleration_m_s2": 3.1094527363184086,
+      "peak_mechanical_braking_power_w": 388.6815920398011,
+      "ideal_each_motor_braking_torque_nm": 0.34981343283582095,
+      "translation_energy_j": 260.41666666666674,
+      "initial_cell_ocv_v": 2.0,
+      "final_cell_ocv_v": 2.052405958448736,
+      "maximum_cell_terminal_v": 2.1275714285714615,
+      "max_sc_charge_current_a": 20.0,
+      "peak_unabsorbed_bus_energy_j": 1.800504111009723,
+      "bus_peak_v": 38.690612559474715,
+      "bus_limit_comparison_v": 39.009,
+      "bus_margin_v": 0.3183874405252851,
+      "bus_energy_headroom_at_start_j": 2.4543448008300115
+    },
+    "interpretation": "A common window exists only for the specified modeled launch duration and starting cell-voltage band, under the stated 80A/20A/95% assumptions. Passing this averaged screen does not qualify physical stopping, which also needs measured torque, grip, response and working hardware."
+  },
+  "cost_paths": {
+    "recommended_lowest_candidate": {
+      "path": "reuse the currently selected 8S1P LICAP bank and the two selected 10uH inductors/two main MOSFETs; use software power limiting when the measured SC reserve or temperature/current margin is insufficient",
+      "board_bom_delta": {
+        "supercap_cells": 0,
+        "inductors": 0,
+        "main_mosfets": 0
+      },
+      "verified_incremental_cost_cny": 0.0,
+      "meaning": "zero new BOM items relative to current selected design, not zero total vehicle procurement cost and not evidence that parts are in stock; complete purchase value remains unknown",
+      "qualification": "HOLD; must measure complete switching/thermal envelope and stop reserve before assigning launch power"
+    },
+    "add_eight_cells_for_8s2p": {
+      "board_bom_delta": {
+        "supercap_cells": 8
+      },
+      "price_status": "not costable at a valid per-vehicle purchase price from saved evidence: project source records a 256-piece MOQ / USD 7.81-per-piece bulk-page quote, while 8 are needed; no current domestic delivered quote/tax/freight was verified",
+      "decision": "not selected; do not treat this as a required change until current 8S1P time-domain result fails the user-selected launch profile"
+    },
+    "inductor_or_mosfet_upsize": {
+      "board_bom_delta": "unknown",
+      "price_status": "no exact replacement MPN with verified thermal/current fit and same-channel delivered price was established in this scoped review",
+      "decision": "do not add before measured current/temperature shows the saved pair cannot meet the requirement"
+    },
+    "cost_conclusion": "The least-cost route supported by evidence is reuse plus a conditional launch power cap. No hardware change is justified by the current model alone, and no net savings claim is made. If the required full-peak duration exceeds the modeled common window, actual duration and part pricing must be resolved before proposing a BOM change."
+  },
+  "qualification_gates": [
+    "HOLD: 9S5P/130A BMS is an unimplemented candidate; pack sag, cell sharing, connector, busbar and BMS thermal behavior at low SOC are absent.",
+    "HOLD: motor 1.8kW input peak and 80A seller figure do not define current convention, duration, torque-speed curve or motor temperature; 15km/h traction cannot be derived from these values alone.",
+    "HOLD: 95% converter efficiency and 20A SC charging limit are comparison inputs, not measured/guaranteed stage performance.",
+    "HOLD: 80A peak-current screen and 12.8uH biased inductance are not qualified limits; manufacturer heat currents are typical points and assembly thermal impedance is unknown.",
+    "HOLD: EOL cell ESR/capacitance values are datasheet condition limits, not a service-life prediction; cell mismatch and balancing are not modeled.",
+    "HOLD: braking assumes 50ms delay as an explicit planning stress input, ideal mechanical-to-BUS recovery, zero battery/dump and a constant-deceleration 3m stop; no physical stopping guarantee follows.",
+    "HOLD: 39.009V is a comparator threshold reference, not a permitted bus maximum or safe design voltage."
+  ],
+  "sources_and_limits": {
+    "PWM_source": "固件/regulator_driver/Bsp/Inc/bsp_board.h:138; configuration value only",
+    "LICAP_original_datasheet": "https://www.licaptech.com/pdfs/datasheets/ultracapacitors/60862a8f5979e5f969df83ba_LICAP_SC0350_270_RSS_Datasheet_061120.pdf",
+    "Vishay_original_datasheet": "https://www.vishay.com/docs/34681/ihxl2000vz-3a.pdf",
+    "Infineon_original_datasheet": "https://www.infineon.com/dgdl/irlb4030pbf.pdf?fileId=5546d462533600a4015356604640258",
+    "local_EVE_cell_spec": "电力/参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
+    "existing_brake_envelope": "电力/检查/联合仿真/起步停车与下坡包络.py; this file retains it as reference and adds 50ms response-delay and joint launch/brake simulation"
+  }
+}

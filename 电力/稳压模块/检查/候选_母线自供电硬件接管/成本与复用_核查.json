@@ -1,0 +1,672 @@
+{
+  "schema": "AGTC_aux_12V_candidate_cost_and_reuse_review_v1",
+  "as_of": "2026-11-05",
+  "status": "HOLD_COST_AND_QUALIFICATION_OPEN_NOT_PROCUREMENT_OR_POWER_APPROVAL",
+  "scope": "只读核查现有稳压板BOM、共用器件库和已留存报价；本文件是母线自供电硬件接管候选的成本附件。未改原理图、BOM、共用库或其它文件。",
+  "selection": {
+    "preferred_source_candidate": "LT3010EMS8E#PBF",
+    "reason": "ADI原厂资料和DigiKey exact-MPN页面可核；输入额定上限80V，且资料说明VIN拉低而VOUT仍被外部维持时可阻止输出向输入反灌。当前独立 rail 的输入浪涌、热、负载和保护仍须资格验证。选择该源是来源/功能可核优先，不代表成本低于Hi-Link模块。",
+    "alternative": "保留BOM现有URB4812YMD-10WR3模块候选；现有记录标为Hi-Link，但该精确MPN的官方来源/分销身份存在Hi-Link与MORNSUN页面重叠，未取得可用于当前BOM身份的精确采购报价。该件不是已核实的低价替代。",
+    "supervisor": "TPS3760A012DYYR exact orderable MPN；TI页面/数据手册状态Active、Production，DYY、14 pin；本轮不以型号字符串推断可购。",
+    "shared_analog": "保留REF5025 SOIC-8与TLV1811DBV作为本候选参考/比较器；它们是新板上物理器件，库中有精确身份不等于已有可用库存。",
+    "d_hold_candidate": {
+      "exact_mpn": "1N4148W",
+      "manufacturer": "JSCJ / Changjing",
+      "supplier_part": "LCSC C2099",
+      "decision": "选作本轮D_HOLD候选；BAT46W仅保留为未选替代，若要保留须补齐热漏电实测/原厂保证。",
+      "qualification": "原厂列Vf max 1.25V@150mA、IR max 1uA@75V；本预算以Vf≤1.25V作保守门限。3mA模拟总负载预算包含二极管反漏，需在60°C核实反漏与保持波形。",
+      "official_url": "https://www.jscj-elec.com/kaiguanerjiguan.html"
+    },
+    "input_branch_protection_candidate": {
+      "exact_mpn": "3403.0266.23",
+      "manufacturer": "SCHURTER UMT-H",
+      "rating": "160mA, 250VDC, 1500A DC breaking capacity",
+      "placement": "板上实装，BUS_BMS_DOWNSTREAM支路入口首位、C_IN之前；不加输入串联电阻。两只RAG-06K22R0FT/44Ω仍保留在LT3010输出slew路径。",
+      "qualification": "以支路最大预期直流短路电流≤1500A作接口边界；pack/BMS/线束Isс、热插入浪涌、最大清除I²t与PCB铜/连接器协调仍须核验。"
+    },
+    "capacitor_timing": {
+      "exact_mpn": "FH 0603CG222J500NT / LCSC C2991172",
+      "dielectric": "C0G, 2.2nF ±5%, 50V, 0603",
+      "positions": "C_FF在LT3010反馈补偿位、C_CTR接TPS3760 MR pin 9各1只；CTS pin 10不装。两位置同一SKU，已计入当前候选数量，不额外增加件数。",
+      "effective_range_nF": [
+        1.98,
+        2.42
+      ],
+      "timing": "C_FF最低1.98nF高于LT3010应用条件1.592nF；TPS3760冷启动定时上角5.888ms。与同域核算中的最大电容充电/基准建立及≤2ms源启动预算合计45.378ms，距BUS14V→READY≤50ms验收限约4.622ms。",
+      "qualification": "电容公差及温度角按同域核算条件；源启动≤2ms、至少50mA可用充电能力是资格条件，不是已测保证。"
+    },
+    "feedback_corner_check": {
+      "status": "PAPER_CORNER_CONFIRMED_CONDITIONAL_ON_COMPONENT_AND_TEMPERATURE_LIMITS",
+      "feedback_top": {
+        "exact_mpn": "YAGEO RT0603BRD0784K5L",
+        "project_library_part": "C705797",
+        "nominal_ohm": 84500,
+        "initial_tolerance_pct": 0.1,
+        "tcr_ppm_per_C": 25,
+        "quote": "DigiKey USD 0.11/pc exact-MPN single-quantity reference; not a transaction price.",
+        "official_tcr_source": "https://yageogroup.com/content/datasheet/asset/file/pyu-rt_1-to-0-01_rohs_l"
+      },
+      "feedback_bottom": {
+        "exact_mpn": "Milliohm HoAR0603-1/10W-10KR-0.1%-TCR25",
+        "supplier_part": "LCSC C5123581",
+        "nominal_ohm": 10000,
+        "initial_tolerance_pct": 0.1,
+        "tcr_ppm_per_C": 25,
+        "manufacturer_source": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/1F058B90493065B947FC0225A8FCECD8.pdf"
+      },
+      "resistor_temperature_range_C": [
+        0,
+        85
+      ],
+      "reference_voltage_range_V": [
+        1.237,
+        1.313
+      ],
+      "reference_voltage_condition": "LT3010 ADJ pin limits apply at VIN 4..80V and output load 1..50mA; planned BUS and 16mA load fall inside these stated conditions.",
+      "adj_bias_current_budget_nA": 100,
+      "resistor_worst_case": "Each resistor initial ±0.1% plus |ΔT|=60°C×25ppm/°C=±0.15% temperature change gives a per-part worst-case ±0.25%; use opposing extreme values for top and bottom ratio.",
+      "rtop_min_ohm": 84288.75,
+      "rtop_max_ohm": 84711.25,
+      "rbottom_min_ohm": 9975,
+      "rbottom_max_ohm": 10025,
+      "formula": "VOUT = VADJ × (1 + RTOP/RBOTTOM) ± |IADJ|×RTOP",
+      "calculated_output_corner_V": [
+        11.6290882073,
+        12.4719344082
+      ],
+      "source_load_check": {
+        "continuous_output_current_budget_A": 0.016,
+        "total_slew_resistance_max_ohm": 44.44,
+        "worst_steady_slew_drop_V": 0.71104,
+        "ideal_gate_step_charge_C": 3E-07,
+        "effective_capacitance_F": 1E-05,
+        "gate_step_drop_V": 0.03,
+        "min_driver_rail_after_load_and_gate_step_V": 10.8880482073,
+        "supervisor_max_release_V": 10.7469335616,
+        "remaining_margin_V": 0.1411146457
+      },
+      "startup_current_semantics": "50mA是启动期间要求可用的LT3010输出充电能力下界，不是LT3010限流上限或实际启动峰值上限。LT3010典型限流约140mA且没有该启动过程的最大峰流保证；需实测启动输入电流及保险/电容I²t。",
+      "result": "按原厂电压、反馈电阻公差/TCR和±100nA偏流纸面角计算，source Vout为11.62909..12.47193V；16mA、44.44Ω及300nC/10µF门极步阶后的低角仍比TPS最高release约高0.141V。须执行器件体温0..85°C约束并测量实际板温。"
+    }
+  },
+  "price_policy": {
+    "currency": "不换汇、不混算币种；USD和CNY分列。",
+    "price_meaning": "商城/授权分销公开页面或本地报价快照的参考价，不是已下单成交价；税、运、汇率、装配不含，库存和价格会变化。",
+    "missing": "未知单价保留null；不可把共用SKU、库中存在或原板复用记作零成本，只有确认可转用的既有实物库存才可抵扣采购数量。",
+    "quote_reliability": "当前公开页面报价与2026-10-21项目商城快照分别标注；陈旧/缺货页面不进入当前已知小计。"
+  },
+  "architecture_comparison": [
+    {
+      "candidate": "LT3010EMS8E#PBF可调LDO",
+      "exact_mpn": true,
+      "unit_reference": {
+        "currency": "USD",
+        "amount": 6.45,
+        "quantity": 1,
+        "supplier": "DigiKey",
+        "observed_on": "2026-11-05",
+        "availability_snapshot": "页面显示20,688库存；页面同时显示制造商标准交期19周，采购前需再次核实",
+        "url": "https://www.digikey.com/en/products/detail/analog-devices-inc/LT3010EMS8E-PBF/891307"
+      },
+      "source_passives": "另需YAGEO RT0603BRD0784K5L/C705797 84.5kΩ/0.1%（原厂TCR ±25ppm/°C）、Milliohm C5123581 10kΩ/0.1%（TCR25）、C_FF=2.2nF C0G±5%、C_IN=2.2µF/100V并满足有效值≥1µF、直接C_OUT=2.2µF/100V并满足有效值≥1µF，以及C_REF局部2.2µF/100V；C_FF与C_CTR使用同一C0G SKU。C_IN/C_OUT/C_REF候选TCC1210X7R225K101MT/C5449052需全温、偏压有效容量资格。源端瓷片电容温度/容差角按2.2µF×1.20×1.15=3.036µF上界参与充电核算。",
+      "boundary": "LDO到手器件价不等于供电方案总成本；热、输入暂态、实际负载与电容有效值未闭合。"
+    },
+    {
+      "candidate": "URB4812YMD-10WR3隔离模块",
+      "exact_mpn": true,
+      "manufacturer_identity": "稳压板现有官方BOM标HiLink，项目历史资料有Hi-Link官网/资料；MORNSUN官网也有同精确MPN和另一套官方资料。未解决现有模块实物/计划采购源究竟对应哪家原厂，不允许跨厂报价。",
+      "price": null,
+      "price_status": "Hi-Link精确12V模块未取得可验证供应报价。LCSC上同MPN的YLPTEC C5369760和DEXU C2916519不是BOM指定Hi-Link，价格不得移用；Hi-Link 5V兄弟型号价格也不替代12V价格。MORNSUN页面/分销结果只可证明存在同MPN的另一厂家目录，不能用来给当前Hi-Link BOM定价。",
+      "additional_costs": "还要按原厂3%最小负载条件核定保底负载；候选390Ω/2W在12V下约0.369W，但精确阻值/封装料号和报价未闭合。输入/输出电容、浪涌及保护仍需成本。",
+      "technical_sources": [
+        "https://hlktech.net/index.php?cate=DCDC10W&id=product&pageid=2",
+        "https://datasheet.lcsc.com/datasheet/pdf/fa739afeb02d395567139b145d5d7e5f.pdf?productCode=C5183122",
+        "https://www.mornsun-power.com/html/pdf/URB4812YMD-10WR3.html",
+        "https://www.mornsun-power.com/public/uploads/pdf/URB_YMD-10WR3.pdf"
+      ]
+    },
+    {
+      "candidate": "HX6105国产100V/50mA可调线性稳压器（不替换当前LT3010图）",
+      "exact_mpn": false,
+      "manufacturer": "Hotchip / 华芯邦",
+      "listed_variants": [
+        "HX6105E8 (ESOP8)",
+        "HX6105F8 (eMSOP8L)",
+        "HX6105U5 (SOT23-5)"
+      ],
+      "official_public_specs": "原厂产品页标注100V输入、50mA输出、±1.5%、Iq typ 23µA/max 40µA、dropout typ 1.0V@20mA及2.8V@50mA、限流55mA min/120mA typ/200mA max、Cin>0.47µF、Cout>2.2µF。原厂文章宣称有反向电流保护且无需外接二极管。",
+      "orderability_and_price": "原厂产品中心标“清仓”；未找到完整官方数据手册、精确封装变体可购状态或授权渠道报价，因此不能证明比LT3010的DigiKey单量参考价USD 6.45便宜，也不计入小计。",
+      "open_qualification": [
+        "反向保护缺少最大反向电流、VIN=0/VOUT=12V条件和全温保证；",
+        "±1.5%精度适用条件/完整温度范围需完整数据表确认；",
+        "以37.8V输入、12V/50mA输出估算耗散约1.29W，需精确封装热阻与板级热核算；",
+        "需核实最小有效C及启动、过流/短路行为；"
+      ],
+      "decision": "仅保留降本评估候选；本轮继续采用LT3010EMS8E#PBF，不切换源页。",
+      "official_sources": [
+        "https://www.hotchip.com.cn/hx6105/",
+        "https://www.hotchip.com.cn/hcyvvn/",
+        "https://www.hotchip.com.cn/product-center/"
+      ]
+    }
+  ],
+  "priced_candidate_items": [
+    {
+      "function": "独立12V源",
+      "mpn": "LT3010EMS8E#PBF",
+      "manufacturer": "Analog Devices",
+      "supplier_part": "DigiKey 505-LT3010EMS8E#PBF-ND",
+      "qty_board": 1,
+      "unit_price": 6.45,
+      "currency": "USD",
+      "moq": 1,
+      "price_status": "公开exact-MPN单量页面参考价，非成交价",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.digikey.com/en/products/detail/analog-devices-inc/LT3010EMS8E-PBF/891307"
+    },
+    {
+      "function": "12V同域监督",
+      "mpn": "TPS3760A012DYYR",
+      "manufacturer": "Texas Instruments",
+      "supplier_part": "Mouser 595-TPS3760A012DYYR",
+      "qty_board": 1,
+      "unit_price": 2.29,
+      "currency": "USD",
+      "moq": 1,
+      "stock_snapshot": 2423,
+      "price_status": "Mouser exact-MPN公开页面快照；非成交价，页面库存/价格会变化",
+      "observed_on": "2026-11-05",
+      "source_urls": [
+        "https://www.mouser.com/en/ProductDetail/Texas-Instruments/TPS3760A012DYYR?qs=Znm5pLBrcAL1XOG5Mqw2gg%3D%3D",
+        "https://www.ti.com/product/TPS3760/part-details/TPS3760A012DYYR",
+        "https://www.ti.com/lit/ds/symlink/tps3760.pdf"
+      ]
+    },
+    {
+      "function": "Cdrv与Chold两bank候选，共4只；另须逐节点确认是否可有一只同时满足LT3010 Cout",
+      "mpn": "TCC1210X7R226K250MT",
+      "manufacturer": "CCTC（三环）",
+      "supplier_part": "LCSC C49118556",
+      "qty_board": 4,
+      "unit_price": 0.1756,
+      "currency": "USD",
+      "price_tier_qty": 5,
+      "minimum_order_cash": 0.878,
+      "stock_snapshot": 415,
+      "price_status": "LCSC exact-MPN页面参考价；页面爬取约1个月，库存非保证",
+      "observed_on": "2026-11-05",
+      "qualification": "每bank 2只，必须实测或取得原厂直流偏压曲线证明Ceff≥10µF；25V X7R标称值不构成有效容量保证。不得在未定网络前将此bank同时计作12V_SRC Cout与下游Cdrv。",
+      "source_url": "https://www.lcsc.com/product-detail/C49118556.html"
+    },
+    {
+      "function": "监督分压上臂120kΩ/0.1%",
+      "mpn": "PTFR0805B120KN9",
+      "manufacturer": "RESI（开步睿思）",
+      "supplier_part": "LCSC C351616",
+      "qty_board": 1,
+      "unit_price": 0.1938,
+      "currency": "USD",
+      "price_tier_qty": 5,
+      "minimum_order_cash": 0.969,
+      "stock_snapshot": 15100,
+      "price_status": "LCSC exact-MPN公开页面参考价/库存快照；非成交价",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.lcsc.com/product-detail/C351616.html"
+    },
+    {
+      "function": "LDO反馈下臂10kΩ/0.1%",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "manufacturer": "Milliohm（毫欧）",
+      "supplier_part": "LCSC C5123581",
+      "qty_board": 1,
+      "unit_price": 0.0748,
+      "currency": "USD",
+      "price_tier_qty": 10,
+      "minimum_order_cash": 0.748,
+      "stock_snapshot": 29000,
+      "price_status": "LCSC exact-MPN页面价/库存快照；本SKU已在现有BOM用于R_SC_OV_BOT，但新板新实例仍计入采购数量",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.lcsc.com/product-detail/C5123581.html",
+      "tcr_ppm_per_C": 25,
+      "temperature_qualification": "精确料号后缀TCR25；0.1%/25ppm元件用于反馈下臂，按0..85°C器件温度范围参与±0.25%阻值角。",
+      "manufacturer_source_url": "https://atta.szlcsc.com/upload/public/pdf/source/20220805/1F058B90493065B947FC0225A8FCECD8.pdf"
+    },
+    {
+      "function": "C_FF与C_CTR，2.2nF C0G同SKU共2只",
+      "mpn": "0603CG222J500NT",
+      "manufacturer": "FH（风华）",
+      "supplier_part": "LCSC C2991172",
+      "qty_board": 2,
+      "unit_price": 0.0133,
+      "currency": "USD",
+      "price_tier_qty": 50,
+      "minimum_order_cash": 0.665,
+      "stock_snapshot": 40200,
+      "price_status": "LCSC精确MPN公开报价/库存快照；参考单价USD 0.0133@50，非成交价，库存会变。",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-0603cg222j500nt_C2991172.html",
+      "manufacturer_source_url": "https://www.fhcomp.com/en/product_info/?prod_code=0603CG222J500NT",
+      "qualification": "2.2nF、C0G、±5%、50V、0603；C_FF/C_CTR共用此SKU。"
+    },
+    {
+      "function": "LT3010反馈上臂84.5kΩ/0.1%",
+      "mpn": "RT0603BRD0784K5L",
+      "manufacturer": "YAGEO",
+      "supplier_part": "DigiKey YAG1739CT-ND",
+      "qty_board": 1,
+      "unit_price": 0.11,
+      "currency": "USD",
+      "moq": 1,
+      "stock_snapshot": 775,
+      "price_status": "DigiKey精确MPN公开单量参考价；非成交价，库存/价格会变化。",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.digikey.com/en/products/detail/yageo/RT0603BRD0784K5L/1072662",
+      "comparison": "国产RESI PTFR0805B84K5P9/C2849363历史参考USD 0.1441@5，但缺货快照，未计入选定小计。",
+      "project_library_part": "C705797",
+      "tcr_ppm_per_C": 25,
+      "temperature_qualification": "Yageo原厂RT系列编码D=±25ppm/°C、B=±0.1%；RT0603表列1k–1MΩ档可用±25ppm，84.5k在档内。官方额定温度−55..155°C，覆盖本设计0..85°C器件温度范围。",
+      "manufacturer_datasheet": "https://yageogroup.com/content/datasheet/asset/file/pyu-rt_1-to-0-01_rohs_l",
+      "library_status": "项目库精确载体C705797；当前价格仍按DigiKey同一精确MPN USD 0.11单量参考计，库映射不作为库存成本抵扣。"
+    },
+    {
+      "function": "D_HOLD模拟保持串联二极管",
+      "mpn": "1N4148W",
+      "manufacturer": "JSCJ（长晶）",
+      "supplier_part": "LCSC C2099",
+      "qty_board": 1,
+      "unit_price": 0.0092,
+      "currency": "USD",
+      "price_tier_qty": 50,
+      "minimum_order_cash": 0.46,
+      "stock_snapshot": 884350,
+      "price_status": "LCSC精确MPN公开页面参考价/库存快照；非成交价。",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.lcsc.com/product-detail/diodes-general-purpose-fast-recovery-rectifiers_jscj-1n4148w_C2099.html",
+      "manufacturer_source_url": "https://www.jscj-elec.com/kaiguanerjiguan.html",
+      "qualification": "原厂页列100V、Vf max 1.25V@150mA、IR max 1µA@75V；保持节点60°C漏电和实际Vf仍需核验，3mA是含漏电的总模拟预算。"
+    },
+    {
+      "function": "C_IN、LT3010直接C_OUT和C_REF局部去耦，共3只",
+      "mpn": "TCC1210X7R225K101MT",
+      "manufacturer": "CCTC（三环）",
+      "supplier_part": "LCSC C5449052",
+      "qty_board": 3,
+      "unit_price": 0.4905,
+      "currency": "CNY",
+      "price_tier_qty": 5,
+      "minimum_order_cash": 2.4525,
+      "stock_snapshot": 54705,
+      "price_status": "项目本地商城成本快照，供应商LCSC，2026-10-21；不是本轮现货或成交确认。",
+      "captured_at_utc": "2026-10-21T04:17:31.183Z",
+      "source_url": "https://item.szlcsc.com/6351015.html",
+      "qualification": "2.2µF/100V/X7R/1210。C_IN、直接C_OUT和C_REF各一只；C_IN和C_OUT要求实测/原厂曲线证实有效值≥1µF。容差+20%与温度+15%上角按3.036µF计入启动核算。"
+    },
+    {
+      "function": "BUS支路输入高分断保险，板上装、C_IN之前",
+      "mpn": "3403.0266.23",
+      "manufacturer": "SCHURTER UMT-H",
+      "supplier_part": "Mouser 693-3403.0266.23",
+      "qty_board": 1,
+      "unit_price": 2.77,
+      "currency": "USD",
+      "moq": 1,
+      "stock_snapshot": 2688,
+      "price_status": "Mouser精确MPN公开单量页面参考价；非成交价，价格/库存快照会变化。",
+      "observed_on": "2026-11-05",
+      "source_url": "https://www.mouser.com/ProductDetail/Schurter/3403.0266.23?qs=mBwMfv9Clf3yd8jPnGI5gA%3D%3D",
+      "manufacturer_datasheet": "https://www.schurter.com/en/datasheet/typ_UMT-H.pdf",
+      "rating": "160mA, 250VDC, 1500A DC breaking capacity; time-lag; -55..125°C",
+      "qualification": "最大总清除I²t及实际系统源Isc仍需与PCB/线束/连接器协同验证。"
+    }
+  ],
+  "known_price_subtotals_not_total_cost": {
+    "selected_LT3010_candidate_usd": {
+      "consumed_qty_reference": 12.6268,
+      "formula": "6.45 (LT3010×1) + 2.29 (TPS3760×1) + 4×0.1756 (CCTC 22µF bank) + 2×0.0133 (C0G 2.2nF C_FF/C_CTR) + 0.11 (YAGEO 84.5k) + 0.1938 (RESI 120k) + 0.0748 (Milliohm 10k) + 2.77 (SCHURTER fuse) + 0.0092 (JSCJ 1N4148W)",
+      "minimum_order_cash_reference": 15.34,
+      "minimum_order_formula": "6.45 + 2.29 + 5×0.1756 + 50×0.0133 + 0.11 + 5×0.1938 + 10×0.0748 + 2.77 + 50×0.0092",
+      "scope": "仅为已列USD价格候选件的单车消耗与公开MOQ参考现金，不含CNY直接源电容、未报价器件、税运/装配，也不代表整板总成本或成交价。"
+    },
+    "separate_cny_item": {
+      "consumed_qty_reference": 1.4715,
+      "minimum_order_cash_reference": 2.4525,
+      "currency": "CNY",
+      "mpn": "TCC1210X7R225K101MT / C5449052",
+      "qty_board": 3,
+      "function": "C_IN、LT3010直接C_OUT、C_REF各1只",
+      "price_date": "2026-10-21",
+      "scope": "项目商城LCSC本地报价快照，3×¥0.4905；与USD subtotal分开、不换汇，现价/库存须采购时确认。"
+    },
+    "unpriced_total_formula": "C_total_USD = 12.6268 + C_REF5025 + C_TLV1811 + C_2xRAG22 + C_BC847C + C_READY_resistors + C_LED_resistor + C_UCC_local_bypass + C_other_added_USD + tax_USD + freight_USD. C_total_CNY = 1.4715 + C_other_added_CNY + tax_CNY + freight_CNY. 未报价实例保持未知，不得用库内SKU或未经证实的实物库存记0；币种不可直接相加。",
+    "module_comparison_formula": "C_module_USD = C_HiLink_URB4812_exact(null) + C_minimum_load_390R_2W(null) + C_input_output_caps(null) + C_protection(null) + tax/freight. HX6105也没有可核实的精确订货变体和渠道报价，尚不能证明比LT3010便宜。不得用不同制造商同MPN报价替换C_HiLink_URB4812_exact。"
+  },
+  "candidate_bom_actions": [
+    {
+      "action": "add",
+      "ref_or_function": "U_POR",
+      "qty": 1,
+      "mpn": "TPS3760A012DYYR",
+      "supplier_part": "Mouser 595-TPS3760A012DYYR",
+      "status": "exact active/production orderable MPN verified at TI"
+    },
+    {
+      "action": "retain_candidate_new_instance",
+      "ref_or_function": "U_REF",
+      "qty": 1,
+      "mpn": "REF5025 SOIC-8",
+      "status": "exact part family candidate; new physical instance; price null"
+    },
+    {
+      "action": "retain_candidate_new_instance",
+      "ref_or_function": "U_CMP",
+      "qty": 1,
+      "mpn": "TLV1811DBV",
+      "status": "exact part candidate; new physical instance; price null"
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "R_SLEW",
+      "qty": 2,
+      "mpn": "RAG-06K22R0FT",
+      "manufacturer": "FH（风华）",
+      "value_each": "22Ω ±1%, 1206, 0.5W",
+      "status": "采购实装MPN为FH RAG-06K22R0FT，22Ω±1%、1206、0.5W；共2只串联44Ω。原生CAD封装载体标称0.25W仅为库身份，不得混作采购功率额定。两只单件脉冲约6.666V，低于五秒过载试验8.25V；重复启动间隔及热板温仍需限定。",
+      "cad_library_carrier_power_W": 0.25,
+      "procurement_mpn_power_W": 0.5
+    },
+    {
+      "action": "replace_value_and_part",
+      "ref_or_function": "R_POR_TOP",
+      "qty_delta": 0,
+      "old_value": "125kΩ/0.1%",
+      "new_value": "120kΩ/0.1%",
+      "new_mpn": "PTFR0805B120KN9",
+      "status": "value substitution; price listed above"
+    },
+    {
+      "action": "reuse_and_reassign",
+      "ref_or_function": "R_READY_PD",
+      "qty_delta": 0,
+      "mpn": "RMC0603100K1%N",
+      "supplier_part": "C269699",
+      "source_ref": "R_QP_BE",
+      "status": "existing 100kΩ is reassigned from removed circuit position; reduce one addition and one retirement in count reconciliation. Physical inventory is not proven; no cost credit is asserted."
+    },
+    {
+      "action": "replace_value",
+      "ref_or_function": "R_READY_PU",
+      "qty_delta": 0,
+      "old_value": "10kΩ",
+      "new_value": "4.7kΩ",
+      "status": "as parent-directed for HW_READY pullup; reset output sink stays within stated 5mA bound at selected rail; exact MPN/price is not independently closed here"
+    },
+    {
+      "action": "replace_value",
+      "ref_or_function": "R_READY_BASE",
+      "qty_delta": 0,
+      "old_value": "22kΩ",
+      "new_value": "10kΩ",
+      "status": "as parent-directed; exact MPN/price not independently closed here"
+    },
+    {
+      "action": "replace_part",
+      "ref_or_function": "C_DUMP_DRV_BULK",
+      "qty_delta": 0,
+      "mpn": "TCC1210X7R225K101MT",
+      "supplier_part": "C5449052",
+      "status": "原1µF/25V件不保证有效C≥1µF，改为2.2µF/100V CCTC，与C_IN/C_REF同SKU；旧件1退、新件1进，净件数0。须核12.44V偏压与全温有效容量。"
+    },
+    {
+      "action": "reuse",
+      "ref_or_function": "C_DUMP_DRV_HF",
+      "qty_delta": 0,
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "status": "existing 100nF/50V can serve local UCC bypass if existing local function is removed/reassigned; physical inventory/placement still to be reconciled"
+    },
+    {
+      "action": "add_candidate_bank",
+      "ref_or_function": "Cdrv + Chold",
+      "qty": 4,
+      "mpn": "TCC1210X7R226K250MT",
+      "supplier_part": "C49118556",
+      "status": "2 parts per bank, each bank Ceff≥10µF target; no DC-bias curve/qualification result. Final topology must decide if any part also satisfies COUT; do not double-count an instance."
+    },
+    {
+      "action": "replace_part",
+      "ref_or_function": "R_QP_COL",
+      "qty_delta": 0,
+      "old_value": "10kΩ",
+      "new_value": "1.8kΩ series optocoupler LED resistor",
+      "status": "one replacement position, not an added second series resistor; exact 0805 MPN and quote remain null in this cost attachment"
+    },
+    {
+      "action": "replace_part",
+      "ref_or_function": "old AND gate",
+      "qty_delta": 0,
+      "old_mpn": "SN74LVC1G08",
+      "new_mpn": "SN74LVC1G11DCKR",
+      "supplier_part": "LCSC C529281",
+      "status": "same MPN exists elsewhere in shared library/BOM; new physical use still counts as one instance unless board stock is confirmed; price null for this merge"
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "Q_READY_HW + base resistor; HW_READY pullup",
+      "qty": 3,
+      "status": "cold-start READY interlock required by parent decision; 1×BC847C, 1×10k base resistor, 1×4.7k pullup. Use existing R_QP_BE 100k as base pulldown, not a new fourth part. Exact unit prices not verified."
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "C_FF + C_CTR",
+      "qty": 2,
+      "mpn": "0603CG222J500NT",
+      "supplier_part": "LCSC C2991172",
+      "value": "2.2nF C0G ±5% 50V 0603",
+      "status": "两位置共用同一精确SKU；C_FF有效下限1.98nF满足LT3010 1.592nF条件，CTR上角定时5.888ms；已包含在数量核算，不额外增加件数。"
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "C_IN + direct C_OUT + C_REF",
+      "qty": 3,
+      "mpn": "TCC1210X7R225K101MT",
+      "supplier_part": "LCSC C5449052",
+      "status": "C_IN/C_OUT/C_REF各1只，2.2µF/100V X7R 1210；C_OUT直接接LT3010 OUT且Ceff≥1µF，C_IN Ceff≥1µF。C_FF/CTR定时使用C0G，不在此组。"
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "D_HOLD",
+      "qty": 1,
+      "mpn": "JSCJ 1N4148W",
+      "supplier_part": "LCSC C2099",
+      "status": "推荐替代已接线的BAT46W；高温反漏须覆盖3mA模拟总负载/保持预算。若保留BAT46W，须先取得其高温最大反漏证据。"
+    },
+    {
+      "action": "add_candidate",
+      "ref_or_function": "F_BUS",
+      "qty": 1,
+      "mpn": "SCHURTER UMT-H 3403.0266.23",
+      "supplier_part": "Mouser 693-3403.0266.23",
+      "status": "板上BUS输入支路起点、C_IN之前；160mA/250VDC/1500A DC分断；价格列入已知USD小计。Isc≤1500A接口边界与清除I²t/铜协调须验收。"
+    }
+  ],
+  "source_protection_review": {
+    "status": "EXACT_FUSE_SELECTED_CONDITIONAL_SYSTEM_COORDINATION_OPEN",
+    "selected_part": {
+      "exact_mpn": "SCHURTER UMT-H 3403.0266.23",
+      "rating": "160mA, 250VDC, 1500A DC breaking capacity, time-lag, -55..125°C",
+      "manufacturer_datasheet": "https://www.schurter.com/en/datasheet/typ_UMT-H.pdf",
+      "supplier": "Mouser",
+      "price_usd": 2.77,
+      "price_observed_on": "2026-11-05",
+      "price_scope": "公开精确MPN单量参考价、非成交价；页面库存快照约2,688。",
+      "supplier_url": "https://www.mouser.com/ProductDetail/Schurter/3403.0266.23?qs=mBwMfv9Clf3yd8jPnGI5gA%3D%3D"
+    },
+    "placement": "板上实装，在BUS_BMS_DOWNSTREAM独立支路入口首位、C_IN之前。与BUS薄膜/HF/母线电容的相对位置必须按最终板网表确认。支路不加33/47Ω输入电阻；2×RAG-06K22R0FT/44Ω仅在LT3010输出slew路径。",
+    "design_boundary": {
+      "bus_voltage_V": [
+        22.5,
+        37.8
+      ],
+      "prospective_dc_short_current_limit_A": 1500,
+      "qualification": "以支路最大可达DC预期短路电流≤1500A且BUS≤37.8V作为保护件接口边界；packs/BMS MOSFET/接触器/主保险/线束的实测Isc和源阻抗仍需核验。若大于1500A，本选型不满足边界。"
+    },
+    "current_and_voltage": {
+      "steady_branch_input_current_A": 0.0193,
+      "normal_budget_rounded_A": 0.02,
+      "normal_current_percent_of_rated_at_19p3mA": 12.0625,
+      "source_output_budget_A": 0.016,
+      "ldo_ground_current_budget_A": 0.0033,
+      "normal_branch_budget_explanation": "同域纸面预算：16mA连续输出负载（含模拟3mA）+LT3010地电流3.3mA=19.3mA，20mA取整。",
+      "fuse_current_rating_A": 0.16,
+      "typical_voltage_drop_V_at_rated_current": 1.68,
+      "estimated_drop_V_at_20mA_if_linear": 0.21,
+      "voltage_drop_caveat": "1.68V是厂家在额定160mA处的典型值；20mA处0.21V仅按典型电阻近似，非厂家保证值。",
+      "startup_current": "同域充电核算要求源至少可提供50mA输出电流；50mA不是LT3010限流上限。LT3010限流typ约140mA，未找到可用于全启动峰流/I²t保证的最大限值。启动输入峰值与保险I²t需实际波形核验。"
+    },
+    "capacitor_and_startup": {
+      "cin_exact_candidate": "TCC1210X7R225K101MT / LCSC C5449052, 2.2µF/100V",
+      "cin_high_corner_uF": 3.036,
+      "max_bus_voltage_V": 37.8,
+      "stored_energy_mJ_at_high_corner": 2.169,
+      "cap_charge_i2t_formula": "I²t = C·V²/(2·Rsource) = 0.002169/Rsource_ohm A²s（理想电阻源充电近似）",
+      "example_at_30mohm": "Rsource=0.03Ω时估算I²t≈0.0723A²s，高于厂家典型预弧0.055A²s参考；因此不得宣称带电热插入不误熔。",
+      "normal_connection": "支路焊接于公共BUS，正常上电随整车共同预充/BUS恢复；带电插接维护不属于正常连接规程，维护前BUS须零电压。",
+      "normal_bus_recovery": "共同BUS电容至少52.86mF、450W net比较条件下，14V处dV/dt≤约608V/s；C_IN额外电流约1.85mA。此为纸面恢复角，不代表所有热插拔/残余电压条件。",
+      "startup_timing": "同域最高角Cbank 121.854µF、直接源节点电容3.036µF、READY前10mA负载、50mA源可用电流下，BUS14V到READY估计上界45.378ms；源启动≤2ms等为验收条件，实测必须≤50ms。启动电流峰值不由此计算闭合。"
+    },
+    "fuse_evidence": {
+      "prearcing_curve": "厂家表：额定组在1.25×In最小60min、2×In最大120s、10×In最小10ms/最大100ms。",
+      "typical_prearcing_i2t_A2s": 0.055,
+      "i2t_condition": "典型熔化I²t@10×In，非最大总清除I²t，也不能单独用于PCB/线束安全协调。",
+      "dc_interrupt": "厂家规格行含250VDC、1500A分断；按该较严接口电流定义支路源Isc上限。",
+      "ambient": "-55..125°C"
+    },
+    "fault_cases": {
+      "bus_branch_hard_short": "F_BUS直接置于分支入口；候选额定DC分断满足≤1500A接口边界。需用pack实测Isc确认；源电容位于保险前/后及回路布置按最终网表复核。",
+      "cin_or_lt3010_input_short": "保险处于C_IN及LT3010前端，可隔离输入支路故障；最大清除时间/I²t与铜箔、线束、连接器、焊盘温升仍待协调。",
+      "lt3010_output_short": "输出侧44Ω slewing网络保留；LT3010热/输出故障电流不等同为F_BUS已通过保护验证。",
+      "live_hot_plug": "排除在正常规程之外；2.169mJ输入电容储能及0.03Ω例子显示不可声称带电插拔不误熔。"
+    },
+    "remaining_qualification_inputs": [
+      "测量/计算电芯最高SOC与温度、BMS MOS/接触器/主保险状态、线束与连接器共同决定的支路最大DC预期Isc和源阻抗，证明≤1500A。",
+      "实测共同BUS预充/恢复及LT3010启动输入电流波形、F_BUS熔化/清除行为；覆盖C_IN有效值上角、残余电压、重复上电和环境温度。",
+      "取得SCHURTER对该MPN在目标实际直流Isc下的最大总清除时间/I²t；若厂家不提供，用限定电源和真实保险进行故障验证。",
+      "按最终PCB铜厚/线宽、焊盘、连接器和线束I²t/温升能力确认保险能先于导体损坏动作；确认母线电容在保险前/后及故障放电路径。"
+    ],
+    "decision": "已选精确保险MPN与位置并可进入板图；仍为条件性候选，不宣称保护协调/热插拔/实测Isc已经通过。",
+    "official_sources": [
+      "https://www.schurter.com/en/datasheet/typ_UMT-H.pdf"
+    ]
+  },
+  "reconciliation": {
+    "retire_old_BUS_OV_A_channel": [
+      "Q_PMOS_CTRL",
+      "R_PB6_BASE",
+      "R_QP_BE (reassigned, not physically scrapped)",
+      "R_DUMP_HW_PU",
+      "R_BUS_OV_TOP1",
+      "R_BUS_OV_TOP2",
+      "R_BUS_OV_BOT",
+      "C_T3_FILTER"
+    ],
+    "keep": "U_SC_OV/TLV6700 remains for SC_OV channel B; BUS_OV channel A is decommissioned with OUTA NC and INA+ assigned SC_MINUS as parent directed.",
+    "replacement_positions": [
+      "R_QP_COL 10kΩ→1.8kΩ LED series resistor, one old part removed/one new part added",
+      "SN74LVC1G08→SN74LVC1G11DCKR, one old part removed/one new part added",
+      "POR divider top 125kΩ→120kΩ, same instance",
+      "HW_READY base 22kΩ→10kΩ and pullup 10kΩ→4.7kΩ, same two instances"
+    ],
+    "provisional_piece_count": {
+      "parent_baseline": "43 added - 10 retired = 33 net",
+      "adjustments": "R_SLEW second 22Ω resistor adds one; reuse of old R_QP_BE as HW_READY_PD removes one from added and one from retired, so reuse does not alter net count.",
+      "provisional_net_added_before_source_protection": 34,
+      "source_protection": "加入板上F_BUS 3403.0266.23一只；净增从34件临时估计调整为35件。",
+      "confidence": "parent-directed arithmetic, plus one exact F_BUS instance; not a fresh row-by-row CAD BOM export; do not present as final released BOM count.",
+      "provisional_net_added_after_source_protection": 35
+    }
+  },
+  "reuse_inventory": [
+    {
+      "mpn": "BAT46W",
+      "supplier_part": "C915627",
+      "existing_use": "BMS BOM 2 positions",
+      "candidate_use": "Not selected; optional D_HOLD alternate only after high-temperature reverse-leakage qualification.",
+      "cost_treatment": "No reuse or cost credit asserted; selected D_HOLD candidate is JSCJ 1N4148W C2099."
+    },
+    {
+      "mpn": "RMC0603100K1%N",
+      "supplier_part": "C269699",
+      "existing_use": "R_ARM_PD and R_QP_BE on regulator BOM",
+      "candidate_use": "move R_QP_BE to HW_READY_PD",
+      "cost_treatment": "one net-zero reassign in piece count; no monetary saving credited without stock proof"
+    },
+    {
+      "mpn": "C3216X7R1E105K160AA",
+      "supplier_part": "C3869375",
+      "existing_use": "C_DRV_BOOT, C_DUMP_DRV_BULK",
+      "candidate_use": "old C_DUMP_DRV_BULK 1µF is not counted as satisfying direct LT3010 Cout; replace that position with 2.2µF/100V CCTC while preserving the retired/moved old instance status in detailed BOM.",
+      "cost_treatment": "replacement is one old part out/one new part in; net count 0, but new capacitor purchase is included at the quoted candidate quantity."
+    },
+    {
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "supplier_part": "C342998",
+      "existing_use": "5 pcs in official regulator BOM",
+      "candidate_use": "UCC local 100nF bypass",
+      "cost_treatment": "no additional purchase only if existing C_DUMP_DRV_HF part is moved/reused; no cost credit without stock proof"
+    },
+    {
+      "mpn": "SN74LVC1G11DCKR",
+      "supplier_part": "C529281",
+      "existing_use": "same exact MPN in shared project/BMS BOM",
+      "candidate_use": "replace former SN74LVC1G08 in this candidate",
+      "cost_treatment": "new physical board instance still has purchase cost; current price null"
+    },
+    {
+      "mpn": "1N4148W",
+      "supplier_part": "LCSC C2099",
+      "existing_use": "not confirmed as installed in current project BOM",
+      "candidate_use": "selected D_HOLD candidate",
+      "cost_treatment": "counted as new physical instance and costed at public LCSC reference price; no reuse credit."
+    }
+  ],
+  "remaining_cost_and_design_gaps": [
+    "Hi-Link URB4812YMD-10WR3精确制造商身份/报价仍未闭合；不得用MORNSUN、YLPTEC、DEXU或同名记录替代现BOM身份。",
+    "HX6105仅作降本候选：原厂资料缺完整datasheet/反向状态定量保证与精确变体可购报价，且标“清仓”；目前无法证明比LT3010便宜或等效。",
+    "JSCJ 1N4148W C2099已按公开价纳入；须确认60°C反向漏电、实际Vf与模拟保持3mA总预算。BAT46W不得在未核高温反漏时视为已通过。",
+    "C_IN、LT3010直接C_OUT与C_REF候选TCC1210X7R225K101MT/C5449052的有效电容需在37.8V/12.44V相应偏压及全温核验；C_FF/C_CTR固定2.2nF C0G。",
+    "SCHURTER UMT-H 3403.0266.23已定为板上BUS支路入口F_BUS候选，USD 2.77单量参考；pack最大Isc≤1500A、输入电容浪涌、最大清除I²t与PCB/线束协调仍需验证。",
+    "LT3010启动/故障限流不能把50mA当作最大值；需实测输出充电与输入支路峰流/I²t。50mA仅为纸面所需可供电流下界。",
+    "精确RAG-06K22R0FT价格及重复脉冲间隔/热板温规则未闭合；库封装0.25W与采购MPN额定0.5W需分开标识。",
+    "CCTC 22µF bank每bank两只，需验证每bank有效容量≥10µF；同域最高角按总bank 121.854µF、源节点3.036µF核算，BUS14V→READY≤50ms仍须台架验收。",
+    "REF5025、TLV1811、BC847C、UCC本地去耦、总线感测、LED与基极/门极电阻的精确采购价仍有缺项；不据此宣称整板采购成本闭合。",
+    "VO617A-2X007T实装件与现有-4库载体不同；1.8k LED电流约5.2–6.9mA，满温/老化最小CTR和实装身份仍待确认。",
+    "LT3010反馈上臂确认YAGEO RT0603BRD0784K5L/C705797，原厂TCR ±25ppm/°C；成本参考继续采用DigiKey USD 0.11单量价。国产RESI PTFR0805B84K5P9/C2849363历史参考价缺货，不纳入选定小计。"
+  ],
+  "technical_sources": [
+    "https://www.analog.com/media/en/technical-documentation/data-sheets/lt3010-3010-5.pdf",
+    "https://www.ti.com/lit/ds/symlink/tps3760.pdf",
+    "https://www.ti.com/lit/ds/symlink/ref50.pdf",
+    "https://www.ti.com/lit/ds/symlink/tlv1811.pdf",
+    "https://fenghua.com/pdf/thickfilmchipres/antisurge_chipres.pdf",
+    "https://www.vishay.com/docs/83430/vo617a.pdf",
+    "https://www.schurter.com/en/datasheet/typ_UMT-H.pdf",
+    "https://www.jscj-elec.com/kaiguanerjiguan.html",
+    "https://www.fhcomp.com/en/product_info/?prod_code=0603CG222J500NT",
+    "https://www.hotchip.com.cn/hx6105/",
+    "https://www.hotchip.com.cn/hcyvvn/",
+    "https://www.hotchip.com.cn/product-center/",
+    "https://item.szlcsc.com/6351015.html",
+    "https://www.lcsc.com/product-detail/multilayer-ceramic-capacitors-mlcc-smd-smt_fh-0603cg222j500nt_C2991172.html",
+    "https://www.mouser.com/ProductDetail/Schurter/3403.0266.23?qs=mBwMfv9Clf3yd8jPnGI5gA%3D%3D",
+    "https://yageogroup.com/content/datasheet/asset/file/pyu-rt_1-to-0-01_rohs_l"
+  ],
+  "source_files_read_only": [
+    "电力/稳压模块/检查/当前官方BOM.tsv",
+    "电力/稳压模块/检查/候选_母线自供电硬件接管/LT3010独立12V_针网.json",
+    "电力/稳压模块/检查/候选_母线自供电硬件接管/同域TPS3760_互锁针网与验收.json",
+    "电力/元件封装库/索引/商城报价.json",
+    "电力/元件封装库/索引/商城成本.json",
+    "电力/元件封装库/索引/元件总表.csv",
+    "电力/检查/联合仿真/同域泄放互锁核算.json"
+  ]
+}

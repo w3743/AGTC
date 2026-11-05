@@ -1,0 +1,35 @@
+{
+  "status": "HOLD_NOT_POWER_APPROVED",
+  "supersedes": "最小化对照_针网与数量.json 已否决：LED 反向电压风险",
+  "gate": {
+    "part": "SN74LVC1G11 DBV 或 DCK 六脚，封装选型及 PCB 重设计待定；不是原 SN74LVC1G08 直接替换",
+    "pin1": "DUMP_PWM_LIMIT",
+    "pin2": "GND_SYS",
+    "pin3": "LPV_QUAL_LOCAL",
+    "pin4": "DUMP_PWM_ALLOWED → 原 R_DUMP_SW_BASE 100Ω → DUMP_SW_BASE → Q_DUMP_SW pin1 G；保留原47k栅极下拉",
+    "pin5": "3V3_CORE",
+    "pin6": "GUARD_OK",
+    "logic": "三个输入均高时才驱动 Q_DUMP_SW 栅极；核验GUARD电平、输入负载、未供电及复位态。"
+  },
+  "opto": {
+    "legacy": "12V_PROT → 2.2kΩ ±1% → VO617A pin1 A，pin2 K → AO3400A Q_DUMP_SW pin3 D；pin2 S → GND_SYS；pin1 G = DUMP_SW_BASE，通过原100Ω连接 DUMP_PWM_ALLOWED，保留原47k栅极下拉。移除旧 DUMP_OFF 上拉电阻至 Q pin3 的连接，其他旧网络须逐针切割确认。",
+    "new": "12V_HW → 47kΩ ±1% → DUMP_OFF_HW → VO617A pin4 C；pin3 E → GND_SYS；Q_HW C 亦接 DUMP_OFF_HW；UCC pin5 接 DUMP_OFF_HW。",
+    "driver": "UCC pin1 12V_HW；2/3 原输出；4 GND_SYS；5 DUMP_OFF_HW；6 HW_READY；两只监督器保留。",
+    "optional_resistor": "若 2.2k 在最低旧电源电压下不能达到所选 VO617A 数据表 CTR 测试点 5mA，可评估 1.8kΩ ±1%；不得无依据更改，须用所选型号数据手册核算全温老化 CTR、最大 LED 电流、Q_DUMP_SW 灌流、串联电阻功率及瞬态，且 5mA 测试点不等于保证实际 CTR。"
+  },
+  "legacy_ov": "原40.32V比较器及元件保留，但旧 DUMP_OFF 不接新驱动请求，因此不继承其硬件冗余。新较低阈值接管必须验证后才允许移除或取消原路径；独立替代需另行验证。",
+  "count": {
+    "relative_dual_opto_baseline": "39件/车净增，去掉1光耦和1个1k电阻，旧1G08移除1件、新1G11增加1件，合计净减少2件，名义净增37件/车。",
+    "relative_rejected": "同为37件/车净增，另有旧1G08→新1G11的1增1减替换；两者均非完整采购BOM。",
+    "excluded": "输入保护及附加故障防护尚未设计计数；成本未知。"
+  },
+  "limits": [
+    "旧输出 DUMP_OFF 与 Q_DUMP_SW 集电极、Q_PMOS_CTRL及比较器现有连接须逐针切割确认，禁止因改线意外将旧比较器接入或造成反灌。",
+    "GUARD和三个输入的逻辑电平、门供电、上电失电及反灌须验证；Q_DUMP_SW 栅极驱动及漏极电流、电阻功率、光耦CTR和UCC阈值/延迟须验证。",
+    "新旧12V无直接连接，GND共用；光耦不构成电源安全隔离。",
+    "旧光耦LED反向电压风险已消除为设计意图；瞬态、断电和故障电压仍需验证。",
+    "监督默认关、失效安全、低阈值准确度、功率热、3m停车未闭合；不得上电。"
+  ],
+  "source": "https://www.ti.com/lit/ds/symlink/sn74lvc1g11.pdf",
+  "native_project_modified": false
+}
