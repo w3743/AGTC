@@ -198,11 +198,11 @@ class RslPredictionModel:
             with torch.inference_mode():
                 actions = model(TensorDict(values, batch_size=[batch]), stochastic_output=not deterministic)
                 next_state = tuple(value.detach().cpu().numpy().copy() for value in model.get_hidden_state())
-                if clip:
-                    actions = actions.clamp(-1, 1)
                 actions = actions.detach().cpu().numpy()
             if not np.isfinite(actions).all():
                 raise ValueError("RSL actor produced nonfinite actions")
+            if clip:
+                actions = np.clip(actions, -1, 1)
         finally:
             model.reset(hidden_state=previous)
         return (actions[0] if unbatched else actions), next_state

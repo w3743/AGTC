@@ -15,15 +15,22 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from isaac_field.task import Config
-from isaac_field.telemetry import make_hardware_feedback_estimator
+from isaac_field.telemetry import (
+    DRIVE_QUALITY_RPM_VALID,
+    TelemetryAssembler,
+    drive_crc16_ccitt_false,
+    make_hardware_feedback_estimator,
+)
 from isaac_field.action_contract import action_config
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA
 from isaac_field.policy_contract import OBSERVATION_SHAPES, validate_policy_spaces
-from scripts.lassc_consumer import PoseHistory
+from scripts.lassc_consumer import PoseHistory, action_commands
 from scripts.lassc_replay import (
     SYNTHETIC_CLOCK,
     SYNTHETIC_SESSION,
     _action_codec_check,
+    _feed_drive_fixture,
+    _golden_vectors,
     _policy_env,
     _rsl_config_from_contract,
     _rsl_spaces_from_contract,
@@ -101,6 +108,42 @@ def test_action_to_motor_codec_and_typed_gimbal_units():
     assert result["gimbal_request_rad_s"] == pytest.approx([0.45, -0.6])
     assert result["gimbal_wire_codec"] == "not defined; typed rad/s only"
     assert result["transmitted"] is False
+
+
+@pytest.mark.parametrize("side", ["left", "right"])
+@pytest.mark.parametrize("condition", ["fresh", "stale", "missing", "invalid"])
+def test_action_commands_requires_fresh_valid_feedback_on_both_sides(side, condition):
+    assembler = TelemetryAssembler()
+    vectors, _ = _golden_vectors()
+    for node in ("left", "right"):
+        if node == side and condition == "missing":
+            continue
+        node_vectors = vectors
+        if node == side and condition == "invalid":
+            node_vectors = dict(vectors)
+            for name in ("state_left", "quality_left"):
+                vector = vectors[name]
+                data = bytearray.fromhex(vector["data_hex"])
+                if name == "state_left":
+                    data[2:4] = b"\x00\x80"
+                else:
+                    data[4] &= ~DRIVE_QUALITY_RPM_VALID
+                crc = drive_crc16_ccitt_false(int(vector["id"], 16), len(data), data[:6])
+                data[6:8] = crc.to_bytes(2, "little")
+                node_vectors[name] = dict(vector, data_hex=data.hex())
+        received = 0.899 if node == side and condition == "stale" else 1.0
+        _feed_drive_fixture(assembler, node_vectors, side=node, received_monotonic=received)
+
+    kwargs = dict(session_id=0x4242, sequence=1, ttl_10ms=10, cfg=Config(),
+                  telemetry=assembler, now_monotonic=1.0)
+    action = [1.0, -0.5, 0.0, 0.0]
+    if condition == "fresh":
+        command = action_commands(action, **kwargs)
+        assert [packet["can_id"] for packet in command["drive_packets"]] == [0x501, 0x502]
+        assert command["transmitted"] is False
+    else:
+        with pytest.raises(ValueError, match=f"{side} motor feedback"):
+            action_commands(action, **kwargs)
 
 
 def test_checkpoint_space_adapter_matches_saved_bounds_without_fake_steps():
