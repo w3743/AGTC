@@ -7,6 +7,6 @@
 | `data.py` | 下载和校验 MNIST IDX 数据，并提供训练集、开发集及显式请求的测试集读取。 |
 | `model.py` | 定义用于 MNIST 的局部神经元循环分类模型及相关更新规则。 |
 | `baseline.py` | 定义作为参考的全连接多层感知机；不宣称与实验模型计算量匹配。 |
-| `train.py` | 提供模型训练和结果记录入口；默认将运行结果写入仓库外的 `C:/pioneer/local-neuron-runs`。 |
+| `train.py` | 提供模型训练和结果记录入口；默认将运行结果写入本目录的 `.local/runs`（已 gitignore）。 |
 
 代码依赖 PyTorch；目录内尚无已跟踪的依赖清单。`train.py` 中列出的 `requirements.txt` 不在当前目录，运行前应确认依赖和源码快照记录方式。

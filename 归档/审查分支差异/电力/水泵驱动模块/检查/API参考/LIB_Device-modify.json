@@ -1,0 +1,50 @@
+{
+  "title": "修改器件",
+  "remarks": "如希望清除某些属性，则将其的值设置为 `null`",
+  "params": [
+    {
+      "name": "deviceUuid",
+      "type": "string",
+      "description": "器件 UUID",
+      "required": true
+    },
+    {
+      "name": "libraryUuid",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "deviceName",
+      "type": "string",
+      "description": "器件名称",
+      "required": false
+    },
+    {
+      "name": "classification",
+      "type": "ILIB_ClassificationIndex | Array<string> | null",
+      "description": "分类",
+      "required": false
+    },
+    {
+      "name": "association",
+      "type": "{ symbolUuid?: string; symbol?: { uuid: string; libraryUuid: string }; footprintUuid?: string | null; footprint?: { uuid: string; libraryUuid: string } | null; model3D?: { uuid: string; libraryUuid: string } | null; imageData?: null }",
+      "description": "关联符号、封装、图像",
+      "required": false
+    },
+    {
+      "name": "description",
+      "type": "string | null",
+      "description": "描述",
+      "required": false
+    },
+    {
+      "name": "property",
+      "type": "{ name?: string | null; designator?: string; addIntoBom?: boolean; addIntoPcb?: boolean; net?: string; manufacturer?: string | null; manufacturerId?: string | null; supplier?: string | null; supplierId?: string | null; otherProperty?: object }",
+      "description": "其它属性",
+      "required": false
+    }
+  ],
+  "returns": {
+    "type": "boolean"
+  }
+}

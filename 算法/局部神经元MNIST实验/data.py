@@ -21,7 +21,7 @@ from typing import Literal
 from uuid import uuid4
 
 
-DEFAULT_CACHE_DIR = Path("C:/pioneer/mnist-local-neuron-data")
+DEFAULT_CACHE_DIR = Path(__file__).resolve().parent / ".local" / "mnist-data"
 MIRRORS = (
     "https://ossci-datasets.s3.amazonaws.com/mnist",
     "https://storage.googleapis.com/cvdf-datasets/mnist",

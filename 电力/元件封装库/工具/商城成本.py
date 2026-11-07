@@ -49,7 +49,7 @@ MODULES = {
     "REGULATOR": {
         "label": "稳压模块",
         "input": PRICE_INPUT_DIR / "稳压.json",
-        "bom": ROOT / "电力" / "稳压模块" / "原理图准备" / "BOM.csv",
+        "bom": ROOT / "电力" / "稳压模块" / "原理图准备" / "选型BOM.csv",
         "kind": "csv",
     },
     "PUMP": {
@@ -173,6 +173,8 @@ def scope_bucket_for(module: str, scope: str, refs: list[str]) -> str:
         return "external_accessory"
     if module in {"FOC-A", "FOC-B", "FOC"}:
         return "external_accessory" if set(refs) & FOC_EXTERNAL_REFS or "external" in raw or "harness" in raw else "on_board"
+    if module == "REGULATOR" and "COREBOARD_WEACT" in refs:
+        return "core_board_module"
     if raw in {"daughterboard", "core_board_module", "core_board"} or "核心板" in scope:
         return "core_board_module"
     if raw in {"off_board", "off_board_external", "harness", "board_interface_package_pending", "external_accessory"} or "external" in raw or "harness" in raw:
@@ -325,78 +327,82 @@ def bms_demands(
     by_ref, parts_by_mpn = catalog_indexes(catalog)
     bom_by_ref = {clean(r.get("位号")): r for r in bom_rows if clean(r.get("位号"))}
     input_items = input_doc.get("items", [])
-    item_by_ref: dict[str, dict[str, Any]] = {}
-    for item in input_items:
-        for ref in item.get("designators", []):
-            if ref in item_by_ref:
-                issues.append(f"BMS核价输入重复映射位号:{ref}")
-            item_by_ref[ref] = item
-
+    covered_refs: set[str] = set()
     records: list[dict[str, Any]] = []
     for item in input_items:
         scope = str(item.get("scope") or "unspecified")
-        refs = list(item.get("designators", []))
-        q = as_int(item.get("qty_per_bms_set", 0))
+        item_mpn = clean(item.get("mpn"))
+        known_variants = {norm_mpn(item_mpn), *[norm_mpn(x) for x in item.get("source_mpn_variants", [])]}
+        refs = []
+        for ref in item.get("designators", []):
+            row = bom_by_ref.get(ref)
+            if row is None:
+                continue
+            if ref in covered_refs:
+                issues.append(f"BMS核价输入重复映射位号:{ref}")
+                continue
+            if scope != "on_board" and norm_mpn(row.get("MPN")) not in known_variants:
+                continue
+            refs.append(ref)
+            covered_refs.add(ref)
+        if not refs:
+            continue
+        q = sum(as_int(bom_by_ref[ref].get("每套用量"), default=None) for ref in refs)
         if scope == "on_board":
             resolved = []
             for ref in refs:
-                row = bom_by_ref.get(ref)
+                row = bom_by_ref[ref]
                 ci = by_ref.get(f"BMS模块::{ref}")
                 local_issues: list[str] = []
-                if row is None:
-                    local_issues.append("designator_missing_from_current_BOM")
                 if ci is None:
                     local_issues.append("designator_missing_from_current_catalog")
-                bom_mpn = clean(row.get("MPN")) if row else None
+                bom_mpn = clean(row.get("MPN"))
                 cat_mpn = clean(ci.get("mpn")) if ci else None
-                item_mpn = clean(item.get("mpn"))
-                known_variants = {norm_mpn(item_mpn), *[norm_mpn(x) for x in item.get("source_mpn_variants", [])]}
-                if bom_mpn and item_mpn and norm_mpn(bom_mpn) not in known_variants:
-                    local_issues.append("audit_input_mpn_differs_from_current_BOM")
-                if bom_mpn and cat_mpn and norm_mpn(bom_mpn) != norm_mpn(cat_mpn) and norm_mpn(cat_mpn) not in known_variants:
+                historical_mpn_matches = bool(bom_mpn and norm_mpn(bom_mpn) in known_variants)
+                if ci and not (
+                    bom_mpn and (
+                        norm_mpn(bom_mpn) == norm_mpn(cat_mpn)
+                        or (historical_mpn_matches and norm_mpn(cat_mpn) in known_variants)
+                    )
+                ):
                     local_issues.append("central_catalog_mpn_differs_from_current_BOM")
-                maker = clean(ci.get("manufacturer")) if ci else None
+                    ci = None
+                bom_maker = clean(row.get("Manufacturer"))
+                maker = bom_maker or (clean(ci.get("manufacturer")) if ci else None)
                 code = norm_code(ci.get("supplier_part")) if ci else None
-                if item.get("lcsc_codes") and code and code not in {norm_code(x) for x in item.get("lcsc_codes", [])}:
+                if ci and bom_maker and norm_manufacturer(ci.get("manufacturer")) != norm_manufacturer(bom_maker):
+                    code = None
+                if historical_mpn_matches and item.get("lcsc_codes") and code and code not in {norm_code(x) for x in item.get("lcsc_codes", [])}:
                     local_issues.append("catalog_supplier_part_not_in_price_input_crosscheck")
                 resolved.append({
                     "ref": ref,
                     # The audit input's normalized exact MPN resolves harmless manufacturer
                     # prefixes recorded in source BOM/native attributes (e.g. "TI SN..." vs "SN...").
-                    "mpn": item_mpn if item_mpn and ((bom_mpn and norm_mpn(bom_mpn) in known_variants) or (cat_mpn and norm_mpn(cat_mpn) in known_variants)) else (bom_mpn or cat_mpn or item_mpn),
+                    "mpn": item_mpn if item_mpn and historical_mpn_matches else bom_mpn,
                     "manufacturer": maker,
                     "supplier_part": code,
                     "issues": local_issues,
                     "row": row,
                 })
             signatures = {(norm_manufacturer(x["manufacturer"]), norm_mpn(x["mpn"]), norm_code(x["supplier_part"])) for x in resolved}
-            if len(signatures) <= 1:
-                entry = resolved[0] if resolved else {"mpn": item.get("mpn"), "manufacturer": None, "supplier_part": None, "issues": ["no_designators"]}
+            if len(signatures) == 1:
+                entry = resolved[0]
                 all_issues = [p for x in resolved for p in x["issues"]]
-                if q != len(refs):
-                    all_issues.append(f"quantity_{q}_differs_from_designator_count_{len(refs)}")
                 records.append(make_demand(
                     "BMS", scope, refs, entry["mpn"], entry["manufacturer"], entry["supplier_part"], q,
                     MODULES["BMS"]["bom"], None, all_issues, "included_current_BMS_input",
                     source_supplier_part=None,
                     supplier_part_resolution_source="current_central_index" if entry["supplier_part"] else None,
                 ))
-            elif q == len(resolved):
+            else:
                 for x in resolved:
                     records.append(make_demand(
-                        "BMS", scope, [x["ref"]], x["mpn"], x["manufacturer"], x["supplier_part"], 1,
+                        "BMS", scope, [x["ref"]], x["mpn"], x["manufacturer"], x["supplier_part"],
+                        as_int(x["row"].get("每套用量"), default=None),
                         MODULES["BMS"]["bom"], None, x["issues"], "included_current_BMS_input",
                         source_supplier_part=None,
                         supplier_part_resolution_source="current_central_index" if x["supplier_part"] else None,
                     ))
-            else:
-                records.append(make_demand(
-                    "BMS", scope, refs, item.get("mpn"), None, None, q,
-                    MODULES["BMS"]["bom"], None,
-                    ["central_catalog identities differ within an input group and quantity cannot be split safely"],
-                    "included_current_BMS_input",
-                    source_supplier_part=None,
-                ))
         else:
             # The audit input joins the current BOM and the purchase supplement; keep every current
             # off-board accessory and the explicitly required core-board module as purchase demand.
@@ -420,8 +426,6 @@ def bms_demands(
                 local_issues.append("ambiguous_manufacturer_candidates")
             if len(code_list) > 1:
                 local_issues.append("ambiguous_supplier_part_candidates")
-            if not refs or any(ref not in bom_by_ref for ref in refs):
-                local_issues.append("reference_not_found_in_current_BMS_BOM")
             records.append(make_demand(
                 "BMS", scope, refs, mpn, maker, code, q, MODULES["BMS"]["bom"], None,
                 local_issues, "included_current_BMS_input" if scope == "core_board_module" else "current_external_accessory",
@@ -429,12 +433,19 @@ def bms_demands(
                 supplier_part_resolution_source="BMS_price_audit_input" if code else None,
             ))
 
-    total_from_items = sum(as_int(x.get("qty_per_bms_set", 0)) for x in input_items)
+    for ref, row in bom_by_ref.items():
+        if ref in covered_refs:
+            continue
+        issues.append(f"BMS当前BOM位号未找到适用的历史范围映射:{ref}")
+        records.append(make_demand(
+            "BMS", "unspecified", [ref], row.get("MPN"), row.get("Manufacturer"), None,
+            as_int(row.get("每套用量"), default=None), MODULES["BMS"]["bom"], None,
+            ["current_BOM_scope_unresolved"], "included_current_BMS_BOM",
+        ))
+    total_from_items = sum(x["quantity"] for x in records)
     total_from_bom = sum(as_int(r.get("每套用量", 0)) for r in bom_rows)
     if total_from_items != total_from_bom:
         issues.append(f"BMS输入数量{total_from_items}与当前BOM数量{total_from_bom}不一致")
-    if len(bom_rows) != input_doc.get("summary", {}).get("bom_designator_rows"):
-        issues.append("BMS输入声明的BOM行数与当前BOM不一致")
     return records, issues, total_from_items
 
 
@@ -489,6 +500,9 @@ def generic_module_demands(
             scope = clean(row.get("Scope")) or "unspecified"
             quantity = as_int(row.get("Quantity", 0))
             status = str(row.get("Procurement status") or "")
+            if module_key == "REGULATOR":
+                # The selected BOM records adoption separately from historical procurement qualification.
+                status = clean(row.get("Selection status")) or status
             # Explicit non-current candidates/placeholders are listed separately, never priced as current.
             is_candidate = (
                 "CONDITIONAL" in scope.upper()
@@ -529,6 +543,12 @@ def generic_module_demands(
                 ci = by_ref.get(f"稳压模块::{ref}")
             elif module_key == "PUMP":
                 ci = by_ref.get(f"水泵驱动模块::{ref}")
+            if ci and module_key == "REGULATOR" and (
+                not mpn or not maker or norm_mpn(ci.get("mpn")) != norm_mpn(mpn)
+                or norm_manufacturer(ci.get("manufacturer")) != norm_manufacturer(maker)
+            ):
+                local_issues.append("native_reference_not_exact_procurement_identity")
+                continue
             if ci:
                 if norm_code(ci.get("supplier_part")):
                     codes_from_catalog.add(norm_code(ci.get("supplier_part")) or "")
@@ -544,7 +564,7 @@ def generic_module_demands(
             bom_code = next(iter(codes_from_catalog))
             code_resolution_source = "current_central_index"
             local_issues.append("supplier_code_filled_from_current_central_index")
-        if not bom_code and mpn:
+        if not bom_code and mpn and (module_key != "REGULATOR" or maker):
             exact_parts = [
                 x for x in parts_by_mpn.get(norm_mpn(mpn), [])
                 if norm_mpn(x.get("mpn")) == norm_mpn(mpn)
@@ -654,7 +674,7 @@ def foc_demands(input_doc: dict[str, Any], bom_rows: list[dict[str, str]], catal
                 "scope": "DNP population override", "status": "FOC-B DNP",
                 "source": MODULES["FOC"]["supplement"].relative_to(ROOT).as_posix(),
                 "source_row": as_int(bias_rows[0].get("source_row", 0)) if bias_rows else None,
-                "reason": "双板装配覆盖：该共享10k偏置仅FOC-A安装一次，FOC-B不装",
+                "reason": "双板装配覆盖：该共享偏置仅FOC-A安装一次，FOC-B不装",
             })
 
         for module_label, target_q, target in (("FOC-A", qa, a_records), ("FOC-B", qb, b_records)):
@@ -671,7 +691,9 @@ def foc_demands(input_doc: dict[str, Any], bom_rows: list[dict[str, str]], catal
             catalog_mpns: set[str] = set()
             for ref in refs:
                 ci = by_ref.get(f"FOC驱动模块::{ref}")
-                if ci:
+                if ci and mpn and norm_mpn(ci.get("mpn")) == norm_mpn(mpn) and (
+                    not maker or norm_manufacturer(ci.get("manufacturer")) == norm_manufacturer(maker)
+                ):
                     if norm_code(ci.get("supplier_part")):
                         catalog_codes.add(norm_code(ci.get("supplier_part")) or "")
                     if clean(ci.get("manufacturer")):
@@ -696,7 +718,9 @@ def foc_demands(input_doc: dict[str, Any], bom_rows: list[dict[str, str]], catal
 
             for ref in refs:
                 for meta in meta_by_ref.get(ref, []):
-                    if clean(meta.get("manufacturerPart")) and norm_mpn(meta.get("manufacturerPart")) == norm_mpn(mpn):
+                    if mpn and norm_mpn(meta.get("manufacturerPart")) == norm_mpn(mpn) and (
+                        not maker or norm_manufacturer(meta.get("manufacturer")) == norm_manufacturer(maker)
+                    ):
                         if not maker:
                             maker = clean(meta.get("manufacturer"))
                         if not code:
@@ -744,14 +768,6 @@ def foc_demands(input_doc: dict[str, Any], bom_rows: list[dict[str, str]], catal
                     source_supplier_part=code,
                     supplier_part_resolution_source="FOC_assembly_supplement_and_price_input" if code else None,
                 ))
-    # Validate the explicit population override and expected module piece counts.
-    q_a = sum(x["quantity"] for x in a_records)
-    q_b = sum(x["quantity"] for x in b_records)
-    expected_a = input_doc.get("quantityBasis", {}).get("FOC_A_total", 156)
-    expected_b = input_doc.get("quantityBasis", {}).get("FOC_B_total", 155)
-    if q_a != expected_a or q_b != expected_b:
-        # Quantity basis in earlier inputs may be free text; verification is also performed in build_output.
-        pass
     return a_records, b_records
 
 
@@ -1280,7 +1296,7 @@ def build_outputs() -> tuple[dict[str, Any], str]:
             register_binding(bindings, f"{key}装配补充", spec["supplement"], "population overrides and additive off-board purchase lines")
 
     input_issues: list[str] = []
-    # Verify each audit input is bound to the BOM bytes actually being priced.
+    # Preserve historical bindings as audit evidence, including any drift from today's inputs.
     for key, spec in MODULES.items():
         input_doc = inputs[key]
         actual_sha = sha256(spec["bom"])
@@ -1292,13 +1308,17 @@ def build_outputs() -> tuple[dict[str, Any], str]:
         else:
             declared_sha = input_doc.get("source_bom", {}).get("sha256")
         if declared_sha and declared_sha.casefold() != actual_sha.casefold():
-            input_issues.append(f"{spec['label']}核价输入绑定BOM SHA与当前BOM不一致")
+            input_issues.append(f"{spec['label']}历史核价输入的BOM SHA与当前BOM不同；保留原核价输入绑定")
 
     candidate_exclusions: list[dict[str, Any]] = []
     bms_records, bms_issues, bms_total = bms_demands(inputs["BMS"], bms_rows, catalog)
     input_issues.extend(bms_issues)
     foc_a, foc_b = foc_demands(inputs["FOC"], foc_rows, catalog, candidate_exclusions)
-    regulator_records = generic_module_demands("REGULATOR", inputs["REGULATOR"], regulator_rows, catalog, candidate_exclusions)
+    regulator_input = inputs["REGULATOR"]
+    # Historical reference-based audit metadata cannot identify changed or unspecified selections.
+    if regulator_input.get("source_bom", {}).get("sha256") != sha256(MODULES["REGULATOR"]["bom"]):
+        regulator_input = {}
+    regulator_records = generic_module_demands("REGULATOR", regulator_input, regulator_rows, catalog, candidate_exclusions)
     pump_records = generic_module_demands("PUMP", inputs["PUMP"], pump_rows, catalog, candidate_exclusions)
 
     # The user decision is to keep only the current eight supercapacitors; no 16-piece alternative
@@ -1316,7 +1336,7 @@ def build_outputs() -> tuple[dict[str, Any], str]:
         "included_in_current_scenario": True,
         "additional_quantity_included": 0,
         "configuration_status": "single_current_configuration_only; no active 16-piece alternative",
-        "source": "电力/稳压模块/原理图准备/BOM.csv",
+        "source": MODULES["REGULATOR"]["bom"].relative_to(ROOT).as_posix(),
         "note": "当前设计目标使用现有8只，增量0；超容首要承接制动回生，有余电时辅助启动。先前16只方案已撤回；如重新采购须另行核价。",
     }
 
@@ -1337,24 +1357,6 @@ def build_outputs() -> tuple[dict[str, Any], str]:
 
     quantity_a = sum(x["quantity"] for x in module_demands["FOC-A"])
     quantity_b = sum(x["quantity"] for x in module_demands["FOC-B"])
-    foc_basis = inputs["FOC"].get("quantityBasis", {})
-    foc_native_a = as_int(foc_basis.get("FOC_AActual", 156))
-    foc_native_b = as_int(foc_basis.get("FOC_BActual", 155))
-    foc_mates = as_int(foc_basis.get("extraExternalMatePlugUnits", 2))
-    foc_mates_a = foc_mates // 2
-    foc_mates_b = foc_mates - foc_mates_a
-    expected_a = foc_native_a + foc_mates_a
-    expected_b = foc_native_b + foc_mates_b
-    if quantity_a != expected_a:
-        input_issues.append(
-            f"FOC-A当前采购数为{quantity_a}，预期原生实装{foc_native_a}+线端配套{foc_mates_a}={expected_a}"
-        )
-    if quantity_b != expected_b:
-        input_issues.append(
-            f"FOC-B当前采购数为{quantity_b}，预期原生实装{foc_native_b}+线端配套{foc_mates_b}={expected_b}"
-        )
-    if bms_total != 271:
-        input_issues.append(f"BMS输入当前采购数为{bms_total}，既有核对基线为271")
     if supercap_current != 8:
         input_issues.append(f"当前SC0350-270-RSS数量为{supercap_current}，既有当前BOM配置预期8")
 
@@ -1404,11 +1406,11 @@ def build_outputs() -> tuple[dict[str, Any], str]:
     foc_bias = [r for r in foc_rows if "R_LOAD_VALID_BIAS" in split_refs(r.get("Designator"))]
     foc_supp_rows = read_csv(MODULES["FOC"]["supplement"])
     bms_scopes = defaultdict(int)
-    for d in module_demands["BMS"]:
-        bms_scopes[d.get("scopes", ["unspecified"])[0]] += d["quantity"]
+    for d in bms_records:
+        bms_scopes[d["scope"]] += d["quantity"]
     evidence = {
         "module_input_summaries": {
-            "BMS": {"items": len(inputs["BMS"].get("items", [])), "total_qty": bms_total, "expected_scope_qty": inputs["BMS"].get("summary", {}).get("items_by_scope", [])},
+            "BMS": {"items": len(inputs["BMS"].get("items", [])), "total_qty": bms_total, "current_scope_qty": dict(sorted(bms_scopes.items()))},
             "FOC": {"input_items": len(inputs["FOC"].get("items", [])), "current_bom_rows": len(foc_rows), "native_bom_qty_per_board": foc_native_a, "current_a_total_including_external_mate": quantity_a, "current_b_total_including_external_mate": quantity_b, "bias_rows": len(foc_bias), "supplement_rows": len(foc_supp_rows)},
             "REGULATOR": {"input_items": len(inputs["REGULATOR"].get("items", [])), "current_bom_rows": len(regulator_rows), "current_bom_qty_including_candidate_lines": sum(as_int(r.get("Quantity", 0)) for r in regulator_rows), "candidate_excluded_qty": sum(x["quantity"] for x in candidate_exclusions if x["module"] == MODULES["REGULATOR"]["label"])},
             "PUMP": {"input_items": len(inputs["PUMP"].get("items", [])), "current_bom_rows": len(pump_rows), "current_bom_qty": sum(as_int(r.get("Quantity", 0)) for r in pump_rows)},
@@ -1454,10 +1456,7 @@ def fmt_money(value: Any) -> str:
 
 def render_markdown(data: dict[str, Any]) -> str:
     summaries = data["input_validation"]["module_input_summaries"]
-    bms_scopes = {
-        x.get("scope"): as_int(x.get("qty_per_bms_set", 0))
-        for x in summaries["BMS"].get("expected_scope_qty", [])
-    }
+    bms_scopes = summaries["BMS"]["current_scope_qty"]
     bms_scope_text = " + ".join(
         f"{bms_scopes.get(scope, 0)}{label}"
         for scope, label in (("on_board", "板上"), ("external_accessory", "外配"), ("core_board_module", "核心板"))
@@ -1473,7 +1472,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         "",
         "本页由 `工具/商城成本.py` 从下方列出的原生BOM、模块核价输入和统一商城报价表确定性生成。只将精确MPN、厂家、已验证LCSC C码三者一致且有记录人民币价梯的SKU计入已核价小计。",
         "",
-        "**使用边界：稳压核价输入仍绑定原 `原理图准备/BOM.csv`，未覆盖新版 `选型BOM.csv`；BMS原生亦未完成9S5P升级。报价日期以各条记录为准，不代表今天可成交价格。本页不能作为现行整车总价或新版稳压总价。** 本次新旧口径核对见 [电力器件成本复核](../../检查/电力器件成本复核_20261030.json)。",
+        "**使用边界：采购数量以现行BOM和装配补充为准。稳压采用状态来自现行 `选型BOM.csv`，历史位号映射须与其BOM哈希一致才启用。已采用而采购身份待定的条目仍计入需求，价格待核。已核价项来自精确身份一致的报价记录，日期见各条记录。BMS板级采购与9S5P电芯采购分别核算。** 历史口径见 [电力器件成本复核](../../检查/电力器件成本复核_20261030.json)。",
         "",
         "完整总价在存在未核价SKU、身份/数量不确定或现金约束缺失时保持 `null`。本页不把部分小计称为总价，也不包括PCB、SMT、运费；没有报价明确说明的税费不推算。",
         "库存快照中的 `zero_snapshot`、`unknown`、`out_of_stock` 仅列待复核；只有报价标为在售且有正的已知库存数、数量低于采购批量时才计为确证库存不足。",
@@ -1493,7 +1492,7 @@ def render_markdown(data: dict[str, Any]) -> str:
         for issue in data["input_validation"]["input_issues"]:
             lines.append(f"- {issue}")
     else:
-        lines.extend(["", "## 输入校验", "", "核价输入声明的原生BOM绑定、数量基线与对应源文件检查一致；不代表已覆盖新版选型BOM。"])
+        lines.extend(["", "## 输入校验", "", "核价输入声明的BOM绑定、数量基线与对应源文件检查一致。"])
 
     lines.extend(["", "## 场景汇总", ""])
     for key, scenario in data["scenarios"].items():

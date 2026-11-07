@@ -1,0 +1,29 @@
+{
+  "qualification": "HOLD",
+  "input_sha256": {
+    "电力\\FOC驱动模块\\仿真\\tools\\ngspice-47-portable\\Spice64\\bin\\ngspice_con.exe": "22d5cae2bd32b2e39157a8d27bf457122f68285b72a9ebefdf41551b628233ab",
+    "电力\\稳压模块\\检查\\候选_预充与超容隔离_R1\\保护页_保持与监控.json": "774ef951d22b24e24d2e6d5563127ba8015926cfed9e50583b868033fecf01c5",
+    "电力\\稳压模块\\检查\\候选_预充与超容隔离_R1\\受限储能隔离_概念候选.svg": "e92b00d1ce7c363dd8a0dc8bf1b596928c67c44452fcf2fd6de22fbc1d5e3450"
+  },
+  "scope": "电源拓扑筛查。理想 11.4 V 早轨、固定 0.6 V 加 0.1 Ω 的单向导通包络及 105 mA 压力负载。欠压监管、输出关栅、共点短路导致早轨的实际退化和器件损耗动态待核。",
+  "startup_from_zero_ms_to_10p7_v": 31.9998051,
+  "startup_scope": "26.4 µF、434.3 Ω，无检测输入分压漏载，计二极管分流至105mA负载。",
+  "early_rail_short_hold_above_4p8_v_us": 100.05568199999999,
+  "early_rail_short_scope": "有效保持电容仅 2.2 µF，起始10.7 V条件，425.7 Ω 向短接早轨反向泄放。",
+  "reserve_short_steady_ldo_input_v": 10.7895,
+  "reserve_short_steady_prot_current_a_in_model": 0.131778793,
+  "reserve_short_max_added_source_current_a_at_13p2_v": 0.031007751937984496,
+  "reserve_short_max_charge_resistor_power_w_at_13p2_v": 0.4093023255813953,
+  "charge_resistor_open_reserve_v_in_model": 2.07272727e-09,
+  "common_ldo_input_short_v_in_idealized_model": 0.981832551,
+  "ldo_thermal_screen": {
+    "datasheet": "https://www.ti.com/lit/ds/symlink/tlv760.pdf",
+    "specified_max_output_a": 0.1,
+    "ambient_c": 60,
+    "operating_junction_limit_c": 125,
+    "datasheet_theta_ja_c_per_w": 275.2,
+    "steady_output_limit_a_ignoring_ground_current_at_13p2_in": 0.023857763683345082,
+    "scope": "105mA 为电源前端压力假设。实际 TPSI/逻辑脉冲和平均负载、稳压及散热待验证。"
+  },
+  "remaining": "欠压检测必须在电容未就绪、充电开路及电容短路时硬禁能；保持通路的二极管和公共 LDO 输入节点短路仍须分别处理。"
+}

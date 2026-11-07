@@ -47,7 +47,7 @@ class InputMemoryRTRLTests(unittest.TestCase):
         n = model.network
         h = torch.zeros(20, dtype=n.input_weights.dtype)
         f = torch.zeros(20, 20, dtype=h.dtype)
-        m = torch.zeros(30, dtype=h.dtype)
+        m = torch.zeros(model.memory_width, dtype=h.dtype)
         for digit in sequence:
             x = F.one_hot(torch.tensor(digit), 10).to(h.dtype)
             # The memory read is from m_prev; its write occurs after h_new.
@@ -55,7 +55,8 @@ class InputMemoryRTRLTests(unittest.TestCase):
             decay = n.trace_decay
             f = decay * f + (1 - decay) * torch.outer(h_new, h)
             retention = model.input_retention
-            m = retention * m + (1 - retention) * torch.cat((x, h))
+            sources = torch.cat((x, h)) if model.scope == "all" else x
+            m = retention * m + (1 - retention) * sources
             h = h_new
         return n.W_out @ h + n.b_out, h, f, m
 
@@ -107,6 +108,28 @@ class InputMemoryRTRLTests(unittest.TestCase):
         model.learn_target(2)
         for name, grad in expected.items():
             self.assertTrue(torch.allclose(captured[name], grad, atol=3e-5, rtol=3e-5), name)
+
+    def test_external_memory_sensitivity_matches_autograd(self):
+        model = InputMemoryRTRL(seed=209, mode="learned", scope="external")
+        model.network.double()
+        model.reset_state()
+        with torch.no_grad():
+            model.network.memory_weights.normal_(0, .04)
+        for digit in HISTORY:
+            model.advance(digit)
+        n = model.network
+        core = [n.input_weights, n.recurrent_weights, n.bias, n.eta_raw,
+                n.decay_logit, n.memory_weights, n.input_retention_logit]
+        _, h, f, m = self._reference(model, HISTORY)
+        gen = torch.Generator().manual_seed(210)
+        vh = torch.randn(20, generator=gen, dtype=torch.float64)
+        vf = torch.randn(20, 20, generator=gen, dtype=torch.float64)
+        vm = torch.randn(10, generator=gen, dtype=torch.float64)
+        expected = torch.cat([g.reshape(-1) for g in torch.autograd.grad(
+            h @ vh + (f * vf).sum() + m @ vm, core)])
+        actual = model.eh.T @ vh + model.ef.reshape(400, -1).T @ vf.reshape(-1) + model.em.T @ vm
+        self.assertTrue(torch.allclose(actual, expected, atol=3e-8, rtol=3e-7),
+                        float((actual - expected).abs().max()))
 
     def test_optimizer_layout_fresh_state_checkpoint_and_bounded_stream(self):
         fixed = InputMemoryRTRL(seed=206, mode="fixed")

@@ -53,6 +53,11 @@ function Invoke-Logged {
     $logPath = Join-Path $logRoot ($Name + '.log')
     [System.IO.File]::WriteAllText($logPath, "COMMAND: $Executable $($Arguments -join ' ')`r`n", $utf8NoBom)
     & $Executable @Arguments 2>&1 | Tee-Object -FilePath $logPath -Append
+    # Windows PowerShell 5.1 Tee-Object writes UTF-16; normalize the appended log to UTF-8.
+    if ($PSVersionTable.PSVersion.Major -lt 7 -and (Test-Path -LiteralPath $logPath)) {
+        $logText = Get-Content -LiteralPath $logPath -Raw
+        [System.IO.File]::WriteAllText($logPath, $logText, $utf8NoBom)
+    }
     $exitCode = $LASTEXITCODE
     [System.IO.File]::WriteAllText(($logPath + '.exit'), [string]$exitCode, $utf8NoBom)
     if ($exitCode -ne 0) {

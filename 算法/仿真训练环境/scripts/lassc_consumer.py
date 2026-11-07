@@ -29,7 +29,7 @@ if str(ROOT) not in sys.path:
 
 from isaac_field.feedback import ABSOLUTE_GOAL_INPUT_SCHEMA, FeedbackSnapshot
 from isaac_field.task import Config, FieldTask
-from isaac_field.telemetry import encode_speed_command
+from isaac_field.telemetry import TelemetryAssembler, encode_speed_command
 
 
 def load_depth_modules(app: str | Path | None = None):
@@ -435,7 +435,8 @@ class LASSCConsumer:
 
 
 def action_commands(action, *, session_id: int, sequence: int, ttl_10ms: int,
-                    cfg: Config, drive_radius_m: float = .03,
+                    cfg: Config, telemetry: TelemetryAssembler, now_monotonic: float,
+                    drive_radius_m: float = .03,
                     reduction: float = 4.0) -> dict:
     """Pure command conversion using physical sprocket radius, NOT proxy radius.
 
@@ -445,6 +446,12 @@ def action_commands(action, *, session_id: int, sequence: int, ttl_10ms: int,
     a = np.asarray(action, dtype=np.float64)
     if a.shape != (4,) or not np.isfinite(a).all() or np.max(np.abs(a)) > 1:
         raise ValueError("action must be four finite normalized values")
+    if not math.isfinite(now_monotonic):
+        raise ValueError("finite command monotonic time required")
+    for side in ("left", "right"):
+        pair = telemetry.get_motor_feedback(side, now_monotonic)
+        if pair is None or not pair["valid"]:
+            raise ValueError(f"{side} motor feedback is missing, stale or invalid")
     if (not math.isfinite(drive_radius_m) or drive_radius_m <= 0
             or not math.isfinite(reduction) or reduction <= 0):
         raise ValueError("positive drive geometry required")
