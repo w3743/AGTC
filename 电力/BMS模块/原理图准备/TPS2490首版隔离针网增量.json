@@ -1,0 +1,260 @@
+{
+  "status": "HOLD，仅原理图候选增量，禁止生成投产BOM或用作可上电网表",
+  "base": {
+    "path": "../检查/预充合闸候选基线/精简候选_P1.enet",
+    "sha256": "3813a9189720186eb35cb4cbd5ff690745a4587cde5d7b9bb33db15d85286586"
+  },
+  "verified": {
+    "TPS2490DGSR": {
+      "1": "B0，仅禁能审图态，待最终 EN 许可接线",
+      "2": "PRE_TPS_VREF",
+      "3": "PRE_TPS_PROG",
+      "4": "PRE_TPS_TIMER",
+      "5": "B0",
+      "6": "NC，仅供参考，不接主路许可",
+      "7": "PRE_LIN_OUT",
+      "8": "PRE_LINEAR_GATE",
+      "9": "PRE_TPS_SENSE",
+      "10": "BATT+_FUSED"
+    },
+    "passives": [
+      {
+        "value": "47 kΩ",
+        "nets": [
+          "PRE_TPS_VREF",
+          "PRE_TPS_PROG"
+        ]
+      },
+      {
+        "value": "56 mΩ，总偏差≤±1.5%，Kelvin取样",
+        "nets": [
+          "BATT+_FUSED",
+          "PRE_TPS_SENSE"
+        ]
+      },
+      {
+        "value": "CT有效47–55 µF，料号及漏电待定",
+        "nets": [
+          "PRE_TPS_TIMER",
+          "B0"
+        ]
+      }
+    ],
+    "linear_fet": {
+      "mpn": "CSD19536KTT",
+      "gate": "PRE_LINEAR_GATE",
+      "drain": "PRE_TPS_SENSE",
+      "source": "PRE_LIN_OUT"
+    },
+    "base_changes": [
+      {
+        "pin": "Q_PRE1.2",
+        "from": "BATT+_FUSED",
+        "to": "PRE_LIN_OUT"
+      },
+      {
+        "pin": "Q_PRE2.2",
+        "from": "QPRE_SW",
+        "to": "PACK+"
+      },
+      {
+        "ref": "R_PRE",
+        "action": "脱离预充支路。测试支路未定稿，不装配或接线"
+      }
+    ],
+    "retain": [
+      "Q_PRE1.3/Q_PRE2.3 QPRE_SRC，共源",
+      "Q_PRE1.1/Q_PRE2.1 QPRE_G",
+      "U_PRE_SENSE.3 BATT+_FUSED / .4 PACK+",
+      "U_LPV_CONFIRM 保留 MAIN_PROVEN 硬门"
+    ]
+  },
+  "blocked": [
+    "禁能审图态须同时保持 P-MOS 驱动禁止及 MAIN_PROVEN 为低，不能按原驱动直接上电",
+    "最终 EN 默认低和 P-MOS 独立硬撤销接线",
+    "方向检测静态及动态预算与接口",
+    "探测负载、隔离实证、绝对Kelvin与硬超时",
+    "输入去耦与OUT负尖峰钳位的选料和实装"
+  ],
+  "gate_review_2026_11_05": {
+    "reg1_first": {
+      "existing": "FAIL",
+      "active_low_candidate": "HOLD",
+      "off_threshold_V": 0.528,
+      "positive_injection_budget_uA": 11.08,
+      "physical_stop_budget_ms": 1
+    },
+    "continuous_direction": {
+      "status": "HOLD",
+      "existing_budget_mV": 44.48,
+      "required_error_strictly_below_mV": 38,
+      "one_point_calibration_conditional_budget_mV": 24.46,
+      "comparison_end_to_end_age_budget_ms_at_12p50_V_per_s": 1.26,
+      "true_positive_finish_mV": 76
+    },
+    "absolute_kelvin": {
+      "status": "HOLD",
+      "decision_mV": 35,
+      "max_abs_error_mV": 10,
+      "optimistic_remaining_budget_mV_after_ideal_offset_and_ref_correction": 12.79,
+      "max_recovery_ms": 0.5
+    },
+    "legacy_hard_trip_V": 0.26,
+    "native_drawing_and_release": "未生成新版原生图。BOM、DRC、图面验收待合图。可评审布局输入，正式PCB交接HOLD。"
+  },
+  "independent_bias_and_sar_review": {
+    "status": "HOLD, screening evidence only, not a pin net change",
+    "dfetoff_high_active_static": {
+      "source": "BATT+_FUSED",
+      "top_ohm": 150000,
+      "bottom_ohm": 18000,
+      "node_min_at_22p1_V": 2.326,
+      "node_max_at_37p8_V": 4.123,
+      "node_max_at_48_V": 5.235,
+      "downward_leakage_budget_uA_at_22p1_V": 62,
+      "pending": "brownout-qualified hardware gate and OTP startup proof"
+    },
+    "sar": {
+      "AD7687": "FAIL: 2.60 V CM ceiling, 17.6 mV referred full-temperature offset",
+      "LTC2311-16": "FAIL for untrimmed Kelvin: 16.5 mV referred full-temperature offset, range covers 37.8 V opening"
+    },
+    "legacy_hard_trip_V": 0.26
+  },
+  "lm2936hv_static_supply_delta": {
+    "status": "PASS for static independent VCC, battery maintained and REG1 alone falls. Integrated HOLD.",
+    "part": "LM2936HVMA-5.0/NOPB",
+    "package": "SOIC-8 D, LM2936M pinout",
+    "pins": {
+      "1": "DFET_ISO_5V",
+      "2": "B0",
+      "3": "B0",
+      "4": "NC",
+      "5": "NC",
+      "6": "B0",
+      "7": "B0",
+      "8": "BATT+_FUSED"
+    },
+    "connect": [
+      {
+        "pin": "TMUX1072_RUT.9",
+        "from": "VOUT_5V (prior proposed only)",
+        "to": "DFET_ISO_5V"
+      }
+    ],
+    "passives": [
+      {
+        "value": "100 nF nominal; voltage rating against actual input peak",
+        "nets": [
+          "BATT+_FUSED",
+          "B0"
+        ]
+      },
+      {
+        "value": "0.68 ohm; total series ESR 0.3–8 ohm",
+        "nets": [
+          "DFET_ISO_5V",
+          "DFET_ISO_C"
+        ]
+      },
+      {
+        "value": "10 uF minimum effective over voltage/temperature",
+        "nets": [
+          "DFET_ISO_C",
+          "B0"
+        ]
+      },
+      {
+        "value": "43.0 kohm total ±1%",
+        "nets": [
+          "DFET_ISO_5V",
+          "B0"
+        ]
+      }
+    ],
+    "guaranteed": {
+      "vin_V": [
+        5.5,
+        48
+      ],
+      "junction_C": [
+        -40,
+        125
+      ],
+      "output_load_mA": [
+        0.1,
+        50
+      ],
+      "output_V": [
+        4.85,
+        5.15
+      ]
+    },
+    "checks": {
+      "bleeder_uA": [
+        111.7,
+        121
+      ],
+      "disabled_output_load_upper_uA": 131,
+      "tmux_off_leakage_uA": 10,
+      "tmux_off_test": "VCC 2.3–5.5 V; COM 0–5.5 V; NC/NO at 0 or 5.5 V"
+    },
+    "open": [
+      "actual cap part and effective C/ESR",
+      "actual node leakage and REG1/BQ/1ms dynamic",
+      "battery source lost while PACK remains energized",
+      "no native CAD merge or official CAD DRC"
+    ]
+  },
+  "central12_battery_source_interface": {
+    "status": "Superseded source/return topology for Central 12 V maintenance. System HOLD.",
+    "base_pins": {
+      "RSHUNT.1": "B0",
+      "RSHUNT.2": "PACK-",
+      "SW_RUN_STORE.2": "PRE_CTRL_3V3",
+      "SW_RUN_STORE.3": "REG1",
+      "SW_RUN_STORE.4": "B0",
+      "SW_RUN_STORE.5": "CTRL_MODULE"
+    },
+    "source_path": [
+      "BATT+_FUSED (after F1, device side of SB175)",
+      "F_CENTRAL12 (rating open)",
+      "J_CENTRAL12.1 BAT12_IN_P",
+      "regulator U_AUX1.2"
+    ],
+    "return_path": [
+      "regulator U_AUX1.1",
+      "J_CENTRAL12.2 BAT12_IN_N",
+      "SB175 device-side B0 power terminal"
+    ],
+    "regulator_primary_old_nets_to_remove": {
+      "U_AUX1.1": "GND_SYS",
+      "U_AUX1.2": "BUS_EXT"
+    },
+    "secondary": "regulator owner, isolation from B0 required",
+    "first_blocker": "maintain zero branch current before service connector separation; DT12 pin1 can become alternate B0 return with SB175 negative open",
+    "other_gates": [
+      "F_CENTRAL12 input inrush and fuse coordination",
+      "STORE/maintenance disconnect sequence",
+      "protection hold after emergency LPV/REG1 loss",
+      "BMS direction, absolute low resistance, actual shutdown"
+    ],
+    "maintenance_revision": {
+      "local_static": "PASS, central 12 V primary does not use DT12 with SB175 negative open",
+      "source_path": [
+        "battery enclosure positive power terminal",
+        "F_CENTRAL12, dedicated source-side fuse",
+        "U_AUX1.2 inside battery enclosure"
+      ],
+      "return_path": [
+        "U_AUX1.1 inside battery enclosure",
+        "battery enclosure negative power terminal"
+      ],
+      "secondary_crossing": {
+        "U_AUX1.3": "12V_DRV",
+        "U_AUX1.5": "GND_SYS"
+      },
+      "f1": "Existing F1 main branch unchanged. Relative physical order of F1 and SB175 is not established by the frozen source. No F1 protection assumed for this auxiliary branch.",
+      "remaining_blocker": "Independent service disconnect or combined interface decision for isolated secondary; battery-side branch remains live after SB175 and DT12 are removed. Other DT12 and external ground paths remain open."
+    }
+  }
+}

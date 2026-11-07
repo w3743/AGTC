@@ -1,0 +1,47 @@
+{
+  "status": "SCREENING_ONLY_NOT_QUALIFIED",
+  "source": {
+    "live_readonly": "检查\\本轮活跃工程只读核对.json",
+    "sha256": "da56da0131792e25a98846d1584e8bb372404928ec4251d9d0f4782f354acbb3",
+    "active_page_drc": [],
+    "netlist_sha256": "ac32911ec9e8d289e1d328826dfe451763a82941311a13bd8324f75be66c1b98",
+    "four_page_drc": "检查\\本轮四页活动会话官方检查.json",
+    "four_page_sha256": "2e378e9204d30081f9bb8d0900d48ccc9eb3eb66fa48d92f25866d76abb8e406"
+  },
+  "zero_charge": {
+    "assumptions": "8 equal 350F cells; ideal series bank; 20A constant; start 0V; ideal cell threshold 2V",
+    "series_capacitance_F": 43.75,
+    "target_bank_V": 16.0,
+    "seconds": 35.0,
+    "limitations": "No ESR, current loop, cell mismatch, switching and gate-driver startup"
+  },
+  "regen": {
+    "assumptions": "local 5.4mF ideal capacitor, no losses, 37.8 to 40.3V; constant 495.3W injection for 30ms",
+    "local_capacitor_J": 0.5271750000000001,
+    "injected_J": 14.859,
+    "ideal_no_other_sink_time_ms": 1.0643549364021807,
+    "limitations": "Not full bus or braking response: FOC bus caps, controller, line, ESR, protection delay and load excluded"
+  },
+  "isolation_energy": {
+    "L_uH": 24,
+    "I_A": 80.0,
+    "stored_J": 0.07680000000000001,
+    "limitations": "No MOS fault waveform, parasitic or shutdown timing; gate signal is not proof of current interruption"
+  },
+  "candidate_BFT": {
+    "six_C_nominal_uF": 6000.0,
+    "rating_100kHz_105C_A_each": 5.3549999999999995,
+    "rating_100kHz_105C_A_six_ideal_equal_share": 32.129999999999995,
+    "rectangular_bridge_AC_A_at_80A_D_0p5": 40.0,
+    "limitations": "Waveform RMS and single-frequency rating are not directly comparable; actual spectrum, current sharing, ESR and temperature conditions missing"
+  },
+  "required_proof": {
+    "fast_loss_bidir_isolation": "NOT_PROVEN",
+    "zero_V_actual_start": "NOT_PROVEN",
+    "regen_full_envelope": "NOT_PROVEN",
+    "capacitor_ripple_and_ESR": "NOT_PROVEN",
+    "four_page_live_DRC": "PASS_LIVE_SESSION_ONLY",
+    "reopen_saved_source": "NOT_PROVEN",
+    "physical_testing": "OUT_OF_SCOPE"
+  }
+}

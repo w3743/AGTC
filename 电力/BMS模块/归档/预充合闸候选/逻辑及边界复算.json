@@ -1,0 +1,158 @@
+{
+  "logic": {
+    "model": "settled logic only",
+    "columns": [
+      "pre",
+      "done",
+      "fet_release",
+      "lpv"
+    ],
+    "cases": {
+      "early_edge": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "stale_high_request_no_edge": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "new_qualified_request": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "physical_proof_arrives_after_release": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "timer_expires_after_physical_proof": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "brownout_or_cancel_after_proof": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "cancel_then_permit_recovery_within_window": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "second_pre_req_same_power_session": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "rail_transient_window_without_dwell": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "differential_lost_before_physical_proof": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "timeout_before_physical_proof": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "request_edge_after_timeout": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "stale_high_physical_proof_blocks_new_main_request": [
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "electrical": {
+    "status": "HOLD: semiconductor and whole-system qualification open",
+    "differential": {
+      "tap_to_center_bounds_V": [
+        0.03387662406098682,
+        0.04079223388391488
+      ],
+      "error_terms_output_V": {
+        "INA600_output_offset_and_drift": 0.00335,
+        "INA600_common_mode_screen": 0.0013411946113029145,
+        "TLV9001_reference_buffer_offset": 0.002,
+        "TLV9032_offset_screen": 0.002,
+        "TLV9032_hysteresis_assumed": 0.003
+      },
+      "symmetric_static_acceptance_screen_V": 0.11081633091750204,
+      "static_acceptance_outer_bound_V": 0.2626798222983874,
+      "outer_bound_with_10V_per_s_and_2ms_V": 0.2826798222983874,
+      "example_true_allowed_V": 0.26,
+      "confirmed_bounds_missing": [
+        "saturation recovery and false-window dwell at all rail/CM corners",
+        "actual hysteresis, input protection transients and Kelvin routing error",
+        "source direction and unpowered backfeed"
+      ]
+    },
+    "timing": {
+      "TPL5111_DRVn_window_s": [
+        6.078891386424628,
+        7.05740197910444
+      ],
+      "RC_dwell_s_sensitivity": [
+        0.0320163921435216,
+        0.19095500692392037
+      ],
+      "physical_turn_on_budget_s": 0.075,
+      "remaining_transfer_after_dwell_s": 0.06,
+      "charging_budget_s": 5.752936379500707,
+      "charge_screen_at_10mA": {
+        "load_A": 0.01,
+        "end_gap_V": 0.1120582512892152,
+        "steady_gap_V": 0.09419649999999999,
+        "time_to_target_s": 5.80709580798173
+      },
+      "hot_R_ohm": 9.419649999999999,
+      "identified_C_upper_F": 0.079783824,
+      "load_limit_at_identified_C_A": 0.009868093935009542,
+      "C_limit_at_10mA_F": 0.07903972635588478,
+      "dwell_earliest_requires_initial_cap_voltage_at_B0": true
+    },
+    "short_fault": {
+      "peak_current_A": 5.189705710735689,
+      "resistor_power_W": 196.170875865809,
+      "single_long_DRVn_pulse_energy_J_before_tail": 1384.4567275780119,
+      "two_pulses_no_cooldown_energy_J_before_tails": 2768.9134551560237,
+      "additional_resistor_energy_per_ms_tail_J": 0.196170875865809,
+      "extra_time_before_7s_comparison_s": -0.05740197910443978,
+      "QPRE_each_hot_R_assumed_ohm": 0.125,
+      "QPRE_each_conduction_W": 3.366630670505328,
+      "automatic_retry_model_pass": true,
+      "physical_tail_and_rearm_cooldown": "OPEN"
+    },
+    "handoff": {
+      "proof_input_required_low_before_arming": true,
+      "stale_high_proof_blocks_fresh_main_request_in_logic_model": true,
+      "proving_observation": "Both bank VGS and bounded low-impedance conduction response before power permission.",
+      "physical_proof_source_and_validity": "OPEN"
+    }
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "schema": "agtc.bms_early_guard_ready_handoff.v1",
+  "status": "CANDIDATE_HANDOFF_NOT_MERGED",
+  "scope": "只读针网交接；未改BMS ENET、稳压原理图或正文。",
+  "sources": {
+    "bms_frozen_p1_candidate": {
+      "path": "电力/BMS模块/检查/预充合闸候选基线/精简候选_P1.enet",
+      "sha256": "3813A9189720186EB35CB4CBD5FF690745A4587CDE5D7B9BB33DB15D85286586",
+      "component": "J_CORE_P1",
+      "manufacturer_part": "254PM-2x12P-V"
+    },
+    "regulator_candidate_interfaces": {
+      "path": "电力/稳压模块/检查/候选_预充与超容隔离_R1/保护页_interfaces.json",
+      "sha256": "30770811933B21C5DA4FD1693E0B311688305DCDCDA38A7B3BD197F37CD34B5A",
+      "schematic_path": "电力/稳压模块/检查/候选_预充与超容隔离_R1/sc-regulator/sch/sc-regulator/05 Early Guard and SC Isolation.esch2",
+      "schematic_sha256": "875E1D6D3F1C31C33F89155A7D88576A778C770A99FC5965099CB257909FB8DA",
+      "official_netlist_path": "电力/稳压模块/检查/候选_预充与超容隔离_R1/候选官方.enet",
+      "official_netlist_sha256": "0C799603D113F29B288747AFB9A64EA101D4EBEB217F062E6B2B4A415A38177A"
+    }
+  },
+  "source_interface": {
+    "connector": {
+      "ref": "J_EARLY_READY",
+      "manufacturer_part": "2541WV-2X01P",
+      "pins": {
+        "1": "EARLY_GUARD_READY_N",
+        "2": "B0_READY_RETURN"
+      }
+    },
+    "opto": {
+      "ref": "U_EARLY_READY_OPTO",
+      "manufacturer_part": "LTV-817S-TA1-C",
+      "pin_1": "READY_LED_A",
+      "pin_2": "READY_LED_K",
+      "pin_3": "B0_READY_RETURN (phototransistor emitter)",
+      "pin_4": "EARLY_GUARD_READY_N (open-collector phototransistor collector)"
+    },
+    "electrical_contract": {
+      "output_type": "光耦开集电极；稳压板不向READY_N提供上拉电源",
+      "return": "专用导线回BMS的B0接收点；不得接GND_SYS、PACK-、车架或屏蔽层",
+      "logic_low": "早保护资格已建立",
+      "logic_high": "未就绪、稳压板失电、LED灭、信号线开路或B0_READY_RETURN开路",
+      "pullup": {
+        "ref": "R_BMS_EARLY_READY_PU (候选新件)",
+        "value_ohm": 10000,
+        "from": "EARLY_GUARD_READY_N_RAW",
+        "to": "PRE_CTRL_3V3",
+        "nominal_sink_current_at_3v3_ma": 0.33,
+        "note": "按冻结BMS ENET已有PRE_CTRL_3V3域定义；拉低电流与光耦全温CTR/饱和压降仍须核对。"
+      },
+      "short_to_b0_fault": "信号短接B0会伪装成READY；单根开集电极状态线不能检测此故障，仍需诊断/跨板验证或增加独立状态措施。"
+    }
+  },
+  "bms_receiver": {
+    "raw_input": "EARLY_GUARD_READY_N_RAW",
+    "receiver_connector": {
+      "ref": "J_BMS_EARLY_READY_RX (新增接口候选；冻结ENET中不存在)",
+      "pins": {
+        "1": "EARLY_GUARD_READY_N_RAW",
+        "2": "B0_READY_RETURN -> BMS B0接收点"
+      }
+    },
+    "hardware_use": {
+      "required": true,
+      "use_raw_input_for": [
+        "PRE_RUN_OK硬件许可门",
+        "PRE_REQ单次启动资格",
+        "MAIN_REQ硬件闭锁"
+      ],
+      "logic": "EARLY_GUARD_READY_N_RAW低才表示早保护就绪；高或无效时禁止PRE_RUN_OK并清除本次PRE资格。不得只接MCU或CAN后依赖固件判断。",
+      "power_loss_default": "PRE_CTRL_3V3掉电时现有BMS POR/许可链须将PRE_RUN_OK保持禁能；恢复后需重新资格，不沿用旧状态。",
+      "proposed_native_delta": {
+        "status": "verified against frozen source; review patch only",
+        "new_receiver_devices": {
+          "J_BMS_EARLY_READY_RX": {
+            "mpn": "2541WV-2X01P",
+            "pin_nets": {
+              "1": "EARLY_GUARD_READY_N_RAW",
+              "2": "B0"
+            }
+          },
+          "R_BMS_EARLY_READY_PU": {
+            "mpn": "RS-03K1002FT",
+            "pin_nets": {
+              "1": "PRE_CTRL_3V3",
+              "2": "EARLY_GUARD_READY_N_RAW"
+            }
+          },
+          "U_BMS_EARLY_INV": {
+            "mpn": "SN74LVC1G14DCKR",
+            "pin_nets": {
+              "1": null,
+              "2": "EARLY_GUARD_READY_N_RAW",
+              "3": "B0",
+              "4": "EARLY_GUARD_READY",
+              "5": "PRE_CTRL_3V3"
+            }
+          },
+          "U_BMS_EARLY_AND": {
+            "mpn": "SN74LVC1G08DCKR",
+            "pin_nets": {
+              "1": "PRE_RUN_OK",
+              "2": "EARLY_GUARD_READY",
+              "3": "B0",
+              "4": "PRE_RUN_GUARD_OK",
+              "5": "PRE_CTRL_3V3"
+            }
+          },
+          "C_BMS_EARLY_INV": {
+            "mpn": "CGA3E2X7R1H104KT0Y0S",
+            "pin_nets": {
+              "1": "PRE_CTRL_3V3",
+              "2": "B0"
+            }
+          },
+          "C_BMS_EARLY_AND": {
+            "mpn": "CGA3E2X7R1H104KT0Y0S",
+            "pin_nets": {
+              "1": "PRE_CTRL_3V3",
+              "2": "B0"
+            }
+          }
+        },
+        "rewire": [
+          {
+            "ref": "U_GATE1",
+            "pin": "3",
+            "from": "PRE_RUN_OK",
+            "to": "PRE_RUN_GUARD_OK"
+          },
+          {
+            "ref": "U_PRE_ARM",
+            "pin": "6",
+            "from": "PRE_RUN_OK",
+            "to": "PRE_RUN_GUARD_OK"
+          },
+          {
+            "ref": "U_AND2",
+            "pin": "3",
+            "from": "PRE_RUN_OK",
+            "to": "PRE_RUN_GUARD_OK"
+          }
+        ],
+        "source_pin": {
+          "ref": "U_PRE_RUN",
+          "pin": "4",
+          "net": "PRE_RUN_OK"
+        },
+        "startup_test": "在可单独切断稳压早轨且功率关断的自检中，必须看到 READY_N 先高再低。若系统不能控制该自检，单线短接 B0 仍为未覆盖故障。",
+        "notes": [
+          "等待 BMS 负责人完成原理图合入及故障注入。",
+          "本建议件未计入稳压隔离图 BOM，MCU镜像为可选独立项。"
+        ]
+      }
+    },
+    "mcu_status_copy": {
+      "purpose": "只供G431观察/记录，不作为硬件许可来源",
+      "net": "EARLY_GUARD_READY_N_MCU",
+      "buffer": {
+        "ref": "U_BMS_READY_STATUS_BUF (器件待核)",
+        "input": "EARLY_GUARD_READY_N_RAW",
+        "output": "J_CORE_P1.5",
+        "supply": "CORE_3V3",
+        "requirement": "CORE_3V3=0且PRE_CTRL_3V3有效时，输入须有Ioff/等效隔离，禁止经缓冲器或P1.5反灌CORE_3V3；输出在CORE_3V3未有效时不得伪造READY。"
+      }
+    }
+  },
+  "frozen_p1_binding": {
+    "component": "J_CORE_P1",
+    "current_pin_map": {
+      "3": "B0",
+      "4": "B0",
+      "5": "NC",
+      "6": "NC",
+      "19": "BMS_LOCAL_OK",
+      "21": "PRE_REQ",
+      "22": "MAIN_REQ"
+    },
+    "proposed_pin_changes": [
+      {
+        "pin": 5,
+        "old_net": "NC",
+        "new_net": "EARLY_GUARD_READY_N_MCU",
+        "direction": "BMS状态输出至G431输入",
+        "qualification": "只接CORE_3V3供电且Ioff合格的缓冲输出；不得把PRE_CTRL_3V3上拉的RAW信号直接送入P1.5。"
+      }
+    ],
+    "unchanged_pins": [
+      {
+        "pin": 3,
+        "net": "B0"
+      },
+      {
+        "pin": 4,
+        "net": "B0"
+      },
+      {
+        "pin": 6,
+        "net": "NC"
+      },
+      {
+        "pin": 19,
+        "net": "BMS_LOCAL_OK"
+      },
+      {
+        "pin": 21,
+        "net": "PRE_REQ"
+      },
+      {
+        "pin": 22,
+        "net": "MAIN_REQ"
+      }
+    ],
+    "note": "专用B0_READY_RETURN从稳压J_EARLY_READY.2落至BMS接收器B0点；P1已有pin3/4为B0，P1.6无需改作回线。"
+  },
+  "new_pre_handshake": [
+    {
+      "state": "POWER_UP_OR_NOT_READY",
+      "condition": "EARLY_GUARD_READY_N_RAW为高，或BMS_PRE_CTRL_3V3未有效",
+      "required_action": "PRE_RUN_OK低；PRE_REQ维持现有下拉默认低；清除/禁止PRE单次窗，MAIN_REQ硬闭锁。"
+    },
+    {
+      "state": "ARM_ONLY_AFTER_READY",
+      "condition": "EARLY_GUARD_READY_N_RAW连续低至系统规定的资格时间，且先观察到PRE_REQ低",
+      "required_action": "置位一次性PRE_ARMED；仅进入待命，不因READY到达或旧PRE_REQ高电平而启动。"
+    },
+    {
+      "state": "FRESH_PRE_REQUEST",
+      "condition": "PRE_ARMED后出现新的PRE_REQ低到高沿",
+      "required_action": "只启动一次现有PRE窗口/定时器；消费PRE_ARMED；要求PRE_REQ随后返回低，低返回本身不重触发或延长窗口。"
+    },
+    {
+      "state": "READY_LOST_OR_ABORT",
+      "condition": "PRE期间EARLY_GUARD_READY_N_RAW变高、BMS控制电源复位或资格链失效",
+      "required_action": "异步拉低PRE_RUN_OK、清本次PRE资格并闭锁MAIN_REQ；READY恢复后不自动续跑，须PRE_REQ先为低，再取得新READY资格并产生新低到高沿。"
+    }
+  ],
+  "cross_board_validation_required": [
+    "冻结ENET无J_BMS_EARLY_READY_RX及PRE_READY输入；新增接收端/硬门需由BMS负责板级合图，不能把P1.5只读脚当硬许可。",
+    "核实稳压J_EARLY_READY.1/.2与BMS接收端的线束极性、B0专用回线及对GND_SYS/外壳/CAN屏蔽的绝缘；示波确认线开路、回线开路、稳压失电及LED灭时READY_N均为高。",
+    "核实BMS 3V3最小/最大电压、10k上拉电流、LTV-817S全温CTR/漏电和BMS接收门限；验证ready低有效和未就绪高有效。",
+    "对EARLY_GUARD_READY_N_RAW短接B0、短接PRE_CTRL_3V3、串联高阻、间歇开路做故障注入；短接B0当前无法由单线开集合同区分，评估其是否需要第二独立诊断。",
+    "CORE_3V3先掉、PRE_CTRL_3V3先掉、两者慢降/快复电时测P1.5和缓冲器反灌；确认P1状态镜像不会让MCU掉电域被RAW上拉供电。",
+    "实接两板测READY_N资格建立/撤销与PRE_REQ高—低脉冲、PRE_DONE、MAIN_REQ、PRE_RUN_OK及QPRE/主FET实际栅极；READY撤销必须先于可能的PRE/MAIN动作且不得自动重启。",
+    "若稳压端UCC IN+在资格前被硬件屏蔽，BMS必须保持PRE及全部BUS注入/回生源硬禁止直到EARLY_GUARD_READY有效；实证该盲区内BUS确无主动能量输入。"
+  ],
+  "open_items": [
+    "BMS新增接收连接器参考号、封装、P1.5缓冲器精确料号与Ioff条件尚未冻结。",
+    "EARLY_GUARD_READY_N_RAW的硬门原理图节点及其与现有PRE_RUN_OK/PRE_REQ单次逻辑的门级连接尚未落入冻结ENET。",
+    "单线READY_N对短接B0故障没有检测能力；跨板实测与系统故障策略尚未闭合。",
+    "READY持续资格时长、阈值及下降撤销传播上限由稳压/BMS联合核定；不可把MCU采样或CAN状态替代异步硬撤销。"
+  ]
+}

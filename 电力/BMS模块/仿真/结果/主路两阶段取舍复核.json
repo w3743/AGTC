@@ -1,0 +1,157 @@
+{
+  "status": "HOLD_REJECT_ZERO_NEW_HARDWARE",
+  "netlist_evidence": {
+    "BMS_frozen_sha256": "3813a9189720186eb35cb4cbd5ff690745a4587cde5d7b9bb33db15d85286586",
+    "FOC_adopted_sha256": "2b84940fcdf5bdd5ba3e15f0861afb38acaf5a515cb91479ad3a74581edc207d",
+    "FOC_pin_nets": {
+      "J_LOAD_POWER_VALID": {
+        "1": "LOAD_EN_BIAS_EXT",
+        "2": "LOAD_POWER_VALID"
+      },
+      "U1": {
+        "28": "BREAK_N",
+        "33": "DRV_ENABLE",
+        "47": "BUCK_RT_SD"
+      },
+      "Q_BUCK_CLAMP": {
+        "1": "BUCK_CLAMP_BASE",
+        "3": "BUCK_RT_SD"
+      },
+      "Q_BUCK_RELEASE": {
+        "1": "BUCK_RELEASE_BASE",
+        "3": "BUCK_CLAMP_BASE"
+      }
+    },
+    "BMS_current_and_Kelvin_taps": {
+      "18": "SRP",
+      "20": "SRN",
+      "42": "BQ_PACK",
+      "43": "DSG",
+      "45": "CHG",
+      "48": "VC16_FILT"
+    },
+    "BMS_unrouted_differential_endpoints": [
+      "U_PRE_CMP.3",
+      "U_PRE_CMP.6",
+      "U_PRE_SENSE.1"
+    ]
+  },
+  "rated_reference_only": {
+    "cold_MOS_only": {
+      "ohm": 0.0018666666666666666,
+      "60A": {
+        "V": 0.112,
+        "W": 6.72
+      },
+      "130A_comparison": {
+        "V": 0.24266666666666667,
+        "W": 31.546666666666667
+      }
+    },
+    "hot_MOS_only_x2_sensitivity": {
+      "ohm": 0.0037333333333333333,
+      "60A": {
+        "V": 0.224,
+        "W": 13.44
+      },
+      "130A_comparison": {
+        "V": 0.48533333333333334,
+        "W": 63.093333333333334
+      }
+    },
+    "healthy_Kelvin_budget": {
+      "ohm": 0.006,
+      "60A": {
+        "V": 0.36,
+        "W": 21.6
+      },
+      "130A_comparison": {
+        "V": 0.78,
+        "W": 101.4
+      }
+    },
+    "fault_30mohm": {
+      "ohm": 0.03,
+      "60A": {
+        "V": 1.7999999999999998,
+        "W": 108.0
+      },
+      "130A_comparison": {
+        "V": 3.9,
+        "W": 507.0
+      }
+    },
+    "fault_100mohm": {
+      "ohm": 0.1,
+      "60A": {
+        "V": 6.0,
+        "W": 360.0
+      },
+      "130A_comparison": {
+        "V": 13.0,
+        "W": 1690.0
+      }
+    },
+    "separate_negative_shunt": {
+      "ohm": 0.0005,
+      "60A": {
+        "V": 0.03,
+        "W": 1.8
+      },
+      "130A_comparison": {
+        "V": 0.065,
+        "W": 8.45
+      }
+    }
+  },
+  "handoff": {
+    "A": {
+      "status": "REJECT_ON_FROZEN_INTERFACE_AND_LOAD_GUARANTEES",
+      "true_precharge_only_current_ceiling_A": 0.03569638848654178,
+      "other_shunt_current_budget_A": 0.005,
+      "CC2_total_error_budget_A": 0.025,
+      "open_indicated_max_A": 0.06569638848654177,
+      "indicated_acceptance_floor_A": 0.1,
+      "healthy_true_shunt_current_for_worst_error_pass_A": 0.125,
+      "main_branch_current_proven_min_A_at_acceptance": 0.03430361151345823,
+      "largest_instantaneous_apparent_R_main_ohm_at_acceptance": 7.579376879836544,
+      "dual_buck_ideal_input_A_at_rated_output_and_37p8V": 0.0925925925925926,
+      "nominal_dual_buck_2p4W_ideal_input_A_at_37p8V": 0.06349206349206349,
+      "current_cap_A_required_at_actual_aux_Bus_feed": 0.25,
+      "physical_timeout_s_required": 0.06,
+      "aux_supplied_energy_cap_J_if_current_and_time_enforced": 0.567,
+      "main_path_energy_J_if_gap_valid_plus_1ms_full_voltage_tail": 0.01335
+    },
+    "B": {
+      "status": "CONDITIONAL_SEPARATION_CURRENT_AND_TIMING_INTERLOCK_MISSING",
+      "true_pack_current_range_A": [
+        4.3,
+        5.0
+      ],
+      "true_Kelvin_parallel_path_current_floor_A": 4.295,
+      "CC2_error_budget_A": 0.25,
+      "CC2_indicated_floor_A": 4.55,
+      "differential_total_error_budget_V": 0.045,
+      "readback_threshold_V": 0.08,
+      "healthy_indicated_drop_ceiling_V": 0.075,
+      "bad_indicated_drop_floor_V_including_precharge_parallel": 0.08332146773498868,
+      "main_ohm_ceiling_at_pass": 0.029220365981889547,
+      "min_current_A_for_existing_BQ_1V_gap_error_to_separate_6mohm_and_30mohm": 83.33333333333333,
+      "example_trial_timeout_s_requires_independent_hardware": 0.06,
+      "energy_J_with_current_limit_and_timeout_only": 11.34,
+      "energy_J_with_260mV_guard_and_1ms_full_voltage_tail": 0.267,
+      "voltage_error_ohm_at_60A_130A_excluding_current_error": [
+        0.00075,
+        0.00034615384615384613
+      ]
+    }
+  },
+  "minimum_new_online_observation": "protected synchronous BATT+_FUSED minus PACK+ Kelvin voltage",
+  "sources": {
+    "BQ76952": "https://www.ti.com/lit/gpn/bq76952",
+    "BQ76952_TRM": "https://www.ti.com/lit/pdf/sluuby2",
+    "DRV8353": "https://www.ti.com/lit/gpn/drv8353",
+    "LM5008A": "https://www.ti.com/lit/ds/symlink/lm5008a.pdf",
+    "INA600A": "https://www.ti.com/lit/gpn/ina600"
+  }
+}
