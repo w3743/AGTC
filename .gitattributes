@@ -68,6 +68,8 @@
 
 # CAD TSV exports retain trailing empty columns in the original evidence bytes.
 电力/检查/统一审查/FOC_G431_BOM_CAD_Official.csv whitespace=-blank-at-eol
+电力/稳压模块/检查/本轮磁盘读回BOM.csv whitespace=-blank-at-eol
+电力/稳压模块/检查/候选_独立门槛_LTC2965/候选BOM.csv whitespace=-blank-at-eol
 
 # Preserve the recorded EOF bytes of frozen validation sources and the raw static log.
 算法/仿真训练环境/results/isaac_field_diagnosis/rsl_completion_smoke_20261022_attempt2/source_snapshot/** whitespace=cr-at-eol,-blank-at-eof
@@ -146,3 +148,7 @@
 电力/FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv whitespace=-blank-at-eol
 电力/FOC驱动模块/检查/本地耗能删减_文字更正_重开.csv whitespace=-blank-at-eol
 电力/FOC驱动模块/检查/本地耗能删减_重开验证.csv whitespace=-blank-at-eol
+# RNN 研究实验证据（算法/rnn研究/runs）：JSON/JSONL 单文件可能超过普通 Git blob 上限，统一走 LFS；
+# 权重 .pt、图像 .png、数据 .gz/.bin、模型等已由上方全局规则覆盖，其余文本类文件按普通 blob 保存。
+算法/rnn研究/runs/**/*.json filter=lfs diff=lfs merge=lfs -text
+算法/rnn研究/runs/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
