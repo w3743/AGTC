@@ -26,7 +26,7 @@ from uuid import uuid4
 import data as mnist_data
 
 
-DEFAULT_RUNS_ROOT = Path("C:/pioneer/local-neuron-runs")
+DEFAULT_RUNS_ROOT = Path(__file__).resolve().parent / ".local" / "runs"
 SOURCE_FILES = ("data.py", "baseline.py", "train.py", "model.py", "requirements.txt")
 
 

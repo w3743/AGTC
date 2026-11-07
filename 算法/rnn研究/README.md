@@ -52,5 +52,5 @@ python .\run.py --digits 000111000111
 ## 本地运行环境与证据目录
 
 - 虚拟环境：`.venv`（Python 3.12.14 + PyTorch 2.14.1 CPU），不纳入版本管理。
-- 实验证据：`runs/`（各实验的报告、权重、原始预测与日志，约 3.1GB），不纳入版本管理。实验文档中的复跑命令原引用 `C:\pinoeer\rnn-research-runs`，2026-11-07 已随目录迁入统一改为 `C:\pinoeer\AGTC\算法\rnn研究\runs`；`归档/` 下的历史记录保持原始字节，不作改写。
+- 实验证据：`runs/`（各实验的报告、权重、原始预测与日志，约 3.1GB），不纳入版本管理。实验文档中的复跑命令原先引用仓库外旧目录（`rnn-research-runs`），2026-11-07 已随目录迁入统一改为 `C:\pinoeer\AGTC\算法\rnn研究\runs`；`归档/` 下的历史记录保持原始字节，不作改写。
 - 合并说明：外部目录 `rnn-research-runs`、`rnn-research-env` 已分别迁入本目录的 `runs/` 与 `.venv/`；`agtc-brake-review-20261105` 审查工作树已并入仓库并删除，审查侧差异字节保存在 `归档/审查分支差异/`（含 `manifest.json`）。

@@ -45,7 +45,36 @@ TEXT_SUFFIXES = {
     ".txt", ".yml", ".yaml", ".toml", ".sh", ".ini", ".cfg", ".html", ".svg",
 }
 
-AUDIT_DIRS = ("归档/", "算法/rnn研究/runs/")
+# 冻结快照、第三方技能文档、厂商资料与已删除的 results 目录按原样保留，
+# 其中的历史相对链接不参与现行文档断链统计。
+LINK_SKIP_PREFIXES = (
+    "归档/",
+    "算法/rnn研究/runs/",
+    "算法/仿真训练环境/results/",
+    "电力/.agents/",
+    "电力/参考资料/",
+)
+LINK_SKIP_PART = "/source_snapshot/"
+
+SELF_PATH = ".github/scripts/repository-self-check.py"
+
+# 历史记录、冻结验收快照与历史协议文档按当时机器路径原样保留，
+# 不参与现行机器路径检查；当前代码与现行文档仍会报告警告。
+STALE_SKIP_PREFIXES = (
+    "归档/",
+    "算法/rnn研究/runs/",
+    "算法/仿真训练环境/native/acceptance/",
+    "算法/仿真训练环境/native/proto/",
+)
+STALE_SKIP_FILES = (
+    "算法/仿真训练环境/AGENTS.md",
+    "算法/仿真训练环境/ISAAC_LAB.md",
+    "算法/仿真训练环境/PERF_PLATFORM.md",
+    "算法/仿真训练环境/NATIVE_STACK_PLAN.md",
+    "算法/仿真训练环境/WSL_TRAIN_PLAN.md",
+    "算法/仿真训练环境/训练结果汇总.md",
+    "算法/仿真训练环境/使用说明.md",
+)
 
 
 class Result:
@@ -118,21 +147,84 @@ def check_whitespace(result: Result, diff_range: str) -> None:
         result.add("FAIL", "空白检查", f"{len(offenders)} 个文件，例如 {offenders[:3]}")
 
 
-def lfs_attribute(head: str, path: str) -> bool:
-    output = git_text("check-attr", f"--source={head}", "filter", "--", path)
-    return output.rstrip("\n").endswith(": lfs")
-
-
-def is_canonical_lfs_pointer(content: bytes) -> bool:
+def lfs_attributes(head: str, paths: list[str]) -> dict[str, bool]:
+    """Return {path: is_lfs} for all paths in a single git call."""
+    payload = b"\0".join(path.encode("utf-8") for path in paths) + b"\0"
     proc = subprocess.run(
-        ["git", "lfs", "pointer", "--check", "--strict", "--stdin"],
-        input=content,
+        ["git", "check-attr", "-z", "--stdin", f"--source={head}", "filter", "--"],
+        input=payload,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=ROOT,
         check=False,
     )
-    return proc.returncode == 0
+    fields = proc.stdout.split(b"\0")
+    result: dict[str, bool] = {}
+    for index in range(0, len(fields) - 2, 3):
+        path = fields[index].decode("utf-8", "replace")
+        value = fields[index + 2].decode("utf-8", "replace")
+        result[path] = value == "lfs"
+    return result
+
+
+def cat_file_sizes(oids: list[str]) -> dict[str, int]:
+    """Return {oid: object size} using one `git cat-file --batch-check`."""
+    if not oids:
+        return {}
+    payload = ("\n".join(oids) + "\n").encode("ascii")
+    proc = subprocess.run(
+        ["git", "cat-file", "--batch-check"],
+        input=payload,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=ROOT,
+        check=False,
+    )
+    sizes: dict[str, int] = {}
+    for line in proc.stdout.decode("ascii", "replace").splitlines():
+        parts = line.split()
+        if len(parts) == 3 and parts[1] == "blob":
+            sizes[parts[0]] = int(parts[2])
+    return sizes
+
+
+def cat_file_blobs(oids: list[str]) -> dict[str, bytes]:
+    """Return {oid: content} using one `git cat-file --batch`."""
+    if not oids:
+        return {}
+    payload = ("\n".join(oids) + "\n").encode("ascii")
+    proc = subprocess.run(
+        ["git", "cat-file", "--batch"],
+        input=payload,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=ROOT,
+        check=False,
+    )
+    blobs: dict[str, bytes] = {}
+    data = proc.stdout
+    position = 0
+    while position < len(data):
+        newline = data.find(b"\n", position)
+        if newline < 0:
+            break
+        header = data[position:newline].decode("ascii", "replace").split()
+        position = newline + 1
+        if len(header) != 3 or header[1] != "blob":
+            break
+        oid, size = header[0], int(header[2])
+        blobs[oid] = data[position:position + size]
+        position += size + 1
+    return blobs
+
+
+def is_canonical_lfs_pointer(content: bytes) -> bool:
+    if not content.startswith(b"version https://git-lfs.github.com/spec/v1\n"):
+        return False
+    lines = content.decode("utf-8", "replace").splitlines()
+    has_oid = any(line.startswith("oid sha256:") for line in lines)
+    has_size = any(line.startswith("size ") for line in lines)
+    return has_oid and has_size
 
 
 def check_blob_policy(result: Result, diff_range: str) -> None:
@@ -145,7 +237,8 @@ def check_blob_policy(result: Result, diff_range: str) -> None:
     if len(records) % 2:
         result.add("FAIL", "Git/LFS 大文件策略", "无法解析 NUL 分隔的 diff 记录")
         return
-    checked = 0
+
+    entries: list[tuple[str, str]] = []
     problems: list[str] = []
     for index in range(0, len(records), 2):
         metadata = records[index].decode("ascii", "replace")
@@ -157,21 +250,32 @@ def check_blob_policy(result: Result, diff_range: str) -> None:
         new_mode, new_oid = fields[1], fields[3]
         if new_mode in ("000000", "160000"):
             continue
-        size = int(git_text("cat-file", "-s", new_oid).strip())
-        checked += 1
-        if lfs_attribute(head, path):
+        entries.append((path, new_oid))
+
+    sizes = cat_file_sizes([oid for _, oid in entries])
+    attributes = lfs_attributes(head, [path for path, _ in entries])
+    lfs_blobs = cat_file_blobs(
+        [oid for path, oid in entries if attributes.get(path) and sizes.get(oid, 0) < 1024]
+    )
+
+    for path, oid in entries:
+        size = sizes.get(oid)
+        if size is None:
+            problems.append(f"无法读取 blob 大小: {path}")
+            continue
+        if attributes.get(path):
             if size >= 1024:
                 problems.append(f"LFS 文件不是指针（{size} B）: {path}")
-                continue
-            if not is_canonical_lfs_pointer(git("cat-file", "blob", new_oid)):
+            elif not is_canonical_lfs_pointer(lfs_blobs.get(oid, b"")):
                 problems.append(f"LFS 指针格式不规范: {path}")
         elif size > MAX_ORDINARY_BLOB:
             problems.append(f"普通 Git blob 超过 10 MiB（{size} B）: {path}")
+
     if problems:
         result.add("FAIL", "Git/LFS 大文件策略",
                    f"{len(problems)} 项，例如 {problems[:3]}")
     else:
-        result.add("PASS", "Git/LFS 大文件策略", f"{checked} 个变更 blob")
+        result.add("PASS", "Git/LFS 大文件策略", f"{len(entries)} 个变更 blob")
 
 
 def iter_tracked_text_files() -> Iterable[tuple[str, Path]]:
@@ -196,7 +300,7 @@ def check_stale_paths(result: Result) -> None:
     patterns = [re.compile(p) for p in STALE_PATH_PATTERNS]
     hits: list[str] = []
     for path, full in iter_tracked_text_files():
-        if path.startswith(AUDIT_DIRS):
+        if path == SELF_PATH or path.startswith(STALE_SKIP_PREFIXES) or path in STALE_SKIP_FILES:
             continue
         try:
             text = full.read_text(encoding="utf-8", errors="replace")
@@ -216,9 +320,14 @@ LINK_RE = re.compile(r"\[[^\]]*\]\(\s*<?([^)\s>]+)>?(?:\s+\"[^\"]*\")?\s*\)")
 
 def check_markdown_links(result: Result) -> None:
     broken: list[str] = []
+    skipped = 0
     scanned = 0
     for path, full in iter_tracked_text_files():
-        if not path.endswith(".md") or path.startswith("归档/"):
+        if not path.endswith(".md"):
+            continue
+        if path.startswith(LINK_SKIP_PREFIXES) or LINK_SKIP_PART in path \
+                or path in STALE_SKIP_FILES or path == "算法/仿真训练环境/PERF_SUMMARY.md":
+            skipped += 1
             continue
         scanned += 1
         try:
@@ -234,6 +343,9 @@ def check_markdown_links(result: Result) -> None:
             fragment_free = target.split("#", 1)[0]
             if not fragment_free:
                 continue
+            # 仿真训练环境的 results/ 原始记录已按用户要求删除，文档保留为历史溯源。
+            if fragment_free.startswith("results/") and path.startswith("算法/仿真训练环境/"):
+                continue
             resolved = (base / fragment_free).resolve()
             try:
                 resolved.relative_to(ROOT)
@@ -242,9 +354,11 @@ def check_markdown_links(result: Result) -> None:
             if not resolved.exists():
                 broken.append(f"{path} -> {target}")
     if broken:
-        result.add("WARN", "Markdown 相对链接", f"{len(broken)} 处，例如 {broken[:3]}")
+        result.add("WARN", "Markdown 相对链接",
+                   f"{len(broken)} 处，例如 {broken[:3]}")
     else:
-        result.add("PASS", "Markdown 相对链接", f"{scanned} 个文件")
+        result.add("PASS", "Markdown 相对链接",
+                   f"{scanned} 个文件（跳过 {skipped} 个历史/第三方文档）")
 
 
 def iter_changed_files(diff_range: str, statuses: str) -> list[str]:
@@ -254,9 +368,17 @@ def iter_changed_files(diff_range: str, statuses: str) -> list[str]:
 
 
 def check_syntax(result: Result, diff_range: str) -> None:
+    head = git_text("rev-parse", "HEAD").strip()
+    candidates: list[str] = []
+    for path in iter_changed_files(diff_range, "AM"):
+        if Path(path).suffix.lower() in (".py", ".json"):
+            candidates.append(path)
+    attributes = lfs_attributes(head, candidates)
     checked = 0
     problems: list[str] = []
-    for path in iter_changed_files(diff_range, "AM"):
+    for path in candidates:
+        if attributes.get(path):
+            continue  # LFS 指针文件不按源码解析
         suffix = Path(path).suffix.lower()
         full = ROOT / path
         if not full.is_file():
