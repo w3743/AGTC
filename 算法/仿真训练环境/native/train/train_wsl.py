@@ -170,6 +170,10 @@ def main() -> int:
     parser.add_argument("--out", type=str, default="")
     parser.add_argument("--threads", type=int, default=8)
     parser.add_argument("--device", type=str, default="cuda", choices=("cpu", "cuda"))
+    parser.add_argument("--policy-device", type=str, default=None, choices=("cpu", "cuda"),
+                        help="torch policy/PPO device; defaults to --device. On Windows x64 "
+                             "the CUDA physics+sensor stack can require --policy-device cpu "
+                             "because mixing torch CUDA kernels with Warp/Newton crashes.")
     parser.add_argument("--physics", type=str, default="newton_xpbd",
                         choices=("mujoco_cpu", "newton_xpbd", "newton_mujoco_warp"))
     parser.add_argument("--physics-cuda-graph", action="store_true", default=False,
@@ -219,7 +223,7 @@ def main() -> int:
     np.random.seed(args.seed)
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("--device cuda requested but CUDA is unavailable")
-    device = torch.device(args.device)
+    policy_device = torch.device(args.policy_device or args.device)
 
     if args.out:
         out_dir = args.out
@@ -255,10 +259,10 @@ def main() -> int:
     if is_lstm:
         from policy_lstm import LSTMActorCritic
         policy = LSTMActorCritic(env.single_observation_space, action_dim=4,
-                                 hidden_size=args.lstm_hidden).to(device)
+                                 hidden_size=args.lstm_hidden).to(policy_device)
         policy_meta = policy.policy_meta()
     else:
-        policy = ActorCritic(env.single_observation_space, action_dim=4).to(device)
+        policy = ActorCritic(env.single_observation_space, action_dim=4).to(policy_device)
         policy_meta = {"policy_type": "mlp",
                        "params_total": int(sum(p.numel() for p in policy.parameters()))}
     identity = {
@@ -267,6 +271,7 @@ def main() -> int:
         "num_envs": args.num_envs,
         "num_steps": args.num_steps,
         "device": args.device,
+        "policy_device": str(policy_device),
         "physics": args.physics,
         "physics_cuda_graph": args.physics_cuda_graph,
         "lidar": args.lidar,
@@ -339,12 +344,12 @@ def main() -> int:
         policy.load_state_dict(checkpoint["policy"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         start_iteration = int(checkpoint["iteration"])
-        policy.to(device)
+        policy.to(policy_device)
         print(f"RESUMED iteration={start_iteration} from {args.resume} (policy={ck_type})")
 
     policy.train()
     obs, _ = env.reset(seed=args.seed)
-    obs_t = to_torch(obs, device)
+    obs_t = to_torch(obs, policy_device)
     jsonl_path = os.path.join(out_dir, "metrics.jsonl")
     failure_path = os.path.join(out_dir, "failure.json")
     nonfinite_jsonl = os.path.join(out_dir, "nonfinite_events.jsonl")
@@ -389,7 +394,7 @@ def main() -> int:
         nf_iter = 0
         nf_action_iter = 0
         solver_diag_totals = None
-        hidden = policy.init_hidden(args.num_envs, device) if is_lstm else None
+        hidden = policy.init_hidden(args.num_envs, policy_device) if is_lstm else None
         hidden0 = None
         if is_lstm:
             hidden0 = (hidden[0].clone(), hidden[1].clone())
@@ -453,13 +458,13 @@ def main() -> int:
             buf_actions.append(action)
             buf_logp.append(logp)
             buf_values.append(value)
-            buf_rewards.append(torch.from_numpy(reward).to(device))
-            buf_dones.append(torch.from_numpy(done.astype(np.float32)).to(device))
+            buf_rewards.append(torch.from_numpy(reward).to(policy_device))
+            buf_dones.append(torch.from_numpy(done.astype(np.float32)).to(policy_device))
             if is_lstm:
-                done_t = torch.from_numpy(done.astype(bool)).to(device)
+                done_t = torch.from_numpy(done.astype(bool)).to(policy_device)
                 buf_done_masks.append(done_t)
                 hidden = policy.reset_hidden(hidden, done_t)
-            obs_t = to_torch(next_obs, device)
+            obs_t = to_torch(next_obs, policy_device)
             live_counter += 1
             if (live_exporter is not None and live_origins is not None
                     and live_counter % max(1, args.live_state_interval) == 0):
@@ -556,6 +561,7 @@ def main() -> int:
         "num_envs": args.num_envs,
         "num_steps": args.num_steps,
         "device": args.device,
+        "policy_device": str(policy_device),
         "physics": args.physics,
         "physics_cuda_graph": args.physics_cuda_graph,
         "observation_contract_sha256": contract["observation_contract_sha256"],
