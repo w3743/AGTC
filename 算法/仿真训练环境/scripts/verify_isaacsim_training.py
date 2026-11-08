@@ -53,7 +53,7 @@ def main(argv=None):
     extra_sources = []
     for relative in ('scripts/verify_isaacsim_training.py', 'scripts/export_rsl_policy.py',
                      'scripts/install_isaaclab_windows.ps1', 'scripts/isaaclab_python.ps1',
-                     '安装IsaacLab.cmd', '启动IsaacLab.cmd'):
+                     '归档/Isaac/安装IsaacLab.cmd', '归档/Isaac/启动IsaacLab.cmd'):
         source, target = ROOT / relative, output / 'source_snapshot' / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)

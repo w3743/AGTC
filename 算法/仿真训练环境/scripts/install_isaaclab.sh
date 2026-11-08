@@ -21,7 +21,7 @@ fail() {
 }
 
 [[ "${WSL_DISTRO_NAME:-}" == "Ubuntu-24.04" ]] \
-    || fail '请从 Windows 的 安装IsaacLab.cmd 启动，或在 Ubuntu-24.04 WSL 中运行此脚本。'
+    || fail '历史 Isaac 安装入口已归档；该脚本仅供历史复现，请在适配的 Ubuntu-24.04 WSL 中运行。'
 [[ "$(uname -m)" == "x86_64" ]] || fail '仅支持 x86_64 WSL。'
 [[ -x /usr/bin/python3.12 ]] || fail '缺少 /usr/bin/python3.12。'
 command -v git >/dev/null 2>&1 || fail '缺少 git。'
