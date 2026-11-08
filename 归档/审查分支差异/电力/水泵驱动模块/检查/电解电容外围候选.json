@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-18",
+  "scope": "水泵驱动模块 XL7015 5V电源电解电容候选；只读选型；不修改共享BOM或EDA工程",
+  "status": "候选型号已冻结供原理图阶段采用；非采购放行、非电气/实物验收",
+  "power_stage_context": {
+    "converter": "XL7015E1",
+    "input_bus": "9S母线22.5–37.8V理论范围；电源额定输入须同时考虑本板输入保护和系统瞬态设计",
+    "output": "5V，设计负载预算0.2–0.3A",
+    "manufacturer_typical_application": "XL7015官方5V典型应用图标注VIN电容33uF/100V、VOUT电容100uF/10V、L=100uH/1A、S310；官方资料未给出本应用的输出电容ESR稳定窗口",
+    "design_boundary": "本文只核电解候选规格与厂商资料；未做样机启动、输出过冲/纹波、负载瞬态或环路稳定性测试。"
+  },
+  "candidates": [
+    {
+      "reference": "C_5V_IN",
+      "quantity": 1,
+      "manufacturer": "AiSHi / AISHI (艾华)",
+      "manufacturer_part_number": "EMK1KM330GB0D00T",
+      "type": "表面贴装铝电解电容",
+      "rated_capacitance_uF": 33,
+      "rated_voltage_V": 100,
+      "temperature_category_C": "-40..+105（目录规格适用于16..450V系列）",
+      "endurance": "105°C、额定电压施加10,000h",
+      "ripple_current_mA": 560,
+      "ripple_current_condition": "105°C额定纹波；系列频率修正表100kHz系数1.00，因此560mA按100kHz条件",
+      "case_size_mm": "D=10.0, L=10.5 (GB0)",
+      "selection_check": "满足XL7015典型输入电容33uF/100V；560mA额定纹波高于本电源给定的0.2A目标。",
+      "availability_status": "官方目录列出精确料号；未找到官方单料号状态/当前现货声明，现售状态和报价待供应商确认。",
+      "price_CNY": "待询价",
+      "MOQ": "待询价",
+      "sources": [
+        "https://aishi.com/files/3_AiSHi_Full_Catalog.pdf",
+        "https://www.xlsemi.com/datasheet/XL7015-EN.pdf"
+      ]
+    },
+    {
+      "reference": "C_5V_OUT",
+      "quantity": 1,
+      "manufacturer": "Nichicon",
+      "manufacturer_part_number": "UHE1C331MPD",
+      "type": "UHE系列低阻抗液态铝电解电容，径向引线",
+      "rated_capacitance_uF": 330,
+      "rated_voltage_V": 16,
+      "temperature_range_C": "-40..+105",
+      "endurance": "7000h（Nichicon单料号官方页面）",
+      "ripple_current_120Hz_105C_mA": 448,
+      "ripple_current_100kHz_105C_mA": 640,
+      "impedance_max_20C_100kHz_ohm": 0.13,
+      "impedance_max_minus10C_100kHz_ohm": 0.52,
+      "case_size_mm": "D=8.0, L=11.5",
+      "lead_spacing_mm": 3.5,
+      "selection_check": "满足5V/0.2–0.3A设计负载下电容16V耐压与>=0.2A纹波目标；比XL7015典型图的100uF增至330uF，以满足所选纹波余量及易采购完整型号。",
+      "availability_status": "Nichicon官方精确单料号页标注Mass Production。",
+      "price_CNY": "待询价",
+      "MOQ": "待询价",
+      "prototype_checks": [
+        "与XL7015 100uF典型值相比容量增至330uF；样机需检查上电启动时间、输出过冲/跌落和输入浪涌影响。",
+        "XL7015官方资料未给出输出电容ESR稳定范围；需在目标VIN、负载及温度范围测输出纹波/负载瞬态，必要时验证环路稳定性。"
+      ],
+      "sources": [
+        "https://www.nichicon.com/en-us/part/uhe1c331mpd/5772/",
+        "https://www.nichicon.com/en-us/datasheet/5715/",
+        "https://www.xlsemi.com/datasheet/XL7015-EN.pdf"
+      ]
+    }
+  ],
+  "library_and_bom_review": {
+    "common_library": "只读检查元件封装库索引/型号文本，未发现上述两个精确MPN已有共用候选；仍需按项目流程将实购MPN与CAD载体身份分开登记。",
+    "current_bom_rows": {
+      "C_5V_IN": "原规格33uF/100V，无精确MPN；本候选补齐",
+      "C_5V_OUT": "原规格100uF/16V低ESR，无精确MPN；本候选改为330uF/16V，需同步考虑容量变更",
+      "other_xl7015_peripheral_rows_still_without_exact_mpn": [
+        "C_5V_IN_HF (100nF/100V X7R)",
+        "C_5V_OUT_HF (100nF/16V X7R 0603)",
+        "C_FB_FF (33nF/16V X7R)",
+        "R_FB_TOP (10kΩ/1%/0603)",
+        "R_FB_BOTTOM (3.3kΩ/1%/0603)"
+      ],
+      "already_have_mpn": [
+        "U_5V: XL7015E1",
+        "L_5V: SWPA8065S101MT",
+        "D_5V: S310"
+      ]
+    },
+    "cost_status": "两颗电容均待询价；未用无来源报价替代。"
+  },
+  "references": [
+    {
+      "title": "AiSHi Full Catalog (manufacturer official)",
+      "url": "https://aishi.com/files/3_AiSHi_Full_Catalog.pdf",
+      "verified_items": "MA系列耐久与温度规格；EMK1KM330GB0D00T精确型号表行及纹波值；GB0尺寸图/尺寸表D10×L10.5mm；100kHz纹波修正系数1.00。",
+      "caveat": "目录发布年份较早；当前生产状态与现货未从厂商单料号页面核实。"
+    },
+    {
+      "title": "Nichicon UHE exact part page (manufacturer official)",
+      "url": "https://www.nichicon.com/en-us/part/uhe1c331mpd/5772/",
+      "verified_items": "精确料号UHE1C331MPD；330uF/16V；448mA@120Hz、640mA@100kHz；φ8×11.5mm；7000h；状态Mass Production。"
+    },
+    {
+      "title": "Nichicon UHE series datasheet (manufacturer official)",
+      "url": "https://www.nichicon.com/en-us/datasheet/5715/",
+      "verified_items": "16V/330uF对应表格行；阻抗上限0.13Ω@20°C/100kHz及0.52Ω@-10°C/100kHz；纹波表标注105°C/100kHz。"
+    },
+    {
+      "title": "XL7015 datasheet (manufacturer official)",
+      "url": "https://www.xlsemi.com/datasheet/XL7015-EN.pdf",
+      "verified_items": "Fig.10 5V典型应用中的33uF/100V输入、100uF/10V输出、100uH/1A及S310外围。",
+      "caveat": "该典型应用图没有给出输出电容ESR稳定范围。"
+    }
+  ]
+}

@@ -10,7 +10,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 SOURCE = Path(r"C:\pinoeer\AGTC\电力\水泵驱动模块")
-WORKTREE = Path(r"C:\pinoeer\agtc-brake-review-20261105\电力\水泵驱动模块")
+# 2026-11-07：审查工作树（agtc-brake-review-20261105）已并入 AGTC 并删除；
+# 审查侧原始字节按原相对路径归档于此，供本脚本历史复跑。
+WORKTREE = Path(r"C:\pinoeer\AGTC\归档\审查分支差异\电力\水泵驱动模块")
 OUT = HERE / "水泵快速卸载预算.json"
 
 

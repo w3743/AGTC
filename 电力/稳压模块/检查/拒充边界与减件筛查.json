@@ -1,0 +1,51 @@
+{
+  "source_netlist_sha256": "161f056f6a787682ac41b1caac71d30ef196e61618f026affbd2a3a44071a735",
+  "guarantee_scope": "conditional arithmetic only; no thermal, failure, end-to-end timing, or actual motor guarantee",
+  "ideal_dump_22p5V": {
+    "r_min_ohm": 0.7789999999999999,
+    "r_max_ohm": 0.861,
+    "min_full_on_W_no_extra_impedance": 587.9790940766551,
+    "flat_example_initial_W": 495.3,
+    "initial_margin_W": 92.67909407665508,
+    "total_series_ohm_max_for_495p3W": 1.0221078134463961,
+    "series_ohm_allowance_after_initial_r_max": 0.16110781344639613,
+    "incl_temperature_example": {
+      "TCR_per_C_assumed": 0.0002,
+      "delta_C_assumed": 225,
+      "R_hot_ohm": 0.8997449999999999,
+      "series_ohm_allowance": 0.12236281344639621
+    },
+    "slope_10deg_initial_W_example": 708.1633626896754,
+    "slope_10deg_shortfall_W_no_other_sinks": 120.18426861302032
+  },
+  "comparator_static": {
+    "foc_earliest_paper_V": 39.209,
+    "ti_tlv6700_vit_positive_max_V": 0.404,
+    "ti_tlv6700_vit_negative_min_V": 0.387,
+    "max_guaranteed_release_if_earliest_foc_precedes_V": 37.559116336633664,
+    "bus_full_V_comparison": 37.8,
+    "conditional_conclusion": "with independent published extrema and an ideal single divider, cannot guarantee both central rise before 39.209 V and release above 37.8 V; does not include dynamic delay, R tolerances or offsets"
+  },
+  "candidate_remove_R_DUMP_IN_SER": {
+    "PB7_lowest_high_V": 2.6,
+    "assumed_Vbe_V": 1.0,
+    "base_series_max_ohm": 10100,
+    "base_pulldown_min_ohm": 9900,
+    "derived_ib_A": 5.740574057405741e-05,
+    "status": "NOT_QUALIFIED: MDD Vce(sat) 0.15 V and Vbe 1 V at Ic=10mA, Ib=1mA, 25 C do not establish Vce at this base current; base series short changes MCU fault-current limiting",
+    "component_change_if_qualified": -1,
+    "existing_mpn_change_if_qualified": 0
+  },
+  "scenarios": {
+    "battery_refuses": "P_batt=0; P_sc + P_dump must cover regen minus actual loads and transient storage",
+    "supercap_refuses": "P_sc=0; share fresh BMS net CCL once, then P_dump covers deficit",
+    "both_refuse": "P_batt=P_sc=0; P_regen-P_load <= qualified P_dump plus time-limited storage",
+    "12V_absent": "no guaranteed central dump or SC converter drive; FOC BOV requested stop and remaining bus paths only",
+    "one_foc_feeder_open": "evaluate each electrical island; disconnected FOC cannot use remote dump"
+  },
+  "sources": [
+    "https://www.ti.com/lit/ds/symlink/tlv6700.pdf",
+    "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+    "https://www.mouser.com/pdfDocs/ENG_DS_1773309-8_B.pdf"
+  ]
+}

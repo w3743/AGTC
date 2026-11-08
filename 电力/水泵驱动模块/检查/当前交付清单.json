@@ -1,104 +1,150 @@
 {
-  "date": "2026-10-21",
-  "scope": "原理图设计交付；不含PCB布局布线或实物验收",
+  "date": "2026-11-05",
+  "scope": "水泵图面修订、原理级复核和采购范围证据",
   "native_components": 49,
   "pins_verified": 197,
   "netlist_check": "PASS",
-  "library_sync_check": {
-    "status": "PASS",
-    "scope": "共享库来源与资产一致性；不代表电气资格、DRC闭环、PCB或实物验收。",
-    "current_source_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
-    "current_record_path": "最终库同步核对.json",
-    "current_record_sha256": "8e331c340cc194f6a3b19b5adb117f3fd7f9455fa2d003c25000d9a0e401b995",
-    "sync_evidence_path": "../../元件封装库/检查/同步证据.json",
-    "sync_evidence_sha256": "7e003bdabc07794ec216a9f74b9a38f38fb2797361dcf56fb7fd0e62fa4a33ff",
-    "full_readonly_check_path": "../../检查/统一审查/全库同步与只读校验.json",
-    "full_readonly_check_sha256": "49c8551398e920d88f95b41b564915d877e0551f850fd52afb5e2a7dbb6eb711",
-    "component_index_sha256": "a39e641744f16aae6f4ea2f44cf3f2132d5ac4177be62af2738b123d9a5818b6",
-    "asset_index_sha256": "83ec9ab84caa9cfdb082eeba82ae764b27ced2004d7a8b90fa172e4fc237b603",
-    "source_config_sha256": "7404aadf60d7c91664983ef7dd0d37690228c08dea65937af6ff2429913af367",
-    "procurement_index_sha256": "b72940ea948acb2ed28f2249595c6b34505a37ca249c1c3a6ece95add77620e6",
-    "check_result": {
-      "exit_code": 0,
-      "native_sources": 4,
-      "bom_instances": 575,
-      "asset_references": 478,
-      "asset_files": 2459,
-      "library_packages": 8,
-      "library_packages_status": "PASS",
-      "procurement_status": "PASS"
-    }
-  },
   "drc": {
-    "status": "API_SUMMARY_ONLY_DETAILS_PENDING",
-    "fatal": null,
-    "error": null,
-    "warn": 24,
-    "source_sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9",
-    "api_summary_path": "水泵驱动模块/检查/原生DRC.json",
-    "details_status": "PENDING_VERIFICATION",
-    "disposition": "当前原生API摘要为warn=24；本轮逐项明细未取得。历史明细源SHA不匹配，不能作为本轮结论。",
-    "previous_record": {
-      "path": "水泵驱动模块/检查/DRC明细与处理.json",
-      "record_sha256": "eb8fa6269b175b2d3ff00f3647e2057a15bd8b73f542f512a249db52b0f8648e",
-      "recorded_source_sha256": "da0caa8b0fbdd558aedcd955548d3e113b4617a65c5d874e904b69cb992367e9",
-      "current_schematic_sha256": "97d9b05e5219f8f8f912262eb86feed061fe70b2a1b288c3d18b2547eab2c622",
-      "source_sha_matches": false,
-      "treated_as_current_round": false
-    }
+    "strict": true,
+    "status": "OPEN",
+    "errors": 0,
+    "warnings_by_rule": {
+      "ONENETNAME": 0,
+      "ATTRMATCHCODE": 1
+    },
+    "proof": "检查/ATTRMATCHCODE复核.json",
+    "ATTRMATCHCODE_affected_refs": 24
+  },
+  "library_sync_check": {
+    "status": "FULL_CHECK_BLOCKED_BY_SOURCE_HASH_DRIFT",
+    "modules_reported": [
+      "BMS模块",
+      "稳压模块",
+      "水泵驱动模块"
+    ],
+    "pump_before_source_sha256": "e7cfafd311d6e0fa14c980e02ce24419e52a9ffa0d082ea0e6de99275f8b5bd5",
+    "pump_current_source_sha256": "d028d711f84eea5709c8026325084e6dc8713a643331efb2b24d3d4aa0b179cf",
+    "pump_library_binding_equivalence_proof": "检查/图面修订复核.json",
+    "central_sync_deferred_to_cross_board_coordination": true,
+    "pump_drc_binding_equivalence_proof": "检查/DRC逐图元复核.json",
+    "pump_attribute_binding_equivalence_proof": "检查/ATTRMATCHCODE复核.json"
+  },
+  "inventory": {
+    "schematic": {
+      "pieces": 49,
+      "distinct_mpn_entries": 27
+    },
+    "fit_default": {
+      "pieces": 48,
+      "distinct_mpn_entries": 26
+    },
+    "default_dnp": [
+      "R_TERM"
+    ],
+    "external": {
+      "pieces": 9,
+      "distinct_mpn_entries": 6
+    },
+    "external_sku_to_confirm": [
+      "U_MCU"
+    ],
+    "procurement_bom_changed": false,
+    "native_changes": "38 active replacement notes, 194 obsolete texts tombstoned, and five label positions; removed 65 duplicate NET attributes; aligned three manufacturer display aliases",
+    "verified_savings_cny": 0
+  },
+  "verification": {
+    "state_model_tests_passed": 5,
+    "switch_fixture_cases_passed": 4,
+    "real_pump_running_qualification": "HOLD",
+    "drawing_review": "PASS 1/1, pixel-identical full-page render after manufacturer alias update",
+    "single_220k_short_circuit_preservation": "FAIL",
+    "cross_board_bus_load_contract": "设计细节.md#公共母线负载交接"
   },
   "files": [
     {
       "path": "eda工程文件/水泵驱动/水泵驱动.eprj3",
       "bytes": 1105,
-      "sha256": "43d8da6b47c9c4c58261148eae4f99c5c81ad2930ea76138ce461258d7608129"
+      "sha256": "ec3287d5feb23680f1faaf57d7817966d8b88a38ff7d57aa5855abc5764e7bf3"
     },
     {
       "path": "eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
-      "bytes": 2172593,
-      "sha256": "e16c343b2fcff015ee0e66e942697df0e5eb299ad05c055bbccafc89105c22e9"
+      "bytes": 2211974,
+      "sha256": "d028d711f84eea5709c8026325084e6dc8713a643331efb2b24d3d4aa0b179cf"
     },
     {
-      "path": "eda工程文件/导出/当前交付/水泵驱动原理图.pdf",
-      "bytes": 312064,
-      "sha256": "8bd781851334cc6370b934cc5b5c6fbc26c36f56e83c90f0d1a81e3904343354"
+      "path": "eda工程文件/水泵驱动/sch/Schematic1/Schematic1.ecfg",
+      "bytes": 757,
+      "sha256": "8ef2332f227d5993f742bb9b7d5c735967faa8fe07acd5723e9d3bc49d7c3ed9"
     },
     {
       "path": "eda工程文件/导出/当前交付/水泵驱动.enet",
-      "bytes": 157875,
-      "sha256": "156f3e1de76dc2400c66ef6fb8ae9e2d8c398c5e5c8bc116c53b8a707de079cb"
+      "bytes": 159265,
+      "sha256": "746b29dfdc6088d813c5ff41d214789ba603d56af02f1830efe5b7ac5438a16b"
+    },
+    {
+      "path": "eda工程文件/导出/当前交付/水泵驱动_CAD_BOM.csv",
+      "bytes": 5792,
+      "sha256": "960d4ede80079cffee15d9c2b852089dcd1a744469e8cdad4de1e5cfce5df6e2"
+    },
+    {
+      "path": "eda工程文件/导出/当前交付/水泵驱动原理图.pdf",
+      "bytes": 229230,
+      "sha256": "c8bfd5fbb0480f5b3d4758c58bcd1d58449fac6416674158a352c5077e2e5eab"
     },
     {
       "path": "原理图准备/BOM.csv",
-      "bytes": 13947,
-      "sha256": "9c661149e9af2a8b8a450d112c8e0bd0d6f10bf8d865737c1bba65bb9dfac117"
+      "bytes": 14318,
+      "sha256": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686"
+    },
+    {
+      "path": "原理图准备/原理图连接契约.json",
+      "bytes": 18663,
+      "sha256": "9a36666ca5ceaa9af84c47b522644cfa9e1f06ce080e75147fddaf537116326f"
+    },
+    {
+      "path": "检查/本轮原生复核.json",
+      "bytes": 14083,
+      "sha256": "16f856001a0a720de705cecb92851076adfef120948b3cacac076dcd935b6786"
+    },
+    {
+      "path": "检查/网表逐脚核对.json",
+      "bytes": 69941,
+      "sha256": "51a234038047ad70811ea3fe4e0c0f983f50db583cbb265af55181431a609a1a"
+    },
+    {
+      "path": "检查/功率路径模型.py",
+      "bytes": 4031,
+      "sha256": "d8007ae74426e64c9d0ee615328f3609e1e6c5806cd1a74791be8dc56eddc670"
+    },
+    {
+      "path": "检查/功率路径模型.json",
+      "bytes": 1021,
+      "sha256": "7634617b22f43e7555cbfbc7f8ca7992d2d16bff7b740a53a04bc58625efaac7"
+    },
+    {
+      "path": "检查/泵控制参考状态机.py",
+      "bytes": 10151,
+      "sha256": "b5247a3bd9a53916da297a757ce7a476e3d5cd93a88ae7cf8da16981b2d5feeb"
+    },
+    {
+      "path": "检查/图面修订复核.json",
+      "bytes": 24529,
+      "sha256": "9bbbf3b42555101aa6e5679a9e4d9ba6a53baa0b81965d0306f8e19a89ff1460"
+    },
+    {
+      "path": "检查/图面修订复核.png",
+      "bytes": 1313952,
+      "sha256": "016d17773a967041674a5a7cfaecec2e662a987fc7193cbc1807acdd08627480"
+    },
+    {
+      "path": "检查/DRC逐图元复核.json",
+      "bytes": 91343,
+      "sha256": "637545c87ab5b98171e43c8e36543a648a298fa0ba9276b577166d8990ede490"
+    },
+    {
+      "path": "检查/ATTRMATCHCODE复核.json",
+      "bytes": 32225,
+      "sha256": "5b47aab2adc7ac3f7e9a79905b73a8977b3722121ccfd83f33a6786236491b0e"
     }
-  ],
-  "current_cli_recheck": {
-    "timestamp": "2026-10-21T01:48:53+08:00",
-    "project": "水泵驱动.eprj3 / Schematic1 / P1",
-    "value_only_instance_updates": [
-      "C_5V_OUT_HF",
-      "C_ADC_BUS",
-      "C_CAN_VCC",
-      "C_CAN_VIO",
-      "C_DRV_VCC",
-      "C_VREF"
-    ],
-    "updated_property": "Value=100nF; Manufacturer Part C1608X7R1H104K080AA and CAD device C1608X7R1H103K080AA preserved",
-    "official_cli_drc": {
-      "type": "warn",
-      "count": 24,
-      "details": "API returned count only; still open"
-    },
-    "enet_pin_check": {
-      "status": "PASS",
-      "components": 49,
-      "pins": 197,
-      "pins_changed": 0,
-      "netlist_sha256": "156f3e1de76dc2400c66ef6fb8ae9e2d8c398c5e5c8bc116c53b8a707de079cb"
-    },
-    "official_bom_evidence": "../检查/统一审查/水泵_BOM_CAD_Official.csv",
-    "source_unchanged_after_export": true
-  }
+  ]
 }

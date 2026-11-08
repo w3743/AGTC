@@ -115,9 +115,16 @@ $trainArgs = @(
     Set-Content -LiteralPath (Join-Path $trial "cli_args.txt") -Encoding utf8
 
 Write-Host "=== formal trial train: $trial ==="
+$trainLog = Join-Path $trial "train.log"
 & $Python -u (Join-Path $here "train_wsl.py") @trainArgs 2>&1 |
-    Tee-Object -FilePath (Join-Path $trial "train.log") | Out-Host
+    Tee-Object -FilePath $trainLog | Out-Host
 $trainRc = $LASTEXITCODE
+# Windows PowerShell 5.1 Tee-Object writes UTF-16; normalize the log to UTF-8 (no BOM)
+# so evidence encoding matches the other UTF-8 files across hosts.
+if ($PSVersionTable.PSVersion.Major -lt 7 -and (Test-Path -LiteralPath $trainLog)) {
+    $trainLogText = Get-Content -LiteralPath $trainLog -Raw
+    [System.IO.File]::WriteAllText($trainLog, $trainLogText, [System.Text.UTF8Encoding]::new($false))
+}
 
 & $Python $helper write-manifest --trial-dir $trial --train-exit $trainRc --protocol-sha $protocolSha
 $manifestRc = $LASTEXITCODE

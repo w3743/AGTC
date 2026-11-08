@@ -6,13 +6,13 @@ V2 使用 Ubuntu 24.04 ARM64 WSL2、Newton MuJoCo Warp V6、MuJoCo/mujoco-warp 3
 
 ## 正式训练
 
-使用新的唯一 tag；V2 runner 校验协议与配方，为新 run 建立独立目录并从头训练。
+在 WSL 中先进入当前检出的 `算法/仿真训练环境/native` 目录并按冻结协议准备依赖；当前仓库没有证明可从空环境完整重建。将示例中的 `my-unique-trial` 改成新的唯一 tag；V2 runner 校验协议与配方，为新 run 建立独立目录并从头训练。
 
 ~~~bash
-cd /mnt/c/pioneer/先进通用履带底盘工程/算法/仿真训练环境/native
-PYTHON=/opt/venv_mujoco315_smoke/bin/python bash train/run_native_v2_trial.sh <unique-tag> \
-  --live-state-file /mnt/c/pioneer/agtc-native-acceptance-backup/native_v2_live/state.json \
-  --live-state-interval 5
+# 先在当前检出的 native 目录中执行；将变量设为本机实际路径。
+export NATIVE_PYTHON="/实际环境/bin/python"
+test -x "$NATIVE_PYTHON" || { echo "请设置可执行的 NATIVE_PYTHON"; exit 1; }
+PYTHON="$NATIVE_PYTHON" bash train/run_native_v2_trial.sh my-unique-trial
 ~~~
 
 固定配方为 64 env × 32 steps × 300 iterations、seed 0、LSTM-512、fast_stop_v2、五路观测、1 ms × 50 和 zero-nonfinite gate。协议明确允许的附加 live-state 参数、版本限制与验收门请以 V2 协议及 runner 校验结果为准。
@@ -20,7 +20,10 @@ PYTHON=/opt/venv_mujoco315_smoke/bin/python bash train/run_native_v2_trial.sh <u
 ## 开发评估
 
 ~~~bash
-PYTHON=/opt/venv_mujoco315_smoke/bin/python bash train/run_eval_v2.sh <checkpoint.pt> <new-output-dir> pilot
+CHECKPOINT="/实际路径/checkpoint.pt"
+OUTPUT_DIR="/实际路径/新评估目录"
+test -f "$CHECKPOINT" || { echo "请设置实际检查点路径"; exit 1; }
+PYTHON="$NATIVE_PYTHON" bash train/run_eval_v2.sh "$CHECKPOINT" "$OUTPUT_DIR" pilot
 ~~~
 
 pilot 使用 seed 87010–87013；formal 使用 seed 87010–87025。评估 runner 会在创建环境前校验协议与 checkpoint contract。不匹配时应拒绝运行。formal 开发评估仍不等于 held-out 能力验收。

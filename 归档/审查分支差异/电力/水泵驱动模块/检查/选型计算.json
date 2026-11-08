@@ -1,0 +1,92 @@
+{
+  "status": "初步选型估算；不是仿真、器件实测或正式验收",
+  "device_candidate": "TI DRV8262DDWR",
+  "inputs": {
+    "motor_rated_voltage_v": 21.0,
+    "bus_voltage_min_v": 22.5,
+    "bus_voltage_max_v": 37.8,
+    "motor_current_for_ipropi_example_a": 3.0,
+    "motor_rms_current_for_thermal_estimate_a": 3.0,
+    "vref_v": 1.65,
+    "vref_source": "WeAct 主控板 3.3 V 经 10 kΩ/10 kΩ 分压得到；不取 DRV8262 DVDD",
+    "vref_divider_input_v": 3.3,
+    "vref_divider_top_ohm": 10000.0,
+    "vref_divider_bottom_ohm": 10000.0,
+    "r_ipropi_ohm_single_resistor": 1500.0,
+    "a_ipropi_a_per_a_typical": 0.000212,
+    "single_bridge_ipropi_connection": "IPROPI1 与 IPROPI2 相连；连接点仅接一个 RIPROPI 至 GND",
+    "bus_divider_top_ohm": [
+      110000.0,
+      110000.0
+    ],
+    "bus_divider_bottom_ohm": 10000.0,
+    "thermal_assumptions": {
+      "bus_voltage_v": 37.8,
+      "pwm_frequency_hz": 20000.0,
+      "hot_rds_each_fet_ohm_estimate": 0.043,
+      "room_rds_each_fet_ohm_typical": 0.025,
+      "body_diode_voltage_v": 1.0,
+      "dead_time_s": 3e-07,
+      "output_rise_fall_time_s": 1.1e-07,
+      "external_vcc_vm_quiescent_current_typical_a": 0.005,
+      "ddw_jeDEC_board_rtheta_ja_c_per_w": 22.2,
+      "ambient_temperature_c_project_limit": 60.0,
+      "duty_for_thermal_estimate": "conduction model uses motor RMS current; switching estimate uses TI PSW=VM*I*trf*f formula"
+    }
+  },
+  "results": {
+    "ipropi_voltage_at_3a_v": 0.9540000000000001,
+    "nominal_itrip_a": 5.188679245283018,
+    "current_mirror_gain_total_a_per_a": 0.000212,
+    "nominal_duty_for_21v_motor": {
+      "at_21v_bus": 1.0,
+      "at_22_5v_bus": 0.9333333333333333,
+      "at_37_8v_bus": 0.5555555555555556
+    },
+    "bus_divider_ratio_vout_over_vin": 0.043478260869565216,
+    "bus_divider_sensed_voltage_v": {
+      "at_22_5v_bus": 0.9782608695652174,
+      "at_37_8v_bus": 1.643478260869565
+    },
+    "thermal_estimate_20khz_3arms_at_37_8v": {
+      "conduction_hot_fet_resistance_estimate_w": 0.7739999999999999,
+      "dead_time_w": 0.036,
+      "switching_w": 0.24947999999999998,
+      "quiescent_external_vcc_typical_w": 0.189,
+      "total_hot_r_plus_typical_other_terms_w": 1.24848,
+      "junction_rise_using_JEDEC_rtheta_ja_c_estimate": 27.716256,
+      "junction_temperature_at_25c_ambient_estimate": 52.716256,
+      "junction_temperature_at_60c_ambient_estimate": 87.716256,
+      "total_room_r_typical_other_terms_w": 0.92448,
+      "interpretation": "约1.25 W 为热态典型导通电阻估算值与典型开关/静态损耗相加；不是最坏值。RθJA仅对应 TI 指定 JEDEC 板条件，实际值依 PCB 铜面积、层数和热过孔变化。"
+    }
+  },
+  "formula_notes": [
+    "ITRIP = VREF / (RIPROPI × AIPROPI); single mode ties IPROPI pins and uses one resistor, so gain remains 212 µA/A against total motor current.",
+    "VREF = 3.3 V × 10 kΩ / (10 kΩ + 10 kΩ) = 1.65 V; source is the WeAct board 3V3 rail, not DRV8262 DVDD.",
+    "VIPROPI = I × AIPROPI × RIPROPI.",
+    "Dideal = 21 V / VBUS; use as an ideal duty ceiling estimate, then validate using motor-terminal voltage and actual bus voltage.",
+    "VADC/VBUS = 10k / (110k + 110k + 10k) = 1/23.",
+    "Pcond ≈ Irms² × (RHS + RLS); for this estimate both hot FETs use 43 mΩ.",
+    "Pdead ≈ 2 × VD × I × tD × fPWM; Pswitch ≈ VM × I × tRF × fPWM; Pq ≈ VM × IVM.",
+    "The 5.19 A trip point is nominal only. Mirror gain accuracy, reference and resistor tolerances mean it is not a guaranteed 5 A hard ceiling; it does not current-limit commanded high-side braking."
+  ],
+  "sources": [
+    {
+      "title": "TI DRV8262 Rev.C data sheet",
+      "url": "https://www.ti.com/lit/ds/symlink/drv8262.pdf",
+      "used_for": [
+        "single-H-bridge AIPROPI=212 µA/A and current-regulation equation",
+        "single-H-bridge truth table and input defaults",
+        "RDS(on), tD=300 ns, tRF=110 ns, IVM, RθJA and recommended capacitors"
+      ]
+    },
+    {
+      "title": "TI E2E: DRV8262 current regulation in single H-bridge mode",
+      "url": "https://e2e.ti.com/support/motor-drivers-group/motor-drivers/f/motor-drivers-forum/1336342/drv8262-current-regulation-in-single-h-bridge-mode",
+      "used_for": [
+        "clarification that tying both IPROPI outputs sums their currents; using two equal resistors makes the effective resistance half"
+      ]
+    }
+  ]
+}

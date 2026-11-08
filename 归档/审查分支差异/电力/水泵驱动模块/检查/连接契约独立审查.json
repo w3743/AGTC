@@ -1,0 +1,1000 @@
+{
+  "标题": "水泵驱动模块原理图连接契约独立逻辑审查",
+  "日期": "2026-10-18",
+  "审查范围": "只读审查原理图连接契约.json列出的全部49器件及其引脚网络、现行BOM标号/MPN/制造商/供方料号一致性；不调用EDA，不读取原生网表或修改任何原理图/BOM。",
+  "总体结论": {
+    "结果": "PASS（逻辑审查）",
+    "契约器件数": 49,
+    "唯一契约标号数": 49,
+    "逐项BOM匹配数": 49,
+    "发现的契约/BOM不一致数": 0,
+    "边界": "PASS只表示逻辑连接及选型字段审查符合约束/数据手册；不代表原生工程网表一致、封装映射通过、PCB布局/DRC、热/EMC/供电稳定性或样机验收。"
+  },
+  "BOM核对": {
+    "BOM行数": 37,
+    "BOM展开唯一标号数": 58,
+    "契约标号全部存在于BOM": true,
+    "契约MPN制造商供方料号全部匹配": true,
+    "契约以外的BOM标号": [
+      "F_BUS",
+      "H_FUSE",
+      "P_BUS",
+      "P_CAN",
+      "P_MOTOR",
+      "T_CAN_1",
+      "T_CAN_2",
+      "T_CAN_3",
+      "U_MCU"
+    ],
+    "契约外标号说明": "F_BUS、H_FUSE是板外保险/座；P_BUS、P_MOTOR、P_CAN及T_CAN_1/2/3为线束端子/壳体；U_MCU是插接式WeAct核心板，原理图契约用J_MCU_A/B两组插座表示，因此这些标号合理地不属于此49器件契约。"
+  },
+  "功能组审查": [
+    {
+      "功能组": "BUS及电机功率接口",
+      "器件": [
+        "J_BUS",
+        "J_MOTOR",
+        "C_VM_BULK",
+        "D_BUS"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "J_BUS.1=BUS_M，.2=GND_SYS；BUS_M在契约中按已熔断后的板内母线处理，保险丝与座在板外BOM另列。",
+        "J_MOTOR.1/.2分别接MOTOR_A/MOTOR_B，两根电机线均为驱动输出，没有把电机端误接地。",
+        "C_VM_BULK和D_BUS均跨BUS_M/GND_SYS；SMCJ40A按单向TVS极性约定K/阴极到BUS_M、A/阳极到GND_SYS。",
+        "DRV VM旁两只C_DRV_VM也跨BUS_M/GND_SYS，符合就近VM去耦预期。"
+      ]
+    },
+    {
+      "功能组": "DRV8262及外围",
+      "器件": [
+        "U_DRV",
+        "C_DRV_VM1",
+        "C_DRV_VM2",
+        "C_DRV_VCP",
+        "C_DRV_CP",
+        "C_DRV_DVDD",
+        "C_DRV_VCC",
+        "R_SLEEP",
+        "R_IN1_PD",
+        "R_IN2_PD",
+        "R_FAULT_PU",
+        "R_IPROPI",
+        "R_VREF_TOP",
+        "R_VREF_BOTTOM",
+        "C_VREF",
+        "R_ADC_I",
+        "C_ADC_I"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "DDW单桥引脚：VM 2/11/12/21并BUS_M；OUT1 4/5/6/17/18/19并MOTOR_A；OUT2 7/8/9/14/15/16并MOTOR_B。PGND 3/10/13/20及GND 22/23、OCPM 27均接GND_SYS。",
+        "模式与PWM：MODE1 pin28、MODE2 pin29均接DVDD pin24；TI表6-2定义MODE1=1、MODE2=浮空或DVDD为单H桥PWM。两模式脚在nSLEEP使能/上电时锁存。",
+        "保留脚：RSVD pins32/36/38/39均为NC。封装是44个外围引脚；TI DDW0044E封装图将底部PowerPAD明确编号45，因此契约pin45接GND_SYS正确；它不是44脚，也不是普通外引脚。",
+        "并桥电流检测：IPROPI pins30/31接同一IPROPI节点，且只经一只R_IPROPI=1.5kΩ至GND_SYS；ADC_I由同节点经R_ADC_I=1kΩ串入并由C_ADC_I=10nF对地滤波，没把滤波串入IPROPI限流主节点。按约束表212µA/A及VREF约1.65V，名义限流5.19A；单桥并脚后镜像不翻倍。",
+        "限流参考：VREF pins33/34并DRV_VREF；R_VREF_TOP 10k从+3V3上拉、R_VREF_BOTTOM 10k接GND_SYS、C_VREF 100nF对地，得到名义1.65V。",
+        "模式/时序与故障：OCPM 27接地选择锁存；TOFF 35接DVDD；DECAY 37接地；nFAULT 26接MCU故障网并由10k上拉+3V3；IN2 40、IN1 41、nSLEEP 42各自独立到控制网并有10k下拉。",
+        "电源与电荷泵：VCC25=+5V并100nF至地；DVDD24仅用作本地逻辑输出，C_DRV_DVDD=1µF接DVDD/GND_SYS；VCP1至BUS_M并1µF；CPH44至CPL43并100nF。"
+      ]
+    },
+    {
+      "功能组": "母线ADC分压与滤波",
+      "器件": [
+        "R_BUS_TOP1",
+        "R_BUS_TOP2",
+        "R_BUS_BOTTOM",
+        "R_ADC_BUS",
+        "C_ADC_BUS"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "R_BUS_TOP1/2两只110kΩ串联，BUS_M→BUS_DIV_MID→BUS_SENSE；R_BUS_BOTTOM=10kΩ从BUS_SENSE到GND_SYS，分压比1/23。",
+        "BUS_SENSE经R_ADC_BUS=1kΩ至ADC_BUS，C_ADC_BUS=100nF接ADC_BUS/GND_SYS；37.8V母线计算约1.643V，低于3.3V ADC供电上限。"
+      ]
+    },
+    {
+      "功能组": "NTC分压与滤波",
+      "器件": [
+        "R_NTC_PULL",
+        "NTC_BOARD",
+        "C_ADC_NTC"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "R_NTC_PULL=10kΩ从+3V3接ADC_NTC，NTC_BOARD=10kΩ/B3950从ADC_NTC接GND_SYS，构成预期分压。",
+        "C_ADC_NTC=10nF从ADC_NTC接GND_SYS，未改变分压拓扑；采样对象是板温。"
+      ]
+    },
+    {
+      "功能组": "XL7015五伏电源",
+      "器件": [
+        "U_5V",
+        "C_5V_IN",
+        "C_5V_IN_HF",
+        "D_5V",
+        "L_5V",
+        "C_5V_OUT",
+        "C_5V_OUT_HF",
+        "R_FB_TOP",
+        "R_FB_BOTTOM",
+        "C_FB_FF"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "XL7015E1符号六针完整：1 VIN=BUS_M；2 SW=XL_SW；3 GND=GND_SYS；4 FB=XL_FB；5 EN=GND_SYS（低有效，常开）；6为TO-252-5L exposed tab的CAD扩展脚，接GND_SYS。原厂机械封装为5个外引脚加接地散热焊盘；契约同时覆盖pin6，没有遗漏。",
+        "S310 pin1按阴极接XL_SW、pin2按阳极接GND_SYS，构成降压续流方向；L_5V从XL_SW到+5V。",
+        "输入33µF/100V电解与100nF均跨BUS_M/GND_SYS；输出330µF/16V与100nF均跨+5V/GND_SYS。",
+        "FB上臂10kΩ从+5V到XL_FB、下臂3.3kΩ从XL_FB到地；33nF跨+5V与FB，与上臂并联作前馈。按1.25V参考计算输出约5.038V。"
+      ]
+    },
+    {
+      "功能组": "TCAN1042 CAN收发与防护",
+      "器件": [
+        "U_CAN",
+        "C_CAN_VCC",
+        "C_CAN_VIO",
+        "R_CAN_STB_PU",
+        "R_CAN_TXD_PU",
+        "D_CAN",
+        "J_CAN",
+        "R_TERM"
+      ],
+      "结论": "PASS",
+      "核对": [
+        "TCAN1042HGV pinout一致：1 TXD=CAN_TX；2 GND=GND_SYS；3 VCC=+5V；4 RXD=CAN_RX；5 VIO=+3V3；6 CANL；7 CANH；8 STB=CAN_STB。STB高有效待机，10k上拉使复位默认待机，MCU拉低进入正常通信；TXD由10k上拉到3V3。",
+        "VCC及VIO各有100nF对地去耦。",
+        "PESD2CANFD24V-TR：pin1=CANH、pin2=CANL、pin3=GND_SYS；与Nexperia三脚双线防护器件应用图的1/2接总线、3作公共回流一致。",
+        "J_CAN pin1=GND_SYS、pin2=CANH、pin3=CANL；R_TERM 120Ω跨CANH/CANL且BOM/约束标记默认DNP。"
+      ]
+    },
+    {
+      "功能组": "MCU核心板排针",
+      "器件": [
+        "J_MCU_A",
+        "J_MCU_B"
+      ],
+      "结论": "PASS-契约层",
+      "核对": [
+        "J_MCU_A/B都是同号物理针脚映射，不镜像；本审查逐项保留契约的1–24脚连接并与现行BOM核对。",
+        "具体WeAct Normal QFN48核心板针名、P1/P2编号、GPIO/AF、BOOT0兼容、供电与USB/SWD/晶振冲突审查引用检查/MCU引脚核对.json；该独立报告已有对应官方原理图核查。本文件不替代该项MCU板级审查。"
+      ]
+    }
+  ],
+  "器件逐项核对": [
+    {
+      "标号": "U_DRV",
+      "MPN": "DRV8262DDWR",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_VCP",
+        "2": "BUS_M",
+        "3": "GND_SYS",
+        "4": "MOTOR_A",
+        "5": "MOTOR_A",
+        "6": "MOTOR_A",
+        "7": "MOTOR_B",
+        "8": "MOTOR_B",
+        "9": "MOTOR_B",
+        "10": "GND_SYS",
+        "11": "BUS_M",
+        "12": "BUS_M",
+        "13": "GND_SYS",
+        "14": "MOTOR_B",
+        "15": "MOTOR_B",
+        "16": "MOTOR_B",
+        "17": "MOTOR_A",
+        "18": "MOTOR_A",
+        "19": "MOTOR_A",
+        "20": "GND_SYS",
+        "21": "BUS_M",
+        "22": "GND_SYS",
+        "23": "GND_SYS",
+        "24": "DRV_DVDD",
+        "25": "+5V",
+        "26": "DRV_nFAULT",
+        "27": "GND_SYS",
+        "28": "DRV_DVDD",
+        "29": "DRV_DVDD",
+        "30": "IPROPI",
+        "31": "IPROPI",
+        "32": null,
+        "33": "DRV_VREF",
+        "34": "DRV_VREF",
+        "35": "DRV_DVDD",
+        "36": null,
+        "37": "GND_SYS",
+        "38": null,
+        "39": null,
+        "40": "DRV_IN2",
+        "41": "DRV_IN1",
+        "42": "DRV_SLEEP",
+        "43": "DRV_CPL",
+        "44": "DRV_CPH",
+        "45": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "U_5V",
+      "MPN": "XL7015E1",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "XL_SW",
+        "3": "GND_SYS",
+        "4": "XL_FB",
+        "5": "GND_SYS",
+        "6": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "U_CAN",
+      "MPN": "TCAN1042HGVDRQ1",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "CAN_TX",
+        "2": "GND_SYS",
+        "3": "+5V",
+        "4": "CAN_RX",
+        "5": "+3V3",
+        "6": "CANL",
+        "7": "CANH",
+        "8": "CAN_STB"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "J_MCU_A",
+      "MPN": "JXT-PM2.54-2X12P-A9",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "MCU核心板排针",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "+5V",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": null,
+        "10": "DRV_IN2",
+        "11": null,
+        "12": null,
+        "13": null,
+        "14": null,
+        "15": null,
+        "16": "CAN_STB",
+        "17": "DRV_nFAULT",
+        "18": null,
+        "19": null,
+        "20": "DRV_IN1",
+        "21": null,
+        "22": "DRV_SLEEP",
+        "23": "CAN_RX",
+        "24": "CAN_TX"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "J_MCU_B",
+      "MPN": "JXT-PM2.54-2X12P-A9",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "MCU核心板排针",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "+3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": null,
+        "10": null,
+        "11": null,
+        "12": null,
+        "13": null,
+        "14": null,
+        "15": null,
+        "16": null,
+        "17": "ADC_BUS",
+        "18": "ADC_NTC",
+        "19": null,
+        "20": "ADC_I",
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "J_BUS",
+      "MPN": "2EDGVC-5.08-02P-14-100A(H)",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "BUS及电机功率接口",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "J_MOTOR",
+      "MPN": "2EDGVC-5.08-02P-14-100A(H)",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "BUS及电机功率接口",
+      "契约针脚到网络": {
+        "1": "MOTOR_A",
+        "2": "MOTOR_B"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_VM_BULK",
+      "MPN": "UHW2A471MHD",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "BUS及电机功率接口",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "D_BUS",
+      "MPN": "SMCJ40A",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "BUS及电机功率接口",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_VM1",
+      "MPN": "C2012X7R2E103K125AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_VM2",
+      "MPN": "C2012X7R2E103K125AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_VCP",
+      "MPN": "C1608X7R1C105K080AC",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_VCP",
+        "2": "BUS_M"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_CP",
+      "MPN": "C2012X7R2A104K125AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_CPH",
+        "2": "DRV_CPL"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_DVDD",
+      "MPN": "C1608X7R1C105K080AC",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_DVDD",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_DRV_VCC",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_SLEEP",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_SLEEP",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_IN1_PD",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_IN1",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_IN2_PD",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_IN2",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_FAULT_PU",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "DRV_nFAULT"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_IPROPI",
+      "MPN": "RMC06031.5K1%N",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "IPROPI",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_VREF_TOP",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "DRV_VREF"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_VREF_BOTTOM",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_VREF",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_VREF",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "DRV_VREF",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_ADC_I",
+      "MPN": "RMC06031K1%N",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "IPROPI",
+        "2": "ADC_I"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_ADC_I",
+      "MPN": "C1608X7R1H103K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "DRV8262及外围",
+      "契约针脚到网络": {
+        "1": "ADC_I",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_BUS_TOP1",
+      "MPN": "TC0350B1103T5F",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "母线ADC分压与滤波",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "BUS_DIV_MID"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_BUS_TOP2",
+      "MPN": "TC0350B1103T5F",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "母线ADC分压与滤波",
+      "契约针脚到网络": {
+        "1": "BUS_DIV_MID",
+        "2": "BUS_SENSE"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_BUS_BOTTOM",
+      "MPN": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "母线ADC分压与滤波",
+      "契约针脚到网络": {
+        "1": "BUS_SENSE",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_ADC_BUS",
+      "MPN": "RMC06031K1%N",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "母线ADC分压与滤波",
+      "契约针脚到网络": {
+        "1": "BUS_SENSE",
+        "2": "ADC_BUS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_ADC_BUS",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "母线ADC分压与滤波",
+      "契约针脚到网络": {
+        "1": "ADC_BUS",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_NTC_PULL",
+      "MPN": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "NTC分压与滤波",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "ADC_NTC"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "NTC_BOARD",
+      "MPN": "MF52A103F3950(A1)",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "NTC分压与滤波",
+      "契约针脚到网络": {
+        "1": "ADC_NTC",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_ADC_NTC",
+      "MPN": "C1608X7R1H103K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "NTC分压与滤波",
+      "契约针脚到网络": {
+        "1": "ADC_NTC",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_5V_IN",
+      "MPN": "EMK1KM330GB0D00T",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_5V_IN_HF",
+      "MPN": "C2012X7R2A104K125AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "D_5V",
+      "MPN": "S310",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "XL_SW",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "L_5V",
+      "MPN": "SWPA8065S101MT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "XL_SW",
+        "2": "+5V"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_5V_OUT",
+      "MPN": "UHE1C331MPD",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_5V_OUT_HF",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_FB_TOP",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "XL_FB"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_FB_BOTTOM",
+      "MPN": "RMC06033.3K1%N",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "XL_FB",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_FB_FF",
+      "MPN": "GCJ188R71H333KA12D",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "XL7015五伏电源",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "XL_FB"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_CAN_VCC",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "C_CAN_VIO",
+      "MPN": "C1608X7R1H104K080AA",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_CAN_STB_PU",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "CAN_STB"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_CAN_TXD_PU",
+      "MPN": "RS-03K1002FT",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "+3V3",
+        "2": "CAN_TX"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "D_CAN",
+      "MPN": "PESD2CANFD24V-TR",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND_SYS"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "J_CAN",
+      "MPN": "B3B-XH-A(LF)(SN)",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "GND_SYS",
+        "2": "CANH",
+        "3": "CANL"
+      },
+      "逻辑审查": "PASS"
+    },
+    {
+      "标号": "R_TERM",
+      "MPN": "MFR25SFRE52-120R",
+      "BOM标号存在": true,
+      "BOM制造商料号一致": true,
+      "BOM制造商字段一致": true,
+      "BOM供方料号一致": true,
+      "功能组": "TCAN1042 CAN收发与防护",
+      "契约针脚到网络": {
+        "1": "CANH",
+        "2": "CANL"
+      },
+      "逻辑审查": "PASS"
+    }
+  ],
+  "保留的验证边界": [
+    "XL7015输出电解从典型应用100µF增至330µF；官方数据表没有定义该输出电容ESR稳定窗口。启动、负载瞬态和环路稳定性留待板级/样机验证，不能仅由连接拓扑推定。",
+    "SMCJ40A的40V反向工作电压覆盖37.8V名义满电；原厂规定脉冲下钳位64.5V高于DRV8262的60V推荐工作上限、低于70V绝对最大值。系统实际瞬态能量与器件引脚峰值需后续独立校核。",
+    "D_BUS和D_5V的符号引脚号与实际封装焊盘极性对应、功率器件底部EP焊接/散热铜和过孔仍由原生网表、封装和PCB检查确认。",
+    "MCU PB8复用BOOT0需要按MCU引脚核对记录设置并读回nSWBOOT0=0、nBOOT0=1，再做独立复位/上电验证。",
+    "BOM对连接契约49项均匹配；JXT/JXTCONN制造商名称映射仍按现行选型备注待核实，属于采购身份核验。"
+  ],
+  "输入文件SHA256": {
+    "BOM.csv": "4B79B7411AC29C9C591A566AEA4D642C48E722A3E806FBB5893A36A04B4B9119",
+    "选型与连接约束.md": "F3E5CB604F04007F5A6EB513C296A323FDBF9106408765805ADD90479D70EE68",
+    "MCU引脚核对.json": "89C76546C2D45AB0832230FA8FAAEDF54D49C38939654706E5B547FDCC391E1B",
+    "原理图连接契约.json": "9D31722133EB4359E4F11850D7C442B2FDBF5A349961EC00491A21E9EBA610A3"
+  },
+  "来源": [
+    {
+      "名称": "TI DRV8262 Rev.C 数据手册",
+      "URL": "https://www.ti.com/lit/ds/symlink/drv8262.pdf",
+      "核对位置": "§4 pin configuration/DDW top view与DDW0044E封装图（1–44外引脚、thermal pad 45）；§6.4 Table 6-2/单桥PWM真值表；§6.5 IPROPI/VREF。"
+    },
+    {
+      "名称": "XLSEMI XL7015 数据手册 Rev.1.8",
+      "URL": "https://www.xlsemi.com/datasheet/XL7015-EN.pdf",
+      "核对位置": "TO252-5L pin configuration与Table 1：1 VIN、2 SW、3 GND、4 FB、5 EN、金属散热片GND；FB基准1.25V、EN低有效。"
+    },
+    {
+      "名称": "onsemi S310/SS39 系列数据手册",
+      "URL": "https://www.onsemi.com/download/data-sheet/pdf/ss39-d.pdf",
+      "核对位置": "封装引脚极性：pin1 cathode、pin2 anode。"
+    },
+    {
+      "名称": "TI TCAN1042HGV-Q1 Rev.D 数据手册",
+      "URL": "https://www.ti.com/lit/ds/symlink/tcan1042h-q1.pdf",
+      "核对位置": "pin configuration及STB逻辑：1 TXD、2 GND、3 VCC、4 RXD、5 VIO、6 CANL、7 CANH、8 STB（高有效待机）。"
+    },
+    {
+      "名称": "Nexperia PESD2CANFD24V-T 数据手册",
+      "URL": "https://assets.nexperia.com/documents/data-sheet/PESD2CANFD24V-T.pdf",
+      "核对位置": "§5 pinning information和§10典型CAN保护应用图：引脚1/2接总线线对、pin3公共回流。"
+    },
+    {
+      "名称": "Littelfuse SMCJ 单向TVS数据表",
+      "URL": "https://www.littelfuse.com/assetdocs/tvs-diodes-smcj-datasheet?assetguid=37388813-0d6d-4329-969b-1aa8b7614ac1",
+      "核对位置": "SMCJ40A反向工作/钳位电压及阴极标识。"
+    },
+    {
+      "名称": "WeAct STM32G431核心板官方Normal QFN48原理图",
+      "URL": "https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/QFN48/WeAct-STM32G431CxUxCoreBoard_V10_SchDoc.pdf",
+      "核对位置": "与已有MCU引脚核对.json及本地官方PDF记录配套引用；本轮不重复其逐针核验。"
+    }
+  ]
+}

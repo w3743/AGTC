@@ -63,6 +63,22 @@ def test_prediction_round_trip_and_independent_episode_state(rsl_checkpoint):
     assert model.num_timesteps is None  # iteration 0 does not prove a transition count
 
 
+@pytest.mark.parametrize("invalid", [float("inf"), -float("inf"), float("nan")])
+def test_prediction_rejects_nonfinite_actor_output_before_clipping(rsl_checkpoint, invalid):
+    path, config = rsl_checkpoint
+    model = RslPredictionModel(path, expected_observation_config=config)
+    observation = {
+        key: np.zeros(shape, dtype=np.float32)
+        for key, shape in config["observation_shapes"].items()
+    }
+    with model.actor.register_forward_hook(
+        lambda _module, _args, output: torch.full_like(output, invalid)
+    ):
+        with pytest.raises(ValueError, match="RSL actor produced nonfinite actions"):
+            model.predict(observation)
+    assert model.actor.get_hidden_state() is None
+
+
 def test_lazy_critic_uses_the_actor_encoder_without_registering_a_second_copy(rsl_checkpoint):
     path, config = rsl_checkpoint
     model = RslPredictionModel(path, expected_observation_config=config)

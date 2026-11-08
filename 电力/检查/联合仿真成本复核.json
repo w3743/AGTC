@@ -1,0 +1,194 @@
+{
+  "schema_version": "agtc.power_cost_review.v1",
+  "captured_local_date": "2026-11-05",
+  "status": "read_only_cost_review; candidates_not_adopted",
+  "scope": {
+    "vehicle": {"BMS": 1, "FOC_A": 1, "FOC_B": 1, "regulator": 1, "pump": 1},
+    "baseline": "当前BOM、装配补充及板外配套；不含电芯、电机、PCB/SMT、运输；税费仅按报价显式记录。",
+    "boundary": "本轮仅新增此JSON，不改原理图、BOM、现行板级文档或报价库。"
+  },
+  "current_vehicle_cost_baseline": {
+    "module_quantities": {"BMS": 269, "FOC_A": 140, "FOC_B": 139, "regulator": 174, "pump": 58, "total": 780},
+    "verified_installed_partial_cny": 724.379,
+    "declared_moq_cash_partial_cny": 877.244725,
+    "known_moq_overbuy_pieces": 3207,
+    "unpriced_skus": 104,
+    "unpriced_pieces": 366,
+    "complete_installed_cost_cny": null,
+    "complete_minimum_cash_cny": null,
+    "caveats": [
+      "BMS、FOC、稳压历史核价输入的BOM SHA与当前BOM不一致；当前数量可用，报价映射须重绑。",
+      "商城报价表103个观察记录主要为2026-10-21快照，不代表当前库存/到手价。",
+      "当前BMS原生为9S4P/3+3，用户目标是9S5P/45颗；该基线不含电芯与电池包。"
+    ],
+    "source": "电力/元件封装库/索引/商城成本.json",
+    "source_sha256": "1d681587c01555bc0d79cfc5fa3ba212fe1fdafc046040d39d22f37a855d6ef3"
+  },
+  "bms_target_gap": {
+    "current_native": "9S4P / 3+3主MOS",
+    "vehicle_target": "9S5P EVE INR18650-30P，45颗",
+    "additional_cells_vs_9S4P": 9,
+    "user_quoted_cell_price_cny_each": 13,
+    "known_cell_increment_cny": 117,
+    "quote_limit": "无MOQ、税运、组包加工价；不是整包成本。",
+    "interface_blocker": "现有LOAD_POWER_VALID由FET_RELEASE逻辑许可驱动，不证明主MOS实际低阻；不可直接当作MAIN_PROVEN或水泵门控许可。",
+    "source": "电力/BMS模块/原理图准备/9S5P增量报价.json",
+    "source_sha256": "a32f1a1f8b19e82b68f29790dcfa7fdf85a1abc7cd571361aaf6f4b4d3bab75a"
+  },
+  "candidate_deltas": {
+    "pump_upstream_gate": {
+      "status": "候选，未进入现行水泵BOM；实施HOLD",
+      "purpose": "按真实MAIN_PROVEN许可在板外水泵支路上游硬切整条支路，隔离当前BUS_M直挂电容、XL7015、VM、TVS和分压。",
+      "known_quote": {
+        "mpn": "TPS26631PWPT",
+        "manufacturer": "Texas Instruments",
+        "quantity_per_vehicle": 1,
+        "supplier": "DigiKey China",
+        "captured_local_date": "2026-11-05",
+        "unit_price_cny_at_qty_1_including_13pct_vat": 45.15,
+        "moq": 1,
+        "stock_snapshot": 0,
+        "expected_receipt": {"quantity": 250, "date": "2026-12-01"},
+        "source_url": "https://www.digikey.cn/zh/products/detail/texas-instruments/TPS26631PWPT/12165230"
+      },
+      "manufacturer_constraints": [
+        "TI TPS2663 Rev.G规定反向电流阻断需要外加Q1 N沟道功率MOS和Q2 N沟道信号MOS作快速下拉；Q1额定值依整车瞬态确定。",
+        "Q2要求VDS至少15V、最大VGS 20V、Ciss不大于50pF、Vth(min)不大于3V。",
+        "IN_SYS到GND至少0.1uF旁路；还需要RILIM、dV/dT等设置器件，尚无完整候选BOM或报价。",
+        "泵输入电容503.12uF名义、+20%筛查603.74uF，须与5V启动负载一起验证浪涌、热和MOS SOA。"
+      ],
+      "known_minimum_added_cost_cny": 45.15,
+      "complete_net_cost_cny": null,
+      "unpriced_items": ["Q1功率N-MOS", "Q2信号MOS", "限流/斜率外围", "旁路和接口件", "接收器、线束及合并MOQ"],
+      "no_current_design_saving_cny": 0,
+      "qualification_constraints": [
+        "现行泵直挂不能保证0.45mA非电容预充预算；XL7015 EN接地，原厂5mA最大静耗仅是VIN=48V、VEN=0V、25°C测试点，完整斜坡全温吸流仍未知。",
+        "当前BMS没有冻结的真实MAIN_PROVEN接口；LOAD_POWER_VALID/FET_RELEASE不能直接接PUMP_PWR_EN。",
+        "板外连接器、许可参考/默认态及上游电源域尚未冻结。"
+      ],
+      "sources": ["电力/水泵驱动模块/设计细节.md", "https://www.ti.com/lit/ds/symlink/tps2663.pdf"]
+    },
+    "regulator_constrained_storage": {
+      "status": "受限储能概念候选；未改图、未入现行BOM",
+      "accounting_basis": "相对R1候选复用D_GUARD_HOLD及C_GUARD_HOLD 22uF。相对现行稳压BOM，R1仍未采用；复用件不自动等于已有库存或免费采购。",
+      "reused_from_R1": [
+        {"ref": "D_GUARD_HOLD", "mpn": "1N5819HW-7-F", "supplier_part": "C82544", "qty": 1, "incremental_qty_vs_R1": 0},
+        {"ref": "C_GUARD_HOLD", "mpn": "CGA6P3X7R1E226M250AB", "supplier_part": "C2181866", "nominal": "22uF", "qty": 1, "incremental_qty_vs_R1": 0}
+      ],
+      "net_additions_vs_R1": [
+        {
+          "mpn": "25121WF4300T4E",
+          "supplier_part": "C784343",
+          "manufacturer": "UNI-ROYAL(厚声)",
+          "spec": "430Ω ±1%, 1W, 2512",
+          "qty": 1,
+          "price_cny": null,
+          "moq": null,
+          "current_vehicle_demand": 0,
+          "note": "项目报价表和整车合并需求均无此精确MPN/C码；按指示停止扩大搜索。",
+          "datasheet_url": "https://item.szlcsc.com/datasheet/25121WF4300T4E/839379.html"
+        },
+        {
+          "mpn": "1N5819HW-7-F",
+          "supplier_part": "C82544",
+          "manufacturer": "DIODES(美台)",
+          "qty_additional_beyond_reused_R1_D": 1,
+          "live_quote_cny": {"1": 0.358, "100": 0.295, "300": 0.263, "3000": 0.237, "6000": 0.228, "9000": 0.221},
+          "live_quote_moq": 1,
+          "stock_snapshot": 282455,
+          "tax_status": "未明确",
+          "shipping_included": null,
+          "current_vehicle_demand": 0,
+          "price_source_url": "https://www.jlc-smt.com/lcsc/373",
+          "identity_source_url": "https://item.szlcsc.com/83701.html",
+          "known_incremental_cost_cny": 0.358,
+          "note": "此价是超出复用R1原D之外再增加一只；现行采用BOM没有R1原D/22uF，且物理库存未证，不能计作免费。"
+        },
+        {"ref": "independent_monitor", "qty": 1, "selected_mpn": null, "price_cny": null},
+        {"ref": "voltage_divider", "qty": null, "values": null, "price_cny": null}
+      ],
+      "known_partial_increment_vs_R1_cny": 0.358,
+      "complete_net_cost_cny": null,
+      "complete_cash_cost_cny": null,
+      "cost_down_claim": false,
+      "blockers": ["430Ω无精确报价/MOQ", "监控芯片未选", "分压值/精度/温漂/数量未定", "监控阈值、响应和失效默认态未闭合", "R1复用件实物库存未证"],
+      "prior_full_R1_candidate_context": {
+        "priced_additions_cny": 139.64,
+        "priced_removals_cny": 83.11,
+        "known_net_addition_cny": 56.53,
+        "unpriced_board_items": 32,
+        "cross_board_items_excluded": 4,
+        "actual_procurement_savings_cny": 0,
+        "source": "电力/稳压模块/检查/候选_预充与超容隔离_R1/净BOM汇总.json",
+        "source_sha256": "90192174dec70000045a6ff7322573b84db52fb89973c742b2fe21795d0ba3c5",
+        "note": "完整R1并非此受限储能变体；两者不得混算。"
+      }
+    }
+  },
+  "verified_minimum_change_options": [
+    {
+      "board": "双FOC",
+      "change": "J_PWR_SENSE八针观测连接器已从两块现行图/BOM移除，八个信号复用J_MCU_L既有端点。",
+      "status": "已实施并有官方读回",
+      "dual_board_parts_delta": -2,
+      "total_parts_before_after": [281, 279],
+      "identity_count_before_after": [55, 54],
+      "historical_quote": {"mpn": "XY-XH2.54-8A11", "supplier_part": "C19271374", "unit_price_cny": 0.135825, "moq": 20, "stock_at_capture": 700, "captured_utc": "2026-10-21T04:18:16.538Z", "url": "https://item.szlcsc.com/20540883.html"},
+      "installed_value_avoided_cny": 0.27165,
+      "standalone_moq_cash_avoided_if_no_shared_stock_cny": 2.7165,
+      "realized_saving_cny": null,
+      "caveat": "历史报价未刷新税运/装配/库存；实际现金是否避免取决于原采购和跨项目合并。",
+      "sources": ["电力/FOC驱动模块/检查/J_PWR_SENSE删减_官方复核.json", "电力/FOC驱动模块/检查/双FOC采购人口与核价.json"]
+    },
+    {
+      "board": "双FOC",
+      "change": "当前已删本地dump电阻支路及关联驱动、保险、端子、专用温控。",
+      "status": "已实施；中央耗能路径资格仍HOLD",
+      "known_quantity_delta": {"LPS0300H2R00FB": -4},
+      "verified_net_cost_delta_cny": null,
+      "caveat": "中央dump脉冲/连续热能力和掉电回生未闭合；关桥/BREAK不代表吸能或停车。保留本地BOV和三相过流保护。"
+    }
+  ],
+  "cross_board_and_protection_constraints": {
+    "bms_to_regulator_R1": {
+      "status": "候选交接未合入冻结BMS ENET",
+      "regulator_signal": "EARLY_GUARD_READY_N表示早保护资格，不是MAIN_PROVEN；低有效开集电极并须专用B0回线。",
+      "proposed_bms_delta": "候选6件：接收连接器、上拉电阻、2个逻辑IC、2个去耦电容；另有3项网络重接，成本未计入当前BOM。",
+      "fault_limit": "READY_N短到B0会伪装就绪，单线不能检测。",
+      "layout_blockers": ["连接器/针号未进冻结ENET", "专用B0回线不得接GND_SYS/PACK-/机壳/CAN屏蔽", "未定义真实主路低阻证明源及资格/撤销上限"],
+      "sources": ["电力/稳压模块/检查/候选_预充与超容隔离_R1/BMS接收针网交接.json", "电力/BMS模块/设计细节.md:862,898,1111-1117"]
+    },
+    "foc_bov_cost_option": {
+      "retain": ["U7本地BUS过压链", "U3三相低侧过流窗口", "现有跨电源域到BREAK_N转接"],
+      "candidate_reuse": "复用U3空闲比较器可能减少独立器件，但须验证共轨/共享输出级影响、5V与过驱、2.2kΩ上拉下VOL和响应保证值后再报价。",
+      "direct_u7_to_break_rejected_for_now": "DUMP_5V掉电而MCU_3V3仍供电时可能反灌掉电U7；未证实U7的VDD=0输出态/注入限制。",
+      "accepted_cost_delta_cny": 0,
+      "source": "电力/FOC驱动模块/设计细节.md:53-57"
+    },
+    "joint_simulation_blocks": [
+      "泵支路预充非电容吸流和整条BUS电流波形没有全温保证；要建模时须把603.74uF筛查、旁路电容和5V启动负载分开。",
+      "BMS未提供冻结的MAIN_PROVEN，R1 EARLY_GUARD_READY和LOAD_POWER_VALID均不能代替主路低阻证据。",
+      "中央制动耗能能力、失电回生和FOC过压保护链尚未形成车辆级资格，不能把关桥算成能量出口。"
+    ]
+  },
+  "source_hashes": {
+    "电力/元件封装库/索引/当前商城成本.md": "f9191473d7d1a08337c0a6a7d58e72167bc8708c48e4a6f3e67ad3c38dc7973b",
+    "电力/元件封装库/商城报价.json": "1b66f63b395a69cb17dfff4b9608967db47baf837ccefbd48a3a2a73d8864b34",
+    "电力/水泵驱动模块/设计细节.md": "04f43e0166f82012beddc550882a3c5dec820c53fa42d5c2f1f1bd60411feacc",
+    "电力/水泵驱动模块/原理图准备/BOM.csv": "11dc3aaef2dbfd43f3438e106d4c1ee7ae90f426e54335901802f53ee4dea686",
+    "电力/稳压模块/设计细节.md": "5fad85d2b24f040651b4c6b498c4813c5c424e3b7012b9c401ae7a4842239413",
+    "电力/稳压模块/检查/候选_预充与超容隔离_R1/净BOM差额.csv": "07134c4d5d9a68e088237705840a42afa7eac7c2e5a1356c929af5b959310485",
+    "电力/稳压模块/检查/候选_预充与超容隔离_R1/BMS接收针网交接.json": "724541fd2f908f2402b33a8b7f1d8ebb87ed990c9f03c238603e8d7efde373fd",
+    "电力/FOC驱动模块/设计细节.md": "98cc53e7475769a3d3b9b9a2643b89876d715f5b722f72aa6afabac7e796e79b",
+    "电力/FOC驱动模块/检查/双FOC采购人口与核价.json": "a4cbbeaed50e6bb9579fe565c56679f0da7c028c01622da32ac1869f3f55a9bc",
+    "电力/BMS模块/设计细节.md": "5ad62384399239819820e5b9cb81c476f60b519eae120f4d7644d3e44e318995",
+    "电力/BMS模块/原理图准备/BOM.csv": "01d39969d46caedbbed03b5bf107361ae0ffd5890d5e6e3d32e7df436c33c1c2",
+    "电力/BMS模块/原理图准备/9S5P增量报价.json": "a32f1a1f8b19e82b68f29790dcfa7fdf85a1abc7cd571361aaf6f4b4d3bab75a"
+  },
+  "live_sources": [
+    "https://www.digikey.cn/zh/products/detail/texas-instruments/TPS26631PWPT/12165230",
+    "https://www.ti.com/lit/ds/symlink/tps2663.pdf",
+    "https://item.szlcsc.com/83701.html",
+    "https://www.jlc-smt.com/lcsc/373"
+  ]
+}

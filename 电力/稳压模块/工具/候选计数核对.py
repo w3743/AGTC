@@ -13,7 +13,7 @@ from collections import defaultdict
 from pathlib import Path
 
 
-ROOT = Path(r"C:\pioneer\先进通用履带底盘工程")
+ROOT = Path(__file__).resolve().parents[3]
 POWER = ROOT / "电力"
 REG = POWER / "稳压模块"
 CHECK = REG / "检查"

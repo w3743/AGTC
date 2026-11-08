@@ -1,0 +1,14 @@
+await eda.dmt_EditorControl.openDocument('28c1f3740a9b8e02');
+await new Promise(r=>setTimeout(r,1500));
+const schematic=await eda.dmt_Schematic.getCurrentSchematicInfo();
+if(!schematic?.uuid)throw Error('schematic context');
+const uuid=await eda.dmt_Schematic.createSchematicPage(schematic.uuid);
+if(!uuid)throw Error('create page');
+if(!await eda.dmt_Schematic.modifySchematicPageName(uuid,'05 早保护与超容关栅-隔离验证'))throw Error('name page');
+await eda.dmt_EditorControl.openDocument(uuid);
+await new Promise(r=>setTimeout(r,1600));
+if((await eda.dmt_SelectControl.getCurrentDocumentInfo())?.uuid!==uuid)throw Error('page binding');
+await eda.sch_PrimitiveText.create(220,1250,'HOLD / DO NOT POWER - protection refactor review only',0,null,null,20);
+await eda.sch_PrimitiveText.create(220,1205,'12V_PROT from isolated battery service branch; no primary return to GND_SYS',0,null,null,13);
+const saved=await Promise.race([eda.sch_Document.save(),new Promise(r=>setTimeout(()=>r('SAVE_TIMEOUT'),8000))]);
+return {uuid,saved};

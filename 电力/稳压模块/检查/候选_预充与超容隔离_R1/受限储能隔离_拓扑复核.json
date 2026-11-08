@@ -1,0 +1,48 @@
+{
+  "status": "HOLD_CONCEPT_ONLY",
+  "source": "保护页_保持与监控.json 和保护页_iso.json；未修改 R1 原生工程",
+  "topology": {
+    "direct": "12V_PROT -> D_GUARD_HOLD A/K -> LDO_IN -> U_GUARD_BIAS pin2",
+    "charge": "12V_PROT -> R_CHG -> C_RESERVE -> GND_SYS",
+    "reserve": "C_RESERVE -> D_RESERVE A/K -> LDO_IN",
+    "supervision": "C_RESERVE -> 待定欠压监控 -> 开漏 SC_RAIL_OK；不得取消既有12V_PROT监控；仅概念接口",
+    "existing_capacitor": "C_GUARD_HOLD CGA6P3X7R1E226M250AB 22uF名义，移动至C_RESERVE；有效容量待证",
+    "existing_diode": "D_GUARD_HOLD 1N5819HW-7-F，压降和额定值须按实际电流温度核对",
+    "reserve_diode": "新件，精确型号和反向漏电待定",
+    "charge_resistor": "430欧1W比较候选；精确型号及额定/降额待核"
+  },
+  "conditional_arithmetic": {
+    "source_max_V": 13.2,
+    "resistor_nominal_ohm": 430,
+    "resistor_assumed_min_ohm": 425.7,
+    "reserve_short_current_max_mA": 31.01,
+    "reserve_short_resistor_power_W": 0.4094,
+    "nominal_RC_ms": 9.46,
+    "ideal_unloaded_90_percent_ms": 21.78,
+    "ideal_unloaded_99_percent_ms": 43.57,
+    "charge_timing_limits": "上述仅22uF恒定、无漏电/监控负载、理想阶跃的算例，不是启动最大时间",
+    "early_rail_short_hold_assumptions": "C有效2.2uF、C起始10.7V、放电二极管压降0.6V、LDO输入门槛4.8V、负载105mA、回灌31.1mA，均仅为比较假设",
+    "early_rail_short_hold_us": 85.7,
+    "hold_limit": "105mA是LDO输入侧模型压力假设，不是输出已验证负载；常电流比较并非保证值",
+    "independent_ngspice": "电力/检查/联合仿真/保持电容短路隔离复核.json；同名py为模型程序。理想11.4V输入、105mA输入侧负载、电容短时LDO输入约10.79V；2.2uF、早轨短时约100.06us至4.8V；26.4uF充至10.7V约32.00ms。只适用模型边界",
+    "ldo_thermal_limit": "TLV76033推荐输出最大100mA；按原厂θJA 275.2°C/W、60°C环境、125°C结温和13.2V输入/3.3V输出，忽略地电流的稳态筛查约23.9mA。实际平均及峰值电流和板级热阻未证，不能声明实际3.3V保持。"
+  },
+  "fault_review": {
+    "off": "储能经电阻向早轨回灌，不能假设立刻为零；监控和输出各自失电默认态待核",
+    "charging": "先禁SC，等待储能与其他监控均取得资格、新ARM后放行；90/99%时间不是全温保证",
+    "reserve_cap_short": "电阻限流，直供路径保留；早轨短路额外31.1mA及电阻0.4094W只在上述假设下成立，电源余量和OV功能待证",
+    "charge_resistor_open": "储能无法可靠维持；监控应在储能不足时撤销，但漏电、检测电路开路及检测响应待证",
+    "early_rail_zero_or_short": "储能经430欧回灌，可能影响保持；独立早轨与硬过压能力不能假定持续",
+    "ldo_input_short": "两只二极管汇合后的共同故障，可拉低直供和储能，拓扑不覆盖；需单列系统后果",
+    "reserve_diode_short": "与电容短同时发生会使直接支路受拖累；单故障和规定组合由系统定义",
+    "monitor_loss": "须证明失电或监控线开路不造成错误许可；不能凭开漏名字假定失效安全"
+  },
+  "open": [
+    "储能下降撤销阈值、启动释放阈值、迟滞及延迟无保证数据，留空",
+    "SC_RAIL_OK撤销至隔离MOS和主桥实际电流停止的上限未证；40us只作为比较，不能单独证明母线峰值安全",
+    "新增监督器供电、开漏低电平、Ioff、掉电默认态和与既有开漏输出兼容待证",
+    "二极管工作点压降、漏电和动态，电容有效值、温度/老化、R功率降额待证",
+    "现有早轨过压检测、吸能与驱动的真实供电边界及断电/负载变化须联合验证",
+    "不得将该概念候选当作官方DRC、完整针网、单板或联合仿真通过"
+  ]
+}

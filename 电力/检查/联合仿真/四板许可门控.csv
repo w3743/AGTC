@@ -1,0 +1,6 @@
+sequence,phase,main_proven,load_power_valid_foc_a,load_power_valid_foc_b,regulator_12v_protection,regulator_external_5v,pump_branch_power_enable,pump_motor_arm,sc_converter_charge_enable,notes
+1,PRECHARGE,0,0,0,BUS direct / startup envelope unknown,0,0,0,0,Current pump branch is direct BUS; proposed upstream gate is not implemented. Current regulator 12V also starts from BUS when its internal threshold is crossed.
+2,MAIN_ROUTE_PROVEN,1,0,0,must remain valid,0,0,0,0,Candidate proof event only; never inferred from LOAD_POWER_VALID or timer expiry.
+3,AUXILIARY_RELEASE,1,1,1,must remain valid,LPV after MAIN_PROVEN,1,0,0,Pump power switch is a candidate interface; actual component and timing remain HOLD.
+4,LOCAL_READY_AND_NEW_ARM,1,1,1,ready/valid,ready/valid,1,1,1,FOC motion and supercapacitor charge only after local readiness; pump ARM is independent and explicit.
+5,FAULT_OR_POWER_LOSS,0,0,0,hold through actual regen tail if physically available,0,0,0,0,"AUX drop order, final gate-off, current tail and per-island voltage are not simulated as qualified."
