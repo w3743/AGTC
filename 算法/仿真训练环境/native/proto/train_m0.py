@@ -13,7 +13,10 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import resource
+try:
+    import resource
+except ModuleNotFoundError:  # POSIX-only; rss_mb is diagnostic and not part of the task identity
+    resource = None
 import sys
 import time
 from datetime import datetime
@@ -36,6 +39,8 @@ def to_torch(obs: dict[str, np.ndarray], device="cpu") -> dict[str, torch.Tensor
 
 
 def rss_mb() -> float:
+    if resource is None:
+        return 0.0
     return float(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss) / 1024.0
 
 
