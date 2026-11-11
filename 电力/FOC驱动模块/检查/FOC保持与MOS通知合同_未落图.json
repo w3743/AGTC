@@ -1,0 +1,83 @@
+{
+  "status": "NOT_IMPLEMENTED_CANDIDATE_ONLY",
+  "source_sha256": {
+    "foc_enet": "2b84940fcdf5bdd5ba3e15f0861afb38acaf5a515cb91479ad3a74581edc207d",
+    "bms_reference_enet": "537caa4389b5fae40fe5508d4ae1c194f69ed53982c99c0fb8fe04959f53c6eb",
+    "shared_device": "a604a113e9894ae7ab14b02ff5f80e3bbba6993c6d2883d91aae555cfbf8b802"
+  },
+  "parts_per_board": [
+    {
+      "ref": "Q_HOLD",
+      "mpn": "Nexperia BC847C",
+      "supplier": "C9900010419",
+      "pins": {
+        "1": "FOC_HOLD_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_CLAMP_BASE"
+      }
+    },
+    {
+      "ref": "R_HOLD_BASE",
+      "mpn": "FH RS-03K4701FT",
+      "supplier": "C116693",
+      "pins": {
+        "1": "FOC_HOLD_GPIO",
+        "2": "FOC_HOLD_BASE"
+      }
+    },
+    {
+      "ref": "R_HOLD_PD",
+      "mpn": "Tyohm RMC0603100K1%N",
+      "supplier": "C269699",
+      "pins": {
+        "1": "FOC_HOLD_BASE",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "Q_LPV_MOS",
+      "mpn": "UMW AO3400A",
+      "supplier": "C347475",
+      "device": "8ae7cb4a29cf630a",
+      "symbol": "cc29dd40af12c275",
+      "footprint": "63a89eb4f6592f79",
+      "pins": {
+        "1": "LOAD_POWER_VALID",
+        "2": "GND_SYS",
+        "3": "LPV_FAIL_MCU"
+      }
+    },
+    {
+      "ref": "R_LPV_GATE_PD",
+      "mpn": "Tyohm RMC0603100K1%N",
+      "supplier": "C269699",
+      "pins": {
+        "1": "LOAD_POWER_VALID",
+        "2": "GND_SYS"
+      }
+    },
+    {
+      "ref": "R_LPV_PULLUP",
+      "mpn": "FH RS-03K1002FT",
+      "supplier": "C115324",
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "LPV_FAIL_MCU"
+      }
+    }
+  ],
+  "per_board_other_connections": {
+    "J_MCU_L.9": "FOC_HOLD_GPIO / selected WeAct Normal V1.0 QFN48 P1-9 PC6; remove NC",
+    "J_MCU_L.16": "LPV_FAIL_MCU / selected WeAct Normal V1.0 QFN48 P1-16 PC10; remove NC"
+  },
+  "population": "A and B each fit all six added parts; A only existing R_LOAD_VALID_BIAS=1k, B DNP; confirm other board contracts and physical orientation.",
+  "cost": "Two boards need 2 BC847C + 2 AO3400A + 2 FH 4.7k + 4 Tyohm 100k + 2 FH 10k. Historical price subtotal for UMW AO3400A, 100k and 10k only = 2*0.2054 + 4*0.0241 + 2*0.0125 = CNY 0.5322. BC847C, 4.7k exact comparable quote, MOQ, shipping and assembly are excluded. Not vehicle delivered cost or a saving claim.",
+  "constraints": [
+    "Existing LPV optical/output population and protective circuits retained.",
+    "LPV healthy=PC10 low; failure=high; read current level before ARM and detect rising edge.",
+    "User selected WeAct Normal V1.0 QFN48; verify physical top-view orientation and supply.",
+    "AO3400A library META RDS 17mOhm is not 48mOhm max guarantee; use UMW datasheet conditions.",
+    "LPV optical VCE/CTR, physical-main-to-LPV timing, actual gate, input and power transition and shared wiring require system and bench validation.",
+    "Candidate only; no PCB, firmware or active native schematic modified."
+  ]
+}

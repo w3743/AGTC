@@ -1,0 +1,494 @@
+{
+  "status": "CONDITIONAL_SCREEN_HOLD",
+  "sources": {
+    "regulator": {
+      "path": "../../稳压模块/检查/比较器参考地验收/改前/主工程.enet",
+      "sha256": "80d318455a640c08967285593d58edb05ad160e17031ac78b64bcbf2b7d31fcc"
+    },
+    "foc": {
+      "path": "../../FOC驱动模块/检查/主工程图面验收/主工程.enet",
+      "sha256": "2afe68e63bd1d39974f3c81163070524fefab63d591097b626a18aee916896ae"
+    },
+    "bms": {
+      "path": "../../BMS模块/检查/主工程图面验收/主工程.enet",
+      "sha256": "cce8086b5bbff2945e90263665c5bfb67eda60109d53b975777d237b5ab10bc3"
+    },
+    "pump": {
+      "path": "../../水泵驱动模块/检查/主工程图面验收/主工程.enet",
+      "sha256": "17e29e12726eb62c0e35ceec1cde65fae4962257ffdc65a6cc673e9eba374d67"
+    }
+  },
+  "source_checks": [
+    {
+      "board": "regulator",
+      "ref": "U_DUMP_DRV",
+      "mpn": "UCC27511ADBVR",
+      "pins": {
+        "1": "12V_DRV",
+        "5": "DUMP_OFF",
+        "6": "12V_DRV"
+      }
+    },
+    {
+      "board": "regulator",
+      "ref": "U_SC_OV",
+      "mpn": "TLV6700DDCR",
+      "pins": {
+        "2": "SC_MINUS",
+        "3": "BUS_OV_DIV",
+        "5": "12V_DRV"
+      }
+    },
+    {
+      "board": "regulator",
+      "ref": "R_BUS_OV_BOT",
+      "mpn": "RT0603BRD075K11L",
+      "pins": {
+        "1": "BUS_OV_DIV",
+        "2": "SC_MINUS"
+      }
+    },
+    {
+      "board": "regulator",
+      "ref": "R_SC_OV_BOT",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "pins": {
+        "1": "SC_OV_DIV",
+        "2": "SC_MINUS"
+      }
+    },
+    {
+      "board": "regulator",
+      "ref": "C_T3_FILTER",
+      "mpn": "CC0805CG100V102GN",
+      "pins": {
+        "1": "BUS_OV_DIV",
+        "2": "SC_MINUS"
+      }
+    },
+    {
+      "board": "regulator",
+      "ref": "C_SC_OV_VDD",
+      "mpn": "CGA3E2X7R1H104KT0Y0S",
+      "pins": {
+        "1": "12V_DRV",
+        "2": "SC_MINUS"
+      }
+    },
+    {
+      "board": "foc",
+      "ref": "R_OVTOP",
+      "mpn": "RC0603FR-071ML",
+      "pins": {
+        "1": "BUS",
+        "2": "VBUS_OV_SENSE"
+      }
+    },
+    {
+      "board": "foc",
+      "ref": "U7",
+      "mpn": "TLV6700DDCR",
+      "pins": {
+        "4": "VBUS_OV_SENSE",
+        "5": "DUMP_5V",
+        "6": "BUSOV_N"
+      }
+    },
+    {
+      "board": "bms",
+      "ref": "R_ALERT_SER",
+      "mpn": "RMC06031K1%N",
+      "pins": {}
+    },
+    {
+      "board": "pump",
+      "ref": "R_IPROPI",
+      "mpn": "RMC06031.5K1%N",
+      "pins": {}
+    }
+  ],
+  "threshold_file_sha256": "c9aea471dbe40903832dbce843273900c6fbe9fa4a41cb9f96f785225ca36ed6",
+  "present": {
+    "foc_earliest_static_v": 39.25046693266833,
+    "central_latest_static_v": 40.97983118124016,
+    "central_dump_vdd": "12V_DRV"
+  },
+  "candidate_foc_earliest_static_v": 42.53278094792394,
+  "trims": [
+    {
+      "trim_ohm": 0,
+      "latest_on_overdrive_v": 41.99287695614709,
+      "earliest_release_overdrive_v": 37.76284300641804,
+      "release_margin_above_37p8_v": -0.03715699358195934,
+      "cases": [
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 2.181162658080207,
+          "ideal_window_915w_ms": 1.0727744601265963,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.1669
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 2.181162658080207,
+          "ideal_window_915w_ms": 1.0727744601265963,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.3772
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.186690822466044,
+          "ideal_window_915w_ms": 0.5836573451742009,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.3669
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.186690822466044,
+          "ideal_window_915w_ms": 0.5836573451742009,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5352
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.7449301264641655,
+          "ideal_window_915w_ms": 0.8582195681012769,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.1856
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.7449301264641655,
+          "ideal_window_915w_ms": 0.8582195681012769,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.4495
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.9493526579728354,
+          "ideal_window_915w_ms": 0.46692587613936076,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.3856
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.9493526579728354,
+          "ideal_window_915w_ms": 0.46692587613936076,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.536
+        }
+      ]
+    },
+    {
+      "trim_ohm": 1000,
+      "latest_on_overdrive_v": 42.075422550958976,
+      "earliest_release_overdrive_v": 37.8352338453159,
+      "release_margin_above_37p8_v": 0.03523384531590068,
+      "cases": [
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.773611753413258,
+          "ideal_window_915w_ms": 0.8723262266541731,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.2484
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.773611753413258,
+          "ideal_window_915w_ms": 0.8723262266541731,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.4582
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.7791399177990954,
+          "ideal_window_915w_ms": 0.383209111701778,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.4484
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.7791399177990954,
+          "ideal_window_915w_ms": 0.383209111701778,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5352
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.4188894027306065,
+          "ideal_window_915w_ms": 0.6978609813233386,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.2674
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.4188894027306065,
+          "ideal_window_915w_ms": 0.6978609813233386,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.53
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.6233119342392763,
+          "ideal_window_915w_ms": 0.3065672893614224,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.4674
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.6233119342392763,
+          "ideal_window_915w_ms": 0.3065672893614224,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.536
+        }
+      ]
+    },
+    {
+      "trim_ohm": 1500,
+      "latest_on_overdrive_v": 42.116695348364914,
+      "earliest_release_overdrive_v": 37.87142926476483,
+      "release_margin_above_37p8_v": 0.07142926476483069,
+      "cases": [
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.5695361742896996,
+          "ideal_window_915w_ms": 0.7719544967383535,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.2905
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.5695361742896996,
+          "ideal_window_915w_ms": 0.7719544967383535,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.5
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.5750643386755369,
+          "ideal_window_915w_ms": 0.2828373817859583,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.4905
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.5750643386755369,
+          "ideal_window_915w_ms": 0.2828373817859583,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5352
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.2556289394317597,
+          "ideal_window_915w_ms": 0.6175635973906828,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.3095
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.2556289394317597,
+          "ideal_window_915w_ms": 0.6175635973906828,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5359
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.4600514709404296,
+          "ideal_window_915w_ms": 0.22626990542876668,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.5095
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.4600514709404296,
+          "ideal_window_915w_ms": 0.22626990542876668,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.536
+        }
+      ]
+    },
+    {
+      "trim_ohm": 2700,
+      "latest_on_overdrive_v": 42.21575006213917,
+      "earliest_release_overdrive_v": 37.95829827144226,
+      "release_margin_above_37p8_v": 0.15829827144226272,
+      "cases": [
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 1.0789384395239996,
+          "ideal_window_915w_ms": 0.5306608370917875,
+          "passed": 10,
+          "total": 10,
+          "max_near_bridge_v": 42.3884
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 1.0789384395239996,
+          "ideal_window_915w_ms": 0.5306608370917875,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5353
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.08446660390983683,
+          "ideal_window_915w_ms": 0.041543722139392204,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5352
+        },
+        {
+          "bus_cap_f": 0.05286,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.08446660390983683,
+          "ideal_window_915w_ms": 0.041543722139392204,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5352
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.8631507516191996,
+          "ideal_window_915w_ms": 0.4245286696734299,
+          "passed": 8,
+          "total": 10,
+          "max_near_bridge_v": 42.4074
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.1,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.8631507516191996,
+          "ideal_window_915w_ms": 0.4245286696734299,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.5359
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.0005,
+          "ideal_window_450w_ms": 0.06757328312786946,
+          "ideal_window_915w_ms": 0.03323497771151377,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.536
+        },
+        {
+          "bus_cap_f": 0.042288,
+          "local_minus_central_v": 0.3,
+          "gate_delay_s": 0.002,
+          "ideal_window_450w_ms": 0.06757328312786946,
+          "ideal_window_915w_ms": 0.03323497771151377,
+          "passed": 0,
+          "total": 10,
+          "max_near_bridge_v": 42.536
+        }
+      ]
+    }
+  ],
+  "ground_reference_candidate": {
+    "scope": "Move U_SC_OV.2 and both divider returns, BUS filter and comparator bypass to Kelvin GND_SYS. Keep SC_PLUS sense unchanged.",
+    "assumed_residual_ground_error_v": 0.01,
+    "trim_ohm": 1500,
+    "on": 42.08669534836491,
+    "off": 37.90142926476483,
+    "sc_overvoltage_threshold_high_v": 21.17446007048873
+  },
+  "joint_stress": {
+    "bus_cap_f": 0.05286,
+    "central_to_near_bridge_v": 0.3,
+    "net_injection_w": 450.03,
+    "gate_delay_s": 0.0005,
+    "comparison_release_target_v": 37.9,
+    "minimum_trim_for_release_ohm": 1894.6733547477863,
+    "maximum_trim_for_rise_ohm": 1683.7898692450233,
+    "feasible": false
+  },
+  "boundaries": [
+    "Candidate assumes the independent rail is already valid, both FOC retain torque, and tail feedback stays available.",
+    "The 10 mV comparator overdrive, 0.5 ms activation and 100 mV release guard are engineering screens. Comparator timing limits and dump branch energy need physical verification.",
+    "The ideal energy window runs to gate activation; R/L current build and release are included separately in the motion model. Neither model grants TVS braking credit."
+  ]
+}

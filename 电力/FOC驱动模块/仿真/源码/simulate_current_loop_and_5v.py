@@ -604,17 +604,33 @@ def buck_startup(
     dt_s: float = 50e-9,
     current_limit_a: float = 0.410,
     include_current_limit_delay: bool = True,
+    extra_direct_cap_f: float = 0.0,
+    ripple_injection: tuple[float, float, float] | None = None,
+    full_load_after_s: float = 0.0,
 ) -> dict:
     """Switching buck startup envelope; ideal COT/diode/limit behavior model.
 
     The 22uF capacitor is behind 0.82 ohm; direct output includes 0.47uF and
     the WeAct board's nominal 4.7uF+0.1uF VCC input caps. C_SCALE is an explicit
-    effective-capacitance sensitivity (not a TDK guarantee).
+    effective-capacitance sensitivity (not a TDK guarantee). With ripple
+    injection, the 22uF is moved directly onto VOUT. The three values are
+    RA, CA and CB as shown in TI LM5008A Figure 12.
     """
     rt = rt_ohm
     ton_s = 1.385e-10 * rt / vin_v
-    c_direct = (0.47 + 4.7 + 0.1) * 1e-6 * c_scale
+    c_direct = (0.47 + 4.7 + 0.1) * 1e-6 * c_scale + extra_direct_cap_f
     c_branch = 22e-6 * c_scale
+    if ripple_injection:
+        resistance_inj, cap_to_out, cap_to_fb = ripple_injection
+        c_direct += c_branch
+        c_branch = 0.0
+    injection_relative_to_out = 0.0
+    coupling_cap_voltage = 0.0
+    steady_fb_min = float("inf")
+    steady_fb_max = -float("inf")
+    steady_vout_min = float("inf")
+    steady_vout_max = -float("inf")
+    minimum_after_full_load = float("inf")
     r_ripple = 0.82
     dcr = 0.338
     diode_v = 0.5
@@ -653,7 +669,7 @@ def buck_startup(
         t = k * dt_s
         in_overload = overload_step and step_at_s <= t < step_at_s + step_duration_s
         if load_profile_mode == "startup_50mA_then_full_at_4p84v":
-            if vout >= 4.84:
+            if vout >= 4.84 and t >= full_load_after_s:
                 full_load_started = True
             i_target = load_a if full_load_started else startup_load_a
         else:
@@ -672,7 +688,13 @@ def buck_startup(
         else:
             raise ValueError(f"unknown load profile: {load_profile_mode}")
         last_i_load = i_load
-        fb = max(vout * 0.5, 0.0)
+        fb = (vout + injection_relative_to_out - coupling_cap_voltage
+              if ripple_injection else vout * 0.5)
+        if ripple_injection and t >= duration_s - 0.001:
+            steady_fb_min = min(steady_fb_min, fb)
+            steady_fb_max = max(steady_fb_max, fb)
+            steady_vout_min = min(steady_vout_min, vout)
+            steady_vout_max = max(steady_vout_max, vout)
 
         if state == "limit_wait" and t >= next_action_s:
             state = "off"
@@ -715,14 +737,27 @@ def buck_startup(
                 limit_trip_s = t + delay_s
                 peak_limit_delay_extra_a = max(peak_limit_delay_extra_a, max(il_next - current_limit_a, 0.0))
 
-        i_branch = (vout - vbranch) / r_ripple
-        dvout_dt = (il - i_load - i_branch) / c_direct
-        dvbranch_dt = i_branch / c_branch
-        vout = max(vout + dvout_dt * dt_s, 0.0)
-        vbranch = max(vbranch + dvbranch_dt * dt_s, 0.0)
+        if ripple_injection:
+            switch_voltage = vin_v if switch_on else (-diode_v if il > 0 else vout)
+            current_from_sw = (switch_voltage - vout - injection_relative_to_out) / resistance_inj
+            current_into_fb = (fb - 0.5 * vout) / 1505.0
+            current_into_out = current_from_sw - current_into_fb
+            injection_relative_to_out += current_into_out * dt_s / cap_to_out
+            coupling_cap_voltage += current_into_fb * dt_s / cap_to_fb
+            divider_draw = vout / 6020.0
+            output_current = il - i_load + current_into_out + current_into_fb * 0.5 - divider_draw
+            vout = max(vout + output_current * dt_s / c_direct, 0.0)
+        else:
+            i_branch = (vout - vbranch) / r_ripple
+            dvout_dt = (il - i_load - i_branch) / c_direct
+            dvbranch_dt = i_branch / c_branch
+            vout = max(vout + dvout_dt * dt_s, 0.0)
+            vbranch = max(vbranch + dvbranch_dt * dt_s, 0.0)
         il = il_next
         min_v = min(min_v, vout)
         max_v = max(max_v, vout)
+        if ripple_injection and full_load_started:
+            minimum_after_full_load = min(minimum_after_full_load, vout)
         if first_v4p84_s is None and vout >= 4.84:
             first_v4p84_s = t
         if first_v5p00_s is None and vout >= 5.00:
@@ -776,6 +811,11 @@ def buck_startup(
         "final_vout_v": vout,
         "final_branch_v": vbranch,
         "final_inductor_current_a": il,
+        **({"feedback_ripple_last_ms_v": steady_fb_max - steady_fb_min,
+            "vout_last_ms_v": [steady_vout_min, steady_vout_max],
+            "vout_min_after_full_load_v": minimum_after_full_load if full_load_started else None,
+            "injection_r_ohm_ca_f_cb_f": ripple_injection}
+           if ripple_injection else {}),
     }
 
 
@@ -1356,5 +1396,36 @@ def main() -> None:
     print(json.dumps({"output": str(OUT), "script_sha256": result["script_sha256"], "cases": len(current_cases) + len(candidate_control_cases) + len(param_sensitivity) + len(buses) + len(buck_cases), "buck_corner": {k: result["buck_5v"][k] for k in ("ripple_worst_corner_pp_a", "steady_peak_at_270ma_a", "steady_min_limit_margin_at_270ma_a", "overload_peak_at_350ma_a", "steady_output_corner_v")}, "current": [{"name": c["name"], "peak_a": c["measured_current_peak_abs_a"], "tail_a": c["steady_tail_mean_a"], "sat_fraction": c["voltage_saturation_sample_fraction"]} for c in current_cases + candidate_control_cases], "bus": [{"case": b["case"], "vmax": b["bus_peak_v"], "sink_j": b["external_sink_used_j"], "dump_j": b["dump_energy_per_board_j"]} for b in buses], "buck_start": [{"vin": b["vin_v"], "c_scale": b["effective_capacitance_scale_assumption"], "t_4p84_ms": None if b["time_to_4p84v_s"] is None else round(b["time_to_4p84v_s"] * 1e3, 3), "vmax": b["vout_max"], "max_il": b["max_inductor_current_a"], "overload_vmin": b["overload_step"]["vout_min_during_step_v"]} for b in buck_cases]}, indent=2))
 
 
+def screen_isolated_can_buck() -> None:
+    """Compare the two resistor choices at the declared CAN load corners."""
+    cases = []
+    for resistance, voltages in ((280e3, (22.5,)), (220e3, (22.5, 37.8))):
+        for vin in voltages:
+            for capacitance in (10e-6, 51.7e-6):
+                row = buck_startup(vin_v=vin, l_h=176e-6, rt_ohm=resistance * 1.01,
+                                   extra_direct_cap_f=capacitance,
+                                   ripple_injection=(resistance, 2.2e-9, 100e-9),
+                                   load_a=0.310, startup_load_a=0.200, full_load_after_s=0.070,
+                                   duration_s=0.150,
+                                   load_profile_mode="startup_50mA_then_full_at_4p84v")
+                cases.append(row)
+                print(resistance, vin, capacitance, row['vout_min_after_full_load_v'],
+                      row['feedback_ripple_last_ms_v'], flush=True)
+    preferred = [row for row in cases if row['rt_ohm'] == 220e3 * 1.01]
+    assert all(row['vout_min_after_full_load_v'] is not None and
+               4.5 <= row['vout_min_after_full_load_v'] <= row['vout_last_ms_v'][1] <= 5.5 and
+               row['feedback_ripple_last_ms_v'] >= 0.025 for row in preferred)
+    assert any(row['vout_last_ms_v'][1] < 4.5 for row in cases if row not in preferred)
+    output = Path(__file__).resolve().parents[2] / '检查/隔离CAN纹波注入与启动筛查.json'
+    result = {'status':'CONDITIONAL_IDEAL_COT_MODEL', 'cases':cases,
+              'datasheet':'https://www.ti.com/lit/ds/symlink/lm5008a.pdf#page=17',
+              'boundaries':'Explicit Figure 12 RC and ideal COT model. 200mA idle and 310mA after 70ms are comparison inputs. Parasitics, device variation, actual transient load and startup require bench checks.'}
+    output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if '--isolated-can-buck' in sys.argv:
+        screen_isolated_can_buck()
+    else:
+        main()

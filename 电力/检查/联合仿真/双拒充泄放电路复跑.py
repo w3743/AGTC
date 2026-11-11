@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 from tempfile import TemporaryDirectory
 
 
@@ -16,7 +17,7 @@ DECK = '''AGTC dual-reject dump first cycles
 .include st.lib
 .options method=gear reltol=1e-5
 .ic V(SW)={start_v} V(IND)={start_v}
-C_BUS BUS 0 52.86m IC={start_v}
+C_BUS BUS 0 {bus_cap_f} IC={start_v}
 B_REGEN 0 BUS I={{{power_w}/max(V(BUS),1)}}
 R_DUMP BUS IND {dump_r}
 L_WIRE IND SW {wire_l} IC=0
@@ -52,7 +53,7 @@ def run_deck(work, netlist, end_s):
 
 
 def run_case(work, start_v, dump_r, wire_l, power_w=390, gate_delay_s=160e-6, end_s=1e-3,
-             release_v=None):
+             release_v=None, bus_cap_f=.05286, comparison_limit_v=39.009):
     gate_control = f'V_GATE G 0 PULSE(0 10 {gate_delay_s} 2n 2n 30u 50u)'
     if release_v is not None:
         gate_control = f'''V_GUARD GUARD 0 10
@@ -60,7 +61,7 @@ S_CMD GUARD RAW BUS 0 CMP
 R_RAW RAW 0 1k
 .model CMP SW(Ron=1 Roff=1G Vt={(start_v + release_v) / 2} Vh={(start_v - release_v) / 2})
 B_GATE G 0 V={{V(RAW)*u(time-{gate_delay_s})}}'''
-    netlist = DECK.format(start_v=start_v, dump_r=dump_r, wire_l=wire_l,
+    netlist = DECK.format(start_v=start_v, dump_r=dump_r, wire_l=wire_l, bus_cap_f=bus_cap_f,
                           power_w=power_w, gate_control=gate_control, end_s=end_s)
     samples = run_deck(work, netlist, end_s)
     first_gate_end = gate_delay_s + 30e-6 if release_v is None else end_s
@@ -76,11 +77,11 @@ B_GATE G 0 V={{V(RAW)*u(time-{gate_delay_s})}}'''
             'bus_peak_v': max(row[1] for row in samples), 'bus_at_end_v': samples[-1][1],
             **({'bus_at_1ms_v': samples[-1][1]} if end_s == 1e-3 else {}),
             'wire_current_peak_a': max(row[2] for row in samples),
-            'bus_voltage_comparison': 'PASS' if max(row[1] for row in samples) <= 39.009 else 'FAIL'}
+            'bus_voltage_comparison': 'PASS' if max(row[1] for row in samples) <= comparison_limit_v else 'FAIL'}
 
 
-def run_release_case(work, gate_off_s):
-    release_v, resistance, end_s = 37.88849391597611, 0.779, 0.0003
+def run_release_case(work, gate_off_s, release_v=37.88849391597611, bus_cap_f=.05286):
+    resistance, end_s = 0.779, 0.0003
     initial_current = release_v / (resistance + 0.001)
     initial_drain_v = initial_current * 0.001
     gate = f'V_GATE G 0 PWL(0 10 {gate_off_s} 10 {gate_off_s + 2e-9} 0)'
@@ -89,12 +90,62 @@ def run_release_case(work, gate_off_s):
                            'C_SWITCH SW 0 2n IC={start_v}', 'C_SWITCH SW 0 2n IC={drain_v}').replace(
                            'L_WIRE IND SW {wire_l} IC=0', 'L_WIRE IND SW {wire_l} IC={current}')
     samples = run_deck(work, netlist.format(start_v=release_v, drain_v=initial_drain_v,
-                       dump_r=resistance, wire_l=100e-6, current=initial_current, power_w=0,
+                       dump_r=resistance, wire_l=100e-6, current=initial_current, power_w=0, bus_cap_f=bus_cap_f,
                        gate_control=gate, end_s=end_s), end_s)
     lowest = min(voltage for _, voltage, _ in samples)
     return {'release_start_v': release_v, 'initial_branch_a': initial_current,
             'gate_off_delay_s': gate_off_s, 'bus_min_v': lowest,
             'over_37p8_v_comparison': lowest > 37.8}
+
+
+def run_tlv_trim_cases():
+    sweep_path = OUT / '双拒充叠加断电_复用电阻取舍.json'
+    sweep = json.loads(sweep_path.read_text(encoding='utf-8'))
+    bridge_limit = sweep['candidate_foc_earliest_static_v']
+    delta_v = .3
+    cases = []
+    with TemporaryDirectory(prefix='agtc_tlv_trim_') as temp:
+        work = Path(temp)
+        shutil.copyfile(DIODE, work / 'st.lib')
+        for trim in sweep['trims']:
+            for capacitance in (.05286, .042288):
+                rise = run_case(work, trim['latest_on_overdrive_v'], .861, 100e-6,
+                                power_w=450.03, gate_delay_s=500e-6, end_s=2e-3,
+                                release_v=trim['earliest_release_overdrive_v'],
+                                bus_cap_f=capacitance, comparison_limit_v=bridge_limit-delta_v)
+                release = [run_release_case(work, delay, trim['earliest_release_overdrive_v'], capacitance)
+                           for delay in (40e-6, 100e-6)]
+                cases.append({'trim_ohm': trim['trim_ohm'], 'bus_cap_f': capacitance,
+                              'rise': rise, 'bridge_peak_v': rise['bus_peak_v'] + delta_v,
+                              'release': release,
+                              'passes_both_at_100us': rise['bus_voltage_comparison'] == 'PASS'
+                              and release[-1]['over_37p8_v_comparison']})
+        reused = next(trim for trim in sweep['trims'] if trim['trim_ohm'] == 1500)
+        tighter_rise = run_case(work, reused['latest_on_overdrive_v'], .861, 100e-6,
+                               power_w=450.03, gate_delay_s=400e-6, end_s=2e-3,
+                               release_v=reused['earliest_release_overdrive_v'],
+                               bus_cap_f=.042288, comparison_limit_v=bridge_limit-delta_v)
+        tighter_release = run_release_case(work, 40e-6, reused['earliest_release_overdrive_v'], .042288)
+        kelvin = sweep['ground_reference_candidate']
+        kelvin_rise = run_case(work, kelvin['on'], .861, 100e-6, power_w=450.03,
+                               gate_delay_s=500e-6, end_s=2e-3, release_v=kelvin['off'],
+                               bus_cap_f=.042288, comparison_limit_v=bridge_limit-delta_v)
+        kelvin_release = [run_release_case(work, delay, kelvin['off'], .042288)
+                          for delay in (80e-6, 100e-6)]
+    evidence = OUT / '双拒充泄放_复用电阻开关复跑.json'
+    result = {'status': 'CONDITIONAL_SCREEN_HOLD', 'bridge_delta_v': delta_v,
+              'foc_earliest_static_v': bridge_limit, 'cases': cases,
+              'reused_1500ohm_tighter_timing': {'bus_cap_f': .042288, 'rise': tighter_rise,
+                 'bridge_peak_v': tighter_rise['bus_peak_v'] + delta_v, 'release': tighter_release,
+                 'passes_both': tighter_rise['bus_voltage_comparison'] == 'PASS'
+                 and tighter_release['over_37p8_v_comparison']},
+              'reused_1500ohm_kelvin_reference': {'bus_cap_f': .042288, 'rise': kelvin_rise,
+                 'bridge_peak_v': kelvin_rise['bus_peak_v'] + delta_v, 'release': kelvin_release},
+              'sweep_sha256': hashlib.sha256(sweep_path.read_bytes()).hexdigest(),
+              'diode_model_sha256': hashlib.sha256(DIODE.read_bytes()).hexdigest(),
+              'scope': 'Ideal gate command, physical R/L with ST diode macro, 450.03 W rise and zero-injection release. No pack clamp, gate or rail qualification.'}
+    evidence.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(f'{len(cases)} cases; {sum(case["passes_both_at_100us"] for case in cases)} pass both; {evidence}')
 
 
 def main():
@@ -132,4 +183,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if sys.argv[1:] == ['--tlv-trim']:
+        run_tlv_trim_cases()
+    else:
+        main()

@@ -1,0 +1,106 @@
+{
+  "description": "Sets of allowed DUMP_OFF request states only, not MOS gate action or current. In R1 UCC IN+ is GUARD_OK; GUARD low blocks both hardware and software requests. No unknown state is declared a failure.",
+  "rows": [
+    {
+      "event": "stable early rail, LPV low, PB7 high",
+      "rail": 12,
+      "core": 3.3,
+      "guard": 3.3,
+      "lpv": 0,
+      "hw": 0,
+      "r1": [
+        0
+      ],
+      "adg": [
+        0
+      ]
+    },
+    {
+      "event": "CORE crosses undefined startup region while early rail on",
+      "rail": 12,
+      "core": 1.5,
+      "guard": 3.3,
+      "lpv": 0,
+      "hw": 0,
+      "r1": [
+        0,
+        1
+      ],
+      "adg": [
+        0
+      ],
+      "note": "ADG [0] only if independent supervisor already valid and its low output has proven current margin"
+    },
+    {
+      "event": "early rail ramps, independent supervisor starts late",
+      "rail": 6,
+      "core": 0,
+      "guard": 0.5,
+      "lpv": 0,
+      "hw": 0,
+      "r1": [
+        0,
+        1
+      ],
+      "adg": [
+        0,
+        1
+      ],
+      "note": "intermediate ADG VDD and guard output outside stated guarantee; UCC may leave UVLO, physical MOS conduction not asserted"
+    },
+    {
+      "event": "early rail valid, software blocked, hardware OV",
+      "rail": 12,
+      "core": 3.3,
+      "guard": 3.3,
+      "lpv": 0,
+      "hw": 1,
+      "r1": [
+        1
+      ],
+      "adg": [
+        1
+      ],
+      "note": "only the hard request pulls DUMP_OFF, bypassing ADG; actual MOS action additionally requires valid early rail and GUARD_OK high"
+    },
+    {
+      "event": "CORE brownout while early rail and guard remain valid",
+      "rail": 12,
+      "core": 1.5,
+      "guard": 3.3,
+      "lpv": 1,
+      "hw": 0,
+      "r1": [
+        0,
+        1
+      ],
+      "adg": [
+        0
+      ],
+      "note": "ADG [0] conditional on independent supervisor SENSE3 undervoltage detection, valid asserted output and sufficient sink/load margin; not established on real circuit"
+    }
+  ],
+  "supervisor_startup_current": {
+    "supply": 0.9,
+    "guaranteed_low_v": 0.2,
+    "guaranteed_sink_uA": 15,
+    "example_resistor_ohm": 4700,
+    "upstream_v": 3.3,
+    "required_uA": 659.5744680851063
+  },
+  "datasheet_boundaries": {
+    "lvc1g08_operating_min_v": 1.65,
+    "lvc1g17_operating_min_v": 1.65,
+    "adg_single_supply_operating_min_v": 8,
+    "adg_12v_spec_min_v": 10.8,
+    "adg_unpowered_channel_open": "VDD=0 or floating with ground present; not general intermediate ramp",
+    "supervisor_reset_low_at_0_9v": "0.2 V maximum at 15 µA load; current and supply ramp conditions apply",
+    "ucc_uvlo_typical_v": 4.2
+  },
+  "limits": [
+    "Exact early-rail and guard waveforms unknown; representative states are not trajectories.",
+    "Supervisor output guarantees depend on load, sense and VDD slew; do not tie outputs without revisiting SC_RAIL_OK.",
+    "ADG hard-OV independence applies only to the request node. R1 UCC IN+=GUARD_OK; a low GUARD prevents hard actuation, regardless of DUMP_OFF.",
+    "No guaranteed ADG intermediate-voltage behavior or UCC actual VGS/conduction is established."
+  ]
+}

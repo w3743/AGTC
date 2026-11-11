@@ -1,0 +1,168 @@
+{
+  "status": "HOLD_REVIEWABLE_AFFECTED_NETS_ONLY_NOT_SAVED_SCHEMATIC",
+  "scope": "R1 candidate baseline; affected hard-only channel and preserved old hardware request; unmentioned rest retains R1 netlist",
+  "sources": [
+    "../候选_母线自供电硬件接管/同域TPS3760_互锁针网与验收.json",
+    "../候选_母线自供电硬件接管/LT3010独立12V_针网.json",
+    "../../原理图准备/最终逐针连接.csv"
+  ],
+  "components_and_pin_nets": {
+    "U_POR TPS3760A012DYYR": {
+      "1 VDD": "12V_HW",
+      "2 NC": "NC",
+      "3 SENSE": "POR_SENSE",
+      "4 NC": "NC",
+      "5 NC": "NC",
+      "6 RESET_N": "HW_READY",
+      "7 NC": "NC",
+      "8 GND": "GND_SYS",
+      "9 CTR_MR": "CTR",
+      "10 CTS": "NC",
+      "11 NC": "NC",
+      "12 NC": "NC",
+      "13 GND": "GND_SYS",
+      "14 NC": "NC"
+    },
+    "U_DRV UCC27511ADBVR": {
+      "1 VDD": "12V_HW",
+      "2 OUTH": "原栅极源出路径",
+      "3 OUTL": "原栅极灌入路径",
+      "4 GND": "GND_SYS",
+      "5 IN-": "DUMP_OFF_HW",
+      "6 IN+": "HW_READY"
+    },
+    "U_REF REF5025_SOIC8": {
+      "1 DNC": "DNC",
+      "2 VIN": "12V_ANALOG_HOLD",
+      "3 TEMP": "NC",
+      "4 GND": "GND_SYS",
+      "5 TRIM/NR": "NC",
+      "6 VOUT": "REF_2V5",
+      "7 NC": "NC",
+      "8 DNC": "DNC",
+      "exact_part": "REF5025ID"
+    },
+    "U_CMP TLV1811DBV": {
+      "1 OUT": "CMP_OUT",
+      "2 GND": "GND_SYS",
+      "3 IN+": "BUS_SENSE",
+      "4 IN-": "REF_2V5",
+      "5 V+": "12V_ANALOG_HOLD"
+    },
+    "Q_HW BC847C": {
+      "1 B": "HW_BASE",
+      "2 E": "GND_SYS",
+      "3 C": "DUMP_OFF_HW"
+    },
+    "U_OPTO VO617A-2": {
+      "1 A": "OLD_LED_A",
+      "2 K": "DUMP_OFF_LEGACY",
+      "3 E": "GND_SYS",
+      "4 C": "DUMP_OFF_HW"
+    },
+    "D_HOLD 1N4148W C2099": {
+      "A": "12V_HW",
+      "K": "12V_ANALOG_HOLD"
+    },
+    "U_LT LT3010EMS8E#PBF": {
+      "1 OUT": "12V_SRC",
+      "2 ADJ": "LDO_ADJ",
+      "3 NC": "NC",
+      "4 GND": "GND_SYS",
+      "5 SHDN": "BUS_FUSED",
+      "6 NC": "NC",
+      "7 NC": "NC",
+      "8 IN": "BUS_FUSED",
+      "9 EP": "GND_SYS"
+    },
+    "U_SC_OV TLV6700DDCR": {
+      "1 OUTA": "BUS_OV_OUT",
+      "2 GND": "SC_MINUS",
+      "3 INA+": "BUS_OV_DIV",
+      "4 INB-": "SC_OV_DIV",
+      "5 VDD": "12V_PROT",
+      "6 OUTB": "DRV_FAULT_N"
+    },
+    "Q_PMOS_CTRL MMBT5551": {
+      "1 B": "DUMP_HW_BASE",
+      "2 E": "GND_SYS",
+      "3 C": "DUMP_OFF_LEGACY"
+    },
+    "Q_DUMP IRLB4030PBF": {
+      "1 G": "GATE_DUMP",
+      "2 D": "DUMP_SW",
+      "3 S": "GND_SYS"
+    },
+    "D_DUMP_FW STPS30100ST": {
+      "1": "DUMP_SW",
+      "2": "BUS_EXT",
+      "3": "DUMP_SW"
+    },
+    "Q_READY_LED MMBT5551": {
+      "1 B": "READY_BASE",
+      "2 E": "GND_SYS",
+      "3 C": "READY_LED_K"
+    },
+    "U_EARLY_READY_OPTO LTV-817S-TA1-C": {
+      "1 A": "READY_LED_A",
+      "2 K": "READY_LED_K",
+      "3 E": "B0_READY_RETURN",
+      "4 C": "EARLY_GUARD_READY_N"
+    },
+    "J_EARLY_READY": {
+      "1": "EARLY_GUARD_READY_N",
+      "2": "B0_READY_RETURN"
+    }
+  },
+  "passives": {
+    "R_POR_TOP": "12V_HW→120kΩ 0.1%→POR_SENSE",
+    "R_POR_BOT": "POR_SENSE→10kΩ 0.1%→GND_SYS",
+    "C_CTR": "CTR→2.2nF C0G→GND，工作全角有效1.98–2.42nF；FH 0603CG222J500NT/C2991172 与Cff同SKU",
+    "C_POR": "move original C_DUMP_DRV_HF to 12V_HW/GND; share between UCC and TPS only if physically close and local bypass requirements are met",
+    "R_READY": "12V_HW→4.7kΩ→HW_READY",
+    "R_READY_PD": "HW_READY→100kΩ→GND_SYS",
+    "R_SLEW": "12V_SRC→R_SLEW1 22Ω→R_SLEW2 22Ω→12V_HW；FH RAG-06K22R0FT，1%，0.5W各一只",
+    "C_SRC": "12V_SRC→GND_SYS，有效≥1µF，符合LT3010稳定要求",
+    "C_DRV": "12V_HW→GND_SYS，有效≥10µF",
+    "C_HOLD": "12V_ANALOG_HOLD -> two 22uF C49118556 -> GND, effective >=10uF per bank; placed close enough to satisfy REF supply 1-10uF effective and comparator supply",
+    "C_REF": "REF_2V5→GND_SYS，1µF有效起并满足REF5025稳定条件；C_NR/其他引脚依原候选且须具体核对",
+    "R_BUS_TOP": "BUS_EXT→143kΩ→节点→600Ω→BUS_SENSE",
+    "R_BUS_BOT": "BUS_SENSE→10kΩ→GND_SYS",
+    "R_FB": "CMP_OUT→6.8MΩ→BUS_SENSE",
+    "R_BASE": "CMP_OUT→22kΩ→HW_BASE",
+    "R_BASE_PD": "HW_BASE→100kΩ→GND_SYS",
+    "R_OFF": "12V_HW→47kΩ→DUMP_OFF_HW",
+    "C_HW_FF": "12V_SRC→2.2nF C0G→LDO_ADJ；FH 0603CG222J500NT/C2991172，全角有效≥1.98nF",
+    "C_ANALOG_BYP": "one shared 100nF analog hold -> GND close to REF/TLV1811; actual layout and ESR must meet both",
+    "early_ready": "12V_PROT -> R_READY_LED 1.8k -> READY_LED_A; READY_LED_K -> Q_READY_LED.C, Q_READY_LED.E -> GND_SYS; GUARD_OK -> R_READY_BASE 1k -> READY_BASE; Q_READY_HW and its series drive resistors excluded; independent HW_READY does not gate early ready",
+    "old_isolator": "12V_PROT -> 1.8k -> OLD_LED_A; VO617A.2 -> DUMP_OFF_LEGACY; original 10k 12V_PROT pullup and Q_PMOS_CTRL kept",
+    "LDO_INPUT": "BUS_EXT -> 160mA UMT-H 3403.0266.23 -> BUS_FUSED; FET source impedance, DC interrupt and fusing coordination pending",
+    "LDO_FEEDBACK": "12V_SRC -> 84.5k 0.1% -> LDO_ADJ -> 10k 0.1% -> GND_SYS; 2.2nF C0G from 12V_SRC to LDO_ADJ",
+    "POWER_GATE": "UCC OUTH -> 10Ω -> GATE_DUMP; UCC OUTL -> 10Ω -> GATE_DUMP; 10k GATE_DUMP -> GND_SYS",
+    "EXT_LOAD": "BUS_EXT -> external 0.82Ω ±5% -> DUMP_SW"
+  },
+  "remove_vs_r1": [
+    "Q_DUMP_SW",
+    "R_DUMP_IN_SER",
+    "R_DUMP_SW_BASE",
+    "R_DUMP_IN_PD",
+    "R_DUMP_PWM_PD",
+    "U_DUMP_SW_ALLOW",
+    "C_DUMP_SW_ALLOW"
+  ],
+  "release_blockers": [
+    "J_EARLY_READY reflects only early GUARD_OK; separate HW_READY is local UCC enable. BMS early receiver and post-PRE HW status slow coordination remain unresolved.",
+    "REF5025 start-up maximum and allowed brownout/recovery not guaranteed by fixed delay; qualification needed.",
+    "Old-domain VO reverse voltage and full-corner input/output leakage and timing not established; new node static and transient budget open.",
+    "Independent LDO startup current, BUS precharge burden, fuse clearing and supply hold are not proven.",
+    "Precise capacitors, additional circuitry and hardware-only net BOM including original change are not fully specified; verify source in official EDA.",
+    "User owns resistor power/thermal implementation; provide electrical waveform, no power rating selection by agent."
+  ],
+  "validation_handoff": [
+    "Human bench: cold/slow start, brownout/short dip and restart with 12V, REF, HW_READY, DUMP_OFF_HW, MOS VGS and resistor current synchronized.",
+    "Human bench: calibrated threshold full window, 0.5ms current rise, 92us ideal release comparison and battery current; measured line and sensor conditions.",
+    "Human bench: 12V_PROT on/off with BUS-side supply valid, VO LED forward/reverse and both comparator requests; early READY signal and BMS receiving behavior.",
+    "Post-PRE HW_READY may be coordinated over CAN only after safe hardware-to-MCU sensing and fresh-state contract; this cannot replace local fast protection or FOC hardware REGEN_PATH_OK.",
+    "PCB/manufacturing/firmware/testing remain human work."
+  ]
+}

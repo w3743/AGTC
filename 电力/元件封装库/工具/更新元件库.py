@@ -29,7 +29,7 @@ EVIDENCE_PATH = LIB_ROOT / "检查" / "同步证据.json"
 DEFAULT_SOURCES = [
     {
         "module": "BMS模块",
-        "path": "BMS模块/sch/Schematic1/P1.esch2"
+        "path": "BMS模块/eda工程文件/BMS-9S4P/sch/Schematic1/P1.esch2"
     },
     {
         "module": "FOC驱动模块",
@@ -174,6 +174,8 @@ def parse_record(line: str, location: str) -> tuple[dict[str, Any], dict[str, An
         value = json.loads(payload) if payload.strip() else {}
     except Exception as exc:
         raise ValueError(f"原理图记录JSON无效：{location}：{exc}") from exc
+    if value == "":
+        value = {}
     if not isinstance(header, dict) or not isinstance(value, dict):
         raise ValueError(f"原理图记录必须是JSON对象：{location}")
     return header, value
@@ -437,13 +439,20 @@ def get_components(parsed: dict[str, Any], device_map: dict[str, list[dict[str, 
     missing_device = missing_symbol = missing_footprint = 0
     component_count = 0
     for page in parsed["pages"]:
-        for record in page["records"]:
+        # Page records form an edit log. A later empty record deletes that ID.
+        current_records = {
+            (record["header"]["type"], record["header"]["id"]): record
+            for record in page["records"]
+            if record["header"].get("type") in {"COMPONENT", "ATTR"}
+        }
+        live_records = [record for record in current_records.values() if record["value"]]
+        for record in live_records:
             if record["header"].get("type") != "COMPONENT":
                 continue
             component_count += 1
             component_id = str(record["header"].get("id", ""))
             component = record["value"]
-            instance_attrs, attr_records = extract_instance_attributes(page["records"], component_id)
+            instance_attrs, attr_records = extract_instance_attributes(live_records, component_id)
             device_id = device_identifier(instance_attrs, component)
             device_candidates = by_device.get(str(device_id), []) if is_nonempty(device_id) else []
             device_section = device_candidates[0] if device_candidates else None

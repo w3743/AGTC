@@ -4,7 +4,7 @@
 
 | 板卡 | 设计需求 | 设计细节 | 原生工程 |
 |---|---|---|---|
-| BMS | [需求](BMS模块/设计需求.md) | [细节](BMS模块/设计细节.md) | [BMS-9S4P.eprj3](BMS模块/BMS-9S4P.eprj3) |
+| BMS | [需求](BMS模块/设计需求.md) | [细节](BMS模块/设计细节.md) | [BMS-9S4P.eprj3](BMS模块/eda工程文件/BMS-9S4P/BMS-9S4P.eprj3) |
 | FOC驱动，两块同版 | [需求](FOC驱动模块/设计需求.md) | [细节](FOC驱动模块/设计细节.md) | [FOC_G431_Driver.eprj3](FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3) |
 | 独立超容稳压 | [需求](稳压模块/设计需求.md) | [细节](稳压模块/设计细节.md) | [sc-regulator.eprj3](稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3) |
 | 水泵驱动 | [需求](水泵驱动模块/设计需求.md) | [细节](水泵驱动模块/设计细节.md) | [水泵驱动.eprj3](水泵驱动模块/eda工程文件/水泵驱动/水泵驱动.eprj3) |
