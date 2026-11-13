@@ -8,53 +8,43 @@ extern "C" {
 #endif
 
 /********************************************************************************************
- * 功率路径与诊断 GPIO —— 稳压板的三个开关量
+ * 功率许可与故障回读 —— 稳压板的两个开关量
  *
- * 三根线各管一件事，都在 P1/P2 排针上，实体引脚定义在 bsp_board.h：
- *   PMOS_CTRL  PB6   P1.21   → Q_PMOS_CTRL(MMBT5551 NPN) → Q_BUS_P 栅极
- *   PERMIT     PB5   P1.20   → 经 R_PB5_PERMIT 1k 接 **active-low** 的 PERMIT/DRV_FAULT_N 线
- *   TEST       PB10  P2.5    → 诊断用 TEST 网络
+ * 2026-10-30 改版后本层只剩两根线（实体引脚定义在 bsp_board.h）：
  *
- * ⚠️ 三根线的**有效电平不一样**，照抄会导致上电就通电或永远不通电，见下面每个函数的说明。
+ *   PERMIT    PA9   P1.11  → SN74LVC1G07 开漏缓冲器 A 端，Y 端并到 DRV_FAULT_N
+ *   FAULT_FB  PA10  P1.12  → 同一条 DRV_FAULT_N 的真线回读（纯输入）
  *
- * ⚠️ 复位期间板子靠硬件停在安全态，本层只是把电平"钉死"：
- *     R_QP_BE    100k  Q_PMOS_CTRL 基极下拉 → NPN 截止 → R_QP_GS 47k 把 Q_BUS_P 栅源短路
- *                                            → P-MOS 默认关断
- *     R_DRV_FAULT_PD 10k  把 PERMIT/DRV_FAULT_N 拉低 → 驱动处于"故障"态 → 禁止功率级
+ * ⚠️ 和改版前完全不同的两点：
+ *
+ *  1) **极性翻了。** 老版本是 PB5 推挽直接驱动故障线，高 = 放行。
+ *     现在中间隔了一只非反相开漏缓冲器 G07：
+ *         PA9 = 低 → G07 的 Y 高阻 → 故障线由 R_PB5_PERMIT 1k 上拉到 3V3_CORE（≈3.0 V）→ 放行
+ *         PA9 = 高 → G07 把 Y 拉低     → 故障线被拉低 → DRV8161 停输出、LTC7001 撤隔离 → 禁止
+ *     所以 **低 = 放行，高 = 禁止**。宏在 bsp_board.h（BSP_BOARD_PERMIT_LEVEL_*），
+ *     函数体里不写魔法电平。
+ *
+ *  2) **现在能读回来了。** 老版本这根线是单向的，DRV8161 报故障软件看不见。
+ *     现在 PA10 直连故障线，可以区分“故障还在”和“故障已消失”，
+ *     配合 TIM1 Break 的锁存状态，能判断刚才那次关桥是谁拉低的。
+ *
+ * ⚠️ 为什么必须开漏（G07）而不是直连：这条线上同时挂着 DRV8161 的 nFAULT（开漏）、
+ *    TLV6700 的 OUTB（开漏）和两个比较器输出（开漏）。谁都可以拉低，谁都不能推高。
+ *    MCU 直接推挽驱动会在别人报故障时形成对拉 —— 3.3 V 灌进开漏器件的输出级。
+ *
+ * ⚠️ P-MOS 控制已不在 MCU 手上：改版后 Q_PMOS_CTRL 由 U_SC_OV 的 OUTA 驱动，
+ *    纯硬件路径。旧的 bsp_gpio_pmos_set() 一并删除，别再找。
+ *
+ * ⚠️ 复位期间：PA9 是输入（高阻），外部 100k 下拉让 G07 的 A=0 → Y 高阻 → 故障线≈3.0 V；
+ *    但此时 INH/INL 各有 47k 下拉、TIM1 的 MOE=0，功率级本身是关的。
+ *    “上电安全”靠的是这三件事叠加，不是靠故障线电平。
  ********************************************************************************************/
-
-/* PERMIT 线的有效电平。
- *
- * 依据：BOM 里 R_PB5_PERMIT 的描述原文是
- *   "1kohm PB5 series connection to **active-low** permit/DRV_FAULT_N line"，
- * 加上 R_DRV_FAULT_PD = 10 kΩ 下拉到 GND_SYS。
- *
- * 推一遍电平：PB5 高 → 3.3 V 经 1 kΩ 与 10 kΩ 分压 → 该线约 3.0 V，高于 VIH，故障解除；
- *            PB5 低 → 直接把该线拉到约 0 V，故障成立；
- *            PB5 高阻（复位态）→ 10 kΩ 下拉到 0 V，故障成立。
- * 所以：**高 = 放行，低 = 禁止**。三态里两种都落在"禁止"上，是安全的失效方向。
- *
- * ⚠️ 这条线同时挂着 DRV8161 自己的 nFAULT（开漏）。也就是说 PB5 拉高只是"不主动
- *    制造故障"，芯片真报故障时它照样把线拉低 —— 1 kΩ 串阻保证芯片能赢过 MCU 的
- *    3.3 mA 上拉电流。因此**不能**把 PB5 当成"屏蔽故障"的手段。 */
-#define BSP_GPIO_PERMIT_LEVEL_ENABLE                                    (GPIO_PIN_SET)
-#define BSP_GPIO_PERMIT_LEVEL_DISABLE                                   (GPIO_PIN_RESET)
-
-/* PMOS_CTRL 的有效电平。
- *
- * 依据：BOM 里 R_QP_GS 的描述是 "47kohm Q_BUS_P **gate-to-source default-off** resistor"，
- * 驱动链是 PB6 → MMBT5551(NPN) 基极，集电极经 R_QP_COL 10 kΩ 接 Q_BUS_P 栅极。
- * 推一遍：PB6 高 → NPN 导通 → 集电极拉低 → 栅极低于源极 → P-MOS 导通；
- *         PB6 低 → NPN 截止 → 集电极悬空 → R_QP_GS 把栅源短路 → Vgs=0 → P-MOS 关断。
- * 所以：**高 = 导通，低 = 关断**。 */
-#define BSP_GPIO_PMOS_LEVEL_ON                                          (GPIO_PIN_SET)
-#define BSP_GPIO_PMOS_LEVEL_OFF                                         (GPIO_PIN_RESET)
 
 /************************************Function***********************************************/
 /********************************************************************************************
 * Function name :   bsp_gpio_init
-* Descriptions  :   Configure PMOS_CTRL / PERMIT / TEST as push-pull outputs and park them
-*                   in the safe state (all LOW) before anything else runs.
+* Descriptions  :   Configure PERMIT as a push-pull output parked in the INHIBIT state and
+*                   FAULT_FB as a plain input. Nothing else is touched.
 * Input         :
 *                   none
 * Output        :
@@ -69,9 +59,11 @@ extern VOID bsp_gpio_init
 
 /********************************************************************************************
 * Function name :   bsp_gpio_permit_set
-* Descriptions  :   Drive the PERMIT / DRV_FAULT_N line.
-*                   TRUE releases the driver, FALSE asserts a fault and inhibits the bridge.
-*                   This is the "hardest" software gate on the board: with it asserted the
+* Descriptions  :   Drive the PERMIT buffer (G07) input.
+*                   TRUE  = release: PA9 low  -> G07 high-Z -> fault line pulled up -> driver live
+*                   FALSE = inhibit: PA9 high -> G07 pulls the fault line low -> driver off,
+*                                    LTC7001 INP low -> SC back-to-back isolation removed
+*                   This is the "hardest" software gate on the board: with it inhibited the
 *                   gate driver stops switching regardless of what TIM1 is doing.
 * Input         :
 *                   enable: TRUE = release, FALSE = inhibit
@@ -86,40 +78,23 @@ extern VOID bsp_gpio_permit_set
 );
 
 /********************************************************************************************
-* Function name :   bsp_gpio_pmos_set
-* Descriptions  :   Drive the BUS series P-MOS gate.
-*                   TRUE closes the switch, FALSE opens it.
-*                   WARNING: never open it while the bridge is still switching - the inductor
-*                   current has nowhere to go and will punch through Q_BUS_P. Stop PWM first
-*                   and let the current decay.
+* Function name :   bsp_gpio_read_fault
+* Descriptions  :   Read the real level of DRV_FAULT_N.
+*                   The line is pulled up by 1k to 3V3_CORE and down by 10k to GND, and can be
+*                   pulled low by DRV8161 nFAULT, TLV6700 OUTB, the G07 buffer, or the two
+*                   comparator outputs. Low therefore only means "someone is asserting a
+*                   fault" - it cannot tell you who.
 * Input         :
-*                   on: TRUE = conduct, FALSE = open
+*                   none
 * Output        :
 *                   none
 * Return        :
-*                   none
+*                   TRUE  = line low, fault asserted (or permit inhibited by us)
+*                   FALSE = line high, no fault
 *********************************************************************************************/
-extern VOID bsp_gpio_pmos_set
+extern BOOL bsp_gpio_read_fault
 (
-    IN  BOOL    on
-);
-
-/********************************************************************************************
-* Function name :   bsp_gpio_test_set
-* Descriptions  :   Drive the shared TEST net.
-*                   Must stay LOW in normal operation: T1-T7 each have a 47k resistor from the
-*                   tap side to TEST, so the TEST level directly shifts those divider ratios.
-*                   Only raise it for a short channel diagnosis, then restore LOW.
-* Input         :
-*                   high: TRUE = drive high, FALSE = drive low (normal)
-* Output        :
-*                   none
-* Return        :
-*                   none
-*********************************************************************************************/
-extern VOID bsp_gpio_test_set
-(
-    IN  BOOL    high
+    VOID
 );
 
 #ifdef _cplusplus

@@ -46,13 +46,13 @@ extern "C" {
  *    两个极端都是**危险状态**，正常调制永远不该到达端点。要真正断开功率级请用
  *    bsp_gpio_permit_set(FALSE)（把 DRV_FAULT_N 拉低）或 bsp_bridge_stop()（清 MOE）。
  *
- * 4) 本层**不开** TIM1 的刹车，也不接 COMP1/COMP2。
- *    原因：PB12(NTC_DUMP) 与 PA6(AD_T7) 在别的复用里都是 TIM1_BKIN，一旦把 BreakState
- *    打开、或把 BKIN 源配到这两个脚，NTC 分压和抽头分压上的任何低电平都会被当成刹车。
- *    原理图准备的方案是用 COMP1(上阈值)/COMP2(下阈值) → TIM1 Break 做快关断，
- *    但文档明确写着"极性、内部源合并、MOE/OSSI/OSSR、Break 锁存清除、DAC/COMP 上电顺序、
- *    传播延迟"全部**尚未核实**。在核实之前不实现，比实现一个反逻辑的保护更安全。
- *    → 当前过流保护只有 DRV8161 自己的 VDS OCP（LEVEL4，typ 0.8 V）。
+ * 4) 本层**启用** TIM1 刹车，BKIN = PB12 = DRV_FAULT_N（低有效），并**不启用** COMP。
+ *    2026-10-30 改版把 PB12 从 NTC 模拟输入改成了共享故障线，从此 Break 可以安全打开：
+ *    硬件在故障线上任何一方拉低时立刻清 MOE，不再依赖软件轮询。
+ *    AutomaticOutput = DISABLE —— 刹车后不会自恢复，必须软件重新 bsp_bridge_start()。
+ *    COMP1/COMP2（PA6/PA2 开漏并到同一条线）**没有启用**：阈值、迟滞、极性、DAC 上电
+ *    顺序与传播延迟都还没核，开着比不开危险。当前过流保护 = DRV8161 自己的 VDS OCP
+ *    （LEVEL4，typ 0.8 V）+ 故障线硬件 Break 这条链。
  ********************************************************************************************/
 
 #define BSP_BRIDGE_ARR                                                  (BSP_BOARD_BRIDGE_PWM_ARR)

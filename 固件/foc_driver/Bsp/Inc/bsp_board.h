@@ -42,7 +42,7 @@ extern "C" {
  *   BREAK_N       L.5       PB12   TIM1_BKIN   (AF6)     输入    硬件刹车，低有效
  *   DRV_ENABLE    R.6       PB11   GPIO                  输出    DRV8353 ENABLE，高=放行
  *   CAN_STB       L.20      PB5    GPIO                  输出    收发器待机，高=待机
- *   DUMP_THERM_OK L.24      PB9    GPIO                  输入    泄放电阻热许可
+ *   (L.24)        —       —      —                     NC      2026-10-30 起本地泄放电路整套删除
  *   HALL_A        L.15      PA15   TIM2_CH1    (AF1)     输入    霍尔 A
  *   HALL_B        L.18      PB3    TIM2_CH2    (AF1)     输入    霍尔 B
  *   HALL_C        R.5       PB10   TIM2_CH3    (AF1)     输入    霍尔 C
@@ -147,9 +147,19 @@ extern "C" {
 #define BSP_BOARD_CAN_STB_PORT                                          (GPIOB)
 #define BSP_BOARD_CAN_STB_PIN                                           (GPIO_PIN_5)    /* J_MCU_L.20 */
 
-/* 泄放电阻热许可：U4 比较器输出经 R_THERM_SER 100k 串入，板上无上下拉，靠比较器推挽驱动。 */
-#define BSP_BOARD_DUMP_THERM_OK_PORT                                    (GPIOB)
-#define BSP_BOARD_DUMP_THERM_OK_PIN                                     (GPIO_PIN_9)    /* J_MCU_L.24 */
+/* ── J_MCU_L.24 / PB9：已作废（2026-10-30 用户决定，2026-11-07 落地）─────────────
+ * 两块 FOC 各自的本地制动电阻 R_DUMP_A/B、泄放管 Q7、驱动 U4(UCC27511A)、保险 F_BRAKE、
+ * 端子 J_BRAKE_R 与 J_DUMP_SW、专用温控支路（R_THERM_TOP/BOT/SER 与 J_TEMP）与观测座
+ * J_PWR_SENSE 全部删除，
+ * 每板 16 个位号，整车制动电阻由 4 只降为 0 只。能量出口改为稳压模块的中央支路。
+ *
+ * 后果：
+ *   1) 本板**不再有** DUMP_THERM_OK 这根线，PB9 在网表里是 NC。旧宏与
+ *      bsp_gpio_get_dump_therm_ok() 一并删除，不要再加回来。
+ *   2) 本地仍保留过压检测（U6 DUMP_5V + U7 TLV6700）及其到 BREAK_N 的链路，
+ *      **只请求关桥，不吸收能量**。所以 Break 配置与 bsp_gpio_read_break_n() 保留。
+ *   3) 删除不等于停车能力已证：关桥后电机体二极管仍可能回灌。全车停车/掉电能力
+ *      在稳压中央支路的热能力与断线包络闭合前维持 HOLD（见 BSP引脚对照.md §7）。 */
 
 /************************************霍尔（TIM2）***********************************************/
 /* 三路霍尔既可以当普通 GPIO 读（本层当前做法），也可以接 TIM2 的 CH1/CH2/CH3 做输入捕获，

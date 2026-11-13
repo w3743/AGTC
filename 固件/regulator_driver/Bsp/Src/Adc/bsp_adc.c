@@ -21,8 +21,8 @@ extern "C" {
 /************************************数据类型定义************************************************/
 typedef struct _BSP_ADC_MODULE_T_
 {
-    ADC_HandleTypeDef       handle1;                                    // ADC1：T1/T2/T3/T4/T8/NTC_DUMP/SO/BUS
-    ADC_HandleTypeDef       handle2;                                    // ADC2：T5/T6/T7/NTC_MAIN/NTC_SC/TEST_FB
+    ADC_HandleTypeDef       handle1;                                    // ADC1：BUS/IMON/NTC_DUMP/SC_A
+    ADC_HandleTypeDef       handle2;                                    // ADC2：NTC_MAIN/NTC_SC/SC_B
     DMA_HandleTypeDef       dma1;                                       // ADC1 → DMA1_Channel1
     DMA_HandleTypeDef       dma2;                                       // ADC2 → DMA1_Channel2
     U16                     reg1[BSP_ADC1_REG_NUM];                    // 规则组 DMA 目标缓冲
@@ -72,21 +72,21 @@ static BSP_ADC_MODULE_T * _bsp_adc_get_module
 
 /********************************************************************************************
 * 函数名称 :   _bsp_adc_gpio_init
-* 功能描述 :   把 14 个采样脚 + 1 个比较器专用脚配成模拟输入
+* 功能描述 :   把 7 个采样脚 + 2 个比较器专用脚配成模拟输入
 *
 *               为什么必须是 GPIO_MODE_ANALOG：
 *                 模拟模式下施密特触发器输入被断开、上下拉被切断，输入漏电流降到 nA 级。
-*                 如果留成浮空输入，数字输入缓冲会吃掉一部分电荷 —— 本板的抽头分压
-*                 源阻抗约 8 kΩ、母线分压约 9.4 kΩ，漏电会把读数明显拉低。
+*                 如果留成浮空输入，数字输入缓冲会吃掉一部分电荷 —— 抽头分压源阻抗
+*                 约 4.7 kΩ、母线分压约 9.4 kΩ，漏电会把读数明显拉低。
 *
-*               为什么要单独处理 PA7：
-*                 它是 DRV_SO 的第二分支，只接 COMP2_INP，不进任何 ADC 序列。
-*                 但仍然要配成模拟输入 —— 浮空脚在比较器输入端会拾噪，
-*                 而比较器的输出将来要接 TIM1 Break，一个噪声尖峰就是一次误刹车。
+*               为什么要单独处理 PA7 / PA0：
+*                 它们是 IMON 的第二、第三分支，只接 COMP2_INP / COMP3_INP，
+*                 不进任何 ADC 序列。仍然配成模拟输入 —— 浮空脚在比较器输入端会拾噪，
+*                 而比较器输出并在这条共享故障线上，一个噪声尖峰就是一次误刹车。
 *
-*               ⚠️ PB12（NTC_DUMP）与 PA6（AD_T7）在别的复用功能里是 TIM1_BKIN。
-*                  这里把它们配成模拟输入，就等于**关掉了这两条刹车通路**，
-*                  和 bsp_bridge.c 里 BreakState=DISABLE 的决定是一致的。
+*               ⚠️ PB12 这次**不是**模拟脚了：它就是 DRV_FAULT_N / TIM1_BKIN，
+*                  由 bsp_bridge.c 配成 AF 复用输入。这里千万别把它再配成模拟，
+*                  否则等于把硬件刹车关掉（旧版正是这么做的，见 bsp_bridge.h 历史说明）。
 *
 * 输入参数 :   无
 * 输出参数 :   无
@@ -106,17 +106,15 @@ static VOID _bsp_adc_gpio_init
     gpio_init.Mode = GPIO_MODE_ANALOG;
     gpio_init.Pull = GPIO_NOPULL;
 
-    /* ── GPIOA：T2/T3/T4（ADC1）在 PA1/PA2/PA3；T5/T6/T7（ADC2）在 PA4/PA5/PA6 ──
-     * 再加 PA7 那个比较器专用分支，一次配完。T1 在 PA0，也在 GPIOA。 */
-    gpio_init.Pin = BSP_BOARD_ADC_T1_PIN | BSP_BOARD_ADC_T2_PIN | BSP_BOARD_ADC_T3_PIN |
-                    BSP_BOARD_ADC_T4_PIN | BSP_BOARD_ADC_T5_PIN | BSP_BOARD_ADC_T6_PIN |
-                    BSP_BOARD_ADC_T7_PIN | BSP_BOARD_ADC_SO_ALT_PIN;
+    /* ── GPIOA：NTC_DUMP(PA3) + IMON 的两个比较器分支(PA7/PA0) ── */
+    gpio_init.Pin = BSP_BOARD_ADC_NTC_DUMP_PIN |
+                    BSP_BOARD_ADC_IMON_C2_PIN | BSP_BOARD_ADC_IMON_C3_PIN;
     HAL_GPIO_Init(GPIOA, &gpio_init);
 
-    /* ── GPIOB：BUS / DRV_SO / NTC_DUMP / T8 / NTC_MAIN / TEST_FB ── */
-    gpio_init.Pin = BSP_BOARD_ADC_BUS_PIN | BSP_BOARD_ADC_DRV_SO_PIN |
-                    BSP_BOARD_ADC_NTC_DUMP_PIN | BSP_BOARD_ADC_T8_PIN |
-                    BSP_BOARD_ADC_NTC_MAIN_PIN | BSP_BOARD_ADC_TEST_FB_PIN;
+    /* ── GPIOB：BUS / IMON / NTC_MAIN / SC_ADC_A / SC_ADC_B ── */
+    gpio_init.Pin = BSP_BOARD_ADC_BUS_PIN | BSP_BOARD_ADC_IMON_PIN |
+                    BSP_BOARD_ADC_NTC_MAIN_PIN |
+                    BSP_BOARD_ADC_SC_A_PIN | BSP_BOARD_ADC_SC_B_PIN;
     HAL_GPIO_Init(GPIOB, &gpio_init);
 
     /* ── GPIOC：NTC_SC 在 PC4（只有 ADC2_IN5 一个映射）── */
@@ -173,7 +171,7 @@ static BOOL _bsp_adc_dma_init
 
 /********************************************************************************************
 * 函数名称 :   bsp_adc_init
-* 功能描述 :   配置 ADC1（8 通道）与 ADC2（6 通道）以及各自的 DMA
+* 功能描述 :   配置 ADC1（4 通道）与 ADC2（3 通道）以及各自的 DMA
 *
 *               几个关键取舍：
 *
@@ -189,7 +187,7 @@ static BOOL _bsp_adc_dma_init
 *               3) Overrun 选"覆盖"：读慢了就丢旧值，不要让 OVR 把 ADC 卡死。
 *                  对慢信号来说，丢一个旧样本远比停转强。
 *
-*               4) ScanConvMode 必须 ENABLE —— 一个 ADC 要轮询 6~8 个通道，
+*               4) ScanConvMode 必须 ENABLE —— 一个 ADC 要轮询 3~4 个通道，
 *                  关掉的话只会反复采第一个。
 *
 * 输入参数 :   无
@@ -218,7 +216,7 @@ VOID bsp_adc_init
      *    DMA 标志永远不动、缓冲区永远全是 0，而代码看起来完全正常。 */
     __HAL_RCC_DMAMUX1_CLK_ENABLE();
 
-    /* ================= ADC1 主体（8 通道） ================= */
+    /* ================= ADC1 主体（4 通道） ================= */
     p_mod->handle1.Instance                      = ADC1;
     p_mod->handle1.Init.ClockPrescaler           = ADC_CLOCK_SYNC_PCLK_DIV4;
     p_mod->handle1.Init.Resolution               = ADC_RESOLUTION_12B;
@@ -246,39 +244,23 @@ VOID bsp_adc_init
     ch.OffsetNumber = ADC_OFFSET_NONE;
     ch.Offset       = 0;
 
-    ch.Channel = BSP_BOARD_ADC_T1_CHANNEL;                              /* PA0   AD_T1       → idx 0 */
+    ch.Channel = BSP_BOARD_ADC_BUS_CHANNEL;                             /* PB0   BUS_ADC    → idx 0 */
     ch.Rank    = ADC_REGULAR_RANK_1;
     if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T2_CHANNEL;                              /* PA1   AD_T2       → idx 1 */
+    ch.Channel = BSP_BOARD_ADC_IMON_CHANNEL;                            /* PB1   IMON       → idx 1 */
     ch.Rank    = ADC_REGULAR_RANK_2;
     if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T3_CHANNEL;                              /* PA2   AD_T3       → idx 2 */
+    ch.Channel = BSP_BOARD_ADC_NTC_DUMP_CHANNEL;                        /* PA3   NTC_DUMP   → idx 2 */
     ch.Rank    = ADC_REGULAR_RANK_3;
     if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T4_CHANNEL;                              /* PA3   AD_T4       → idx 3 */
+    ch.Channel = BSP_BOARD_ADC_SC_A_CHANNEL;                            /* PB14  SC_ADC_A   → idx 3 */
     ch.Rank    = ADC_REGULAR_RANK_4;
     if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T8_CHANNEL;                              /* PB14  SC_SUM/T8   → idx 4 */
-    ch.Rank    = ADC_REGULAR_RANK_5;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_NTC_DUMP_CHANNEL;                        /* PB12  NTC_DUMP    → idx 5 */
-    ch.Rank    = ADC_REGULAR_RANK_6;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_DRV_SO_CHANNEL;                          /* PB1   DRV_SO      → idx 6 */
-    ch.Rank    = ADC_REGULAR_RANK_7;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_BUS_CHANNEL;                             /* PB0   BUS_ADC     → idx 7 */
-    ch.Rank    = ADC_REGULAR_RANK_8;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle1, &ch) != HAL_OK) { return; }
-
-    /* ================= ADC2 主体（6 通道） ================= */
+    /* ================= ADC2 主体（3 通道） ================= */
     p_mod->handle2.Instance                      = ADC2;
     p_mod->handle2.Init.ClockPrescaler           = ADC_CLOCK_SYNC_PCLK_DIV4;
     p_mod->handle2.Init.Resolution               = ADC_RESOLUTION_12B;
@@ -302,28 +284,16 @@ VOID bsp_adc_init
 
     ch.SamplingTime = ADC_SAMPLETIME_247CYCLES_5;
 
-    ch.Channel = BSP_BOARD_ADC_T5_CHANNEL;                              /* PA4   AD_T5       → idx 0 */
+    ch.Channel = BSP_BOARD_ADC_NTC_MAIN_CHANNEL;                        /* PB11  NTC_MAIN   → idx 0 */
     ch.Rank    = ADC_REGULAR_RANK_1;
     if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T6_CHANNEL;                              /* PA5   AD_T6       → idx 1 */
+    ch.Channel = BSP_BOARD_ADC_NTC_SC_CHANNEL;                          /* PC4   NTC_SC     → idx 1 */
     ch.Rank    = ADC_REGULAR_RANK_2;
     if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
 
-    ch.Channel = BSP_BOARD_ADC_T7_CHANNEL;                              /* PA6   AD_T7       → idx 2 */
+    ch.Channel = BSP_BOARD_ADC_SC_B_CHANNEL;                            /* PB15  SC_ADC_B   → idx 2 */
     ch.Rank    = ADC_REGULAR_RANK_3;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_NTC_MAIN_CHANNEL;                        /* PB11  NTC_MAIN   → idx 3 */
-    ch.Rank    = ADC_REGULAR_RANK_4;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_NTC_SC_CHANNEL;                          /* PC4   NTC_SC     → idx 4 */
-    ch.Rank    = ADC_REGULAR_RANK_5;
-    if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
-
-    ch.Channel = BSP_BOARD_ADC_TEST_FB_CHANNEL;                         /* PB15  TEST_FB    → idx 5 */
-    ch.Rank    = ADC_REGULAR_RANK_6;
     if (HAL_ADC_ConfigChannel(&p_mod->handle2, &ch) != HAL_OK) { return; }
 
     /* ================= DMA ================= */
@@ -459,7 +429,7 @@ S32 bsp_adc_get_so_ma
     S32 v_mv;
     S32 delta_mv;
 
-    raw      = bsp_adc_get_raw(1U, BSP_ADC1_IDX_DRV_SO);
+    raw      = bsp_adc_get_raw(1U, BSP_ADC1_IDX_IMON);
     v_mv     = (S32)(((U32)raw * BSP_BOARD_ADC_VREF_MV) / 4095U);
     delta_mv = v_mv - (S32)(BSP_BOARD_ADC_VREF_MV / 2U);
 

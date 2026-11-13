@@ -8,27 +8,31 @@ extern "C" {
 #endif
 
 /********************************************************************************************
- * 超容 8 节累积抽头 —— 换算与它的前提
+ * 超容 8 节累积抽头 —— 选通采样、换算与它的前提
  *
- * ── 硬件 ────────────────────────────────────────────────────────────────────
+ * ── 硬件（2026-10-30 改版后）─────────────────────────────────────────────────
  *   T0 是超容负极（SC−），T1–T8 依次往上抽头，T8 = SC+ 顶端，共 9 根进 J_SC_TAPS。
- *   T1–T7 每路的候选网络（BOM 已逐只核对）：
- *       Tj ── R_Tj_HI 68 kΩ ──┬── ADCj
- *                             ├── R_Tj_LO   10 kΩ ── GND_SYS
- *                             └── R_Tj_TEST 47 kΩ ── TEST
- *   T8 只有 R_T8_HI 68 kΩ + R_T8_LO 10 kΩ，没有 TEST 支路。
+ *   每节的电阻网络现在只有两只：
+ *       Tj ── R_Tj_HI 68 kΩ ──┬── AD_Tj ── U_CELL_MUX(开关) ── SC_ADC_x ── ADC
+ *                             └── R_Tj_LO   10 kΩ ── GND_SYS
+ *   ADC 节点上另有 R_ADC_x_PD 10 kΩ 下拉（与 R_Tj_LO 并联）和 1 nF 滤波电容。
  *
- *   解得：Vtap[j] = K × Vadc[j] − c × Vtest
- *         K = 1 + 68/10 + 68/47 = 9.246808…
- *         c = 68/47             = 1.446808…
- *   T8：Vtap[8] = 7.8 × Vadc[8]，c = 0。
+ *   于是选通后的分压比：
+ *       K = 1 + 68k / (10k ∥ 10k) = 1 + 13.6 = 14.6
+ *   **8 路完全一样**，T8 也不例外。
  *
- * ── 为什么公式里要减 c × Vtest，而不是当 TEST 是 0 ────────────────────────
- *   TEST 平时由 PB10 推挽拉低，理论上 Vtest = 0，第二项消失。
- *   但一旦 PB10 没配好、焊点虚了、或者有人在做诊断把它拉高，
- *   这一项就是实打实的误差：TEST 抬高 1 V，每节读数会偏 1.45 V。
- *   所以本层**始终用实测的 TEST_FB 反推出 Vtest**（TEST_FB 是 10k/10k 分压，×2），
- *   而不是假设它为零。多读一个通道，换掉一整类"看起来正常其实全偏"的故障。
+ *   ⚠️ 旧的 47k→TEST 支路已随 TEST 网络一起删除，所以不再有 −c×Vtest 修正项。
+ *      不要再按 7.8 / 9.2468 换算 —— 那会把读数放大 1.87 倍 / 1.58 倍。
+ *
+ * ── 采样方式 ────────────────────────────────────────────────────────────────
+ *   两颗 TMUX1511 各带 4 路开关，D 端分别并到 SC_ADC_A（ADC1）与 SC_ADC_B（ADC2）。
+ *   所以**同一时刻只能测一节**，8 节靠轮询。dl_cell_scan() 负责整轮扫描并刷新缓存，
+ *   dl_cell_get_tap_mv() 只读缓存 —— 否则每读一节就要等一次模拟建立，调用者会被拖死。
+ *
+ *   扫描周期建议 100 ms 级：抽头电压跟着超容 SOC 走，时间常数是秒级。
+ *
+ *   ⚠️ 选通后模拟侧需要建立时间：68k ∥ 5k 对 1 nF，τ ≈ 4.7 µs，5τ ≈ 24 µs。
+ *      本层用 DL_CELL_SETTLE_LOOPS 的空转等待（远大于 24 µs），宁可慢也不要读错。
  *
  * ── ⚠️ 一个原理图层面的缺口，本层绕不过去 ──────────────────────────────────
  *   所有 tap ADC 都相对 **GND_SYS** 读数，而超容负极（SC−）不是 GND_SYS：
@@ -41,38 +45,66 @@ extern "C" {
  *     第 8 节      = Vtap8 − Vtap7          ← 同上，可以直接算
  *     超容总压     = Vtap8 − V_SCminus      ← 同样缺 V_SCminus
  *
- *   这就是为什么 dl_cell_get_cell_mv() 要调用者自己把 sc_minus_mv 传进来：
- *   本层不编造一个它测不到的数。真值是 0、是 I×R_shunt、还是别的补偿值，
- *   要等硬件补上 SC− 采样或给出可行的估算方法之后才能定。
- *   文档里也写着「SC−偏移的采集或基于电流/分流器的补偿方法及其误差预算仍待闭合」。
- *
- *   传 0 的后果：第 1 节读数会等于 Vtap1 的全值（可能偏几十毫伏到几百毫伏，
- *   取决于当前电流），总压同理。做单体过压判断时不能接受这种偏差。
+ *   这就是为什么 dl_cell_get_cell_mv() 要调用者自己把 sc_minus_mv 传进来。
+ *   传 0 意味着假设 SC− 与系统地等电位，在有电流时**不成立**
+ *   （0.5 mΩ × 100 A = 50 mV，已经超过单节工作窗余量）。
  ********************************************************************************************/
 
 #define DL_CELL_NUM                                                     (8U)
 
-/* T1–T7 的换算系数（由 68k / 10k / 47k 三个电阻定出来，不是经验值） */
-#define DL_CELL_TAP_K                                                   (9.246808F)
-#define DL_CELL_TAP_C                                                   (1.446808F)
+/* 选通后的分压比：68k / (10k ∥ 10k) + 1 = 14.6（8 路统一） */
+#define DL_CELL_TAP_K                                                   (14.6F)
 
-/* T8 的换算比：68k / 10k 简单分压 */
-#define DL_CELL_T8_RATIO                                                (7.8F)
-
-/* TEST_FB 的分压比：R_TEST_HI 10k / R_TEST_LO 10k → Vtest = 2 × V(TEST_FB) */
-#define DL_CELL_TEST_FB_RATIO                                           (2.0F)
+/* 每路选通后的模拟建立等待。用空转循环而不是 HAL_Delay：
+ * 这里只需要几十微秒，HAL_Delay 最小 1 ms，会把一次扫描拖到 8 ms 以上。
+ * 170 MHz 下每次循环约 3–4 个周期，12000 次约 250–280 µs，是 τ 的 50 倍以上。 */
+#define DL_CELL_SETTLE_LOOPS                                            (12000U)
 
 /************************************Function***********************************************/
 /********************************************************************************************
+* Function name :   dl_cell_scan
+* Descriptions  :   Walk all eight taps: close one switch, wait for the divider to settle,
+*                   read the shared ADC node, open the switch. Results are cached.
+*                   Blocking, roughly 8 x 280 us = 2.3 ms per round.
+*                   Call it from the slow task (100 ms class), not from the control loop.
+* Input         :
+*                   none
+* Output        :
+*                   none
+* Return        :
+*                   none
+*********************************************************************************************/
+extern VOID dl_cell_scan
+(
+    VOID
+);
+
+/********************************************************************************************
+* Function name :   dl_cell_is_scanned
+* Descriptions  :   TRUE once dl_cell_scan() has completed at least one full round
+* Input         :
+*                   none
+* Output        :
+*                   none
+* Return        :
+*                   TRUE / FALSE
+*********************************************************************************************/
+extern BOOL dl_cell_is_scanned
+(
+    VOID
+);
+
+/********************************************************************************************
 * Function name :   dl_cell_get_tap_mv
-* Descriptions  :   Absolute voltage of tap j (1..8) in mV, already corrected for the TEST
-*                   network. This is referenced to GND_SYS, not to SC-.
+* Descriptions  :   Absolute voltage of tap j (1..8) in mV, from the last scan.
+*                   Referenced to GND_SYS, not to SC-.
+*                   Returns 0 if dl_cell_scan() has never run.
 * Input         :
 *                   index: 1..8
 * Output        :
 *                   none
 * Return        :
-*                   tap voltage in mV, 0 when the index is out of range
+*                   tap voltage in mV, 0 when the index is out of range or no scan yet
 *********************************************************************************************/
 extern U32 dl_cell_get_tap_mv
 (
@@ -86,7 +118,7 @@ extern U32 dl_cell_get_tap_mv
 *                   of the SC- offset. Cell 1 needs the SC- potential, which has no sampling
 *                   path in the current schematic and must be supplied by the caller.
 * Input         :
-*                   index     : 1..8
+*                   index      : 1..8
 *                   sc_minus_mv: potential of SC- above GND_SYS, in mV (pass 0 if unknown,
 *                                but then cell 1 carries an unknown offset)
 * Output        :
@@ -98,22 +130,6 @@ extern S32 dl_cell_get_cell_mv
 (
     IN  U8      index,
     IN  U32     sc_minus_mv
-);
-
-/********************************************************************************************
-* Function name :   dl_cell_get_test_mv
-* Descriptions  :   Reconstructed TEST net voltage in mV (TEST_FB x 2).
-*                   Useful as a sanity check before trusting any tap reading.
-* Input         :
-*                   none
-* Output        :
-*                   none
-* Return        :
-*                   TEST voltage in mV
-*********************************************************************************************/
-extern U32 dl_cell_get_test_mv
-(
-    VOID
 );
 
 #ifdef _cplusplus

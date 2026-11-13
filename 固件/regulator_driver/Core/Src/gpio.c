@@ -45,10 +45,10 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, TEST_Pin|PERMIT_Pin|PMOS_CTRL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, MUX_SEL7_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : TEST_Pin PERMIT_Pin PMOS_CTRL_Pin */
-  GPIO_InitStruct.Pin = TEST_Pin|PERMIT_Pin|PMOS_CTRL_Pin;
+  /*Configure GPIO pin : MUX_SEL7_Pin（抽头选通第 7 路，细由 bsp_mux.c 接管） */
+  GPIO_InitStruct.Pin = MUX_SEL7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;

@@ -7,6 +7,10 @@
 #include "dl_sense.h"
 #include "bl_foc.h"
 
+#if defined(__FAST_MATH__) || (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ > 0)
+#error "FOC requires IEEE non-finite checks; disable fast/finite-only math"
+#endif
+
 
 #ifdef _cplusplus
 extern "C" {
@@ -150,10 +154,9 @@ static F32 _bl_foc_clamp_f32
 * 函数名称 :   _bl_foc_wrap_angle
 * 功能描述 :   把角度折到 [0, 2π)
 *
-*              用 while 而不是 fmodf：角度来源决定了它最多偏出一两个 2π
-*              （扇区角本身在 [0,2π)，加上 ±30° 的偏置最多差一个周期），
-*              一两次减法就收敛，比调库函数快也更可预测。
-*              保险起见还是用 while，万一偏置被人设成 1e6 也不会死循环之外出别的怪事。
+*              常见范围走单次加减；大角度使用 fmodf，避免重复减法在
+*              极大数或无穷大输入时无法推进。非有限值沿用 NaN 的归零约定。
+*              非常规输入的目标板执行时间仍需测量，不能当作最坏时间上界。
 *
 * 输入参数 :   angle_rad: 任意角度
 * 输出参数 :   无
@@ -166,20 +169,32 @@ static F32 _bl_foc_wrap_angle
 {
     F32 angle = angle_rad;
 
-    /* NaN 进去会在这里被拦下，回到 0 而不是在 while 里空转 */
-    if (!(angle == angle))
+    if (!isfinite(angle))
     {
         return 0.0F;
     }
 
-    while (angle >= BL_FOC_TWO_PI)
+    if (angle >= BL_FOC_TWO_PI)
     {
         angle -= BL_FOC_TWO_PI;
     }
-
-    while (angle < 0.0F)
+    else if (angle < 0.0F)
     {
         angle += BL_FOC_TWO_PI;
+    }
+
+    if (angle < 0.0F || angle >= BL_FOC_TWO_PI)
+    {
+        angle = fmodf(angle_rad, BL_FOC_TWO_PI);
+        if (angle < 0.0F)
+        {
+            angle += BL_FOC_TWO_PI;
+        }
+        /* A tiny negative remainder can round up to exactly one period. */
+        if (angle >= BL_FOC_TWO_PI)
+        {
+            angle = 0.0F;
+        }
     }
 
     return angle;

@@ -27,14 +27,14 @@ config RANGE_LINK_USER_PERIOD_MS
 
 config RANGE_LINK_FILTER_WIN
     int
-    prompt "Server distance filter window size (1 = pass-through)."
+    prompt "Server distance filter window size."
     default 16
     range 1 32
     help
         This option means the sliding window size of server distance filter
         (output = median of window, robust against static jitter).
-        1 = no filtering (use the library's own Kalman-smoothed distance
-        directly, same as the official sample).
+        1 = output each accepted sample; outlier rejection and the
+        consecutive-rejection reset still apply.
 
 config RANGE_LINK_PROB_MIN
     int

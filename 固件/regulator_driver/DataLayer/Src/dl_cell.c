@@ -1,5 +1,7 @@
 /************************************包含头文件*************************************************/
+#include "stm32g4xx_hal.h"
 #include "type.h"
+#include "bsp_mux.h"
 #include "bsp_adc.h"
 #include "dl_cell.h"
 #include "dl_bus.h"
@@ -9,129 +11,145 @@
 extern "C" {
 #endif
 
+/************************************静态变量定义************************************************/
+/* 上一次扫描得到的原始码值，下标 1..8（0 不用）。
+ * 为什么要缓存：一次选通要等 ~280 µs 建立，如果每个 getter 都现场选通，
+ * 上层连着读 8 节就会阻塞 2 ms 以上，而且中途还会互相打断（mux 是全局单例）。 */
+static U16  s_dl_cell_raw[DL_CELL_NUM + 1U];
+static BOOL s_dl_cell_scanned = FALSE;
+
+
 /************************************静态函数声明************************************************/
-static U32 _dl_cell_get_tap_pin_mv
+static VOID _dl_cell_wait_settle
 (
-    IN  U8      index
+    VOID
 );
 
 
 /************************************函数实现**************************************************/
 /********************************************************************************************
-* 函数名称 :   _dl_cell_get_tap_pin_mv
-* 功能描述 :   按 tap 序号取对应的 ADC 引脚电压（mV）
+* 函数名称 :   _dl_cell_wait_settle
+* 功能描述 :   等模拟开关 + 分压网络建立
 *
-*               T1–T4 在 ADC1（idx 0–3），T5–T7 在 ADC2（idx 0–2），T8 在 ADC1（idx 4）。
-*               这个"跨两个 ADC"的分布是原理图布线定的，软件改不了，
-*               所以这张映射表必须留在这里、不能省。
+*               抽头侧 68k 与 ADC 节点 10k∥10k=5k 组成 4.66 kΩ 源阻抗，
+*               对 1 nF 滤波电容 τ ≈ 4.7 µs，5τ ≈ 24 µs。
+*               这里用空转循环给到 ~250 µs，是 5τ 的十倍，留足余量。
 *
-* 输入参数 :   index: 1 ~ 8
-* 输出参数 :   无
-* 返回值   :   引脚电压（mV），越界返回 0
-*********************************************************************************************/
-static U32 _dl_cell_get_tap_pin_mv
-(
-    IN  U8      index
-)
-{
-    U16 raw = 0U;
-
-    switch (index)
-    {
-        case 1U: raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T1); break;
-        case 2U: raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T2); break;
-        case 3U: raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T3); break;
-        case 4U: raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T4); break;
-        case 5U: raw = bsp_adc_get_raw(2U, BSP_ADC2_IDX_T5); break;
-        case 6U: raw = bsp_adc_get_raw(2U, BSP_ADC2_IDX_T6); break;
-        case 7U: raw = bsp_adc_get_raw(2U, BSP_ADC2_IDX_T7); break;
-        case 8U: raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T8); break;
-        default: return 0U;
-    }
-
-    return bsp_adc_raw_to_mv(raw);
-}
-
-/********************************************************************************************
-* 函数名称 :   dl_cell_get_test_mv
-* 功能描述 :   TEST 网络电压（mV）
-*
-*               TEST_FB 是 10k/10k 分压 → Vtest = 2 × V(TEST_FB)。
-*               正常情况下 TEST 被 PB10 推挽拉低，这里应该读到接近 0。
-*               **如果这里读到几百毫伏以上，先别信任何 tap 读数** ——
-*               说明 TEST 没被拉低（PB10 没初始化 / 焊点开路 / 有人在做诊断），
-*               此时每一节都会被 c × Vtest 拉偏。把本函数的值打出来是最快的排查手段。
+*               ⚠️ 不要改成 HAL_Delay(1)：那是最小 1 ms，一轮 8 节就是 8 ms，
+*                  而且依赖 SysTick 中断，在中断关闭的上下文里会直接卡死。
 *
 * 输入参数 :   无
 * 输出参数 :   无
-* 返回值   :   TEST 电压（mV）
+* 返回值   :   无
 *********************************************************************************************/
-U32 dl_cell_get_test_mv
+static VOID _dl_cell_wait_settle
 (
     VOID
 )
 {
+    volatile U32 i;
+
+    for (i = 0U; i < DL_CELL_SETTLE_LOOPS; i++)
+    {
+        __NOP();
+    }
+}
+
+/********************************************************************************************
+* 函数名称 :   dl_cell_scan
+* 功能描述 :   轮询 8 节抽头，刷新缓存
+*
+*               顺序：选通 → 等建立 → 读对应 ADC → 下一路。
+*               T1–T4 走 U_CELL_MUX1 → SC_ADC_A（ADC1 的 idx 3）
+*               T5–T8 走 U_CELL_MUX2 → SC_ADC_B（ADC2 的 idx 2）
+*
+*               ⚠️ 扫描结束时**必须**把 mux 关回全断：
+*                  否则最后一个通道的开关一直闭着，那一路的 10k 会长期并到 ADC 节点上，
+*                  虽然电气上无害，但下次读到的是"上一路"，很容易误判。
+*
+* 输入参数 :   无
+* 输出参数 :   无
+* 返回值   :   无
+*********************************************************************************************/
+VOID dl_cell_scan
+(
+    VOID
+)
+{
+    U8  i;
     U16 raw;
-    U32 pin_mv;
 
-    raw    = bsp_adc_get_raw(2U, BSP_ADC2_IDX_TEST_FB);
-    pin_mv = bsp_adc_raw_to_mv(raw);
+    for (i = 1U; i <= DL_CELL_NUM; i++)
+    {
+        bsp_mux_select(i);
+        _dl_cell_wait_settle();
 
-    return (U32)(((F32)pin_mv * DL_CELL_TEST_FB_RATIO) + 0.5F);
+        if (i <= 4U)
+        {
+            raw = bsp_adc_get_raw(1U, BSP_ADC1_IDX_SC_A);
+        }
+        else
+        {
+            raw = bsp_adc_get_raw(2U, BSP_ADC2_IDX_SC_B);
+        }
+
+        s_dl_cell_raw[i] = raw;
+    }
+
+    bsp_mux_select(BSP_MUX_CH_NONE);
+
+    s_dl_cell_scanned = TRUE;
+}
+
+/********************************************************************************************
+* 函数名称 :   dl_cell_is_scanned
+* 功能描述 :   是否已经完整扫过一轮
+*
+*               给上层（尤其是 dl_bus 的超容总压）用来判断“现在读到的 0 是没扫过，
+*               还是真的 0 V”。没有这个判断，只能靠调用顺序约束，一旦漏调就会静默出错。
+*
+* 输入参数 :   无
+* 输出参数 :   无
+* 返回值   :   TRUE = 至少扫过一轮
+*********************************************************************************************/
+BOOL dl_cell_is_scanned
+(
+    VOID
+)
+{
+    return s_dl_cell_scanned;
 }
 
 /********************************************************************************************
 * 函数名称 :   dl_cell_get_tap_mv
-* 功能描述 :   第 j 个抽头的绝对电压（mV），已按 TEST 网络修正
+* 功能描述 :   第 j 个抽头的绝对电压（mV，相对 GND_SYS）
 *
-*               公式：Vtap = K × Vadc − c × Vtest
-*                     K = 1 + 68/10 + 68/47 = 9.2468
-*                     c = 68/47             = 1.4468
+*               换算：Vtap = K × Vadc，K = 14.6（8 路统一，见 dl_cell.h）
+*               没有 TEST 修正项了 —— TEST 网络已在 2026-10-30 改版中删除。
 *
-*               推导（以 T1 为例，68k 从 T1 到 ADC，10k 从 ADC 到地，47k 从 ADC 到 TEST）：
-*                 节点 KCL：(Vtap − Vadc)/68 = Vadc/10 + (Vadc − Vtest)/47
-*                 两边乘 68×10×47 整理即得上式。
-*
-*               T8 没有 47k 支路，是一条纯 68k/10k 分压，所以直接走 7.8 倍，
-*               不需要减 Vtest 项（传 c=0 的效果一样）。
+*               ⚠️ 本函数读的是缓存。没扫过就返回 0，调用者要自己保证 dl_cell_scan()
+*                  在跑。返回 0 和"真的 0 V"在这里不可区分，这是刻意的：
+*                  宁可让上层看到 0 并去查扫描有没有启动，也不要现场阻塞 280 µs。
 *
 * 输入参数 :   index: 1 ~ 8
 * 输出参数 :   无
-* 返回值   :   抽头电压（mV，相对 GND_SYS），越界返回 0
+* 返回值   :   抽头电压（mV），越界或未扫描返回 0
 *********************************************************************************************/
 U32 dl_cell_get_tap_mv
 (
     IN  U8      index
 )
 {
-    F32 pin_mv;
+    U32 pin_mv;
     F32 tap_mv;
-    F32 test_mv;
 
-    if ((index < 1U) || (index > DL_CELL_NUM))
+    if ((index < 1U) || (index > DL_CELL_NUM) || (s_dl_cell_scanned != TRUE))
     {
         return 0U;
     }
 
-    pin_mv = (F32)_dl_cell_get_tap_pin_mv(index);
-
-    /* T8 是纯分压，没有 TEST 支路 */
-    if (index == DL_CELL_NUM)
-    {
-        tap_mv = pin_mv * DL_CELL_T8_RATIO;
-        return (U32)(tap_mv + 0.5F);
-    }
-
-    test_mv = (F32)dl_cell_get_test_mv();
-
-    tap_mv = (DL_CELL_TAP_K * pin_mv) - (DL_CELL_TAP_C * test_mv);
-
-    /* 理论上 tap ≥ 0，但 TEST 被拉高时减出来的值可能为负。
-     * 这里钳到 0 而不是回绕 —— 回绕会变成一个巨大的正数，比负数更误导人。 */
-    if (tap_mv < 0.0F)
-    {
-        tap_mv = 0.0F;
-    }
+    pin_mv = bsp_adc_raw_to_mv(s_dl_cell_raw[index]);
+    tap_mv = (F32)pin_mv * DL_CELL_TAP_K;
 
     return (U32)(tap_mv + 0.5F);
 }
@@ -140,16 +158,11 @@ U32 dl_cell_get_tap_mv
 * 函数名称 :   dl_cell_get_cell_mv
 * 功能描述 :   第 j 节单体电压（mV，带符号）
 *
-*               第 2–8 节：直接两个抽头相减，SC− 电位互相抵消，**结果可信**。
-*               第 1 节  ：需要 SC− 相对 GND_SYS 的电位，而当前原理图没有这个采样通道。
-*                          调用者必须自己把 sc_minus_mv 传进来；
-*                          传 0 意味着假设 SC− 与系统地等电位，这在有电流时**不成立**
-*                          （0.5 mΩ × 100 A = 50 mV，已经超过单节工作窗余量）。
+*               第 2–8 节：两个抽头相减，SC− 电位互相抵消，**结果可信**。
+*               第 1 节  ：需要 SC− 相对 GND_SYS 的电位，当前原理图没有这个采样通道，
+*                          调用者必须自己传；传 0 意味着假设 SC− 与系统地等电位。
 *
-*               ⚠️ 第 8 节 = Vtap8 − Vtap7，两端各带一次分压误差，
-*                  而 T8 的比值（7.8）与 T1–T7 的 K（9.2468）不同，
-*                  所以这两路的增益误差**不会互相抵消**。做单体过压判断时要单独评估。
-*
+*               ⚠️ Vtap1 本身也是相对 GND_SYS 的量，所以第 1 节 = Vtap1 − V(SC−)。
 * 输入参数 :   index      : 1 ~ 8
 *               sc_minus_mv: SC− 相对 GND_SYS 的电位（mV）
 * 输出参数 :   无
