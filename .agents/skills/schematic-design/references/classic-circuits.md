@@ -295,7 +295,7 @@ VCC → [电容] → [MCU RST]
 ### 9. MOS管电机驱动（NMOS低端驱动）
 
 ```
-[VBAT] → [电机+] 
+[VBAT] → [电机+]
 [电机-] → [NMOS漏极(D)]
 [NMOS源极(S)] → [GND] ←→ [电流检测电阻Rsense]→GND
 [NMOS栅极(G)] ← [MCU PWM输出] → [Rg 10Ω~100Ω]
@@ -600,7 +600,7 @@ VCC → [电容] → [MCU RST]
 
 **方案二：PMOS防反接**（推荐，无压降低损耗）
 ```
-[电源+] → [PMOS漏极(D)] 
+[电源+] → [PMOS漏极(D)]
 [PMOS源极(S)] → [电路VCC]
 [PMOS栅极(G)] → [电阻 100K] → GND（或接电池-）
 ```
