@@ -1,0 +1,98 @@
+{
+  "status": "COMPARISON_ONLY_HOLD",
+  "inputs": {
+    "busMin": 22.1,
+    "busMax": 37.8,
+    "rPreMin": 7.284,
+    "rPreMax": 9.41965,
+    "rAddMin": 2.09,
+    "rAddMax": 2.3100000000000005,
+    "switchMax": 0.2,
+    "cc2Error": 0.1,
+    "otherCurrent": 0.005,
+    "prechargeLeak": 0.02,
+    "healthyR": 0.006,
+    "faultR": 0.03,
+    "senseError": 0.01,
+    "threshold": 0.038,
+    "window": 0.26
+  },
+  "normalPassive": {
+    "currentMinA": 1.8525271068304603,
+    "currentMaxA": 4.0324301258800945,
+    "powerUpperW": 152.42585875826757,
+    "energy40msJ": 6.097034350330703,
+    "assumptions": "Both resistors intact; switches and wires <=0.2 ohm; voltage at actual input; ignores turn-on and capacitance."
+  },
+  "absoluteKelvin": {
+    "requiredIndicatedA": 1.85,
+    "trueFaultCurrentMinA": 1.725,
+    "healthyReadMaxV": 0.034224580755280565,
+    "faultReadMinV": 0.041749999999999995,
+    "thresholdV": 0.038,
+    "slowCornerWorstIndicatedA": 1.7525271068304602,
+    "oldContractTrueFaultMinA": 1.575,
+    "oldContractFaultReadMinV": 0.03725,
+    "oldThresholdV": 0.035,
+    "warning": "38 mV is invalid for the old 1.575 A minimum; choose the matching complete contract."
+  },
+  "alternativeReadThreshold": {
+    "requiredIndicatedA": 1.74,
+    "slowCornerWorstIndicatedA": 1.7525271068304602,
+    "indicatedCurrentMarginA": 0.01252710683046021,
+    "trueFaultCurrentMinA": 1.615,
+    "healthyReadMaxV": 0.034224580755280565,
+    "faultReadMinV": 0.03845,
+    "voltageThresholdV": 0.03633729037764028,
+    "marginEachV": 0.0021127096223597167,
+    "warning": "Only under complete assumed current and voltage error budgets; actual quantization, sampling, drift, loads and dynamics are not qualified."
+  },
+  "resistorShortIdealScreenA": {
+    "addedShort": 5.189456342668863,
+    "originalShort": 18.086124401913874
+  },
+  "lowOneAmp": {
+    "currentMin": 0.85,
+    "currentMax": 1.1,
+    "readError": 0.005,
+    "threshold": 0.016,
+    "healthyReadMaxV": 0.011600000000000001,
+    "faultReadMinV": 0.020499999999999997,
+    "warning": "0.85–1.10 A and ±5 mV are unqualified system assumptions; TPS2660 table at 1 V across eFuse is not a guarantee at actual ~12–30 V drop."
+  },
+  "oldSmallPulse": {
+    "currentMin": 0.1096,
+    "currentMax": 0.2175,
+    "readError": 0.01,
+    "healthyReadMaxV": 0.011305,
+    "faultReadMinV": -0.006712
+  },
+  "tests": {
+    "resistorNormalCurrentWindow": true,
+    "absolute38mVSeparatesEndpoints": true,
+    "oneA5mVSeparatesEndpoints": true,
+    "smallPulseCannotSeparate": true,
+    "stuckSensorWithUnqualifiedDiagnosticRejected": true,
+    "saturatedSensorRejected": true,
+    "openPlatformRejected": true,
+    "openPathCannotMeetCurrent": true,
+    "old1575mAContractDoesNotSupport38mV": true,
+    "lowVoltageCornerNotGuaranteedToMeetIndicatedThreshold": true,
+    "lowVoltageCornerPassesAlternativeUnderBudget": true,
+    "alternativeSeparatesEndpoints": true,
+    "shortedAddedResistorBreaksFiveAmpLimit": true,
+    "shortedOriginalResistorBreaksFiveAmpLimit": true
+  },
+  "startupNegativeControls": {
+    "alwaysShortedKelvinRejected": true,
+    "adcStuckRejected": true,
+    "shortAfterScreenCanStillPassModel": true
+  },
+  "limits": [
+    "Self-test stuck-sensor branch assumes an independent diagnostic reports the fault; no such circuit is specified or verified.",
+    "Absolute Kelvin accuracy, source taps, precharge disconnection, 1 ms physical stop and independent time limit remain unqualified.",
+    "Healthy <=6 mOhm and faulty >=30 mOhm apply to the actual operating point. Intermediate and non-ohmic faults require separate criteria.",
+    "Passive current limit only exists with both resistors intact. Shorted resistor, shorts before series elements, switch short, battery BUS voltage and fault energy require independent protection.",
+    "TPS2660 fast trip threshold is not a maximum transient current guarantee; actual current and thermal behavior at large voltage drops must be established."
+  ]
+}

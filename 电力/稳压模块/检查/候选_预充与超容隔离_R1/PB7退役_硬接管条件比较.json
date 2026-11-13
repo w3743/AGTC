@@ -1,0 +1,57 @@
+{
+  "classification": "hard-only candidate; calculations conditional, no new circuit simulation or acceptance",
+  "scope": "preserve supercap controller/CAN and existing hard overvoltage; remove PB7 software dump requests only after hardware candidate qualifies",
+  "budgets": {
+    "comparator_trip_v": [
+      38.16179860974392,
+      38.74058989409242
+    ],
+    "release_v": [
+      37.88496821334952,
+      38.619137268951455
+    ],
+    "bus_ceiling_v": 39.009,
+    "capacity_f": 0.05286,
+    "net_regen_w": 450.03,
+    "latest_trip_to_ceiling_energy_j": 0.5515617406341794,
+    "latest_trip_to_ceiling_no_absorption_ms": 1.225611049561539,
+    "available_regen_removed_release_to_battery_v": 0.08496821334951932,
+    "release_energy_j": 0.16996648079548954,
+    "release_delay_if_full_resistor_ms": 0.09225010849180143,
+    "legacy_nominal_v": 40.32,
+    "legacy_nominal_above_ceiling": true
+  },
+  "r1_candidate_removals": [
+    "Q_DUMP_SW",
+    "R_DUMP_IN_SER",
+    "R_DUMP_SW_BASE",
+    "R_DUMP_IN_PD",
+    "R_DUMP_PWM_PD",
+    "U_DUMP_SW_ALLOW",
+    "C_DUMP_SW_ALLOW"
+  ],
+  "current_baseline_removals": [
+    "Q_DUMP_SW",
+    "R_DUMP_IN_SER",
+    "R_DUMP_SW_BASE",
+    "R_DUMP_IN_PD"
+  ],
+  "preserve": [
+    "R_DUMP_LPV_PD",
+    "U_DRV_LPV_BUF",
+    "U_SC_OV channel B",
+    "Q_PMOS_CTRL",
+    "UCC27511",
+    "Q_DUMP",
+    "0.82ohm external resistor",
+    "independent MCU and CAN",
+    "all existing SC and LPV interfaces"
+  ],
+  "qualification": [
+    "No branch removal until validated hardware netlist is ready; current and R1 counts are not actual purchase savings.",
+    "BUS-powered HW_READY cannot gate first PRE, protection input remains inactive until qualified.",
+    "Legacy hardware request transfer needs explicit isolation and power-sequence analysis; without it, old hard fallback is not preserved.",
+    "One comparator reference model did not converge; threshold and power windows are conditional assumptions, not guaranteed silicon or physical stop.",
+    "User owns resistor power and thermal implementation; interface and required operating envelope must be delivered."
+  ]
+}

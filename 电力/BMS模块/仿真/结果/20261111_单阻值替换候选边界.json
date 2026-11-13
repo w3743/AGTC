@@ -1,0 +1,176 @@
+{
+  "status": "ISOLATED_HOLD",
+  "logic_equivalent_truth_combinations": 32,
+  "logic_cases": {
+    "model": "settled logic only",
+    "columns": [
+      "pre",
+      "done",
+      "fet_release",
+      "lpv"
+    ],
+    "cases": {
+      "early_edge": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "stale_high_request_no_edge": [
+        true,
+        true,
+        false,
+        false
+      ],
+      "new_qualified_request": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "physical_proof_arrives_after_release": [
+        true,
+        false,
+        true,
+        true
+      ],
+      "timer_expires_after_physical_proof": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "brownout_or_cancel_after_proof": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "cancel_then_permit_recovery_within_window": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "second_pre_req_same_power_session": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "rail_transient_window_without_dwell": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "differential_lost_before_physical_proof": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "timeout_before_physical_proof": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "request_edge_after_timeout": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "stale_high_physical_proof_blocks_new_main_request": [
+        true,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "differential": {
+    "status": "CONDITIONAL at the 1ms transfer error budget; original 2ms comparison fails",
+    "center_leg_ohm": 442,
+    "screened_supply_V": [
+      4.5374,
+      5.25
+    ],
+    "supervisor_worst_rising_release_threshold_V": 4.793438999999999,
+    "supervisor_release_guaranteed_at_4p75V": false,
+    "tap_to_center_V": [
+      0.02901796020850567,
+      0.03542569320174249
+    ],
+    "output_error_contributions_V": {
+      "INA600A_full_temperature_offset": 0.005,
+      "INA600A_common_mode_91dB": 0.001065348748017964,
+      "INA600A_supply_sensitivity": 1e-05,
+      "OPA333_buffer_including_bias_and_drift_screen": 3e-05,
+      "TLV9032_offset_5V_spec_point": 0.002,
+      "TLV9032_common_mode_60dB_5V_spec_point": 0.002625,
+      "TLV9032_supply_sensitivity": 7e-05,
+      "TLV9032_half_hysteresis_assumption_to_qualify": 0.003
+    },
+    "input_inner_to_guarantee_reading_pass_V": 0.07601204525718135,
+    "input_outer_static_V": 0.2463765863351374,
+    "input_outer_at_10V_per_s_1ms_V": 0.2563765863351374,
+    "input_outer_at_10V_per_s_2ms_V": 0.2663765863351374,
+    "conditional_true_limit_V": 0.26,
+    "remaining_combined_Kelvin_noise_model_margin_at_1ms_V": 0.00362341366486261,
+    "minimum_loop_resistance_for_example_130A_ohm": 0.002
+  },
+  "timing_and_allocation": {
+    "TPL5111_DRVn_s": [
+      5.592878164523366,
+      6.540283707147307
+    ],
+    "physical_turn_on_dwell_and_handoff_budget_s": 0.326,
+    "budget_includes_turn_on_s": 0.075,
+    "budget_includes_max_dwell_s": 0.191,
+    "budget_includes_proof_and_handoff_s": 0.06,
+    "effective_charge_time_s": 5.266878164523367,
+    "hot_model_r_ohm": 9.419649999999999,
+    "identified_cap_upper_F": 0.079783824,
+    "load_limit_old_110p8mV_target_A": 0.008142180772206567,
+    "load_limit_442ohm_target_A": 0.004443976081612874,
+    "design_allocation_A": 0.00425,
+    "allocation_buckets_A": {
+      "FOC_A": 0.0015,
+      "FOC_B": 0.0015,
+      "regulator_always_on_protection": 0.0006,
+      "pump_disabled": 0.00045,
+      "BMS_sense_MPPT_other": 0.0002
+    },
+    "case_at_allocated_current": {
+      "load_A": 0.00425,
+      "end_gap_V": 0.07418651110735569,
+      "steady_gap_V": 0.0400335125,
+      "time_to_target_s": 5.227744153195947
+    },
+    "cap_limit_at_allocated_current_F": 0.08038107225482366,
+    "remaining_charge_time_at_allocated_current_s": 0.03913401132741967,
+    "short_peak_A": 5.189705710735689,
+    "short_resistor_W": 196.170875865809,
+    "short_single_energy_J_before_tail": 1283.0131832419675,
+    "short_double_energy_J_before_tails": 2566.026366483935,
+    "available_fault_tail_against_7s_s": 0.45971629285269344,
+    "fixture_discrimination_only": {
+      "pulse_A": 0.1,
+      "pulse_s": 0.04,
+      "minimum_precharge_only_increment_V": 0.04844890899458807,
+      "increment_measured_acceptance_ceiling_V": 0.02,
+      "increment_total_error_budget_V": 0.01,
+      "also_require_both_main_bank_VGS": true,
+      "autonomous_proof_source_implemented": false
+    }
+  },
+  "open": [
+    "FOC and all other branch input envelopes and total effective capacitance",
+    "comparator and INA worst hysteresis, saturation recovery and unpowered behavior",
+    "actual proof generator, main path R/L, and physical propagation",
+    "hot SOA and Q_PRE current-to-zero tail; rearm thermal recovery",
+    "full procurement coverage"
+  ]
+}

@@ -1,0 +1,39 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const dir=__dirname,root=path.resolve(dir,'../..');
+const read=p=>JSON.parse(fs.readFileSync(p,'utf8'));
+const en=read(path.join(dir,'候选官方.enet')),official=read(path.join(root,'检查/当前官方网表.enet'));
+function map(e){return new Map(Object.values(e.components).filter(c=>c.props['Add into BOM']!=='no').map(c=>[c.props.Designator,c]))}
+const r1=map(en),base=map(official),adds=[
+['D_AUX_BAT','RS1B C2993636','battery service OR'],['D_AUX_BUS','RS1B C2993636','BUS OR'],['J_AUX_BUS_FUSE','JST B2B-XH-A(LF)(SN) C158012','two pin interface to external 1A KLM-1 fuse; fuse and holder off-board'],['J_AUX_BAT','JST B2B-XH-A(LF)(SN) C158012','2 pin, 3A 250V; mating XHP-2 housing and SXH-001T-P0.6 crimp contacts'],['U_HW_POR','TPS3760A012DYYR','supervision'],['R_HW_SLEW1','RAG-06K10R0FT 10Ω','source slew'],['R_HW_SLEW2','RAG-06K10R0FT 10Ω','source slew'],['C_HW_BANK','Ymin MPD470M1ED19040R 47µF 25V candidate','single polymer bank; actual effective capacitance and life verify'],['R_HW_POR_TOP','120kΩ 0.1% ≤25ppm/K','supervisor sense'],['R_HW_POR_BOT','10kΩ 0.1% ≤25ppm/K','supervisor sense'],['C_HW_CTR','2.2nF C0G C2991172','release delay'],['R_HW_READY_PU','FH RS-03K2701FT C118394 2.7kΩ 1%','RESET pullup; max 5mA sink budget'],['R_HW_READY_PD','100kΩ','RESET default pull-down'],['U_READY_BUF','SN74LVC1G17DBVR','CORE-off tolerant digital status']];
+const remove=['Q_DUMP_SW','R_DUMP_IN_SER','R_DUMP_PWM_PD','U_DUMP_SW_ALLOW','J_GUARD_12V'];
+adds.push(['R_BUS_OV_TRIM','FH RS-03K2701FT C118394 2.7kΩ ±1% 100ppm/K','reuse the HW_READY pullup SKU and retain both 255k resistors']);
+adds.find(x=>x[0]==='R_HW_POR_TOP')[1]='UNI-ROYAL TC0325B1203T5F C2989459 120kΩ ±0.1% 25ppm/K';
+adds.find(x=>x[0]==='R_HW_POR_BOT')[1]='Reuse R_SC_OV_BOT exact HoAR0603-1/10W-10KR-0.1%-TCR25 C5123581';
+adds.find(x=>x[0]==='R_HW_READY_PD')[1]='Tyohm RMC0603100K1%N C269699 100kΩ';
+assert(remove.every(x=>r1.has(x))); assert(adds.every(x=>!r1.has(x[0])));assert(r1.has('R_BUS_OV_TOP1'));
+let target=new Set(r1.keys());remove.forEach(x=>target.delete(x));adds.forEach(x=>target.add(x[0]));
+const addbase=[...target].filter(x=>!base.has(x)),removebase=[...base.keys()].filter(x=>!target.has(x));
+let pins={
+'U_AUX1 URB4812YMD-10WR3':{'1 -Vin':'B0_AUX_EXTERNAL via J_AUX_BAT.2','2 +Vin':'AUX_OR_POS: D_AUX_BAT.K and D_AUX_BUS.K','3 +Vo':'12V_PROT continuous','4 NP':'NC','5 GND':'GND_SYS','6 CTRL':'NC'},
+'J_AUX_BAT':{'1':'protected battery service positive PACK_GUARD_FUSED_POS','2':'B0_AUX_EXTERNAL'},
+'J_AUX_BUS_FUSE':{'1':'BUS_EXT','2':'BUS_AUX_FUSED return from external Eaton KLM-1'},'D_AUX_BAT':{'A':'J_AUX_BAT.1','K':'AUX_OR_POS'},'D_AUX_BUS':{'A':'BUS_AUX_FUSED via J_AUX_BUS_FUSE.2','K':'AUX_OR_POS'},
+'Q_DRV_SWITCH':{'1 G':'DRV_PMOS_G (R1 controlled)','2 S':'12V_PROT','3 D':'12V_DRV'},
+'U_SC_OV TLV6700DDCR':{'1 OUTA':'BUS_OV_OUT','2 GND':'SC_MINUS','3 INA+':'BUS_OV_DIV','4 INB−':'SC_OV_DIV unchanged','5 VDD':'12V_HW (moved from 12V_PROT)','6 OUTB':'DRV_FAULT_N unchanged'},
+'U_DUMP_DRV UCC27511ADBVR':{'1 VDD':'12V_HW','2 OUTH':'UCC_OUT_H unchanged','3 OUTL':'UCC_OUT_L unchanged','4 GND':'GND_SYS','5 IN−':'DUMP_OFF','6 IN+':'HW_READY (replaces GUARD_OK)'},
+'Q_PMOS_CTRL MMBT5551':{'1 B':'DUMP_HW_BASE','2 E':'GND_SYS','3 C':'DUMP_OFF'},
+'U_HW_POR TPS3760A012DYYR':{'1 VDD':'12V_HW','2 NC':'NC','3 SENSE':'HW_POR_SENSE','4 NC':'NC','5 NC':'NC','6 RESET_N':'HW_READY','7 NC':'NC','8 GND':'GND_SYS','9 CTR_MR':'HW_CTR','10 CTS':'NC','11 NC':'NC','12 NC':'NC','13 GND':'GND_SYS','14 NC':'NC'},
+'Q_READY_LED':{'1 B':'READY_BASE unchanged','2 E':'GND_SYS unchanged','3 C':'READY_LED_K unchanged'},
+'U_EARLY_READY_OPTO':{'1 A':'READY_LED_A','2 K':'READY_LED_K','3 E':'B0_READY_RETURN','4 C':'EARLY_GUARD_READY_N'},'J_EARLY_READY':{'1':'EARLY_GUARD_READY_N','2':'B0_READY_RETURN'},
+'R_BUS_OV_TOP1':{'1':'BUS_EXT','2':'BUS_OV_MID','value':'258k ±0.1% ≤25ppm/K, replace 255k'},'R_BUS_OV_TOP2':{'1':'BUS_OV_MID','2':'BUS_OV_DIV','value':'existing 255k'},'R_BUS_OV_BOT':{'1':'BUS_OV_DIV','2':'SC_MINUS','value':'existing 5.11k'},'C_T3_FILTER':{'1':'BUS_OV_DIV','2':'SC_MINUS','value':'1nF unchanged'},
+'R_DUMP_SW_BASE':{'1':'HW_READY','2':'HW_READY_BUF_A','value':'FH RS-03K2402FT C294655 24k ±1%, replace original 10k'},'R_DUMP_IN_PD':{'1':'HW_READY_BUF_A','2':'GND_SYS','value':'10k retained'},'C_DUMP_SW_ALLOW':{'1':'3V3_CORE','2':'GND_SYS','value':'100nF buffer supply decoupling'},'U_READY_BUF SN74LVC1G17DBVR':{'1 NC':'NC','2 A':'HW_READY_BUF_A','3 GND':'GND_SYS','4 Y':'HW_READY_CORE','5 VCC':'3V3_CORE'},'J_CORE_P2.13':{'pin':'PA5','net':'NC'},'J_CORE_P1.22':{'pin':'PB7','net':'HW_READY_CORE'},'R_DUMP_HW_PU':{'1':'12V_HW','2':'BUS_OV_OUT'},'R_PB6_BASE':{'1':'BUS_OV_OUT','2':'DUMP_HW_BASE'},'R_QP_COL':{'1':'12V_HW','2':'DUMP_OFF'},'C_SC_OV_VDD':{'1':'12V_HW','2':'SC_MINUS'},'C_DUMP_DRV_HF':{'1':'12V_HW','2':'GND_SYS'},'C_DUMP_DRV_BULK':{'1':'12V_HW','2':'GND_SYS'},
+'R_HW_SLEW1':{'1':'12V_PROT','2':'HW_SLEW_MID'},'R_HW_SLEW2':{'1':'HW_SLEW_MID','2':'12V_HW'},'C_HW_BANK':{'+':'12V_HW','−':'GND_SYS'},'R_HW_POR_TOP':{'1':'12V_HW','2':'HW_POR_SENSE'},'R_HW_POR_BOT':{'1':'HW_POR_SENSE','2':'GND_SYS'},'C_HW_CTR':{'1':'HW_CTR','2':'GND_SYS'},'R_HW_READY_PU':{'1':'12V_HW','2':'HW_READY'},'R_HW_READY_PD':{'1':'HW_READY','2':'GND_SYS'} };
+for (const ref of ['C_12V_IN','C_12V_IN_HF']) {
+  assert.equal(r1.get(ref)?.pinInfoMap['1'].net,'PACK_GUARD_FUSED_POS');
+  assert.equal(r1.get(ref)?.pinInfoMap['2'].net,'B0_AUX_EXTERNAL');
+  pins[ref]={'1':'AUX_OR_POS','2':'B0_AUX_EXTERNAL'};
+}
+assert.equal(r1.get('R_BUS_OV_TOP2')?.pinInfoMap['2'].net,'BUS_OV_DIV');
+pins.R_BUS_OV_TOP1={'1':'BUS_EXT','2':'BUS_OV_MID','value':'existing PTFR0805B255KP9 255k'};
+pins.R_BUS_OV_TOP2={'1':'BUS_OV_MID','2':'BUS_OV_TRIM_IN','value':'existing PTFR0805B255KP9 255k'};
+pins.R_BUS_OV_TRIM={'1':'BUS_OV_TRIM_IN','2':'BUS_OV_DIV','value':'FH RS-03K2701FT C118394 2.7k'};
+const out={status:'REVIEWABLE_SINGLE_CANDIDATE_NOT_SAVED_NOT_QUALIFIED',baseline:'R1 official exported candidate netlist; all other R1 parts unchanged; official comparisons computed by reference name only',pins,additions_r1:adds.map(([ref,part,reason])=>({ref,part,reason})),removals_r1:remove,removal_reason:{J_GUARD_12V:'External secondary inlet superseded by the retained onboard U_AUX1 and protected primary inputs.'},status_replacements:['R_DUMP_SW_BASE: 10k to 24k','R_DUMP_IN_PD: 10k retained','C_DUMP_SW_ALLOW: reused as buffer bypass'],totals:{r1_added:adds.length,r1_removed:remove.length,r1_net:adds.length-remove.length,formal_added:addbase.length,formal_removed:removebase.length,formal_net:addbase.length-removebase.length},formal_added_refs:addbase,formal_removed_refs:removebase,limitations:['Counts compare component reference names and omit same-reference value changes and any BOM exclusions/cross-board wire, protection or assembly; no price claim.','External KLM-1 fuse DC interrupt rating 50kA at 600VDC, 1A fast; fuse holder, fuse inrush and wire coordination are subsequent harness checks. 47uF full-temperature/lifetime effective capacitance, connector locking and line ratings are subsequent hardware checks.','EARLY_READY remains R1 GUARD_OK only; HW_READY divided by 24k/10k to 1G17 A, Y drives P1.22/PB7; 100nF reused as VCC bypass. Motion requires current sampled PB7 high and new ARM.','Short dip discharges HW bank backward through 20Ω to 12V_PROT; effective capacitance and actual load are required bench inputs.','TLV6700 OUTB SC protection is now powered from 12V_HW; bench-check DRV_FAULT_N default and power sequence.','Historical LT3010, REF5025, TLV1811 and legacy optocoupler were never adopted.']};assert(out.totals.formal_net===target.size-base.size);fs.writeFileSync(path.join(dir,'PB7退役_共源TLV施工合同.json'),JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out.totals));

@@ -2,7 +2,7 @@
  * Copyright (c) NearLink Project. 2026-2026. All rights reserved.
  *
  * Description: SLE Range Link distance filter (median outlier removal + mean). \n
- *              窗口内先按中值剔除野值，再对窗口做均值；全程只用整数，无大数组/大栈。
+ *              按窗口中值剔除野值，再输出中值（不足三个样本时输出均值）。
  */
 
 #include "range_link_filter.h"
@@ -15,9 +15,10 @@ static uint32_t g_range_valid_total;
 static uint32_t g_range_reject_streak;
 static int32_t g_range_last_out;
 
-static int32_t rl_abs32(int32_t val)
+static uint32_t rl_magnitude32(int32_t val)
 {
-    return (val < 0) ? (-val) : val;
+    /* Unsigned negation is defined even for INT32_MIN. */
+    return (val < 0) ? (0U - (uint32_t)val) : (uint32_t)val;
 }
 
 void rl_filter_init(void)
@@ -66,19 +67,21 @@ static int32_t rl_filter_median(void)
 
 static int32_t rl_filter_window_mean(void)
 {
-    int32_t sum = 0;
-    uint32_t i;
-
     if (g_range_win_cnt == 0) {
         return 0;
     }
-    for (i = 0; i < g_range_win_cnt; i++) {
-        sum += g_range_win[i];
+    if (g_range_win_cnt == 1) {
+        return g_range_win[0];
     }
-    return sum / (int32_t)g_range_win_cnt;
+    /* Only called when count < 3. Widen before summing two int32 values. */
+#if RL_FILTER_WIN > 1
+    return (int32_t)(((int64_t)g_range_win[0] + g_range_win[1]) / 2);
+#else
+    return g_range_win[0];
+#endif
 }
 
-/* 输出用中值（对静态抖动/偶发野值更稳），窗口内均值仅用于野值判决 */
+/* 输出用中值；窗口不足三个样本时输出均值。 */
 static int32_t rl_filter_output(void)
 {
     return (g_range_win_cnt >= 3) ? rl_filter_median() : rl_filter_window_mean();
@@ -87,15 +90,23 @@ static int32_t rl_filter_output(void)
 int32_t rl_filter_push(int32_t raw_mm, uint32_t *valid_num)
 {
     int32_t median;
-    int32_t limit;
-    int32_t rate_limit;
-    int32_t diff;
+    uint32_t limit;
+    uint32_t rate_limit;
+    uint32_t diff;
+    uint32_t magnitude;
 
     if (g_range_win_cnt > 0) {
-        median = rl_filter_median();
-        diff = rl_abs32(raw_mm - median);
+        /* With >=3 entries the last accepted output is this window's median.
+         * Rejected samples leave both the window and last output unchanged. */
+        median = (g_range_win_cnt >= 3) ? g_range_last_out : rl_filter_median();
+        /* Ordered unsigned subtraction represents the full 0..UINT32_MAX gap. */
+        diff = (raw_mm >= median) ? (uint32_t)raw_mm - (uint32_t)median :
+                                   (uint32_t)median - (uint32_t)raw_mm;
         limit = RL_FILTER_OUTLIER_ABS_MM;
-        rate_limit = rl_abs32(median) * RL_FILTER_OUTLIER_RATE / 100;
+        magnitude = rl_magnitude32(median);
+        /* Split before multiplication to avoid overflowing at large magnitudes. */
+        rate_limit = (magnitude / 100U) * RL_FILTER_OUTLIER_RATE +
+                     ((magnitude % 100U) * RL_FILTER_OUTLIER_RATE) / 100U;
         if (rate_limit > limit) {
             limit = rate_limit;
         }

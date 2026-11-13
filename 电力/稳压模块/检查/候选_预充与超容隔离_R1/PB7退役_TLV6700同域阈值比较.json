@@ -1,0 +1,61 @@
+{
+  "qualification": "CONDITIONAL, not final FOC threshold or transistor macromodel",
+  "source": "TLV6700 datasheet VIT+/VIT− over temperature, 5.23k hypothetical 0.1% and 25ppm/C both divider arms, 60C component excursion, input bias ±25nA conservatively compared",
+  "rise_relative_to_SC_MINUS_v": [
+    38.806299999663246,
+    40.01004802316199
+  ],
+  "release_relative_to_SC_MINUS_v": [
+    37.92404813887544,
+    39.614035487041576
+  ],
+  "ground_assumption": {
+    "sc_shunt_ohm": 0.0005,
+    "sc_current_assumed_a": 80,
+    "max_magnitude_v": 0.04,
+    "public_bus_release_low_v": 37.88404813887544,
+    "public_bus_rise_high_v": 40.05004802316199,
+    "warning": "40mV assumes DC current only; shunt tolerance, dynamics and wiring excluded"
+  },
+  "resistor_mpns": {
+    "top": "existing PTFR0805B255KP9 x2, TCR verify",
+    "bottom": "5.23k exact domestic MPN not selected"
+  },
+  "ideal_release": {
+    "battery_v": 37.8,
+    "margin_v": 0.08404813887544549,
+    "stored_energy_j": 0.16812396256155096,
+    "delay_us": 91.25450539734136,
+    "condition": "zero regen, ideal full discharge through 0.779Ω; not actual battery current or released switch timing"
+  },
+  "dynamic_assumptions": {
+    "initial_bus_v": 40.05004802316199,
+    "foc_limit_v": 41,
+    "capacity_f": 0.05286,
+    "net_injection_w": 450.03,
+    "resistor_and_wiring_ohm": 1,
+    "inductance_h": 0.0001,
+    "gate_delay_includes_filter_comparator_bjt_ucc": "stipulated, not datasheet guarantee",
+    "step_s": 0.000001
+  },
+  "cases": [
+    {
+      "assumed_delay_ms": 0.5,
+      "peak_v": 40.15935287498115,
+      "balance_ms": 0.532,
+      "within_41v": true
+    },
+    {
+      "assumed_delay_ms": 5,
+      "peak_v": 41.10210708662017,
+      "balance_ms": 5.029999999999999,
+      "within_41v": false
+    }
+  ],
+  "limits": [
+    "41V FOC threshold is an engineering hypothetical; compare actual earliest threshold and local voltage difference.",
+    "29us TLV6700 timing at 10mV overdrive is typical and input equivalent ~1V BUS; cannot use as worst-case at threshold.",
+    "Threshold, propagation, inactive BJT saturation, filtering, startup, source OR, power loss and 3m stopping still require physical qualification.",
+    "Output gate and switch idealized, no temperature/motor torque/wire EMI or PCB verification."
+  ]
+}

@@ -26,7 +26,7 @@ BATTERY_CURRENT_CASES_A = (60.0, 100.0, 130.0)
 EVIDENCE = {
     "foc_firmware": "固件/foc_driver/BusinessLayer/Inc/bl_motor.h",
     "bms_native_design": "电力/BMS模块/设计细节.md",
-    "bms_native_project": "电力/BMS模块/BMS-9S4P.eprj3",
+    "bms_native_project": "电力/BMS模块/eda工程文件/BMS-9S4P/BMS-9S4P.eprj3",
     "bms_native_bom": "电力/BMS模块/原理图准备/BOM.csv",
     "bms_target_requirements": "电力/BMS模块/设计需求.md",
     "battery_cell_spec": "电力/参考资料/电池/11-_EVE_INR18650-30P_SPEC._PBRI-INR1865030P-D06-01-B-2023.8.4.pdf",
