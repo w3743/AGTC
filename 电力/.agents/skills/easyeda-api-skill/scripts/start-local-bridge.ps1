@@ -27,7 +27,7 @@ if (-not $bridge) {
     if (-not $bridge) { throw "Bridge did not become healthy; inspect $logDir" }
 }
 if ($LaunchEda -and -not (Get-Process -Name lceda-pro -ErrorAction SilentlyContinue)) {
-    Start-Process -FilePath 'C:\Program Files\lceda-pro\lceda-pro.exe' -WindowStyle Hidden | Out-Null
+    Start-Process -FilePath 'C:\Program Files\lceda-pro\lceda-pro.exe' | Out-Null
 }
 if ($LaunchEda -and -not $bridge.Health.edaConnected) {
     # The extension connects asynchronously after the desktop process starts.
