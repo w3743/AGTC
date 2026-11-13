@@ -3,6 +3,7 @@
 #include "bsp.h"
 #include "bsp_can.h"
 #include "dl.h"
+#include "dl_cell.h"
 #include "bl.h"
 
 
@@ -15,11 +16,16 @@ extern "C" {
  * 又不会把 500 kbit/s 的总线占满（8 字节帧约 130 µs，占空比 0.13%）。 */
 #define BL_STATUS_PERIOD_MS                                             (100U)
 
+/* 抽头扫描周期。8 节经 TMUX1511 轮询，一轮阻塞约 2.3 ms。
+ * 100 ms 对超容单体电压足够（SOC 变化是秒级），又只占 2.3% 的 CPU。 */
+#define BL_CELL_SCAN_PERIOD_MS                                          (100U)
+
 
 /************************************数据类型定义************************************************/
 typedef struct _BL_MODULE_T_
 {
     U32     last_status_tick;                                           /* 上次发状态帧的时刻 */
+    U32     last_cell_scan_tick;                                        /* 上次扫抽头的时刻 */
 }BL_MODULE_T;
 
 
@@ -55,6 +61,7 @@ TYPE_RET_E bl_init
     TYPE_RET_E result = TYPE_RET_SUCCESS;
 
     s_bl_module.last_status_tick = 0U;
+    s_bl_module.last_cell_scan_tick = 0U;
 
     (VOID)bl_regulator_init();
 
@@ -127,7 +134,19 @@ VOID bl_task_schedule
         (VOID)frame;
     }
 
-    /* ── 2. 周期状态帧 ─────────────────────────────────────────────────────── */
+    /* ── 2. 抽头扫描 ─────────────────────────────────────────────────────────
+     * 2026-10-30 改版后 8 节抽头经 TMUX1511 选通，同一时刻只能测一节，
+     * 必须由软件轮询。100 ms 一轮足够：抽头电压跟着超容 SOC 走，时间常数是秒级。
+     * ⚠️ 这轮扫描是阻塞的（约 2.3 ms），别放进控制环里，只在这里跑。 */
+    now = bsp_get_tick();
+
+    if ((now - s_bl_module.last_cell_scan_tick) >= BL_CELL_SCAN_PERIOD_MS)
+    {
+        s_bl_module.last_cell_scan_tick = now;
+        dl_cell_scan();
+    }
+
+    /* ── 3. 周期状态帧 ─────────────────────────────────────────────────────── */
     now = bsp_get_tick();
 
     if ((now - s_bl_module.last_status_tick) >= BL_STATUS_PERIOD_MS)

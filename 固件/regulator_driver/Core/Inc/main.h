@@ -57,12 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TEST_Pin GPIO_PIN_10
-#define TEST_GPIO_Port GPIOB
-#define PERMIT_Pin GPIO_PIN_5
-#define PERMIT_GPIO_Port GPIOB
-#define PMOS_CTRL_Pin GPIO_PIN_6
-#define PMOS_CTRL_GPIO_Port GPIOB
+/* PB5 只是被 CubeMX 当成一个普通输出脚登记；它的真实身份是 MUX_SEL7（抽头选通），
+ * 由 bsp_mux.c 接管，bsp_gpio 不再碰它。旧标签 PERMIT 已作废——
+ * 许可现在走 PA9 → SN74LVC1G07 开漏，见 bsp_board.h。 */
+#define MUX_SEL7_Pin GPIO_PIN_5
+#define MUX_SEL7_GPIO_Port GPIOB
+/* PB6 (旧 PMOS_CTRL) 与 PB10 (旧 TEST) 在 2026-10-30 改版后是 NC，已从 .ioc 移除 */
 
 /* USER CODE BEGIN Private defines */
 

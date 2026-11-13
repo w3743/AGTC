@@ -85,8 +85,7 @@ void Error_Handler(void);
 #define HALL_B_GPIO_Port GPIOB
 #define CAN_STB_Pin GPIO_PIN_5
 #define CAN_STB_GPIO_Port GPIOB
-#define DUMP_THERM_OK_Pin GPIO_PIN_9
-#define DUMP_THERM_OK_GPIO_Port GPIOB
+/* PB9 / J_MCU_L.24 (DUMP_THERM_OK)：随本地泄放电路删除，2026-10-30 起为 NC */
 
 /* USER CODE BEGIN Private defines */
 

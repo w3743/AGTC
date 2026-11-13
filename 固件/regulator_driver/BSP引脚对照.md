@@ -316,3 +316,63 @@ CMakeLists 调整与 foc 相同：`add_compile_definitions` 已撤销（会撞
 代价：FLASH 27540 → ~31700 B (24.22%)。`MX_ADC1/2_Init`、
 `MX_FDCAN1_Init` 与 BSP 初始化并存，后者完整重配（含 DMA/DMAMUX，
 `.ioc` 里刻意不配 DMA，与 foc 工程口径一致）。
+
+### 12.6 2026-10-30 接口重排：固件按新针网重写（本次）
+
+**依据**：仓库 `电力/稳压模块/原理图准备/最终逐针连接.csv`（515 针 / 166 实例 / 21 NC / 84 网）
+与 `最终逐针连接合同.json` 的 `mcu_gpio_net_mapping`（37 条，含 10 条 NC）。
+设计文档原话：“J_CORE_P1/P2 的 48 个物理脚已按 Normal V1.0 厂家图展开，**旧针网作废**”。
+
+**引脚变化（旧 → 新）**
+
+| 功能 | 旧 | 新 | 说明 |
+|---|---|---|---|
+| 许可 PERMIT | PB5 推挽直连故障线（高=放行） | **PA9 → SN74LVC1G07 开漏**（低=放行） | 极性翻转，且只能开漏 |
+| 故障回读 | 无 | **PA10** | 改版后第一次能读回真线 |
+| 焊接刹车 BKIN | 刻意禁用（PB12 是 NTC 模拟） | **PB12 = DRV_FAULT_N，Break 已启用** | 硬件关桥不再是软件轮询 |
+| 抽头采样 | 8 路直连 ADC（PA0–PA6/PB14） | **8 路经 TMUX1511 → PB14/PB15**，8 根 MUX_SEL | 单节轮询 |
+| 分压比 | T1–T7 = 9.2468（含 47k→TEST）、T8 = 7.8 | **统一 14.6** | TEST 网络已删除 |
+| 温度 NTC_DUMP | PB12（ADC1_IN11） | **PA3（ADC1_IN4）** | |
+| P-MOS 控制 | PB6 输出 | **硬件（U_SC_OV OUTA）** | PB6 变 NC |
+| 诊断 TEST | PB10 输出 | 删除 | PB10 变 NC |
+| IMON | PB1 = DRV_SO 单路 ADC | PB1 ADC + **PA7/PA0 接 COMP2/COMP3** | 比较器未启用 |
+
+**代码改动**
+
+- `Bsp/Inc/bsp_board.h`：整表重写，27 个 NET 脚 + 10 个 NC 脚逐条注明；
+- 新增 `Bsp/Inc/bsp_mux.h` + `Bsp/Src/Mux/bsp_mux.c`：8 路 one-hot 选通，
+  先全关再开一路，防两路同开把两节超容短在一起；
+- `bsp_adc.h/.c`：ADC1 8 通道 → **4 通道**（BUS/IMON/NTC_DUMP/SC_A），
+  ADC2 6 → **3 通道**（NTC_MAIN/NTC_SC/SC_B）；
+- `bsp_gpio.h/.c`：`pmos_set` / `test_set` 删除；`permit_set` 改为 G07 开漏语义
+  （TRUE=放行=PA9 低）；新增 `bsp_gpio_read_fault()`；
+- `bsp_bridge.c/.h`：`BreakState = ENABLE`，BKIN = PB12 AF6，`AutomaticOutput = DISABLE`；
+- `bsp.c`：初始化顺序插入 `bsp_mux_init()`；`bsp_power_stage_enable()` 去掉 P-MOS 两步，
+  断电后仍等电流衰减，超时只作告警（已无开关可断）；
+- `dl_cell.h/.c`：改为 `dl_cell_scan()` 轮询 + 缓存，K=14.6，删除 TEST 修正；
+- `dl_bus.c`：超容总压改取 T8 缓存（无独立通道）；
+- `dl.c` / `bl.c`：`dl_init` 用 `dl_cell_scan()` 取代已删除的 `dl_cell_get_test_mv()`；
+  `bl_task_schedule()` 每 100 ms 扫一轮（约 2.3 ms 阻塞）；
+- `Core/Inc/main.h` / `Core/Src/gpio.c` / `regulator_driver.ioc`：PB6、PB10 移除，
+  PB5 标签由 `PERMIT` 改为 `MUX_SEL7`（引脚数 25 → 23）。已在临时目录用 CubeMX
+  重新生成验证：产物只剩 `MUX_SEL7_Pin`，与工程代码一致。
+
+**机械核对**：脚本比对新合同 27 个 NET 脚 ↔ `bsp_board.h` 定义的 27 个脚 —— 逐脚同名同功能，
+无遗漏、无多余、10 个 NC 脚一个都没被配置。
+
+**需要上板确认的三件事（未验证，别当结论）**
+
+1. **许可极性**：按 74LVC1G07 非反相开漏推演，PA9 高 → 故障线被拉低 → 禁止。
+   上板验证：万用表量 DRV_FAULT_N，PA9 高时 ≈0 V、低时 ≈3.0 V。若相反，改
+   `BSP_BOARD_PERMIT_LEVEL_ALLOW/INHIBIT` 两个宏即可，不要改函数体。
+2. **抽头选通映射**：按 `U_CELL_MUX1.SEL1..4 → AD_T1..T4 → SC_ADC_A`、
+   `U_CELL_MUX2.SEL1..4 → AD_T5..T8 → SC_ADC_B`（来自逐针 CSV）。实测可用
+   “选通单节、其余全断，看读数是否只有那一路变化”确认。
+3. **14.6 倍分压**：由 68k/(10k∥10k)+1 推出，还需逐路实测校准（文档也写了
+   “须做每路实际路由的增益/偏置校准”）。
+
+**仍未闭环**：`.ioc` 里的 ADC1/ADC2 参数块还是旧通道集（会被 BSP 完整重配覆盖），
+重新生成不会破坏功能，但别拿生成的 `adc.c` 当参考；COMP1/COMP2 的阈值、迟滞、极性与
+DAC 上电顺序仍未核，所以**没有启用**比较器保护。
+
+**代价**：FLASH 31848 → 32108 B（+260 B），RAM 3216 → 3232 B。

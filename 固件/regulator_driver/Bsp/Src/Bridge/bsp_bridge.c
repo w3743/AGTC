@@ -220,10 +220,13 @@ static U32 _bsp_bridge_duty_to_compare
 *                  驱动器看到 INH=0/INL=0 → 两栅极关断、SH 进 Hi-Z。这是安全态。
 *                  若设成 SET，一停 MOE 反而会让一根管子常通 —— 千万别改。
 *
-*               4) 刹车的处理：
-*                  BreakState = DISABLE，理由见 bsp_bridge.h 第 4 条。
-*                  这个定时器的 BKIN 引脚在 PB12 / PA6 上，而这两个脚在本板是
-*                  NTC_DUMP 和 AD_T7 的模拟输入，打开刹车等于给 NTC 分压装了个触发源。
+*               4) 刹车的处理（2026-10-30 改版后**已启用**）：
+*                  BreakState = ENABLE，BKIN = PB12 = DRV_FAULT_N，极性低。
+*                  老版本 PB12 是 NTC_DUMP 模拟输入、PA6 是抽头模拟输入，两个都撞 BKIN，
+*                  所以当时必须关掉 Break。改版后 PB12 就是共享故障线本身，
+*                  打开 Break 才是正确做法：DRV8161 nFAULT / TLV6700 OUTB / G07 / 比较器
+*                  任一方拉低，硬件立刻清 MOE，不等软件。
+*                  AutomaticOutput = DISABLE：刹车后不自恢复，必须软件重新 start。
 *
 *               5) 只起计数器、不起 MOE：
 *                  这样其他依赖 TIM1 的东西（将来要做同步采样的话）从 init 之后就有节拍，
@@ -259,6 +262,19 @@ VOID bsp_bridge_init
     gpio_init.Pin = BSP_BOARD_BRIDGE_L_PIN;
     HAL_GPIO_Init(BSP_BOARD_BRIDGE_L_PORT, &gpio_init);
 
+    /* ── BKIN：PB12 → TIM1_BKIN（AF6），复用输入 ──────────────────────────────
+     * 2026-10-30 改版后 PB12 就是共享故障线 DRV_FAULT_N，不再是 NTC 模拟输入，
+     * 所以这次可以（也必须）把它配成 BKIN。板上已有 1k 上拉 + 10k 下拉，
+     * 这里不再加内部上下拉，避免改变分压。
+     * ⚠️ 若哪天又把 PB12 改回模拟功能，必须同时把 BreakState 关掉，
+     *    否则一个分压电平就能让半桥反复掉输出。 */
+    gpio_init.Mode      = GPIO_MODE_AF_PP;
+    gpio_init.Pull      = GPIO_NOPULL;
+    gpio_init.Speed     = GPIO_SPEED_FREQ_LOW;
+    gpio_init.Alternate = BSP_BOARD_BKIN_AF;
+    gpio_init.Pin       = BSP_BOARD_BKIN_PIN;
+    HAL_GPIO_Init(BSP_BOARD_BKIN_PORT, &gpio_init);
+
     /* ── 时基 ──────────────────────────────────────────────────────────────── */
     p_mod->handle.Instance               = TIM1;
     p_mod->handle.Init.Prescaler         = 0;
@@ -291,7 +307,7 @@ VOID bsp_bridge_init
     bdt_init.OffStateIDLEMode = TIM_OSSI_ENABLE;
     bdt_init.LockLevel        = TIM_LOCKLEVEL_OFF;                      /* 允许后续改 DTG/OSSI，上板调试方便 */
     bdt_init.DeadTime         = _bsp_bridge_deadtime_to_dtg(BSP_BOARD_BRIDGE_DEADTIME_NS);
-    bdt_init.BreakState       = TIM_BREAK_DISABLE;                      /* ⚠️ 见 bsp_bridge.h 第 4 条，别打开 */
+    bdt_init.BreakState       = TIM_BREAK_ENABLE;                       /* PB12 = DRV_FAULT_N，低有效 */
     bdt_init.BreakPolarity    = TIM_BREAKPOLARITY_LOW;
     bdt_init.BreakFilter      = 0;
     bdt_init.BreakAFMode      = TIM_BREAK_AFMODE_INPUT;
@@ -414,7 +430,7 @@ VOID bsp_bridge_set_duty
 
     p_mod->duty = duty;
 
-    /* 写 PMOS_CTRL 那一路是另一回事，这里只动 CH1 的比较值。
+    /* 这里只动 CH1 的比较值。
      * CH1N 是硬件互补，CCR 只有一份，改 CH1 就等于同时改了两路。 */
     __HAL_TIM_SET_COMPARE(&p_mod->handle, TIM_CHANNEL_1, _bsp_bridge_duty_to_compare(duty));
 }

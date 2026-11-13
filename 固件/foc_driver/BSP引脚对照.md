@@ -460,3 +460,33 @@ CMakeLists 兜底相应调整：`add_compile_definitions(HAL_SPI_MODULE_ENABLED)
 
 代价：FLASH 46280 → 46488 B。`MX_SPI1_Init()` 与 `bsp_spi_init()` 并存，
 后者完整重配，与 ADC/TIM/FDCAN 的处理方式一致。
+
+### 6.9 2026-11-07 电路改动：本地制动/泄放整套删除（固件已同步）
+
+**改了什么（硬件）**：每块 FOC 删掉 16 个位号 —— 本地制动电阻 `R_DUMP_A/B`、泄放管 `Q7`、
+驱动 `U4(UCC27511A)`、保险 `F_BRAKE`、端子 `J_BRAKE_R`/`J_DUMP_SW`、专用温控支路
+（`R_THERM_TOP/BOT/SER`、`J_TEMP`）以及观测座 `J_PWR_SENSE`。整车制动电阻由 4 只降为 0 只，
+能量出口改为稳压模块的中央支路。器件数 169 → 152。
+
+**网表逐脚比对**（旧 `foc.enet` vs 新 `FOC_G431_P1.enet`）：
+26 个信号里只有一处变化 —— `J_MCU_L.24` 从 `DUMP_THERM_OK_GPIO` 变成 **NC**。
+其余 25 根（含 `BREAK_N`、`DRV_ENABLE`、六路 PWM、霍尔、SPI、三相电流、母线/温度采样）
+**一根没动**。
+
+**固件同步（本次）**：
+- `Bsp/Inc/bsp_board.h`：删除 `BSP_BOARD_DUMP_THERM_OK_PORT/PIN`，原位留作废说明；
+- `Bsp/Inc/bsp_gpio.h` + `Bsp/Src/Gpio/bsp_gpio.c`：删除 `bsp_gpio_get_dump_therm_ok()`
+  及其初始化块（该函数此前无调用者，删除不影响业务层）；
+- `Bsp/bsp.h`：模块图里“泄放”一行改为“已删除”；
+- `Core/Inc/main.h` + `Core/Src/gpio.c`：移除 `DUMP_THERM_OK_Pin` 定义与 `HAL_GPIO_Init`；
+- `foc_driver.ioc`：删除 `Mcu.Pin25=PB9` 与全部 `PB9.*`（引脚数 28 → 27），
+  已在临时目录用 CubeMX 重新生成验证：产物不再出现 PB9/DUMP_THERM，其余引脚不变。
+
+**保留**：本地过压检测 `U6/DUMP_5V` + `U7/TLV6700` → `BREAK_N` 链路，只请求关桥、不吸能。
+Break 配置与 `bsp_gpio_read_break_n()` 保留不动。
+
+**代价**：FLASH 46460 → 46436 B（-24 B），RAM 不变。
+
+⚠️ **删减不等于停车能力已证**：关桥后电机体二极管仍可能回灌。全车停车/掉电能力在稳压
+中央支路的热能力、断线包络与 12 V 失效路径闭合前维持 HOLD（见仓库
+`电力/FOC驱动模块/设计需求.md`「本地制动电阻的用户决定」）。
