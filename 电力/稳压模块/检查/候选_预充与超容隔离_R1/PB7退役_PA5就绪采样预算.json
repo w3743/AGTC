@@ -1,0 +1,37 @@
+{
+  "conservative_example": {
+    "adc_acceptance_v": 1.2,
+    "adc_total_error_budget_v": 0.1,
+    "all_resistors_assumed_total_tolerance": 0.015,
+    "hw_ready_required_v": 6.430359650070202,
+    "remaining_ucc_net_sink_mA": 0.7472695053353497,
+    "undefined_tps_pa5_max_plus_leak_v": 0.5784472789493567,
+    "warning": "0.1 V assigned budget not an ST full system accuracy guarantee; remaining current must include UCC input plus all other leakage"
+  },
+  "status": "conditional static node calculations; UCC input sink not guaranteed by these calculations",
+  "pin": "J_CORE_P2.13 -> PA5 -> ADC2_IN13",
+  "divider": {
+    "upper_ohm": 180000,
+    "lower_ohm": 47000,
+    "filter_f": 1e-7,
+    "ratio": 4.829787234042553,
+    "source_resistance_ohm": 37268.72246696035,
+    "filter_tau_ms": 3.7268722466960353,
+    "adc_max_nominal_v": 2.733039647577092,
+    "adc_when_tps_undefined_max_nominal_v": 0.5590308370044054,
+    "tt_input_leakage_150nA_v": 0.005590308370044052
+  },
+  "thresholds_example": {
+    "ready_above_v": 1.5,
+    "not_ready_below_v": 1,
+    "required_hw_ready_v": 7.24468085106383,
+    "remaining_ucc_sink_current_mA": 0.5756210955183341,
+    "conditions": "12V_HW >=10.4406V, resistors nominal, no ADC offsets; 100k pulldown and 227k divider included; calculate full tolerances and current guarantee separately"
+  },
+  "motion": "Read currently valid reference and fresh PA5 samples after filter settled before ARM; HW_READY loss or invalid ADC requires withdrawal and fresh ARM. This slow indication never gates fast UCC response.",
+  "limits": [
+    "Input above supply during CORE-off uses MCU TT_a behavior only under specified supplies: do not infer unpowered absolute guarantee.",
+    "100nF filter delays loss indication; exact sample period, ADC settling and end-to-end motion removal are system requirements to implement and verify.",
+    "UCC IN+ pulldown current at actual high voltage unspecified in timing table; high-state 1.5V criterion depends on remaining current budget."
+  ]
+}

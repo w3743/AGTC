@@ -1,0 +1,29 @@
+{
+  "type": "conditional DC KCL, no dynamic circuit simulation",
+  "pin_contract": {
+    "old": "U_SC_OV OUTA -> Q_PMOS_CTRL B unchanged; Q_PMOS_CTRL E=GND C=legacy DUMP_OFF, original 10k pullup to 12V_PROT",
+    "isolator": "12V_PROT -> 1.8k -> VO617A pin1 A, pin2 K -> legacy DUMP_OFF; VO617A pin4 C -> DUMP_OFF_HW, pin3 E -> GND_SYS",
+    "new": "TLV1811 -> Q_HW C -> DUMP_OFF_HW; 47k pullup to 12V_HW; UCC IN- = DUMP_OFF_HW, IN+ = HW_READY; PB7 software branch disconnected"
+  },
+  "bounds": {
+    "ledIfMin_mA_assumed": 5.143014301430142,
+    "ledIfMax_mA_ideal": 7.07070707070707,
+    "resistorWMax_ideal": 0.08909090909090908,
+    "newOptoSinkAt1V_mA": 0.24930152589727056,
+    "oldQbase_mA_assumed": 1.0523352335233525,
+    "highBudget47_uA": 178.6307141352433,
+    "highBudget22_uA": 381.6201620162016,
+    "externalLowSink22_mA": 0.5325987144168962
+  },
+  "assumptions": [
+    "LED VF<=1.65V and old Q VCE<=0.4V assumed at actual current, not guaranteed all-temperature; supplier points differ.",
+    "Rail 11.4–12.6V is a comparison window, not established early supply envelope.",
+    "VO617A VCEsat <=0.4V is specified at 25C, LED IF=5mA, IC=1mA; no extrapolation to full temperature or actual transients.",
+    "UCC IN- has internal pullup to VDD; external-resistor-only sink calculation omits its internal contribution. Total current bounds needed.",
+    "IN- high budget must cover Q_HW and opto leakage, UCC input net sink and wiring; no full-corner pass is established.",
+    "Supply falls, transient reverse LED voltage (6V max), backfeed, startup/restart and all leakage remain unproven.",
+    "R1 old rail is 12V_PROT, current released board calls original rail 12V_DRV; candidate cannot be identified by name alone.",
+    "Old 40.32V nominal hardware OV is later backup; new 38V hardware chain must be qualified independently.",
+    "No savings claim: LED opto and resistor added; actual full BOM/MOQ, early and HW domains unverified."
+  ]
+}

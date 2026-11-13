@@ -1,0 +1,40 @@
+{
+  "status": "ENGINEERING_ENVELOPE_NOT_UNCONDITIONAL_VENDOR_GUARANTEE",
+  "ic": "SN74LVC1G17DBVR DBV: 1 NC, 2 A, 3 GND, 4 Y, 5 VCC",
+  "values": {
+    "top_ohm": 24000,
+    "bottom_ohm": 10000,
+    "pullup_ohm": 2700,
+    "pulldown_ohm": 100000,
+    "total_tolerance": 0.015
+  },
+  "low_voltage": {
+    "hw_ready_max_v": 2.7,
+    "input_max_assuming_5uA": 0.8468622982782932,
+    "comparator_vtminus_3v_min": 0.89,
+    "margin_v": 0.043137701721706834
+  },
+  "high_voltage": {
+    "rail_assumed_min_v": 11.004,
+    "vtplus_engineering_ceiling_v": 2.74,
+    "required_hw_ready_v": 9.63808426395939,
+    "allowance_other_net_sink_A": 0.0001173972804051997,
+    "ucc_input_200kohm_typical_A": 0.00004819042131979695
+  },
+  "tps_reset": {
+    "supply_max_v": 13.2,
+    "vol_assumed_v": 0.3,
+    "total_sink_with_2_7k_A": 0.004855535815002819,
+    "total_sink_with_2_2k_A": 0.005957930318412551,
+    "tps_guarantee_A": 0.005
+  },
+  "input_at_13_2v_max_assuming_5uA": 4.00090195498146,
+  "limits": [
+    "VT+ at VCC=4.5V and VT− at VCC=3.0V are engineering envelope for VCC=3–3.6V only if monotonic; TI does not specify interpolation as guarantee.",
+    "±5µA input current is specified at VI=0 or 5.5V; using it at intermediate node is an assumption, not a vendor guarantee.",
+    "UCC 200k internal pulldown drawn in functional diagram, not maximum guaranteed input current over actual voltage/temp.",
+    "Ioff ±10µA is a VCC=0 test at VI or VO=5.5V; low VCC transitions are not certified by Ioff.",
+    "TPS guarantee VOL 0.3V at 5mA and VDD≥2.7V; CTR and shallow-dip proof separate.",
+    "Use Y to PB7 with CORE-powered GPIO; firmware loss/invalid ready prohibits new ARM and withdraws motion, while local TPS/UCC executes hard protection."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "type": "proposed full-permit ideal logic and explicit assumed counterexample; not transient simulation",
+  "inputs": "proposed full qualification contract; resistor example refers to R1 latest official netlist",
+  "checks": {
+    "logic_rows": 64,
+    "software_blocked_without_any_permit": true,
+    "hard_request_node_independent_of_lpv": true,
+    "optocoupler_high_ideal_conservative_resistors_v": 2.298940701926339,
+    "logic_high_threshold_v": 2,
+    "low_supply_example": {
+      "supply_v": 1.5,
+      "assumed_undefined_and_output_v": 1.5,
+      "assumed_vbe_v": 0.55,
+      "assumed_gain": 35,
+      "base_current_ua": 38.503850385038504,
+      "collector_current_ma": 1.3476347634763475,
+      "required_collector_current_ma": 1.1717171717171715,
+      "interpretation": "Plausibility calculation only; output and BJT behavior not guaranteed; no claim actual failure."
+    }
+  },
+  "limits": [
+    "The 64 cases evaluate only the desired DUMP_OFF request expression, not actual netlist or power flow; R1 UCC IN+=GUARD_OK and a low GUARD blocks actuation.",
+    "Guard 0 to valid, supervisor POR, reset assertion, analog switch power-up and partial rails are unmodeled.",
+    "Optocoupler VCE=0.2 V is an assumed operating point, not a CTR guarantee.",
+    "No BJT temperature/saturation, gate charge, wiring, or measured waveforms."
+  ]
+}

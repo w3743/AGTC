@@ -1,0 +1,67 @@
+{
+  "status": "conditional comparison; no claim of manufacturer maximum or physical validation",
+  "divider_assumptions": "510k top for comparison, 513k top for preferred; 0.1% plus 25ppm/K * 60K = 0.25% independent arms; ±25nA bias; ±40mV SC shunt shift; all require actual part and operating-bound verification",
+  "datasheet": "TLV6700 VIT+ 396..404mV, VIT− 387..400mV; 18/29us typical at VDD=5V and 10mV overdrive, not maximum and not guaranteed at 12V",
+  "models": "rise: constant 450.03W, 52.86mF, no dump absorption until deadline; fall: zero regeneration, 52.86mF, ideal instantaneous current V/0.779Ω until gate off, no battery clamp; electrical and thermal values assumed",
+  "foc_earliest_assumed_v": 42.5,
+  "battery_v": 37.8,
+  "cases": [
+    {
+      "rb_ohm": 5110,
+      "rise_static_latest_v": 40.979831181240165,
+      "fall_static_earliest_v": 38.76584453841851,
+      "rise_overdrive10_latest_v": 41.99287695614709,
+      "fall_overdrive10_earliest_v": 37.762779256418035,
+      "rise_window_ms": 2.5164548388327166,
+      "fall_window_us": -40.56689510407616,
+      "rise_typical_29us_multiples": 86.77430478733504,
+      "fall_typical_18us_multiples": -2.2537163946708976
+    },
+    {
+      "rb_ohm": 5100,
+      "rise_static_latest_v": 41.059288140664165,
+      "fall_static_earliest_v": 38.841200668640894,
+      "rise_overdrive10_latest_v": 42.074300671992475,
+      "fall_overdrive10_earliest_v": 37.836188199812966,
+      "rise_window_ms": 2.114448332124763,
+      "fall_window_us": 39.40324518671343,
+      "rise_typical_29us_multiples": 72.91201145257804,
+      "fall_typical_18us_multiples": 2.189069177039635
+    },
+    {
+      "rb_ohm": 5090,
+      "rise_static_latest_v": 41.1390573081802,
+      "fall_static_earliest_v": 38.91685289367752,
+      "rise_overdrive10_latest_v": 42.15604432385297,
+      "fall_overdrive10_earliest_v": 37.90988558699335,
+      "rise_window_ms": 1.710078905170856,
+      "fall_window_us": 119.5316899587045,
+      "rise_typical_29us_multiples": 58.968238109339865,
+      "fall_typical_18us_multiples": 6.6406494421502495
+    },
+    {
+      "rb_ohm": 5080,
+      "rise_static_latest_v": 41.21914052753685,
+      "fall_static_earliest_v": 38.992802962119804,
+      "rise_overdrive10_latest_v": 42.2381098011145,
+      "fall_overdrive10_earliest_v": 37.98387312136735,
+      "rise_window_ms": 1.3033279686650912,
+      "fall_window_us": 199.81906189097757,
+      "rise_typical_29us_multiples": 44.94234374707211,
+      "fall_typical_18us_multiples": 11.101058993943198
+    }
+  ],
+  "preferred_255k_plus_258k_over_5110": {
+    "rb_ohm": 5110,
+    "rise_static_latest_v": 41.21827724701216,
+    "fall_static_earliest_v": 38.991837741585684,
+    "rise_overdrive10_latest_v": 42.23722329118325,
+    "fall_overdrive10_earliest_v": 37.98293089910285,
+    "rise_window_ms": 1.307726110345356,
+    "fall_window_us": 198.79759541290386,
+    "rise_typical_29us_multiples": 45.09400380501227,
+    "fall_typical_18us_multiples": 11.044310856272437
+  },
+  "candidate": "Preferred: replace one of two 255k top arms with 258k, retaining 5.11k bottom; 258k PTN0805E2583BBT1 0.1% 25ppm/K is an identified fallback, actual other resistors TCR and supply price unverified",
+  "warning": "Rising and falling time budgets include comparator, BJT, UCC, MOSFET, filter and current dynamics; cannot independently spend full budget on each. Fall budget is an ideal capacitance example, not a battery-current guarantee. Validating final thresholds, current, actual 12V timing and FOC remote gradients is mandatory."
+}

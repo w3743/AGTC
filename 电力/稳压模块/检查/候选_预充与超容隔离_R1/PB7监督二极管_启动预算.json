@@ -1,0 +1,46 @@
+{
+  "scope": "R1 candidate, not current released board",
+  "pin_contract": {
+    "existing": "RESET1 pin15 -> GUARD_RESET_N -> 68k pullup to 3V3_SVS, 1M pulldown, U_GUARD_BUF 1G17 input; buffer powered 3V3_GUARD and output GUARD_OK -> UCC IN+",
+    "shared": "RESET2/3 pin16/17 -> SC_RAIL_OK; RESET4 pin18 -> LPV_QUAL_LOCAL; never sever existing destinations",
+    "proposal": "Q_CLAMP C=DUMP_SW_BASE E=GND B=CLAMP_B via 100k to 12V_PROT; Q_RELEASE C=CLAMP_B E=GND B=REL_B via 10k from LPV_DRV_LOCAL and 100k to GND; diode anodes REL_B, cathodes SC_RAIL_OK and LPV_QUAL_LOCAL",
+    "hardware": "Q_PMOS_CTRL C remains DUMP_OFF, but R1 UCC IN+=GUARD_OK; GUARD low prevents driver action even on hard OV"
+  },
+  "calculations": {
+    "reset1_por": {
+      "svs_v": 0.9,
+      "reset_v": 0.2,
+      "pullup_uA": 10.398098633392749,
+      "pulldown_uA": 0.19801980198019803,
+      "remaining_injection_uA": 4.799921168587449,
+      "illustrative_input_leakage_uA": 5,
+      "illustrative_total_sink_uA": 15.20007883141255,
+      "por_sink_uA": 15,
+      "warning": "5uA is an input-leakage specification at its own endpoint, not a guarantee that this exact node injects 5uA. Additional line/input leakage consumes same budget."
+    },
+    "diode_or": {
+      "reset_vol_assumption_v": 0.4,
+      "diode_vf_assumption_v": 0.24,
+      "release_base_assumption_v": 0.64,
+      "conclusion": "0.64V is not guaranteed Q_RELEASE off; 0.4V reset and 0.24V diode values belong to different current/temperature test conditions and cannot be summed as a full-temperature bound."
+    }
+  },
+  "bounds": {
+    "supervisor_por": "0.9V, 15uA, VOL<=0.2V, rising slew >=15us/V; not a falling/reset guarantee",
+    "normal_vdd_min_v": 1.8,
+    "sense_min_pulse_us": 4,
+    "release_delay_open_ct_ms": [
+      14,
+      24
+    ],
+    "ucc_von_min_v": 3.7,
+    "ucc_voff_min_v": 3.45
+  },
+  "failure_scenarios": [
+    "Startup: GUARD rail can precede filtered SVS rail; without valid reset and output state, GUARD high before qualification is not excluded by the 0.9V point.",
+    "Short dip: SENSE pulses below 4us in the specified test cannot be guaranteed detected; release delay only follows a detected reset.",
+    "GUARD remains valid high after CORE/5V loss until detection, diode and transistor propagation complete; Q_RELEASE must stay off throughout, not merely after settling.",
+    "GUARD low blocks UCC; hard OV request does not imply MOS conduction or energy absorption."
+  ],
+  "needed": "Guarantee supervisor 0-to-valid output versus both rails and slew, RESET sink including both diodes and existing loads, max diode voltage at actual current/temperature, Q_RELEASE collector leakage versus VBE and temperature, clamp sink and switching storage bounds, and detection-to-safe timing for allowed shortest dips."
+}

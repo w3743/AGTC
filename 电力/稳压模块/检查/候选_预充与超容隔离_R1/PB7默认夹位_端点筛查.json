@@ -1,0 +1,66 @@
+{
+  "description": "bounded DC endpoint/assumed-state screening; not SPICE, time-waveform, silicon failure or pass",
+  "pin": {
+    "clamp": "Q_CLAMP collector=DUMP_SW_BASE, emitter=GND_SYS, base=CLAMP_B",
+    "bias": "100k from 12V_PROT to CLAMP_B",
+    "release": "Q_RELEASE collector=CLAMP_B, emitter=GND_SYS, base via 10k from LPV_DRV_LOCAL and 100k to ground",
+    "hard": "Q_PMOS_CTRL collector=DUMP_OFF untouched; R1 UCC IN+=GUARD_OK, so real hard takeover also requires GUARD_OK valid high"
+  },
+  "hold": [
+    {
+      "early_v": 3.45,
+      "clamp_base_uA": 27.22772277227723,
+      "max_collector_uA": 343.4343434343434,
+      "forced_ratio": 12.613406795224975
+    },
+    {
+      "early_v": 3.7,
+      "clamp_base_uA": 29.7029702970297,
+      "max_collector_uA": 343.4343434343434,
+      "forced_ratio": 11.562289562289562
+    },
+    {
+      "early_v": 12.6,
+      "clamp_base_uA": 117.82178217821782,
+      "max_collector_uA": 343.4343434343434,
+      "forced_ratio": 2.9148629148629146
+    }
+  ],
+  "falseRel": {
+    "core_v": 1.5,
+    "lpv_buffer_output_assumed_v": 1.5,
+    "early_v": 12.6,
+    "release_base_uA": 72.13721372137215,
+    "release_collector_uA": 125.25252525252525,
+    "software_base_uA": 38.503850385038504,
+    "required_dump_ic_mA": 1.1717171717171715,
+    "release_forced_ratio": 1.7363094412865656,
+    "dump_required_gain": 30.43116883116883
+  },
+  "supervisor": {
+    "guard_early_3_45v": "not guaranteed regulated 3.3V; TLV760 input includes series hold diode and dropout",
+    "tlv760_dropout_max_10ma_v": 1,
+    "early_rail_v": 3.45,
+    "supervisor_por_v": 0.9,
+    "por_sink_uA": 15,
+    "por_vol_v": 0.2,
+    "pullup_example_3_3v_4k7_uA": 659.5744680851063,
+    "qual_release_delay_ms": [
+      14,
+      24
+    ],
+    "sense_pulse_us": 4
+  },
+  "thresholds": {
+    "ucc_earliest_rising_v": 3.7,
+    "ucc_earliest_falling_v": 3.45,
+    "ucc_vdd_recommended_min_v": 4.5
+  },
+  "limits": [
+    "An actual intermediate-voltage logic output is unspecified; 1.5V is one admissible assumption, not a guaranteed output.",
+    "VBE=0.7V, VCE=0.2V and 3.6V logic drive are illustrations, not all-temperature saturation guarantees.",
+    "The present MMBT5551 VCEsat data at IC=10mA/IB=1mA and 25 C cannot validate these low-current corners.",
+    "No hold diode Vf, guard load, supervisor VDD slope, reset load, clamp storage or loss sequencing guarantee is supplied.",
+    "UCC threshold does not establish actual MOS VGS, current or full functionality at 3.45–3.7V; R1 IN+=GUARD_OK must be high to permit either request."
+  ]
+}

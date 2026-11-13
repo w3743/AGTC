@@ -128,8 +128,14 @@ async function findAvailablePort() {
 
 // ─── HTTP Server (for AI to submit code via HTTP POST) ─────────────
 const httpServer = createServer(async (req, res) => {
+  // Agent HTTP calls are local, non-browser requests. The native EDA client
+  // connects over WebSocket; it does not need cross-origin HTTP execution.
+  if (req.headers.origin) {
+    res.writeHead(403);
+    res.end('Origin not allowed');
+    return;
+  }
   // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -227,7 +233,10 @@ const httpServer = createServer(async (req, res) => {
 });
 
 // ─── WebSocket Server ───────────────────────────────────────────────
-const wss = new WebSocketServer({ server: httpServer });
+const wss = new WebSocketServer({
+  server: httpServer,
+  verifyClient: ({ req }) => !req.headers.origin || req.headers.origin === 'https://client',
+});
 
 wss.on('connection', (ws, req) => {
   const clientType = req.url === '/eda' ? 'eda' : 'agent';
@@ -449,7 +458,7 @@ async function start() {
 
     const port = await findAvailablePort();
 
-    httpServer.listen(port, () => {
+    httpServer.listen(port, '127.0.0.1', () => {
       console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║         EasyEDA WebSocket Bridge Server                      ║

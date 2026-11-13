@@ -1,0 +1,63 @@
+{
+  "status": "CONDITIONAL_COMPARISON_HOLD_NOT_IMPLEMENTED",
+  "input": {
+    "healthyMaxOhm": 0.006,
+    "faultMinOhm": 0.03,
+    "prechargeMinOhm": 7.284,
+    "shuntTrueMinA": 4.3,
+    "shuntTrueMaxA": 5,
+    "nonPathCurrentMaxA": 0.005,
+    "baselineAbsMaxV": 0.005,
+    "differentialReadErrorMaxV": 0.01,
+    "sourceDisturbanceMaxV": 0.002,
+    "synchronizationErrorMaxV": 0.002,
+    "thresholdV": 0.08,
+    "pulseDurationMs": 40,
+    "inaGain": 0.2,
+    "cutoutV": 0.26,
+    "supplyMaxV": 37.8,
+    "tailMaxMs": 1
+  },
+  "outputs": {
+    "mainOrPrechargeCurrentRangeA": [
+      4.295,
+      5.005
+    ],
+    "healthyLargestDeltaReadV": 0.049030000000000004,
+    "faultSmallestDeltaReadV": 0.10932149302707138,
+    "thresholdV": 0.08,
+    "healthyMarginV": 0.030969999999999998,
+    "faultMarginV": 0.029321493027071377,
+    "differentialReadErrorAbsoluteLimitV": 0.03932149302707138,
+    "analogOutputDeltaErrorBudgetV": 0.002,
+    "openPathCurrentMaxA": 0.0356946732564525,
+    "openPathVoltageForMinimumPlatformV": 31.284779999999998,
+    "sourcePulseEnergyJ": 7.56,
+    "sourceTailEnergyJ": 0.189,
+    "mainWindowEnergyJ": 0.05205200000000001,
+    "mainTailEnergyJ": 0.189189,
+    "conservativeMainWindowPlusFullVoltageTailJ": 0.241241,
+    "prechargePowerMaxW": 0.00928061504667765,
+    "prechargePulseEnergyMaxJ": 0.00037122460186710603
+  },
+  "selfTests": {
+    "healthyBoundary": true,
+    "fault30mOhmBoundary": true,
+    "stuckAdcEvenIfDeltaZero": true,
+    "saturatedReadoutEvenIfDeltaZero": true,
+    "openMainNoCurrentPlatform": true,
+    "openCannotReachPlatform": true
+  },
+  "assumptions": [
+    "One genuine 4.3–5.0 A positive battery-shunt current pulse, 40 ms; 5 mA bounds currents outside the two modeled positive paths.",
+    "Pulse and baseline sample the same unsaturated Kelvin pair; each sample and shunt current are fresh, stable and synchronized; signed battery-minus-PACK voltage is used.",
+    "Baseline true difference <= 5 mV; 10 mV budget applies to total *change* of readout error between the two samples, not to absolute error. Both are unqualified assumptions.",
+    "A healthy path is <=6 mOhm and a fault path is >=30 mOhm during the pulse; these are comparison bounds, not vehicle ratings.",
+    "Both paths share the same Kelvin terminals; precharge resistance >=7.284 Ohm. A bypass, other power source, sensor fault, offset change, or current outside budget invalidates the result.",
+    "Before asserting the pulse, hard 5 A current limit, physical timeout, independent 0.260 V cutout and <=1 ms current cessation are prerequisites and remain unqualified.",
+    "An 80 mV threshold with these budgets separates only the modeled examples; it does not establish rated current, thermal SOA, gate health or safe permission.",
+    "6–30 mOhm is an unspecified comparison interval: a reading can be ambiguous, and acceptance there does not qualify rated operation.",
+    "A fully open main path cannot supply the required current platform while the 0.260 V hard window is valid; timeout or window loss rejects, rather than assuming a 4.3 A sample.",
+    "Source energy is a supply-side bound. Main-path bound applies only while true voltage stays <=0.260 V and assumes <=1 ms full-voltage tail; stored energy and overvoltage require separate analysis."
+  ]
+}

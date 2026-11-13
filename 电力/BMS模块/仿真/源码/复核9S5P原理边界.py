@@ -26,23 +26,26 @@ def digest(path: Path) -> str:
 
 def saved_source() -> dict:
     coverage = charge.load_json(BOARD.parent / "检查/统一审查/BMS/current-pin-net-coverage.json")
-    project = coverage["project"]
     render_readback = charge.load_json(BOARD / "检查/当前源/本轮图面与官方复核.json")
-    assert render_readback["source_bytes_unchanged"] and not render_readback["own_session_alive_after_close"]
-    assert not render_readback["netlist"]["identity_or_pin_net_differences"]
-    netlist_name = "检查/当前源/BMS-9S4P_P1_图面检查.enet"
+    project_dir = "eda工程文件/BMS-9S4P"
+    evidence_dir = "检查/主工程图面验收"
+    proof = charge.load_json(BOARD / evidence_dir / "验收.json")
+    result = proof["results"]
+    assert proof["status"] == "PASS" and result["unchanged_after_reopen"]
+    assert result["pin_and_device_attributes_match"] and result["bom_matches"]
+    netlist_name = f"{evidence_dir}/主工程.enet"
+    drc_name = f"{evidence_dir}/主工程_DRC.json"
     paths = {
-        "BMS-9S4P.eprj3": project["eprj3Sha256"],
-        "sch/Schematic1/P1.esch2": render_readback["source_sha256_after"]["sch/Schematic1/P1.esch2"],
+        **{f"{project_dir}/{name}": expected for name, expected in proof["design_file_sha256"].items()},
         "原理图准备/BOM.csv": render_readback["source_sha256_after"]["原理图准备/BOM.csv"],
-        netlist_name: render_readback["netlist"]["new_export_sha256"],
+        netlist_name: proof["exports_sha256"]["主工程.enet"],
+        drc_name: proof["exports_sha256"]["主工程_DRC.json"],
     }
     for name, expected in paths.items():
         if digest(BOARD / name) != expected:
             raise ValueError(f"Source drift: {name}")
 
     netlist = charge.load_json(BOARD / netlist_name)
-    assert netlist["projectId"] == render_readback["scope"]["uuid"]
     components = {c["props"]["Designator"]: c for c in netlist["components"].values()}
     pins = {
         ref: {number: pin["net"] for number, pin in c["pinInfoMap"].items()}
@@ -50,8 +53,8 @@ def saved_source() -> dict:
     }
     removed = {"R_PSU_MINLOAD6", "R_PSU_MINLOAD7"}
     assert set(render_readback["netlist"]["expected_removed_refs"]) == removed
-    assert len(pins) == render_readback["netlist"]["refs"] == 224
-    assert sum(map(len, pins.values())) == render_readback["netlist"]["pins"] == 736
+    assert len(pins) == result["parts"] == 224
+    assert sum(map(len, pins.values())) == result["pins"] == 736
     assert pins == {
         ref: {number: pin["net"] for number, pin in c["pinInfoMap"].items()}
         for ref, c in coverage["components"].items()
@@ -115,7 +118,7 @@ def saved_source() -> dict:
     return {
         "source_sha256": paths, "checked_refs": len(pins), "checked_pins": sum(map(len, pins.values())),
         "cad_board_purchase_refs_all_in_bom": len(pcb_bom_refs),
-        "targeted_pin_checks": required, "current_drc": render_readback["drc"],
+        "targeted_pin_checks": required, "current_drc": charge.load_json(BOARD / drc_name),
         "official_drc_rerun": True,
     }
 
