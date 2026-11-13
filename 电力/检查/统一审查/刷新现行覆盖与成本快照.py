@@ -329,10 +329,10 @@ def report_page_binding(
 
 def review_completion_status(report: dict[str, Any]) -> str:
     """Require explicit completion; a design release HOLD is a separate field."""
-    completion_values = [
-        report[key] for key in ("reviewComplete", "review_complete")
-        if isinstance(report.get(key), bool)
-    ]
+    completion_keys = ("reviewComplete", "review_complete")
+    if any(key in report and not isinstance(report[key], bool) for key in completion_keys):
+        raise ValueError("审查完成字段必须是布尔值")
+    completion_values = [report[key] for key in completion_keys if key in report]
     if len(set(completion_values)) > 1:
         raise ValueError("审查报告的reviewComplete与review_complete字段冲突")
 

@@ -112,6 +112,8 @@ class SnapshotBindingTests(unittest.TestCase):
         self.assertEqual(snapshot.review_completion_status({"reviewComplete": True, "status": "PASS_NOT_COMPLETED"}), "FAILED")
         with self.assertRaises(ValueError):
             snapshot.review_completion_status({"reviewComplete": True, "review_complete": False})
+        with self.assertRaises(ValueError):
+            snapshot.review_completion_status({"reviewComplete": True, "review_complete": "false"})
 
     def test_hash_only_report_is_not_evidence_of_review_completion(self):
         pages = self.configure_module([{}, {}, {}, {}])
