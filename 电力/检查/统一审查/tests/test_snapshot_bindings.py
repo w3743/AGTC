@@ -79,6 +79,10 @@ class SnapshotBindingTests(unittest.TestCase):
         )
         self.assertEqual(sum(len(snapshot.module_pages(item)) for item in modules.values()), 7)
 
+    def test_regulator_procurement_uses_current_selected_bom(self):
+        sources = [item for item in snapshot.BOM_SOURCES if item["module"] == "稳压模块"]
+        self.assertEqual([item["path"] for item in sources], ["稳压模块/原理图准备/选型BOM.csv"])
+
     def test_complete_multi_page_report_matches_only_each_explicit_page(self):
         self.configure_module([{}, {}, {}, {}])
         pages = snapshot.module_pages(snapshot.MODULES[0])

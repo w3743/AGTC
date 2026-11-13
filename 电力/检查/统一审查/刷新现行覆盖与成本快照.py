@@ -72,7 +72,7 @@ BOM_SOURCES: list[dict[str, Any]] = [
     {"module": "BMS模块", "path": "BMS模块/原理图准备/BOM.csv", "board_count": 1},
     {"module": "FOC驱动模块", "path": "FOC驱动模块/eda工程文件/导出/当前交付/FOC_G431_BOM.csv", "board_count": 2},
     {"module": "FOC驱动模块", "path": "FOC驱动模块/原理图准备/装配采购补充.csv", "board_count": 2},
-    {"module": "稳压模块", "path": "稳压模块/原理图准备/BOM.csv", "board_count": 1},
+    {"module": "稳压模块", "path": "稳压模块/原理图准备/选型BOM.csv", "board_count": 1},
     {"module": "水泵驱动模块", "path": "水泵驱动模块/原理图准备/BOM.csv", "board_count": 1},
 ]
 
