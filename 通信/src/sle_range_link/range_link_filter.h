@@ -34,7 +34,7 @@ void rl_filter_init(void);
 void rl_filter_reset(void);
 
 /**
- * @brief 压入一个原始距离样本，返回窗口均值。
+ * @brief 压入原始距离样本；窗口少于 3 个值时返回均值，否则返回中值。
  * @param raw_mm      原始距离 (mm)
  * @param valid_num   输出：累计有效样本数
  * @retval            滤波后距离 (mm)

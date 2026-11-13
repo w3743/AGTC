@@ -60,7 +60,7 @@ sle_range_link/
 | `SAMPLE_SUPPORT_SLE_RANGE_LINK` | n | 打开本 sample（products Kconfig 中） |
 | `SAMPLE_SUPPORT_SLE_RANGE_LINK_SERVER/_CLIENT` | SERVER | 角色二选一 |
 | `RANGE_LINK_USER_PERIOD_MS` | 5000 | client 发送用户数据周期；**周期太小会干扰 IQ 上传导致测距偏小**（实测 500ms 使 0.5m 原始值 1583→1420mm），追求精度用 5000ms |
-| `RANGE_LINK_FILTER_WIN` | 1 | server 距离滤波窗口（1=直通，使用库自身 Kalman 平滑值，与官方一致） |
+| `RANGE_LINK_FILTER_WIN` | 16 | server 距离滤波窗口；1 时输出当前被接受样本，但野值拒绝和连续超差重置仍生效。实际设备配置以生成的配置为准。 |
 | `RANGE_LINK_CALIB_MM` | 0 | 校准偏移（mm）：`d_cal = d_raw * SCALE_PM/1000 - CALIB_MM`；按官方方法填 `mean(dist_first@1m) - 1000` |
 | `RANGE_LINK_CALIB_SCALE_PM` | 1000 | 校准比例（千分比，1000=1.0）；官方方法只偏移，比例一般保持 1000 |
 | `RANGE_LINK_DIST_NOTIFY` | n | server 把距离 notify 回 client（已硬件验证可用；本工程出厂配置为 y） |
