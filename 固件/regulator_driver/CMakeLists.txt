@@ -68,6 +68,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Bsp/bsp.c
     Bsp/Src/Callback/bsp_callback.c
     Bsp/Src/Gpio/bsp_gpio.c
+    Bsp/Src/Mux/bsp_mux.c              # 抽头选通：8 路 one-hot 控制 TMUX1511（稳压板）
     Bsp/Src/Bridge/bsp_bridge.c        # 双向半桥：TIM1 CH1/CH1N 互补 + 死区（稳压板）
     Bsp/Src/Dump/bsp_dump.c            # 泄放：TIM4_CH2 单路 PWM（稳压板）
     Bsp/Src/Adc/bsp_adc.c              # ADC1 八通道 + ADC2 六通道，DMA 循环

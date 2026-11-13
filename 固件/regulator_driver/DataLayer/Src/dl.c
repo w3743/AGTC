@@ -3,6 +3,7 @@
 #include "type.h"
 #include "bsp.h"
 #include "bsp_adc.h"
+#include "dl_cell.h"
 #include "dl.h"
 
 
@@ -37,7 +38,7 @@ TYPE_RET_E dl_init
      * 返回值故意忽略：上电第一轮采样可能是 0，不代表硬件坏。 */
     (VOID)dl_bus_get_bus_mv();
     (VOID)dl_bus_get_sc_mv();
-    (VOID)dl_cell_get_test_mv();
+    dl_cell_scan();
     (VOID)dl_power_get_current_ma();
     (VOID)dl_temp_get_c(DL_TEMP_MAIN);
 

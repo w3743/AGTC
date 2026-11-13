@@ -2,6 +2,7 @@
 #include "stm32g4xx_hal.h"
 #include "type.h"
 #include "bsp_gpio.h"
+#include "bsp_mux.h"
 #include "bsp_bridge.h"
 #include "bsp_dump.h"
 #include "bsp_adc.h"
@@ -14,7 +15,7 @@ extern "C" {
 #endif
 
 /************************************宏定义****************************************************/
-/* 断开 BUS P-MOS 之前等待电感电流衰减的门限与超时。
+/* 断电后等待电感电流衰减的门限与超时。
  *
  * 门限 5000 mA 的依据：DRV8161 的输入偏移 ±1.94 mV 在 10 mV/A 下等效 ±3.88 A，
  * 也就是说"读到 0 A"其实只表示"小于 3.9 A 左右"。把门限定在 5 A，
@@ -22,9 +23,9 @@ extern "C" {
  *
  * 超时 100 ms：20 µH 电感、按几十安量级算，电流衰减到 5 A 远小于这个时间；
  * 给足余量是为了避免误判，而不是暗示正常需要这么久。 */
-#define BSP_PMOS_OFF_CURRENT_MA                                         (5000)
-#define BSP_PMOS_OFF_TIMEOUT_MS                                         (100U)
-#define BSP_PMOS_OFF_POLL_MS                                            (2U)
+#define BSP_STAGE_OFF_CURRENT_MA                                        (5000)
+#define BSP_STAGE_OFF_TIMEOUT_MS                                        (100U)
+#define BSP_STAGE_OFF_POLL_MS                                           (2U)
 
 
 /************************************函数实现**************************************************/
@@ -51,7 +52,8 @@ U32 bsp_get_tick
 *
 *              顺序按安全优先级排列，每一步都在为下一步创造条件，不能重排：
 *
-*                1. GPIO —— 最先，而且一进来就把 PMOS_CTRL 拉低、PERMIT 拉低、TEST 拉低。
+*                1. GPIO —— 最先，而且一进来就把 PERMIT 钉在“禁止”（PA9 高 → G07 拉低故障线），
+*                            并把 8 路抽头选通全部关断。
 *                            这样即使后面任何一步崩了，功率通路和泄放都是关着的。
 *                2. 半桥 —— 配 TIM1 的时基/通道/死区，计数器起跑但 MOE=0。
 *                3. 泄放 —— 配 TIM4_CH2，占空比 0，电阻不发热。
@@ -82,13 +84,14 @@ TYPE_RET_E bsp_init
     TYPE_RET_E result = TYPE_RET_SUCCESS;
 
     /* ── 1. GPIO：安全态优先 ──────────────────────────────────────────────────
-     * bsp_gpio_init() 内部已经把三根线都写成低；这里再显式写一遍，是为了让
+     * bsp_gpio_init() 内部已经把 PERMIT 钉在“禁止”；这里再显式写一遍，是为了让
      * "安全态"这件事在总入口里看得见，而不是藏在子模块里靠读者去翻。
-     * 多写两个寄存器没有成本。 */
+     * 多写一个寄存器没有成本。
+     * 抽头选通（bsp_mux_init）也放在这里：它必须早于第一次 ADC 读数，
+     * 而且上电默认全断 —— 8 路开关全开时抽头只挂自身分压，谁也短不到谁。 */
     bsp_gpio_init();
-    bsp_gpio_pmos_set(FALSE);
     bsp_gpio_permit_set(FALSE);
-    bsp_gpio_test_set(FALSE);
+    bsp_mux_init();
 
     /* ── 2. 半桥：配好并让计数器起跑，MOE 保持 0 ──────────────────────────── */
     bsp_bridge_init();
@@ -118,46 +121,40 @@ TYPE_RET_E bsp_init
 
 /********************************************************************************************
 * 函数名称 :   bsp_power_stage_enable
-* 功能描述 :   按安全顺序给整条功率通路加电 / 断电
+* 功能描述 :   按安全顺序给功率级加电 / 断电
 *
-*              ── 加电（enable = TRUE），四步，顺序不能换 ──────────────────────────
+*              ⚠️ 2026-10-30 改版后 **MCU 不再控制 BUS 串联 P-MOS**：
+*                 Q_PMOS_CTRL 改由 U_SC_OV 的 OUTA 直接驱动（硬件路径），
+*                 旧的 PMOS_CTRL(PB6) 引脚已变成 NC。所以本函数不再有“合/断 P-MOS”这一步。
+*                 这也意味着 MCU **无法**把 BUS 与半桥彻底隔离 —— 这件事现在由硬件决定。
+*
+*              ── 加电（enable = TRUE），三步 ──────────────────────────────────────
 *                1. 占空比先摆到中点（50%）—— 最温和的工作点，不是零电流，见下；
-*                2. 合上 BUS P-MOS —— 此时半桥还没开关，电感里没有电流，合闸无冲击；
-*                3. 放行 PERMIT —— 栅极驱动解除故障态，但 MOE 还是 0，仍然不开关；
-*                4. MOE = 1 —— 半桥开始按中点占空比工作。
+*                2. 放行 PERMIT —— G07 松开故障线，栅极驱动解除禁用，但 MOE 还是 0；
+*                3. MOE = 1 —— 半桥开始按中点占空比工作。
 *
 *              为什么第 1 步是 50% 而不是 0% 或 100%：
 *                0% 是下管常通（把超容经电感短到地），100% 是上管常通（把超容直接挂到
 *                BUS），两个都是危险状态。50% 位于中间，最接近"什么都不做"。
-*               但要注意：50% 只有在 V_SC ≈ V_BUS/2 时才是零电流。9S 母线 22.5–37.8 V、
+*                但要注意：50% 只有在 V_SC ≈ V_BUS/2 时才是零电流。9S 母线 22.5–37.8 V、
 *                8S 超容 0–20.4 V，平衡点随 SOC 漂移。**真正的平衡占空比要由 BL 层
 *                按两端实测电压算出来**，本函数不做这个假设。
 *
-*              为什么 P-MOS 在 MOE 之前合：
-*                P-MOS 合上只是把 BUS 接到半桥的上管漏极。MOE=0 时两个栅极都关着，
-*                开关节点是浮的，不会有电流。反过来先开关再合闸，相当于让半桥对着
-*                一个不确定的母线电压工作，第一拍就可能过流。
-*
-*              ── 断电（enable = FALSE），五步 ────────────────────────────────────
+*              ── 断电（enable = FALSE），三步 ────────────────────────────────────
 *                1. MOE = 0：先停开关，两栅极全关，电感电流走体二极管续流衰减；
-*                2. PERMIT 拉低：栅极驱动进故障态，作为第二道保险；
-*                3. 占空比回中点：给下一次加电留一个干净的起点；
-*                4. **等电感电流衰减**：轮询 DRV_SO，直到 |I| < 5 A 或超时 100 ms；
-*                5. 断开 P-MOS：只有第 4 步成功了才断，否则**故意保持合闸**并返回 TIMEOUT。
+*                2. PERMIT 拉高：G07 把故障线拉低，作为第二道保险，同时撤掉 LTC7001
+*                   对超容隔离管的许可；
+*                3. 等电流衰减：轮询 IMON，直到 |I| < 5 A 或超时 100 ms。
+*                   超时只作为告警返回，**没有**后续可断的开关了 ——
+*                   电流会在体二极管/母线上自然衰减，MCU 只能如实上报。
 *
-*              为什么第 5 步要等：
-*                电感电流不能突变。带着几十安去开 P-MOS，L di/dt 会在 Q_BUS_P 上打出
-*                远超它 100 V 额定的尖峰。宁可让 P-MOS 保持合闸（电流继续经体二极管衰减），
-*                也不要为了"看起来断干净了"去冒炸管的险。返回 TIMEUT 是让上层知道
-*                功率级没有完全隔离，别当成成功。
-*
-*              ⚠️ 第 4 步用的电流读数本身带 ±3.88 A 的偏移不确定度（见 bsp_adc.c），
+*              ⚠️ 第 3 步用的电流读数本身带 ±3.88 A 的偏移不确定度（见 bsp_adc.c），
 *                 所以这个"衰减完成"判断只是工程近似，不能当安全认证的依据。
 *
 * 输入参数 :   enable: TRUE = 加电，FALSE = 断电
 * 输出参数 :   无
 * 返回值   :   TYPE_RET_SUCCESS: 已完成
-*              TYPE_RET_TIMEOUT: 电流未衰减，P-MOS 仍保持合闸
+*              TYPE_RET_TIMEOUT: 电流未衰减到门限以下（仅告警，功率级已关 MOE）
 *********************************************************************************************/
 TYPE_RET_E bsp_power_stage_enable
 (
@@ -166,20 +163,16 @@ TYPE_RET_E bsp_power_stage_enable
 {
     U32     t0;
     S32     current_ma;
-    BOOL    decayed = FALSE;
 
     if (enable == TRUE)
     {
         /* 第 1 步：占空比摆到中点 */
         bsp_bridge_set_duty(0.0F);
 
-        /* 第 2 步：合上 BUS P-MOS（半桥还没开关，无冲击） */
-        bsp_gpio_pmos_set(TRUE);
-
-        /* 第 3 步：解除驱动故障态（MOE 仍为 0，不会立刻开关） */
+        /* 第 2 步：解除驱动禁用（MOE 仍为 0，不会立刻开关） */
         bsp_gpio_permit_set(TRUE);
 
-        /* 第 4 步：放行输出 */
+        /* 第 3 步：放行输出 */
         bsp_bridge_start();
 
         return TYPE_RET_SUCCESS;
@@ -189,39 +182,25 @@ TYPE_RET_E bsp_power_stage_enable
     /* 第 1 步：先停开关。这一步是纯硬件动作，最快也最可靠 */
     bsp_bridge_stop();
 
-    /* 第 2 步：驱动也进故障态 */
+    /* 第 2 步：驱动也进禁用态（同时撤掉超容隔离许可） */
     bsp_gpio_permit_set(FALSE);
 
-    /* 第 3 步：占空比回中点 */
-    bsp_bridge_set_duty(0.0F);
-
-    /* 第 4 步：等电感电流衰减。MOE=0 后两管全关，电流经体二极管续流，
+    /* 第 3 步：等电感电流衰减。MOE=0 后两管全关，电流经体二极管续流，
      * 在母线/超容之间自然衰减，这个等待就是让它走完。 */
     t0 = HAL_GetTick();
-    while ((HAL_GetTick() - t0) < BSP_PMOS_OFF_TIMEOUT_MS)
+    while ((HAL_GetTick() - t0) < BSP_STAGE_OFF_TIMEOUT_MS)
     {
         current_ma = bsp_adc_get_so_ma();
 
-        if ((current_ma < BSP_PMOS_OFF_CURRENT_MA) && (current_ma > -BSP_PMOS_OFF_CURRENT_MA))
+        if ((current_ma < BSP_STAGE_OFF_CURRENT_MA) && (current_ma > -BSP_STAGE_OFF_CURRENT_MA))
         {
-            decayed = TRUE;
-            break;
+            return TYPE_RET_SUCCESS;
         }
 
-        HAL_Delay(BSP_PMOS_OFF_POLL_MS);
+        HAL_Delay(BSP_STAGE_OFF_POLL_MS);
     }
 
-    if (decayed != TRUE)
-    {
-        /* 电流没下来：**不**断 P-MOS。让电流继续经体二极管走，
-         * 上层需要在告警后继续观察，而不是强行隔离。 */
-        return TYPE_RET_TIMEOUT;
-    }
-
-    /* 第 5 步：电流已衰减，可以安全断开 */
-    bsp_gpio_pmos_set(FALSE);
-
-    return TYPE_RET_SUCCESS;
+    return TYPE_RET_TIMEOUT;
 }
 
 #ifdef _cplusplus

@@ -21,9 +21,6 @@ extern "C" {
 #define BSP_GPIO_CAN_STB_PORT                                           (BSP_BOARD_CAN_STB_PORT)
 #define BSP_GPIO_CAN_STB_PIN                                            (BSP_BOARD_CAN_STB_PIN)
 
-#define BSP_GPIO_THERM_OK_PORT                                          (BSP_BOARD_DUMP_THERM_OK_PORT)
-#define BSP_GPIO_THERM_OK_PIN                                           (BSP_BOARD_DUMP_THERM_OK_PIN)
-
 /* BREAK_N 由 bsp_inverter 配成 AF 复用输入；本模块只读 IDR，不改它的模式。 */
 #define BSP_GPIO_BREAK_N_PORT                                           (BSP_BOARD_INV_BKIN_PORT)
 #define BSP_GPIO_BREAK_N_PIN                                            (BSP_BOARD_INV_BKIN_PIN)
@@ -80,14 +77,8 @@ VOID bsp_gpio_init
     gpio_init.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(BSP_GPIO_CAN_STB_PORT, &gpio_init);
 
-    /* DUMP_THERM_OK：普通输入。
-     * 信号从比较器 U4 的推挽输出出来，经 100k 串联到 MCU，属于"慢边沿"信号，
-     * 这里不加内部上/下拉：加了只会和比较器对着拉，反而让电平不确定。
-     * 100k 串联的作用是限流保护，不影响读取（输入电流只有 nA 级）。 */
-    gpio_init.Pin  = BSP_GPIO_THERM_OK_PIN;
-    gpio_init.Mode = GPIO_MODE_INPUT;
-    gpio_init.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(BSP_GPIO_THERM_OK_PORT, &gpio_init);
+    /* DUMP_THERM_OK（PB9 / J_MCU_L.24）已于 2026-10-30 随本地泄放电路一并删除，
+     * 网表标 NC，这里不再初始化该脚。 */
 
     /* BREAK_N（PB12）故意不在这里初始化：
      * 它要作为 TIM1_BKIN 复用输入，AF 配置归 bsp_inverter 管，两处都配会互相覆盖。
@@ -133,24 +124,6 @@ VOID bsp_gpio_can_set_stb
 {
     HAL_GPIO_WritePin(BSP_GPIO_CAN_STB_PORT, BSP_GPIO_CAN_STB_PIN,
                       (level == TRUE) ? GPIO_PIN_SET : GPIO_PIN_RESET);
-}
-
-/********************************************************************************************
-* 函数名称 :   bsp_gpio_get_dump_therm_ok
-* 功能描述 :   读泄放电阻的热许可信号
-*               本板没有能耗散母线回馈能量的负载，多余能量靠 Q7 + R_DUMP_A/B 烧掉；
-*               这个脚告诉 MCU "现在允许烧"，比较器判据由 R_THERM_TOP/BOT 分压决定。
-* 输入参数 :   无
-* 输出参数 :   无
-* 返回值   :   TRUE = 允许泄放，FALSE = 不允许
-*********************************************************************************************/
-BOOL bsp_gpio_get_dump_therm_ok
-(
-    VOID
-)
-{
-    return (HAL_GPIO_ReadPin(BSP_GPIO_THERM_OK_PORT, BSP_GPIO_THERM_OK_PIN) == GPIO_PIN_SET)
-           ? TRUE : FALSE;
 }
 
 /********************************************************************************************

@@ -2,6 +2,7 @@
 #include "type.h"
 #include "bsp_adc.h"
 #include "dl_bus.h"
+#include "dl_cell.h"
 
 
 #ifdef _cplusplus
@@ -46,11 +47,11 @@ U32 dl_bus_get_bus_mv
 * 函数名称 :   dl_bus_get_sc_mv
 * 功能描述 :   超容总压（mV）
 *
-*               链路：SC+ → R_T8_HI 68k / R_T8_LO 10k → PB14（ADC1_IN5）→ ×7.8
+*               2026-10-30 改版后**没有独立的总压通道**：SC+ 就是第 8 节抽头 T8，
+*               经 U_CELL_MUX2 选通到 SC_ADC_B。所以这里直接取 dl_cell 的 T8 缓存。
 *
-*               ⚠️ 7.8 不是整数，必须走浮点。这里先乘再除，避免 pin_mv×(78/10) 的整数截断。
-*               ⚠️ 这个通道和 AD_T8 是同一个 ADC 读数，不是两条独立路径。
-*                  所以"8 节之和 ≈ 总压"是望远镜恒等式，不构成交叉校验。
+*               ⚠️ 14.6 倍分压是“选通后”的比值（68k 对 10k∥10k），换算在 dl_cell.c 统一做，
+*                  本函数不再自己乘系数 —— 否则两处系数一改一漏，就会出现 1.87 倍的静默偏差。
 *               ⚠️ 更根本的问题：这个值相对 GND_SYS，而超容负极不是 GND_SYS。
 *                  真正的超容总压应该减掉 SC− 的电位，见 dl_cell.h 顶部的说明。
 *
@@ -63,16 +64,14 @@ U32 dl_bus_get_sc_mv
     VOID
 )
 {
-    U16 raw;
-    U32 pin_mv;
-    F32 total;
+    /* 还没扫过就先扫一轮：调用者可能是控制环，不能让它拿到恒 0 的反馈。
+     * 一轮约 2.3 ms，只在第一次调用时发生。 */
+    if (dl_cell_is_scanned() != TRUE)
+    {
+        dl_cell_scan();
+    }
 
-    raw    = bsp_adc_get_raw(1U, BSP_ADC1_IDX_T8);
-    pin_mv = bsp_adc_raw_to_mv(raw);
-
-    total = (F32)pin_mv * DL_SC_RATIO;
-
-    return (U32)(total + 0.5F);
+    return dl_cell_get_tap_mv(DL_CELL_NUM);
 }
 
 #ifdef _cplusplus
