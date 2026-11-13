@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Refresh mechanical source bindings for the four active power schematics.
+"""Refresh mechanical source bindings for the four active power projects.
 
 Read-only by default. Pass --review-report MODULE=PATH for each final module
 review and --write only after those reports have been finalized. This script
@@ -31,27 +31,40 @@ SUPPLEMENT_PATH = POWER / "元件封装库" / "整车器件补充.json"
 MODULES: list[dict[str, Any]] = [
     {
         "module": "BMS模块",
-        "project": "BMS模块/BMS-9S4P.eprj3",
-        "page": "BMS模块/sch/Schematic1/P1.esch2",
-        "sheet_id": "350a4904c4ec87b3",
+        "project": "BMS模块/eda工程文件/BMS-9S4P/BMS-9S4P.eprj3",
+        "pages": [{
+            "path": "BMS模块/eda工程文件/BMS-9S4P/sch/Schematic1/P1.esch2",
+            # Historical BMS audits used paths relative to the old project root.
+            # These aliases still require an exact current SHA match.
+            "report_path_aliases": [
+                "BMS-9S4P/sch/Schematic1/P1.esch2",
+                "sch/Schematic1/P1.esch2",
+            ],
+        }],
     },
     {
         "module": "FOC驱动模块",
         "project": "FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3",
-        "page": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
-        "sheet_id": "90aa6c46493624cf",
+        "pages": [{
+            "path": "FOC驱动模块/eda工程文件/FOC_G431_Driver/sch/Schematic1/P1.esch2",
+        }],
     },
     {
         "module": "稳压模块",
         "project": "稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3",
-        "page": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 稳压模块全部电路.esch2",
-        "sheet_id": "9546dca0bc8bce7f",
+        "pages": [
+            {"path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/01 主功率与超容.esch2"},
+            {"path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/02 门极驱动与硬保护.esch2"},
+            {"path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/03 模拟采样.esch2"},
+            {"path": "稳压模块/eda工程文件/sc-regulator/sch/sc-regulator/04 控制通信与辅助供电.esch2"},
+        ],
     },
     {
         "module": "水泵驱动模块",
         "project": "水泵驱动模块/eda工程文件/水泵驱动/水泵驱动.eprj3",
-        "page": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
-        "sheet_id": "bafe8a48e4625018",
+        "pages": [{
+            "path": "水泵驱动模块/eda工程文件/水泵驱动/sch/Schematic1/P1.esch2",
+        }],
     },
 ]
 
@@ -147,6 +160,36 @@ def matching_source_entry(entries: list[dict[str, Any]], path: str) -> dict[str,
     return matches[0] if matches else None
 
 
+def module_pages(item: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return configured current pages, accepting the prior single-page shape."""
+    pages = item.get("pages")
+    if pages is None:
+        page = item.get("page")
+        pages = [{"path": page, "sheet_id": item.get("sheet_id")}] if page else []
+    if not isinstance(pages, list) or not pages:
+        raise ValueError(f"模块必须配置至少一个当前原理图页：{item.get('module')}")
+    if any(not isinstance(page, dict) or not isinstance(page.get("path"), str) for page in pages):
+        raise ValueError(f"当前原理图页必须是包含path的对象：{item.get('module')}")
+    paths = [page["path"].replace("\\", "/").casefold() for page in pages]
+    if len(paths) != len(set(paths)):
+        raise ValueError(f"模块的当前原理图页路径重复：{item.get('module')}")
+    project_path = item.get("project", "").replace("\\", "/")
+    project_dir = project_path.rsplit("/", 1)[0] if "/" in project_path else ""
+    normalized_pages = []
+    for page in pages:
+        aliases = page.get("report_path_aliases", [])
+        if not isinstance(aliases, list) or any(not isinstance(alias, str) for alias in aliases):
+            raise ValueError(f"report_path_aliases必须是字符串列表：{item.get('module')}")
+        aliases = list(aliases)
+        page_path = page["path"].replace("\\", "/")
+        if project_dir and page_path.startswith(project_dir + "/"):
+            project_relative_path = page_path[len(project_dir) + 1:]
+            if project_relative_path not in aliases:
+                aliases.append(project_relative_path)
+        normalized_pages.append({**page, "report_path_aliases": aliases})
+    return normalized_pages
+
+
 def rebuild_incomplete_identity(index: dict[str, Any], procurement: dict[str, Any]) -> dict[str, Any]:
     records_by_native: dict[str, list[dict[str, Any]]] = {}
     for record in procurement.get("records", []):
@@ -224,12 +267,23 @@ def rebuild_board_scope(index: dict[str, Any], procurement: dict[str, Any], fres
     return scope
 
 
-def report_page_binding(report: Any, page_rel: str) -> str | None:
-    """Return an explicitly recorded SHA for the page, if the report exposes one."""
-    normalized_page = page_rel.replace("\\", "/")
-    candidates = {normalized_page.casefold(), ("电力/" + normalized_page).casefold()}
-    if "/" in normalized_page:
-        candidates.add(normalized_page.split("/", 1)[1].casefold())
+def report_page_binding(
+    report: Any, page_rel: str, page_aliases: tuple[str, ...] | list[str] = (),
+) -> str | None:
+    """Return a page SHA only when a current report section names that page."""
+    def normalize(value: str) -> str:
+        normalized = re.sub(r"/+", "/", value.replace("\\", "/").strip()).casefold()
+        while normalized.startswith("./"):
+            normalized = normalized[2:]
+        return normalized.rstrip("/")
+
+    page_path = normalize(page_rel)
+    candidates = {page_path, normalize("電力/" + page_rel)}
+    candidates.update(normalize(alias) for alias in page_aliases if alias)
+
+    def path_matches(value: str) -> bool:
+        normalized = normalize(value)
+        return any(normalized == candidate or normalized.endswith("/" + candidate) for candidate in candidates)
 
     def walk(value: Any, parent_key: str = ""):
         if isinstance(value, dict):
@@ -239,47 +293,91 @@ def report_page_binding(report: Any, page_rel: str) -> str | None:
             )
             hash_value = (value.get("schematic_sha256") or value.get("sha256")
                           or value.get("sourceSha256") or value.get("nativeSha256"))
-            if isinstance(path_value, str) and isinstance(hash_value, str):
-                normalized = path_value.replace("\\", "/").casefold()
-                if any(normalized.endswith(candidate) for candidate in candidates):
-                    yield hash_value.lower()
-            page_sha = value.get("page_sha256") or value.get("p1_sha256")
-            if isinstance(page_sha, str) and parent_key.casefold() in {
-                "native_source", "current_native_source", "source_binding", "schematic_source"
-            }:
-                yield page_sha.lower()
+            if isinstance(path_value, str) and isinstance(hash_value, str) and path_matches(path_value):
+                yield hash_value.lower()
+
+            # Some read-only audits store {relative_path: sha256} maps. Treat
+            # these as current only when the audit also proves the source was
+            # unchanged during the review; *_before alone is historical evidence.
+            if parent_key.casefold() in {"source_sha256_before", "source_sha256_after"}:
+                for path, digest in value.items():
+                    if isinstance(path, str) and isinstance(digest, str) and path_matches(path):
+                        yield digest.lower()
             for key, child in value.items():
                 yield from walk(child, key)
         elif isinstance(value, list):
             for child in value:
                 yield from walk(child, parent_key)
 
-    # Final reports retain before/after proofs as historical evidence. Prefer
-    # explicit current-source sections; still reject conflicts between them.
     current_sections = (
         "sourceFiles", "sourceBinding", "source_binding", "native_source",
         "current_native_source", "schematic_source", "source",
     )
-    hashes = set()
+    hashes: set[str] = set()
     if isinstance(report, dict):
         for key in current_sections:
             if isinstance(report.get(key), (dict, list)):
                 hashes.update(walk(report[key], key))
-    if not hashes:
-        hashes = set(walk(report))
+        if report.get("source_bytes_unchanged") is True:
+            for key in ("source_sha256_before", "source_sha256_after"):
+                if isinstance(report.get(key), dict):
+                    hashes.update(walk(report[key], key))
     if len(hashes) > 1:
-        raise ValueError(f"报告对同一P1记录多个不同SHA：{page_rel}: {sorted(hashes)}")
+        raise ValueError(f"报告对同一原理图页记录多个不同SHA：{page_rel}: {sorted(hashes)}")
     return next(iter(hashes), None)
 
 
-def review_record(module: str, report_path: Path, page_rel: str, page_sha: str) -> dict[str, Any]:
+def review_completion_status(report: dict[str, Any]) -> str:
+    """Require explicit completion; a design release HOLD is a separate field."""
+    completion_values = [
+        report[key] for key in ("reviewComplete", "review_complete")
+        if isinstance(report.get(key), bool)
+    ]
+    if len(set(completion_values)) > 1:
+        raise ValueError("审查报告的reviewComplete与review_complete字段冲突")
+
+    raw_status = report.get("status")
+    status = raw_status.strip().upper() if isinstance(raw_status, str) else ""
+    failed_status = bool(re.search(
+        r"(?:^|_)(?:FAIL(?:ED)?|ERROR|NOT_COMPLETE(?:D)?|INCOMPLETE|PENDING|PARTIAL|UNVERIFIED)(?:_|$)",
+        status,
+    ))
+    if failed_status:
+        return "FAILED"
+    if completion_values and all(completion_values):
+        return "COMPLETE"
+    if completion_values and not any(completion_values):
+        return "INCOMPLETE"
+    return "NOT_EXPOSED"
+
+
+def review_record(module: str, report_path: Path, pages: list[dict[str, Any]]) -> dict[str, Any]:
     data = read_json(report_path)
     if not isinstance(data, dict):
         raise ValueError(f"审查报告顶层必须是JSON对象：{report_path}")
-    recorded_sha = report_page_binding(data, page_rel)
-    binding_status = "NOT_EXPOSED_IN_REPORT"
-    if recorded_sha is not None:
-        binding_status = "MATCH" if recorded_sha == page_sha.lower() else "MISMATCH"
+    page_bindings = []
+    for page in pages:
+        recorded_sha = report_page_binding(
+            data, page["path"], page.get("report_path_aliases", []),
+        )
+        current_sha = page["sha256"].lower()
+        binding_status = (
+            "NOT_EXPOSED_IN_REPORT" if recorded_sha is None
+            else "MATCH" if recorded_sha == current_sha
+            else "MISMATCH"
+        )
+        page_bindings.append({
+            "path": page["path"],
+            "current_sha256": current_sha,
+            "report_recorded_sha256": recorded_sha,
+            "status": binding_status,
+        })
+    statuses = {entry["status"] for entry in page_bindings}
+    binding_status = (
+        "MISMATCH" if "MISMATCH" in statuses
+        else "MATCH" if statuses == {"MATCH"}
+        else "NOT_EXPOSED_IN_REPORT"
+    )
     summary = data.get("summary")
     if isinstance(summary, dict):
         summary_out = summary
@@ -287,17 +385,22 @@ def review_record(module: str, report_path: Path, page_rel: str, page_sha: str) 
         summary_out = summary
     else:
         summary_out = str(summary)
+    completion_status = review_completion_status(data)
     return {
         "report_path": rel_path(report_path),
         "report_sha256": sha256(report_path),
         "report_title": data.get("title"),
         "review_date": data.get("review_date") or data.get("asOf") or data.get("date"),
         "review_complete": data.get("reviewComplete", data.get("review_complete")),
+        "review_completion_status": completion_status,
         "design_release": data.get("designRelease") or data.get("design_release"),
         "status": data.get("status"),
         "summary": summary_out,
         "page_binding_status": binding_status,
-        "report_recorded_page_sha256": recorded_sha,
+        "page_bindings": page_bindings,
+        "report_recorded_page_sha256": (
+            page_bindings[0]["report_recorded_sha256"] if len(page_bindings) == 1 else None
+        ),
         "full_schematic_review_present": isinstance(data.get("full_schematic_review"), dict),
         "review_findings_count": len(data.get("findings", [])) if isinstance(data.get("findings"), list) else None,
     }
@@ -317,51 +420,81 @@ def load_review_args(items: list[str]) -> dict[str, str]:
 
 def build_coverage(reviews: dict[str, str]) -> dict[str, Any]:
     entries = []
-    missing_reviews = []
+    unresolved_reviews = []
+    completion_unresolved = []
     mismatches = []
+    current_page_count = 0
     for item in MODULES:
         project_path = POWER / item["project"]
-        page_path = POWER / item["page"]
-        for source in (project_path, page_path):
-            if not source.is_file():
-                raise FileNotFoundError(source)
-        page_sha = sha256(page_path)
+        configured_pages = module_pages(item)
+        pages = []
+        for configured_page in configured_pages:
+            page_path = POWER / configured_page["path"]
+            if not page_path.is_file():
+                raise FileNotFoundError(page_path)
+            pages.append({
+                **configured_page,
+                "sha256": sha256(page_path),
+            })
+        current_page_count += len(pages)
+        if not project_path.is_file():
+            raise FileNotFoundError(project_path)
+        project_sha = sha256(project_path)
         review_rel = reviews.get(item["module"])
         review = None
         if not review_rel:
-            missing_reviews.append(item["module"])
+            unresolved_reviews.append(item["module"])
+            completion_unresolved.append(item["module"])
         else:
             review_path = POWER / review_rel
             if not review_path.is_file():
-                missing_reviews.append(item["module"])
+                unresolved_reviews.append(item["module"])
+                completion_unresolved.append(item["module"])
             else:
-                review = review_record(item["module"], review_path, item["page"], page_sha)
+                review = review_record(item["module"], review_path, pages)
                 if review["page_binding_status"] == "MISMATCH":
                     mismatches.append(item["module"])
-        entries.append({
+                if review["review_completion_status"] != "COMPLETE":
+                    completion_unresolved.append(item["module"])
+                if (review["page_binding_status"] != "MATCH"
+                        or review["review_completion_status"] != "COMPLETE"):
+                    unresolved_reviews.append(item["module"])
+        entry = {
             "module": item["module"],
             "project_path": item["project"],
-            "project_sha256": sha256(project_path),
-            "page_path": item["page"],
-            "page_sha256": page_sha,
-            "sheet_id": item["sheet_id"],
+            "project_sha256": project_sha,
+            "page_count": len(pages),
+            "pages": [
+                {"path": page["path"], "sha256": page["sha256"], **(
+                    {"sheet_id": page["sheet_id"]} if page.get("sheet_id") else {}
+                )}
+                for page in pages
+            ],
             "review": review,
-        })
+        }
+        # Keep the historical singular fields available for one-page modules.
+        if len(pages) == 1:
+            entry["page_path"] = pages[0]["path"]
+            entry["page_sha256"] = pages[0]["sha256"]
+            if pages[0].get("sheet_id"):
+                entry["sheet_id"] = pages[0]["sheet_id"]
+        entries.append(entry)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "title": "四个当前电力原理图审查覆盖",
         "as_of": date.today().isoformat(),
-        "scope": "四个当前EPRJ3工程及各自唯一现行原理图页；不含检查备份、归档、开源参考和仿真示例。",
+        "scope": f"四个当前EPRJ3工程及其{current_page_count}个现行原理图页；不含检查备份、归档、开源参考和仿真示例。",
         "module_count": len(entries),
         "active_project_count": len(entries),
-        "current_page_count": len(entries),
-        "review_evidence_complete": not missing_reviews,
-        "all_review_page_bindings_match": not missing_reviews and all(
+        "current_page_count": current_page_count,
+        "review_evidence_complete": not unresolved_reviews,
+        "all_review_page_bindings_match": all(
             entry["review"] is not None and entry["review"]["page_binding_status"] == "MATCH"
             for entry in entries
         ),
         "overall_release": "本覆盖索引不授予设计放行；各模块按其审查结论与未闭合事项执行。",
-        "missing_or_unresolved_review_modules": missing_reviews,
+        "missing_or_unresolved_review_modules": sorted(set(unresolved_reviews)),
+        "review_completion_unresolved_modules": sorted(set(completion_unresolved)),
         "source_binding_mismatches": mismatches,
         "modules": entries,
     }
@@ -458,28 +591,35 @@ def refresh_cost(coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
     current_pages = []
     page_differences = []
     for item in MODULES:
-        page_path = POWER / item["page"]
-        page_sha = sha256(page_path)
-        indexed_source = next((entry for entry in index_sources if entry.get("module") == item["module"]), None)
-        indexed_sha = indexed_source.get("sha256") if indexed_source else None
-        matches_index = indexed_sha == page_sha
-        if not matches_index:
-            page_differences.append(item["module"])
-        current_pages.append({
-            "module": item["module"],
-            "path": item["page"],
-            "sha256": page_sha,
-            "index_sha256": indexed_sha,
-            "matches": matches_index,
-            "index_status": "MATCHES_CURRENT_CENTRAL_INDEX" if matches_index else "STALE_PENDING_CENTRAL_SYNC",
-        })
+        configured_pages = module_pages(item)
+        module_sources = [entry for entry in index_sources if entry.get("module") == item["module"]]
+        for page in configured_pages:
+            page_path = POWER / page["path"]
+            page_sha = sha256(page_path)
+            indexed_source = matching_source_entry(index_sources, page["path"])
+            # Preserve the prior module-only lookup for one-page boards. Never
+            # reuse one module hash across several current pages.
+            if indexed_source is None and len(configured_pages) == 1 and len(module_sources) == 1:
+                indexed_source = module_sources[0]
+            indexed_sha = indexed_source.get("sha256") if indexed_source else None
+            matches_index = indexed_sha == page_sha
+            if not matches_index:
+                page_differences.append(page["path"])
+            current_pages.append({
+                "module": item["module"],
+                "path": page["path"],
+                "sha256": page_sha,
+                "index_sha256": indexed_sha,
+                "matches": matches_index,
+                "index_status": "MATCHES_CURRENT_CENTRAL_INDEX" if matches_index else "STALE_PENDING_CENTRAL_SYNC",
+            })
 
     procurement_differences = [entry["path"] for entry in local_bom_sources if not entry["matches_procurement_index"]]
     sync_evidence_sources = sync_evidence.get("sources", []) if isinstance(sync_evidence, dict) else []
     sync_source_checks = []
-    for item in MODULES:
-        current_page_sha = sha256(POWER / item["page"])
-        source_entry = matching_source_entry(sync_evidence_sources, item["page"])
+    for current_page in current_pages:
+        current_page_sha = current_page["sha256"]
+        source_entry = matching_source_entry(sync_evidence_sources, current_page["path"])
         sync_source_checks.append(bool(
             source_entry
             and source_entry.get("sha256") == current_page_sha
@@ -505,7 +645,7 @@ def refresh_cost(coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, An
     )
     sync_evidence_matches = (
         sync_evidence.get("config_sha256") == source_config_sha
-        and len(sync_source_checks) == len(MODULES)
+        and len(sync_source_checks) == len(current_pages)
         and all(sync_source_checks)
     )
     sync_proof_matches = bool(
@@ -663,13 +803,19 @@ def main() -> int:
     cost, summary = refresh_cost(coverage)
     if args.write:
         if not coverage["review_evidence_complete"]:
-            raise ValueError(f"缺少最终模块审查JSON，拒绝落盘：{coverage['missing_or_unresolved_review_modules']}")
+            raise ValueError(
+                "每份审查报告都须显式标记reviewComplete=true并绑定全部当前页面SHA；拒绝落盘："
+                f"未解决模块={coverage['missing_or_unresolved_review_modules']}；"
+                f"未确认完成模块={coverage['review_completion_unresolved_modules']}"
+            )
         nonmatching = [
             entry["module"] for entry in coverage["modules"]
-            if not entry["review"] or entry["review"]["page_binding_status"] != "MATCH"
+            if not entry["review"]
+            or entry["review"]["page_binding_status"] != "MATCH"
+            or entry["review"]["review_completion_status"] != "COMPLETE"
         ]
         if nonmatching:
-            raise ValueError(f"每份报告均须明确绑定当前P1 SHA并匹配；缺失或不匹配：{nonmatching}")
+            raise ValueError(f"每份报告均须明确完成审查并绑定全部当前页面SHA；缺失、不完整或不匹配：{nonmatching}")
         write_json_atomic(COVERAGE_PATH, coverage)
         write_json_atomic(COST_PATH, cost)
     print(json.dumps({
@@ -677,6 +823,7 @@ def main() -> int:
         "coverage_output": rel_path(COVERAGE_PATH),
         "cost_output": rel_path(COST_PATH),
         "missing_or_unresolved_review_modules": coverage["missing_or_unresolved_review_modules"],
+        "review_completion_unresolved_modules": coverage["review_completion_unresolved_modules"],
         "source_binding_mismatches": coverage["source_binding_mismatches"],
         "all_review_page_bindings_match": coverage["all_review_page_bindings_match"],
         "summary": summary,
