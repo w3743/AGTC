@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="native_rover18">
+  <option timestep="0.001" gravity="0 0 -9.81" iterations="40" ls_iterations="8" solver="Newton" cone="pyramidal" impratio="1" integrator="implicitfast" />
+  <default>
+    <geom rgba="0.6 0.6 0.6 1" />
+  </default>
+  <worldbody>
+    <geom name="ground" type="plane" size="200 200 0.1" rgba="1 1 1 1" friction="0.8 0.005 0.0001" contype="1" conaffinity="1" material="ground_tiles" />
+    <body name="base" pos="0 0 0.15">
+      <freejoint name="base_free" />
+      <geom name="chassis" type="box" size="0.4 0.15 0.075" mass="26.4" />
+      <body name="gimbal_yaw_link" pos="0 0 0.25">
+        <joint name="gimbal_yaw_joint" type="hinge" axis="0 0 1" range="-3.141592653589793 3.141592653589793" damping="0.1" />
+        <geom name="gimbal_yaw_geom" type="box" size="0.03 0.03 0.02" mass="0.05" />
+        <body name="gimbal_pitch_link" pos="0 0 0">
+          <joint name="gimbal_pitch_joint" type="hinge" axis="0 1 0" range="-0.4363323129985824 1.0471975511965976" damping="0.1" />
+          <geom name="gimbal_pitch_geom" type="box" size="0.02 0.02 0.02" mass="0.05" />
+        </body>
+      </body>
+      <body name="left_wheel_0_link" pos="-0.297500 0.205000 -0.105">
+        <joint name="left_wheel_0_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_0_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_1_link" pos="-0.198333 0.205000 -0.105">
+        <joint name="left_wheel_1_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_1_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_2_link" pos="-0.099167 0.205000 -0.105">
+        <joint name="left_wheel_2_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_2_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_3_link" pos="0.000000 0.205000 -0.105">
+        <joint name="left_wheel_3_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_3_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_4_link" pos="0.099167 0.205000 -0.105">
+        <joint name="left_wheel_4_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_4_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_5_link" pos="0.198333 0.205000 -0.105">
+        <joint name="left_wheel_5_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_5_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_wheel_6_link" pos="0.297500 0.205000 -0.105">
+        <joint name="left_wheel_6_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_wheel_6_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="left_front_guide_link" pos="0.420000 0.205000 -0.055000">
+        <joint name="left_front_guide_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="left_front_guide_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction="0.8 0.005 0.0001" contype="1" conaffinity="1" />
+      </body>
+      <body name="right_wheel_0_link" pos="-0.297500 -0.205000 -0.105">
+        <joint name="right_wheel_0_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_0_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_1_link" pos="-0.198333 -0.205000 -0.105">
+        <joint name="right_wheel_1_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_1_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_2_link" pos="-0.099167 -0.205000 -0.105">
+        <joint name="right_wheel_2_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_2_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_3_link" pos="0.000000 -0.205000 -0.105">
+        <joint name="right_wheel_3_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_3_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_4_link" pos="0.099167 -0.205000 -0.105">
+        <joint name="right_wheel_4_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_4_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_5_link" pos="0.198333 -0.205000 -0.105">
+        <joint name="right_wheel_5_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_5_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_wheel_6_link" pos="0.297500 -0.205000 -0.105">
+        <joint name="right_wheel_6_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_wheel_6_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction=".06 .001 .0001" contype="1" conaffinity="1" priority="1" />
+      </body>
+      <body name="right_front_guide_link" pos="0.420000 -0.205000 -0.055000">
+        <joint name="right_front_guide_wheel_joint" type="hinge" axis="0 1 0" damping="0.2" limited="false" />
+        <geom name="right_front_guide_geom" type="cylinder" size="0.045 0.03" mass="0.25" quat="0.70710678 0.70710678 0 0" friction="0.8 0.005 0.0001" contype="1" conaffinity="1" />
+      </body>
+      <camera name="left" pos="0.38 0.0481432815 0.3" xyaxes="0 -1 0 0 0 1" fovy="65" />
+      <camera name="right" pos="0.38 -0.0481432815 0.3" xyaxes="0 -1 0 0 0 1" fovy="65" />
+    </body>
+  </worldbody>
+  <equality>
+    <joint joint1="left_wheel_1_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_wheel_2_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_wheel_3_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_wheel_4_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_wheel_5_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_wheel_6_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="left_front_guide_wheel_joint" joint2="left_wheel_0_wheel_joint" polycoef="0 1.000000 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_1_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_2_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_3_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_4_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_5_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_wheel_6_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+    <joint joint1="right_front_guide_wheel_joint" joint2="right_wheel_0_wheel_joint" polycoef="0 1.000000 0 0 0" solref="0.004 1" solimp="0.999 0.9999 0.001 0.5 2" />
+  </equality>
+  <actuator>
+    <motor joint="left_wheel_0_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_1_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_2_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_3_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_4_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_5_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="left_wheel_6_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_0_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_1_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_2_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_3_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_4_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_5_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <motor joint="right_wheel_6_wheel_joint" gear="1" ctrlrange="-2.0 2.0" />
+    <position joint="gimbal_yaw_joint" kp="1" kv="0.1" ctrlrange="-3.141592653589793 3.141592653589793" forcerange="-1 1" />
+    <position joint="gimbal_pitch_joint" kp="1" kv="0.1" ctrlrange="-0.4363323129985824 1.0471975511965976" forcerange="-1 1" />
+  </actuator>
+  <visual>
+    <headlight active="0" />
+    <map znear=".002" />
+  </visual>
+  <asset>
+    <texture name="tiles" type="2d" builtin="checker" width="128" height="128" rgb1=".16 .20 .23" rgb2=".23 .27 .29" />
+    <material name="ground_tiles" texture="tiles" texrepeat="100 100" emission=".75" />
+    <material name="obstacle" emission=".85" specular="0" />
+  </asset>
+</mujoco>
