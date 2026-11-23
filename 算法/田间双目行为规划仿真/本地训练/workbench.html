@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AGTC · 本地训练工作台</title>
+  <link rel="stylesheet" href="/workbench.css">
+  <script defer src="/workbench.js"></script>
+</head>
+<body>
+  <header>
+    <div><div class="brand">AGTC NATIVE / 双目越野</div><h1>本地训练工作台</h1></div>
+    <div class="head-right"><span id="status" role="status">正在连接</span><button id="showLive">查看实时仿真 ↓</button></div>
+  </header>
+  <main>
+    <div class="summary">
+      <div><span>训练设备</span><b id="backend">待探测</b></div>
+      <div><span>训练阶段</span><b id="stage">—</b></div>
+      <div><span>完成轮数</span><b id="count">—</b></div>
+      <div><span>仿真画面权重</span><b id="weights">基线模型</b></div>
+    </div>
+    <div class="grid">
+      <section class="card">
+        <h2>继续训练</h2>
+        <p>从随项目交付的基线权重续训。优先选择通过训练探针的 NPU、GPU，再使用 CPU。</p>
+        <p><strong>训练双目：</strong>每眼 3840×2160 · 30 FPS（仿真时间），1024×576 双目匹配。</p>
+        <p id="captureReport"></p>
+        <form id="form">
+          <fieldset id="inputs">
+            <label>地形网络轮数<input name="terrain" value="12" type="number" min="1" max="200" required></label>
+            <label>局部神经元轮数<input name="local" value="8" type="number" min="1" max="200" required></label>
+            <label>RNN 记忆轮数<input name="memory" value="8" type="number" min="1" max="200" required></label>
+            <label>CPU 线程数<input name="threads" value="4" type="number" min="1" max="16" required></label>
+          </fieldset>
+          <div class="buttons"><button id="start" class="primary" type="submit">开始训练</button><button id="stop" type="button">停止训练</button></div>
+        </form>
+        <progress id="progress" value="0" max="1" aria-label="训练轮数完成度"></progress>
+        <p id="message" aria-live="polite"></p>
+        <ul id="probes" aria-label="设备探测"></ul>
+      </section>
+      <section class="card metrics" aria-label="训练验证曲线">
+        <div class="section-row"><h2>训练与验证曲线</h2><label>模型<select id="model"><option>地形网络</option><option>局部神经元</option><option>RNN 记忆</option></select></label></div>
+        <canvas id="chart" width="620" height="175" aria-label="每轮训练和验证损失曲线"></canvas>
+        <div class="legend"><span><i></i>验证损失</span><span><i></i>训练损失</span></div>
+        <table><thead><tr><th>模型</th><th>入选轮次</th><th>验证损失</th><th>标签吻合</th></tr></thead><tbody id="summaryRows"></tbody></table>
+        <p>标签吻合是特征或序列验证指标。车辆到点、碰撞和翻车可在仿真中另行检查。</p>
+      </section>
+    </div>
+    <details class="card logs"><summary>本轮日志与结果</summary><div id="output"></div><pre id="log"></pre></details>
+    <section id="live" class="card">
+      <div class="section-row live-header">
+        <div><h2>实时仿真与决策</h2><p id="liveHint">双击地图设定目标。两个视图共用同一个仿真任务。</p></div>
+        <div class="buttons">
+          <button id="baseline">基线模型</button><button id="preview">试跑本轮模型</button>
+          <label>布局<select id="layout"><option value="both">并排</option><option value="map">3D 全宽</option><option value="think">决策全宽</option></select></label>
+        </div>
+      </div>
+      <div id="panes">
+        <iframe id="map" title="3D地图、小车与双目画面" src="http://127.0.0.1:8922/"></iframe>
+        <iframe id="think" title="实时地形和神经元决策" src="http://127.0.0.1:8922/think"></iframe>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
