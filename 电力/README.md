@@ -2,25 +2,25 @@
 
 每块板仅维护两份现行设计文档：`设计需求.md`说明要达到的功能、指标及边界；`设计细节.md`说明采用的电路、器件、接口、计算、成本、验证状态和待解决问题。后续原位更新，不再另建模块README、TODO、专项设计报告或审查结论。
 
-| 板卡 | 设计需求 | 设计细节 | 原生工程 |
+| 板卡 | 设计需求 | 设计细节 | 现行 Code-as-EDA / KiCad 工程 |
 |---|---|---|---|
-| BMS | [需求](BMS模块/设计需求.md) | [细节](BMS模块/设计细节.md) | [BMS-9S4P.eprj3](BMS模块/eda工程文件/BMS-9S4P/BMS-9S4P.eprj3) |
-| FOC驱动，两块同版 | [需求](FOC驱动模块/设计需求.md) | [细节](FOC驱动模块/设计细节.md) | [FOC_G431_Driver.eprj3](FOC驱动模块/eda工程文件/FOC_G431_Driver/FOC_G431_Driver.eprj3) |
-| 独立超容稳压 | [需求](稳压模块/设计需求.md) | [细节](稳压模块/设计细节.md) | [sc-regulator.eprj3](稳压模块/eda工程文件/sc-regulator/sc-regulator.eprj3) |
-| 水泵驱动 | [需求](水泵驱动模块/设计需求.md) | [细节](水泵驱动模块/设计细节.md) | [水泵驱动.eprj3](水泵驱动模块/eda工程文件/水泵驱动/水泵驱动.eprj3) |
+| BMS | [需求](BMS模块/设计需求.md) | [细节](BMS模块/设计细节.md) | [BmsBoard.kicad_pro](BMS模块/eda工程文件/exports/kicad/BmsBoard.kicad_pro) · [SVG](BMS模块/eda工程文件/exports/schematic.svg) · [BOM](BMS模块/eda工程文件/exports/bom.csv) |
+| FOC驱动，两块同版 | [需求](FOC驱动模块/设计需求.md) | [细节](FOC驱动模块/设计细节.md) | [FOCBoard.kicad_pro](FOC驱动模块/eda工程文件/exports/kicad/FOCBoard.kicad_pro) · [SVG](FOC驱动模块/eda工程文件/exports/schematic.svg) · [BOM](FOC驱动模块/eda工程文件/exports/bom.csv) |
+| 独立超容稳压 | [需求](稳压模块/设计需求.md) | [细节](稳压模块/设计细节.md) | [RegulatorBoard.kicad_pro](稳压模块/eda工程文件/exports/kicad/RegulatorBoard.kicad_pro) · [SVG](稳压模块/eda工程文件/exports/schematic.svg) · [BOM](稳压模块/eda工程文件/exports/bom.csv) |
+| 水泵驱动 | [需求](水泵驱动模块/设计需求.md) | [细节](水泵驱动模块/设计细节.md) | [PumpBoard.kicad_pro](水泵驱动模块/eda工程文件/exports/kicad/PumpBoard.kicad_pro) · [SVG](水泵驱动模块/eda工程文件/exports/schematic.svg) · [BOM](水泵驱动模块/eda工程文件/exports/bom.csv) |
 
-新设计输入为9S5P、保留8颗超容、稳压独立。超容首先承接无机械刹车车辆的电制动回生，启动有余电则辅助，无余电允许受限慢加速。当前原生仍含9S4P/旧功率链；约130A增强等候选不能当作已实施。每板设计细节区分已保存源、下一版候选、纸面验证和后续人类实施。
+新设计输入为9S5P、保留8颗超容、稳压独立。超容首先承接无机械刹车车辆的电制动回生，启动有余电则辅助，无余电允许受限慢加速。四套主电力板均已替换为冻结施工合同对应的 `Code-as-EDA (tscircuit)` / `KiCad` 原理图成果并完成 100% 逐针校验；每板设计细节区分冻结底稿、施工合同、模型验证与后续人类 PCB/固件/实物实施。
 
 ### 交付与证据入口
 
-| 板卡 | BOM / 连接 | 历史与候选材料 |
+| 板卡 | 施工合同 / 逐针校验 | 采购 / 仿真 / 检查 |
 |---|---|---|
-| BMS | [BOM](BMS模块/原理图准备/BOM.csv) | [检查目录](BMS模块/检查/)；候选状态以设计细节为准 |
-| FOC | 导出目录已移除；需要时从原生工程重新导出 BOM | [检查目录](FOC驱动模块/检查/)；仿真结果需核对源版本 |
-| 稳压 | [BOM](稳压模块/原理图准备/BOM.csv) · [连接合同](稳压模块/原理图准备/最终逐针连接.csv) | [检查目录](稳压模块/检查/)；候选图不等于现行原生图 |
-| 水泵 | [BOM](水泵驱动模块/原理图准备/BOM.csv) | [检查目录](水泵驱动模块/检查/)；以设计细节核对实际负载资格 |
+| BMS | [施工合同](BMS模块/检查/闭合候选_9S5P/BMS_9S5P施工合同.json) · [逐针报告](BMS模块/eda工程文件/exports/netlist_verify_report.json) | [闭合复算](BMS模块/检查/闭合候选_9S5P/BMS_9S5P闭合复算.json) |
+| FOC | [施工合同](FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2施工合同.json) · [逐针报告](FOC驱动模块/eda工程文件/exports/netlist_verify_report.json) | [闭合复算](FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2闭合复算.json) |
+| 稳压 | [施工合同](稳压模块/检查/闭合候选_P5Rev2/稳压P5Rev2施工合同.json) · [逐针报告](稳压模块/eda工程文件/exports/netlist_verify_report.json) | [闭合复算与仿真](稳压模块/检查/闭合候选_P5Rev2/稳压闭合复算与仿真.json) |
+| 水泵 | [施工合同](水泵驱动模块/检查/闭合候选_隔离CAN/水泵闭合施工合同.json) · [逐针报告](水泵驱动模块/eda工程文件/exports/netlist_verify_report.json) | [整车立创一键采购 BOM](检查/联合仿真/整车立创一键采购BOM.csv) |
 
-文件名含“当前”或“最终”只表示对应导出时的状态，应核对原生工程、BOM及证据版本；临时输出不作为验收依据。历史归档索引见[审查分支差异](../归档/审查分支差异/README.md)。
+整车联合门禁见[画图前合同完整性校验](检查/联合仿真/画图前合同完整性校验.json)与[6场景故障联合仿真](检查/联合仿真/降本后典型故障联合仿真.json)。历史过程文档、旧版嘉立创 `.eprj3` 及原归档目录已按成果精简策略清理（完整历史快照保留在 Git 提交历史中）。
 
 本机根目录可能存在被 Git 忽略的 SQLite 文件 `0819f05c4eef4c71ace90d822a990e87`。2026-11-08 只读检查显示它的 projects、schematics、documents、components、devices、resources 等表无记录，users 和 db_versions 各一条；库标识也出现在设计导出中，但这不证明此本机文件是工程必需品。该文件不随仓库交付，本次未验证应用重建或替换过程，暂保留；不要把标识相同当作可恢复性证明。
 

@@ -1,0 +1,3657 @@
+{
+  "contract_id": "FOC_164_REV2_CLOSURE_20261123",
+  "target_schematic_count": 165,
+  "inputs": {
+    "enet": {
+      "path": "电力/FOC驱动模块/检查/候选_本地保持与失电通知/官方V3_20261109/修正重开.enet",
+      "sha256": "97d8c1b0b3398947b1e12fe7a168da4e0e9e0147a104ae657956f5bd6a15b8a4"
+    },
+    "contract": {
+      "path": "电力/FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2施工合同.json",
+      "sha256": "ea1889b8e90cff04302014b491793f9894efc94cff2ab432dacbdfa522f2f98c"
+    },
+    "joint": {
+      "path": "电力/检查/联合仿真/画图前合同完整性校验.json",
+      "sha256": "af0949db315970ee020856cf683fac52d162ac51994ce6b82e27b2273cddda34"
+    }
+  },
+  "counts_by_placement": {
+    "board": 161,
+    "off-board": 4
+  },
+  "notes": [
+    "165 schematic objects include 161 on-board objects and four off-board electrical symbols per FOC board.",
+    "CBUS1–3 are an off-board bank; F_MAIN is an off-board bolt fuse.",
+    "Q1–Q6 use the frozen contract's physical TOLL pins 1–9.",
+    "HALL supply short-circuit ride-through and bank thermal qualification remain subject to bench evidence."
+  ],
+  "components": [
+    {
+      "ref": "CBUS1",
+      "mpn": "SW31R103MNNAS07S2",
+      "manufacturer": "上海永铭 Ymin",
+      "lcsc": "C42400396",
+      "footprint": "Φ35×50 mm snap-in, ±20%",
+      "value": "10000uF 63V off-board",
+      "dnp": false,
+      "placement": "off-board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "+",
+        "2": "-"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "localization_v1.offboard_bulk"
+      ]
+    },
+    {
+      "ref": "CBUS2",
+      "mpn": "SW31R103MNNAS07S2",
+      "manufacturer": "上海永铭 Ymin",
+      "lcsc": "C42400396",
+      "footprint": "Φ35×50 mm snap-in, ±20%",
+      "value": "10000uF 63V off-board",
+      "dnp": false,
+      "placement": "off-board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "+",
+        "2": "-"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "localization_v1.offboard_bulk"
+      ]
+    },
+    {
+      "ref": "CBUS3",
+      "mpn": "SW31R103MNNAS07S2",
+      "manufacturer": "上海永铭 Ymin",
+      "lcsc": "C42400396",
+      "footprint": "Φ35×50 mm snap-in, ±20%",
+      "value": "10000uF 63V off-board",
+      "dnp": false,
+      "placement": "off-board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "+",
+        "2": "-"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "localization_v1.offboard_bulk"
+      ]
+    },
+    {
+      "ref": "CBYP_U_HF1",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "lcsc": "C5343513",
+      "footprint": "C1812",
+      "value": "4.7uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CBYP_U_HF2",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "100nF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CBYP_V_HF1",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "lcsc": "C5343513",
+      "footprint": "C1812",
+      "value": "4.7uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CBYP_V_HF2",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "100nF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CBYP_W_HF1",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "lcsc": "C5343513",
+      "footprint": "C1812",
+      "value": "4.7uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CBYP_W_HF2",
+      "mpn": "C3225X7R2A104K200AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "100nF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CNEG_REF",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CSO_U",
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C3893887",
+      "footprint": "C0603",
+      "value": "220pF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SO_U_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CSO_V",
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C3893887",
+      "footprint": "C0603",
+      "value": "220pF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SO_V_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "CSO_W",
+      "mpn": "C1608C0G1H221J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C3893887",
+      "footprint": "C0603",
+      "value": "220pF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SO_W_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_BUCK_RIP_CA",
+      "mpn": "0603CG222J500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C2991172",
+      "footprint": "C0603",
+      "value": "2.2nF/50V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RIPPLE_INJ",
+        "2": "5V_BUCK"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_BUCK_RIP_CB",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RIPPLE_INJ",
+        "2": "BUCK_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_BUSADC",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_HA",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_A",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_HALL_VCC1",
+      "mpn": "C3225X7R1A106K160AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "10uF/10V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_HALL_VCC2",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_HB",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_B",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_HC",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_C",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_OV_SENSE",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF/50V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_SAFEADC",
+      "mpn": "C1608C0G1H102J080AA",
+      "manufacturer": "TDK",
+      "lcsc": "C183116",
+      "footprint": "C0603",
+      "value": "1nF/50V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_TEMP_MOS",
+      "mpn": "C1608C0G1H103J080AE",
+      "manufacturer": "TDK",
+      "lcsc": "C3877961",
+      "footprint": "C0603",
+      "value": "10nF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOS_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_TEMP_MOTOR",
+      "mpn": "C1608C0G1H103J080AE",
+      "manufacturer": "TDK",
+      "lcsc": "C3877961",
+      "footprint": "C0603",
+      "value": "10nF",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOTOR_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "C_U5_ISOIN_1U",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_U5_ISOOUT_100N",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_U5_ISOOUT_47U",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "value": "47uF/16V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_U5_VDDP_47U",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "value": "47uF/16V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_U7",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "DTVS1",
+      "mpn": "SMCJ40A",
+      "manufacturer": "MDD(Microdiode Semiconductor)",
+      "lcsc": "C840777",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "value": "40 V VRWM，44.4–49.1 V VBR，64.5 V@23.3 A，10/1000 µs",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "D_BUSADC_CLAMP",
+      "mpn": "BZT52C3V6",
+      "manufacturer": "ElecSuper(静芯)",
+      "lcsc": "C5334032",
+      "footprint": "SOD-123_L2.7-W1.6-LS3.8-RD",
+      "value": "BZT52C3V6",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "C",
+        "2": "A"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "D_CAN_ESD",
+      "mpn": "PESD2CANFD24V-TR",
+      "manufacturer": "Nexperia",
+      "lcsc": "C552486",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "PESD2CANFD24V-T",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CANH_CONN",
+        "2": "CANL_CONN",
+        "3": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "F_HALL_5V",
+      "mpn": "ASMD0805-010",
+      "lcsc": "C135326",
+      "manufacturer": "JDTfuse（集电通）",
+      "footprint": "F0805",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pin_roles": {},
+      "source_layers": [
+        "drawing_components"
+      ],
+      "value": "ASMD0805-010",
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "5V_HALL_PROT"
+      }
+    },
+    {
+      "ref": "F_MAIN",
+      "mpn": "0998100.UX-2M8",
+      "manufacturer": "Littelfuse",
+      "lcsc": null,
+      "footprint": "MEGA 70V SF51, 2xM8, P51 mm",
+      "value": "100A / 70V EXT",
+      "dnp": false,
+      "placement": "off-board",
+      "in_bom": true,
+      "pins": {
+        "1": "PACK+",
+        "2": "BUS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "JP_HA",
+      "mpn": null,
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "HDR-TH_3P-P2.54-V-M-A",
+      "value": "3P selector",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_A_DIRECT",
+        "2": "HALL_A",
+        "3": "HALL_A_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "JP_HB",
+      "mpn": null,
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "HDR-TH_3P-P2.54-V-M-A",
+      "value": "3P selector",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_B_DIRECT",
+        "2": "HALL_B",
+        "3": "HALL_B_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "JP_HC",
+      "mpn": null,
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "HDR-TH_3P-P2.54-V-M-A",
+      "value": "3P selector",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_C_DIRECT",
+        "2": "HALL_C",
+        "3": "HALL_C_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_BUS_N",
+      "mpn": "M4 PCB铜接线柱",
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "STUD-M4-TH_D4.5_PAD12",
+      "value": "BUS−",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "single electrical terminal on the M4 copper stud"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_BUS_P",
+      "mpn": "M4 PCB铜接线柱",
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "STUD-M4-TH_D4.5_PAD12",
+      "value": "BUS+",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS"
+      },
+      "pin_roles": {
+        "1": "single electrical terminal on the M4 copper stud"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_CAN",
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "manufacturer": "JST",
+      "lcsc": "C144394",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "value": "B3B-XH-A(LF)(SN)",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_CAN",
+        "2": "CANH_CONN",
+        "3": "CANL_CONN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_HALL",
+      "mpn": "B5B-PH-K-S(LF)(SN)",
+      "manufacturer": "JST",
+      "lcsc": "C157993",
+      "footprint": "CONN-TH_B5B-PH-K-S-LF-SN",
+      "value": "Hall 5P 2.0mm",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_HALL_PROT",
+        "2": "HALL_A_RAW",
+        "3": "HALL_B_RAW",
+        "4": "HALL_C_RAW",
+        "5": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_LOAD_POWER_VALID",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "value": "A2501WV-2P",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "LOAD_EN_BIAS_EXT",
+        "2": "LOAD_POWER_VALID"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MCU_L",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "value": "WeAct P1 2×12",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "5V_BUCK",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "BREAK_N",
+        "6": "PWM_UL",
+        "7": "PWM_VL",
+        "8": "PWM_WL",
+        "9": "FOC_HOLD_GPIO",
+        "10": "PWM_UH",
+        "11": "PWM_VH",
+        "12": "PWM_WH",
+        "13": "FDCAN1_RX",
+        "14": "FDCAN1_TX",
+        "15": "HALL_A",
+        "16": "LPV_FAIL_MCU",
+        "17": null,
+        "18": "HALL_B",
+        "19": null,
+        "20": null,
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MCU_R",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "value": "WeAct P2 2×12",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "MCU_3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "HALL_C",
+        "6": "DRV_ENABLE",
+        "7": null,
+        "8": "VREF_CORE",
+        "9": "SAFE_ADC",
+        "10": "TEMP_MOTOR_ADC",
+        "11": "DRV_SPI_MOSI",
+        "12": "BUS_ADC",
+        "13": "DRV_SPI_SCK",
+        "14": "DRV_SPI_MISO",
+        "15": "SO_V_ADC",
+        "16": "DRV_SPI_CS_N",
+        "17": "SO_U_ADC",
+        "18": "TEMP_MOS_ADC",
+        "19": null,
+        "20": "SO_W_ADC",
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MOTOR_U",
+      "mpn": "M4 PCB铜接线柱",
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "STUD-M4-TH_D4.5_PAD12",
+      "value": "PH_U",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "PH_U"
+      },
+      "pin_roles": {
+        "1": "single electrical terminal on the M4 copper stud"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MOTOR_V",
+      "mpn": "M4 PCB铜接线柱",
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "STUD-M4-TH_D4.5_PAD12",
+      "value": "PH_V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "PH_V"
+      },
+      "pin_roles": {
+        "1": "single electrical terminal on the M4 copper stud"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MOTOR_W",
+      "mpn": "M4 PCB铜接线柱",
+      "manufacturer": null,
+      "lcsc": null,
+      "footprint": "STUD-M4-TH_D4.5_PAD12",
+      "value": "PH_W",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "PH_W"
+      },
+      "pin_roles": {
+        "1": "single electrical terminal on the M4 copper stud"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_TEMP_MOS",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "value": "MOS NTC",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOS_NODE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_TEMP_MOTOR",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "value": "MOTOR NTC",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOTOR_NODE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q1",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_UH",
+        "2": "PH_U",
+        "3": "PH_U",
+        "4": "PH_U",
+        "5": "PH_U",
+        "6": "PH_U",
+        "7": "PH_U",
+        "8": "PH_U",
+        "9": "BUS"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q2",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_UL",
+        "2": "SH_U",
+        "3": "SH_U",
+        "4": "SH_U",
+        "5": "SH_U",
+        "6": "SH_U",
+        "7": "SH_U",
+        "8": "SH_U",
+        "9": "PH_U"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q3",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_VH",
+        "2": "PH_V",
+        "3": "PH_V",
+        "4": "PH_V",
+        "5": "PH_V",
+        "6": "PH_V",
+        "7": "PH_V",
+        "8": "PH_V",
+        "9": "BUS"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q4",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_VL",
+        "2": "SH_V",
+        "3": "SH_V",
+        "4": "SH_V",
+        "5": "SH_V",
+        "6": "SH_V",
+        "7": "SH_V",
+        "8": "SH_V",
+        "9": "PH_V"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q5",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_WH",
+        "2": "PH_W",
+        "3": "PH_W",
+        "4": "PH_W",
+        "5": "PH_W",
+        "6": "PH_W",
+        "7": "PH_W",
+        "8": "PH_W",
+        "9": "BUS"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q6",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI（华羿微）",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "value": "HYG022N10NS1TA / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_WL",
+        "2": "SH_W",
+        "3": "SH_W",
+        "4": "SH_W",
+        "5": "SH_W",
+        "6": "SH_W",
+        "7": "SH_W",
+        "8": "SH_W",
+        "9": "PH_W"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q_BOV_NPN",
+      "mpn": "MMBT5551",
+      "manufacturer": "MDD(辰达)",
+      "lcsc": "C408396",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "MMBT5551",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS",
+        "3": "BREAK_N"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q_BOV_PNP",
+      "mpn": "BC857C",
+      "manufacturer": "Nexperia",
+      "lcsc": "C2931734",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "BC857C",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BOV_PNP_BASE",
+        "2": "DUMP_5V",
+        "3": "BOV_BK_SRC"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "Q_BUCK_CLAMP",
+      "mpn": "MMBT5551",
+      "manufacturer": "MDD(辰达)",
+      "lcsc": "C408396",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "MMBT5551",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_CLAMP_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_RT_SD"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q_BUCK_RELEASE",
+      "mpn": "MMBT5551",
+      "manufacturer": "MDD(辰达)",
+      "lcsc": "C408396",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "MMBT5551",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RELEASE_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_CLAMP_BASE"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q_HOLD",
+      "mpn": "MMBT5551",
+      "manufacturer": "MDD(辰达)",
+      "lcsc": "C408396",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "MMBT5551",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "FOC_HOLD_BASE",
+        "2": "GND_SYS",
+        "3": "BUCK_CLAMP_BASE"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "Q_LPV_MOS",
+      "mpn": "AO3400A",
+      "manufacturer": "UMW(友台半导体)",
+      "lcsc": "C347475",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "AO3400A",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "LOAD_POWER_VALID",
+        "2": "GND_SYS",
+        "3": "LPV_FAIL_MCU"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "D"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "RNEG_BOT",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VNEG_REF",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "RNEG_TOP",
+      "mpn": "RC0603FR-0726K7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137756",
+      "footprint": "R0603",
+      "value": "26.7k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VREF_CORE",
+        "2": "VNEG_REF"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSO_U",
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114623",
+      "footprint": "R0603",
+      "value": "47Ω",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_U_RAW",
+        "2": "SO_U_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSO_V",
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114623",
+      "footprint": "R0603",
+      "value": "47Ω",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_V_RAW",
+        "2": "SO_V_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSO_W",
+      "mpn": "RC0603FR-0747RL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114623",
+      "footprint": "R0603",
+      "value": "47Ω",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_W_RAW",
+        "2": "SO_W_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSU",
+      "mpn": "PSF4NTEBL500F",
+      "manufacturer": "KOA Speer",
+      "lcsc": "C4135357",
+      "footprint": "RES-SMD_4P-L3.8-W3.0_HCSK1216",
+      "value": "0.5mΩ/1%/5W",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SH_U",
+        "2": "SH_U",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSV",
+      "mpn": "PSF4NTEBL500F",
+      "manufacturer": "KOA Speer",
+      "lcsc": "C4135357",
+      "footprint": "RES-SMD_4P-L3.8-W3.0_HCSK1216",
+      "value": "0.5mΩ/1%/5W",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SH_V",
+        "2": "SH_V",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "RSW",
+      "mpn": "PSF4NTEBL500F",
+      "manufacturer": "KOA Speer",
+      "lcsc": "C4135357",
+      "footprint": "RES-SMD_4P-L3.8-W3.0_HCSK1216",
+      "value": "0.5mΩ/1%/5W",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SH_W",
+        "2": "SH_W",
+        "3": "GND_SYS",
+        "4": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_BOV_DRIVE",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BOV_BK_SRC",
+        "2": "BOV_BK_DRIVE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BOV_NPN_PD",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BOV_BK_DRIVE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BOV_PNP_B",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUSOV_N",
+        "2": "BOV_PNP_BASE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BREAK_PU",
+      "mpn": "RC0603FR-072K2L",
+      "manufacturer": "Yageo",
+      "lcsc": "C114662",
+      "footprint": "R0603",
+      "value": "2.2k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "BREAK_N"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_BUCK_CLAMP_BUS",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "BUCK_CLAMP_BASE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BUCK_VALID_BASE",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RELEASE_BASE",
+        "2": "LOAD_POWER_VALID"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BUCK_VALID_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RELEASE_BASE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BUSADC_BOT",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BUSADC_SER",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VBUS_ADC_SENSE",
+        "2": "BUS_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BUSADC_TOP",
+      "mpn": "RC0603FR-07180KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C123419",
+      "footprint": "R0603",
+      "value": "180k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "VBUS_ADC_SENSE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_CAN_TERM",
+      "mpn": "RC0603FR-07120RL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114640",
+      "footprint": "R0603",
+      "value": "120Ω (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "CANH_CONN",
+        "2": "CANL_CONN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_CAN_TX_PU",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "FDCAN1_TX"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_DRV_EN_PD",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_ENABLE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_UH",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_UH",
+        "2": "PH_U"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_UL",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_UL",
+        "2": "SH_U"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_VH",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_VH",
+        "2": "PH_V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_VL",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_VL",
+        "2": "SH_V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_WH",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_WH",
+        "2": "PH_W"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GS_WL",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GATE_WL",
+        "2": "SH_W"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_GUH",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GUH",
+        "2": "GATE_UH"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_GUL",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GUL",
+        "2": "GATE_UL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_GVH",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GVH",
+        "2": "GATE_VH"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_GVL",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GVL",
+        "2": "GATE_VL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_GWH",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GWH",
+        "2": "GATE_WH"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_GWL",
+      "mpn": "RC0603FR-074R7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C137705",
+      "footprint": "R0603",
+      "value": "4.7Ω/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DRV_GWL",
+        "2": "GATE_WL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HA",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_HALL_PU_A",
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C99782",
+      "footprint": "R0603",
+      "value": "4.7k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_A_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HALL_PU_B",
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C99782",
+      "footprint": "R0603",
+      "value": "4.7k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_B_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HALL_PU_C",
+      "mpn": "RC0603FR-074K7L",
+      "manufacturer": "Yageo",
+      "lcsc": "C99782",
+      "footprint": "R0603",
+      "value": "4.7k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "HALL_C_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HA_5V_PD",
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114610",
+      "footprint": "R0603",
+      "value": "18k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_A_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HA_5V_SER",
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C98220",
+      "footprint": "R0603",
+      "value": "10k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_A_RAW",
+        "2": "HALL_A_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HB",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_HB_5V_PD",
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114610",
+      "footprint": "R0603",
+      "value": "18k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_B_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HB_5V_SER",
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C98220",
+      "footprint": "R0603",
+      "value": "10k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_B_RAW",
+        "2": "HALL_B_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HC",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_DIRECT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_HC_5V_PD",
+      "mpn": "RC0603FR-0718KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C114610",
+      "footprint": "R0603",
+      "value": "18k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_C_5V_DIV",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HC_5V_SER",
+      "mpn": "RC0603FR-0710KL",
+      "manufacturer": "Yageo",
+      "lcsc": "C98220",
+      "footprint": "R0603",
+      "value": "10k (DNP)",
+      "dnp": true,
+      "placement": "board",
+      "in_bom": false,
+      "pins": {
+        "1": "HALL_C_RAW",
+        "2": "HALL_C_5V_DIV"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_HOLD_BASE",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "FOC_HOLD_GPIO",
+        "2": "FOC_HOLD_BASE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_HOLD_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "FOC_HOLD_BASE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_LOAD_VALID_BIAS",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "LOAD_EN_BIAS_EXT",
+        "2": "SAFE_5V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_LPV_GATE_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "LOAD_POWER_VALID",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_LPV_PULLUP",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "LPV_FAIL_MCU"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_NEG_U_IN",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_U_RAW",
+        "2": "NEG_U"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_NEG_V_IN",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_V_RAW",
+        "2": "NEG_V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_NEG_W_IN",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CSA_SO_W_RAW",
+        "2": "NEG_W"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_OVBOT",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "manufacturer": "Milliohm(毫欧)",
+      "lcsc": "C5123581",
+      "footprint": "R0603",
+      "value": "10.0k/0.1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VBUS_OV_SENSE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_OVTOP",
+      "mpn": "TC0325B1004T5F",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C2989464",
+      "footprint": "R0603",
+      "value": "1M/0.1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "FOC_OV_TOP_SER"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_OVTOP_SER",
+      "mpn": "TC0325B6982T5F",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C50670192",
+      "footprint": "R0603",
+      "value": "69.8k/0.1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "FOC_OV_TOP_SER",
+        "2": "VBUS_OV_SENSE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_OV_PU",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_5V",
+        "2": "BUSOV_N"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_SAFEADC_BOT",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_ADC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_SAFEADC_TOP",
+      "mpn": "RC0603FR-0727K4L",
+      "manufacturer": "Yageo",
+      "lcsc": "C165753",
+      "footprint": "R0603",
+      "value": "27.4k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "R_SPI_SDO_PU",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "DRV_SPI_MISO"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_TEMP_MOS_PU",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "TEMP_MOS_NODE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_TEMP_MOS_SER",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOS_NODE",
+        "2": "TEMP_MOS_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_TEMP_MOTOR_PU",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "TEMP_MOTOR_NODE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_TEMP_MOTOR_SER",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "TEMP_MOTOR_NODE",
+        "2": "TEMP_MOTOR_ADC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1",
+      "mpn": "DRV8353RSRGZR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C506246",
+      "footprint": "QFN-48_L7.0-W7.0-P0.50-TL-EP4.7",
+      "value": "DRV8353RS",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_SYS",
+        "2": "VGLS",
+        "3": "CP_FLYING_LO",
+        "4": "CP_FLYING_HI",
+        "5": "BUS",
+        "6": "BUS",
+        "7": "VCP_PUMP",
+        "8": "DRV_GUH",
+        "9": "PH_U",
+        "10": "DRV_GUL",
+        "11": "SH_U",
+        "12": "GND_SYS",
+        "13": "GND_SYS",
+        "14": "SH_V",
+        "15": "DRV_GVL",
+        "16": "PH_V",
+        "17": "DRV_GVH",
+        "18": "DRV_GWH",
+        "19": "PH_W",
+        "20": "DRV_GWL",
+        "21": "SH_W",
+        "22": "GND_SYS",
+        "23": "CSA_SO_W_RAW",
+        "24": "CSA_SO_V_RAW",
+        "25": "CSA_SO_U_RAW",
+        "26": "VREF_CORE",
+        "27": "GND_SYS",
+        "28": "BREAK_N",
+        "29": "DRV_SPI_MISO",
+        "30": "DRV_SPI_MOSI",
+        "31": "DRV_SPI_SCK",
+        "32": "DRV_SPI_CS_N",
+        "33": "DRV_ENABLE",
+        "34": "PWM_UH",
+        "35": "PWM_UL",
+        "36": "PWM_VH",
+        "37": "PWM_VL",
+        "38": "PWM_WH",
+        "39": "PWM_WL",
+        "40": "DVDD_5V",
+        "41": "GND_SYS",
+        "42": "BUCK_SW",
+        "43": "BUS",
+        "44": "BUCK_VCC",
+        "45": "BUCK_BST",
+        "46": "BUCK_RCL",
+        "47": "BUCK_RT_SD",
+        "48": "BUCK_FB",
+        "49": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "GND",
+        "2": "VGLS",
+        "3": "CPL",
+        "4": "CPH",
+        "5": "VM",
+        "6": "VDRAIN",
+        "7": "VCP",
+        "8": "GHA",
+        "9": "SHA",
+        "10": "GLA",
+        "11": "SPA",
+        "12": "SNA",
+        "13": "SNB",
+        "14": "SPB",
+        "15": "GLB",
+        "16": "SHB",
+        "17": "GHB",
+        "18": "GHC",
+        "19": "SHC",
+        "20": "GLC",
+        "21": "SPC",
+        "22": "SNC",
+        "23": "SOC",
+        "24": "SOB",
+        "25": "SOA",
+        "26": "VREF",
+        "27": "AGND",
+        "28": "nFAULT",
+        "29": "SDO",
+        "30": "SDI",
+        "31": "SCLK",
+        "32": "NSCS",
+        "33": "ENABLE",
+        "34": "INHA",
+        "35": "INLA",
+        "36": "INHB",
+        "37": "INLB",
+        "38": "INHC",
+        "39": "INLC",
+        "40": "DVDD",
+        "41": "DGND",
+        "42": "SW",
+        "43": "VIN",
+        "44": "VCC",
+        "45": "BST",
+        "46": "RCL",
+        "47": "RT/SD",
+        "48": "FB",
+        "49": "EP"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_CBST",
+      "mpn": "C1608C0G1H103J080AE",
+      "manufacturer": "TDK",
+      "lcsc": "C3877961",
+      "footprint": "C0603",
+      "value": "10nF/50V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_BST",
+        "2": "BUCK_SW"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_CIN1",
+      "mpn": "C3225X7R2A225K230AE",
+      "manufacturer": "TDK",
+      "lcsc": "C2167875",
+      "footprint": "C1210",
+      "value": "2.2uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_CIN2",
+      "mpn": "0805B104K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C89258",
+      "footprint": "C0805",
+      "value": "100 nF ±10%, X7R, 100 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_COUT1",
+      "mpn": "C3225X7R1C226K250AC",
+      "manufacturer": "TDK",
+      "lcsc": "C3839713",
+      "footprint": "C1210",
+      "value": "22uF / 16V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_COUT2",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF / 25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_D",
+      "mpn": "SS310-SMC",
+      "manufacturer": "GOODWORK",
+      "lcsc": "C2848691",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "value": "100V Schottky",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_SW",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_L",
+      "mpn": "CDRH127/LDNP-221MC",
+      "manufacturer": "Sumida",
+      "lcsc": "C2452976",
+      "footprint": "IND-SMD_L12.0-W12.0_CDRH127NP",
+      "value": "220uH",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_SW",
+        "2": "5V_BUCK"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_RCL",
+      "mpn": "RC0603FR-071ML",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "1.00M/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RCL",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_RFB1",
+      "mpn": "RC0603FR-073K01L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "3.01k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_FB",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_RFB2",
+      "mpn": "RC0603FR-073K01L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "3.01k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "BUCK_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_RRIP",
+      "mpn": "RT0603BRD07220KL",
+      "manufacturer": "YAGEO(国巨)",
+      "lcsc": "C861231",
+      "footprint": "R0603",
+      "value": "220k/0.1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_SW",
+        "2": "BUCK_RIPPLE_INJ"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_BUCK_RT",
+      "mpn": "RT0603BRD07220KL",
+      "manufacturer": "YAGEO(国巨)",
+      "lcsc": "C861231",
+      "footprint": "R0603",
+      "value": "220k/0.1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_RT_SD",
+        "2": "BUS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_CP_C",
+      "mpn": "0603B473K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C43254",
+      "footprint": "C0603",
+      "value": "47nF/100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CP_FLYING_HI",
+        "2": "CP_FLYING_LO"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_DVDD_C",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DVDD_5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_VCC_C",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF / 25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUCK_VCC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_VCP_C",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VCP_PUMP",
+        "2": "BUS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_VGLS_C",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VGLS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_VM_C1",
+      "mpn": "0805B104K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C89258",
+      "footprint": "C0805",
+      "value": "100 nF ±10%, X7R, 100 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U1_VM_C2",
+      "mpn": "C4532X7S2A475K230KB",
+      "manufacturer": "TDK",
+      "lcsc": "C5343513",
+      "footprint": "C1812",
+      "value": "4.7uF/100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_VM_C3",
+      "mpn": "EEEFK2A330P",
+      "manufacturer": "PANASONIC(松下)",
+      "lcsc": "C178571",
+      "footprint": "CAP-SMD_BD10.0-L10.3-W10.3-FD",
+      "value": "33uF/100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U1_VREF_C",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "VREF_CORE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U2",
+      "mpn": "TPS7A4001DGNR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C55006",
+      "footprint": "MSOP-8_L3.0-W3.0-P0.65-LS5.0-BL-EP",
+      "value": "TPS7A4001",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB",
+        "4": "GND_SYS",
+        "5": "BUS",
+        "8": "BUS",
+        "9": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "OUT",
+        "2": "FB",
+        "4": "GND",
+        "5": "EN",
+        "8": "IN",
+        "9": "EP"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U2_CIN",
+      "mpn": "C3225X7R2A225K230AE",
+      "manufacturer": "TDK",
+      "lcsc": "C2167875",
+      "footprint": "C1210",
+      "value": "2.2uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U2_COUT",
+      "mpn": "C3225X7R1A106K160AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "10uF / 10V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U2_RBOT",
+      "mpn": "RC0603FR-0730K1L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "30.1k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_FB",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U2_RTOP",
+      "mpn": "RC0603FR-0797K6L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "97.6k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "SAFE_5V",
+        "2": "SAFE_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U3",
+      "mpn": "TLV1704AIPWR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C181596",
+      "footprint": "TSSOP-14_L5.0-W4.4-P0.65-LS6.4-BL",
+      "value": "TLV1704A",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "BREAK_N",
+        "2": "BREAK_N",
+        "3": "DUMP_5V",
+        "4": "VNEG_REF",
+        "5": "NEG_U",
+        "6": "VNEG_REF",
+        "7": "NEG_V",
+        "8": "VNEG_REF",
+        "9": "NEG_W",
+        "10": "GND_SYS",
+        "11": "DUMP_5V",
+        "12": "GND_SYS",
+        "13": null,
+        "14": "BREAK_N"
+      },
+      "pin_roles": {
+        "1": "2OUT",
+        "2": "1OUT",
+        "3": "V+",
+        "4": "1IN-",
+        "5": "1IN+",
+        "6": "2IN-",
+        "7": "2IN+",
+        "8": "3IN-",
+        "9": "3IN+",
+        "10": "4IN-",
+        "11": "4IN+",
+        "12": "V-",
+        "13": "4OUT",
+        "14": "3OUT"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U3_C1",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U3_C2",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U5",
+      "mpn": "CA-IS2062A",
+      "manufacturer": "Chipanalog(川土微)",
+      "lcsc": "C22438481",
+      "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+      "value": "CA-IS2062A",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "FDCAN1_RX",
+        "2": null,
+        "3": null,
+        "4": "FDCAN1_TX",
+        "5": "GND_SYS",
+        "6": "5V_BUCK",
+        "7": "MCU_3V3",
+        "8": "GND_SYS",
+        "9": "GND_CAN",
+        "10": "CAN_ISO_5V",
+        "11": "CAN_ISO_5V",
+        "12": "GND_CAN",
+        "13": null,
+        "14": "CANL_CONN",
+        "15": "CANH_CONN",
+        "16": null
+      },
+      "pin_roles": {
+        "1": "RXD",
+        "2": "NC",
+        "3": "NC",
+        "4": "TXD",
+        "5": "GNDP1",
+        "6": "VDDP",
+        "7": "VDDL",
+        "8": "GND1",
+        "9": "GND2",
+        "10": "VISOIN",
+        "11": "VISOOUT",
+        "12": "GNDP2",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U5_C",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "5V_BUCK",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U5_VIO_C",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF/25V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U6",
+      "mpn": "TPS7A4001DGNR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C55006",
+      "footprint": "MSOP-8_L3.0-W3.0-P0.65-LS5.0-BL-EP",
+      "value": "TPS7A4001",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_5V",
+        "2": "DUMP_FB",
+        "4": "GND_SYS",
+        "5": "BUS",
+        "8": "BUS",
+        "9": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "OUT",
+        "2": "FB",
+        "4": "GND",
+        "5": "EN",
+        "8": "IN",
+        "9": "EP"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U6_CIN",
+      "mpn": "C3225X7R2A225K230AE",
+      "manufacturer": "TDK",
+      "lcsc": "C2167875",
+      "footprint": "C1210",
+      "value": "2.2uF / 100V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_SYS",
+        "2": "BUS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U6_COUT",
+      "mpn": "C3225X7R1A106K160AE",
+      "manufacturer": "TDK",
+      "lcsc": null,
+      "footprint": "C1210",
+      "value": "10uF/10V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_SYS",
+        "2": "DUMP_5V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U6_RBOT",
+      "mpn": "RC0603FR-0730K1L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "30.1k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_SYS",
+        "2": "DUMP_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U6_RTOP",
+      "mpn": "RC0603FR-0797K6L",
+      "manufacturer": "Yageo",
+      "lcsc": null,
+      "footprint": "R0603",
+      "value": "97.6k/1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "DUMP_FB",
+        "2": "DUMP_5V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "baseline_enet"
+      ]
+    },
+    {
+      "ref": "U7",
+      "mpn": "TLV6700DDCR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C2868382",
+      "footprint": "TSOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR",
+      "value": "TLV6700DDCR",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": null,
+        "2": "GND_SYS",
+        "3": "GND_SYS",
+        "4": "VBUS_OV_SENSE",
+        "5": "DUMP_5V",
+        "6": "BUSOV_N"
+      },
+      "pin_roles": {
+        "1": "OUTA",
+        "2": "GND",
+        "3": "INA+",
+        "4": "INB-",
+        "5": "VDD",
+        "6": "OUTB"
+      },
+      "source_layers": [
+        "baseline_enet"
+      ]
+    }
+  ]
+}

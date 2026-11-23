@@ -1,0 +1,1190 @@
+{
+  "contract_id": "PUMP_ISOCAN_CLOSURE_20261123",
+  "inputs": {
+    "enet": {
+      "path": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet",
+      "sha256": "17e29e12726eb62c0e35ceec1cde65fae4962257ffdc65a6cc673e9eba374d67"
+    },
+    "bom": {
+      "path": "电力/水泵驱动模块/检查/主工程图面验收/主工程_BOM.csv",
+      "sha256": "eae05b7f721101636f525d91ae535f7bf5c6d961ed9149881e14161e31127688"
+    },
+    "contract": {
+      "path": "电力/水泵驱动模块/检查/闭合候选_隔离CAN/水泵闭合施工合同.json",
+      "sha256": "f41dfbbd9e0afeb81308ae879661d0e9a68281b6d448eae13d15c6fa82919cf4"
+    },
+    "joint": {
+      "path": "电力/检查/联合仿真/画图前合同完整性校验.json",
+      "sha256": "af0949db315970ee020856cf683fac52d162ac51994ce6b82e27b2273cddda34"
+    }
+  },
+  "counts": {
+    "published": 49,
+    "after_can": 52,
+    "final": 52,
+    "drawing_entries": 37
+  },
+  "can_harness_pinout": {
+    "1": "GND_CAN",
+    "2": "CANH",
+    "3": "CANL"
+  },
+  "mcu_mapping": {
+    "PUMP_PWM": {
+      "board_connector": "J_MCU_A.10",
+      "mcu_pad": "PA8",
+      "peripheral": "TIM1_CH1",
+      "alternate_function": "AF6",
+      "electrical_mode": "3.3V timer output; NSG1416 non-inverting driver input"
+    },
+    "PUMP_BRAKE": {
+      "board_connector": "J_MCU_A.20",
+      "mcu_pad": "PB5",
+      "peripheral": "GPIO output",
+      "electrical_mode": "active-high NPN sink control; 10k pulldown R_IN1_PD"
+    },
+    "PUMP_I_SENSE": {
+      "board_connector": "J_MCU_B.11",
+      "mcu_pad": "PA7",
+      "opamp_path": "OPAMP1 VINP; configure internal non-inverting PGA x16; OPAMP1 output internally to ADC1_IN13",
+      "comparator_path": "COMP2_INP=PA7; COMP2_INM=internal DAC3_CH2 nominal 100mV (about 5A at 20mOhm)",
+      "hardware_trip": "route COMP2 output internally to TIM1 break with TIM1_AF1.BKCMP2E; configure polarity/lockout, leave AOE disabled and latch MOE off until a fresh arm"
+    },
+    "ADC_BUS": {
+      "board_connector": "J_MCU_B.17",
+      "mcu_pad": "PA1"
+    },
+    "ADC_NTC": {
+      "board_connector": "J_MCU_B.18",
+      "mcu_pad": "PA2"
+    }
+  },
+  "hardware_scope": "Confirm exact fitted STM32G431 coreboard revision and J_MCU_A/J_MCU_B header orientation/pinout before schematic capture or PCB release; bench-calibrate COMP2/DAC offset and verify brake/shunt paths on the actual pump.",
+  "components": [
+    {
+      "ref": "C_5V_IN",
+      "mpn": "EMK1KM330GB0D00T",
+      "lcsc": null,
+      "lcsc_source": null,
+      "manufacturer": "AiSHi / AISHI (艾华)",
+      "footprint": "CAP-SMD_BD10.0-L10.3-W10.3-FD",
+      "value": "33uF / 100V",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "C_5V_IN_HF",
+      "mpn": "0805B104K101NT",
+      "lcsc": "C89258",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0805",
+      "value": "100 nF ±10%, X7R, 100 V",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_5V_OUT",
+      "mpn": "UHE1C331MPD",
+      "lcsc": "C445436",
+      "lcsc_source": "https://www.lcsc.com/product-detail/C445436.html",
+      "manufacturer": "Nichicon",
+      "footprint": "CAP-TH_BD8.0-P3.50-D0.6-FD",
+      "value": "330uF / 16V",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "C_5V_OUT_HF",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.modified",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_ADC_BUS",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "pins": {
+        "1": "ADC_BUS",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_ADC_I",
+      "mpn": "0603B102K500NT",
+      "lcsc": "C44369",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH (Fenghua)",
+      "footprint": "C0603",
+      "value": "1nF, 50V, X7R",
+      "dnp": false,
+      "pins": {
+        "1": "PUMP_I_SENSE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_ADC_NTC",
+      "mpn": "C1608X7R1H103K080AA",
+      "lcsc": "C2180830",
+      "lcsc_source": "https://www.lcsc.com/product-detail/C2180830.html",
+      "manufacturer": "TDK",
+      "footprint": "C0603",
+      "value": "10nF / 50V",
+      "dnp": false,
+      "pins": {
+        "1": "ADC_NTC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "C_CAN_ISOIN_1U",
+      "dnp": false,
+      "source_layers": [
+        "CHG-PUMP-01.added",
+        "drawing_components"
+      ],
+      "manufacturer": "FH (Fenghua)",
+      "footprint": "C0603",
+      "value": "1uF, 25V, X7R, ±10%",
+      "mpn": "0603B105K250NT",
+      "lcsc": "C59302",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "C_CAN_ISO_BULK",
+      "dnp": false,
+      "source_layers": [
+        "CHG-PUMP-01.added",
+        "drawing_components"
+      ],
+      "manufacturer": "FH (Fenghua)",
+      "footprint": "C1210",
+      "value": "47uF, 16V, X5R, ±10%",
+      "mpn": "1210X476K160NT",
+      "lcsc": "C2961286",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "C_CAN_ISO_HF",
+      "dnp": false,
+      "source_layers": [
+        "CHG-PUMP-01.added",
+        "passive_freeze",
+        "drawing_components"
+      ],
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "C_CAN_VCC",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.modified",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_CAN_VDDP_BULK",
+      "dnp": false,
+      "source_layers": [
+        "CHG-PUMP-01.added",
+        "drawing_components"
+      ],
+      "manufacturer": "FH (Fenghua)",
+      "footprint": "C1210",
+      "value": "47uF, 16V, X5R, ±10%",
+      "mpn": "1210X476K160NT",
+      "lcsc": "C2961286",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "C_CAN_VIO",
+      "mpn": "0603B105K250NT",
+      "lcsc": "C59302",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH (Fenghua)",
+      "footprint": "C0603",
+      "value": "1uF, 25V, X7R, ±10%",
+      "dnp": false,
+      "pins": {
+        "1": "+3V3",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.modified",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_DRV_VCC",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_DRV_VM1",
+      "mpn": "C2012X7R2E103K125AA",
+      "lcsc": "C2167598",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "TDK",
+      "footprint": "C0805",
+      "value": "10nF ±10%, 250V, X7R",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "C_FB_FF",
+      "mpn": "GCJ188R71H333KA12D",
+      "lcsc": "C2173059",
+      "lcsc_source": "https://item.szlcsc.com/2265125.html",
+      "manufacturer": "Murata",
+      "footprint": "C0603",
+      "value": "33nF / 50V",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "XL_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "C_VM_BULK",
+      "mpn": "UHW2A471MHD",
+      "lcsc": "C1585392",
+      "lcsc_source": "https://item.szlcsc.com/1676207.html",
+      "manufacturer": "Nichicon",
+      "footprint": "CAP-TH_BD12.5-P5.00-D0.6-FD",
+      "value": "470uF / 100V",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "D_5V",
+      "mpn": "SS310-SMC",
+      "lcsc": "C2848691",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "GOODWORK",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "value": "3 A/100 V，80 A 单次 8.3 ms IFSM，K=XL_SW",
+      "dnp": false,
+      "pins": {
+        "1": "XL_SW",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "source_layers": [
+        "published_enet",
+        "p0_phase_a",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "D_BUS",
+      "mpn": "SMCJ40A",
+      "lcsc": "C840777",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "MDD(Microdiode Semiconductor)",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "value": "40 V VRWM，44.4–49.1 V VBR，64.5 V@23.3 A，10/1000 µs",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "source_layers": [
+        "published_enet",
+        "p0_phase_a",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "D_CAN",
+      "mpn": "PESD2CANFD24V-TR",
+      "lcsc": "C552486",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "Nexperia",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "PESD2CANFD24V-TR",
+      "dnp": false,
+      "pins": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND_CAN"
+      },
+      "pin_roles": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND"
+      },
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.pin_updates",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "D_PUMP_FW",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "辰达 MDD",
+      "footprint": "SMC (DO-214AB)",
+      "value": "100 V / 5 A，SMC",
+      "mpn": "SS510C",
+      "lcsc": "C19229",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "BUS_M",
+        "2": "MOTOR_B"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      }
+    },
+    {
+      "ref": "J_BUS",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "lcsc": "C581328",
+      "lcsc_source": "published_enet",
+      "manufacturer": "DEGSON(町洋)",
+      "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+      "value": "BUS IN / FUSED",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "J_CAN",
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "lcsc": "C144394",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "JST",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "value": "XH, 3-pin, 2.5mm pitch",
+      "dnp": false,
+      "pins": {
+        "1": "GND_CAN",
+        "2": "CANH",
+        "3": "CANL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.pin_updates",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MCU_A",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "lcsc": "C54803369",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "JXTCONN",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "value": "2x12P 2.54mm coreboard header",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "+5V",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": null,
+        "10": "PUMP_PWM",
+        "11": null,
+        "12": null,
+        "13": null,
+        "14": null,
+        "15": null,
+        "16": null,
+        "17": null,
+        "18": null,
+        "19": null,
+        "20": "PUMP_BRAKE",
+        "21": null,
+        "22": null,
+        "23": "CAN_RX",
+        "24": "CAN_TX"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MCU_B",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "lcsc": "C54803369",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "JXTCONN",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "value": "2x12P 2.54mm coreboard header",
+      "dnp": false,
+      "pins": {
+        "1": "+3V3",
+        "2": "+3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": null,
+        "6": null,
+        "7": null,
+        "8": null,
+        "9": null,
+        "10": null,
+        "11": "PUMP_I_SENSE",
+        "12": null,
+        "13": null,
+        "14": null,
+        "15": null,
+        "16": null,
+        "17": "ADC_BUS",
+        "18": "ADC_NTC",
+        "19": null,
+        "20": null,
+        "21": null,
+        "22": null,
+        "23": null,
+        "24": null
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "J_MOTOR",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "lcsc": "C581328",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "DEGSON (町洋)",
+      "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+      "value": "PUMP / 21V PWM",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "MOTOR_B"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "L_5V",
+      "mpn": "SWPA8065S101MT",
+      "lcsc": "C334254",
+      "lcsc_source": "https://item.szlcsc.com/312813.html",
+      "manufacturer": "Sunlord(顺络)",
+      "footprint": "IND-SMD_L8.0-W8.0_SWPA8040S",
+      "value": "100uH",
+      "dnp": false,
+      "pins": {
+        "1": "XL_SW",
+        "2": "+5V"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "NTC_BOARD",
+      "mpn": "MF52A103F3950(A1)",
+      "lcsc": "C13879",
+      "lcsc_source": "https://item.szlcsc.com/14534.html",
+      "manufacturer": "时恒",
+      "footprint": "RES-TH_L2.5-W2.5-P1.70-D0.3",
+      "value": "10k / B3950",
+      "dnp": false,
+      "pins": {
+        "1": "ADC_NTC",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "Q_BRAKE",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "毅芯达 Existar",
+      "footprint": "TO-252",
+      "value": "−100 V/−40 A @Tc25，55mΩ max @−4.5 V，TO-252",
+      "mpn": "E100P045CL1",
+      "lcsc": "C29781153",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "BRAKE_GATE",
+        "2": "MOTOR_B",
+        "3": "BUS_M"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "D (tab)",
+        "3": "S"
+      }
+    },
+    {
+      "ref": "Q_BRAKE_CTL",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "辰达 MDD",
+      "footprint": "SOT-23",
+      "value": "NPN 160V，整车复用，SOT-23",
+      "mpn": "MMBT5551",
+      "lcsc": "C408396",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "BRAKE_BASE",
+        "2": "GND_SYS",
+        "3": "BRAKE_SINK"
+      },
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      }
+    },
+    {
+      "ref": "Q_PWM",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "无锡新洁能 NCE",
+      "footprint": "TO-252-2L",
+      "value": "100 V/17 A，85mΩ max @4.5V，TO-252-2L",
+      "mpn": "NCE0117K",
+      "lcsc": "C108638",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "PWM_GATE",
+        "2": "MOTOR_B",
+        "3": "PUMP_SHUNT"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "D (tab)",
+        "3": "S"
+      }
+    },
+    {
+      "ref": "R_ADC_BUS",
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_SENSE",
+        "2": "ADC_BUS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_ADC_I",
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "PUMP_SHUNT",
+        "2": "PUMP_I_SENSE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_BRAKE_BASE",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "passive_freeze",
+        "drawing_components"
+      ],
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "PUMP_BRAKE",
+        "2": "BRAKE_BASE"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "R_BRAKE_GATE_HIGH",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "passive_freeze",
+        "drawing_components"
+      ],
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "BUS_M",
+        "2": "BRAKE_GATE"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "R_BRAKE_GATE_LOW",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "风华 FH",
+      "footprint": "R1206",
+      "value": "27kΩ ±1% 1206 / 200V",
+      "mpn": "RS-06K2702FT",
+      "lcsc": "C294775",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "BRAKE_GATE",
+        "2": "BRAKE_SINK"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "R_BUS_BOTTOM",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "lcsc": "C5123581",
+      "lcsc_source": "published_enet",
+      "manufacturer": "Milliohm（毫欧）",
+      "footprint": "R0603",
+      "value": "10k / 0.1%",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_SENSE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "R_BUS_TOP1",
+      "mpn": "TC0350B1103T5F",
+      "lcsc": "C50670544",
+      "lcsc_source": "published_enet",
+      "manufacturer": "UNI-ROYAL（厚声 / ROYALOHM）",
+      "footprint": "R0603",
+      "value": "110k / 0.1%",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "BUS_DIV_MID"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "R_BUS_TOP2",
+      "mpn": "TC0350B1103T5F",
+      "lcsc": "C50670544",
+      "lcsc_source": "published_enet",
+      "manufacturer": "UNI-ROYAL（厚声 / ROYALOHM）",
+      "footprint": "R0603",
+      "value": "110k / 0.1%",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_DIV_MID",
+        "2": "BUS_SENSE"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "R_CAN_TXD_PU",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "+3V3",
+        "2": "CAN_TX"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_FB_BOTTOM",
+      "mpn": "RMC06033.3K1%N",
+      "lcsc": "C269710",
+      "lcsc_source": "published_enet",
+      "manufacturer": "Tyohm（幸亚电阻）",
+      "footprint": "R0603",
+      "value": "3.3k / 1%",
+      "dnp": false,
+      "pins": {
+        "1": "XL_FB",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "R_FB_TOP",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "+5V",
+        "2": "XL_FB"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_IN1_PD",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "PUMP_BRAKE",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_IN2_PD",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "PUMP_PWM",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_NTC_PULL",
+      "mpn": "HoAR0603-1/10W-10KR-0.1%-TCR25",
+      "lcsc": "C5123581",
+      "lcsc_source": "published_enet",
+      "manufacturer": "Milliohm（毫欧）",
+      "footprint": "R0603",
+      "value": "10k / 0.1%",
+      "dnp": false,
+      "pins": {
+        "1": "+3V3",
+        "2": "ADC_NTC"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "R_PUMP_SHUNT",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "毫欧 Milliohm",
+      "footprint": "R2512",
+      "value": "20mOhm ±1%, 2W; Kelvin sense is PCB routing, not a four-terminal part",
+      "mpn": "HoJLR2512-2W-20mR-1%-75ppm",
+      "lcsc": "C2924538",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "PUMP_SHUNT",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "R_PWM_GATE_SER",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "风华 FH",
+      "footprint": "R1206",
+      "value": "10Ω±1% 1206，同稳压板",
+      "mpn": "RS-06K10R0FT",
+      "lcsc": "C140052",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": "PWM_GATE_DRV",
+        "2": "PWM_GATE"
+      },
+      "pin_roles": {}
+    },
+    {
+      "ref": "R_SLEEP",
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "pins": {
+        "1": "PWM_GATE",
+        "2": "PUMP_SHUNT"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet",
+        "localization_v1.reuse_pins",
+        "passive_freeze",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "R_TERM",
+      "mpn": "MFR25SFRE52-120R",
+      "lcsc": "C1744031",
+      "lcsc_source": "published_enet",
+      "manufacturer": "YAGEO（国巨）",
+      "footprint": "RES-TH_BD1.9-L3.5-P7.50-D0.5",
+      "value": "120R / DNP default",
+      "dnp": true,
+      "pins": {
+        "1": "CANH",
+        "2": "CANL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "U_5V",
+      "mpn": "XL7015E1",
+      "lcsc": "C73013",
+      "lcsc_source": "published_enet",
+      "manufacturer": "XLSEMI(芯龙)",
+      "footprint": "TO-252-5_L6.6-W5.8-P1.27-TL",
+      "value": "XL7015E1",
+      "dnp": false,
+      "pins": {
+        "1": "BUS_M",
+        "2": "XL_SW",
+        "3": "GND_SYS",
+        "4": "XL_FB",
+        "5": "GND_SYS",
+        "6": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "VIN",
+        "2": "SW",
+        "3": "GND",
+        "4": "FB",
+        "5": "EN",
+        "6": "GND"
+      },
+      "source_layers": [
+        "published_enet"
+      ]
+    },
+    {
+      "ref": "U_CAN",
+      "mpn": "CA-IS2062A",
+      "lcsc": "C22438481",
+      "lcsc_source": "drawing_components",
+      "manufacturer": "Chipanalog (川土微)",
+      "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+      "value": "Isolated CAN transceiver with integrated isolated DC/DC",
+      "dnp": false,
+      "pins": {
+        "1": "CAN_RX",
+        "2": null,
+        "3": null,
+        "4": "CAN_TX",
+        "5": "GND_SYS",
+        "6": "+5V",
+        "7": "+3V3",
+        "8": "GND_SYS",
+        "9": "GND_CAN",
+        "10": "CAN_ISO_5V",
+        "11": "CAN_ISO_5V",
+        "12": "GND_CAN",
+        "13": null,
+        "14": "CANL",
+        "15": "CANH",
+        "16": null
+      },
+      "pin_roles": {
+        "1": "RXD",
+        "2": "NC",
+        "3": "NC",
+        "4": "TXD",
+        "5": "GNDP1",
+        "6": "VDDP",
+        "7": "VDDL",
+        "8": "GND1",
+        "9": "GND2",
+        "10": "VISOIN",
+        "11": "VISOOUT",
+        "12": "GNDP2",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "source_layers": [
+        "published_enet",
+        "CHG-PUMP-01.modified",
+        "drawing_components"
+      ]
+    },
+    {
+      "ref": "U_PWM",
+      "dnp": false,
+      "source_layers": [
+        "localization_v1.add",
+        "drawing_components"
+      ],
+      "manufacturer": "NCE (NSIC Technology, Wuxi)",
+      "footprint": "SOT-23-5",
+      "value": "5V non-inverting low-side gate driver, 4.5–25V supply, 2A source/sink",
+      "mpn": "NSG1416",
+      "lcsc": "C53436462",
+      "lcsc_source": "drawing_components",
+      "pins": {
+        "1": null,
+        "2": "+5V",
+        "3": "PUMP_PWM",
+        "4": "GND_SYS",
+        "5": "PWM_GATE_DRV"
+      },
+      "pin_roles": {}
+    }
+  ]
+}

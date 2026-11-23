@@ -1,0 +1,443 @@
+{
+  "module": "BMS模块",
+  "candidate_id": "BMS_9S5P_CLOSURE_20261123",
+  "status": "BMS_SUBCIRCUIT_MODEL_ONLY",
+  "source_bindings": {
+    "bms_official_enet": "电力\\BMS模块\\检查\\主工程图面验收\\主工程.enet",
+    "bms_official_enet_sha256": "cce8086b5bbff2945e90263665c5bfb67eda60109d53b975777d237b5ab10bc3",
+    "merged_precharge_contract": "电力\\BMS模块\\原理图准备\\复用预充合并施工合同.json",
+    "merged_precharge_contract_sha256": "f8184d5218934c223ba0c90d37b716b8437e86ab8ed0bb8840b1517f4c5b44e1",
+    "p0_contract_sha256": "e436ef7a83bd4062d782069599b6deebffedb3f8d1a93bef0648a0caf707019e"
+  },
+  "power_9s5p_4p4": {
+    "mos_mpn": "HYG022N10NS1TA (HUAYI, C2925050)",
+    "topology": "4+4 common-drain back-to-back high-side N-MOS (原3+3增Q_CHG4/Q_DSG4及独立门阻/泄放阻共+6件, 0新SKU)",
+    "total_path_rds_25c_max_mOhm": {
+      "old_3p3": 1.867,
+      "new_4p4": 1.4
+    },
+    "loss_60A_W": {
+      "old_3p3": 6.72,
+      "new_4p4": 5.04,
+      "per_mos_new_2x_hot_W": 1.26
+    },
+    "loss_130A_W": {
+      "old_3p3": 31.55,
+      "new_4p4": 23.66,
+      "per_mos_current_A": 32.5
+    },
+    "shunt_130A_power_W": 8.45,
+    "bq_protection_candidate": {
+      "OCD1_threshold_mV": 80,
+      "OCD1_nom_A": 160.0,
+      "OCD1_conservative_min_A": 142.2,
+      "margin_above_130A_peak_A": 12.2,
+      "SCD_threshold_mV": 100,
+      "SCD_nom_A": 200.0,
+      "offboard_fuse_F1_upgrade_candidate": "Littelfuse JLLN150.VXP (150A Class T, 125VDC, 由人类按9S5P峰值与线束核定)"
+    },
+    "gate_charge_note": "4管典型Qg=642nC (2x工程筛查1.284µC), Ciss典型36.1nF (>BQ 20nF表征点), 首板须示波器实测关断波形与止流时长。"
+  },
+  "precharge_and_probe": {
+    "timer_resistor": "R_TIMER_SET = 11.0kΩ (替换原7.32kΩ)",
+    "timer_window_s": [
+      8.953,
+      10.226
+    ],
+    "slow_corner_charge_s": 4.266,
+    "slow_corner_total_with_4p1s_probe_s": 8.721,
+    "margin_inside_timer_min_s": 0.232,
+    "pass_slow_corner": true,
+    "probe_open_detect_worst_s": 3.798,
+    "probe_duration_s": 4.1,
+    "pass_open_main_detect": true,
+    "probe_resistor_max_power_W": 1.76,
+    "probe_resistor_rating_W": 3.0,
+    "short_circuit_37p8v_power_W": 196.2,
+    "short_circuit_rpre_60c_derated_W": 253.3,
+    "short_circuit_energy_max_kJ": 2.006,
+    "pass_rpre_power_derated": true
+  },
+  "three_isolated_lpv": {
+    "unified_opto_mpn": "LTV-817S-TA1-C (LITEON, C109227, 全车4颗同料替代原 UNVERIFIED_2X VO617A)",
+    "led_series_resistor": "0603WAF5100T5E (UNI-ROYAL, 510Ω ±1%, C23193) ×3",
+    "if_min_cold_mA": 5.8,
+    "if_nom_mA": 7.35,
+    "total_3ch_max_mA": 25.98,
+    "ic_capable_at_50pct_ctr_derating_mA": 5.8,
+    "foc_single_board_sink_max_mA": 1.5,
+    "saturation_margin_ratio": 3.86,
+    "pass": true
+  },
+  "early_guard_ready_in": {
+    "assigned_pin": "J_CORE_P2.12 (PC4, 原为 NC)",
+    "coreboard_schematic": "https://github.com/WeActStudio/WeActStudio.STM32G431CoreBoard/blob/master/Hardware/QFN48/WeAct-STM32G431CxUxCoreBoard_V10_SchDoc.pdf",
+    "net": "EARLY_GUARD_READY_N",
+    "pullup": "R_EARLY_READY_PU = 10kΩ (FH RS-03K1002FT C115324) -> CORE_3V3",
+    "connector": "J_EARLY_READY_IN (HanElectricity 2541WV-2X01P C41430884): pin1=EARLY_GUARD_READY_N, pin2=B0",
+    "interlock_rule": "严格不接入 U_AND2.3 异步清主锁存链；仅作为新预充/新合闸硬件/固件准入资格，运行中丢失触发撤运动许可而非瞬时硬断主路。"
+  },
+  "p0_5v_and_visoin": {
+    "output_nominal_v": 4.999335548172756,
+    "output_static_v": [
+      4.885412409871026,
+      5.113882017154257
+    ],
+    "previous_preload_output_w": 0.46296296296296297,
+    "max_comparison_ripple_pp_a": 0.3845864943283669,
+    "peak_at_401ma_a": 0.5932932471641834,
+    "en_open_delay_typ_ms": 35.42857142857144,
+    "tapped_input_c_nominal_uf": 9.5,
+    "input_cap_energy_at_37v8_j": 0.006786989999999999,
+    "scope": "静态及理想连续导通筛查。入口电流与I²t取真实线束，反灌与掉电时序按合同核验。",
+    "abnormal_boundaries": {
+      "main_and_precharge_off": "Buck仍可能由独立TAP_B9取电；只经B0返回。主MOS、预充及LPV默认态由原电路保持，不搬迁PACK−回流。",
+      "reg1_falls_first": "RUN时5V可仍有效。PRE_CTRL_3V3失电须由原有DFETOFF/本地资格链落实实际止流，测PRE、DFETOFF、LPV和实测VGS。5V存在不可延长合闸资格。",
+      "usb_or_residual": "VIN=0且VOUT外供时可经L和高侧体二极管抬起TAP_B9，EN关断不能保证反向隔断。操作合同禁止USB/SWD供电与未供电TAP域并联，仅信号调试或切断USB/外部VOUT供电，核核心板VBUS桥、掉电波形及允许残压。"
+    }
+  },
+  "isolated_can_fix": {
+    "part_delta": 1,
+    "visoin_bypass": "C_CAN_ISOIN_1U (C15849) 紧贴 U_CAN.10/.12",
+    "net_rename": "PACK- -> GND_CAN on CAN secondary isolated domain",
+    "affected_pins": [
+      "U_CAN.9 (GND2)",
+      "U_CAN.12 (GNDP2)",
+      "D_CAN_TVS.3 (GND)",
+      "J_CAN.3 (GND)",
+      "C_CAN_PWR_OUT1.2",
+      "C_CAN_PWR_OUT2.2"
+    ],
+    "harness_pinout_warning": "BMS J_CAN (DEGSON 5.08 3P) 针序为 1=CANH, 2=CANL, 3=GND_CAN；FOC/稳压/水泵 (JST XH 3P) 为 1=GND_CAN, 2=CANH, 3=CANL，做线束时必须按信号名逐针对应，严禁直通混插。"
+  },
+  "bom_encoding_fix": {
+    "ref": "C_VC1",
+    "fix": "Manufacturer 从乱码 'FH(华)' 修正为 'FH(风华)' (MPN 0603B224K500NT / C83626 不变)"
+  },
+  "localization_v1": {
+    "joint_evidence": "电力\\检查\\联合仿真\\降本后典型故障联合仿真.json",
+    "precharge_after": {
+      "c_high_f": 0.080507,
+      "assumed_pump_aux_w": 0.65,
+      "leakage_a": 0.021802,
+      "slow": {
+        "inherited_without_pump_aux": {
+          "delta_at_deadline_v": 0.305307,
+          "charge_s": 3.53986,
+          "total_s": 7.994859999999999,
+          "timer_margin_s": 0.9581400000000002,
+          "pass": true
+        },
+        "pump_aux_typical": {
+          "delta_at_deadline_v": 0.471526,
+          "charge_s": 4.02899,
+          "total_s": 8.48399,
+          "timer_margin_s": 0.46900999999999904,
+          "pass": true
+        }
+      },
+      "probe": {
+        "detect_s": 3.89249,
+        "drop_at_4p1_v": 1.19149
+      },
+      "short": {
+        "peak_w": 196.161,
+        "energy_j": 2005.95,
+        "rx24_mount_and_pulse_qualification": "待核验，300 W 须按指定散热安装"
+      },
+      "pass_timing": true
+    },
+    "main_path_after": {
+      "main_ocd_and_scd_fixtures": {
+        "ocd": {
+          "start_shunt_v": 0.0649998,
+          "peak_shunt_v": 0.0899996,
+          "threshold_at_s": 0.00200051,
+          "break_at_s": 0.011901,
+          "start_mos_drop_v": 0.181999,
+          "fault_mos_energy_j": 0.449054,
+          "settled_current_a": 3.78e-08,
+          "fixture_break_delay_s": 0.00990049,
+          "pass": true
+        },
+        "scd": {
+          "start_shunt_v": 0.0649998,
+          "peak_shunt_v": 0.124999,
+          "threshold_at_s": 0.00200051,
+          "break_at_s": 0.002101,
+          "start_mos_drop_v": 0.181999,
+          "fault_mos_energy_j": 0.00876125,
+          "settled_current_a": 3.78e-08,
+          "fixture_break_delay_s": 0.00010048999999999995,
+          "pass": true
+        }
+      },
+      "bms_130a_cold_w": 23.66,
+      "bms_130a_hot_screen_w": 47.32,
+      "bms_130a_shunt_w": 8.45,
+      "foc_phase_peak_a": 65,
+      "foc_six_switch_pwm_conduction_w": 17.744999999999994,
+      "foc_instantaneous_two_switch_w": 23.66,
+      "foc_12_gate_driver_w": 0.38520000000000004,
+      "foc_92p4a_phase_peak_conduction_w": 35.858591999999994,
+      "pass_thresholds": true
+    },
+    "tap_fuse_after": {
+      "before": "Eaton PV-5A10F + CHPV1U",
+      "withdrawn": "2410FA-5A C2838938, 50 A DC",
+      "after": "0997005.WXN",
+      "dc_interrupt_a": 1000,
+      "dc_rating_v": 58,
+      "model_inputs": {
+        "series": 9,
+        "parallel": 5,
+        "cell_screen_ohm": 0.012,
+        "verified_minimum_cell_dc_ohm": null,
+        "copper_temp_c": 0,
+        "wire_section_mm2": 0.5,
+        "board_end_loop_m": 0.8,
+        "minimum_loop_ohm_exclusive": 0.0378,
+        "minimum_cell_ohm_exclusive_at_near_zero_cable": 0.021
+      },
+      "cases": {
+        "board_end_screen": {
+          "harness_loop_ohm": 0.0254158976,
+          "taps": [
+            {
+              "series": 1,
+              "voltage_v": 4.199999999999999,
+              "pack_ohm": 0.0024000000000000002,
+              "prospective_a": 150.99279054003992,
+              "cold_fuse_current_a": 92.17419652016247
+            },
+            {
+              "series": 2,
+              "voltage_v": 8.399999999999999,
+              "pack_ohm": 0.0048000000000000004,
+              "prospective_a": 277.9993535588365,
+              "cold_fuse_current_a": 175.12442006297405
+            },
+            {
+              "series": 3,
+              "voltage_v": 12.6,
+              "pack_ohm": 0.007200000000000001,
+              "prospective_a": 386.3146786430921,
+              "cold_fuse_current_a": 250.16927326636187
+            },
+            {
+              "series": 4,
+              "voltage_v": 16.799999999999997,
+              "pack_ohm": 0.009600000000000001,
+              "prospective_a": 479.78207475680983,
+              "cold_fuse_current_a": 318.3874578871941
+            },
+            {
+              "series": 5,
+              "voltage_v": 21.0,
+              "pack_ohm": 0.012,
+              "prospective_a": 561.2587522155288,
+              "cold_fuse_current_a": 380.66995940622564
+            },
+            {
+              "series": 6,
+              "voltage_v": 25.2,
+              "pack_ohm": 0.014400000000000001,
+              "prospective_a": 632.9130201500216,
+              "cold_fuse_current_a": 437.7591777531842
+            },
+            {
+              "series": 7,
+              "voltage_v": 29.399999999999995,
+              "pack_ohm": 0.016800000000000002,
+              "prospective_a": 696.4201088075406,
+              "cold_fuse_current_a": 490.2786613169949
+            },
+            {
+              "series": 8,
+              "voltage_v": 33.599999999999994,
+              "pack_ohm": 0.019200000000000002,
+              "prospective_a": 753.0947892439127,
+              "cold_fuse_current_a": 538.755975509282
+            },
+            {
+              "series": 9,
+              "voltage_v": 37.8,
+              "pack_ohm": 0.0216,
+              "prospective_a": 803.9833743384705,
+              "cold_fuse_current_a": 583.6404867490016
+            }
+          ],
+          "max_prospective_a": 803.9833743384705,
+          "below_interrupt_rating": true,
+          "typical_wire_prearc_energy_j": 0.63539744,
+          "typical_fuse_prearc_energy_j": 0.44375,
+          "agrees_with_ohmic_model": true,
+          "cold_current_a": 583.64,
+          "typical_prearc_s": 7.33921e-05
+        },
+        "source_end_screen": {
+          "harness_loop_ohm": 0.0,
+          "taps": [
+            {
+              "series": 1,
+              "voltage_v": 4.199999999999999,
+              "pack_ohm": 0.0024000000000000002,
+              "prospective_a": 1749.9999999999995,
+              "cold_fuse_current_a": 208.4367245657568
+            },
+            {
+              "series": 2,
+              "voltage_v": 8.399999999999999,
+              "pack_ohm": 0.0048000000000000004,
+              "prospective_a": 1749.9999999999995,
+              "cold_fuse_current_a": 372.5055432372505
+            },
+            {
+              "series": 3,
+              "voltage_v": 12.6,
+              "pack_ohm": 0.007200000000000001,
+              "prospective_a": 1749.9999999999998,
+              "cold_fuse_current_a": 505.0100200400801
+            },
+            {
+              "series": 4,
+              "voltage_v": 16.799999999999997,
+              "pack_ohm": 0.009600000000000001,
+              "prospective_a": 1749.9999999999995,
+              "cold_fuse_current_a": 614.2595978062157
+            },
+            {
+              "series": 5,
+              "voltage_v": 21.0,
+              "pack_ohm": 0.012,
+              "prospective_a": 1750.0,
+              "cold_fuse_current_a": 705.8823529411765
+            },
+            {
+              "series": 6,
+              "voltage_v": 25.2,
+              "pack_ohm": 0.014400000000000001,
+              "prospective_a": 1749.9999999999998,
+              "cold_fuse_current_a": 783.8258164852256
+            },
+            {
+              "series": 7,
+              "voltage_v": 29.399999999999995,
+              "pack_ohm": 0.016800000000000002,
+              "prospective_a": 1749.9999999999995,
+              "cold_fuse_current_a": 850.9406657018812
+            },
+            {
+              "series": 8,
+              "voltage_v": 33.599999999999994,
+              "pack_ohm": 0.019200000000000002,
+              "prospective_a": 1749.9999999999995,
+              "cold_fuse_current_a": 909.3369418132611
+            },
+            {
+              "series": 9,
+              "voltage_v": 37.8,
+              "pack_ohm": 0.0216,
+              "prospective_a": 1749.9999999999998,
+              "cold_fuse_current_a": 960.6099110546379
+            }
+          ],
+          "max_prospective_a": 1750.0,
+          "below_interrupt_rating": false,
+          "typical_wire_prearc_energy_j": 0.0,
+          "typical_fuse_prearc_energy_j": 0.44375,
+          "agrees_with_ohmic_model": true,
+          "cold_current_a": 960.61,
+          "typical_prearc_s": 2.70923e-05
+        }
+      },
+      "board_end_harness_fault": {
+        "prospective_current_a": 803.9833743384705,
+        "interrupt_rating_a": 1000,
+        "below_interrupt_rating": true,
+        "typical_prearc_time_s": 7.33921e-05,
+        "typical_prearc_time_us": 73.3921,
+        "typical_wire_prearc_energy_j": 0.63539744,
+        "typical_fuse_prearc_energy_j": 0.44375,
+        "model_agrees_with_ohmic_screen": true,
+        "basis": "Prospective current is before fuse resistance; pre-arc time uses typical cold fuse resistance and typical I²t."
+      },
+      "source_topology_pass": true,
+      "source_placement_pass": true,
+      "source_assembly_requirements": {
+        "double_insulated_short_input": true,
+        "short_shielded_entry": true,
+        "covers_entire_tap_harness": true,
+        "holder_rated_dc_v": 58,
+        "holder_rating_verified_for_pack": true,
+        "bench_required": true,
+        "required_bench_checks": [
+          "Measure 9S5P minimum dynamic resistance over the relevant fault pulse, including minimum cable and return-path resistance.",
+          "Measure fuse-holder and tap-harness temperature during the fault and recovery tests.",
+          "Verify total clearing I²t, B0 return path, holder DC rating, and physical fuse-to-hub fault coverage.",
+          "Qualify the AWG22 XH crimp pigtail and splices under the existing 5 A fuse total clearing I²t. The 0.5 mm² harness screen omits those local parts and contact heating."
+        ],
+        "description_complete": true
+      },
+      "bench_and_assembly_audit": {
+        "near_source_ideal_prospective_a": 1750.0,
+        "interrupt_rating_a": 1000,
+        "exceeds_interrupt_rating": true,
+        "required": true,
+        "disposition": "Bench and assembly audit required; ideal near-source current above the published interrupt rating is not cleared by the harness screen.",
+        "checks": [
+          "Measure 9S5P minimum dynamic resistance over the relevant fault pulse, including minimum cable and return-path resistance.",
+          "Measure fuse-holder and tap-harness temperature during the fault and recovery tests.",
+          "Verify total clearing I²t, B0 return path, holder DC rating, and physical fuse-to-hub fault coverage.",
+          "Qualify the AWG22 XH crimp pigtail and splices under the existing 5 A fuse total clearing I²t. The 0.5 mm² harness screen omits those local parts and contact heating."
+        ]
+      },
+      "fuse_to_hub_fault_coverage": {
+        "status": "not_proven",
+        "note": "Physical routing, fault location, and return path from source fuse to hub are not established by this resistance screen."
+      },
+      "cell_dc_resistance_sensitivity": [
+        {
+          "cell_dc_mohm": 8,
+          "source_end_a": 2625.0,
+          "board_end_a": 949.3695302250326
+        },
+        {
+          "cell_dc_mohm": 12,
+          "source_end_a": 1749.9999999999998,
+          "board_end_a": 803.9833743384705
+        },
+        {
+          "cell_dc_mohm": 16,
+          "source_end_a": 1312.5,
+          "board_end_a": 697.2124722324987
+        },
+        {
+          "cell_dc_mohm": 18,
+          "source_end_a": 1166.6666666666667,
+          "board_end_a": 653.7994145056739
+        },
+        {
+          "cell_dc_mohm": 21,
+          "source_end_a": 999.9999999999999,
+          "board_end_a": 597.9508546913363
+        },
+        {
+          "cell_dc_mohm": 24,
+          "source_end_a": 874.9999999999999,
+          "board_end_a": 550.8927423839457
+        }
+      ],
+      "typical_prearc_i2t_a2s": 25,
+      "published_opening_time_max_s": {
+        "10A": 5,
+        "17.5A": 0.5,
+        "30A": 0.1
+      },
+      "pass_pack_tap_prospective_and_source_placement": true,
+      "physical_fuse_validation": "pending; this is a screening model, not proof of fuse interruption or manufacturing pass.",
+      "scope": "B1…B9对低位抽头的等效串数扫描。板端0.8 m、单芯0.5 mm²及12 mΩ筛查输入给出板端/线束故障模型；近源理想场景取零导线电阻并单列台架与装配审查。保险至hub的实际故障位置、回流路径和覆盖范围，最小动态电阻、总分断I²t、保险座/线束温升及双重绝缘与短屏蔽入口均待实物核验；不据此宣称保险已证实或制造通过。"
+    },
+    "baseline_note": "原字段precharge_and_probe为降本前基线；4+4主功率保留。"
+  }
+}

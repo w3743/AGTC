@@ -1,0 +1,311 @@
+{
+  "status": "PASS",
+  "contract_sha256": {
+    "稳压模块/检查/闭合候选_P5Rev2/稳压P5Rev2施工合同.json": "197fd417a76a48859b1cf9ab4c1938ad36fc8b95f5975f7e749133f19fcfc5f1",
+    "BMS模块/检查/闭合候选_9S5P/BMS_9S5P施工合同.json": "e436ef7a83bd4062d782069599b6deebffedb3f8d1a93bef0648a0caf707019e",
+    "FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2施工合同.json": "ea1889b8e90cff04302014b491793f9894efc94cff2ab432dacbdfa522f2f98c",
+    "水泵驱动模块/检查/闭合候选_隔离CAN/水泵闭合施工合同.json": "f41dfbbd9e0afeb81308ae879661d0e9a68281b6d448eae13d15c6fa82919cf4"
+  },
+  "boards": {
+    "稳压": {
+      "status": "PASS",
+      "target_schematic_count": 268,
+      "core_change_groups": 8,
+      "drawing_entries": 137,
+      "required_entries": 118,
+      "findings": []
+    },
+    "BMS": {
+      "status": "PASS",
+      "target_schematic_count": 301,
+      "core_change_groups": 8,
+      "drawing_entries": 155,
+      "required_entries": 146,
+      "findings": []
+    },
+    "FOC": {
+      "status": "PASS",
+      "target_schematic_count": 165,
+      "core_change_groups": 4,
+      "drawing_entries": 88,
+      "required_entries": 70,
+      "findings": []
+    },
+    "水泵": {
+      "status": "PASS",
+      "target_schematic_count": 52,
+      "core_change_groups": 3,
+      "drawing_entries": 37,
+      "required_entries": 37,
+      "findings": []
+    }
+  },
+  "critical_pin_roles": {
+    "status": "PASS",
+    "checked": [
+      "稳压.U_CAN1",
+      "稳压.U_LPV_OPTO",
+      "稳压.U_EARLY_READY_OPTO",
+      "稳压.Q_SC_ISO1",
+      "稳压.Q_SC_ISO2",
+      "稳压.Q_MAIN_H",
+      "稳压.Q_MAIN_L",
+      "稳压.Q_DUMP",
+      "稳压.C_BUS_BULK1",
+      "稳压.C_BUS_BULK2",
+      "稳压.C_BUS_BULK3",
+      "稳压.C_BUS_BULK4",
+      "稳压.C_BUS_BULK5",
+      "稳压.C_BUS_BULK6",
+      "稳压.Q_MAIN_BH",
+      "稳压.Q_MAIN_BL",
+      "BMS.U_LOAD_POWER_VALID_B",
+      "BMS.Q_CHG4",
+      "BMS.Q_DSG4",
+      "BMS.U_CAN",
+      "BMS.U_LOAD_POWER_VALID",
+      "BMS.Q_BREG",
+      "BMS.Q_CHG1",
+      "BMS.Q_CHG2",
+      "BMS.Q_CHG3",
+      "BMS.Q_DSG1",
+      "BMS.Q_DSG2",
+      "BMS.Q_DSG3",
+      "FOC.Q1",
+      "FOC.Q2",
+      "FOC.Q3",
+      "FOC.Q4",
+      "FOC.Q5",
+      "FOC.Q6",
+      "FOC.U5",
+      "水泵.U_CAN"
+    ],
+    "findings": []
+  },
+  "harness": {
+    "status": "PASS",
+    "can_signal_to_connector_pin": {
+      "BMS": {
+        "GND_CAN": "1",
+        "CANH": "2",
+        "CANL": "3"
+      },
+      "稳压": {
+        "GND_CAN": "1",
+        "CANH": "2",
+        "CANL": "3"
+      },
+      "FOC-A": {
+        "GND_CAN": "1",
+        "CANH": "2",
+        "CANL": "3"
+      },
+      "FOC-B": {
+        "GND_CAN": "1",
+        "CANH": "2",
+        "CANL": "3"
+      },
+      "水泵": {
+        "GND_CAN": "1",
+        "CANH": "2",
+        "CANL": "3"
+      }
+    },
+    "can_harness_pin_to_pin": {
+      "1": "1",
+      "2": "2",
+      "3": "3"
+    },
+    "lpv_foc": {
+      "FOC-A": [
+        "J_LOAD_POWER_VALID",
+        "J_LOAD_POWER_VALID",
+        {
+          "1": "1",
+          "2": "2"
+        }
+      ],
+      "FOC-B": [
+        "J_LOAD_POWER_VALID_B",
+        "J_LOAD_POWER_VALID",
+        {
+          "1": "1",
+          "2": "2"
+        }
+      ]
+    },
+    "lpv_regulator": [
+      "J_LPV_REG",
+      "J_LPV_IN",
+      {
+        "1": "1",
+        "2": "2"
+      }
+    ],
+    "early_ready": [
+      "J_EARLY_READY",
+      "J_EARLY_READY_IN",
+      {
+        "1": "1",
+        "2": "2"
+      },
+      {
+        "J_CORE_P2.12": "PC4"
+      }
+    ],
+    "findings": []
+  },
+  "connector_standard": {
+    "status": "PASS",
+    "findings": [],
+    "board_ports": {
+      "CAN_XH_3P": 5,
+      "signal_XH_2P": 16,
+      "power_5p08_2P": 3,
+      "core_2x12P": 10,
+      "cell_XH_10P": 1,
+      "power_M5": 13,
+      "supercap_XH_9P": 1,
+      "hall_PH_5P": 2,
+      "power_M4": 10
+    },
+    "configuration_jumpers": {
+      "稳压": [
+        "J_CAN_TERM"
+      ],
+      "FOC-A": [
+        "JP_HA",
+        "JP_HB",
+        "JP_HC"
+      ],
+      "FOC-B": [
+        "JP_HA",
+        "JP_HB",
+        "JP_HC"
+      ]
+    },
+    "sku_scope": "本轮列出的板端接口，排除保留的配置跳线和板外线端。双 FOC 按两板计量，料号去重。无采购型号的裸孔或接口边界不计入旧 SKU。",
+    "before_catalog_sku_count": 11,
+    "after_catalog_sku_count": 7,
+    "before_catalog_skus": [
+      "2541WV-2X01P",
+      "254PM-2x12P-V",
+      "2EDGVC-5.08-02P-14-100A(H)",
+      "2EDGVC-5.08-03P-14-100A(H)",
+      "B3B-XH-A(LF)(SN)",
+      "B5B-PH-K-S(LF)(SN)",
+      "B9B-XH-A(LF)(SN)",
+      "HC-XH2.54-2AW-M",
+      "JXT-PM2.54-2X12P-A9",
+      "MFE04542-T1",
+      "TT56145145-1520"
+    ],
+    "after_catalog_skus": [
+      {
+        "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+        "lcsc": "C581328"
+      },
+      {
+        "mpn": "A2501WV-2P",
+        "lcsc": "C48579979"
+      },
+      {
+        "mpn": "B10B-XH-A(LF)(SN)",
+        "lcsc": "C144400"
+      },
+      {
+        "mpn": "B3B-XH-A(LF)(SN)",
+        "lcsc": "C144394"
+      },
+      {
+        "mpn": "B5B-PH-K-S(LF)(SN)",
+        "lcsc": "C157993"
+      },
+      {
+        "mpn": "B9B-XH-A(LF)(SN)",
+        "lcsc": "C157966"
+      },
+      {
+        "mpn": "JXT-PM2.54-2X12P-A9",
+        "lcsc": "C54803369"
+      }
+    ],
+    "after_mechanical_specs_without_lcsc": [
+      "M4",
+      "M5"
+    ]
+  },
+  "final_selection_freeze": {
+    "status": "PASS",
+    "findings": [],
+    "passive_quantity_by_code": {
+      "C30926": 69,
+      "C89258": 8,
+      "C25804": 57,
+      "C21190": 34,
+      "C25803": 41,
+      "C23162": 14
+    },
+    "foc_npn_quantity": 8
+  },
+  "harness_short_circuit_protection": {
+    "status": "PASS",
+    "findings": [],
+    "supercap_offboard_quantity": 8,
+    "hall_ptc_quantity_vehicle": 2,
+    "foc_target_schematic_count": 165,
+    "physical_qualification": {
+      "supercap_harness": "HOLD：实物的 DC 分断、线束毫秒级清除和最小故障电流待核。",
+      "foc_hall": "HOLD：0.41 A 是峰值开关限流，霍尔短路后的 PTC 动作和 5V_BUCK 存活待首板实测。"
+    },
+    "budget_status": "HOLD"
+  },
+  "pump_pinmux": {
+    "status": "PASS",
+    "findings": [],
+    "scope": "核对数字针网和所选 MCU 内部复用，实物核心板方向与保护实测另行确认。"
+  },
+  "foc_cap_bank": {
+    "status": "PASS",
+    "findings": [],
+    "harness": {
+      "FOC-A": {
+        "references": [
+          "CBUS1",
+          "CBUS2",
+          "CBUS3"
+        ],
+        "connection": "+ terminals to BUS, − terminals to GND_SYS; three in parallel",
+        "location": "local harness feed opening and bridge side of F_MAIN"
+      },
+      "FOC-B": {
+        "references": [
+          "CBUS1",
+          "CBUS2",
+          "CBUS3"
+        ],
+        "connection": "+ terminals to BUS, − terminals to GND_SYS; three in parallel",
+        "location": "local harness feed opening and bridge side of F_MAIN"
+      },
+      "vehicle_total": 6,
+      "physical_check": "Follow capacitor case +/− marks; physical terminal orientation and snap-in drawing are not captured in the schematic."
+    }
+  },
+  "simulation_gate": {
+    "status": "PASS",
+    "scenarios": {
+      "1": "PASS",
+      "2": "PASS",
+      "3": "PASS",
+      "4": "PASS",
+      "5": "PASS",
+      "6": "PASS"
+    },
+    "pass_count": 6,
+    "findings": []
+  },
+  "remaining_capture_constraints": {
+    "status": "PASS",
+    "findings": []
+  }
+}
