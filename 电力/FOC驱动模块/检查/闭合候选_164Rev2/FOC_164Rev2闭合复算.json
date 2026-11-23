@@ -1,0 +1,168 @@
+{
+  "module": "FOC驱动模块",
+  "candidate_id": "FOC_164_REV2_CLOSURE_20261123",
+  "status": "PRE_EDA_CALCULATION_ONLY",
+  "source_bindings": {
+    "foc_164_enet": "电力\\FOC驱动模块\\检查\\候选_本地保持与失电通知\\官方V3_20261109\\修正重开.enet",
+    "foc_164_enet_sha256": "97d8c1b0b3398947b1e12fe7a168da4e0e9e0147a104ae657956f5bd6a15b8a4",
+    "component_count": 164,
+    "p0_contract_sha256": "df317a20ea80ee22f534b391b446a89c6834f07d00b9f3db7a806828cf7bd74c"
+  },
+  "bov_coordination": {
+    "foc_bov_earliest_static_v": 42.5327,
+    "foc_bov_latest_static_v": 43.8566,
+    "central_p5rev2_latest_od10_v": 42.1858,
+    "margin_central_first_v": 0.3469,
+    "margin_below_smcj40a_vbr_44p4v": 0.5434,
+    "pass_sequence_and_tvs_margin": true
+  },
+  "buck_5v_budget": {
+    "buck_ic": "DRV8353RS integrated LM5008A (rated 350mA, ILIM_min 410mA)",
+    "load_breakdown_mA": {
+      "g431_core": 60.0,
+      "hall_sensors": 50.0,
+      "ca_is2062a_recessive": 35.0,
+      "ca_is2062a_dominant_peak": 120.0,
+      "misc_and_bias": 10.0
+    },
+    "i_out_recessive_mA": 155.0,
+    "i_out_dominant_peak_mA": 240.0,
+    "inductor_ripple_pp_mA": 201.1,
+    "switch_peak_dominant_mA": 340.6,
+    "margin_below_410mA_limit_mA": 69.4,
+    "pass_steady_and_dominant": true,
+    "cold_start_caveat": "CA-IS2062A VDDP 新增 47µF (C_U5_VDDP_47U) 增大冷启动电容，首板必须示波器实测 22.5V/37.8V 下 5V_BUCK 软启动波形与 ILIM 行为。"
+  },
+  "p0_bus_tvs": {
+    "ref": "DTVS1",
+    "mpn": "SMCJ40A",
+    "manufacturer": "MDD(Microdiode Semiconductor)",
+    "lcsc": "C840777",
+    "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+    "package": "DO-214AB (SMC)",
+    "pins": {
+      "1": "BUS",
+      "2": "GND_SYS"
+    },
+    "pin_roles": {
+      "1": "K",
+      "2": "A"
+    },
+    "value": "40 V VRWM，44.4–49.1 V VBR，64.5 V@23.3 A，10/1000 µs",
+    "source": "https://www.lcsc.com/product-detail/C840777.html",
+    "price": "待核价"
+  },
+  "dual_board_bom_unification": {
+    "R_LOAD_VALID_BIAS": "FOC-A 与 FOC-B 均装配 RC0603FR-071KL (1kΩ, C22548)，配对 BMS 两路独立 LTV-817S-TA1-C 浮地光耦，消除原 A装/B DNP 差异。",
+    "bus_cap_harness_rule": "改版每侧 3×10,000µF/63V (CBUS1-3) 必须接在正/负动力馈线开点与 F_MAIN 的 FOC 逆变桥一侧。"
+  },
+  "capacitor_upgrades_zero_new_sku_plus_x7r": [
+    {
+      "ref": "U1_VCC_C",
+      "old": "TDK C1608X7R1C474K080AC (470nF/16V, 偏压后不足0.47µF下限)",
+      "new": "FH(风华) 0603B105K250NT (1µF/25V X7R 0603, C59302, 复用板上 C_U5_ISOIN_1U, 0新SKU)"
+    },
+    {
+      "ref": "U1_BUCK_COUT2",
+      "old": "TDK C1608X7R1C474K080AC (470nF/16V, 淘汰进口孤立SKU)",
+      "new": "FH(风华) 0603B105K250NT (1µF/25V X7R 0603, C59302, 纹波注入已由 C_BUCK_RIP_CA/CB 独立完成)"
+    },
+    {
+      "ref": "U1_CP_C",
+      "old": "TDK C1608X7S2A473K080AE (47nF/100V X7S, 无C码, 不符合TI X5R/X7R要求)",
+      "new": "FH(风华) 0603B473K101NT (47nF/100V X7R 0603, C43254, 符合TI X7R规格)"
+    }
+  ],
+  "localization_v1": {
+    "joint_evidence": "电力\\检查\\联合仿真\\降本后典型故障联合仿真.json",
+    "island_before_after": {
+      "before": {
+        "peak_v": 38.4455,
+        "energy_j": 0.500245,
+        "modeled_dc_return_a": -3.78e-11,
+        "headroom_v": 61.5545,
+        "pass": true
+      },
+      "after": {
+        "peak_v": 38.454,
+        "energy_j": 0.500245,
+        "modeled_dc_return_a": -3.78e-11,
+        "headroom_v": 24.546,
+        "pass": true
+      }
+    },
+    "foc_bridge_before_after": {
+      "before": {
+        "main_ocd_and_scd_fixtures": {
+          "ocd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.0899996,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.011901,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.449054,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00990049,
+            "pass": true
+          },
+          "scd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.124999,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.002101,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.00876125,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00010048999999999995,
+            "pass": true
+          }
+        },
+        "bms_130a_cold_w": 23.66,
+        "bms_130a_hot_screen_w": 47.32,
+        "bms_130a_shunt_w": 8.45,
+        "foc_phase_peak_a": 65,
+        "foc_six_switch_pwm_conduction_w": 9.506249999999998,
+        "foc_instantaneous_two_switch_w": 12.675,
+        "foc_12_gate_driver_w": 0.5064000000000001,
+        "foc_92p4a_phase_peak_conduction_w": 19.20996,
+        "pass_thresholds": true
+      },
+      "after": {
+        "main_ocd_and_scd_fixtures": {
+          "ocd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.0899996,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.011901,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.449054,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00990049,
+            "pass": true
+          },
+          "scd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.124999,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.002101,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.00876125,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00010048999999999995,
+            "pass": true
+          }
+        },
+        "bms_130a_cold_w": 23.66,
+        "bms_130a_hot_screen_w": 47.32,
+        "bms_130a_shunt_w": 8.45,
+        "foc_phase_peak_a": 65,
+        "foc_six_switch_pwm_conduction_w": 17.744999999999994,
+        "foc_instantaneous_two_switch_w": 23.66,
+        "foc_12_gate_driver_w": 0.38520000000000004,
+        "foc_92p4a_phase_peak_conduction_w": 35.858591999999994,
+        "pass_thresholds": true
+      }
+    },
+    "offboard_capacitor_ripple": "HOLD: 13.98 Arms目录三并额定，首板核20 kHz分流、纹波与温升"
+  }
+}

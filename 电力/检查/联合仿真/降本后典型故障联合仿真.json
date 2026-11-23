@@ -1,0 +1,629 @@
+{
+  "status": "BEHAVIORAL_MODEL_ONLY",
+  "engine": {
+    "path": "电力/FOC驱动模块/仿真/tools/ngspice-47-portable/Spice64/bin/ngspice_con.exe",
+    "sha256": "22d5cae2bd32b2e39157a8d27bf457122f68285b72a9ebefdf41551b628233ab"
+  },
+  "script_sha256": "6b3739d6edaccd15a29a401e60013e19cb180a263628532317570edbd567b2b3",
+  "contract_sha256": {
+    "稳压模块/检查/闭合候选_P5Rev2/稳压P5Rev2施工合同.json": "197fd417a76a48859b1cf9ab4c1938ad36fc8b95f5975f7e749133f19fcfc5f1",
+    "BMS模块/检查/闭合候选_9S5P/BMS_9S5P施工合同.json": "e436ef7a83bd4062d782069599b6deebffedb3f8d1a93bef0648a0caf707019e",
+    "FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2施工合同.json": "ea1889b8e90cff04302014b491793f9894efc94cff2ab432dacbdfa522f2f98c",
+    "水泵驱动模块/检查/闭合候选_隔离CAN/水泵闭合施工合同.json": "f41dfbbd9e0afeb81308ae879661d0e9a68281b6d448eae13d15c6fa82919cf4"
+  },
+  "parts_for_models": {
+    "before": {
+      "foc_cap_f": 0.03,
+      "reg_cap_f": 0.0054,
+      "foc_esr_ohm": 0.007666666666666666,
+      "reg_esr_ohm": 0.005333333333333333,
+      "foc_mos_ohm": 0.0015,
+      "reg_mos_ohm": 0.0043,
+      "foc_qg_nc": 211,
+      "cap_rating_v": 80,
+      "foc_rating_v": 100
+    },
+    "after": {
+      "foc_cap_f": 0.03,
+      "reg_cap_f": 0.006,
+      "foc_esr_ohm": 0.008333333333333333,
+      "reg_esr_ohm": 0.005833333333333334,
+      "foc_mos_ohm": 0.0028,
+      "reg_mos_ohm": 0.0028,
+      "foc_qg_nc": 160.5,
+      "cap_rating_v": 63,
+      "foc_rating_v": 63
+    }
+  },
+  "comparison": {
+    "before": {
+      "1_braking": {
+        "bus_peak_v": 42.2847,
+        "foc_peak_v": 42.3847,
+        "dump_current_peak_a": 51.6622,
+        "dump_junction_peak_c": 87.8027,
+        "dump_energy_j": 290.262,
+        "cap_f": 0.05286,
+        "esr_ohm": 0.0022303030303030304,
+        "stop_time_s": 1.3727513227513228,
+        "stop_distance_m": 2.964065255731923,
+        "initial_mechanical_w": 393.75,
+        "ideal_motor_brake_torque_each_nm": 0.354375,
+        "cap_headroom_v": 37.7153,
+        "foc_threshold_margin_v": 0.148299999999999,
+        "thermal_fixed_case_bound_c": 94.1813012064096,
+        "pass": true
+      },
+      "2_precharge": {
+        "c_high_f": 0.079787,
+        "assumed_pump_aux_w": 0.65,
+        "leakage_a": 0.045736,
+        "slow": {
+          "inherited_without_pump_aux": {
+            "delta_at_deadline_v": 0.52497,
+            "charge_s": 4.26723,
+            "total_s": 8.72223,
+            "timer_margin_s": 0.2307699999999997,
+            "pass": true
+          },
+          "pump_aux_typical": {
+            "delta_at_deadline_v": 0.692082,
+            "charge_s": null,
+            "total_s": null,
+            "timer_margin_s": null,
+            "pass": false
+          }
+        },
+        "probe": {
+          "detect_s": 3.85768,
+          "drop_at_4p1_v": 1.20192
+        },
+        "short": {
+          "peak_w": 196.161,
+          "energy_j": 2005.95,
+          "rx24_mount_and_pulse_qualification": "待核验，300 W 须按指定散热安装"
+        },
+        "pass_timing": false
+      },
+      "4_island": {
+        "peak_v": 38.4455,
+        "energy_j": 0.500245,
+        "modeled_dc_return_a": -3.78e-11,
+        "headroom_v": 61.5545,
+        "pass": true
+      },
+      "5_protection": {
+        "main_ocd_and_scd_fixtures": {
+          "ocd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.0899996,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.011901,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.449054,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00990049,
+            "pass": true
+          },
+          "scd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.124999,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.002101,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.00876125,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00010048999999999995,
+            "pass": true
+          }
+        },
+        "bms_130a_cold_w": 23.66,
+        "bms_130a_hot_screen_w": 47.32,
+        "bms_130a_shunt_w": 8.45,
+        "foc_phase_peak_a": 65,
+        "foc_six_switch_pwm_conduction_w": 9.506249999999998,
+        "foc_instantaneous_two_switch_w": 12.675,
+        "foc_12_gate_driver_w": 0.5064000000000001,
+        "foc_92p4a_phase_peak_conduction_w": 19.20996,
+        "pass_thresholds": true
+      },
+      "6_pump": {
+        "stall": {
+          "peak_i_a": 5.31581,
+          "min_i_a": -0.0194951,
+          "switch_node_peak_v": 38.346,
+          "bus_peak_v": 37.8703,
+          "bus_current_after_a": 5.4649e-07,
+          "command_off_s": 7.62137e-05,
+          "limit_a": 5.19,
+          "pass": true
+        },
+        "normal_brake": {
+          "peak_i_a": 3.9059,
+          "min_i_a": -16.3725,
+          "switch_node_peak_v": 38.2872,
+          "bus_peak_v": 37.8,
+          "bus_current_after_a": 5.76958e-07,
+          "command_off_s": 0.00100005,
+          "motor_avg_v": 21.0149,
+          "pass": true
+        },
+        "shed": {
+          "v_50ms": 21.1571,
+          "v_100ms": 20.7052,
+          "shed_s": 0.0161471,
+          "sense_trip_s": 0.0096421,
+          "power_tail_budget_s": 0.005,
+          "foc_dq_margin_at_50ms_v": 0.04947999999999908,
+          "foc_18v_margin_at_100ms_v": 2.7052000000000014,
+          "meets_15ms_target": false,
+          "pass": true
+        }
+      }
+    },
+    "after": {
+      "1_braking": {
+        "bus_peak_v": 42.2842,
+        "foc_peak_v": 42.3842,
+        "dump_current_peak_a": 51.8388,
+        "dump_junction_peak_c": 87.2031,
+        "dump_energy_j": 292.689,
+        "cap_f": 0.05334,
+        "esr_ohm": 0.0024305555555555556,
+        "stop_time_s": 1.3727513227513228,
+        "stop_distance_m": 2.964065255731923,
+        "initial_mechanical_w": 393.75,
+        "ideal_motor_brake_torque_each_nm": 0.354375,
+        "cap_headroom_v": 20.7158,
+        "foc_threshold_margin_v": 0.14880000000000138,
+        "thermal_fixed_case_bound_c": 92.22335806646272,
+        "pass": true
+      },
+      "2_precharge": {
+        "c_high_f": 0.080507,
+        "assumed_pump_aux_w": 0.65,
+        "leakage_a": 0.021802,
+        "slow": {
+          "inherited_without_pump_aux": {
+            "delta_at_deadline_v": 0.305307,
+            "charge_s": 3.53986,
+            "total_s": 7.994859999999999,
+            "timer_margin_s": 0.9581400000000002,
+            "pass": true
+          },
+          "pump_aux_typical": {
+            "delta_at_deadline_v": 0.471526,
+            "charge_s": 4.02899,
+            "total_s": 8.48399,
+            "timer_margin_s": 0.46900999999999904,
+            "pass": true
+          }
+        },
+        "probe": {
+          "detect_s": 3.89249,
+          "drop_at_4p1_v": 1.19149
+        },
+        "short": {
+          "peak_w": 196.161,
+          "energy_j": 2005.95,
+          "rx24_mount_and_pulse_qualification": "待核验，300 W 须按指定散热安装"
+        },
+        "pass_timing": true
+      },
+      "4_island": {
+        "peak_v": 38.454,
+        "energy_j": 0.500245,
+        "modeled_dc_return_a": -3.78e-11,
+        "headroom_v": 24.546,
+        "pass": true
+      },
+      "5_protection": {
+        "main_ocd_and_scd_fixtures": {
+          "ocd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.0899996,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.011901,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.449054,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00990049,
+            "pass": true
+          },
+          "scd": {
+            "start_shunt_v": 0.0649998,
+            "peak_shunt_v": 0.124999,
+            "threshold_at_s": 0.00200051,
+            "break_at_s": 0.002101,
+            "start_mos_drop_v": 0.181999,
+            "fault_mos_energy_j": 0.00876125,
+            "settled_current_a": 3.78e-08,
+            "fixture_break_delay_s": 0.00010048999999999995,
+            "pass": true
+          }
+        },
+        "bms_130a_cold_w": 23.66,
+        "bms_130a_hot_screen_w": 47.32,
+        "bms_130a_shunt_w": 8.45,
+        "foc_phase_peak_a": 65,
+        "foc_six_switch_pwm_conduction_w": 17.744999999999994,
+        "foc_instantaneous_two_switch_w": 23.66,
+        "foc_12_gate_driver_w": 0.38520000000000004,
+        "foc_92p4a_phase_peak_conduction_w": 35.858591999999994,
+        "pass_thresholds": true
+      },
+      "6_pump": {
+        "stall": {
+          "peak_i_a": 5.12705,
+          "min_i_a": 0.000112515,
+          "switch_node_peak_v": 38.3381,
+          "bus_peak_v": 37.8,
+          "bus_current_after_a": 4.3244e-07,
+          "command_off_s": 7.3577e-05,
+          "limit_a": 5.0,
+          "pass": true
+        },
+        "normal_brake": {
+          "peak_i_a": 3.89554,
+          "min_i_a": -16.225,
+          "switch_node_peak_v": 38.2909,
+          "bus_peak_v": 37.8,
+          "bus_current_after_a": 4.77221e-07,
+          "command_off_s": 0.00100005,
+          "motor_avg_v": 20.9132,
+          "pass": true
+        },
+        "shed": {
+          "v_50ms": 21.2801,
+          "v_100ms": 20.8349,
+          "shed_s": 0.0142212,
+          "sense_trip_s": 0.00971623,
+          "power_tail_budget_s": 0.003,
+          "foc_dq_margin_at_50ms_v": 0.1724800000000002,
+          "foc_18v_margin_at_100ms_v": 2.834900000000001,
+          "meets_15ms_target": true,
+          "pass": true
+        }
+      }
+    }
+  },
+  "3_hold_unchanged_before_and_after": {
+    "retained_10uf_screen": {
+      "steady_v": 10.8919,
+      "dip_min_v": 7.66971,
+      "recovered_v": 10.8919,
+      "t_deep_s": 0.0174549,
+      "t_uvlo_s": 0.0200931,
+      "t_sense_recover_s": 0.0121265,
+      "ctr_available_us": 2638.2000000000003,
+      "ctr_margin_us": 2426.7000000000003,
+      "crosses_latest_falling_threshold_during_dip": true,
+      "pass": true
+    },
+    "retained_30p08uf": {
+      "steady_v": 10.9048,
+      "dip_min_v": 9.83033,
+      "recovered_v": 10.8801,
+      "t_deep_s": 0.0223653,
+      "t_uvlo_s": 0.0303012,
+      "t_sense_recover_s": null,
+      "ctr_available_us": 7935.9,
+      "ctr_margin_us": 7724.4,
+      "crosses_latest_falling_threshold_during_dip": false,
+      "pass": true
+    }
+  },
+  "3_regulator_two_phase": {
+    "ccm_38v_19v": {
+      "charge": {
+        "a_pp": 47.4989,
+        "b_pp": 47.4989,
+        "a_mean": 40.0052,
+        "b_mean": 39.9948,
+        "sc_pp": 2.52953e-12,
+        "bus_mean": 39.9939,
+        "bus_rms": 42.2849,
+        "bus_ac_rms_a": 13.729556831886459,
+        "pass": true
+      },
+      "discharge": {
+        "a_pp": 47.4989,
+        "b_pp": 47.4989,
+        "a_mean": -39.9948,
+        "b_mean": -40.0052,
+        "sc_pp": 1.5504e-11,
+        "bus_mean": -40.0061,
+        "bus_rms": 42.2848,
+        "bus_ac_rms_a": 13.693658160988223,
+        "pass": true
+      }
+    },
+    "local_fault_tail": {
+      "bus_peak_v": 38.9333,
+      "cap_peak_v": 38.6098,
+      "assumed_total_disable_us": 40.0,
+      "phase_initial_abs_a": [
+        63.75,
+        16.249999999999996
+      ],
+      "assumed_l_uh": 11.999999999999998,
+      "energy_j": 0.025968749999999995,
+      "local_bus_limit_v": 39.009,
+      "pass_screen": true,
+      "scope": "理想同步关断与最慢线性尾流，40µs为既有总注入预算。未含换流寄生、单相短路或器件/驱动实际延迟。"
+    },
+    "pass": true
+  },
+  "5_tap_fuse": {
+    "before": "Eaton PV-5A10F + CHPV1U",
+    "withdrawn": "2410FA-5A C2838938, 50 A DC",
+    "after": "0997005.WXN",
+    "dc_interrupt_a": 1000,
+    "dc_rating_v": 58,
+    "model_inputs": {
+      "series": 9,
+      "parallel": 5,
+      "cell_screen_ohm": 0.012,
+      "verified_minimum_cell_dc_ohm": null,
+      "copper_temp_c": 0,
+      "wire_section_mm2": 0.5,
+      "board_end_loop_m": 0.8,
+      "minimum_loop_ohm_exclusive": 0.0378,
+      "minimum_cell_ohm_exclusive_at_near_zero_cable": 0.021
+    },
+    "cases": {
+      "board_end_screen": {
+        "harness_loop_ohm": 0.0254158976,
+        "taps": [
+          {
+            "series": 1,
+            "voltage_v": 4.199999999999999,
+            "pack_ohm": 0.0024000000000000002,
+            "prospective_a": 150.99279054003992,
+            "cold_fuse_current_a": 92.17419652016247
+          },
+          {
+            "series": 2,
+            "voltage_v": 8.399999999999999,
+            "pack_ohm": 0.0048000000000000004,
+            "prospective_a": 277.9993535588365,
+            "cold_fuse_current_a": 175.12442006297405
+          },
+          {
+            "series": 3,
+            "voltage_v": 12.6,
+            "pack_ohm": 0.007200000000000001,
+            "prospective_a": 386.3146786430921,
+            "cold_fuse_current_a": 250.16927326636187
+          },
+          {
+            "series": 4,
+            "voltage_v": 16.799999999999997,
+            "pack_ohm": 0.009600000000000001,
+            "prospective_a": 479.78207475680983,
+            "cold_fuse_current_a": 318.3874578871941
+          },
+          {
+            "series": 5,
+            "voltage_v": 21.0,
+            "pack_ohm": 0.012,
+            "prospective_a": 561.2587522155288,
+            "cold_fuse_current_a": 380.66995940622564
+          },
+          {
+            "series": 6,
+            "voltage_v": 25.2,
+            "pack_ohm": 0.014400000000000001,
+            "prospective_a": 632.9130201500216,
+            "cold_fuse_current_a": 437.7591777531842
+          },
+          {
+            "series": 7,
+            "voltage_v": 29.399999999999995,
+            "pack_ohm": 0.016800000000000002,
+            "prospective_a": 696.4201088075406,
+            "cold_fuse_current_a": 490.2786613169949
+          },
+          {
+            "series": 8,
+            "voltage_v": 33.599999999999994,
+            "pack_ohm": 0.019200000000000002,
+            "prospective_a": 753.0947892439127,
+            "cold_fuse_current_a": 538.755975509282
+          },
+          {
+            "series": 9,
+            "voltage_v": 37.8,
+            "pack_ohm": 0.0216,
+            "prospective_a": 803.9833743384705,
+            "cold_fuse_current_a": 583.6404867490016
+          }
+        ],
+        "max_prospective_a": 803.9833743384705,
+        "below_interrupt_rating": true,
+        "typical_wire_prearc_energy_j": 0.63539744,
+        "typical_fuse_prearc_energy_j": 0.44375,
+        "agrees_with_ohmic_model": true,
+        "cold_current_a": 583.64,
+        "typical_prearc_s": 7.33921e-05
+      },
+      "source_end_screen": {
+        "harness_loop_ohm": 0.0,
+        "taps": [
+          {
+            "series": 1,
+            "voltage_v": 4.199999999999999,
+            "pack_ohm": 0.0024000000000000002,
+            "prospective_a": 1749.9999999999995,
+            "cold_fuse_current_a": 208.4367245657568
+          },
+          {
+            "series": 2,
+            "voltage_v": 8.399999999999999,
+            "pack_ohm": 0.0048000000000000004,
+            "prospective_a": 1749.9999999999995,
+            "cold_fuse_current_a": 372.5055432372505
+          },
+          {
+            "series": 3,
+            "voltage_v": 12.6,
+            "pack_ohm": 0.007200000000000001,
+            "prospective_a": 1749.9999999999998,
+            "cold_fuse_current_a": 505.0100200400801
+          },
+          {
+            "series": 4,
+            "voltage_v": 16.799999999999997,
+            "pack_ohm": 0.009600000000000001,
+            "prospective_a": 1749.9999999999995,
+            "cold_fuse_current_a": 614.2595978062157
+          },
+          {
+            "series": 5,
+            "voltage_v": 21.0,
+            "pack_ohm": 0.012,
+            "prospective_a": 1750.0,
+            "cold_fuse_current_a": 705.8823529411765
+          },
+          {
+            "series": 6,
+            "voltage_v": 25.2,
+            "pack_ohm": 0.014400000000000001,
+            "prospective_a": 1749.9999999999998,
+            "cold_fuse_current_a": 783.8258164852256
+          },
+          {
+            "series": 7,
+            "voltage_v": 29.399999999999995,
+            "pack_ohm": 0.016800000000000002,
+            "prospective_a": 1749.9999999999995,
+            "cold_fuse_current_a": 850.9406657018812
+          },
+          {
+            "series": 8,
+            "voltage_v": 33.599999999999994,
+            "pack_ohm": 0.019200000000000002,
+            "prospective_a": 1749.9999999999995,
+            "cold_fuse_current_a": 909.3369418132611
+          },
+          {
+            "series": 9,
+            "voltage_v": 37.8,
+            "pack_ohm": 0.0216,
+            "prospective_a": 1749.9999999999998,
+            "cold_fuse_current_a": 960.6099110546379
+          }
+        ],
+        "max_prospective_a": 1750.0,
+        "below_interrupt_rating": false,
+        "typical_wire_prearc_energy_j": 0.0,
+        "typical_fuse_prearc_energy_j": 0.44375,
+        "agrees_with_ohmic_model": true,
+        "cold_current_a": 960.61,
+        "typical_prearc_s": 2.70923e-05
+      }
+    },
+    "board_end_harness_fault": {
+      "prospective_current_a": 803.9833743384705,
+      "interrupt_rating_a": 1000,
+      "below_interrupt_rating": true,
+      "typical_prearc_time_s": 7.33921e-05,
+      "typical_prearc_time_us": 73.3921,
+      "typical_wire_prearc_energy_j": 0.63539744,
+      "typical_fuse_prearc_energy_j": 0.44375,
+      "model_agrees_with_ohmic_screen": true,
+      "basis": "Prospective current is before fuse resistance; pre-arc time uses typical cold fuse resistance and typical I²t."
+    },
+    "source_topology_pass": true,
+    "source_placement_pass": true,
+    "source_assembly_requirements": {
+      "double_insulated_short_input": true,
+      "short_shielded_entry": true,
+      "covers_entire_tap_harness": true,
+      "holder_rated_dc_v": 58,
+      "holder_rating_verified_for_pack": true,
+      "bench_required": true,
+      "required_bench_checks": [
+        "Measure 9S5P minimum dynamic resistance over the relevant fault pulse, including minimum cable and return-path resistance.",
+        "Measure fuse-holder and tap-harness temperature during the fault and recovery tests.",
+        "Verify total clearing I²t, B0 return path, holder DC rating, and physical fuse-to-hub fault coverage.",
+        "Qualify the AWG22 XH crimp pigtail and splices under the existing 5 A fuse total clearing I²t. The 0.5 mm² harness screen omits those local parts and contact heating."
+      ],
+      "description_complete": true
+    },
+    "bench_and_assembly_audit": {
+      "near_source_ideal_prospective_a": 1750.0,
+      "interrupt_rating_a": 1000,
+      "exceeds_interrupt_rating": true,
+      "required": true,
+      "disposition": "Bench and assembly audit required; ideal near-source current above the published interrupt rating is not cleared by the harness screen.",
+      "checks": [
+        "Measure 9S5P minimum dynamic resistance over the relevant fault pulse, including minimum cable and return-path resistance.",
+        "Measure fuse-holder and tap-harness temperature during the fault and recovery tests.",
+        "Verify total clearing I²t, B0 return path, holder DC rating, and physical fuse-to-hub fault coverage.",
+        "Qualify the AWG22 XH crimp pigtail and splices under the existing 5 A fuse total clearing I²t. The 0.5 mm² harness screen omits those local parts and contact heating."
+      ]
+    },
+    "fuse_to_hub_fault_coverage": {
+      "status": "not_proven",
+      "note": "Physical routing, fault location, and return path from source fuse to hub are not established by this resistance screen."
+    },
+    "cell_dc_resistance_sensitivity": [
+      {
+        "cell_dc_mohm": 8,
+        "source_end_a": 2625.0,
+        "board_end_a": 949.3695302250326
+      },
+      {
+        "cell_dc_mohm": 12,
+        "source_end_a": 1749.9999999999998,
+        "board_end_a": 803.9833743384705
+      },
+      {
+        "cell_dc_mohm": 16,
+        "source_end_a": 1312.5,
+        "board_end_a": 697.2124722324987
+      },
+      {
+        "cell_dc_mohm": 18,
+        "source_end_a": 1166.6666666666667,
+        "board_end_a": 653.7994145056739
+      },
+      {
+        "cell_dc_mohm": 21,
+        "source_end_a": 999.9999999999999,
+        "board_end_a": 597.9508546913363
+      },
+      {
+        "cell_dc_mohm": 24,
+        "source_end_a": 874.9999999999999,
+        "board_end_a": 550.8927423839457
+      }
+    ],
+    "typical_prearc_i2t_a2s": 25,
+    "published_opening_time_max_s": {
+      "10A": 5,
+      "17.5A": 0.5,
+      "30A": 0.1
+    },
+    "pass_pack_tap_prospective_and_source_placement": true,
+    "physical_fuse_validation": "pending; this is a screening model, not proof of fuse interruption or manufacturing pass.",
+    "scope": "B1…B9对低位抽头的等效串数扫描。板端0.8 m、单芯0.5 mm²及12 mΩ筛查输入给出板端/线束故障模型；近源理想场景取零导线电阻并单列台架与装配审查。保险至hub的实际故障位置、回流路径和覆盖范围，最小动态电阻、总分断I²t、保险座/线束温升及双重绝缘与短屏蔽入口均待实物核验；不据此宣称保险已证实或制造通过。"
+  },
+  "conclusions": {
+    "1": "PASS",
+    "2": "PASS",
+    "3": "PASS",
+    "4": "PASS",
+    "5": "PASS",
+    "6": "PASS"
+  },
+  "scope": {
+    "1": "断开动力主路，假设电池侧早保护仍有效。30 kg 平地、50 ms 建扭、净 450 W 峰值线性衰减、近桥+0.1 V、0.5 ms 判定滞后、1 µH 泄放线。停距基于给定减速度，需轮地/电机扭矩台架证实。85°C 固定壳温、20 ms 热时间常数为示意，固定壳温下另列 RθJC 上界。",
+    "2": "预充 +20% 初始容量，额定电压漏电作恒流筛查，0.65 W 泵辅助取电为假设。理想硬短路用继承热角及最长定时，RX24 安装及连续/脉冲能力待核。",
+    "3": "既有 100k/10k 门限及 211.5 µs CTR 预算。2 ms 短断与永久短路分开。另验双相理想开关两方向纹波和本地电容故障续流。40µs、80A是压力输入，实物止流和额定功率待核。",
+    "4": "初始 37.8 V、每侧容量−20%、500 W→1 ms 归零。CAN 隔离屏障用假设电容和电阻表示；仅排除结构性直流回路，示波核对其他线束及共模瞬态。",
+    "5": "以37.8V和电阻负载由130A阶跃到180/250A，使用行为阈值与定时。抽头门禁覆盖板端线束模型及源端装配合同，1750A近源理想短路另列装配与台架审计，不代表分断已证实。",
+    "6": "泵用 1 Ω、0.5 mH 旧夹具，正常运行 20 kHz PWM。卸载用 22.2 V 校准阈值、+1% 增益、1.5 ms RC，从稳态 22.5 V 起算模型 crossing 后加 1.5 ms 控制及旧5/新3 ms功率尾段预算，按 21.10762 V/50 ms 与 18 V/100 ms 筛查。COMP 采用1µs输入RC及1µs行为级BREAK锁存，旧芯片用等效单次响应对照。实泵堵转、续流寄生、制动电流、开关实际时序及 FOC 建扭待核。"
+  }
+}
