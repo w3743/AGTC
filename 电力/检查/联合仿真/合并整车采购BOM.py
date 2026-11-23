@@ -73,7 +73,7 @@ def merge_line_items():
         directory = POWER / folder / "检查"
         contract_path = directory / contract_rel
         contracts[board] = read(contract_path)
-        project = directory / "CodeAsEDA_tscircuit"
+        project = POWER / folder / "eda工程文件"
         exports = project / "exports"
         bom_path = exports / "bom.csv"
         reference_path = project / f"reference_{count}_netlist.json"

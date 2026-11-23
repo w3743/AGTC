@@ -1,0 +1,41 @@
+import React from "react"
+import { SchematicSection } from "../../../../检查/联合仿真/code_as_eda/renderer"
+
+export function McuAndCan() {
+  return <SchematicSection title="MCU interfaces, current sensing and isolated CAN" schX={420} schY={0} columns={3} refs={[
+    "C_BUS_ADC",
+    "C_CAN1",
+    "C_CAN_ISOIN_1U",
+    "C_CAN_ISO_BULK",
+    "C_CAN_ISO_HF",
+    "C_CAN_VDDP_BULK",
+    "C_CAN_VDDP_HF",
+    "C_NTC_DUMP",
+    "C_NTC_MAIN",
+    "C_NTC_SC",
+    "D_CAN_TVS",
+    "J_5V_EXT",
+    "J_CAN",
+    "J_CAN_TERM",
+    "J_CORE_P1",
+    "J_CORE_P2",
+    "J_NTC_DUMP",
+    "J_NTC_MAIN",
+    "J_NTC_SC",
+    "R_BUS_HI",
+    "R_BUS_HI2",
+    "R_BUS_LO",
+    "R_CAN_TERM",
+    "R_ISC_BIAS_BOT",
+    "R_ISC_BIAS_TOP",
+    "R_ISC_FEEDBACK",
+    "R_ISC_INPUT",
+    "R_NTC_DUMP_PU",
+    "R_NTC_MAIN_PU",
+    "R_NTC_SC_PU",
+    "R_TEST_HI",
+    "R_TEST_LO",
+    "U_CAN1",
+    "U_SIGNAL_ISO",
+  ]} />
+}
