@@ -1,0 +1,568 @@
+{
+  "contract_id": "MPPT_A_6_BOARD_INTERFACE_PROPOSAL",
+  "status": "INTERFACE_DEFINED_FULL_SCHEMATIC_PENDING",
+  "release_for_power_connection": false,
+  "release_for_purchase": false,
+  "target_component_count": null,
+  "baseline_policy": "四套既有主电力原理图、四份施工合同和整车采购 BOM 只读。新增授权仅定义独立板的 BMS 唤醒与充电接口。",
+  "architecture": {
+    "pv": {
+      "stages": 3,
+      "topology": "同步 Boost，独立 V/I 取样、峰流/零流控制与 P&O",
+      "aggregate_reserved_w": 120,
+      "per_channel_screen_w": 60,
+      "per_channel_max_input_current_screen_a": 5,
+      "absolute_cold_panel_voc_limit_v": 22,
+      "cold_vmp_minimum": "待实际光伏 I-V 曲线及控制辅助电源最低工作电压；60 W 在5 A 限流下至少 12 V。",
+      "input_connectors": "XT30 ×3；AWG18 为比较起点。XH 仅配低流/信号。",
+      "dark_PV_isolation": "每相零流与默认关断，独立输出隔离；控制偏置 OR 只带毫安级独立负载。"
+    },
+    "pd_xt60": {
+      "topology": "TPS26750SRSMR + TPD4S480RUKR + BQ25756RRVR 四管非隔离 Buck-Boost",
+      "type_c_mode": "Sink only，禁止 EN_REV。EEPROM 镜像与硬件 ADCIN strap 按受电角色验证。",
+      "spr_and_epr_input_v": [
+        5,
+        9,
+        12,
+        15,
+        20,
+        28,
+        36,
+        48
+      ],
+      "contract_note": "12 V 仅当电源能力包含该档，由公布的固定 PDO/APDO 决定。5 V 初始阶段按 advertised Rp/已协商电流取小值。48 V/5 A 需合格 EPR 线缆、电源和插座。",
+      "raw_vbus_epr": "原始 48 V 经 TPD4S480 保护/感测适配。TPS26750 引脚 26/27 的推荐 VBUS 范围 4–22 V。由 VBUS LDO 自举时外部 LDO_3V3/GPIO 合计负载不得超过数据表额定，先核 EEPROM/strap 和门控负载。",
+      "priority": "有效 PD 优先；转到 XT60 前先关功率路径、验证通路无重叠。独立 PD_VBUS_PRESENT 和 SOLAR_PRESENT。",
+      "input_rating_boundary": "BQ 输入 4.2–70 V。参考 5 V VINDPM 4.35 V；整机最高连续输入由较低额定的互锁器件、偏置及启动过冲确定。"
+    },
+    "bus": {
+      "power_port": {
+        "1": "BUS_CHG+",
+        "2": "GND_SYS"
+      },
+      "vehicle_termination": {
+        "BUS_CHG+": "BMS 下游 PACK+ / BUS+",
+        "GND_SYS": "BMS PACK−，经既有 RSHUNT 回 B0"
+      },
+      "prohibited_bypass": [
+        "B0 地短接",
+        "以 J_CELL_SERVICE 采样抽头注入",
+        "使用 R_PRE 作持续充电支路"
+      ],
+      "operating_cv_nominal_v": 37.6,
+      "parked_limit_target_v": 37.8,
+      "module_fuse_target_a": 20,
+      "fuse_position": "靠 BUS 源端的模块支路，方向/分断测试须覆盖电池、超容和双向回生供电。",
+      "regenerative_cutback": "独立硬件抑制充电并留有受控电感续流；定时指标须测功率支路实际电流。不替代中央稳压 BOV/泄放。"
+    }
+  },
+  "recovery_interface": {
+    "id": "MPPT_BMS_LD_REQUEST_AND_CHARGE_WINDOW_V0",
+    "status": "AUTHORIZED_TO_DEFINE_UNQUALIFIED",
+    "frozen_hardware_connection": {
+      "wake_probe_physical_path": "光伏低能量独立探测源 → PACK+（BMS 负载侧）→ 原 5.1 kΩ → BQ76952 LD",
+      "return": "GND_SYS / PACK−，保持 B0/RSHUNT 边界",
+      "command_transport_after_wake": "既有隔离 CAN；MPPT 节点 0x06 为项目目标，帧 ID 与协议版待共同冻结",
+      "unused_for_wake": [
+        "TS2（既有板温 NTC）",
+        "J_EARLY_READY_IN（稳压状态）",
+        "LOAD_POWER_VALID（功率开关状态）"
+      ]
+    },
+    "probe_example_not_final": {
+      "max_v": 3.3,
+      "max_a": 0.05,
+      "duration_s": 5.5,
+      "max_supplied_energy_j": 0.9075,
+      "ld_rising_threshold_max_v": 2.25,
+      "retries_per_wake_request": 0
+    },
+    "signals": {
+      "CHARGE_WINDOW": {
+        "direction": "BMS → MPPT via CAN",
+        "fields": [
+          "monotonic_seq",
+          "lease_remaining_ms",
+          "ccl_allocated_ma",
+          "charge_path_proven",
+          "charge_mode",
+          "temperature_valid",
+          "cold_charge_inhibit",
+          "precharge_active"
+        ],
+        "failsafe": "许可不存在、传感器过期、序号重复、超时、零额度、低温或预充有效时，主充电切断。",
+        "role_note": "独立于 LPV。发送前需证实 CHG 通路及 CCL，不使用无条件恢复默认值。帧位序、周期与过期行为需与 BMS、其他源和 RK3588 共同冻结。"
+      },
+      "MPPT_SRC_STATUS": {
+        "direction": "MPPT → vehicle via CAN",
+        "fields": [
+          "solar_present",
+          "pd_vbus_present",
+          "wired_present",
+          "pd_contract_mv",
+          "pd_contract_ma",
+          "probe_active",
+          "charge_output_isolated",
+          "measured_output_ma"
+        ]
+      },
+      "J_SYS_SLEEP_CTL": {
+        "type": "隔离/开漏受控电请求；既有 RK3588 硬件接收口电气定义待定",
+        "logical_signals": [
+          "SYS_PWR_CUT_N",
+          "RK_ALIVE",
+          "POWER_RAIL_LOW_PROVEN"
+        ]
+      }
+    },
+    "sequence": [
+      "太阳能 OR 建立本地控制偏置，主充电链保持隔离，禁止借能注入 BUS。",
+      "在受限 LD 起动接口获准适用且条件成立时，只开一次限压限流探测。探测状态与主充电输出互斥。",
+      "结束探测后硬件断开且向 BMS 提供隔离/残压证明；常规预充仍按冻结 BMS 规则。",
+      "BMS AFE/MCU 在充分电源与传感器资格下判断温度、开关、分流及负载禁止状态。",
+      "仅按有期限正 CHARGE_WINDOW 打开主输出并受控升流。无可信 CCL/撤销硬关断，回生用本地硬件独立优先退让。",
+      "恢复运行前撤销充电授权和外部主动预带电，按原 BMS 规则完成预充及 ARM。"
+    ],
+    "integration_hold": [
+      "核对 PARK/STORE 位置下 AFE 与 SCT2A23ASTER/MCU 能否启动并发布授权。AFE LD 被唤醒本身不建立 MCU 电源。",
+      "复核充电侧 FET/体二极管热角及 BQ 配置，确认仅充状态下负载始终受抑制，防止 FET_RELEASE 与 LPV 关联导致负载提前上电。",
+      "实测实际 PACK+ 初始残压、有效电容、低压负载、LD 脉冲并证明按原预充规则安全交接。若不存在硬件允许的接收状态，仅保留本地唤醒。"
+    ],
+    "sources": [
+      "https://www.ti.com/lit/ds/symlink/bq76952.pdf",
+      "https://www.ti.com/lit/ug/sluuby2b/sluuby2b.pdf",
+      "电力/BMS模块/检查/闭合候选_9S5P/BMS_9S5P施工合同.json",
+      "电力/BMS模块/设计细节.md"
+    ]
+  },
+  "aux": {
+    "heater": {
+      "connector_ref": "J_HEATER",
+      "proposed_board_pinout": {
+        "1": "HEATER_SW+",
+        "2": "PV_RTN"
+      },
+      "source": "只用一条有效光伏路径，经可验证隔离和限流供热",
+      "referenced_power_w": [
+        30,
+        50
+      ],
+      "heat_start_below_c": 2,
+      "resume_requires_all_above_c": 5,
+      "failsafe": "默认关闭",
+      "qualification": "须有可信低温原因与温度、允许电阻冷角/热角和线束温升。"
+    },
+    "rk_watchdog": {
+      "hard_reboot_independent_of_mppt_mcu": true,
+      "target_recovery": "断电到轨低阈值后才能上电；连续失败保守回 Tier 0。",
+      "status": "缺既有 RK3588 控电端与实物启动/放电数据。原 BMS TPL5111 继续作预充。",
+      "control_rail_behavior": "器件需要独立的有效低压电源；关断请求不可经 MPPT MCU 软件转发。关断状态、恢复许可及放电观测在 J_SYS_SLEEP_CTL 端定义。"
+    },
+    "sleep": {
+      "vehicle_tier0_less_than_mw": 50,
+      "proof": "需在电池端实测各轨关断后全温总吸流",
+      "can_off_at_tier0": true
+    },
+    "controller": {
+      "mpn": "STM32G431CBU6",
+      "node_id_target": "0x06",
+      "platform": "STM32G431 目标端编译实现",
+      "firmware": "ADC/PWM/COMP/FDCAN 分配与16 KB CAN OTA 用项目实证闭合。",
+      "node_id_evidence": "固件/README.md Node ID 1–5 已分配规划；独立 MPPT 顺延 0x06，CAN 帧字典待冻结。"
+    }
+  },
+  "known_schematic_scope": {
+    "count": 10,
+    "scope": "隔离 CAN 局部，含 VISOIN 独立1 µF 与供电/数字信号边界",
+    "contract": "CodeAsEDA_tscircuit/CAN接口局部合同.json",
+    "deliverable": "CodeAsEDA_tscircuit/exports/can_interface_preview/netlist_verify_report.json",
+    "main_scopes_unwired": [
+      "三路 PV 功率级与采样",
+      "PD/mux/EPR 与 5V 启动",
+      "热态栅驱和输出保护",
+      "BMS 唤醒/授权",
+      "MCU 完整针网",
+      "加热与 RK 控电"
+    ]
+  },
+  "closure_required_for_full_capture": [
+    "验证受 BMS 许可的 LD 唤醒、独立正充电路径和仅充态下负载默认禁能。保留所有旧板字节。",
+    "确认三路真实 PV 的冷态 Voc、最低 Vmp、Isc、组串输出与任一输入故障时同母线控制稳定性。",
+    "确定 TPS26750 实际受电配置镜像/EPR 插座和两路隔离功率路径，评估 MPP 和 5 V 极限启动。",
+    "补齐控制环、热额定、实际退让/过压、过流分断、CAN 端接和 RK3588 控电的物理针网。"
+  ],
+  "parts_catalog_not_full_bom": [
+    {
+      "role": "PD 受电控制",
+      "mpn": "TPS26750SRSMR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C42166327",
+      "footprint": "VQFN-32-EP 4×4 (RSM)",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/tps26750.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C42166327.html",
+      "selection_limit": "需EEPROM与sink控制路径。",
+      "price": {
+        "usd_each": 3.0155,
+        "tier": "1+",
+        "basis": "LCSC 公开目录快照，未下单"
+      },
+      "physical_pin_functions": {
+        "1": "LDO_3V3",
+        "2": "ADCIN1",
+        "3": "ADCIN2",
+        "4": "LDO_1V5",
+        "5": "GPIO0",
+        "6": "GPIO1",
+        "7": "GPIO2",
+        "8": "I2Ct_SDA",
+        "9": "I2Ct_SCL",
+        "10": "I2Ct_IRQ",
+        "11": "GND",
+        "12": "GND",
+        "13": "GPIO11",
+        "14": "GND",
+        "15": "I2Cc_SDA",
+        "16": "I2Cc_SCL",
+        "17": "I2Cc_IRQ",
+        "18": "GPIO3",
+        "19": "VSYS",
+        "20": "POWER_PATH_EN",
+        "21": "NC",
+        "22": "GPIO4/USB_P/LD1",
+        "23": "GPIO5/USB_N/LD2",
+        "24": "CC1",
+        "25": "CC2",
+        "26": "VBUS",
+        "27": "VBUS",
+        "28": "PP5V",
+        "29": "PP5V",
+        "30": "GPIO7",
+        "31": "GPIO6",
+        "32": "VIN_3V3",
+        "EP": "GND"
+      },
+      "pin_source": "TI SLVSH67 Fig. 4-1/Table 4-1，第 3–4 页。仅为器件管脚名，尚未冻结本板针网。"
+    },
+    {
+      "role": "EPR 输入敏感引脚保护",
+      "mpn": "TPD4S480RUKR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C43131250",
+      "footprint": "WQFN-20 (RUK)",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/tpd4s480.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C43131250.html",
+      "selection_limit": "CC/SBU 及 VBUS 感测；主电流走外部通路。",
+      "price": "待核价"
+    },
+    {
+      "role": "PD/XT60 四管控制",
+      "mpn": "BQ25756RRVR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C19272232",
+      "footprint": "VQFN-36 5×6 (RRV) + EP",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/bq25756.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C19272232.html",
+      "selection_limit": "4.2–70 V 输入，配置禁用反向。",
+      "price": {
+        "usd_each": 5.3065,
+        "tier": "1+",
+        "basis": "LCSC 参考快照，税运待核"
+      },
+      "physical_pin_functions": {
+        "1": "SCL",
+        "2": "SDA",
+        "3": "INT",
+        "4": "STAT1",
+        "5": "STAT2",
+        "6": "PG",
+        "7": "CE",
+        "8": "TS",
+        "9": "ICHG",
+        "10": "ILIM_HIZ",
+        "11": "FBG",
+        "12": "FB",
+        "13": "SRN",
+        "14": "SRP",
+        "15": "NC",
+        "16": "NC",
+        "17": "PGND",
+        "18": "SW2",
+        "19": "HIDRV2",
+        "20": "BTST2",
+        "21": "LODRV2",
+        "22": "PGND",
+        "23": "DRV_SUP",
+        "24": "REGN",
+        "25": "LODRV1",
+        "26": "BTST1",
+        "27": "HIDRV1",
+        "28": "SW1",
+        "29": "ACN",
+        "30": "ACP",
+        "31": "NC",
+        "32": "VAC",
+        "33": "VAC",
+        "34": "ACUV",
+        "35": "ACOV",
+        "36": "FSW_SYNC",
+        "37": "THERMAL_PAD_PGND"
+      },
+      "pin_source": "TI SLUSEN5A Table 4-1，第 3–5 页。仅为器件管脚名，尚未冻结本板针网。"
+    },
+    {
+      "role": "输入 OR/功率隔离候选",
+      "mpn": "LM74800QDRRRQ1",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C3215600",
+      "footprint": "WSON-12 3×3 (DRR)",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/lm7480-q1.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C3215600.html",
+      "selection_limit": "反向阻断并驱动双MOS切断，验证实际 OR 接法、失电和EPR瞬态。",
+      "price": "待核价"
+    },
+    {
+      "role": "光伏同步栅驱候选",
+      "mpn": "UCC27282DRCR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C2677035",
+      "footprint": "VSON-10 3×3 (DRC)",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/ucc27282.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C2677035.html",
+      "selection_limit": "5.5–16 V 栅驱供电；需独立10 V级驱动偏置与峰流/零流环。",
+      "price": "待核价"
+    },
+    {
+      "role": "光伏内环备选比较",
+      "mpn": "LM5122MHX/NOPB",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C77241",
+      "footprint": "HTSSOP-20-EP",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/lm5122.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C77241.html",
+      "selection_limit": "4.5 V启动。普通 Boost 不含MPPT，需要独立外环，不与 UCC27282 同路叠加。",
+      "price": "待核价"
+    },
+    {
+      "role": "功率 MOS 比较",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI 华羿微",
+      "lcsc": "C2925050",
+      "footprint": "TOLL-9",
+      "datasheet_or_frozen_source": "电力/FOC驱动模块/检查/闭合候选_164Rev2/FOC_164Rev2施工合同.json",
+      "catalog": "https://jlcpcb.com/partdetail/HUAYI-HYG022N10NS1TA/C2925050",
+      "selection_limit": "100 V，10 V栅压核对，须复核 200–600 kHz 开关与热损耗。",
+      "price": "待核价",
+      "physical_pin_functions": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "role": "紧凑功率 MOS 比较",
+      "mpn": "HYG053N10NS1C2",
+      "manufacturer": "HUAYI 华羿微",
+      "lcsc": "C2986239",
+      "footprint": "PDFN5×6-8L",
+      "datasheet_or_frozen_source": "https://datasheet.lcsc.com/lcsc/2203300930_HUAYI-HYG053N10NS1C2_C2986239.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C2986239.html",
+      "selection_limit": "100 V，额定栅压下Rds条件及焊盘针序查原厂。",
+      "price": "待核价"
+    },
+    {
+      "role": "光伏22µH比较",
+      "mpn": "CSBL1275-220M",
+      "manufacturer": "CODACA 科达嘉",
+      "lcsc": "C7421390",
+      "footprint": "IND-SMD_L13.8-W12.8",
+      "datasheet_or_frozen_source": "https://datasheet.lcsc.com/datasheet/pdf/f35a5ddef43ba9d479e2bbf2435274e2.pdf?productCode=C7115842",
+      "catalog": "https://www.lcsc.com/product-detail/C7421390.html",
+      "selection_limit": "8 A电流档、9.5 A Isat（目录），需核25°C规范及全温余量，另查现货。",
+      "price": "待核价"
+    },
+    {
+      "role": "PD 10µH比较",
+      "mpn": "CSBX1275-100M",
+      "manufacturer": "CODACA 科达嘉",
+      "lcsc": "C17589901",
+      "footprint": "CSBX1275 SMD 2端",
+      "datasheet_or_frozen_source": "https://www.codaca.com/Private/pdf/CSBX1275.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C17589901.html",
+      "selection_limit": "Isat 21 A（L降30%），Irms 11 A（25°C 时温升50°C），DCR 10.1 mΩ max。仍需核交流损耗、限流角及温升。",
+      "price": "待核价"
+    },
+    {
+      "role": "独立毫安级光伏偏置 OR",
+      "mpn": "BAS70L,315",
+      "manufacturer": "Nexperia",
+      "lcsc": "C456141",
+      "footprint": "SOD-882",
+      "datasheet_or_frozen_source": "https://assets.nexperia.com/documents/data-sheet/BAS70L.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C456141.html",
+      "selection_limit": "仅控制偏置。目录70 V、70 mA，温区最大漏流与正向压降需校核。",
+      "price": "待核价",
+      "physical_pin_functions": {
+        "1": "K",
+        "2": "A"
+      }
+    },
+    {
+      "role": "太阳能自举 LDO 比较",
+      "mpn": "TPS7A1633DGNR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C181239",
+      "footprint": "HVSSOP-8-EP",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/tps7a16.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C181239.html",
+      "selection_limit": "3.3 V / 60 V，典型静态5 µA。22 V输入10 mA负载约0.187 W，CAN/门驱不能直接挂此偏置。",
+      "price": "待核价"
+    },
+    {
+      "role": "RK 独立硬件看门狗比较",
+      "mpn": "TPS3435CAIEGDDFR",
+      "manufacturer": "Texas Instruments",
+      "lcsc": "C22427898",
+      "footprint": "SOT-23-THN-8 (DDF)",
+      "datasheet_or_frozen_source": "https://www.ti.com/lit/ds/symlink/tps3435.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C22427898.html",
+      "selection_limit": "250 nA典型，输出和后级时序需配RK控电输入。",
+      "price": "待核价"
+    },
+    {
+      "role": "光伏输入",
+      "mpn": "XT30PW-M30.G.Y",
+      "manufacturer": "AMASS 艾迈斯",
+      "lcsc": "C431092",
+      "footprint": "XT30PW30-M 2针侧插",
+      "datasheet_or_frozen_source": "https://www.lcsc.com/product-detail/C431092.html",
+      "catalog": "https://www.lcsc.com/product-detail/C431092.html",
+      "selection_limit": "目录15 A档，板端为公头；三路每路按5A限额并校核输入线规。",
+      "price": {
+        "usd_each": 0.3761,
+        "tier": "1+",
+        "basis": "LCSC 公开目录快照，未下单"
+      }
+    },
+    {
+      "role": "备用输入",
+      "mpn": "XT60PW-M",
+      "manufacturer": "AMASS 艾迈斯",
+      "lcsc": "C98732",
+      "footprint": "XT60PW-M 2针侧插",
+      "datasheet_or_frozen_source": "https://www.lcsc.com/product-detail/C98732.html",
+      "catalog": "https://www.lcsc.com/product-detail/C98732.html",
+      "selection_limit": "板端公头，支路不可与PD互灌。",
+      "price": "待核价"
+    },
+    {
+      "role": "加热器端子",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "manufacturer": "DEGSON (町洋)",
+      "lcsc": "C581328",
+      "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://www.lcsc.com/product-detail/C581328.html",
+      "selection_limit": "复用既有 5.08 mm 2P，配 C581323。",
+      "price": "待核价",
+      "pin_numbers_in_proposed_interface": {
+        "1": "HEATER_SW+",
+        "2": "PV_RTN"
+      }
+    },
+    {
+      "role": "模块输出保险比较，未经分断验收",
+      "mpn": "0997020.WXN",
+      "manufacturer": "Littelfuse",
+      "lcsc": "C207028",
+      "footprint": "MINI 刀片，58VDC 额定座",
+      "datasheet_or_frozen_source": "https://www.littelfuse.com/assetdocs/littelfuse-datasheet-997-mini58v?assetguid=838cc4ad-f429-4185-a8e8-ccc70cd2b713",
+      "catalog": "https://www.lcsc.com/product-detail/C207028.html",
+      "selection_limit": "20 A、58 VDC、1 kA DC。电池+超容实际短路电流未证明低于分断额定，装配不放行。",
+      "price": "待核价"
+    },
+    {
+      "role": "MCU 本体比较",
+      "mpn": "STM32G431CBU6",
+      "manufacturer": "STMicroelectronics",
+      "lcsc": "C529356",
+      "footprint": "UFQFPN-48 7×7",
+      "datasheet_or_frozen_source": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+      "catalog": "https://www.lcsc.com/product-detail/C529356.html",
+      "selection_limit": "裸片或现有WeAct方案择一；PWM、ADC、COMP、CAN和Boot接口需锁定。",
+      "price": "待核价"
+    },
+    {
+      "role": "WeAct 插装接口比较",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH 2×12P/2.54",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://www.lcsc.com/product-detail/C54803369.html",
+      "selection_limit": "采用WeAct时使用两只，未计入整板BOM。",
+      "price": "待核价"
+    },
+    {
+      "role": "沿用基础库阻容",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://jlcpcb.com/partdetail/C21190",
+      "selection_limit": "1 kΩ ±1%",
+      "price": "待核价"
+    },
+    {
+      "role": "沿用基础库阻容",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://jlcpcb.com/partdetail/C23162",
+      "selection_limit": "4.7 kΩ ±1%",
+      "price": "待核价"
+    },
+    {
+      "role": "沿用基础库阻容",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://jlcpcb.com/partdetail/C25803",
+      "selection_limit": "100 kΩ ±1%",
+      "price": "待核价"
+    },
+    {
+      "role": "沿用基础库阻容",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://jlcpcb.com/partdetail/C25804",
+      "selection_limit": "10 kΩ ±1%",
+      "price": "待核价"
+    },
+    {
+      "role": "沿用基础库阻容",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "datasheet_or_frozen_source": "电力/检查/联合仿真/降本采购与SMT建议.json",
+      "catalog": "https://www.lcsc.com/product-detail/C30926.html",
+      "selection_limit": "100 nF ±10%, X7R, 50 V",
+      "price": "待核价"
+    }
+  ],
+  "simulation_evidence": "充电MPPT与自持仿真核算.json"
+}

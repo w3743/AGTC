@@ -1,0 +1,267 @@
+{
+  "contract_id": "MPPT_CAN_INTERFACE_PREVIEW_20261123",
+  "status": "PARTIAL_INTERFACE_REVIEW_ONLY",
+  "target_schematic_count": 10,
+  "scope": "仅隔离 CAN 接口及其局部去耦，整体第六板的电源、MCU、功率级、复位、充电和端口均未包含。",
+  "inputs": {
+    "source_reference": {
+      "path": "电力/水泵驱动模块/检查/CodeAsEDA_tscircuit/reference_52_netlist.json",
+      "sha256": "05f27af038261252e4eac71604671d2b2f03f10d53cfc6a7383ea5313598faed"
+    },
+    "scope_contract": {
+      "path": "电力/充电MPPT模块/检查/CodeAsEDA_tscircuit/CAN接口局部合同.json",
+      "sha256": "afa853206acb0c557a5a7c0ff35f772c05acff379aa0fba8db16001a9de95be5"
+    }
+  },
+  "components": [
+    {
+      "ref": "C_CAN_ISOIN_1U",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF, 25V, X7R, ±10%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "C_CAN_ISO_BULK",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "value": "47uF, 16V, X5R, ±10%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "C_CAN_ISO_HF",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "C_CAN_VCC",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_5V_SW",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "C_CAN_VDDP_BULK",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "value": "47uF, 16V, X5R, ±10%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_5V_SW",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "C_CAN_VIO",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "value": "1uF, 25V, X7R, ±10%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "D_CAN",
+      "mpn": "PESD2CANFD24V-TR",
+      "manufacturer": "Nexperia",
+      "lcsc": "C552486",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "value": "PESD2CANFD24V-TR",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND_CAN"
+      },
+      "pin_roles": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND"
+      },
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "J_CAN",
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "manufacturer": "JST",
+      "lcsc": "C144394",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "value": "XH, 3-pin, 2.5mm pitch",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "GND_CAN",
+        "2": "CANH",
+        "3": "CANL"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "R_CAN_TXD_PU",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "MCU_3V3",
+        "2": "CAN_TX"
+      },
+      "pin_roles": {},
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    },
+    {
+      "ref": "U_CAN",
+      "mpn": "CA-IS2062A",
+      "manufacturer": "Chipanalog (川土微)",
+      "lcsc": "C22438481",
+      "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+      "value": "Isolated CAN transceiver with integrated isolated DC/DC",
+      "dnp": false,
+      "placement": "board",
+      "in_bom": true,
+      "pins": {
+        "1": "CAN_RX",
+        "2": null,
+        "3": null,
+        "4": "CAN_TX",
+        "5": "GND_SYS",
+        "6": "CAN_5V_SW",
+        "7": "MCU_3V3",
+        "8": "GND_SYS",
+        "9": "GND_CAN",
+        "10": "CAN_ISO_5V",
+        "11": "CAN_ISO_5V",
+        "12": "GND_CAN",
+        "13": null,
+        "14": "CANL",
+        "15": "CANH",
+        "16": null
+      },
+      "pin_roles": {
+        "1": "RXD",
+        "2": "NC",
+        "3": "NC",
+        "4": "TXD",
+        "5": "GNDP1",
+        "6": "VDDP",
+        "7": "VDDL",
+        "8": "GND1",
+        "9": "GND2",
+        "10": "VISOIN",
+        "11": "VISOOUT",
+        "12": "GNDP2",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "source_layers": [
+        "water_pump_reference",
+        "mppt_interface_net_renames"
+      ]
+    }
+  ],
+  "external_net_boundaries": {
+    "CAN_5V_SW": "外部受控 5 V 输入，来源、电流预算及休眠关断待全板确定",
+    "MCU_3V3": "外部 3.3 V 逻辑域，来源及掉电次序待全板确定",
+    "GND_SYS": "全板逻辑地，跨板回流待总成核实",
+    "CAN_RX": "外部 MCU CAN_RX 输入，具体端口与复用待分配",
+    "CAN_TX": "外部 MCU CAN_TX 输出，具体端口与复用待分配"
+  },
+  "limitations": [
+    "仅证明此十个器件及其端口与指定水泵参考拓扑一致，并不证明整板电路完成。",
+    "封装名称来自参考合同；通用 KiCad 封装库与物理焊盘未在本局部导出中资格化。",
+    "CAN_5V_SW 关断时的逻辑侧反灌、隔离、EMC 与端接策略待整个系统审核。"
+  ]
+}
