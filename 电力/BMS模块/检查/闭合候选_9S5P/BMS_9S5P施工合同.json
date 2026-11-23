@@ -1,0 +1,4645 @@
+{
+  "contract_id": "BMS_9S5P_CLOSURE_20261123",
+  "status": "PRE_EDA_CONTRACT_CANDIDATE",
+  "baseline": {
+    "published_project": "电力/BMS模块/eda工程文件/BMS-9S4P/BMS-9S4P.eprj3",
+    "published_enet": "电力/BMS模块/检查/主工程图面验收/主工程.enet",
+    "published_component_count": 224,
+    "precharge_merged_contract": "电力/BMS模块/原理图准备/复用预充合并施工合同.json",
+    "precharge_merged_net_delta_vs_published": "+55 (279件含预充硬窗、820Ω/3W探测、3路独立LPV及低有效DFETOFF)"
+  },
+  "additional_delta_on_top_of_precharge_contract": {
+    "added": 27,
+    "replaced_in_place": 9,
+    "removed": 5,
+    "net_total_components": 301,
+    "summary": "基于预充合并计数279：既有闭合增量23件；本次新增4个M5单节点板端端子，5项现有接口原位替换，J_CELL_SERVICE为既有逻辑位号由不采购载体改为实装连接器（位号数不增加），移除5件假负载后总计301件。"
+  },
+  "changes": [
+    {
+      "id": "CHG-BMS-01",
+      "title": "合入复用预充合并施工合同 (11.0kΩ 定时 + 820Ω/3W 4.1s 开路探测 + 低有效 DFETOFF 0xC2 + 三路独立 LPV)",
+      "source_contract": "电力/BMS模块/原理图准备/复用预充合并施工合同.json",
+      "part_delta": "+55 vs 发布源 224 件"
+    },
+    {
+      "id": "CHG-BMS-02",
+      "title": "合入 9S5P / 130A 目标 4+4 主功率 MOS 支路 (0 新 SKU)",
+      "part_delta": "+6",
+      "added_components": [
+        {
+          "ref": "Q_CHG4",
+          "mpn": "HYG022N10NS1TA",
+          "manufacturer": "HUAYI(华羿微)",
+          "lcsc": "C2925050",
+          "pins": {
+            "1": "CHG_G4",
+            "2": "BATT+_FUSED",
+            "3": "BATT+_FUSED",
+            "4": "BATT+_FUSED",
+            "5": "BATT+_FUSED",
+            "6": "BATT+_FUSED",
+            "7": "BATT+_FUSED",
+            "8": "BATT+_FUSED",
+            "9": "FET_MID"
+          },
+          "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+          "pin_roles": {
+            "1": "G",
+            "2": "S",
+            "3": "S",
+            "4": "S",
+            "5": "S",
+            "6": "S",
+            "7": "S",
+            "8": "S",
+            "9": "D"
+          },
+          "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf"
+        },
+        {
+          "ref": "Q_DSG4",
+          "mpn": "HYG022N10NS1TA",
+          "manufacturer": "HUAYI(华羿微)",
+          "lcsc": "C2925050",
+          "pins": {
+            "1": "DSG_G4",
+            "2": "PACK+",
+            "3": "PACK+",
+            "4": "PACK+",
+            "5": "PACK+",
+            "6": "PACK+",
+            "7": "PACK+",
+            "8": "PACK+",
+            "9": "FET_MID"
+          },
+          "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+          "pin_roles": {
+            "1": "G",
+            "2": "S",
+            "3": "S",
+            "4": "S",
+            "5": "S",
+            "6": "S",
+            "7": "S",
+            "8": "S",
+            "9": "D"
+          },
+          "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf"
+        },
+        {
+          "ref": "R_G_CHG4",
+          "mpn": "ABD03K1000FT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C20616261",
+          "value": "100Ω",
+          "pins": {
+            "1": "CHG",
+            "2": "CHG_G4"
+          },
+          "footprint": "R0603"
+        },
+        {
+          "ref": "R_G_DSG4",
+          "mpn": "ABD03K1000FT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C20616261",
+          "value": "100Ω",
+          "pins": {
+            "1": "DSG",
+            "2": "DSG_G4"
+          },
+          "footprint": "R0603"
+        },
+        {
+          "ref": "R_GS_CHG4",
+          "mpn": "RS-03L1005FT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C322040",
+          "value": "10MΩ",
+          "pins": {
+            "1": "CHG_G4",
+            "2": "BATT+_FUSED"
+          },
+          "footprint": "R0603"
+        },
+        {
+          "ref": "R_GS_DSG4",
+          "mpn": "RS-03L1005FT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C322040",
+          "value": "10MΩ",
+          "pins": {
+            "1": "DSG_G4",
+            "2": "PACK+"
+          },
+          "footprint": "R0603"
+        }
+      ],
+      "bq_config_update": "OCD1=80mV (160A名义, 保守下界142.2A > 130A峰值); SCD=100mV (200A名义); 外部主保险 F1 候选升级为 150A Class T (JLLN150.VXP)"
+    },
+    {
+      "id": "CHG-BMS-03",
+      "title": "彻底隔离 BMS CA-IS2062A 副边地 (PACK- -> GND_CAN, 零增件)",
+      "part_delta": 0,
+      "pin_updates": {
+        "U_CAN.9 (GND2)": "PACK- -> GND_CAN",
+        "U_CAN.12 (GNDP2)": "PACK- -> GND_CAN",
+        "D_CAN_TVS.3 (GND)": "PACK- -> GND_CAN",
+        "C_CAN_PWR_OUT1.2": "PACK- -> GND_CAN",
+        "C_CAN_PWR_OUT2.2": "PACK- -> GND_CAN",
+        "J_CAN.1": "CANH -> GND_CAN",
+        "J_CAN.2": "CANL -> CANH",
+        "J_CAN.3": "PACK- -> CANL"
+      }
+    },
+    {
+      "id": "CHG-BMS-04",
+      "title": "全车光耦统一为 LITEON LTV-817S-TA1-C (C109227, 消除 UNVERIFIED_2X)",
+      "part_delta": "0 (净减全车 1 个未核实 SKU)",
+      "modified_components": [
+        {
+          "ref": "U_LOAD_POWER_VALID",
+          "old_mpn": "VO617A-2X007T (UNVERIFIED_2X)",
+          "new_mpn": "LTV-817S-TA1-C",
+          "manufacturer": "LITEON(光宝)",
+          "lcsc": "C109227",
+          "pins": {
+            "1": "LOAD_VALID_LED_A",
+            "2": "LOAD_VALID_LED_K",
+            "3": "LOAD_POWER_VALID",
+            "4": "LOAD_EN_BIAS_EXT"
+          },
+          "footprint": "OPTO-SMD-4_L4.6-W6.5-P2.54-LS10.3-BL",
+          "pin_roles": {
+            "1": "A",
+            "2": "K",
+            "3": "E",
+            "4": "C"
+          },
+          "datasheet": "https://www.lcsc.com/product-image/C109227.html"
+        },
+        {
+          "ref": "U_LOAD_POWER_VALID_B",
+          "old_mpn": "VO617A-2X007T (UNVERIFIED_2X)",
+          "new_mpn": "LTV-817S-TA1-C",
+          "manufacturer": "LITEON(光宝)",
+          "lcsc": "C109227",
+          "pins": {
+            "1": "LOAD_VALID_B_LED_A",
+            "2": "LOAD_VALID_LED_K",
+            "3": "LOAD_POWER_VALID_B",
+            "4": "LOAD_EN_BIAS_EXT_B"
+          },
+          "footprint": "OPTO-SMD-4_L4.6-W6.5-P2.54-LS10.3-BL",
+          "pin_roles": {
+            "1": "A",
+            "2": "K",
+            "3": "E",
+            "4": "C"
+          },
+          "datasheet": "https://www.lcsc.com/product-image/C109227.html"
+        }
+      ],
+      "verification": "C档 CTR 200..400% (50%全温老化折减仍>=100%), IF_min=5.80mA -> IC_sat>=5.80mA, 对单块FOC 1.5mA接收负载有 3.87x 饱和裕量"
+    },
+    {
+      "id": "CHG-BMS-05",
+      "title": "新增稳压早轨就绪接收口 J_EARLY_READY_IN (接入 MCU 空脚 P2.12/PC4, 不并入 U_AND2.3)",
+      "part_delta": "+2 件；J_EARLY_READY_IN统一为 A2501WV-2P / C48579979",
+      "added_components": [
+        {
+          "ref": "J_EARLY_READY_IN",
+          "mpn": "A2501WV-2P",
+          "manufacturer": "CJT",
+          "lcsc": "C48579979",
+          "pins": {
+            "1": "EARLY_GUARD_READY_N",
+            "2": "B0"
+          },
+          "footprint": "CONN-TH_2P-P2.50_A2501WV-2P"
+        },
+        {
+          "ref": "R_EARLY_READY_PU",
+          "mpn": "0603WAF1002T5E",
+          "manufacturer": "UNI-ROYAL(厚声)",
+          "lcsc": "C25804",
+          "value": "10 kΩ ±1%",
+          "pins": {
+            "1": "CORE_3V3",
+            "2": "EARLY_GUARD_READY_N"
+          },
+          "footprint": "R0603"
+        }
+      ],
+      "pin_updates": {
+        "J_CORE_P2.12 (PC4)": "NC -> EARLY_GUARD_READY_N"
+      },
+      "coreboard_mapping": {
+        "reference": "WeAct Normal V1.0 QFN48 / STM32G431CBU6",
+        "source": "电力/BMS模块/检查/主控头引脚核对.json",
+        "coreboard_header": "P2",
+        "pin": 12,
+        "mcu_gpio": "PC4"
+      }
+    },
+    {
+      "id": "CHG-BMS-06",
+      "title": "修复 C_VC1 导出编码异常",
+      "part_delta": 0,
+      "attribute_fix": {
+        "ref": "C_VC1",
+        "Manufacturer": "FH(华) -> FH(风华)"
+      }
+    },
+    {
+      "id": "CHG-BMS-P0",
+      "title": "非隔离5V、VISOIN近端去耦及MDD TVS",
+      "replaced": [
+        {
+          "ref": "PSU5_EXT",
+          "mpn": "SCT2A23ASTER",
+          "manufacturer": "Silicon Content Technology(芯洲科技)",
+          "lcsc": "C2901894",
+          "footprint": "ESOP-8_4.9x3.9mm_P1.27_EP",
+          "pins": {
+            "1": "B0",
+            "2": "TAP_B9",
+            "3": "PSU5_EN",
+            "4": "B0",
+            "5": "PSU5_FB",
+            "6": "PSU5_VCC",
+            "7": "PSU5_BST",
+            "8": "PSU5_SW",
+            "9": "B0"
+          },
+          "value": "100 V/1.2 A同步Buck，PFM",
+          "source": "https://www.lcsc.com/product-detail/C2901894.html",
+          "price": "待核价",
+          "pin_roles": {
+            "1": "GND",
+            "2": "VIN",
+            "3": "EN",
+            "4": "MODE",
+            "5": "FB",
+            "6": "VCC",
+            "7": "BST",
+            "8": "SW",
+            "9": "EP"
+          },
+          "datasheet": "https://www.silicontent.com/uploads/20251021/d6286bb1beadf3d3d30724b428363513.pdf"
+        },
+        {
+          "ref": "D_TVS",
+          "mpn": "SMCJ45A",
+          "manufacturer": "MDD(Microdiode Semiconductor)",
+          "lcsc": "C2994055",
+          "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+          "pins": {
+            "1": "PACK+",
+            "2": "PACK-"
+          },
+          "value": "45 V VRWM，72.7 V@20.6 A 10/1000µs",
+          "source": "https://www.lcsc.com/product-detail/C2994055.html",
+          "price": "待核价",
+          "pin_roles": {
+            "1": "K",
+            "2": "A"
+          }
+        }
+      ],
+      "added_components": [
+        {
+          "ref": "L_PSU5",
+          "mpn": "CKST1004-47uH/M",
+          "manufacturer": "CENKER(岑科)",
+          "lcsc": "C19193248",
+          "footprint": "IND-SMD_11.6x10.1mm",
+          "pins": {
+            "1": "PSU5_SW",
+            "2": "VOUT_5V"
+          },
+          "value": "47 µH ±20%, 3 A Irms / 4 A Isat典型, 75 V最大",
+          "source": "https://www.lcsc.com/product-detail/C19193248.html",
+          "price": "待核价",
+          "datasheet": "https://datasheet.lcsc.com/lcsc/2401191735_CENKER-CKST1004-47uH-M_C19193248.pdf"
+        },
+        {
+          "ref": "C_PSU5_IN1",
+          "mpn": "1210B475K101NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2840282",
+          "footprint": "C1210",
+          "pins": {
+            "1": "TAP_B9",
+            "2": "B0"
+          },
+          "value": "4.7 µF 100 V X7R",
+          "source": "https://www.lcsc.com/product-detail/C2840282.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_IN2",
+          "mpn": "1210B475K101NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2840282",
+          "footprint": "C1210",
+          "pins": {
+            "1": "TAP_B9",
+            "2": "B0"
+          },
+          "value": "4.7 µF 100 V X7R",
+          "source": "https://www.lcsc.com/product-detail/C2840282.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_IN_HF",
+          "mpn": "0805B104K101NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C89258",
+          "footprint": "C0805",
+          "pins": {
+            "1": "TAP_B9",
+            "2": "B0"
+          },
+          "value": "100 nF ±10%, X7R, 100 V",
+          "source": "https://www.lcsc.com/product-detail/C89258.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_OUT1",
+          "mpn": "1210X226K250NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C5445361",
+          "footprint": "C1210",
+          "pins": {
+            "1": "VOUT_5V",
+            "2": "B0"
+          },
+          "value": "22 µF 25 V X5R",
+          "source": "https://www.lcsc.com/product-detail/C5445361.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_OUT2",
+          "mpn": "1210X226K250NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C5445361",
+          "footprint": "C1210",
+          "pins": {
+            "1": "VOUT_5V",
+            "2": "B0"
+          },
+          "value": "22 µF 25 V X5R",
+          "source": "https://www.lcsc.com/product-detail/C5445361.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_VCC",
+          "mpn": "0603X225K250NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C99227",
+          "footprint": "C0603",
+          "pins": {
+            "1": "PSU5_VCC",
+            "2": "B0"
+          },
+          "value": "2.2 µF 25 V X5R",
+          "source": "https://www.lcsc.com/product-detail/C99227.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_BST",
+          "mpn": "0603B104K500NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C30926",
+          "footprint": "C0603",
+          "pins": {
+            "1": "PSU5_BST",
+            "2": "PSU5_SW"
+          },
+          "value": "100 nF ±10%, X7R, 50 V",
+          "source": "https://www.lcsc.com/product-detail/C30926.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "D_PSU5_FW",
+          "mpn": "SS310-SMC",
+          "manufacturer": "GOODWORK",
+          "lcsc": "C2848691",
+          "footprint": "SMC_DO-214AB",
+          "pins": {
+            "1": "PSU5_SW",
+            "2": "B0"
+          },
+          "value": "3 A 100 V肖特基，死区续流，1=K 2=A",
+          "source": "https://www.lcsc.com/product-detail/C2848691.html",
+          "price": "待核价",
+          "pin_roles": {
+            "1": "K",
+            "2": "A"
+          }
+        },
+        {
+          "ref": "R_PSU5_FB_TOP",
+          "mpn": "RT0603BRD0795K3L",
+          "manufacturer": "YAGEO(国巨)",
+          "lcsc": "C861605",
+          "footprint": "R0603",
+          "pins": {
+            "1": "VOUT_5V",
+            "2": "PSU5_FB"
+          },
+          "value": "95.3 kΩ ±0.1% 25 ppm/K",
+          "source": "https://www.lcsc.com/product-detail/C861605.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "R_PSU5_FB_BOT",
+          "mpn": "RT0603BRD0730K1L",
+          "manufacturer": "YAGEO(国巨)",
+          "lcsc": "C705764",
+          "footprint": "R0603",
+          "pins": {
+            "1": "PSU5_FB",
+            "2": "B0"
+          },
+          "value": "30.1 kΩ ±0.1% 25 ppm/K",
+          "source": "https://www.lcsc.com/product-detail/C705764.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "R_PSU5_EN_SW",
+          "mpn": "0603WAF1001T5E",
+          "manufacturer": "UNI-ROYAL(厚声)",
+          "lcsc": "C21190",
+          "footprint": "R0603",
+          "pins": {
+            "1": "CTRL_MODULE",
+            "2": "PSU5_EN"
+          },
+          "value": "1 kΩ ±1%",
+          "source": "https://www.lcsc.com/product-detail/C21190.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_PSU5_EN",
+          "mpn": "0603B103K101NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C43253",
+          "footprint": "C0603",
+          "pins": {
+            "1": "PSU5_EN",
+            "2": "B0"
+          },
+          "value": "10 nF 100 V X7R，内部EN电流源上拉；0.35 µA典型时至1.24 V约35 ms",
+          "source": "https://www.lcsc.com/product-detail/C43253.html",
+          "price": "待核价"
+        },
+        {
+          "ref": "C_CAN_ISOIN_1U",
+          "mpn": "CL10A105KB8NNNC",
+          "manufacturer": "Samsung Electro-Mechanics(三星电机)",
+          "lcsc": "C15849",
+          "footprint": "C0603",
+          "pins": {
+            "1": "CAN_ISO_5V",
+            "2": "GND_CAN"
+          },
+          "value": "1 µF 50 V X5R，基础库，紧贴U_CAN.10/.12",
+          "source": "https://www.lcsc.com/product-detail/C15849.html",
+          "price": "待核价",
+          "assembly_source": "https://jlcpcb.com/partdetail/16531-CL10A105KB8NNNC/C15849"
+        },
+        {
+          "ref": "C_PSU5_FB_FF",
+          "mpn": "0603CG680J500NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C1680",
+          "footprint": "C0603",
+          "pins": {
+            "1": "VOUT_5V",
+            "2": "PSU5_FB"
+          },
+          "value": "68 pF ±5% 50 V C0G，芯洲5V典型表前馈",
+          "source": "https://www.lcsc.com/product-detail/C1680.html",
+          "price": "待核价"
+        }
+      ],
+      "removed_components": [
+        "R_PSU_MINLOAD1",
+        "R_PSU_MINLOAD2",
+        "R_PSU_MINLOAD3",
+        "R_PSU_MINLOAD4",
+        "R_PSU_MINLOAD5"
+      ]
+    },
+    {
+      "id": "CHG-BMS-08",
+      "title": "连接器标准统一、Cell Service实装及四个M5主电流板端单节点",
+      "part_delta": "+4 new M5 PCB components; J_CELL_SERVICE populates an existing counted designator; connector SKUs selected in place; no new electrical nets.",
+      "added_components": [
+        {
+          "ref": "J_BATT_POS",
+          "manufacturer": null,
+          "mpn": "M5 PCB铜接线柱",
+          "lcsc": null,
+          "footprint": "STUD-M5-TH_D5.5_PAD14",
+          "pins": {
+            "1": "BATT+_FUSED"
+          },
+          "mechanical_spec": {
+            "thread": "M5",
+            "clearance_hole_mm": 5.5,
+            "pad_diameter_mm": 14,
+            "lug": "OT-5",
+            "target_current_a": 150,
+            "qualification": "pending"
+          }
+        },
+        {
+          "ref": "J_BATT_NEG",
+          "manufacturer": null,
+          "mpn": "M5 PCB铜接线柱",
+          "lcsc": null,
+          "footprint": "STUD-M5-TH_D5.5_PAD14",
+          "pins": {
+            "1": "B0"
+          },
+          "mechanical_spec": {
+            "thread": "M5",
+            "clearance_hole_mm": 5.5,
+            "pad_diameter_mm": 14,
+            "lug": "OT-5",
+            "target_current_a": 150,
+            "qualification": "pending"
+          }
+        },
+        {
+          "ref": "J_PACK_POS",
+          "manufacturer": null,
+          "mpn": "M5 PCB铜接线柱",
+          "lcsc": null,
+          "footprint": "STUD-M5-TH_D5.5_PAD14",
+          "pins": {
+            "1": "PACK+"
+          },
+          "mechanical_spec": {
+            "thread": "M5",
+            "clearance_hole_mm": 5.5,
+            "pad_diameter_mm": 14,
+            "lug": "OT-5",
+            "target_current_a": 150,
+            "qualification": "pending"
+          }
+        },
+        {
+          "ref": "J_PACK_NEG",
+          "manufacturer": null,
+          "mpn": "M5 PCB铜接线柱",
+          "lcsc": null,
+          "footprint": "STUD-M5-TH_D5.5_PAD14",
+          "pins": {
+            "1": "PACK-"
+          },
+          "mechanical_spec": {
+            "thread": "M5",
+            "clearance_hole_mm": 5.5,
+            "pad_diameter_mm": 14,
+            "lug": "OT-5",
+            "target_current_a": 150,
+            "qualification": "pending"
+          }
+        }
+      ],
+      "replaced_in_place": [
+        "J_CAN",
+        "J_LOAD_POWER_VALID",
+        "J_LOAD_POWER_VALID_B",
+        "J_LPV_REG",
+        "J_CELL_SERVICE"
+      ],
+      "updated_new_candidate_sku": [
+        "J_EARLY_READY_IN"
+      ]
+    }
+  ],
+  "localization_v1": {
+    "joint_evidence": "电力/检查/联合仿真/降本后典型故障联合仿真.json",
+    "cost_source": "电力/元件封装库/索引/商城成本.json",
+    "main_mos_quantity": 8,
+    "breg": {
+      "ref": "Q_BREG",
+      "manufacturer": "江苏长晶 JSCJ（C码绑定厂家）",
+      "mpn": "BCX56-16",
+      "lcsc": "C5183147",
+      "pins": {
+        "1": "BREG",
+        "2": "BREG_COLLECTOR",
+        "3": "REGIN"
+      },
+      "replaces": "Diodes FCX495TA C150457",
+      "footprint": "SOT-89-3L",
+      "vceo_v": 80,
+      "ic_a": 1,
+      "pc_25c_w": 0.5,
+      "rth_ja_c_per_w": 250,
+      "existing_feed_ohm": 1000,
+      "regin_min_v": 4.1,
+      "normal_load_ma": 10,
+      "normal_power_upper_w": 0.2391,
+      "normal_tj_at_60c_upper_c": 119.775,
+      "fault_peak_from_existing_feed_screen_w": 0.364,
+      "fault_tj_at_60c_upper_c": 151,
+      "price": "待核价",
+      "source": "https://www.lcsc.com/product-detail/C5183147.html",
+      "bench": "正常10 mA功耗按37.8 V、Rmin约979 Ω、REGIN=4.1 V且二极管压降不计，含发射极供电路径。故障热平衡无正裕量；实测REGIN启动、短路持续及板上铜热阻。按JSCJ实际采购；原长电品牌只核到历史规格书。",
+      "pin_roles": {
+        "1": "B",
+        "2": "C",
+        "3": "E"
+      },
+      "exposed_pad": {
+        "physical_tab": "C",
+        "shares_pad": "2",
+        "net": "BREG_COLLECTOR",
+        "if_separately_numbered": "4"
+      },
+      "old_pin_roles": {
+        "1": "B",
+        "2": "C",
+        "3": "E"
+      },
+      "old_pins": {
+        "1": "BREG",
+        "2": "BREG_COLLECTOR",
+        "3": "REGIN"
+      },
+      "datasheet": "https://www.jscj-elec.com/uploads/20221028/ef6664364fafb015899f720701605be0.pdf",
+      "old_datasheet": "https://www.diodes.com/datasheet/download/FCX495.pdf"
+    },
+    "offboard": {
+      "r_pre": {
+        "manufacturer": "AOTROU 奥创",
+        "series": "RX24",
+        "order_description": "300 W / 8.2 Ω ±5%，铝壳",
+        "exact_order_mpn": null,
+        "lcsc": null,
+        "price": "待核价",
+        "source": "https://www.aotrou.com/d/file/down/RX24.pdf",
+        "bench": "含安装散热条件的60°C额定、196.2 W / 10.226 s ≈2.006 kJ脉冲、重复间隔及支路接线。",
+        "placement": "off-board",
+        "board_connector": "J_R_PRE",
+        "pins": {
+          "1": "QPRE_SW",
+          "2": "PACK+"
+        }
+      },
+      "f1": {
+        "spec": "58–70 VDC / 150 A，MEGA或ANL螺栓式",
+        "exact_order_mpn": null,
+        "lcsc": null,
+        "price": "待核价",
+        "domestic_reference": "华德 WH30-150-M6，150 A / 500 VDC / 10 kA，非MEGA/ANL，仅分断能力对照",
+        "bench": "厂家目录同型号列32/58/72 V版本，询价须明确58 VDC并索取对应完整订货后缀、直流分断额定及曲线。测9S5P预期短路电流，核I²t、130 A脉冲持流、线束及底座。",
+        "manufacturer": "常州胜名电子有限公司 SWE",
+        "mpn": "ANL-150",
+        "rated_option": "58 V，150 A，ANL螺栓式",
+        "source": "https://www.swefuse.com/ProDetail.aspx?ProId=16",
+        "placement": "off-board"
+      },
+      "maintenance": {
+        "placement": "off-board",
+        "manufacturer": "AMASS 艾迈斯",
+        "series": "AS150U (2+4)",
+        "female": "AS150U(2+4)-F.G.Y",
+        "female_lcsc": "C19268052",
+        "female_catalog": "https://jlcpcb.com/partdetail/20526063-AS150U_2_4_F_GY/C19268052",
+        "male": "AS150U(2+4)-M.G.Y",
+        "male_lcsc": "C19268051",
+        "male_catalog": "https://www.lcsc.com/product-detail/C19268051.html",
+        "manufacturer_order_numbers": {
+          "female": "AS150U-F.G.Y",
+          "male": "AS150U-M.G.Y"
+        },
+        "spec_source": "https://kkhobby.biz/guide/AS150U_F_spec.pdf",
+        "manufacturer_source": "https://www.china-amass.com/biao/179.html",
+        "rated_continuous_a_8awg": 70,
+        "short_current_spec_a": 140,
+        "short_current_test_duration_s": 60,
+        "application_comparison": {
+          "continuous_a": 60,
+          "peak_a": 130,
+          "peak_s": 1
+        },
+        "wiring": {
+          "battery_side": "female",
+          "equipment_side": "male",
+          "main_contacts": [
+            "CELL_B9",
+            "B0"
+          ],
+          "auxiliary_contacts": [
+            "NC",
+            "NC",
+            "NC",
+            "NC"
+          ]
+        },
+        "qualification": "板外采购选型；60 A连续、130 A/1 s峰值初筛。按8 AWG及实际环境/重复占空验接点温升；禁止带载维护插拔；沿用BMS母线预充。",
+        "price": "待核价",
+        "compared": {
+          "AS150-F/M": {
+            "manufacturer_page": "https://www.china-amass.com/biao/178.html",
+            "rated_a_on_current_product_page": 65,
+            "short_current_a_on_mirror_spec": 150,
+            "mirror_spec": "https://www.tme.com/Document/42f0bb5e568e0e8cb172e1774ef7866f/AS150%20SPEC.pdf",
+            "male_order_mpn": "AS150-M.G.R",
+            "male_lcsc": "C30170235",
+            "female_order_mpn": "AS150-F.G.R",
+            "female_lcsc": null,
+            "disposition": "原单极AS150母头C码与150 A脉宽未核实。"
+          },
+          "QS8-S": {
+            "manufacturer": "Dongguan QS Electronic Technology",
+            "rated_a": 110,
+            "instantaneous_a": 180,
+            "lcsc": null,
+            "source": "https://www.tme.com/Document/250781e0156f3d08186a2318bfafc598/QS8%2BBlack.pdf"
+          }
+        }
+      },
+      "tap_fuse_holder": {
+        "placement": "off-board",
+        "quantity": 1,
+        "configured_channels": 9,
+        "target": "58 VDC 9路独立MINI，使用已有额定九路参考，原十位比较件退出采购",
+        "ten_way_candidate": {
+          "manufacturer": "Del City",
+          "mpn": "15303404",
+          "mini_positions": 10,
+          "independent_inputs": true,
+          "rated_dc_v": null,
+          "source": "https://www.delzer.com/oneasg/Del-City-2022-Catalog/121/",
+          "status": "退出采购；历史比较"
+        },
+        "rated_nine_way_reference": {
+          "manufacturer": "Littelfuse",
+          "mpn": "PDM31001ZXM",
+          "series": "HWB18",
+          "mini_positions": 9,
+          "independent_inputs": true,
+          "rated_dc_v": 58,
+          "source": "https://www.littelfuse.com/products/power-distribution/hard-wired-pdms/hwb18",
+          "order_source": "https://info.littelfuse.com/hwb18-series-landing-page",
+          "status": "额定复核参考；正好覆盖9路，不带第10备用位；完整装配与价格待确认"
+        },
+        "acceptance": "各抽头到其保险入口就近且无保险前外露细线。核58 VDC、端子兼容、触点温升、独立性及安装位置后放行。",
+        "selected_assembly": {
+          "mpn": "PDM31001ZXM",
+          "manufacturer": "Littelfuse",
+          "rated_dc_v": 58,
+          "configured_channels": 9,
+          "independent_inputs": true,
+          "common_bus": false,
+          "source": "https://www.littelfuse.com/assetdocs/littelfuse-hwb18-series-datasheet?assetguid=f220acd6-a7b4-4b0a-8509-34998e74aca6",
+          "price": "待核价",
+          "assembly": "原厂HWB18配匹配端子、密封与双层绝缘短引线，装在电池侧源端；不共用汇流排。"
+        }
+      }
+    },
+    "candidate_installation": "采样保险、J_CELL_BMS抽头维护线束和RX24均在线束侧；当前施工合同总位号301。J_CELL_SERVICE改为B10B-XH-A(LF)(SN)/C144400实装板端连接器，pin1=B0、pin2..10=TAP_B1..TAP_B9；四个单节点M5板端端子纳入drawing_components。",
+    "tap_fuse": {
+      "placement": "off-board",
+      "mpn": "0997005.WXN",
+      "manufacturer": "Littelfuse",
+      "series": "MINI 997",
+      "quantity": 9,
+      "rated_a": 5,
+      "rated_dc_v": 58,
+      "interrupt_dc_a": 1000,
+      "typical_prearc_i2t_a2s": 25,
+      "typical_cold_resistance_ohm": 0.01775,
+      "published_opening_time_max_s": {
+        "10A": 5,
+        "17.5A": 0.5,
+        "30A": 0.1
+      },
+      "source": "https://www.littelfuse.com/assetdocs/littelfuse-datasheet-997-mini58v?assetguid=838cc4ad-f429-4185-a8e8-ccc70cd2b713",
+      "refs_and_nets": {
+        "F_CELL_B1": {
+          "1": "CELL_B1_RAW",
+          "2": "TAP_B1"
+        },
+        "F_CELL_B2": {
+          "1": "CELL_B2_RAW",
+          "2": "TAP_B2"
+        },
+        "F_CELL_B3": {
+          "1": "CELL_B3_RAW",
+          "2": "TAP_B3"
+        },
+        "F_CELL_B4": {
+          "1": "CELL_B4_RAW",
+          "2": "TAP_B4"
+        },
+        "F_CELL_B5": {
+          "1": "CELL_B5_RAW",
+          "2": "TAP_B5"
+        },
+        "F_CELL_B6": {
+          "1": "CELL_B6_RAW",
+          "2": "TAP_B6"
+        },
+        "F_CELL_B7": {
+          "1": "CELL_B7_RAW",
+          "2": "TAP_B7"
+        },
+        "F_CELL_B8": {
+          "1": "CELL_B8_RAW",
+          "2": "TAP_B8"
+        },
+        "F_CELL_B9": {
+          "1": "CELL_B9_RAW",
+          "2": "TAP_B9"
+        }
+      },
+      "board_target": 297,
+      "b0": "direct_unfused",
+      "source_installation": "each_fuse_before_harness_at_its_cell_tap",
+      "prerequisite": "原始电芯抽头到保险输入仅保留绝缘源端接续。九路输入、九路输出完全独立，禁止共正母排或故障指示跨路桥接。",
+      "bench": "测短路相关脉宽的9S5P最低等效电阻、最短线路电阻、保险总清除能量、座体温升与B0回流。",
+      "disposition": "SCHEMATIC_SCREEN_BOARD_END; NEAR_SOURCE_BENCH_AND_ASSEMBLY_AUDIT",
+      "fault_screen": {
+        "series": 9,
+        "parallel": 5,
+        "full_pack_v": 37.8,
+        "screening_cell_dc_ohm": 0.012,
+        "verified_minimum_cell_dc_ohm": null,
+        "verified_minimum_source": null,
+        "copper_temp_c": 0,
+        "wire_section_mm2": 0.5,
+        "board_end_loop_m": 0.8,
+        "board_end_loop_basis": "板端屏蔽比较角，待实测线束确认。近源场景取零导线电阻。",
+        "cell_datasheet": "https://www.evemall.eu/consumer-battery/cylindrical-ncm-cell/18650-30p",
+        "cell_basis": "公开厂商目录给的是1 kHz交流阻抗上限。12 mΩ是筛查输入，实际下界须供应商或台架给出，覆盖满电、运行温度、批次及相关脉宽。"
+      },
+      "source_assembly_requirements": {
+        "double_insulated_short_input": true,
+        "covers_entire_tap_harness": true,
+        "holder_rated_dc_v": 58,
+        "bench_required": true,
+        "physical": "从各汇流排到就近保险输入全段短距防护、双层绝缘、固定及端子护套。九路独立。保险前短路不受自身保险保护；保险输出附近低阻短路仍有分断超额可能。",
+        "verification": "满电/低内阻角、实测动态电阻、保险座温升及近源分断边界，装配核绝缘与实长。",
+        "short_shielded_entry": true
+      }
+    }
+  },
+  "cell_service_cost_down_item_3a": {
+    "status": "接口选型进入当前施工合同候选；板端由未装配焊线孔改为JST XH实装连接器，BMS侧线束改用XHP-10。5 A抽头保险的总清除I²t与AWG22引线/触点配合仍待验证。",
+    "placement": "板端J_CELL_SERVICE装板；J_CELL_BMS为板外线束端",
+    "replaces_when_qualified": {
+      "board_interface": "J_CELL_SERVICE: unpopulated PTH 1x10, 5.00 mm pitch",
+      "bms_harness_housing": "TE DT04-12PA and superseded MX3.0 2x5 candidate",
+      "bms_harness_contacts": "TE 0460-202-16141 x10 and superseded MX3.0 crimp candidate"
+    },
+    "candidate": {
+      "manufacturer": "JST",
+      "series": "XH",
+      "pitch_mm": 2.5,
+      "rated_current_a": 3,
+      "rated_voltage_v": 250,
+      "board_header": {
+        "ref": "J_CELL_SERVICE",
+        "mpn": "B10B-XH-A(LF)(SN)",
+        "lcsc": "C144400",
+        "quantity": 1,
+        "footprint": "CONN-TH_10P-P2.50_B10B-XH-A",
+        "pitch_mm": 2.5
+      },
+      "harness_housing": {
+        "ref": "J_CELL_BMS",
+        "mpn": "XHP-10",
+        "lcsc": "C144408",
+        "quantity": 1
+      },
+      "harness_contacts": {
+        "mpn": "SXH-001T-P0.6",
+        "lcsc": "C140573",
+        "quantity": 10,
+        "supported_wire_awg": [
+          28,
+          22
+        ],
+        "supported_wire_section_mm2": [
+          0.08,
+          0.33
+        ],
+        "insulation_outer_diameter_mm": [
+          0.9,
+          1.9
+        ]
+      },
+      "datasheet": "https://www.jst.com/wp-content/uploads/2025/06/eXH.pdf"
+    },
+    "wiring": {
+      "board_interface": "J_CELL_SERVICE",
+      "board_interface_construction": "JST B10B-XH-A(LF)(SN) populated PCB header; 1x10, true 2.50 mm pitch",
+      "wire_section_mm2": 0.326,
+      "pin_order": {
+        "1": "B0",
+        "2": "TAP_B1",
+        "3": "TAP_B2",
+        "4": "TAP_B3",
+        "5": "TAP_B4",
+        "6": "TAP_B5",
+        "7": "TAP_B6",
+        "8": "TAP_B7",
+        "9": "TAP_B8",
+        "10": "TAP_B9"
+      },
+      "side_and_protection": "Pin 1=B0 return; pins 2-10=TAP_B1..TAP_B9, each individually fused at its source. No fuse on B0.",
+      "harness_interface": "J_CELL_BMS",
+      "wire_awg": 22,
+      "previous_wire_section_mm2": 0.5,
+      "required_pigtail": "AWG22 crimp pigtail using SXH-001T-P0.6; contact accepts AWG28-22 (0.08-0.33 mm2).",
+      "catalog_rating": {
+        "current_a": 3,
+        "voltage_v": 250
+      },
+      "hotplug_allowed": false,
+      "maintenance": "Zero-current maintenance only; no hotplug or energized disconnect.",
+      "fuse_coordination": {
+        "fuse_rating_a": 5,
+        "status": "pending",
+        "note": "5 A source-fuse total-clearing I2t and clearing time must be coordinated with AWG22 pigtail, crimp contacts and board header before release."
+      }
+    },
+    "release_conditions": "Verify 5 A source-fuse let-through coordination with AWG22 pigtail and JST contact/header, actual harness pull-out and temperature rise, insulation routing, and zero-current service procedure. No hotplug.",
+    "purchase_record": "电力/检查/联合仿真/降本采购与SMT建议.json#further_cost_down.item_3a_bms_tap_connector; board/header and harness/crimp SKUs are recorded in candidate."
+  },
+  "fabricated_interfaces": [],
+  "drawing_components": [
+    {
+      "ref": "J_CORE_P1",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "VOUT_5V",
+        "3": "B0",
+        "4": "B0",
+        "5": "NC",
+        "6": "NC",
+        "7": "NC",
+        "8": "NC",
+        "9": "NC",
+        "10": "NC",
+        "11": "NC",
+        "12": "NC",
+        "13": "NC",
+        "14": "NC",
+        "15": "TMR_ACTIVE",
+        "16": "NC",
+        "17": "NC",
+        "18": "NC",
+        "19": "BMS_LOCAL_OK",
+        "20": "BQ_ALERT_N",
+        "21": "PRE_REQ",
+        "22": "MAIN_REQ",
+        "23": "CAN_RX",
+        "24": "CAN_TX"
+      }
+    },
+    {
+      "ref": "J_CORE_P2",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXT",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "CORE_3V3",
+        "3": "B0",
+        "4": "B0",
+        "5": "BQ_I2C_SCL",
+        "6": "BQ_I2C_SDA",
+        "7": "NC",
+        "8": "NC",
+        "9": "NC",
+        "10": "NC",
+        "11": "PROBE_REQ",
+        "12": "EARLY_GUARD_READY_N",
+        "13": "BAL_ENABLE_CMD",
+        "14": "MAIN_PROVEN",
+        "15": "NC",
+        "16": "NC",
+        "17": "PRE_DONE",
+        "18": "NC",
+        "19": "NC",
+        "20": "NC",
+        "21": "NC",
+        "22": "NC",
+        "23": "NC",
+        "24": "NC"
+      }
+    },
+    {
+      "ref": "U_AND2",
+      "mpn": "SN74LVC1G11DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C529281",
+      "footprint": "SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL",
+      "pins": {
+        "1": "BQ_ALERT_IC_N",
+        "2": "B0",
+        "3": "PRE_RUN_OK",
+        "4": "MAIN_CLR_N",
+        "5": "PRE_CTRL_3V3",
+        "6": "MAIN_OR"
+      }
+    },
+    {
+      "ref": "U_GATE1",
+      "mpn": "SN74LVC1G11DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C529281",
+      "footprint": "SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL",
+      "pins": {
+        "1": "PRE_ARM_Q",
+        "2": "B0",
+        "3": "PRE_RUN_OK",
+        "4": "PRECHARGE_WINDOW",
+        "5": "PRE_CTRL_3V3",
+        "6": "TMR_ACTIVE"
+      }
+    },
+    {
+      "ref": "R_DFETOFF_GATE",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "FET_RELEASE",
+        "2": "DFETOFF"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_LOAD_POWER_VALID_GATE",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "LPV_DRV_OK",
+        "2": "LOAD_VALID_GATE"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_QPRE_BASE",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_PATH_EN",
+        "2": "QPRE_DRV_B"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_DFETOFF_GS",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "pins": {
+        "1": "DFETOFF",
+        "2": "B0"
+      },
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_DFETOFF_PU",
+      "mpn": "RMC060347K1%N",
+      "manufacturer": "Tyohm(幸亚电阻)",
+      "lcsc": "C269715",
+      "footprint": "R0603",
+      "pins": {
+        "1": "B0",
+        "2": "DFETOFF"
+      }
+    },
+    {
+      "ref": "R_LOAD_POWER_VALID_LED",
+      "mpn": "0603WAF5100T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C23193",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "LOAD_VALID_LED_A"
+      }
+    },
+    {
+      "ref": "U_SEQ",
+      "mpn": "SN74LVC74ADR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C7864",
+      "footprint": "SOIC-14_L8.7-W3.9-P1.27-LS6.0-BL",
+      "pins": {
+        "1": "MAIN_CLR_N",
+        "2": "PRE_DONE",
+        "3": "MAIN_REQ",
+        "4": "PRE_CTRL_3V3",
+        "5": "FET_RELEASE",
+        "6": "NC",
+        "7": "B0",
+        "8": "TMR_IDLE",
+        "9": "TMR_TRIG",
+        "10": "PRE_CTRL_3V3",
+        "11": "PRE_REQ",
+        "12": "PRE_CTRL_3V3",
+        "13": "POR_OK_N",
+        "14": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "R_PRE_REF_TOP",
+      "mpn": "RS-03K3322FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C304736",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "PRE_REF_HI"
+      }
+    },
+    {
+      "ref": "R_PRE_REF_BOT",
+      "mpn": "RS-03K3322FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C304736",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_REF_MID",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "U_PRE_SENSE",
+      "mpn": "INA600AIDBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C51890379",
+      "footprint": "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "PRE_SENSE_OUT",
+        "2": "B0",
+        "3": "BATT+_FUSED",
+        "4": "PACK+",
+        "5": "PRE_REF_BUF",
+        "6": "VOUT_5V"
+      }
+    },
+    {
+      "ref": "R_PRE_5V_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_5V_RESET_RAW",
+        "2": "B0"
+      },
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "C_PRE_REF",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_INA",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_CMP",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_AND",
+      "mpn": "SN74LVC08APWR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C465737",
+      "footprint": "TSSOP-14_L5.0-W4.4-P0.65-LS6.4-BL",
+      "pins": {
+        "1": "PRE_LO_PHASE",
+        "2": "PRE_CMP_HI",
+        "3": "PRE_DIFF_IN",
+        "4": "PRE_DIFF_IN",
+        "5": "PRECHARGE_WINDOW",
+        "6": "PRE_RAW",
+        "7": "B0",
+        "8": "PRE_RAILS_OK",
+        "9": "POR_OK_N",
+        "10": "PRE_SENSE5_OK",
+        "11": "PRE_DONE",
+        "12": "PRE_RAW",
+        "13": "PRE_STABLE",
+        "14": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "U_PRE_RUN",
+      "mpn": "SN74LVC1G11DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C529281",
+      "footprint": "SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL",
+      "pins": {
+        "1": "BQ_ALERT_IC_N",
+        "2": "B0",
+        "3": "BMS_LOCAL_OK",
+        "4": "PRE_RUN_OK",
+        "5": "PRE_CTRL_3V3",
+        "6": "PRE_RAILS_OK"
+      }
+    },
+    {
+      "ref": "U_PRE_ARM",
+      "mpn": "SN74LVC1G74DCUR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C70285",
+      "footprint": "SSOP-8_L2.0-W2.3-P0.50-LS3.1-BR",
+      "pins": {
+        "1": "PRE_REQ",
+        "2": "TMR_IDLE",
+        "3": "NC",
+        "4": "B0",
+        "5": "PRE_ARM_Q",
+        "6": "PRE_SAFE_ARM",
+        "7": "PRE_CTRL_3V3",
+        "8": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "U_LPV_CONFIRM",
+      "mpn": "SN74LVC1G08DBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C7666",
+      "footprint": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "FET_RELEASE",
+        "2": "MAIN_PROVEN",
+        "3": "B0",
+        "4": "LPV_DRV_OK",
+        "5": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "C_PRE_LOGIC",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_RUN",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_ARM",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_LPV_CONFIRM",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_MAIN_HOLD_OR",
+      "mpn": "SN74LVC1G32DBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C10096",
+      "footprint": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "PRE_RAW",
+        "2": "MAIN_PROVEN",
+        "3": "B0",
+        "4": "MAIN_OR",
+        "5": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "R_PRE_DWELL",
+      "mpn": "0603WAF3302T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C4216",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_RAW",
+        "2": "PRE_DWELL_RC"
+      }
+    },
+    {
+      "ref": "D_PRE_FAST_RESET",
+      "mpn": "BAT46W",
+      "manufacturer": "DIOTEC(德欧泰克)",
+      "lcsc": "C212799",
+      "footprint": "SOD-123_L2.7-W1.6-LS3.7-RD",
+      "pins": {
+        "1": "PRE_RAW",
+        "2": "PRE_FAST_D"
+      }
+    },
+    {
+      "ref": "R_PRE_FAST_LIMIT",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_FAST_D",
+        "2": "PRE_DWELL_RC"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "C_PRE_DWELL",
+      "mpn": "CL10B105KA8NNNC",
+      "manufacturer": "SAMSUNG(三星)",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_DWELL_RC",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "R_MAIN_PROVEN_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "pins": {
+        "1": "MAIN_PROVEN",
+        "2": "B0"
+      },
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "C_PRE_HOLD",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_STABLE",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_STABLE",
+      "mpn": "SN74LVC1G58DBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C2877637",
+      "footprint": "SOT-23-6_L2.9-W1.6-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "MAIN_PROVEN",
+        "2": "B0",
+        "3": "B0",
+        "4": "PRE_STABLE",
+        "5": "PRE_CTRL_3V3",
+        "6": "PRE_DWELL_RC"
+      }
+    },
+    {
+      "ref": "U_PRE_CMP",
+      "mpn": "TLV9032DDFR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C5213975",
+      "footprint": "SOT-23-8_L2.9-W1.6-P0.65-LS2.8-BL",
+      "pins": {
+        "1": "PRE_CMP_LO",
+        "2": "PRE_REF_LO",
+        "3": "PRE_SENSE_OUT",
+        "4": "B0",
+        "5": "PRE_REF_HI",
+        "6": "PRE_SENSE_OUT",
+        "7": "PRE_CMP_HI",
+        "8": "VOUT_5V"
+      }
+    },
+    {
+      "ref": "R_TIMER_SET",
+      "mpn": "0603WAF1102T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C25950",
+      "footprint": "R0603",
+      "pins": {
+        "1": "TMR_SET",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "R_PRE_REF_HI",
+      "mpn": "0603WAD1541T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C2766999",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_REF_HI",
+        "2": "PRE_REF_LO"
+      }
+    },
+    {
+      "ref": "R_PRE_REF_LO",
+      "mpn": "0603WAF4420T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23057",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_REF_LO",
+        "2": "PRE_REF_MID"
+      }
+    },
+    {
+      "ref": "U_PRE_REF",
+      "mpn": "OPA333AIDBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C30878",
+      "footprint": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "PRE_REF_BUF",
+        "2": "B0",
+        "3": "PRE_REF_MID",
+        "4": "PRE_REF_BUF",
+        "5": "VOUT_5V"
+      }
+    },
+    {
+      "ref": "R_PRE_5V_SENSE_TOP",
+      "mpn": "RT0603BRD074K75L",
+      "manufacturer": "Yageo",
+      "lcsc": "C705782",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "PRE_5V_SENSE"
+      }
+    },
+    {
+      "ref": "R_PRE_5V_SENSE_BOT",
+      "mpn": "TC0325B1001T5F",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C2989112",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_5V_SENSE",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "R_PRE_5V_SENSE_TRIM",
+      "mpn": "0603WAF1004T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C22935",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "PRE_5V_SENSE"
+      }
+    },
+    {
+      "ref": "R_PRE_5V_PU",
+      "mpn": "0603WAF4701T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C23162",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "PRE_5V_RESET_RAW"
+      },
+      "value": "4.7 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C23162.html"
+    },
+    {
+      "ref": "U_PRE_5V_BUF",
+      "mpn": "SN74LVC1G17DBVR",
+      "manufacturer": "TI",
+      "lcsc": "C7836",
+      "footprint": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "NC",
+        "2": "PRE_5V_RESET_RAW",
+        "3": "B0",
+        "4": "PRE_SENSE5_OK",
+        "5": "PRE_CTRL_3V3"
+      },
+      "source": "https://www.ti.com/lit/ds/symlink/sn74lvc1g17.pdf"
+    },
+    {
+      "ref": "C_PRE_5V_BUF",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PRE_5V_POR",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_DIR_ARM",
+      "mpn": "SN74LVC1G08DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C7832",
+      "footprint": "SC-70-5_L2.1-W1.3-P0.65-LS2.1-BR",
+      "pins": {
+        "1": "PRE_RUN_OK",
+        "2": "PRE_LO_PHASE",
+        "3": "B0",
+        "4": "PRE_SAFE_ARM",
+        "5": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "C_PRE_DIR_ARM",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_LO_PHASE",
+      "mpn": "SN74LVC1G32DBVR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C10096",
+      "footprint": "SOT-23-5_L3.0-W1.7-P0.95-LS2.8-BR",
+      "pins": {
+        "1": "PRE_CMP_LO",
+        "2": "FET_RELEASE",
+        "3": "B0",
+        "4": "PRE_LO_PHASE",
+        "5": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "C_PRE_LO_PHASE",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_CLOSE",
+      "mpn": "SN74LVC1G74DCUR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C70285",
+      "footprint": "SSOP-8_L2.0-W2.3-P0.50-LS3.1-BR",
+      "pins": {
+        "1": "FET_RELEASE",
+        "2": "PRE_CTRL_3V3",
+        "3": "PRE_CLOSE_N",
+        "4": "B0",
+        "5": "PRE_CLOSE_Q",
+        "6": "POR_OK_N",
+        "7": "PRE_CTRL_3V3",
+        "8": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "C_PRE_CLOSE",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_PRE_PATH",
+      "mpn": "SN74LVC1G08DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C7832",
+      "footprint": "SC-70-5_L2.1-W1.3-P0.65-LS2.1-BR",
+      "pins": {
+        "1": "PRECHARGE_WINDOW",
+        "2": "PRE_CLOSE_N",
+        "3": "B0",
+        "4": "PRE_PATH_EN",
+        "5": "PRE_CTRL_3V3"
+      }
+    },
+    {
+      "ref": "C_PRE_PATH",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "U_TEST_EN",
+      "mpn": "SN74LVC1G11DCKR",
+      "manufacturer": "TI(德州仪器)",
+      "lcsc": "C529281",
+      "footprint": "SC-70-6_L2.2-W1.3-P0.65-LS2.1-BL",
+      "pins": {
+        "1": "PRECHARGE_WINDOW",
+        "2": "B0",
+        "3": "FET_RELEASE",
+        "4": "PROBE_ENABLE",
+        "5": "PRE_CTRL_3V3",
+        "6": "PROBE_REQ"
+      }
+    },
+    {
+      "ref": "C_TEST_EN",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "Q_PROBE",
+      "mpn": "MMBT5551",
+      "manufacturer": "MDD",
+      "lcsc": "C408396",
+      "footprint": "SOT-23-3_L2.9-W1.6-P1.90-LS2.8-BR",
+      "pins": {
+        "1": "PROBE_BASE",
+        "2": "PACK-",
+        "3": "PROBE_RETURN"
+      }
+    },
+    {
+      "ref": "R_PROBE",
+      "mpn": "RN 3WS 820R F T/B A1",
+      "manufacturer": "Tyohm",
+      "lcsc": "C433538",
+      "footprint": "R_AXIAL_19.5MM_3W_LOCAL_CARRIER",
+      "pins": {
+        "1": "PACK+",
+        "2": "PROBE_RETURN"
+      }
+    },
+    {
+      "ref": "R_PROBE_BASE",
+      "mpn": "1206W4F2700T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C4466",
+      "footprint": "R1206",
+      "pins": {
+        "1": "PROBE_ENABLE",
+        "2": "PROBE_BASE"
+      }
+    },
+    {
+      "ref": "R_PROBE_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PROBE_BASE",
+        "2": "PACK-"
+      },
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_PROBE_REQ_PD",
+      "mpn": "0603WAF1003T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25803",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PROBE_REQ",
+        "2": "B0"
+      },
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "U_PRE_5V_POR",
+      "mpn": "TPS3760A012DYYR",
+      "manufacturer": "TI",
+      "lcsc": "C5218894",
+      "footprint": "SOT-23-14_L4.2-W2.0-P0.50-LS3.3-BL_TI_DYY0014A",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "NC",
+        "3": "PRE_5V_SENSE",
+        "4": "NC",
+        "5": "NC",
+        "6": "PRE_5V_RESET_RAW",
+        "7": "NC",
+        "8": "B0",
+        "9": "NC",
+        "10": "NC",
+        "11": "NC",
+        "12": "NC",
+        "13": "B0",
+        "14": "NC"
+      }
+    },
+    {
+      "ref": "U_LOAD_POWER_VALID_B",
+      "old_mpn": "VO617A-2X007T (UNVERIFIED_2X)",
+      "manufacturer": "LITEON(光宝)",
+      "lcsc": "C109227",
+      "pins": {
+        "1": "LOAD_VALID_B_LED_A",
+        "2": "LOAD_VALID_LED_K",
+        "3": "LOAD_POWER_VALID_B",
+        "4": "LOAD_EN_BIAS_EXT_B"
+      },
+      "footprint": "OPTO-SMD-4_L4.6-W6.5-P2.54-LS10.3-BL",
+      "pin_roles": {
+        "1": "A",
+        "2": "K",
+        "3": "E",
+        "4": "C"
+      },
+      "datasheet": "https://www.lcsc.com/product-image/C109227.html",
+      "mpn": "LTV-817S-TA1-C"
+    },
+    {
+      "ref": "R_LOAD_POWER_VALID_B_LED",
+      "mpn": "0603WAF5100T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C23193",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "LOAD_VALID_B_LED_A"
+      }
+    },
+    {
+      "ref": "J_LOAD_POWER_VALID_B",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "pins": {
+        "1": "LOAD_EN_BIAS_EXT_B",
+        "2": "LOAD_POWER_VALID_B"
+      }
+    },
+    {
+      "ref": "R_LOAD_POWER_VALID_REG_LED",
+      "mpn": "0603WAF5100T5E",
+      "manufacturer": "UNI-ROYAL",
+      "lcsc": "C23193",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "LOAD_VALID_REG_LED_A"
+      }
+    },
+    {
+      "ref": "J_LPV_REG",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "pins": {
+        "1": "LOAD_VALID_REG_LED_A",
+        "2": "LOAD_VALID_LED_K"
+      }
+    },
+    {
+      "ref": "Q_CHG4",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI(华羿微)",
+      "lcsc": "C2925050",
+      "pins": {
+        "1": "CHG_G4",
+        "2": "BATT+_FUSED",
+        "3": "BATT+_FUSED",
+        "4": "BATT+_FUSED",
+        "5": "BATT+_FUSED",
+        "6": "BATT+_FUSED",
+        "7": "BATT+_FUSED",
+        "8": "BATT+_FUSED",
+        "9": "FET_MID"
+      },
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf"
+    },
+    {
+      "ref": "Q_DSG4",
+      "mpn": "HYG022N10NS1TA",
+      "manufacturer": "HUAYI(华羿微)",
+      "lcsc": "C2925050",
+      "pins": {
+        "1": "DSG_G4",
+        "2": "PACK+",
+        "3": "PACK+",
+        "4": "PACK+",
+        "5": "PACK+",
+        "6": "PACK+",
+        "7": "PACK+",
+        "8": "PACK+",
+        "9": "FET_MID"
+      },
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      },
+      "datasheet": "https://atta.szlcsc.com/upload/public/pdf/source/20211129/85A27B49583C97E874E50AC12D8AF79A.pdf"
+    },
+    {
+      "ref": "R_G_CHG4",
+      "mpn": "ABD03K1000FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C20616261",
+      "value": "100Ω",
+      "pins": {
+        "1": "CHG",
+        "2": "CHG_G4"
+      },
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_G_DSG4",
+      "mpn": "ABD03K1000FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C20616261",
+      "value": "100Ω",
+      "pins": {
+        "1": "DSG",
+        "2": "DSG_G4"
+      },
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_GS_CHG4",
+      "mpn": "RS-03L1005FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C322040",
+      "value": "10MΩ",
+      "pins": {
+        "1": "CHG_G4",
+        "2": "BATT+_FUSED"
+      },
+      "footprint": "R0603"
+    },
+    {
+      "ref": "R_GS_DSG4",
+      "mpn": "RS-03L1005FT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C322040",
+      "value": "10MΩ",
+      "pins": {
+        "1": "DSG_G4",
+        "2": "PACK+"
+      },
+      "footprint": "R0603"
+    },
+    {
+      "ref": "U_CAN",
+      "mpn": "CA-IS2062A",
+      "manufacturer": "Chipanalog(川土微)",
+      "lcsc": "C22438481",
+      "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+      "pins": {
+        "1": "CAN_RX",
+        "2": "NC",
+        "3": "NC",
+        "4": "CAN_TX",
+        "5": "B0",
+        "6": "VOUT_5V",
+        "7": "CORE_3V3",
+        "8": "B0",
+        "9": "GND_CAN",
+        "10": "CAN_ISO_5V",
+        "11": "CAN_ISO_5V",
+        "12": "GND_CAN",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "pin_roles": {
+        "1": "RXD",
+        "2": "NC",
+        "3": "NC",
+        "4": "TXD",
+        "5": "GNDP1",
+        "6": "VDDP",
+        "7": "VDDL",
+        "8": "GND1",
+        "9": "GND2",
+        "10": "VISOIN",
+        "11": "VISOOUT",
+        "12": "GNDP2",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "datasheet": "https://www.chipanalog.com/Public/Uploads/uploadfile/files/20250329/CAIS2062AdatasheetVersion1.01cn20250325-314.pdf"
+    },
+    {
+      "ref": "D_CAN_TVS",
+      "mpn": "PESD2CANFD24V-TR",
+      "manufacturer": "Nexperia(安世)",
+      "lcsc": "C552486",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "pins": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND_CAN"
+      }
+    },
+    {
+      "ref": "J_CAN",
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "manufacturer": "JST",
+      "lcsc": "C144394",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "pins": {
+        "1": "GND_CAN",
+        "2": "CANH",
+        "3": "CANL"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_OUT1",
+      "mpn": "GRM32ER61C476KE15L",
+      "manufacturer": "muRata(村田)",
+      "lcsc": "C77101",
+      "footprint": "C1210",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_OUT2",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "source": "https://www.lcsc.com/product-detail/C30926.html",
+      "value": "100 nF ±10%, X7R, 50 V"
+    },
+    {
+      "ref": "U_LOAD_POWER_VALID",
+      "old_mpn": "VO617A-2X007T (UNVERIFIED_2X)",
+      "manufacturer": "LITEON(光宝)",
+      "lcsc": "C109227",
+      "pins": {
+        "1": "LOAD_VALID_LED_A",
+        "2": "LOAD_VALID_LED_K",
+        "3": "LOAD_POWER_VALID",
+        "4": "LOAD_EN_BIAS_EXT"
+      },
+      "footprint": "OPTO-SMD-4_L4.6-W6.5-P2.54-LS10.3-BL",
+      "pin_roles": {
+        "1": "A",
+        "2": "K",
+        "3": "E",
+        "4": "C"
+      },
+      "datasheet": "https://www.lcsc.com/product-image/C109227.html",
+      "mpn": "LTV-817S-TA1-C"
+    },
+    {
+      "ref": "J_EARLY_READY_IN",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "pins": {
+        "1": "EARLY_GUARD_READY_N",
+        "2": "B0"
+      },
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P"
+    },
+    {
+      "ref": "R_EARLY_READY_PU",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "value": "10 kΩ ±1%",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "EARLY_GUARD_READY_N"
+      },
+      "footprint": "R0603",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "C_VC1",
+      "mpn": "0603B224K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C83626",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VC1_FILT",
+        "2": "VC0_FILT"
+      }
+    },
+    {
+      "ref": "J_LOAD_POWER_VALID",
+      "mpn": "A2501WV-2P",
+      "manufacturer": "CJT",
+      "lcsc": "C48579979",
+      "footprint": "CONN-TH_2P-P2.50_A2501WV-2P",
+      "pins": {
+        "1": "LOAD_EN_BIAS_EXT",
+        "2": "LOAD_POWER_VALID"
+      }
+    },
+    {
+      "ref": "Q_BREG",
+      "manufacturer": "江苏长晶 JSCJ（C码绑定厂家）",
+      "mpn": "BCX56-16",
+      "lcsc": "C5183147",
+      "pins": {
+        "1": "BREG",
+        "2": "BREG_COLLECTOR",
+        "3": "REGIN"
+      },
+      "replaces": "Diodes FCX495TA C150457",
+      "footprint": "SOT-89-3L",
+      "vceo_v": 80,
+      "ic_a": 1,
+      "pc_25c_w": 0.5,
+      "rth_ja_c_per_w": 250,
+      "existing_feed_ohm": 1000,
+      "regin_min_v": 4.1,
+      "normal_load_ma": 10,
+      "normal_power_upper_w": 0.2391,
+      "normal_tj_at_60c_upper_c": 119.775,
+      "fault_peak_from_existing_feed_screen_w": 0.364,
+      "fault_tj_at_60c_upper_c": 151,
+      "price": "待核价",
+      "source": "https://www.lcsc.com/product-detail/C5183147.html",
+      "bench": "正常10 mA功耗按37.8 V、Rmin约979 Ω、REGIN=4.1 V且二极管压降不计，含发射极供电路径。故障热平衡无正裕量；实测REGIN启动、短路持续及板上铜热阻。按JSCJ实际采购；原长电品牌只核到历史规格书。",
+      "pin_roles": {
+        "1": "B",
+        "2": "C",
+        "3": "E"
+      },
+      "exposed_pad": {
+        "physical_tab": "C",
+        "shares_pad": "2",
+        "net": "BREG_COLLECTOR",
+        "if_separately_numbered": "4"
+      },
+      "old_pin_roles": {
+        "1": "B",
+        "2": "C",
+        "3": "E"
+      },
+      "old_pins": {
+        "1": "BREG",
+        "2": "BREG_COLLECTOR",
+        "3": "REGIN"
+      },
+      "datasheet": "https://www.jscj-elec.com/uploads/20221028/ef6664364fafb015899f720701605be0.pdf",
+      "old_datasheet": "https://www.diodes.com/datasheet/download/FCX495.pdf"
+    },
+    {
+      "ref": "J_R_PRE",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "manufacturer": "DEGSON(高正/高松)",
+      "lcsc": "C581328",
+      "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+      "pins": {
+        "1": "QPRE_SW",
+        "2": "PACK+"
+      },
+      "replaces_ref": "R_PRE",
+      "source": "https://www.lcsc.com/product-detail/C581328.html"
+    },
+    {
+      "ref": "Q_CHG1",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "CHG_G1",
+        "2": "BATT+_FUSED",
+        "3": "BATT+_FUSED",
+        "4": "BATT+_FUSED",
+        "5": "BATT+_FUSED",
+        "6": "BATT+_FUSED",
+        "7": "BATT+_FUSED",
+        "8": "BATT+_FUSED",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "Q_CHG2",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "CHG_G2",
+        "2": "BATT+_FUSED",
+        "3": "BATT+_FUSED",
+        "4": "BATT+_FUSED",
+        "5": "BATT+_FUSED",
+        "6": "BATT+_FUSED",
+        "7": "BATT+_FUSED",
+        "8": "BATT+_FUSED",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "Q_CHG3",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "CHG_G3",
+        "2": "BATT+_FUSED",
+        "3": "BATT+_FUSED",
+        "4": "BATT+_FUSED",
+        "5": "BATT+_FUSED",
+        "6": "BATT+_FUSED",
+        "7": "BATT+_FUSED",
+        "8": "BATT+_FUSED",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "Q_DSG1",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "DSG_G1",
+        "2": "PACK+",
+        "3": "PACK+",
+        "4": "PACK+",
+        "5": "PACK+",
+        "6": "PACK+",
+        "7": "PACK+",
+        "8": "PACK+",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "Q_DSG2",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "DSG_G2",
+        "2": "PACK+",
+        "3": "PACK+",
+        "4": "PACK+",
+        "5": "PACK+",
+        "6": "PACK+",
+        "7": "PACK+",
+        "8": "PACK+",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "Q_DSG3",
+      "manufacturer": "HUAYI(华羿微)",
+      "mpn": "HYG022N10NS1TA",
+      "lcsc": "C2925050",
+      "footprint": "TOLL_L10.4-W9.9-P1.20-LS11.7-BL_HUAYI_HYG022N10NS1TA",
+      "pins": {
+        "1": "DSG_G3",
+        "2": "PACK+",
+        "3": "PACK+",
+        "4": "PACK+",
+        "5": "PACK+",
+        "6": "PACK+",
+        "7": "PACK+",
+        "8": "PACK+",
+        "9": "FET_MID"
+      },
+      "pin_roles": {
+        "1": "G",
+        "2": "S",
+        "3": "S",
+        "4": "S",
+        "5": "S",
+        "6": "S",
+        "7": "S",
+        "8": "S",
+        "9": "D"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_IN1",
+      "manufacturer": "muRata(村田)",
+      "mpn": "GRM32ER61C476KE15L",
+      "lcsc": "C77101",
+      "footprint": "C1210",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "C_CAN_PWR_IN2",
+      "manufacturer": "FH(风华)",
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "source": "https://www.lcsc.com/product-detail/C30926.html",
+      "value": "100 nF ±10%, X7R, 50 V"
+    },
+    {
+      "ref": "C_CAN_VCC2_2",
+      "manufacturer": "SAMSUNG(三星)",
+      "mpn": "CL10B105KA8NNNC",
+      "lcsc": "C29936",
+      "footprint": "C0603",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "B0"
+      }
+    },
+    {
+      "ref": "PSU5_EXT",
+      "mpn": "SCT2A23ASTER",
+      "manufacturer": "Silicon Content Technology(芯洲科技)",
+      "lcsc": "C2901894",
+      "footprint": "ESOP-8_4.9x3.9mm_P1.27_EP",
+      "pins": {
+        "1": "B0",
+        "2": "TAP_B9",
+        "3": "PSU5_EN",
+        "4": "B0",
+        "5": "PSU5_FB",
+        "6": "PSU5_VCC",
+        "7": "PSU5_BST",
+        "8": "PSU5_SW",
+        "9": "B0"
+      },
+      "value": "100 V/1.2 A同步Buck，PFM",
+      "source": "https://www.lcsc.com/product-detail/C2901894.html",
+      "price": "待核价",
+      "pin_roles": {
+        "1": "GND",
+        "2": "VIN",
+        "3": "EN",
+        "4": "MODE",
+        "5": "FB",
+        "6": "VCC",
+        "7": "BST",
+        "8": "SW",
+        "9": "EP"
+      },
+      "datasheet": "https://www.silicontent.com/uploads/20251021/d6286bb1beadf3d3d30724b428363513.pdf"
+    },
+    {
+      "ref": "L_PSU5",
+      "mpn": "CKST1004-47uH/M",
+      "manufacturer": "CENKER(岑科)",
+      "lcsc": "C19193248",
+      "footprint": "IND-SMD_11.6x10.1mm",
+      "pins": {
+        "1": "PSU5_SW",
+        "2": "VOUT_5V"
+      },
+      "value": "47 µH ±20%, 3 A Irms / 4 A Isat典型, 75 V最大",
+      "source": "https://www.lcsc.com/product-detail/C19193248.html",
+      "price": "待核价",
+      "datasheet": "https://datasheet.lcsc.com/lcsc/2401191735_CENKER-CKST1004-47uH-M_C19193248.pdf"
+    },
+    {
+      "ref": "C_PSU5_IN1",
+      "mpn": "1210B475K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C2840282",
+      "footprint": "C1210",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "B0"
+      },
+      "value": "4.7 µF 100 V X7R",
+      "source": "https://www.lcsc.com/product-detail/C2840282.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_IN2",
+      "mpn": "1210B475K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C2840282",
+      "footprint": "C1210",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "B0"
+      },
+      "value": "4.7 µF 100 V X7R",
+      "source": "https://www.lcsc.com/product-detail/C2840282.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_IN_HF",
+      "mpn": "0805B104K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C89258",
+      "footprint": "C0805",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "B0"
+      },
+      "value": "100 nF ±10%, X7R, 100 V",
+      "source": "https://www.lcsc.com/product-detail/C89258.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_OUT1",
+      "mpn": "1210X226K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C5445361",
+      "footprint": "C1210",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "22 µF 25 V X5R",
+      "source": "https://www.lcsc.com/product-detail/C5445361.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_OUT2",
+      "mpn": "1210X226K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C5445361",
+      "footprint": "C1210",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "B0"
+      },
+      "value": "22 µF 25 V X5R",
+      "source": "https://www.lcsc.com/product-detail/C5445361.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_VCC",
+      "mpn": "0603X225K250NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C99227",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PSU5_VCC",
+        "2": "B0"
+      },
+      "value": "2.2 µF 25 V X5R",
+      "source": "https://www.lcsc.com/product-detail/C99227.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_BST",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PSU5_BST",
+        "2": "PSU5_SW"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "D_PSU5_FW",
+      "mpn": "SS310-SMC",
+      "manufacturer": "GOODWORK",
+      "lcsc": "C2848691",
+      "footprint": "SMC_DO-214AB",
+      "pins": {
+        "1": "PSU5_SW",
+        "2": "B0"
+      },
+      "value": "3 A 100 V肖特基，死区续流，1=K 2=A",
+      "source": "https://www.lcsc.com/product-detail/C2848691.html",
+      "price": "待核价",
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      }
+    },
+    {
+      "ref": "R_PSU5_FB_TOP",
+      "mpn": "RT0603BRD0795K3L",
+      "manufacturer": "YAGEO(国巨)",
+      "lcsc": "C861605",
+      "footprint": "R0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "PSU5_FB"
+      },
+      "value": "95.3 kΩ ±0.1% 25 ppm/K",
+      "source": "https://www.lcsc.com/product-detail/C861605.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "R_PSU5_FB_BOT",
+      "mpn": "RT0603BRD0730K1L",
+      "manufacturer": "YAGEO(国巨)",
+      "lcsc": "C705764",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PSU5_FB",
+        "2": "B0"
+      },
+      "value": "30.1 kΩ ±0.1% 25 ppm/K",
+      "source": "https://www.lcsc.com/product-detail/C705764.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "R_PSU5_EN_SW",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "CTRL_MODULE",
+        "2": "PSU5_EN"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_PSU5_EN",
+      "mpn": "0603B103K101NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C43253",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PSU5_EN",
+        "2": "B0"
+      },
+      "value": "10 nF 100 V X7R，内部EN电流源上拉；0.35 µA典型时至1.24 V约35 ms",
+      "source": "https://www.lcsc.com/product-detail/C43253.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "C_CAN_ISOIN_1U",
+      "mpn": "CL10A105KB8NNNC",
+      "manufacturer": "Samsung Electro-Mechanics(三星电机)",
+      "lcsc": "C15849",
+      "footprint": "C0603",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "value": "1 µF 50 V X5R，基础库，紧贴U_CAN.10/.12",
+      "source": "https://www.lcsc.com/product-detail/C15849.html",
+      "price": "待核价",
+      "assembly_source": "https://jlcpcb.com/partdetail/16531-CL10A105KB8NNNC/C15849"
+    },
+    {
+      "ref": "D_TVS",
+      "mpn": "SMCJ45A",
+      "manufacturer": "MDD(Microdiode Semiconductor)",
+      "lcsc": "C2994055",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "pins": {
+        "1": "PACK+",
+        "2": "PACK-"
+      },
+      "value": "45 V VRWM，72.7 V@20.6 A 10/1000µs",
+      "source": "https://www.lcsc.com/product-detail/C2994055.html",
+      "price": "待核价",
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      }
+    },
+    {
+      "ref": "C_PSU5_FB_FF",
+      "mpn": "0603CG680J500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C1680",
+      "footprint": "C0603",
+      "pins": {
+        "1": "VOUT_5V",
+        "2": "PSU5_FB"
+      },
+      "value": "68 pF ±5% 50 V C0G，芯洲5V典型表前馈",
+      "source": "https://www.lcsc.com/product-detail/C1680.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "J_CELL_SERVICE",
+      "manufacturer": "JST",
+      "mpn": "B10B-XH-A(LF)(SN)",
+      "lcsc": "C144400",
+      "footprint": "CONN-TH_10P-P2.50_B10B-XH-A",
+      "pins": {
+        "1": "B0",
+        "2": "TAP_B1",
+        "3": "TAP_B2",
+        "4": "TAP_B3",
+        "5": "TAP_B4",
+        "6": "TAP_B5",
+        "7": "TAP_B6",
+        "8": "TAP_B7",
+        "9": "TAP_B8",
+        "10": "TAP_B9"
+      },
+      "source": "https://www.jst.com/wp-content/uploads/2025/06/eXH.pdf"
+    },
+    {
+      "ref": "J_BATT_POS",
+      "manufacturer": null,
+      "mpn": "M5 PCB铜接线柱",
+      "lcsc": null,
+      "footprint": "STUD-M5-TH_D5.5_PAD14",
+      "pins": {
+        "1": "BATT+_FUSED"
+      },
+      "mechanical_spec": {
+        "thread": "M5",
+        "clearance_hole_mm": 5.5,
+        "pad_diameter_mm": 14,
+        "lug": "OT-5",
+        "target_current_a": 150,
+        "qualification": "pending"
+      }
+    },
+    {
+      "ref": "J_BATT_NEG",
+      "manufacturer": null,
+      "mpn": "M5 PCB铜接线柱",
+      "lcsc": null,
+      "footprint": "STUD-M5-TH_D5.5_PAD14",
+      "pins": {
+        "1": "B0"
+      },
+      "mechanical_spec": {
+        "thread": "M5",
+        "clearance_hole_mm": 5.5,
+        "pad_diameter_mm": 14,
+        "lug": "OT-5",
+        "target_current_a": 150,
+        "qualification": "pending"
+      }
+    },
+    {
+      "ref": "J_PACK_POS",
+      "manufacturer": null,
+      "mpn": "M5 PCB铜接线柱",
+      "lcsc": null,
+      "footprint": "STUD-M5-TH_D5.5_PAD14",
+      "pins": {
+        "1": "PACK+"
+      },
+      "mechanical_spec": {
+        "thread": "M5",
+        "clearance_hole_mm": 5.5,
+        "pad_diameter_mm": 14,
+        "lug": "OT-5",
+        "target_current_a": 150,
+        "qualification": "pending"
+      }
+    },
+    {
+      "ref": "J_PACK_NEG",
+      "manufacturer": null,
+      "mpn": "M5 PCB铜接线柱",
+      "lcsc": null,
+      "footprint": "STUD-M5-TH_D5.5_PAD14",
+      "pins": {
+        "1": "PACK-"
+      },
+      "mechanical_spec": {
+        "thread": "M5",
+        "clearance_hole_mm": 5.5,
+        "pad_diameter_mm": 14,
+        "lug": "OT-5",
+        "target_current_a": 150,
+        "qualification": "pending"
+      }
+    },
+    {
+      "ref": "C_AND2",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_GATE1",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_POR",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_PSU_IN2",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "B0"
+      },
+      "mpn": "0805B104K101NT",
+      "lcsc": "C89258",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0805",
+      "value": "100 nF ±10%, X7R, 100 V",
+      "source": "https://www.lcsc.com/product-detail/C89258.html"
+    },
+    {
+      "ref": "C_SEQ",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_TIMER",
+      "pins": {
+        "1": "TMR_VDD",
+        "2": "B0"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "R_ALERT_PU",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "BQ_ALERT_N"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_ALERT_SER",
+      "pins": {
+        "1": "BQ_ALERT_IC_N",
+        "2": "BQ_ALERT_N"
+      },
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_BAL_ENABLE_BE",
+      "pins": {
+        "1": "BAL_ENABLE_BASE",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU1",
+      "pins": {
+        "1": "TAP_B2",
+        "2": "BAL_EN_CLAMP_GATE_1"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU2",
+      "pins": {
+        "1": "TAP_B3",
+        "2": "BAL_EN_CLAMP_GATE_2"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU3",
+      "pins": {
+        "1": "TAP_B4",
+        "2": "BAL_EN_CLAMP_GATE_3"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU4",
+      "pins": {
+        "1": "TAP_B5",
+        "2": "BAL_EN_CLAMP_GATE_4"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU5",
+      "pins": {
+        "1": "TAP_B6",
+        "2": "BAL_EN_CLAMP_GATE_5"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU6",
+      "pins": {
+        "1": "TAP_B7",
+        "2": "BAL_EN_CLAMP_GATE_6"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU7",
+      "pins": {
+        "1": "TAP_B8",
+        "2": "BAL_EN_CLAMP_GATE_7"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_EN_GATE_PU8",
+      "pins": {
+        "1": "TAP_B9",
+        "2": "BAL_EN_CLAMP_GATE_8"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET1",
+      "pins": {
+        "1": "BAL_ETA_ISET_1",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET2",
+      "pins": {
+        "1": "BAL_ETA_ISET_2",
+        "2": "TAP_B1"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET3",
+      "pins": {
+        "1": "BAL_ETA_ISET_3",
+        "2": "TAP_B2"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET4",
+      "pins": {
+        "1": "BAL_ETA_ISET_4",
+        "2": "TAP_B3"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET5",
+      "pins": {
+        "1": "BAL_ETA_ISET_5",
+        "2": "TAP_B4"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET6",
+      "pins": {
+        "1": "BAL_ETA_ISET_6",
+        "2": "TAP_B5"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET7",
+      "pins": {
+        "1": "BAL_ETA_ISET_7",
+        "2": "TAP_B6"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_ISET8",
+      "pins": {
+        "1": "BAL_ETA_ISET_8",
+        "2": "TAP_B7"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_BAL_MAINCLR_BE",
+      "pins": {
+        "1": "BAL_MAINCLR_BASE",
+        "2": "BAL_SWITCH_MID"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_CAN_TXD_PU",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "CAN_TX"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_IF_LOCAL_OK_PD",
+      "pins": {
+        "1": "BMS_LOCAL_OK",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_IF_MAIN_REQ_PD",
+      "pins": {
+        "1": "MAIN_REQ",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_IF_PRE_REQ_PD",
+      "pins": {
+        "1": "PRE_REQ",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_LOAD_POWER_VALID_GS",
+      "pins": {
+        "1": "LOAD_VALID_GATE",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_PRE_CTRL_PD",
+      "pins": {
+        "1": "PRE_CTRL_3V3",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_QPRE_BE",
+      "pins": {
+        "1": "QPRE_DRV_B",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1003T5E",
+      "lcsc": "C25803",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "100 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25803.html"
+    },
+    {
+      "ref": "R_QPRE_PU",
+      "pins": {
+        "1": "QPRE_SRC",
+        "2": "QPRE_G"
+      },
+      "mpn": "0603WAF4701T5E",
+      "lcsc": "C23162",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "4.7 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C23162.html"
+    },
+    {
+      "ref": "R_RST_SHUT",
+      "pins": {
+        "1": "RST_SHUT",
+        "2": "B0"
+      },
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_SCL_PU",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "BQ_I2C_SCL"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_SDA_PU",
+      "pins": {
+        "1": "CORE_3V3",
+        "2": "BQ_I2C_SDA"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_TIMER_SUPPLY",
+      "pins": {
+        "1": "TMR_TRIG",
+        "2": "TMR_VDD"
+      },
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    }
+  ],
+  "drawing_scope": {
+    "baseline": "电力/BMS模块/检查/复用预充原生候选/候选重开.enet",
+    "baseline_sha256": "ad0126dfc231a1553f7904b442196b15aa9746f6d8cb8d7905e2a87ebbee4dad",
+    "published_baseline": "电力/BMS模块/检查/主工程图面验收/主工程.enet",
+    "inherited_changed_or_added": [
+      "C_LPV_CONFIRM",
+      "C_PRE_5V_BUF",
+      "C_PRE_5V_POR",
+      "C_PRE_ARM",
+      "C_PRE_CLOSE",
+      "C_PRE_CMP",
+      "C_PRE_DIR_ARM",
+      "C_PRE_DWELL",
+      "C_PRE_HOLD",
+      "C_PRE_INA",
+      "C_PRE_LOGIC",
+      "C_PRE_LO_PHASE",
+      "C_PRE_PATH",
+      "C_PRE_REF",
+      "C_PRE_RUN",
+      "C_PRE_STABLE",
+      "C_TEST_EN",
+      "D_PRE_FAST_RESET",
+      "J_CORE_P1",
+      "J_CORE_P2",
+      "J_LOAD_POWER_VALID_B",
+      "J_LPV_REG",
+      "Q_PROBE",
+      "R_DFETOFF_GATE",
+      "R_DFETOFF_GS",
+      "R_DFETOFF_PU",
+      "R_LOAD_POWER_VALID_B_LED",
+      "R_LOAD_POWER_VALID_GATE",
+      "R_LOAD_POWER_VALID_LED",
+      "R_LOAD_POWER_VALID_REG_LED",
+      "R_MAIN_PROVEN_PD",
+      "R_PRE_5V_PD",
+      "R_PRE_5V_PU",
+      "R_PRE_5V_SENSE_BOT",
+      "R_PRE_5V_SENSE_TOP",
+      "R_PRE_5V_SENSE_TRIM",
+      "R_PRE_DWELL",
+      "R_PRE_FAST_LIMIT",
+      "R_PRE_REF_BOT",
+      "R_PRE_REF_HI",
+      "R_PRE_REF_LO",
+      "R_PRE_REF_TOP",
+      "R_PROBE",
+      "R_PROBE_BASE",
+      "R_PROBE_PD",
+      "R_PROBE_REQ_PD",
+      "R_QPRE_BASE",
+      "R_TIMER_SET",
+      "U_AND2",
+      "U_GATE1",
+      "U_LOAD_POWER_VALID_B",
+      "U_LPV_CONFIRM",
+      "U_MAIN_HOLD_OR",
+      "U_PRE_5V_BUF",
+      "U_PRE_5V_POR",
+      "U_PRE_AND",
+      "U_PRE_ARM",
+      "U_PRE_CLOSE",
+      "U_PRE_CMP",
+      "U_PRE_DIR_ARM",
+      "U_PRE_LO_PHASE",
+      "U_PRE_PATH",
+      "U_PRE_REF",
+      "U_PRE_RUN",
+      "U_PRE_SENSE",
+      "U_PRE_STABLE",
+      "U_SEQ",
+      "U_TEST_EN"
+    ],
+    "closure_changed_or_added": [
+      "C_CAN_ISOIN_1U",
+      "C_CAN_PWR_OUT1",
+      "C_CAN_PWR_OUT2",
+      "C_PSU5_BST",
+      "C_PSU5_EN",
+      "C_PSU5_FB_FF",
+      "C_PSU5_IN1",
+      "C_PSU5_IN2",
+      "C_PSU5_IN_HF",
+      "C_PSU5_OUT1",
+      "C_PSU5_OUT2",
+      "C_PSU5_VCC",
+      "C_VC1",
+      "D_CAN_TVS",
+      "D_PSU5_FW",
+      "D_TVS",
+      "J_CAN",
+      "J_EARLY_READY_IN",
+      "J_R_PRE",
+      "L_PSU5",
+      "PSU5_EXT",
+      "Q_BREG",
+      "Q_CHG4",
+      "Q_DSG4",
+      "R_EARLY_READY_PU",
+      "R_GS_CHG4",
+      "R_GS_DSG4",
+      "R_G_CHG4",
+      "R_G_DSG4",
+      "R_PSU5_EN_SW",
+      "R_PSU5_FB_BOT",
+      "R_PSU5_FB_TOP",
+      "U_CAN",
+      "U_LOAD_POWER_VALID",
+      "J_CELL_SERVICE",
+      "J_BATT_POS",
+      "J_BATT_NEG",
+      "J_PACK_POS",
+      "J_PACK_NEG"
+    ],
+    "retained_interfaces": [
+      "J_LOAD_POWER_VALID",
+      "J_CELL_SERVICE",
+      "Q_CHG1",
+      "Q_CHG2",
+      "Q_CHG3",
+      "Q_DSG1",
+      "Q_DSG2",
+      "Q_DSG3",
+      "C_CAN_PWR_IN1",
+      "C_CAN_PWR_IN2",
+      "C_CAN_VCC2_2"
+    ],
+    "inherited_removed": [
+      "Q_DFETOFF"
+    ],
+    "published_baseline_sha256": "cce8086b5bbff2945e90263665c5bfb67eda60109d53b975777d237b5ab10bc3",
+    "removed_from_frozen_enet": [
+      "R_PSU_MINLOAD1",
+      "R_PSU_MINLOAD2",
+      "R_PSU_MINLOAD3",
+      "R_PSU_MINLOAD4",
+      "R_PSU_MINLOAD5"
+    ]
+  },
+  "can_decoupling": {
+    "vddp": [
+      "C_CAN_PWR_IN1",
+      "C_CAN_PWR_IN2"
+    ],
+    "vddl": [
+      "C_CAN_VCC2_2"
+    ],
+    "visoout": [
+      "C_CAN_PWR_OUT1",
+      "C_CAN_PWR_OUT2"
+    ],
+    "visoin": [
+      "C_CAN_ISOIN_1U"
+    ],
+    "placement": "C_CAN_ISOIN_1U单独从U_CAN.10就近接U_CAN.12。VISOOUT与VISOIN按原厂短接，同网各自就地去耦。"
+  },
+  "p0": {
+    "buck": {
+      "driver_ref": "PSU5_EXT",
+      "added": [
+        "L_PSU5",
+        "C_PSU5_IN1",
+        "C_PSU5_IN2",
+        "C_PSU5_IN_HF",
+        "C_PSU5_OUT1",
+        "C_PSU5_OUT2",
+        "C_PSU5_VCC",
+        "C_PSU5_BST",
+        "D_PSU5_FW",
+        "R_PSU5_FB_TOP",
+        "R_PSU5_FB_BOT",
+        "R_PSU5_EN_SW",
+        "C_PSU5_EN",
+        "C_PSU5_FB_FF"
+      ],
+      "removed": [
+        "R_PSU_MINLOAD1",
+        "R_PSU_MINLOAD2",
+        "R_PSU_MINLOAD3",
+        "R_PSU_MINLOAD4",
+        "R_PSU_MINLOAD5"
+      ],
+      "nominal_output_v": 4.999335548172756,
+      "preload_removed_w": 0.46296296296296297,
+      "run_store": "SW_RUN_STORE.5仍接CTRL_MODULE。RUN触点开，SCT内部EN上拉；STORE触点接B0，串1k下拉EN。10nF只抑制短接触反跳，须验证实际开关波形。禁止用REG1电压替代EN许可。",
+      "abnormal_boundaries": {
+        "main_and_precharge_off": "Buck仍可能由独立TAP_B9取电；只经B0返回。主MOS、预充及LPV默认态由原电路保持，不搬迁PACK−回流。",
+        "reg1_falls_first": "RUN时5V可仍有效。PRE_CTRL_3V3失电须由原有DFETOFF/本地资格链落实实际止流，测PRE、DFETOFF、LPV和实测VGS。5V存在不可延长合闸资格。",
+        "usb_or_residual": "VIN=0且VOUT外供时可经L和高侧体二极管抬起TAP_B9，EN关断不能保证反向隔断。操作合同禁止USB/SWD供电与未供电TAP域并联，仅信号调试或切断USB/外部VOUT供电，核核心板VBUS桥、掉电波形及允许残压。"
+      },
+      "bench": "22.1/37.8 V与实际最大输入尖峰，TAP_B9/VIN（磁件端间尖峰低于其75V上限）、入口电流/I²t、STORE漏电、全温5 V启动；检查EN脉宽、加负载至0.401 A规划及5 V资格释放。"
+    },
+    "can_visoin": "C_CAN_ISOIN_1U",
+    "tvs": "D_TVS",
+    "retained_por": "TPS3809K33DBVR"
+  },
+  "temperature_sensors": {
+    "status": "3个板外电芯温度传感器已选定同项目国产料号；BQ系数及探头装配资格仍HOLD",
+    "pack_offboard": {
+      "quantity_per_bms": 3,
+      "refs": [
+        {
+          "designator": "NTC_CELL1",
+          "source_unique_id": "NTC_CELL1",
+          "pin_map": {
+            "1": "BQ_TS1 / U1.21",
+            "2": "B0"
+          },
+          "bq_channel": "TS1"
+        },
+        {
+          "designator": "NTC_CELL2",
+          "source_unique_id": "NTC_CELL3",
+          "pin_map": {
+            "1": "BQ_DCHG / U1.31",
+            "2": "B0"
+          },
+          "bq_channel": "DCHG"
+        },
+        {
+          "designator": "NTC_CELL3",
+          "source_unique_id": "NTC_CELL5",
+          "pin_map": {
+            "1": "BQ_CFETOFF / U1.29",
+            "2": "B0"
+          },
+          "bq_channel": "CFETOFF"
+        }
+      ],
+      "replaces_in_place": {
+        "manufacturer": "SEMITEC",
+        "mpn": "103AT-2",
+        "quantity": 3,
+        "r25": "10 kΩ ±1%",
+        "b25_85": "3435 K ±1%",
+        "status": "withdrawn from the current BOM; retained only in published ENET/history"
+      },
+      "selected": {
+        "manufacturer": "Nanjing Shiheng Electronics (南京时恒)",
+        "mpn": "MF52A103F3950(A1)",
+        "catalog_display_name": "MF52A103F3950 (A1)",
+        "supplier": "LCSC",
+        "supplier_part": "C13879",
+        "quantity": 3,
+        "r25": "10 kΩ ±1%",
+        "b25_50": "3950 K ±1%",
+        "operating_temperature": "−55…+125 °C",
+        "construction": "bead NTC, tinned leads, 0.3 mm lead diameter; this SKU is not a prewired or sealed cable probe",
+        "primary_evidence": [
+          "https://www.shiheng.com.cn/resource/attachments/d467cdbd622a4b919b2edf07a7f8cca7_19.pdf",
+          "https://jlcpcb.com/partdetail/Nanjing_ShihengElec-MF52A103F3950_A1/C13879"
+        ]
+      },
+      "count_effect": {
+        "offboard_bom_quantity_replaced": 3,
+        "offboard_bom_quantity_added": 0,
+        "board_component_delta": 0,
+        "board_connector_delta": 0,
+        "bms_c13879_total_per_pack": 5,
+        "bms_c13879_total_basis": "3 off-board pack NTCs + existing on-board NTC_BOARD and NTC_MOS",
+        "note": "The three existing BOM-only sensor references remain off-board. No board connector is added; any pack harness splices/connectors and bead insulation/strain relief are separate human assembly items and need a verified drawing before procurement."
+      }
+    },
+    "board_onboard": [
+      {
+        "ref": "NTC_BOARD",
+        "quantity": 1,
+        "mpn": "MF52A103F3950(A1)",
+        "supplier_part": "C13879",
+        "pin_map": {
+          "1": "NTC_BOARD_NODE / BQ TS2 U1.22",
+          "2": "B0"
+        }
+      },
+      {
+        "ref": "NTC_MOS",
+        "quantity": 1,
+        "mpn": "MF52A103F3950(A1)",
+        "supplier_part": "C13879",
+        "pin_map": {
+          "1": "BQ_TS3 / U1.23",
+          "2": "B0"
+        }
+      }
+    ],
+    "bq76952": {
+      "measurement_method": "Use BQ76952 thermistor mode and its programmed polynomial, then read the device temperature subcommands over I2C. Do not apply a host-side generic Beta equation to these readings. Raw ADC counts remain diagnostic inputs for open/short qualification only.",
+      "selected_pullup_ohm": 18000,
+      "selected_temperature_model": "custom 18K-pullup temperature model fitted for the Shiheng MF52A103F3950(A1) R-T data",
+      "cell_protection_channel_config_candidate": "0x27 per TS1, DCHG and CFETOFF; 18 kΩ pull-up + Custom Temperature Model + cell-temperature measurement/protection function, subject to per-pin config and readback verification",
+      "custom_model_data_memory_fields": [
+        "Calibration:Custom Temperature Model:Coeff a1",
+        "Calibration:Custom Temperature Model:Coeff a2",
+        "Calibration:Custom Temperature Model:Coeff a3",
+        "Calibration:Custom Temperature Model:Coeff a4",
+        "Calibration:Custom Temperature Model:Coeff a5",
+        "Calibration:Custom Temperature Model:Coeff b1",
+        "Calibration:Custom Temperature Model:Coeff b2",
+        "Calibration:Custom Temperature Model:Coeff b3",
+        "Calibration:Custom Temperature Model:Coeff b4",
+        "Calibration:Custom Temperature Model:Rc0",
+        "Calibration:Custom Temperature Model:Adc0"
+      ],
+      "per_channel_offset_fields": [
+        "Calibration:Temperature:TS1 Temp Offset",
+        "Calibration:Temperature:DCHG Temp Offset",
+        "Calibration:Temperature:CFETOFF Temp Offset"
+      ],
+      "calibration_source": "Shiheng manufacturer R-T table for exact MPN MF52A103F3950(A1), processed with TI BQ769X2 Thermistor Coefficient Calculator / GPC workflow; TI TRM SLUUBY2B sections 6.4, 13.2.10 and temperature calibration section",
+      "coefficient_status": "not generated or returned by TI GPC; no coefficient bytes recorded or read back; no reference-bath calibration or open/short fault injection evidence",
+      "existing_default_model_disposition": "TI default 18K coefficients target Semitec 103-AT (10 kΩ, B25/85=3435 K). They must not be reused for this 3950 K sensor or treated as a host-firmware curve."
+    },
+    "open_qualification": [
+      "Generate and archive the TI GPC report from the exact manufacturer R-T table; verify every coefficient fits the BQ data-memory range and save configuration bytes separately from this schematic contract.",
+      "Read back TS1, DCHG, CFETOFF, TS2 and TS3 pin config, selected model coefficients, per-channel offsets, and protection limits before using temperature results.",
+      "Calibrate sensor channels against a traceable reference over the defined battery operating range; verify open/short detection, harness leakage, thermal lag, cell-to-bead contact, electrical insulation, strain relief and recovery behavior.",
+      "C13879 is a short-leaded bare bead rather than a cabled probe. If the pack build requires a sealed/cabled sensor, select and verify an exact 10 kΩ/B3950 probe MPN and its full R-T curve before changing the mechanical installation; keep the same board refs and pin maps."
+    ]
+  },
+  "connector_standard": {
+    "before": {
+      "J_CAN": "2EDGVC-5.08-03P-14-100A(H)",
+      "J_LOAD_POWER_VALID": "2EDGVC-5.08-02P-14-100A(H)",
+      "J_LOAD_POWER_VALID_B": "2EDGVC-5.08-02P-14-100A(H)",
+      "J_LPV_REG": "2541WV-2X01P",
+      "J_EARLY_READY_IN": "2541WV-2X01P",
+      "J_CELL_SERVICE": null,
+      "J_CORE_P1": "254PM-2x12P-V",
+      "J_CORE_P2": "254PM-2x12P-V",
+      "J_R_PRE": "2EDGVC-5.08-02P-14-100A(H)",
+      "J_BATT_POS": null,
+      "J_BATT_NEG": null,
+      "J_PACK_POS": null,
+      "J_PACK_NEG": null
+    },
+    "affected_board_interfaces": [
+      "J_CAN",
+      "J_LOAD_POWER_VALID",
+      "J_LOAD_POWER_VALID_B",
+      "J_LPV_REG",
+      "J_EARLY_READY_IN",
+      "J_CELL_SERVICE",
+      "J_BATT_POS",
+      "J_BATT_NEG",
+      "J_PACK_POS",
+      "J_PACK_NEG"
+    ],
+    "targeted_board_interfaces": [
+      "J_CAN",
+      "J_LOAD_POWER_VALID",
+      "J_LOAD_POWER_VALID_B",
+      "J_LPV_REG",
+      "J_EARLY_READY_IN",
+      "J_CELL_SERVICE",
+      "J_CORE_P1",
+      "J_CORE_P2",
+      "J_R_PRE",
+      "J_BATT_POS",
+      "J_BATT_NEG",
+      "J_PACK_POS",
+      "J_PACK_NEG"
+    ],
+    "replacements_in_place": [
+      "J_CAN",
+      "J_LOAD_POWER_VALID",
+      "J_LOAD_POWER_VALID_B",
+      "J_LPV_REG",
+      "J_CELL_SERVICE"
+    ],
+    "selected_sku_for_new_candidate": [
+      "J_EARLY_READY_IN"
+    ],
+    "connector_pin_contract": "J_CAN: 1=GND_CAN, 2=CANH, 3=CANL. 2P ports retain each existing pin mapping.",
+    "retained": [
+      {
+        "ref": "J_CORE_P1",
+        "mpn": "JXT-PM2.54-2X12P-A9",
+        "lcsc": "C54803369",
+        "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+        "pin_map": "Preserve existing 24-pin map exactly."
+      },
+      {
+        "ref": "J_CORE_P2",
+        "mpn": "JXT-PM2.54-2X12P-A9",
+        "lcsc": "C54803369",
+        "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+        "pin_map": "Preserve existing 24-pin map exactly."
+      },
+      {
+        "ref": "J_R_PRE",
+        "board_mpn": "2EDGVC-5.08-02P-14-100A(H)",
+        "board_lcsc": "C581328",
+        "mating_mpn": "2EDGK-5.08-02P-14-1000A(H)",
+        "mating_lcsc": "C581323",
+        "color": "green",
+        "disposition": "remain"
+      }
+    ],
+    "power_port_transfer_provenance": {
+      "authoritative_component_contract": "电力/BMS模块/原理图准备/功率元件连接.json",
+      "published_enet": "电力/BMS模块/检查/主工程图面验收/主工程.enet",
+      "baseline_finding": "Published ENET has no concrete M5 power-terminal references. The power-interface contract names J_BAT_HV as offboard CELL_B9/B0 maintenance interface and J_PACK_HV as abstract PACK output.",
+      "source_interfaces": {
+        "J_BAT_HV": {
+          "1": "CELL_B9",
+          "2": "B0",
+          "construction": "offboard maintenance interface"
+        },
+        "J_PACK_HV": {
+          "1": "PACK+",
+          "2": "PACK-",
+          "construction": "abstract external BUS boundary"
+        }
+      },
+      "board_boundary_targets": {
+        "J_BATT_POS": "BATT+_FUSED (board input after board-external main fuse)",
+        "J_BATT_NEG": "B0",
+        "J_PACK_POS": "PACK+",
+        "J_PACK_NEG": "PACK-"
+      },
+      "offboard_maintenance": {
+        "series": "AS150U (2+4)",
+        "female": "AS150U(2+4)-F.G.Y",
+        "female_lcsc": "C19268052",
+        "male": "AS150U(2+4)-M.G.Y",
+        "male_lcsc": "C19268051",
+        "historical": "SB175 occurs in historical source material; not the active maintenance connector."
+      }
+    },
+    "component_count_reconciliation": {
+      "published_enet_components": 224,
+      "precharge_merged_components": 279,
+      "previous_closure_components": 297,
+      "added_board_component_refs": [
+        "J_BATT_POS",
+        "J_BATT_NEG",
+        "J_PACK_POS",
+        "J_PACK_NEG"
+      ],
+      "new_closure_components": 301,
+      "J_CELL_SERVICE": {
+        "baseline_designator_present": true,
+        "baseline_carrier": "symbol only / no purchase SKU",
+        "designator_count_delta": 0,
+        "populated_bom_quantity_delta": 1,
+        "prior_separate_fabrication_record": "unpopulated plated-through-hole wire termination; not a counted populated part"
+      }
+    },
+    "harness_mapping_keys": [
+      "/cell_service_cost_down_item_3a/candidate/board_header",
+      "/cell_service_cost_down_item_3a/candidate/harness_housing",
+      "/cell_service_cost_down_item_3a/candidate/harness_contacts",
+      "/cell_service_cost_down_item_3a/wiring/pin_order",
+      "/cell_service_cost_down_item_3a/wiring/fuse_coordination"
+    ],
+    "qualification_open_items": [
+      "M5 actual shank-to-5.5 mm hole clearance remains pending.",
+      "M5 150 A thermal, vibration and mechanical qualification remains pending.",
+      "JST XH 3 A contact/header to 5 A fuse total-clearing let-through coordination remains pending.",
+      "Tap-service connector has no hotplug allowance."
+    ]
+  },
+  "passive_freeze": {
+    "basis": {
+      "native_netlist": "电力/BMS模块/检查/复用预充原生候选/候选重开.enet",
+      "precedence": "冻结底稿加本轮前生效施工增量。按位号核用途、电压、原封装、精度及针序。"
+    },
+    "refs": {
+      "C_AND2": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_CAN_PWR_IN2": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "VOUT_5V",
+          "2": "B0"
+        }
+      },
+      "C_CAN_PWR_OUT2": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "CAN_ISO_5V",
+          "2": "GND_CAN"
+        }
+      },
+      "C_GATE1": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_LPV_CONFIRM": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_POR": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_5V_BUF": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_5V_POR": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_ARM": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_CLOSE": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_CMP": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "VOUT_5V",
+          "2": "B0"
+        }
+      },
+      "C_PRE_DIR_ARM": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_HOLD": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_INA": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "VOUT_5V",
+          "2": "B0"
+        }
+      },
+      "C_PRE_LOGIC": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_LO_PHASE": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_PATH": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_REF": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "VOUT_5V",
+          "2": "B0"
+        }
+      },
+      "C_PRE_RUN": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PRE_STABLE": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C3011705",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_PSU5_BST": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PSU5_BST",
+          "2": "PSU5_SW"
+        }
+      },
+      "C_PSU5_IN_HF": {
+        "before": {
+          "mpn": "0805B104K101NT",
+          "lcsc": "C89258",
+          "footprint": "C0805"
+        },
+        "selected_lcsc": "C89258",
+        "pins_before": {
+          "1": "TAP_B9",
+          "2": "B0"
+        }
+      },
+      "C_PSU_IN2": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C89258",
+        "pins_before": {
+          "1": "TAP_B9",
+          "2": "B0"
+        }
+      },
+      "C_SEQ": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_TEST_EN": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "C_TIMER": {
+        "before": {
+          "mpn": "GRM188R72A104KA35J",
+          "lcsc": "C9900019564",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "TMR_VDD",
+          "2": "B0"
+        }
+      },
+      "R_ALERT_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "CORE_3V3",
+          "2": "BQ_ALERT_N"
+        }
+      },
+      "R_ALERT_SER": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "BQ_ALERT_IC_N",
+          "2": "BQ_ALERT_N"
+        }
+      },
+      "R_BAL_ENABLE_BE": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ENABLE_BASE",
+          "2": "B0"
+        }
+      },
+      "R_BAL_EN_GATE_PU1": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B2",
+          "2": "BAL_EN_CLAMP_GATE_1"
+        }
+      },
+      "R_BAL_EN_GATE_PU2": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B3",
+          "2": "BAL_EN_CLAMP_GATE_2"
+        }
+      },
+      "R_BAL_EN_GATE_PU3": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B4",
+          "2": "BAL_EN_CLAMP_GATE_3"
+        }
+      },
+      "R_BAL_EN_GATE_PU4": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B5",
+          "2": "BAL_EN_CLAMP_GATE_4"
+        }
+      },
+      "R_BAL_EN_GATE_PU5": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B6",
+          "2": "BAL_EN_CLAMP_GATE_5"
+        }
+      },
+      "R_BAL_EN_GATE_PU6": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B7",
+          "2": "BAL_EN_CLAMP_GATE_6"
+        }
+      },
+      "R_BAL_EN_GATE_PU7": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B8",
+          "2": "BAL_EN_CLAMP_GATE_7"
+        }
+      },
+      "R_BAL_EN_GATE_PU8": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "TAP_B9",
+          "2": "BAL_EN_CLAMP_GATE_8"
+        }
+      },
+      "R_BAL_ISET1": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_1",
+          "2": "B0"
+        }
+      },
+      "R_BAL_ISET2": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_2",
+          "2": "TAP_B1"
+        }
+      },
+      "R_BAL_ISET3": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_3",
+          "2": "TAP_B2"
+        }
+      },
+      "R_BAL_ISET4": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_4",
+          "2": "TAP_B3"
+        }
+      },
+      "R_BAL_ISET5": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_5",
+          "2": "TAP_B4"
+        }
+      },
+      "R_BAL_ISET6": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_6",
+          "2": "TAP_B5"
+        }
+      },
+      "R_BAL_ISET7": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_7",
+          "2": "TAP_B6"
+        }
+      },
+      "R_BAL_ISET8": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_ETA_ISET_8",
+          "2": "TAP_B7"
+        }
+      },
+      "R_BAL_MAINCLR_BE": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BAL_MAINCLR_BASE",
+          "2": "BAL_SWITCH_MID"
+        }
+      },
+      "R_CAN_TXD_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "CORE_3V3",
+          "2": "CAN_TX"
+        }
+      },
+      "R_DFETOFF_GATE": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "FET_RELEASE",
+          "2": "DFETOFF"
+        }
+      },
+      "R_DFETOFF_GS": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "DFETOFF",
+          "2": "B0"
+        }
+      },
+      "R_EARLY_READY_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "CORE_3V3",
+          "2": "EARLY_GUARD_READY_N"
+        }
+      },
+      "R_IF_LOCAL_OK_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "BMS_LOCAL_OK",
+          "2": "B0"
+        }
+      },
+      "R_IF_MAIN_REQ_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "MAIN_REQ",
+          "2": "B0"
+        }
+      },
+      "R_IF_PRE_REQ_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "PRE_REQ",
+          "2": "B0"
+        }
+      },
+      "R_LOAD_POWER_VALID_GATE": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "LPV_DRV_OK",
+          "2": "LOAD_VALID_GATE"
+        }
+      },
+      "R_LOAD_POWER_VALID_GS": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "LOAD_VALID_GATE",
+          "2": "B0"
+        }
+      },
+      "R_MAIN_PROVEN_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "MAIN_PROVEN",
+          "2": "B0"
+        }
+      },
+      "R_PRE_5V_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "PRE_5V_RESET_RAW",
+          "2": "B0"
+        }
+      },
+      "R_PRE_5V_PU": {
+        "before": {
+          "mpn": "RS-03K4701FT",
+          "lcsc": "C116693",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C23162",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "PRE_5V_RESET_RAW"
+        }
+      },
+      "R_PRE_CTRL_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "PRE_CTRL_3V3",
+          "2": "B0"
+        }
+      },
+      "R_PRE_FAST_LIMIT": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "PRE_FAST_D",
+          "2": "PRE_DWELL_RC"
+        }
+      },
+      "R_PROBE_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "PROBE_BASE",
+          "2": "PACK-"
+        }
+      },
+      "R_PROBE_REQ_PD": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "PROBE_REQ",
+          "2": "B0"
+        }
+      },
+      "R_PSU5_EN_SW": {
+        "before": {
+          "mpn": "RC0603FR-071KL",
+          "lcsc": "C22548",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "CTRL_MODULE",
+          "2": "PSU5_EN"
+        }
+      },
+      "R_QPRE_BASE": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "PRE_PATH_EN",
+          "2": "QPRE_DRV_B"
+        }
+      },
+      "R_QPRE_BE": {
+        "before": {
+          "mpn": "RMC0603100K1%N",
+          "lcsc": "C269699",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25803",
+        "pins_before": {
+          "1": "QPRE_DRV_B",
+          "2": "B0"
+        }
+      },
+      "R_QPRE_PU": {
+        "before": {
+          "mpn": "RC0603FR-074K7L",
+          "lcsc": "C99782",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C23162",
+        "pins_before": {
+          "1": "QPRE_SRC",
+          "2": "QPRE_G"
+        }
+      },
+      "R_RST_SHUT": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "RST_SHUT",
+          "2": "B0"
+        }
+      },
+      "R_SCL_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "CORE_3V3",
+          "2": "BQ_I2C_SCL"
+        }
+      },
+      "R_SDA_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "CORE_3V3",
+          "2": "BQ_I2C_SDA"
+        }
+      },
+      "R_TIMER_SUPPLY": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "TMR_TRIG",
+          "2": "TMR_VDD"
+        }
+      }
+    },
+    "exceptions": {
+      "C_SRP": "AFE 分流差分输入滤波，保留设计 100 V 元件及几何"
+    }
+  }
+}

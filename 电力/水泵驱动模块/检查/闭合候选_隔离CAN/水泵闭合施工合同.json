@@ -1,0 +1,1444 @@
+{
+  "contract_id": "PUMP_ISOCAN_CLOSURE_20261123",
+  "status": "PRE_EDA_CONTRACT_CANDIDATE",
+  "baseline": {
+    "published_project": "电力/水泵驱动模块/eda工程文件/水泵驱动/水泵驱动.eprj3",
+    "published_enet": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet",
+    "published_component_count": 49
+  },
+  "target_component_count": 52,
+  "connector_standard": {
+    "board_quantity": 1,
+    "before": {
+      "J_CAN": "B3B-XH-A(LF)(SN)",
+      "J_BUS": "2EDGVC-5.08-02P-14-100A(H)",
+      "J_MOTOR": "2EDGVC-5.08-02P-14-100A(H)",
+      "J_MCU_A": "JXT-PM2.54-2X12P-A9",
+      "J_MCU_B": "JXT-PM2.54-2X12P-A9"
+    },
+    "retained_from_baseline": [
+      "J_BUS"
+    ],
+    "can_pitch_mm": 2.5,
+    "green_mate_mpn": "2EDGK-5.08-02P-14-1000A(H)",
+    "green_mate_lcsc": "C581323"
+  },
+  "net_delta_vs_published": {
+    "added": 4,
+    "replaced_in_place": 4,
+    "removed": 1,
+    "net_change": "+3 (新增4颗风华隔离CAN旁路电容, 移除无用 R_CAN_STB_PU; 全车5板100%统一为国产 CA-IS2062A, 彻底淘汰整车最后一个 TCAN1042HGVDRQ1 SKU)"
+  },
+  "changes": [
+    {
+      "id": "CHG-PUMP-01",
+      "title": "合入全车统一隔离 CAN (CA-IS2062A C22438481) 并隔离总线地 GND_CAN",
+      "part_delta": "+3 (0 新 SKU)",
+      "modified_components": [
+        {
+          "ref": "U_CAN",
+          "old_mpn": "TCAN1042HGVDRQ1 (C132550, 非隔离)",
+          "new_mpn": "CA-IS2062A",
+          "manufacturer": "Chipanalog(川土微)",
+          "lcsc": "C22438481",
+          "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+          "pins": {
+            "1": "CAN_RX",
+            "2": "NC",
+            "3": "NC",
+            "4": "CAN_TX",
+            "5": "GND_SYS",
+            "6": "+5V",
+            "7": "+3V3",
+            "8": "GND_SYS",
+            "9": "GND_CAN",
+            "10": "CAN_ISO_5V",
+            "11": "CAN_ISO_5V",
+            "12": "GND_CAN",
+            "13": "NC",
+            "14": "CANL",
+            "15": "CANH",
+            "16": "NC"
+          },
+          "supply_budget": "XL7015E1按板级0.3A预算；核心板约60mA，CA-IS2062A显性逻辑侧峰值数据表上限150mA（VDDP=VDDL=5V、60Ω），另计NSG1416约0.5mA静态电流及MOS栅极动态电荷。",
+          "pin_roles": {
+            "1": "RXD",
+            "2": "NC",
+            "3": "NC",
+            "4": "TXD",
+            "5": "GNDP1",
+            "6": "VDDP",
+            "7": "VDDL",
+            "8": "GND1",
+            "9": "GND2",
+            "10": "VISOIN",
+            "11": "VISOOUT",
+            "12": "GNDP2",
+            "13": "NC",
+            "14": "CANL",
+            "15": "CANH",
+            "16": "NC"
+          }
+        },
+        {
+          "ref": "C_CAN_VCC",
+          "old_mpn": "TDK C1608X7R1H104K080AA (缺C码)",
+          "new_mpn": "0603B104K160NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2846678",
+          "pins": {
+            "1": "+5V",
+            "2": "GND_SYS"
+          },
+          "footprint": "C0603",
+          "value": "100nF, 16V, X7R, ±10%"
+        },
+        {
+          "ref": "C_CAN_VIO",
+          "old_mpn": "TDK C1608X7R1H104K080AA (缺C码)",
+          "new_mpn": "0603B105K250NT",
+          "manufacturer": "FH (Fenghua)",
+          "lcsc": "C59302",
+          "pins": {
+            "1": "+3V3",
+            "2": "GND_SYS"
+          },
+          "footprint": "C0603",
+          "value": "1uF, 25V, X7R, ±10%"
+        },
+        {
+          "ref": "C_5V_OUT_HF",
+          "old_mpn": "TDK C1608X7R1H104K080AA (缺C码)",
+          "new_mpn": "0603B104K160NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2846678",
+          "pins": {
+            "1": "+5V",
+            "2": "GND_SYS"
+          },
+          "footprint": "C0603",
+          "value": "100nF, 16V, X7R, ±10%"
+        }
+      ],
+      "removed_components": [
+        {
+          "ref": "R_CAN_STB_PU",
+          "reason": "CA-IS2062A 无 STB 引脚, 释放冗余电阻"
+        }
+      ],
+      "added_components": [
+        {
+          "ref": "C_CAN_VDDP_BULK",
+          "mpn": "1210X476K160NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2961286",
+          "footprint": "C1210",
+          "pins": {
+            "1": "+5V",
+            "2": "GND_SYS"
+          },
+          "value": "47uF, 16V, X5R, ±10%"
+        },
+        {
+          "ref": "C_CAN_ISO_BULK",
+          "mpn": "1210X476K160NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2961286",
+          "footprint": "C1210",
+          "pins": {
+            "1": "CAN_ISO_5V",
+            "2": "GND_CAN"
+          },
+          "value": "47uF, 16V, X5R, ±10%"
+        },
+        {
+          "ref": "C_CAN_ISO_HF",
+          "mpn": "0603B104K160NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C2846678",
+          "footprint": "C0603",
+          "pins": {
+            "1": "CAN_ISO_5V",
+            "2": "GND_CAN"
+          },
+          "value": "100nF, 16V, X7R, ±10%"
+        },
+        {
+          "ref": "C_CAN_ISOIN_1U",
+          "mpn": "0603B105K250NT",
+          "manufacturer": "FH(风华)",
+          "lcsc": "C59302",
+          "footprint": "C0603",
+          "pins": {
+            "1": "CAN_ISO_5V",
+            "2": "GND_CAN"
+          },
+          "value": "1uF, 25V, X7R, ±10%"
+        }
+      ],
+      "pin_updates": {
+        "J_CAN.1 (GND)": "GND_SYS -> GND_CAN",
+        "D_CAN.3 (GND)": "GND_SYS -> GND_CAN (补齐 Supplier Part = C552486)"
+      }
+    },
+    {
+      "id": "CHG-PUMP-02",
+      "title": "断电/预充门控定案（零额外硬线，分立功率级本地停驱）",
+      "part_delta": 0,
+      "policy": "保留 XL7015E1 EN 接地。断电与预充的 PWM/制动输出、时序及待机负载以 localization_v1 合同为准。"
+    },
+    {
+      "id": "CHG-PUMP-03",
+      "title": "关闭 24 位号 ATTRMATCHCODE 严格 DRC 告警并补齐缺失 C 码",
+      "part_delta": 0,
+      "action": "嘉立创 EDA 落图时同步刷新 24 个告警位号的库绑定与 Supplier Part (如 D_CAN=C552486, J_CAN=C144394), 重跑官方 DRC 验收 0 Error / 0 ATTRMATCHCODE。"
+    }
+  ],
+  "localization_v1": {
+    "joint_evidence": "电力/检查/联合仿真/降本后典型故障联合仿真.json",
+    "scope": "首版落图候选；保留既有母线电容、TVS、泵保险与隔离CAN。",
+    "board_count_before": 52,
+    "board_count_after": 52,
+    "remove": [
+      "U_DRV",
+      "C_DRV_VM2",
+      "C_DRV_CP",
+      "C_DRV_VCP",
+      "C_DRV_DVDD",
+      "R_FAULT_PU",
+      "R_IPROPI",
+      "R_VREF_TOP",
+      "R_VREF_BOTTOM",
+      "C_VREF"
+    ],
+    "add": {
+      "U_PWM": {
+        "mpn": "NSG1416",
+        "manufacturer": "NCE (NSIC Technology, Wuxi)",
+        "lcsc": "C53436462",
+        "value": "5V non-inverting low-side gate driver, 4.5–25V supply, 2A source/sink",
+        "pins": {
+          "1": "NC",
+          "2": "+5V",
+          "3": "PUMP_PWM",
+          "4": "GND_SYS",
+          "5": "PWM_GATE_DRV"
+        },
+        "source": "https://www.lcsc.com/product-detail/C53436462.html",
+        "price": "待核价",
+        "footprint": "SOT-23-5"
+      },
+      "Q_PWM": {
+        "mpn": "NCE0117K",
+        "manufacturer": "无锡新洁能 NCE",
+        "lcsc": "C108638",
+        "value": "100 V/17 A，85mΩ max @4.5V，TO-252-2L",
+        "pins": {
+          "1": "PWM_GATE",
+          "2": "MOTOR_B",
+          "3": "PUMP_SHUNT"
+        },
+        "source": "https://www.lcsc.com/product-detail/C108638.html",
+        "price": "待核价",
+        "footprint": "TO-252-2L",
+        "pin_roles": {
+          "1": "G",
+          "2": "D (tab)",
+          "3": "S"
+        }
+      },
+      "Q_BRAKE": {
+        "mpn": "E100P045CL1",
+        "manufacturer": "毅芯达 Existar",
+        "lcsc": "C29781153",
+        "value": "−100 V/−40 A @Tc25，55mΩ max @−4.5 V，TO-252",
+        "pins": {
+          "1": "BRAKE_GATE",
+          "2": "MOTOR_B",
+          "3": "BUS_M"
+        },
+        "source": "https://www.lcsc.com/product-detail/C29781153.html",
+        "price": "待核价",
+        "footprint": "TO-252",
+        "pin_roles": {
+          "1": "G",
+          "2": "D (tab)",
+          "3": "S"
+        }
+      },
+      "Q_BRAKE_CTL": {
+        "mpn": "MMBT5551",
+        "manufacturer": "辰达 MDD",
+        "lcsc": "C408396",
+        "value": "NPN 160V，整车复用，SOT-23",
+        "pins": {
+          "1": "BRAKE_BASE",
+          "2": "GND_SYS",
+          "3": "BRAKE_SINK"
+        },
+        "source": "https://www.lcsc.com/product-detail/C408396.html",
+        "price": "待核价",
+        "footprint": "SOT-23",
+        "pin_roles": {
+          "1": "B",
+          "2": "E",
+          "3": "C"
+        }
+      },
+      "D_PUMP_FW": {
+        "mpn": "SS510C",
+        "manufacturer": "辰达 MDD",
+        "lcsc": "C19229",
+        "value": "100 V / 5 A，SMC",
+        "pins": {
+          "1": "BUS_M",
+          "2": "MOTOR_B"
+        },
+        "source": "https://www.lcsc.com/product-detail/C19229.html",
+        "price": "待核价",
+        "footprint": "SMC (DO-214AB)",
+        "pin_roles": {
+          "1": "K",
+          "2": "A"
+        }
+      },
+      "R_PUMP_SHUNT": {
+        "mpn": "HoJLR2512-2W-20mR-1%-75ppm",
+        "manufacturer": "毫欧 Milliohm",
+        "lcsc": "C2924538",
+        "value": "20mOhm ±1%, 2W; Kelvin sense is PCB routing, not a four-terminal part",
+        "pins": {
+          "1": "PUMP_SHUNT",
+          "2": "GND_SYS"
+        },
+        "source": "https://www.lcsc.com/product-detail/C2924538.html",
+        "price": "待核价",
+        "footprint": "R2512"
+      },
+      "R_PWM_GATE_SER": {
+        "mpn": "RS-06K10R0FT",
+        "manufacturer": "风华 FH",
+        "lcsc": "C140052",
+        "value": "10Ω±1% 1206，同稳压板",
+        "pins": {
+          "1": "PWM_GATE_DRV",
+          "2": "PWM_GATE"
+        },
+        "source": "https://www.lcsc.com/product-detail/C140052.html",
+        "price": "待核价",
+        "footprint": "R1206"
+      },
+      "R_BRAKE_GATE_LOW": {
+        "mpn": "RS-06K2702FT",
+        "manufacturer": "风华 FH",
+        "lcsc": "C294775",
+        "value": "27kΩ ±1% 1206 / 200V",
+        "pins": {
+          "1": "BRAKE_GATE",
+          "2": "BRAKE_SINK"
+        },
+        "source": "https://www.lcsc.com/product-detail/C294775.html",
+        "price": "待核价",
+        "footprint": "R1206"
+      },
+      "R_BRAKE_GATE_HIGH": {
+        "mpn": "RS-03K1002FT",
+        "manufacturer": "风华 FH",
+        "lcsc": "C115324",
+        "value": "10kΩ ±1% 0603，复用泵板",
+        "pins": {
+          "1": "BUS_M",
+          "2": "BRAKE_GATE"
+        },
+        "source": "https://www.lcsc.com/product-detail/C115324.html",
+        "price": "待核价",
+        "footprint": "R0603"
+      },
+      "R_BRAKE_BASE": {
+        "mpn": "RS-03K1002FT",
+        "manufacturer": "风华 FH",
+        "lcsc": "C115324",
+        "value": "10kΩ ±1% 0603，复用泵板",
+        "pins": {
+          "1": "PUMP_BRAKE",
+          "2": "BRAKE_BASE"
+        },
+        "source": "https://www.lcsc.com/product-detail/C115324.html",
+        "price": "待核价",
+        "footprint": "R0603"
+      }
+    },
+    "reuse_pins": {
+      "R_SLEEP": {
+        "1": "PWM_GATE",
+        "2": "PUMP_SHUNT",
+        "mpn": "RS-03K1002FT",
+        "lcsc": "C115324",
+        "note": "MOS门源10kΩ下拉，5V斜降或驱动高阻时仍默认关断",
+        "manufacturer": "FH (Fenghua)",
+        "footprint": "R0603",
+        "value": "10kOhm ±1%",
+        "pins": {
+          "1": "PWM_GATE",
+          "2": "PUMP_SHUNT"
+        },
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#R_SLEEP"
+      },
+      "R_IN1_PD": {
+        "1": "PUMP_BRAKE",
+        "2": "GND_SYS",
+        "manufacturer": "FH (Fenghua)",
+        "footprint": "R0603",
+        "value": "10kOhm ±1%",
+        "mpn": "RS-03K1002FT",
+        "lcsc": "C115324",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#R_IN1_PD"
+      },
+      "R_IN2_PD": {
+        "1": "PUMP_PWM",
+        "2": "GND_SYS",
+        "manufacturer": "FH (Fenghua)",
+        "footprint": "R0603",
+        "value": "10kOhm ±1%",
+        "mpn": "RS-03K1002FT",
+        "lcsc": "C115324",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#R_IN2_PD"
+      },
+      "R_ADC_I": {
+        "1": "PUMP_SHUNT",
+        "2": "PUMP_I_SENSE",
+        "manufacturer": "Tyohm",
+        "footprint": "R0603",
+        "value": "1kOhm ±1%",
+        "pins": {
+          "1": "PUMP_SHUNT",
+          "2": "PUMP_I_SENSE"
+        },
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#R_ADC_I"
+      },
+      "C_ADC_I": {
+        "1": "PUMP_I_SENSE",
+        "2": "GND_SYS",
+        "mpn": "0603B102K500NT",
+        "manufacturer": "风华 FH",
+        "lcsc": "C44369",
+        "value": "1nF, 50V, X7R",
+        "footprint": "C0603",
+        "pins": {
+          "1": "PUMP_I_SENSE",
+          "2": "GND_SYS"
+        },
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#C_ADC_I"
+      },
+      "C_DRV_VCC": {
+        "1": "+5V",
+        "2": "GND_SYS",
+        "mpn": "风华 0603B104K160NT",
+        "lcsc": "C2846678",
+        "placement": "U_PWM近端",
+        "footprint": "C0603",
+        "value": "100nF, 16V, X7R, ±10%",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#C_DRV_VCC"
+      },
+      "C_DRV_VM1": {
+        "1": "BUS_M",
+        "2": "GND_SYS",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#C_DRV_VM1",
+        "mpn": "C2012X7R2E103K125AA",
+        "manufacturer": "TDK",
+        "lcsc": "C2167598",
+        "footprint": "C0805",
+        "value": "10nF ±10%, 250V, X7R",
+        "pins": {
+          "1": "BUS_M",
+          "2": "GND_SYS"
+        },
+        "source": "https://item.szlcsc.com/2259650.html"
+      },
+      "J_MOTOR": {
+        "1": "BUS_M",
+        "2": "MOTOR_B",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#J_MOTOR",
+        "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+        "manufacturer": "DEGSON (町洋)",
+        "lcsc": "C581328",
+        "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+        "pins": {
+          "1": "BUS_M",
+          "2": "MOTOR_B"
+        },
+        "source": "https://www.lcsc.com/product-detail/C581328.html"
+      },
+      "J_MCU_A": {
+        "10": "PUMP_PWM (PA8/TIM1_CH1 AF6)",
+        "16": "NC (former CAN_STB)",
+        "17": "NC (former DRV_NFAULT)",
+        "20": "PUMP_BRAKE (PB5 GPIO)",
+        "22": "NC (former DRV_SLEEP)",
+        "23": "CAN_RX",
+        "24": "CAN_TX",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#J_MCU_A",
+        "board_pinout_evidence": "Header-to-MCU pad mapping is conditional on the fitted coreboard variant; verify its manufacturer schematic/revision before release."
+      },
+      "J_MCU_B": {
+        "11": "PUMP_I_SENSE (PA7; OPAMP1_VINP and COMP2_INP)",
+        "17": "ADC_BUS (PA1)",
+        "18": "ADC_NTC (PA2)",
+        "20": "NC (former ADC_I)",
+        "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#J_MCU_B",
+        "board_pinout_evidence": "Header-to-MCU pad mapping is conditional on the fitted coreboard variant; verify its manufacturer schematic/revision before release."
+      }
+    },
+    "gate_control": {
+      "normal": "PA8正向PWM 20kHz，D限于min(0.95,21/VBUS)，两端标称93.33%/55.56%；量产按带载校准，不把平均21V等同绕组脉冲峰值。PB5保持低。",
+      "freewheel": "SS510C+Q_BRAKE固有体二极管由MOTOR_B指向BUS_M。",
+      "brake": "正常停止先禁PA8并验证PWM关闭，等待100µs再令PB5高。跨电机P沟道短接回路耗能，电流可能反向；重新ARM前PB5低并等待1ms、确认Qg实测关断后再开PWM。两状态互斥。",
+      "p_gate": "10k/27k名义分压，−6.08至−10.22 V正常、64.5 V时约−17.43 V，核瞬态与R/VBE公差。",
+      "startup_fault_default": "PA8及PB5下拉。驱动UVLO、COMP2 BREAK、CAN失联、主路失电、BOR和预充期间故障滑行，两管关。禁止AOE自动恢复、恢复须新ARM及零PWM。",
+      "sensing": "20mΩ低侧Kelvin，3 A=60 mV。PA7同时进OPAMP1内部PGA×16/ADC1_IN13及COMP2，PA2仍作NTC。DAC3_CH2设100 mV (约5A)，COMP2内部路由TIM1 BRK，锁存MOE=0。复用R_ADC_I 1kΩ（C269704）并将C_ADC_I换全车风华1nF（C44369），时间常数约1µs以配合启动/堵转；COMP/DAC失调按实板校准、采样窗在MOS导通期；制动电流绕过低侧分流器，制动驻留上限由实泵确认。",
+      "load_shed": "复用ADC_BUS（22.2 V、校准±1%、RC≤1.5ms）和已有CAN时效候选，急停PWM及BRAKE皆低。预算0.5ms采样+0.5ms判定+0.5ms GPIO+3ms功率尾段；母线与签名许可恢复后才可新ARM。断电不触发正常制动。"
+    },
+    "new_smt_weld_points_net": "按44+EP的U_DRV和分立件计算减少；板内器件数52→52，44脚加EP驱动与拆下外围的焊点由分立器件替代，焊点净减少；控制与测量使用原阻容位号。",
+    "power_budget": "+5V由既有XL7015，NSG1416驱动与核心/CAN仍受既有0.3 A设计预算约束；预充辅助吸流0.65 W是联合夹具的典型工况，按BUS斜坡核实。",
+    "price": "全部新件待核价；DRV8262约¥72为用户参考，与商城账本待核价分开。"
+  },
+  "drawing_components": [
+    {
+      "ref": "U_CAN",
+      "mpn": "CA-IS2062A",
+      "manufacturer": "Chipanalog (川土微)",
+      "lcsc": "C22438481",
+      "footprint": "LGA-16_L5.2-W4.7-P0.65-TL_CA-IS2062A-FRANK2",
+      "pins": {
+        "1": "CAN_RX",
+        "2": "NC",
+        "3": "NC",
+        "4": "CAN_TX",
+        "5": "GND_SYS",
+        "6": "+5V",
+        "7": "+3V3",
+        "8": "GND_SYS",
+        "9": "GND_CAN",
+        "10": "CAN_ISO_5V",
+        "11": "CAN_ISO_5V",
+        "12": "GND_CAN",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "pin_roles": {
+        "1": "RXD",
+        "2": "NC",
+        "3": "NC",
+        "4": "TXD",
+        "5": "GNDP1",
+        "6": "VDDP",
+        "7": "VDDL",
+        "8": "GND1",
+        "9": "GND2",
+        "10": "VISOIN",
+        "11": "VISOOUT",
+        "12": "GNDP2",
+        "13": "NC",
+        "14": "CANL",
+        "15": "CANH",
+        "16": "NC"
+      },
+      "value": "Isolated CAN transceiver with integrated isolated DC/DC",
+      "source_url": "https://www.chipanalog.com/Public/Uploads/uploadfile/files/20250329/CAIS2062AdatasheetVersion1.01cn20250325-314.pdf"
+    },
+    {
+      "ref": "C_CAN_VCC",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_CAN_VIO",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "pins": {
+        "1": "+3V3",
+        "2": "GND_SYS"
+      },
+      "value": "1uF, 25V, X7R, ±10%",
+      "source_url": "https://www.lcsc.com/product-detail/C59302.html"
+    },
+    {
+      "ref": "C_5V_OUT_HF",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_CAN_VDDP_BULK",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "value": "47uF, 16V, X5R, ±10%"
+    },
+    {
+      "ref": "C_CAN_ISO_BULK",
+      "mpn": "1210X476K160NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C2961286",
+      "footprint": "C1210",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "value": "47uF, 16V, X5R, ±10%"
+    },
+    {
+      "ref": "C_CAN_ISO_HF",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "C_CAN_ISOIN_1U",
+      "mpn": "0603B105K250NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C59302",
+      "footprint": "C0603",
+      "pins": {
+        "1": "CAN_ISO_5V",
+        "2": "GND_CAN"
+      },
+      "value": "1uF, 25V, X7R, ±10%"
+    },
+    {
+      "ref": "D_CAN",
+      "mpn": "PESD2CANFD24V-TR",
+      "manufacturer": "Nexperia",
+      "lcsc": "C552486",
+      "footprint": "SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR",
+      "pins": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND_CAN"
+      },
+      "pin_roles": {
+        "1": "CANH",
+        "2": "CANL",
+        "3": "GND"
+      }
+    },
+    {
+      "ref": "J_CAN",
+      "mpn": "B3B-XH-A(LF)(SN)",
+      "manufacturer": "JST",
+      "lcsc": "C144394",
+      "footprint": "CONN-TH_3P-P2.50_A2501WV2-3P",
+      "pins": {
+        "1": "GND_CAN",
+        "2": "CANH",
+        "3": "CANL"
+      },
+      "value": "XH, 3-pin, 2.5mm pitch"
+    },
+    {
+      "ref": "U_PWM",
+      "mpn": "NSG1416",
+      "manufacturer": "NCE (NSIC Technology, Wuxi)",
+      "lcsc": "C53436462",
+      "footprint": "SOT-23-5",
+      "pins": {
+        "1": "NC",
+        "2": "+5V",
+        "3": "PUMP_PWM",
+        "4": "GND_SYS",
+        "5": "PWM_GATE_DRV"
+      },
+      "value": "5V non-inverting low-side gate driver, 4.5–25V supply, 2A source/sink",
+      "source_url": "https://www.lcsc.com/product-detail/C53436462.html"
+    },
+    {
+      "ref": "Q_PWM",
+      "mpn": "NCE0117K",
+      "manufacturer": "无锡新洁能 NCE",
+      "lcsc": "C108638",
+      "footprint": "TO-252-2L",
+      "pins": {
+        "1": "PWM_GATE",
+        "2": "MOTOR_B",
+        "3": "PUMP_SHUNT"
+      },
+      "value": "100 V/17 A，85mΩ max @4.5V，TO-252-2L",
+      "pin_roles": {
+        "1": "G",
+        "2": "D (tab)",
+        "3": "S"
+      },
+      "source_url": "https://www.lcsc.com/product-detail/C108638.html"
+    },
+    {
+      "ref": "Q_BRAKE",
+      "mpn": "E100P045CL1",
+      "manufacturer": "毅芯达 Existar",
+      "lcsc": "C29781153",
+      "footprint": "TO-252",
+      "pins": {
+        "1": "BRAKE_GATE",
+        "2": "MOTOR_B",
+        "3": "BUS_M"
+      },
+      "value": "−100 V/−40 A @Tc25，55mΩ max @−4.5 V，TO-252",
+      "pin_roles": {
+        "1": "G",
+        "2": "D (tab)",
+        "3": "S"
+      },
+      "source_url": "https://www.lcsc.com/product-detail/C29781153.html"
+    },
+    {
+      "ref": "Q_BRAKE_CTL",
+      "mpn": "MMBT5551",
+      "manufacturer": "辰达 MDD",
+      "lcsc": "C408396",
+      "footprint": "SOT-23",
+      "pins": {
+        "1": "BRAKE_BASE",
+        "2": "GND_SYS",
+        "3": "BRAKE_SINK"
+      },
+      "value": "NPN 160V，整车复用，SOT-23",
+      "pin_roles": {
+        "1": "B",
+        "2": "E",
+        "3": "C"
+      },
+      "source_url": "https://www.lcsc.com/product-detail/C408396.html"
+    },
+    {
+      "ref": "D_PUMP_FW",
+      "mpn": "SS510C",
+      "manufacturer": "辰达 MDD",
+      "lcsc": "C19229",
+      "footprint": "SMC (DO-214AB)",
+      "pins": {
+        "1": "BUS_M",
+        "2": "MOTOR_B"
+      },
+      "value": "100 V / 5 A，SMC",
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "source_url": "https://www.lcsc.com/product-detail/C19229.html"
+    },
+    {
+      "ref": "R_PUMP_SHUNT",
+      "mpn": "HoJLR2512-2W-20mR-1%-75ppm",
+      "manufacturer": "毫欧 Milliohm",
+      "lcsc": "C2924538",
+      "footprint": "R2512",
+      "pins": {
+        "1": "PUMP_SHUNT",
+        "2": "GND_SYS"
+      },
+      "value": "20mOhm ±1%, 2W; Kelvin sense is PCB routing, not a four-terminal part",
+      "source_url": "https://www.lcsc.com/product-detail/C2924538.html"
+    },
+    {
+      "ref": "R_PWM_GATE_SER",
+      "mpn": "RS-06K10R0FT",
+      "manufacturer": "风华 FH",
+      "lcsc": "C140052",
+      "footprint": "R1206",
+      "pins": {
+        "1": "PWM_GATE_DRV",
+        "2": "PWM_GATE"
+      },
+      "value": "10Ω±1% 1206，同稳压板",
+      "source_url": "https://www.lcsc.com/product-detail/C140052.html"
+    },
+    {
+      "ref": "R_BRAKE_GATE_LOW",
+      "mpn": "RS-06K2702FT",
+      "manufacturer": "风华 FH",
+      "lcsc": "C294775",
+      "footprint": "R1206",
+      "pins": {
+        "1": "BRAKE_GATE",
+        "2": "BRAKE_SINK"
+      },
+      "value": "27kΩ ±1% 1206 / 200V",
+      "source_url": "https://www.lcsc.com/product-detail/C294775.html"
+    },
+    {
+      "ref": "R_BRAKE_GATE_HIGH",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "pins": {
+        "1": "BUS_M",
+        "2": "BRAKE_GATE"
+      },
+      "value": "10 kΩ ±1%",
+      "source_url": "https://www.lcsc.com/product-detail/C115324.html",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_BRAKE_BASE",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PUMP_BRAKE",
+        "2": "BRAKE_BASE"
+      },
+      "value": "10 kΩ ±1%",
+      "source_url": "https://www.lcsc.com/product-detail/C115324.html",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_SLEEP",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PWM_GATE",
+        "2": "PUMP_SHUNT"
+      },
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_IN1_PD",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PUMP_BRAKE",
+        "2": "GND_SYS"
+      },
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_IN2_PD",
+      "mpn": "0603WAF1002T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C25804",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PUMP_PWM",
+        "2": "GND_SYS"
+      },
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_ADC_I",
+      "mpn": "0603WAF1001T5E",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "lcsc": "C21190",
+      "footprint": "R0603",
+      "pins": {
+        "1": "PUMP_SHUNT",
+        "2": "PUMP_I_SENSE"
+      },
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "C_ADC_I",
+      "mpn": "0603B102K500NT",
+      "manufacturer": "FH (Fenghua)",
+      "lcsc": "C44369",
+      "footprint": "C0603",
+      "pins": {
+        "1": "PUMP_I_SENSE",
+        "2": "GND_SYS"
+      },
+      "value": "1nF, 50V, X7R"
+    },
+    {
+      "ref": "C_DRV_VCC",
+      "mpn": "0603B104K500NT",
+      "manufacturer": "FH(风华)",
+      "lcsc": "C30926",
+      "footprint": "C0603",
+      "pins": {
+        "1": "+5V",
+        "2": "GND_SYS"
+      },
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "J_MCU_A",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXTCONN",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "pins": {
+        "1": "+5V",
+        "2": "+5V",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "NC",
+        "6": "NC",
+        "7": "NC",
+        "8": "NC",
+        "9": "NC",
+        "10": "PUMP_PWM",
+        "11": "NC",
+        "12": "NC",
+        "13": "NC",
+        "14": "NC",
+        "15": "NC",
+        "16": "NC",
+        "17": "NC",
+        "18": "NC",
+        "19": "NC",
+        "20": "PUMP_BRAKE",
+        "21": "NC",
+        "22": "NC",
+        "23": "CAN_RX",
+        "24": "CAN_TX"
+      },
+      "value": "2x12P 2.54mm coreboard header",
+      "source_url": "https://www.lcsc.com/product-detail/C54803369.html"
+    },
+    {
+      "ref": "J_MCU_B",
+      "mpn": "JXT-PM2.54-2X12P-A9",
+      "manufacturer": "JXTCONN",
+      "lcsc": "C54803369",
+      "footprint": "HDR-TH_24P-P2.54-V-F-R2-C12-S2.54-2",
+      "pins": {
+        "1": "+3V3",
+        "2": "+3V3",
+        "3": "GND_SYS",
+        "4": "GND_SYS",
+        "5": "NC",
+        "6": "NC",
+        "7": "NC",
+        "8": "NC",
+        "9": "NC",
+        "10": "NC",
+        "11": "PUMP_I_SENSE",
+        "12": "NC",
+        "13": "NC",
+        "14": "NC",
+        "15": "NC",
+        "16": "NC",
+        "17": "ADC_BUS",
+        "18": "ADC_NTC",
+        "19": "NC",
+        "20": "NC",
+        "21": "NC",
+        "22": "NC",
+        "23": "NC",
+        "24": "NC"
+      },
+      "value": "2x12P 2.54mm coreboard header",
+      "source_url": "https://www.lcsc.com/product-detail/C54803369.html"
+    },
+    {
+      "ref": "C_DRV_VM1",
+      "mpn": "C2012X7R2E103K125AA",
+      "manufacturer": "TDK",
+      "lcsc": "C2167598",
+      "footprint": "C0805",
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "value": "10nF ±10%, 250V, X7R",
+      "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#C_DRV_VM1",
+      "source_url": "https://item.szlcsc.com/2259650.html"
+    },
+    {
+      "ref": "J_MOTOR",
+      "mpn": "2EDGVC-5.08-02P-14-100A(H)",
+      "manufacturer": "DEGSON (町洋)",
+      "lcsc": "C581328",
+      "footprint": "CONN-TH_P5.08_2EDGVC-5.08-02P-14-100A-H",
+      "pins": {
+        "1": "BUS_M",
+        "2": "MOTOR_B"
+      },
+      "source_record": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet#J_MOTOR",
+      "source_url": "https://www.lcsc.com/product-detail/C581328.html"
+    },
+    {
+      "ref": "D_BUS",
+      "mpn": "SMCJ40A",
+      "manufacturer": "MDD(Microdiode Semiconductor)",
+      "lcsc": "C840777",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "package": "DO-214AB (SMC)",
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "value": "40 V VRWM，44.4–49.1 V VBR，64.5 V@23.3 A，10/1000 µs",
+      "source": "https://www.lcsc.com/product-detail/C840777.html",
+      "price": "待核价"
+    },
+    {
+      "ref": "D_5V",
+      "mpn": "SS310-SMC",
+      "manufacturer": "GOODWORK",
+      "lcsc": "C2848691",
+      "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+      "package": "DO-214AB (SMC)",
+      "pins": {
+        "1": "XL_SW",
+        "2": "GND_SYS"
+      },
+      "pin_roles": {
+        "1": "K",
+        "2": "A"
+      },
+      "value": "3 A/100 V，80 A 单次 8.3 ms IFSM，K=XL_SW",
+      "source": "https://www.lcsc.com/product-detail/C2848691.html",
+      "price": "待核价",
+      "datasheet": "https://datasheet.lcsc.com/lcsc/2108142330_GOODWORK-SS310-SMC_C2848691.pdf"
+    },
+    {
+      "ref": "C_5V_IN_HF",
+      "pins": {
+        "1": "BUS_M",
+        "2": "GND_SYS"
+      },
+      "mpn": "0805B104K101NT",
+      "lcsc": "C89258",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0805",
+      "value": "100 nF ±10%, X7R, 100 V",
+      "source": "https://www.lcsc.com/product-detail/C89258.html"
+    },
+    {
+      "ref": "C_ADC_BUS",
+      "pins": {
+        "1": "ADC_BUS",
+        "2": "GND_SYS"
+      },
+      "mpn": "0603B104K500NT",
+      "lcsc": "C30926",
+      "manufacturer": "FH(风华)",
+      "footprint": "C0603",
+      "value": "100 nF ±10%, X7R, 50 V",
+      "source": "https://www.lcsc.com/product-detail/C30926.html"
+    },
+    {
+      "ref": "R_ADC_BUS",
+      "pins": {
+        "1": "BUS_SENSE",
+        "2": "ADC_BUS"
+      },
+      "mpn": "0603WAF1001T5E",
+      "lcsc": "C21190",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "1 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C21190.html"
+    },
+    {
+      "ref": "R_CAN_TXD_PU",
+      "pins": {
+        "1": "+3V3",
+        "2": "CAN_TX"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    },
+    {
+      "ref": "R_FB_TOP",
+      "pins": {
+        "1": "+5V",
+        "2": "XL_FB"
+      },
+      "mpn": "0603WAF1002T5E",
+      "lcsc": "C25804",
+      "manufacturer": "UNI-ROYAL(厚声)",
+      "footprint": "R0603",
+      "value": "10 kΩ ±1%",
+      "source": "https://www.lcsc.com/product-detail/C25804.html"
+    }
+  ],
+  "controller_pin_verification": {
+    "target_mcu": "STM32G431CBU6 / WeAct Normal V1.0 QFN48 参考针序",
+    "signals": {
+      "PUMP_PWM": {
+        "board_connector": "J_MCU_A.10",
+        "mcu_pad": "PA8",
+        "peripheral": "TIM1_CH1",
+        "alternate_function": "AF6",
+        "electrical_mode": "3.3V timer output; NSG1416 non-inverting driver input"
+      },
+      "PUMP_BRAKE": {
+        "board_connector": "J_MCU_A.20",
+        "mcu_pad": "PB5",
+        "peripheral": "GPIO output",
+        "electrical_mode": "active-high NPN sink control; 10k pulldown R_IN1_PD"
+      },
+      "PUMP_I_SENSE": {
+        "board_connector": "J_MCU_B.11",
+        "mcu_pad": "PA7",
+        "opamp_path": "OPAMP1 VINP; configure internal non-inverting PGA x16; OPAMP1 output internally to ADC1_IN13",
+        "comparator_path": "COMP2_INP=PA7; COMP2_INM=internal DAC3_CH2 nominal 100mV (about 5A at 20mOhm)",
+        "hardware_trip": "route COMP2 output internally to TIM1 break with TIM1_AF1.BKCMP2E; configure polarity/lockout, leave AOE disabled and latch MOE off until a fresh arm"
+      },
+      "ADC_BUS": {
+        "board_connector": "J_MCU_B.17",
+        "mcu_pad": "PA1"
+      },
+      "ADC_NTC": {
+        "board_connector": "J_MCU_B.18",
+        "mcu_pad": "PA2"
+      }
+    },
+    "board_header_mapping_status": "WeAct Normal V1.0 QFN48 官方图纸与模块候选的 J_MCU_A/B 同号接线已复核；实物板型与装配方向待确认。",
+    "shunt_nominal_calculations": {
+      "R_PUMP_SHUNT": "20mOhm ±1%, 2W, Milliohm HoJLR2512-2W-20mR-1%-75ppm, LCSC C2924538",
+      "3A": "60mV; 0.18W",
+      "5A": "100mV; 0.50W",
+      "sense_note": "Kelvin is a PCB routing requirement; the selected resistor is a two-terminal SMD part. COMP/DAC total offset and trip-current tolerance require bench calibration."
+    },
+    "gate_driver_polarity_correction": {
+      "old_candidate": "NSG1415 (C53436461) is the inverting option; do not populate at U_PWM.",
+      "selected": "NSG1416 (C53436462), non-inverting, same U_PWM reference and SOT-23-5 footprint.",
+      "safe_state": "With PA8 held low, NSG1416 OUT is low and Q_PWM stays off; NSG1415 would reverse this logic and break the intended default-off behavior."
+    },
+    "ca_is2062a_decoupling_correction": "Manufacturer application guidance calls for VDDP-GNDP1 >=10uF in parallel with 0.1uF, VISOOUT-GNDP2 >=10uF in parallel with 0.1uF, VDDL-GND1 1uF, and VISOIN-GND2 1uF, placed within 2mm on the same PCB layer. Current 47uF bulk + 100nF HF meet the two >=10uF branches; C_CAN_VIO was corrected from 100nF to 1uF without a new component or SKU because 1uF C59302 already appears at C_CAN_ISOIN_1U. VISOOUT/VISOIN and GNDP2/GND2 must each be shorted directly as specified.",
+    "harness_map_to_bms": {
+      "pump_J_CAN.1": "GND_CAN -> BMS J_CAN.1",
+      "pump_J_CAN.2": "CANH -> BMS J_CAN.2",
+      "pump_J_CAN.3": "CANL -> BMS J_CAN.3",
+      "routing": "五板统一为 JST XH 3P，使用 1–1、2–2、3–3 直通线束。旧交叉转接线退出。"
+    },
+    "sources": [
+      {
+        "document": "ST STM32G431 datasheet DS12589",
+        "url": "https://www.st.com/resource/en/datasheet/stm32g431cb.pdf",
+        "claim": "PA8 exposes TIM1_CH1 on AF6; selected STM32G431 pin-function table."
+      },
+      {
+        "document": "ST STM32G4 reference manual RM0440 Rev 9",
+        "url": "https://www.st.com/resource/en/reference_manual/rm0440-stm32g4-series-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+        "claim": "COMP2_INP supports PA7, COMP2_INM supports DAC3_CH2; OPAMP1 VINP supports PA7 and OPAMP1 VOUT can be routed internally to ADC1_IN13; TIM1_AF1.BKCMP2E enables COMP2 to timer break."
+      },
+      {
+        "document": "Chipanalog CA-IS2062A datasheet v1.01",
+        "url": "https://www.chipanalog.com/Public/Uploads/uploadfile/files/20250329/CAIS2062AdatasheetVersion1.01cn20250325-314.pdf",
+        "claim": "Full LGA16 numeric pin order, direct VISOOUT/VISOIN and GNDP2/GND2 ties, bypass capacitor values and <=2mm placement guidance."
+      },
+      {
+        "document": "NCE NSG1415/6 datasheet and product table",
+        "url": "https://www.wxnsic.com/static/5d14175b36a8d6926ee7f654e4a83515.pdf",
+        "claim": "SOT-23-5 family, 2A source/sink; manufacturer listing identifies NSG1415 as /IN and NSG1416 as IN."
+      },
+      {
+        "document": "LCSC NSG1416",
+        "url": "https://www.lcsc.com/product-detail/C53436462.html",
+        "claim": "NSG1416, C53436462, SOT-23-5, 4.5–25V, 2A."
+      },
+      {
+        "document": "LCSC FH 0603B105K250NT",
+        "url": "https://www.lcsc.com/product-detail/C59302.html",
+        "claim": "C59302 is 1uF, 25V, X7R, ±10%, 0603."
+      },
+      {
+        "document": "LCSC Milliohm HoJLR2512",
+        "url": "https://www.lcsc.com/product-detail/C2924538.html",
+        "claim": "C2924538 is the selected 20mOhm, 2W, 2512 current shunt."
+      }
+    ],
+    "reference_coreboard_pin_audit": "电力/水泵驱动模块/检查/MCU引脚核对.json"
+  },
+  "verification_notes": {
+    "target_component_count": 52,
+    "drawing_components_entry_count": 30,
+    "drawing_components_scope": "The array is a partial map of changed/new/pin-modified components, plus J_CAN, D_CAN, coreboard interlocks J_MCU_A/J_MCU_B, and reused power nodes C_DRV_VM1/J_MOTOR. Its entry count is not the total 52-piece board BOM.",
+    "remaining_hardware_blocker": "Confirm exact fitted STM32G431 coreboard revision and J_MCU_A/J_MCU_B header orientation/pinout before schematic capture or PCB release; bench-calibrate COMP2/DAC offset and verify brake/shunt paths on the actual pump."
+  },
+  "p0_phase_a": {
+    "replaced_components": [
+      {
+        "ref": "D_BUS",
+        "mpn": "SMCJ40A",
+        "manufacturer": "MDD(Microdiode Semiconductor)",
+        "lcsc": "C840777",
+        "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+        "package": "DO-214AB (SMC)",
+        "pins": {
+          "1": "BUS_M",
+          "2": "GND_SYS"
+        },
+        "pin_roles": {
+          "1": "K",
+          "2": "A"
+        },
+        "value": "40 V VRWM，44.4–49.1 V VBR，64.5 V@23.3 A，10/1000 µs",
+        "source": "https://www.lcsc.com/product-detail/C840777.html",
+        "price": "待核价"
+      },
+      {
+        "ref": "D_5V",
+        "mpn": "SS310-SMC",
+        "manufacturer": "GOODWORK",
+        "lcsc": "C2848691",
+        "footprint": "SMC_L6.9-W5.9-LS7.9-RD",
+        "package": "DO-214AB (SMC)",
+        "pins": {
+          "1": "XL_SW",
+          "2": "GND_SYS"
+        },
+        "pin_roles": {
+          "1": "K",
+          "2": "A"
+        },
+        "value": "3 A/100 V，80 A 单次 8.3 ms IFSM，K=XL_SW",
+        "source": "https://www.lcsc.com/product-detail/C2848691.html",
+        "price": "待核价",
+        "datasheet": "https://datasheet.lcsc.com/lcsc/2108142330_GOODWORK-SS310-SMC_C2848691.pdf"
+      }
+    ]
+  },
+  "temperature_sensors": [
+    {
+      "ref": "NTC_BOARD",
+      "mpn": "MF52A103F3950(A1)",
+      "lcsc": "C13879",
+      "resistance_25c_ohm": 10000,
+      "beta_25_50_k": 3950,
+      "pins": {"1": "ADC_NTC", "2": "GND_SYS"},
+      "quantity": 1
+    }
+  ],
+  "passive_freeze": {
+    "basis": {
+      "native_netlist": "电力/水泵驱动模块/检查/主工程图面验收/主工程.enet",
+      "precedence": "冻结底稿加本轮前生效施工增量。按位号核用途、电压、原封装、精度及针序。"
+    },
+    "refs": {
+      "C_5V_IN_HF": {
+        "before": {
+          "mpn": "C2012X7R2A104K125AA",
+          "lcsc": "C2167715",
+          "footprint": "C0805"
+        },
+        "selected_lcsc": "C89258",
+        "pins_before": {
+          "1": "BUS_M",
+          "2": "GND_SYS"
+        }
+      },
+      "C_5V_OUT_HF": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "+5V",
+          "2": "GND_SYS"
+        }
+      },
+      "C_ADC_BUS": {
+        "before": {
+          "mpn": "C1608X7R1H104K080AA",
+          "lcsc": "C72453",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "ADC_BUS",
+          "2": "GND_SYS"
+        }
+      },
+      "C_CAN_ISO_HF": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "CAN_ISO_5V",
+          "2": "GND_CAN"
+        }
+      },
+      "C_CAN_VCC": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "+5V",
+          "2": "GND_SYS"
+        }
+      },
+      "C_DRV_VCC": {
+        "before": {
+          "mpn": "0603B104K160NT",
+          "lcsc": "C2846678",
+          "footprint": "C0603"
+        },
+        "selected_lcsc": "C30926",
+        "pins_before": {
+          "1": "+5V",
+          "2": "GND_SYS"
+        }
+      },
+      "R_ADC_BUS": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "BUS_SENSE",
+          "2": "ADC_BUS"
+        }
+      },
+      "R_ADC_I": {
+        "before": {
+          "mpn": "RMC06031K1%N",
+          "lcsc": "C269704",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C21190",
+        "pins_before": {
+          "1": "PUMP_SHUNT",
+          "2": "PUMP_I_SENSE"
+        }
+      },
+      "R_BRAKE_BASE": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "PUMP_BRAKE",
+          "2": "BRAKE_BASE"
+        }
+      },
+      "R_BRAKE_GATE_HIGH": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "BUS_M",
+          "2": "BRAKE_GATE"
+        }
+      },
+      "R_CAN_TXD_PU": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "+3V3",
+          "2": "CAN_TX"
+        }
+      },
+      "R_FB_TOP": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "+5V",
+          "2": "XL_FB"
+        }
+      },
+      "R_IN1_PD": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "PUMP_BRAKE",
+          "2": "GND_SYS"
+        }
+      },
+      "R_IN2_PD": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "PUMP_PWM",
+          "2": "GND_SYS"
+        }
+      },
+      "R_SLEEP": {
+        "before": {
+          "mpn": "RS-03K1002FT",
+          "lcsc": "C115324",
+          "footprint": "R0603"
+        },
+        "selected_lcsc": "C25804",
+        "pins_before": {
+          "1": "PWM_GATE",
+          "2": "PUMP_SHUNT"
+        }
+      }
+    },
+    "exceptions": {}
+  }
+}
