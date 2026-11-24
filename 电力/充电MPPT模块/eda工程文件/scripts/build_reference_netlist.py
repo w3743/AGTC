@@ -8,7 +8,7 @@ sys.path.insert(0, str(POWER / "检查/联合仿真/code_as_eda"))
 from reference import read_json, require, source_record, apply_drawing_rows, write_json
 CONTRACT = PROJECT.parent / "检查/充电MPPT施工合同.json"
 SIM = PROJECT.parent / "检查/充电MPPT与自持仿真核算.json"
-EXPECTED = {"contract": "dfdeb4669ed7f3b83942d6be69e87055d4af6ad245a2b55ea1463b6ed42055fa", "simulation": "3fd45668f937bac1713197beba060fba34734bf6ef5d736abf284575bacdc01e"}
+EXPECTED = {"contract": "3f927e35d878c54d64dd8b896dce2be237be7f4ba4a9807ed5c5a684b9e82af9", "simulation": "3fd45668f937bac1713197beba060fba34734bf6ef5d736abf284575bacdc01e"}
 def build():
     contract, sim = read_json(CONTRACT), read_json(SIM)
     inputs = {"contract": source_record(CONTRACT), "simulation": source_record(SIM)}
