@@ -143,6 +143,9 @@ def verify_circuit(reference_path, directory, count):
     svg = svg_path.read_text(encoding="utf-8")
     document = ElementTree.fromstring(svg)
     check(not re.search(r"\bNaN", svg), "render", "invalid SVG number or passive value")
+    check('class="schematic-sheet"' not in svg and "schematic_sheet_0_outer" not in svg
+          and "schematic_sheet_0_inner" not in svg,
+          "geometry", "borderless SVG without schematic_sheet border")
     xy = document.attrib["data-real-to-screen-transform"].removeprefix("matrix(").removesuffix(")")
     sx, skew_y, skew_x, sy, dx, dy = map(float, xy.split(","))
     width, height = (float(document.attrib[key]) for key in ("width", "height"))
@@ -162,7 +165,7 @@ def verify_circuit(reference_path, directory, count):
     from verify_kicad import verify_kicad
     kicad = verify_kicad(directory / "kicad", reference_parts, check)
     kicad["files"] = [source_record(path) for path in sorted((directory / "kicad").iterdir())
-                      if path.suffix in (".kicad_pro", ".kicad_sch")]
+                      if path.suffix in (".kicad_pro", ".kicad_sch", ".kicad_wks")]
     return {
         "status": "FAIL" if findings else "PASS",
         "scope": "Frozen contract schematic objects, physical/logical pins, net labels, BOM and KiCad schematic readback",

@@ -2,7 +2,7 @@
 // The repository-wide document gate recursively scans the dependency tree.
 // Keep the local install outside the board directory when running that gate.
 import React from "react"
-import { mkdir, writeFile } from "node:fs/promises"
+import { mkdir, readdir, unlink, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 import { Circuit } from "@tscircuit/core"
@@ -19,6 +19,15 @@ circuit.add(<PumpBoard />)
 await circuit.renderUntilSettled()
 const renderMs = performance.now() - started
 const circuitJson = useShortNetLabels(circuit.getCircuitJson())
+  .filter((element) => element.type !== "schematic_sheet")
+  .map((element) => {
+    if ("schematic_sheet_id" in element) {
+      const next = { ...element }
+      delete next.schematic_sheet_id
+      return next
+    }
+    return element
+  })
 const components = circuitJson.filter((element) => element.type === "source_component")
 const diagnostics = circuitJson.filter((element) => element.type.includes("error"))
 if (diagnostics.length) {
@@ -51,6 +60,7 @@ const exportJson = circuitJson.map((element) => {
 const exportsDirectory = join(dirname(fileURLToPath(import.meta.url)), "../exports")
 const kicadDirectory = join(exportsDirectory, "kicad")
 await mkdir(kicadDirectory, { recursive: true })
+const existingKicad = await readdir(kicadDirectory)
 const svg = enlargeSvgAnnotations(convertCircuitJsonToSchematicSvg(circuitJson, { width: 4800, height: 1380 }))
 const kicadParts = new Map(Object.entries(parts).map(([ref, part]) => [ref, {
   pins: part.pins,
@@ -78,6 +88,8 @@ const quoteCsv = (value: string) => `"${value.replaceAll('"', '""')}"`
 const bom = [header, ...bomRows].map((row) => row.map(quoteCsv).join(",")).join("\n")
 
 await Promise.all([
+  ...existingKicad.filter((entry) => /^section_\d+\.kicad_sch$/.test(entry))
+    .map((entry) => unlink(join(kicadDirectory, entry))),
   writeFile(join(exportsDirectory, "circuit.json"), JSON.stringify(exportJson, null, 2) + "\n"),
   writeFile(join(exportsDirectory, "schematic.svg"), svg.replace(/[ \t]+$/gm, "").trimEnd() + "\n"),
   writeFile(join(exportsDirectory, "bom.csv"), bom + "\n"),

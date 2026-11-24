@@ -209,6 +209,10 @@ def verify(reference_path, circuit_path, bom_path):
     check(shunt.get("resistance") == 0.02 and "2W" in bom.get("R_PUMP_SHUNT", {}).get("Value", ""),
           "shunt", "R_PUMP_SHUNT", "20 mΩ / 2 W")
     check(len(ports) == pin_total, "pin_count", "board", pin_total, len(ports))
+    svg_text = (EXPORTS / "schematic.svg").read_text(encoding="utf-8")
+    check('class="schematic-sheet"' not in svg_text and "schematic_sheet_0_outer" not in svg_text
+          and "schematic_sheet_0_inner" not in svg_text,
+          "geometry", "borderless SVG without schematic_sheet border")
     kicad_parts = {ref: {**part, "placement": "board", "in_bom": True}
                    for ref, part in expected.items()}
     kicad = verify_kicad(EXPORTS / "kicad", kicad_parts, check)

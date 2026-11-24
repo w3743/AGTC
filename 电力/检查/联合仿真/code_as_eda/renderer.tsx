@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from "react"
-import { mkdir, unlink, writeFile } from "node:fs/promises"
+import { mkdir, readdir, unlink, writeFile } from "node:fs/promises"
 import { Circuit, type RootCircuit } from "@tscircuit/core"
 import { MM_PER_SCHEMATIC_UNIT } from "circuit-json"
 import { CircuitJsonToKicadProConverter, CircuitJsonToKicadSchConverter } from "circuit-json-to-kicad"
@@ -116,12 +116,11 @@ export function ReferenceBoard({ reference, title, name, children }: {
   reference: BoardData; title: string; name: string; children: React.ReactNode
 }) {
   const model = modelFor(reference)
+  void title
   return <board name={name} schAutoLayoutEnabled={false}>
-    <schematicsheet name={name + "_circuit"} displayName={title} sheetWidth={6000} sheetHeight={7000}>
-      <group name="Functional sections" schAutoLayoutEnabled={false}>
-        <modelContext.Provider value={model}>{children}</modelContext.Provider>
-      </group>
-    </schematicsheet>
+    <group name="Functional sections" schAutoLayoutEnabled={false}>
+      <modelContext.Provider value={model}>{children}</modelContext.Provider>
+    </group>
   </board>
 }
 
@@ -151,53 +150,85 @@ export function SchematicSection({ title, schX, schY, columns, refs }: {
   return React.createElement(React.Fragment, null, ...elements)
 }
 
-function divideForKicad(elements: CircuitJson, sections: Section[], scaleFactor: number) {
-  const sheetId = (index: number) => "kicad_section_" + (index + 1)
+const BORDERLESS_WKS = `(kicad_wks
+  (version 20231118)
+  (generator "pl_editor")
+  (generator_version "8.0")
+  (setup
+    (textsize 1.5 1.5)
+    (linewidth 0.15)
+    (textlinewidth 0.15)
+    (left_margin 0)
+    (right_margin 0)
+    (top_margin 0)
+    (bottom_margin 0)
+  )
+)
+`
+
+const KICAD_UNITS_TO_MM = 15
+
+function prepareSingleSheetForKicad(elements: CircuitJson, scaleFactor: number) {
   const scale = ({ x, y }: { x: number; y: number }) => ({ x: x * scaleFactor, y: y * scaleFactor })
-  const byRef = new Map(sections.flatMap((section, index) => section.refs.map((ref) => [ref, sheetId(index)])))
-  const byTitle = new Map(sections.map((section, index) => [section.title, sheetId(index)]))
-  const byPart = new Map(elements.flatMap((entry) => entry.type === "source_component" ?
-    [[entry.source_component_id, byRef.get(entry.name)]] : []))
-  const byPort = new Map(elements.flatMap((entry) => entry.type === "source_port" ?
-    [[entry.source_port_id, byPart.get(entry.source_component_id)]] : []))
-  const byTrace = new Map(elements.flatMap((entry) => entry.type === "source_trace" ?
-    [[entry.source_trace_id, byPort.get(entry.connected_source_port_ids![0])]] : []))
-  const bySymbol = new Map(elements.flatMap((entry) => entry.type === "schematic_component" ?
-    [[entry.schematic_component_id, byPart.get(entry.source_component_id)]] : []))
-  const output: CircuitJson = sections.map((section, index) => ({
-    type: "schematic_sheet", schematic_sheet_id: sheetId(index), sheet_index: index,
-    name: "section_" + (index + 1), display_name: section.title,
-  }))
+  const output: CircuitJson = []
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+  const include = (x: number, y: number) => {
+    minX = Math.min(minX, x); minY = Math.min(minY, y)
+    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y)
+  }
   for (const entry of elements) {
-    switch (entry.type) {
-      case "schematic_sheet": break
-      case "schematic_component":
-        output.push({ ...entry, schematic_sheet_id: bySymbol.get(entry.schematic_component_id),
-          center: scale(entry.center),
-          size: { width: entry.size.width * scaleFactor, height: entry.size.height * scaleFactor } })
-        break
-      case "schematic_port":
-        output.push({ ...entry, schematic_sheet_id: byPort.get(entry.source_port_id),
-          center: scale(entry.center),
-          distance_from_component_edge: (entry.distance_from_component_edge ?? 0) * scaleFactor })
-        break
-      case "schematic_trace":
-        output.push({ ...entry, schematic_sheet_id: byTrace.get(entry.source_trace_id!),
-          edges: entry.edges.map((edge) => ({ ...edge, from: scale(edge.from), to: scale(edge.to) })) })
-        break
-      case "schematic_net_label":
-        output.push({ ...entry, schematic_sheet_id: byTrace.get(entry.source_trace_id!),
-          center: scale(entry.center), anchor_position: scale(entry.anchor_position) })
-        break
-      case "schematic_text": {
-        const sheet = entry.schematic_component_id ? bySymbol.get(entry.schematic_component_id) : byTitle.get(entry.text)
-        if (sheet) output.push({ ...entry, schematic_sheet_id: sheet, position: scale(entry.position) })
-        break
+    if (entry.type === "schematic_sheet") continue
+    if (entry.type === "schematic_component") {
+      const center = scale(entry.center)
+      const size = { width: entry.size.width * scaleFactor, height: entry.size.height * scaleFactor }
+      include(center.x - size.width / 2, center.y - size.height / 2)
+      include(center.x + size.width / 2, center.y + size.height / 2)
+      const next = { ...entry, center, size }
+      delete next.schematic_sheet_id
+      output.push(next)
+    } else if (entry.type === "schematic_port") {
+      const center = scale(entry.center)
+      include(center.x, center.y)
+      const next = {
+        ...entry, center,
+        distance_from_component_edge: (entry.distance_from_component_edge ?? 0) * scaleFactor,
       }
-      default: if (!entry.type.startsWith("schematic_")) output.push(entry)
+      delete next.schematic_sheet_id
+      output.push(next)
+    } else if (entry.type === "schematic_trace") {
+      const edges = entry.edges.map((edge) => {
+        const from = scale(edge.from), to = scale(edge.to)
+        include(from.x, from.y); include(to.x, to.y)
+        return { ...edge, from, to }
+      })
+      const next = { ...entry, edges }
+      delete next.schematic_sheet_id
+      output.push(next)
+    } else if (entry.type === "schematic_net_label") {
+      const center = scale(entry.center), anchor_position = scale(entry.anchor_position)
+      include(center.x, center.y); include(anchor_position.x, anchor_position.y)
+      const next = { ...entry, center, anchor_position }
+      delete next.schematic_sheet_id
+      output.push(next)
+    } else if (entry.type === "schematic_text") {
+      if ("source_trace_id" in entry && entry.source_trace_id) continue
+      const position = scale(entry.position)
+      include(position.x, position.y)
+      const next = { ...entry, position }
+      delete next.schematic_sheet_id
+      output.push(next)
+    } else if (!entry.type.startsWith("schematic_")) {
+      output.push(entry)
     }
   }
-  return output
+  const spanX = Number.isFinite(minX) ? (maxX - minX) * KICAD_UNITS_TO_MM : 100
+  const spanY = Number.isFinite(minY) ? (maxY - minY) * KICAD_UNITS_TO_MM : 100
+  const width = Math.max(200, Math.ceil(spanX + 120))
+  const height = Math.max(150, Math.ceil(spanY + 120))
+  return {
+    kicadData: output,
+    paperSize: { name: "User", width, height, customSize: { width, height } },
+  }
 }
 
 function connectKicadPins(schematic: ReturnType<typeof parseKicadSch>,
@@ -273,10 +304,14 @@ export function buildKicadProject(elements: CircuitJson, sections: Section[],
     netsByRef.get(ref)!.set(number, label)
   }
   if (!sections.length) throw new Error("KiCad export needs functional section metadata")
-  const kicadData = divideForKicad(elements, sections, scaleFactor)
-  const kicad = new CircuitJsonToKicadSchConverter(kicadData)
+  const { kicadData, paperSize } = prepareSingleSheetForKicad(elements, scaleFactor)
+  const kicad = new CircuitJsonToKicadSchConverter(kicadData, { paperSize })
   kicad.runUntilFinished()
-  const kicadFiles = kicad.getOutputFiles({ schematicFilename: name + ".kicad_sch" }).map((file) => {
+  const rawFiles = kicad.getOutputFiles({ schematicFilename: name + ".kicad_sch" })
+  if (rawFiles.length !== 1 || rawFiles[0].filename !== name + ".kicad_sch") {
+    throw new Error("Expected a single flat KiCad schematic, got: " + rawFiles.map((file) => file.filename).join(", "))
+  }
+  const kicadFiles = rawFiles.map((file) => {
     const schematic = parseKicadSch(file.content)
     const pinMapByLibrary = new Map<string, string[]>()
     for (const symbol of schematic.symbols) {
@@ -307,14 +342,23 @@ export function buildKicadProject(elements: CircuitJson, sections: Section[],
       }
     }
     connectKicadPins(schematic, netsByRef)
-    const content = schematic.getString().replaceAll('(project ""', '(project "' + name + '"')
+    const content = schematic.getString()
+      .replace(/\(paper\s+[\d.]+\s+[\d.]+\s*\)/, `(paper "User" ${paperSize.width} ${paperSize.height})`)
+      .replaceAll('(project ""', '(project "' + name + '"')
     return { filename: file.filename, content }
   })
   const project = new CircuitJsonToKicadProConverter(kicadData, {
     projectName: name, schematicFilename: name + ".kicad_sch", schematicSheetPlan: kicad.schematicSheetPlan,
   })
   project.runUntilFinished()
-  return [...kicadFiles, { filename: name + ".kicad_pro", content: project.getOutputString() }]
+  const proData = JSON.parse(project.getOutputString())
+  proData.schematic = { ...(proData.schematic ?? {}), page_layout_descr_file: "${KIPRJMOD}/borderless.kicad_wks" }
+  proData.pcbnew = { ...(proData.pcbnew ?? {}), page_layout_descr_file: "${KIPRJMOD}/borderless.kicad_wks" }
+  return [
+    ...kicadFiles,
+    { filename: "borderless.kicad_wks", content: BORDERLESS_WKS },
+    { filename: name + ".kicad_pro", content: JSON.stringify(proData, null, 2) + "\n" },
+  ]
 }
 
 export async function exportBoard({ reference, board, outDir, name }: {
@@ -330,7 +374,15 @@ export async function exportBoard({ reference, board, outDir, name }: {
   const renderMs = performance.now() - started
   // The base renderer checks the pre-fit bounds; the delivered sheet is fitted below.
   const content = useShortNetLabels(circuit.getCircuitJson(), officialNets)
-    .filter((entry) => entry.type !== "schematic_element_outside_sheet_warning")
+    .filter((entry) => entry.type !== "schematic_element_outside_sheet_warning" && entry.type !== "schematic_sheet")
+    .map((entry) => {
+      if ("schematic_sheet_id" in entry) {
+        const next = { ...entry }
+        delete next.schematic_sheet_id
+        return next
+      }
+      return entry
+    }) as CircuitJson
   const points = content.flatMap((entry) => {
     if (entry.type === "schematic_component" || entry.type === "schematic_port" ||
         entry.type === "schematic_net_label") return [entry.center]
@@ -340,10 +392,7 @@ export async function exportBoard({ reference, board, outDir, name }: {
   const maxX = Math.max(...points.map(({ x }) => x)), minX = Math.min(...points.map(({ x }) => x))
   const maxY = Math.max(...points.map(({ y }) => y)), minY = Math.min(...points.map(({ y }) => y))
   const width = maxX - minX + 35, height = maxY - minY + 18
-  const elements = content.map((entry) => entry.type === "schematic_sheet" ? {
-    ...entry, center: { x: (minX + maxX) / 2, y: (minY + maxY) / 2 },
-    sheet_width: width * MM_PER_SCHEMATIC_UNIT, sheet_height: height * MM_PER_SCHEMATIC_UNIT,
-  } : entry)
+  const elements = content
   const components = elements.filter((entry) => entry.type === "source_component")
   const errors = elements.filter((entry) => entry.type.includes("error"))
   if (errors.length) throw new Error(JSON.stringify(errors, null, 2))
@@ -398,7 +447,10 @@ export async function exportBoard({ reference, board, outDir, name }: {
   const bom = [header, ...rows].map((row) => row.map(quote).join(",")).join("\n")
   const kicadDirectory = new URL("kicad/", outDir)
   await mkdir(kicadDirectory, { recursive: true })
+  const existingKicad = await readdir(kicadDirectory)
   await Promise.all([
+    ...existingKicad.filter((entry) => /^section_\d+\.kicad_sch$/.test(entry))
+      .map((entry) => unlink(new URL(entry, kicadDirectory))),
     writeFile(new URL("circuit.json", outDir), JSON.stringify(exportJson, null, 2) + "\n"),
     writeFile(new URL("schematic.svg", outDir), svg.replace(/[ \t]+$/gm, "").trimEnd() + "\n"),
     writeFile(new URL("bom.csv", outDir), bom + "\n"),
