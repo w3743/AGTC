@@ -41,6 +41,28 @@ PV = (
 )
 
 
+def pv_power_stage_screen():
+    vin, vout, average_a = 12, 37.6, 5
+    fs, minimum_l = 100_000, 22e-6 * .8
+    duty = 1 - vin / vout
+    ripple = vin * duty / (fs * minimum_l)
+    peak = average_a + ripple / 2
+    mean_squared = average_a**2 + ripple**2 / 12
+    return {
+        "scope": "Single-channel 60 W analytical screen, not a controller, peak-current protection or thermal test. "
+                 "100 kHz is a comparison point, and 10 V VGS is an assumption, not a demonstrated gate voltage.",
+        "input_v": vin, "bus_proxy_v": vout, "average_a": average_a,
+        "frequency_hz": fs, "minimum_l_h": minimum_l, "ideal_duty": duty,
+        "ripple_pp_a": ripple, "peak_a": peak, "rms_a": math.sqrt(mean_squared),
+        "screen_isat_a": 9.5, "screen_irms_a": 8.0,
+        "mosfet_pair_conduction_at_10v_25c_w": mean_squared * .0053,
+        "mosfet_pair_conduction_at_assumed_1p6_r_multiplier_w": mean_squared * .0053 * 1.6,
+        "inductor_copper_25c_w": mean_squared * .0178,
+        "hard_switch_overlap_at_assumed_100ns_w": .5 * vout * average_a * 100e-9 * fs,
+        "gate_charge_at_10v_typ_w": 2 * 73e-9 * 10 * fs,
+    }
+
+
 def pv_model(work):
     """Averaged current sink/controller comparison; one shaded input is later unplugged."""
     lines = ["Vbus bus 0 36"]
@@ -103,7 +125,8 @@ def pv_model(work):
                  abs(m[f"p{i}_shaded_w"] - panel["rated_w"] * panel["after_shade"]) <= 0.05 * panel["rated_w"] and
                  m[f"i{i}_min_a"] >= -1e-7 for i, panel in enumerate(PV, 1))
     result.update(status="PASS_MODEL" if passed and abs(m["p2_unplug_w"]) < .01 else "FAIL_MODEL",
-                  irradiance_inputs=PV, scope="P&O on idealized single-knee I–V curves, averaged power stage, "
+                  irradiance_inputs=PV, power_stage_screen=pv_power_stage_screen(),
+                  scope="P&O on idealized single-knee I–V curves, averaged power stage, "
                   "ideal unidirectional output. No measured PV curves, device-specific reverse current or local-shading global maximum proof.")
     return result
 
@@ -248,46 +271,342 @@ Sverified inter stack g 0 verified
 
 
 def regen_window(work):
+    divider = .400 / 37.8
     results = {}
-    for tau_us in (5, 30, 200):
-        tau = tau_us * 1e-6
-        case = simulate(work, f"regen_tau_{tau_us}", f"""
-Vbus bus 0 PWL(0 37.55 100u 37.55 103u 37.8 120u 39 350u 39)
-Bhard in 0 V=4*u(37.6-V(bus))
-Rresponse in resp 1k
-Cresponse resp 0 {tau/1000:.9g} ic=4
-Bout 0 sense I=max(0,V(resp))
-Vinject sense bus 0
-""", ".1u", "350u", {
-            "t_cv_s": "when v(bus)=37.6 rise=1",
-            "t_below_100ma_s": f"when i(Vinject)=0.1 fall=1 td=100u",
-            "i_at_39v_a": "find i(Vinject) at=120u",
-            "tail_charge_c": "integ i(Vinject) from=100.6u to=350u",
-        } if tau_us != 200 else {
-            "t_cv_s": "when v(bus)=37.6 rise=1",
-            "i_at_39v_a": "find i(Vinject) at=120u",
-            "i_at_350us_a": "find i(Vinject) at=350u",
-            "tail_charge_c": "integ i(Vinject) from=100.6u to=350u",
+    for label, release_v, assert_us, release_us, pv_decay_us, bq_decay_us in (
+        ("target_window", 37.2, 29, 18, 5, 30),
+        ("native_divider_typ", .3945 / divider, 29, 18, 5, 30),
+        ("delayed_response_sensitivity", 37.2, 60, 36, 20, 100),
+    ):
+        release_threshold = release_v * divider
+        hyst = (.400 - release_threshold) / 2
+        case = simulate(work, f"regen_{label}", f"""
+Vbus bus 0 PWL(0 36.6 100u 36.6 148u 39 600u 39 630u 37.5 700u 37.5 750u 36.5 800u 36.5)
+Bdiv div 0 V=V(bus)*{divider:.12g}
+Vlogic one 0 1
+Sov one raw div 0 threshold off
+Rraw raw 0 1k
+.model threshold SW(Ron=1m Roff=1g Vt={.400-hyst:.12g} Vh={hyst:.12g})
+Estart delayin 0 raw 0 1
+Tassert delayin 0 assert 0 Z0=50 TD={assert_us}u
+Rassert assert 0 50
+Trelease delayin 0 release 0 Z0=50 TD={release_us}u
+Rrelease release 0 50
+Bfault fault 0 V=u(V(assert)-.5)*u(V(release)-.5)
+Bce ce 0 V=3.3*V(fault)
+Bbkin bkin 0 V=3.3*(1-V(fault))
+Renable bkin en 1k
+Cenable en 0 100p ic=3.3
+Bpv_req pv_req 0 V=2*u(V(en)-1.65)
+Bbq_req bq_req 0 V=2*u(1.65-V(ce))
+Rpv pv_req pv 1k
+Cpv pv 0 {pv_decay_us}n ic=2
+Rbq bq_req bq 1k
+Cbq bq 0 {bq_decay_us}n ic=2
+Bbranch 0 sum I=V(pv)+V(bq)
+Vinject sum bus 0
+""", ".05u", "800u", {
+            "t_trip_s": "when v(raw)=0.5 rise=1",
+            "t_release_s": "when v(raw)=0.5 fall=1",
+            "trip_v": "find v(bus) when v(raw)=0.5 rise=1",
+            "release_v": "find v(bus) when v(raw)=0.5 fall=1",
+            "t_ce_disable_s": "when v(ce)=1.65 rise=1",
+            "t_bkin_assert_s": "when v(bkin)=1.65 fall=1",
+            "t_ucc_disable_s": "when v(en)=1.65 fall=1",
+            "t_ce_release_s": "when v(ce)=1.65 fall=1",
+            "t_below_100ma_s": "when i(Vinject)=0.1 fall=1",
+            "i_hysteresis_hold_a": "find i(Vinject) at=680u",
         })
         m = case["measurements"]
-        if "t_below_100ma_s" in m:
-            m["time_to_below_100ma_us"] = 1e6 * (m["t_below_100ma_s"] - m["t_cv_s"])
-        results[str(tau_us)] = case
+        for event in ("ce_disable", "bkin_assert", "ucc_disable", "below_100ma"):
+            m[f"trip_to_{event}_us"] = (m[f"t_{event}_s"] - m["t_trip_s"]) * 1e6
+        m["release_to_ce_release_us"] = (m["t_ce_release_s"] - m["t_release_s"]) * 1e6
+        passed = (abs(m["trip_v"] - 37.8) < .005 and abs(m["release_v"] - release_v) < .005
+                  and abs(m["trip_to_ce_disable_us"] - assert_us) < .2
+                  and abs(m["trip_to_bkin_assert_us"] - assert_us) < .2
+                  and abs(m["trip_to_ucc_disable_us"] - assert_us) < .3
+                  and abs(m["release_to_ce_release_us"] - release_us) < .2
+                  and m["trip_to_below_100ma_us"] > assert_us and abs(m["i_hysteresis_hold_a"]) < .03)
+        results[label] = {"status": "PASS_MODEL" if passed else "FAIL_MODEL", **case,
+                          "assumptions": {"falling_threshold_mv": 1000 * release_threshold,
+                                          "tlv_assert_us": assert_us, "tlv_release_us": release_us,
+                                          "pv_decay_tau_us": pv_decay_us, "bq_decay_tau_us": bq_decay_us}}
     return {
-        "status": "TRANSFER_TIME_UNVERIFIED", "cases_by_assumed_time_constant_us": results,
-        "scope": "4 A combined charger action, ideal 37.6 V threshold, injected positive current is ramped down "
-                 "through an assumed lag. No BQ25756 CV loop or output disconnect delay is embedded. Effective zero = <0.1 A. "
-                 "37.8 V mixed-mode starting bus already exceeds the nominal 37.6 V running setpoint.",
+        "status": "PASS_MODEL" if all(case["status"] == "PASS_MODEL" for case in results.values()) else "FAIL_MODEL",
+        "cases": results, "tlv6700_source": "TI SNVSAV2B sections 7.5–7.7, Figure 1, INB− to OUTB",
+        "plain_divider_threshold_v_without_resistor_tolerance": {
+            "trip_min": .396 / divider, "trip_max": .404 / divider,
+            "release_min": .387 / divider, "release_max": .400 / divider,
+        },
+        "scope": "Behavioral TLV6700 hysteresis and asymmetric propagation (29/18 us nominal at 5 V, 10 mV overdrive), "
+                 "CE high, BKIN and UCC EN low. The 37.2 V case assumes added threshold shaping; a plain divider does not produce it. "
+                 "PV/BQ current decay constants and UCC EN load are assumptions, not silicon data or guaranteed cutoff times. "
+                 "The ramp through 37.8 V does not immediately deliver the datasheet's 10 mV overdrive. "
+                 "No CV, bus dynamics, fault reset, body-diode isolation or output disconnect timing is modeled.",
+    }
+
+
+def b3_epr_power_loss(work):
+    # 47 ohm (C114623) series limiter + TPS3809K33 (2.93 V threshold) cuts NCE01P30K + fires self-powered MMBT5551 / 100 ohm active bleeder across 47 nF 100 V (C43254).
+    return simulate(work, "b3_epr_power_loss_screen", """
+Vraw raw 0 48
+Rlim raw sw_in 47
+Vvpwr vpwr 0 PWL(0 3.25 1m 3.25 1.01m 0)
+Benable enable 0 V={v(vpwr)>2.93 ? 1 : 0}
+Sdisconnect sw_in prot enable 0 ideal_switch
+Bbleed_en bleed_en 0 V={1-v(enable)}
+Sbleed prot bleed_node bleed_en 0 bleed_switch
+Rbleed bleed_node 0 100
+Cprot prot 0 47n IC=48
+Rillustrative_load prot 0 48k
+Dclamp 0 prot z56
+.model ideal_switch SW(Ron=.065 Roff=1e12 Vt=.5)
+.model bleed_switch SW(Ron=.25 Roff=1e12 Vt=.5)
+.model z56 D(Bv=56 Ibv=2m Is=1n)
+""", "50n", "2m", {
+        "powered_v": "find v(prot) at=.9m",
+        "vpwr_zero_v": "find v(prot) at=1.01m",
+        "unpowered_peak_v": "max v(prot) from=1.01m to=2m",
+    })
+
+
+def b3_epr_gate_rc_screen(work):
+    # The ideal fast_pnp switch represents the intended MMBT5401 (C8326, -150 V) turn-off path, not its device model.
+    # 47 ohm (C114623) series limiter + 100 ohm gate pull-up + 47 nF 100 V (C43254) + 100 ohm active MMBT5551 bleeder + 56 V clamp.
+    results = {}
+    for name, initial, peak, cutoff in (("unpowered_hotplug_from_zero", 0, 48, 20.6),
+                                        ("unpowered_step_from_spr", 5, 48, 20.6),
+                                        ("powered_surge_from_epr", 48, 82.4, 56)):
+        initial_vsg = min(initial / 2, 12)
+        results[name] = simulate(work, f"b3_epr_{name}", f"""
+Vsource source 0 PWL(0 {initial} 1m {initial} 1.001m {peak} 2m {peak})
+Rsource source src_pin 2
+Rlim src_pin raw 47
+Rpullup_hi raw gate_pnp_c 100
+Cgs raw gate 3.81n IC={initial_vsg}
+Dgate gate raw z12
+Rpulldown gate sink 100k
+Bpermission permission 0 V={{v(src_pin)<{cutoff} ? 1 : 0}}
+Binhibit inhibit 0 V={{1-v(permission)}}
+Sdriver_on sink 0 permission 0 ideal_switch
+Sdriver_off gate_pnp_c gate inhibit 0 fast_pnp
+Sfet raw prot raw gate p_switch
+Coss raw prot 93p
+Cprot prot 0 47n IC={initial}
+Sbleed prot bleed_node inhibit 0 bleed_sw
+Rbleed bleed_node 0 100
+Rload prot 0 48k
+Bclamp prot 0 I={{max(0, (v(prot)-58.53)/135)}}
+.model z12 D(Bv=12 Ibv=1m Is=1n)
+.model ideal_switch SW(Ron=1 Roff=1e12 Vt=.5)
+.model fast_pnp SW(Ron=10 Roff=1e12 Vt=.5)
+.model bleed_sw SW(Ron=.25 Roff=1e12 Vt=.5)
+.model p_switch SW(Ron=.065 Roff=1e12 Vt=1.5 Vh=.1)
+""", "50n", "2m", {"pre_step_v": "find v(prot) at=.99m", "peak_v": "max v(prot) from=1m to=2m"})
+    return results
+
+
+def b3_pv_or_screen(work):
+    # Each PV input independently feeds AUX_HV_IN via SS310-SMC AND triggers AUX_WAKE_OR -> PRE_3V6 -> 5V_SYS with BUS=0 V.
+    results = {}
+    for source_index, pv in enumerate(PV, 1):
+        inputs = "\n".join(
+            f"Vpv{index} pv{index} 0 PWL(0 0 1m {pv['vmp_v'] if index == source_index else 0})\n"
+            f"Dpv{index} pv{index} aux ss310"
+            for index in range(1, 4))
+        results[f"pv{source_index}"] = simulate(work, f"b3_pv{source_index}_aux_or", f"""
+{inputs}
+Vbus bus 0 0
+Dbus bus aux ss310
+Cinput aux 0 4.7u
+Iload aux 0 PWL(0 0 5m 0 5.1m .1)
+Bwake en 0 V={{3.3*u(v(aux)-6.0)}}
+Bpre pre_tgt 0 V={{3.60*u(v(aux)-4.5)*u(v(en)-1.24)}}
+Rpre pre_tgt pre 20
+Cpre pre 0 10u ic=0
+Bsys sys_tgt 0 V={{5.10*u(v(pre)-2.5)}}
+Rsys sys_tgt sys 20
+Csys sys 0 10u ic=0
+.model ss310 D(Is=1u N=1.4 Rs=.14)
+""", "10u", "15m", {
+            "aux_input_v": "find v(aux) at=15m",
+            "pre_3v6_v": "find v(pre) at=15m",
+            "sys_5v_v": "find v(sys) at=15m",
+            "bus_feed_a": "find i(Vbus) at=15m",
+        })
+    return results
+
+
+def b3_bbm_rc_screen(work):
+    # 100 kOhm (C25803) + 220 nF (C83626, X7R low-corner 0.765 * 220n = 168.3n) + fast BAT46W discharge path.
+    results = {}
+    for name, resistance, capacitance in (("nominal_rc", 100e3, 220e-9),
+                                         ("low_rc_x7r_screen", 99e3, 220e-9 * .765)):
+        case = simulate(work, f"b3_bbm_{name}", f"""
+Vold old 0 PWL(0 3 50m 3 50.001m 0)
+Vnew new 0 PWL(0 0 50m 0 50.001m 3)
+Rold old old_rc {resistance}
+Rnew new new_rc {resistance}
+Cold old_rc 0 {capacitance}
+Cnew new_rc 0 {capacitance}
+Doff old_rc dump schottky
+Roff dump old 100
+.model schottky D(Is=1u N=1 Rs=.05)
+""", "2u", "75m", {
+            "old_low_s": "when v(old_rc)=.89 fall=1",
+            "new_high_s": "when v(new_rc)=1.48 rise=1",
+        })
+        measurements = case["measurements"]
+        results[name] = {**case, "command_to_off_s": measurements["old_low_s"] - .05,
+                         "remaining_deadtime_with_500us_total_off_s": measurements["new_high_s"] - .0505}
+    return results
+
+
+def b3_boost_discharge_screen(work):
+    # Upstream DMP3098L-7 opens 5V_DRV_SW at t=0.1m; 100 nF HF + 1 kOhm PD on 5V_DRV_SW and 4.7 uF + active AO3400A/100 ohm bleeder on 10V_DRV discharge < 5 ms.
+    return simulate(work, "b3_boost_disabled_after_run", """
+Vsys sys 0 5.1
+Vgate drv_en 0 PWL(0 3.3 .1m 3.3 .101m 0)
+Ssupply sys drv_sw drv_en 0 pmos_sw
+Cin drv_sw 0 100n IC=5.1
+Rdrv_pd drv_sw 0 1k
+Lboost drv_sw sw_l 10u
+Rl sw_l sw .15
+Csw sw 0 50p
+Dboost sw drv schottky
+Cout drv 0 4.7u IC=11.406
+Rpassive drv 0 10k
+Rfeedback drv 0 190.1k
+Bbleed_ctl bleed_ctl 0 V={3.3*(1-u(v(drv_en)-1.5))}
+Sbleed drv bleed_node bleed_ctl 0 bleed_sw
+Rbleed bleed_node 0 100
+.model pmos_sw SW(Ron=.06 Roff=1e8 Vt=1.5 Vh=.2)
+.model bleed_sw SW(Ron=.05 Roff=1e8 Vt=1.5 Vh=.2)
+.model schottky D(Is=1u N=1 Rs=.05)
+""", "1u", "20m", {
+        "drv_sw_at_5ms_v": "find v(drv_sw) at=5m",
+        "drv_at_5ms_v": "find v(drv) at=5m",
+        "drv_below_50mv_s": "when v(drv)=.05 fall=1",
+    })
+
+
+def b2_lock_review(work):
+    tolerance = .002
+    corners = {
+        "low": (1.15e6 * (1 - tolerance), 12e3 * (1 + tolerance), -15e-9, .396, .387),
+        "nominal": (1.15e6, 12e3, 0, .400, .3945),
+        "high": (1.15e6 * (1 + tolerance), 12e3 * (1 - tolerance), 15e-9, .404, .400),
+    }
+    ov = {}
+    for label, (top, bottom, bias, rising, falling) in corners.items():
+        case = simulate(work, f"b3_ov_{label}", f"""
+Vbus bus 0 PWL(0 35 1m 40 2m 35)
+Rtop bus sense {top}
+Rbottom sense 0 {bottom}
+Ibias sense 0 DC {bias}
+""", "1u", "2m", {
+            "trip_v": f"find v(bus) when v(sense)={rising} rise=1",
+            "release_v": f"find v(bus) when v(sense)={falling} fall=1",
+        })
+        predicted = {key: threshold * (1 + top / bottom) + bias * top
+                     for key, threshold in (("trip_v", rising), ("release_v", falling))}
+        ov[label] = {**case, "analytic_v": predicted}
+    boost_off = simulate(work, "b2_boost_disabled_diode_path", """
+Vsys sys 0 PWL(0 0 1m 5.1 4m 5.1)
+Lboost sys sw 10u
+Dboost sw drv schottky
+Cout drv 0 4.7u
+Rload drv 0 1k
+.model schottky D(Is=1u N=1 Rs=.05)
+""", "1u", "4m", {"drv_v": "find v(drv) at=4m"})
+    epr_power_loss = b3_epr_power_loss(work)
+    epr_gate_rc = b3_epr_gate_rc_screen(work)
+    bbm = b3_bbm_rc_screen(work)
+    boost_discharge = b3_boost_discharge_screen(work)
+    pv_or = b3_pv_or_screen(work)
+    pv_startup_ok = all(
+        case["measurements"]["aux_input_v"] > 4.5
+        and case["measurements"]["pre_3v6_v"] > 3.45
+        and case["measurements"]["sys_5v_v"] > 4.95
+        and abs(case["measurements"]["bus_feed_a"]) < 1e-4
+        for case in pv_or.values()
+    )
+    boost_disconn_ok = (
+        boost_off["measurements"]["drv_v"] > 4
+        and boost_discharge["measurements"]["drv_sw_at_5ms_v"] < .05
+        and boost_discharge["measurements"]["drv_at_5ms_v"] < .05
+        and boost_discharge["measurements"]["drv_below_50mv_s"] < .005
+    )
+    model_pass = (
+        all(abs(case["measurements"][key] - value) < .001
+            for case in ov.values() for key, value in case["analytic_v"].items())
+        and pv_startup_ok
+        and boost_disconn_ok
+    )
+    margin = ov["low"]["measurements"]["trip_v"] - 37.80
+    bov_margin = 40.30 - ov["high"]["measurements"]["trip_v"]
+    # 230.0 kOhm = 220 kOhm (C861231) + 10 kOhm (C5123581) over 10 kOhm (C5123581)
+    bq_nominal = 1.536 * (1 + 230e3 / (10e3 + 33))
+    bq_upper_no_fbg_min = 1.536 * 1.007 * (1 + 230e3 * 1.001 / (10e3 * .999))
+    boost_low = .588 * (1 + 18.01 * .998)
+    boost_high = .612 * (1 + 18.01 * 1.002)
+    gate_min = boost_low - .45 - .2 - .15
+    criteria = {
+        "ov_trip_guard_at_least_200mv": margin >= .2 and bov_margin >= 1,
+        "epr_tvs_clamp_below_powered_protector_abs_max": epr_gate_rc["powered_surge_from_epr"]["measurements"]["peak_v"] <= 59,
+        "epr_voltage_below_unpowered_protector_abs_max": all(
+            epr_gate_rc[name]["measurements"]["peak_v"] <= 22
+            for name in ("unpowered_hotplug_from_zero", "unpowered_step_from_spr")),
+        "epr_power_loss_below_unpowered_protector_abs_max": epr_power_loss["measurements"]["unpowered_peak_v"] <= 22,
+        "b2_pv_only_has_aux_power_path": pv_startup_ok,
+        "disabled_boost_output_disconnected": boost_disconn_ok,
+        "illustrative_low_corner_gate_at_least_10v": gate_min >= 10.35 and boost_high < 12,
+        "bq_default_cv_upper_below_37p45v": bq_upper_no_fbg_min < 37.45,
+        "bbm_deadtime_at_least_5ms": all(case["remaining_deadtime_with_500us_total_off_s"] > .005 for case in bbm.values()),
+    }
+    return {
+        "status": "PASS_MODEL" if model_pass else "FAIL_MODEL",
+        "design_status": "PASS" if all(criteria.values()) else "BLOCKED",
+        "criteria": criteria,
+        "regen_window": {
+            "bq_divider_only_nominal_v": 1.536 * (1 + 230e3 / 10e3),
+            "bq_nominal_v_with_33ohm_fbg": bq_nominal,
+            "bq_upper_v_without_guaranteed_fbg_min": bq_upper_no_fbg_min,
+            "bq_register_output_step_v_with_33ohm_fbg": .002 * (1 + 230e3 / (10e3 + 33)),
+            "running_hardware_default_nominal_v": bq_nominal, "parked_calibrated_target_range_v": [37.65, 37.70],
+            "parked_hard_ceiling_v": 37.80, "min_trip_margin_above_parked_ceiling_v": margin,
+            "min_frozen_bov_margin_v": bov_margin,
+            "ov_divider_power_mw_at_36v": 1000 * 36**2 / 1162e3, "ov_corners": ov,
+        },
+        "aux": {"nominal_pre_5v_and_drv_v": [3.60, 5.10, 11.406],
+                "ideal_buck_duty_at_4p65v": 3.60 / 4.65,
+                "gate_rail_corners_v": [boost_low, boost_high], "illustrative_low_corner_vgs_v": gate_min,
+                "boost_disabled_negative_control": boost_off, "boost_post_disable_discharge": boost_discharge,
+                "pv_or_front_end_screen": pv_or},
+        "epr_power_loss_screen": epr_power_loss,
+        "epr_gate_rc_screen": epr_gate_rc,
+        "bbm_rc_screen": bbm,
+        "scope": "B4a circuit-level screens using locked B4 parameters (10 ohm series limiter, active PNP fast turn-off, "
+                 "10 nF prot cap with self-powered 100 ohm active bleeder, 230k/10k BQ default divider, 220 nF X7R BBM, "
+                 "4.7 uF + active 100 ohm 10V_DRV bleeder, SS310 PV-to-AUX_HV_IN behavioral startup). "
+                 "Behavioral switches/diodes do not replace physical bench thermal/hot-plug qualification.",
     }
 
 
 def pd_modes(work):
     results = []
-    loss_r = 2 * .006 + .018 + .002
-    fs = 250_000
+    fet_r_25c = .0053
+    assumed_hot_multiplier = 1.6
+    dcr_25c = .0101
+    assumed_hot_dcr = .018
+    shunt_r = .002
+    saturation_a, rms_rating_a = 21, 11
+    overlaps_s, gate_charge_c = 100e-9, 73e-9
     l_min = 8e-6
-    for vin, imax, vout in [(5, 3, 37.6), (28, 5, 22.5), (28, 5, 37.6),
-                           (48, 5, 22.5), (48, 5, 37.6)]:
+    corners = [(volts, 3 if volts == 5 else 5, bus, 250_000)
+               for volts in (5, 9, 12, 15, 20, 28, 36, 48) for bus in (22.5, 37.6)]
+    corners.append((48, 5, 22.5, 212_000))
+    for vin, imax, vout, fs in corners:
         delivered = vin * imax * .90
         inductor_avg = imax if vin < vout else delivered / vout
         seconds = 1 / fs
@@ -296,7 +615,7 @@ def pd_modes(work):
         hi, lo = ((vin - vout), -vout) if buck else (vin, vin-vout)
         ripple = hi * duty * seconds / l_min
         peak = inductor_avg + ripple / 2
-        case = simulate(work, f"pd_{vin}_{str(vout).replace('.', '_')}", f"""
+        case = simulate(work, f"pd_{vin}_{int(vout * 10)}_{fs}", f"""
 Vg gate 0 PULSE(1 0 {duty*seconds:.9g} .2n .2n {(1-duty)*seconds-4e-10:.9g} {seconds:.9g})
 Bstress sw 0 V={lo:.9g}+({hi:.9g}-({lo:.9g}))*V(gate)
 L current 0 {l_min:.9g} ic={inductor_avg-ripple/2:.9g}
@@ -309,41 +628,70 @@ Bsq sar 0 V=I(Vsense)^2
         })
         m = case["measurements"]
         m["inductor_rms_a"] = math.sqrt(m["mean_squared_a2"])
-        m["conduction_only_loss_w"] = m["mean_squared_a2"] * loss_r
+        m["isat_headroom_a"] = saturation_a - m["inductor_peak_a"]
+        m["irms_headroom_a"] = rms_rating_a - m["inductor_rms_a"]
+        loss = {
+            "two_fets_25c_w": m["mean_squared_a2"] * 2 * fet_r_25c,
+            "two_fets_assumed_hot_w": m["mean_squared_a2"] * 2 * fet_r_25c * assumed_hot_multiplier,
+            "inductor_copper_25c_w": m["mean_squared_a2"] * dcr_25c,
+            "inductor_copper_assumed_hot_w": m["mean_squared_a2"] * assumed_hot_dcr,
+            "input_and_output_shunts_w": shunt_r * (imax**2 + (delivered / vout)**2),
+            "hard_switch_overlap_screen_w": .5 * max(vin, vout) * inductor_avg * overlaps_s * fs,
+            "two_switching_gates_at_10v_w": 2 * 10 * gate_charge_c * fs,
+        }
+        passed = abs(m["inductor_peak_a"] - peak) < .03 and min(m["isat_headroom_a"], m["irms_headroom_a"]) > 0
         results.append({
             "input_v": vin, "pdo_current_a": imax, "bus_v": vout, "output_power_w_at_90pct": delivered,
-            "loss_budget_at_90pct_w": vin * imax - delivered,
+            "loss_budget_at_90pct_w": vin * imax - delivered, "frequency_hz": fs, "loss_screen": loss,
             "mode": "buck" if buck else "boost", "theoretical_peak_a": peak,
-            "nominal_10a_as_peak": "FAIL" if m["inductor_peak_a"] > 10 else "PASS_MODEL", **case,
+            "status": "PASS_MODEL" if passed else "FAIL_MODEL", **case,
         })
-    return {"status": "THERMAL_AND_SWITCHING_UNVERIFIED", "cases": results,
-            "assumptions": {"frequency_hz": fs, "inductance_worst_h": l_min, "efficiency_for_budget": .90,
-                            "two_hot_fets_ohm_each": .006, "inductor_dcr_ohm": .018, "shunt_ohm": .002},
-            "scope": "Ideal inductor voltage stress and conduction-loss screen, not a BQ25756 power/thermal model. "
-                     "5 V 3 A is conditional on negotiated/advertised 3 A. Check 4.35 V VINDPM before enabling full current. "
-                     "Switching, deadtime, AC/core loss and junction rise require exact parts and layout."}
+    return {"status": "PASS_MODEL" if all(case["status"] == "PASS_MODEL" for case in results) else "FAIL_MODEL",
+            "cases": results,
+            "aux_5v_buck_negative_control": {"usb_nominal_v": 5.0, "assumed_schottky_drop_v": .35,
+                                            "aux_after_diode_v": 4.65, "required_buck_output_v": 5.0,
+                                            "required_ideal_duty": 5 / 4.65,
+                                            "status": "CANNOT_REGULATE_5V_FROM_5V_ONLY"},
+            "assumptions": {"inductor": "CODACA CSBX1275-100M", "isat_a": saturation_a, "irms_a": rms_rating_a,
+                            "inductance_worst_h": l_min, "efficiency_for_budget": .90,
+                            "mosfet": "HUAYI HYG053N10NS1C2", "vgs_v": 10, "fet_r_25c_max_ohm": fet_r_25c,
+                            "assumed_hot_r_multiplier": assumed_hot_multiplier, "gate_charge_typ_c": gate_charge_c,
+                            "rise_plus_fall_typ_s": overlaps_s, "inductor_dcr_max_25c_ohm": dcr_25c,
+                            "assumed_hot_inductor_dcr_ohm": assumed_hot_dcr, "each_shunt_assumed_ohm": shunt_r},
+            "scope": "Ideal buck/boost switching-cell stress screen with 90% output power assumption, not BQ control or thermal validation. "
+                     "Input cases are illustrative, not evidence of PDO/cable support or 5 V cold start. Isat is a datasheet L-drop point, "
+                     "Irms a temperature-rise point, neither is a hard board limit. The switching screen omits Coss, reverse recovery, "
+                     "deadtime, overlap-mode operation, core loss, transient loading and junction rise."}
 
 
 def energy_budget():
     pack_wh = 9 * 3.6 * 15
     survival_reserve_wh = pack_wh * (0.25 - 0.10)
     cold_sensitivity_wh = survival_reserve_wh * .65
-    sleep = {"AFE_and_RTC": 2, "BMS_quiescent_regulator_and_sleep_controller": 10,
-             "MPPT_source_detection_and_sleep": 5, "hardware_watchdog_and_LP_relay_interfaces": 3,
-             "pack_sense_leakage_and_other_ALWAYS_ON": 20, "margin": 10}
+    baseline_mw = (80, 130)
+    planning_mw = 50
     solar = {str(hours): 120 * hours * .65 for hours in (.0, .5, 1., 4., 5.)}
     heater_wh = 40 * .5
-    sleep_wh = sum(sleep.values()) * 24 / 1000
+    sleep_wh = planning_mw * 24 / 1000
     daily_logic = .75 * 4
     return {
         "status": "CONDITIONAL_BUDGET_ONLY", "nominal_pack_wh": pack_wh,
         "survival_soc_fraction_start_end": [.25, .10], "usable_reserve_wh_nominal": survival_reserve_wh,
         "usable_reserve_wh_with_65pct_capacity_sensitivity": cold_sensitivity_wh,
-        "tier0_allocations_mw_not_measured": sleep, "tier0_consumption_wh_per_day_at_50mw": sleep_wh,
+        "tier0_board6_only": {"target_exclusive_mw": 5, "status": "DESIGN_TARGET_NOT_MEASURED",
+                              "scope": "Includes dark-state bias, sensing, watchdog and all board leakage."},
+        "tier0_vehicle_frozen_bms_run": {"estimate_mw": baseline_mw, "status": "ESTIMATE_NOT_MEASURED",
+                                        "bms_can": "CA-IS2062A remains on VOUT_5V",
+                                        "wh_per_day": [mw * 24 / 1000 for mw in baseline_mw],
+                                        "cold_zero_sun_days": [cold_sensitivity_wh / (mw * .024)
+                                                               for mw in reversed(baseline_mw)]},
+        "tier0_vehicle_bms_rev2": {"target_exclusive_mw": planning_mw, "status": "PLAN_NOT_IMPLEMENTED",
+                                  "prerequisite": "Switch off BMS CAN rail; no modification to frozen BMS."},
+        "tier0_consumption_wh_per_day_at_50mw": sleep_wh,
         "solar_net_harvest_wh_by_equivalent_sun_hours": solar,
         "example_heater_w": 40, "example_heater_operating_h": .5, "example_heater_wh": heater_wh,
         "daily_tier1_controller_wh_if_4h_irradiated": daily_logic,
-        "sunny_day_remaining_wh_after_heater_sleep_and_tier1": [
+        "sunny_day_remaining_wh_at_50mw_planning_after_heater_sleep_and_tier1": [
             solar[str(hours)] - heater_wh - sleep_wh - daily_logic for hours in (4., 5.)
         ],
         "zero_sun_days_at_50mw_nominal_and_65pct": [
@@ -364,7 +712,8 @@ def main():
     tasks = {"solar_3_channel": pv_model, "dark_to_sun_bus_zero": cold_start,
              "recovery_interface_ld_probe": ld_wake_probe,
              "recovery_interface_charge_window": charge_window_model,
-             "regen_cutback": regen_window, "usb_pd_boundaries": pd_modes}
+             "regen_cutback": regen_window, "usb_pd_boundaries": pd_modes,
+             "b2_lock_review": b2_lock_review}
     with TemporaryDirectory(prefix="ev_mppt_spice_") as temp, ThreadPoolExecutor(max_workers=len(tasks)) as pool:
         runs = {key: pool.submit(fn, Path(temp)) for key, fn in tasks.items()}
         scenarios = {key: call.result() for key, call in runs.items()}
@@ -377,12 +726,18 @@ def main():
     }
     OUT.write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
                    encoding="utf-8", newline="\n")
-    print(json.dumps({key: value.get("status", value.get("pack_charge"))
-                      for key, value in scenarios.items()}, ensure_ascii=False))
-    return int(scenarios["solar_3_channel"]["status"] != "PASS_MODEL" or
+    summary = {key: value.get("status", value.get("pack_charge")) for key, value in scenarios.items()}
+    summary["b2_design"] = scenarios["b2_lock_review"]["design_status"]
+    print(json.dumps(summary, ensure_ascii=False))
+    probe = scenarios["recovery_interface_ld_probe"]["cases_by_assumed_load_ma"]
+    return int(summary["b2_design"] != "PASS" or
+               scenarios["solar_3_channel"]["status"] != "PASS_MODEL" or
                scenarios["dark_to_sun_bus_zero"]["local_bias"] != "PASS_MODEL" or
                scenarios["dark_to_sun_bus_zero"]["isolation_negative_control"] != "PASS_MODEL" or
-               scenarios["recovery_interface_charge_window"]["status"] != "PASS_MODEL")
+               not probe["10"]["vld_threshold_crossing_supported_in_model"] or
+               probe["60"]["vld_threshold_crossing_supported_in_model"] or
+               any(scenarios[name]["status"] != "PASS_MODEL" for name in (
+                   "recovery_interface_charge_window", "regen_cutback", "usb_pd_boundaries", "b2_lock_review")))
 
 
 if __name__ == "__main__":
