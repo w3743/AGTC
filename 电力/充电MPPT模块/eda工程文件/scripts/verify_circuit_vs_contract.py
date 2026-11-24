@@ -4,4 +4,4 @@ PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT.parents[1] / "检查/联合仿真/code_as_eda"))
 from reference import verify_cli
 if __name__ == "__main__":
-    verify_cli(PROJECT, 433)
+    verify_cli(PROJECT, 452)

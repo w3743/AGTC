@@ -5,7 +5,7 @@
     "binary": "电力/FOC驱动模块/仿真/tools/ngspice-47-portable/Spice64/bin/ngspice_con.exe",
     "sha256": "22d5cae2bd32b2e39157a8d27bf457122f68285b72a9ebefdf41551b628233ab"
   },
-  "script_sha256": "0faf8fc99b9e68c4146fa93e20f7179708cde7b2ac865be138ce242753c0d932",
+  "script_sha256": "88fdcfff54df2020def833364509f5c3777d3064cbd620421f238e6fc2c336d3",
   "conditions": {
     "solar_3_channel": {
       "measurements": {
@@ -945,6 +945,71 @@
         }
       },
       "scope": "B4a circuit-level screens using locked B4 parameters (10 ohm series limiter, active PNP fast turn-off, 10 nF prot cap with self-powered 100 ohm active bleeder, 230k/10k BQ default divider, 220 nF X7R BBM, 4.7 uF + active 100 ohm 10V_DRV bleeder, SS310 PV-to-AUX_HV_IN behavioral startup). Behavioral switches/diodes do not replace physical bench thermal/hot-plug qualification."
+    },
+    "one_shot_risk_screens": {
+      "status": "PASS_MODEL",
+      "usb_5v_cold_start_assist": {
+        "measurements": {
+          "vpre_4v5": 3.46343,
+          "vvpwr_4v5": 3.23663,
+          "vpre_4v75": 3.46915,
+          "vpre_9v": 3.54446,
+          "vtlv_max": 3.032,
+          "vdrvb_48v": 0.0258072,
+          "vdrvb_82v": 0.0268085,
+          "pqpass_4v75": 0.0882305
+        },
+        "deck_sha256": "a6f90b1b40af5a2bdb293d0fdb3c32898ef2c3aaff3db37ccc22995be882c63c",
+        "status": "PASS_MODEL"
+      },
+      "bq_acuv_and_cv_corners": {
+        "acuv_nominal_v": 4.01783042394015,
+        "acuv_upper_v": 4.198509731676813,
+        "usb_4v75_margin_v": 0.551490268323187,
+        "cv_untrimmed_v": 37.05440027123697,
+        "cv_trimmed_v": 37.407434746586134,
+        "dac_vfb_for_37p2_v": 1.546414876932433,
+        "max_code_cv_at_corner_v": 37.67113267531332,
+        "vfb_max_v": 1.566,
+        "assumptions": "CV low corner: 230k top -0.1%, 10k bottom and 1M trim +0.1%, 55 ohm series FBG, VFB at 1.566 V minus 0.7%; DAC voltage is calibrated at this corner.",
+        "status": "PASS_MODEL"
+      },
+      "vom1271_switch_inrush_and_soa": {
+        "pd_5v": {
+          "measurements": {
+            "i_peak_a": 39.3716,
+            "p_peak_w": 27.7599,
+            "e_total_j": 0.000722562,
+            "t_90_s": 0.000585895
+          },
+          "deck_sha256": "1193d3188a21799de0cf21e877a6ead7b727a10f85b08b6c4111dadaee41ea2c",
+          "status": "PASS_MODEL"
+        },
+        "xt60_48v": {
+          "measurements": {
+            "i_peak_a": 391.215,
+            "p_peak_w": 2259.46,
+            "e_total_j": 0.0591596,
+            "t_90_s": 0.000584627
+          },
+          "deck_sha256": "3fa8d37d803f1becdd5742ba7082ba9759b4d513c932b9d6ea508788467f765c",
+          "operational_rule": "Connect XT60 with source disabled or pre-ramped, or verify 48 V hot-plug SOA on bench."
+        },
+        "status": "PASS_MODEL",
+        "scope": "Simplified MOSFET model and lumped energy are not a device SOA or hot-plug qualification."
+      },
+      "pv_mosfet_merge_and_sku_summary": {
+        "rms_a_squared": 26.795809030674665,
+        "hyg080n10ls1c2_w_per_fet": 0.18489108231165519,
+        "hyg053n10ns1c2_w_per_fet": 0.1420177878625757,
+        "delta_w_per_fet": 0.04287329444907946,
+        "ina293a1_common_mode_v": 110,
+        "comparison_common_mode_v": 26,
+        "bat46w_vrrm_v": 100,
+        "comparison_vrrm_v": 70,
+        "scope": "60 W, 12 V to 37.6 V, 100 kHz; full inductor RMS through each FET is a conservative comparison at 10 V gate and typical resistance, not thermal validation.",
+        "status": "PASS_MODEL"
+      }
     }
   },
   "energy": {

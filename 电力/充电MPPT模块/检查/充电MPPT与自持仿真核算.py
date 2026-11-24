@@ -705,6 +705,122 @@ def energy_budget():
     }
 
 
+def one_shot_risk_screens(work):
+    cold = simulate(work, "one_shot_cold_assist", """
+.model QNPN NPN(IS=1e-14 BF=150 VAF=100)
+.model QPNP PNP(IS=1e-14 BF=200 VAF=100)
+.model DSS310 D(IS=2e-6 N=1.05 RS=0.05)
+.model DBAT46 D(IS=5e-7 N=1.05 RS=0.4)
+.subckt TLV431 ref cat ano
+Bik cat ano I=5e-7 + 0.02*(1/(1+exp(-(V(ref,ano)-1.240)/0.002)))*u(V(cat,ano)-1.24)
+Cka cat ano 10p
+.ends TLV431
+Vusb pd_raw 0 PWL(0 0 0.5m 4.50 15m 4.50 15.5m 4.75 30m 4.75 30.5m 5.25 45m 5.25 45.5m 9.0 60m 9.0 60.5m 48.0 75m 48.0 75.5m 82.0 85m 82.0)
+Daux pd_raw aux_hv DSS310
+Caux aux_hv 0 4.7u
+Vpass_s aux_hv pass_e 0
+Rbe aux_hv pass_b 10k
+Qpass pre3v6 pass_b pass_e QPNP
+Rb pass_b drv_c 1k
+Qdrv drv_c drv_b 0 QNPN
+Rstart aux_hv drv_b 100k
+Rov_top aux_hv ov_b 100k
+Rov_bot ov_b 0 10k
+Qov drv_b ov_b 0 QNPN
+Rfb_top pre3v6 ref_n 20k
+Rfb_bot1 ref_n fb_mid 10k
+Rfb_bot2 fb_mid 0 1k
+Xref ref_n tlv_k 0 TLV431
+Rerr_be pre3v6 tlv_k 2k
+Qerr err_c tlv_k pre3v6 QPNP
+Rerr_c err_c shunt_b 10k
+Qshunt drv_b shunt_b 0 QNPN
+Ccomp tlv_k ref_n 100n
+Bbuck 0 pre3v6 I=max(0,(3.600-V(pre3v6))*2.0)*u(V(aux_hv)-4.7)
+Cpre pre3v6 0 47u
+Rload pre3v6 0 40
+Dvpwr pre3v6 vpwr DBAT46
+Cvpwr vpwr 0 10u
+Rvpwr vpwr 0 1.6k
+Bp_cold pcold 0 V=abs((V(aux_hv)-V(pre3v6))*I(Vpass_s))
+""", "20u", "85m", {
+        "vpre_4v5": "avg v(pre3v6) from=10m to=14.5m",
+        "vvpwr_4v5": "avg v(vpwr) from=10m to=14.5m",
+        "vpre_4v75": "avg v(pre3v6) from=25m to=29.5m",
+        "vpre_9v": "avg v(pre3v6) from=55m to=59.5m",
+        "vtlv_max": "max v(tlv_k) from=0 to=85m",
+        "vdrvb_48v": "avg v(drv_b) from=65m to=74m",
+        "vdrvb_82v": "avg v(drv_b) from=78m to=84m",
+        "pqpass_4v75": "avg v(pcold) from=25m to=29.5m",
+    })
+    m = cold["measurements"]
+    cold["status"] = "PASS_MODEL" if (m["vpre_4v5"] >= 3.40 and m["vvpwr_4v5"] >= 3.15
+        and m["vtlv_max"] <= 4.0 and m["vdrvb_48v"] <= .1 and m["vdrvb_82v"] <= .1
+        and m["pqpass_4v75"] <= .15) else "FAIL_MODEL"
+
+    acuv_nom = 1.15 * (1 + 100e3 / 40.1e3)
+    acuv_high = 1.20 * (1 + 100e3 * 1.001 / (40.1e3 * .999))
+    fb = 1.566 * .993
+    top = 230e3 * .999
+    bottom = 10e3 * 1.001 + 55
+    trimmed_bottom = 1 / (1 / (10e3 * 1.001) + 1 / (1e6 * 1.001)) + 55
+    cv_untrimmed = fb * (1 + top / bottom)
+    cv_trimmed = fb * (1 + top / trimmed_bottom)
+    dac_for_37p2 = 37.2 / (1 + top / trimmed_bottom)
+    max_code_cv = 1.566 * (1 + top / trimmed_bottom)
+    corners = {"acuv_nominal_v": acuv_nom, "acuv_upper_v": acuv_high,
+               "usb_4v75_margin_v": 4.75 - acuv_high,
+               "cv_untrimmed_v": cv_untrimmed, "cv_trimmed_v": cv_trimmed,
+               "dac_vfb_for_37p2_v": dac_for_37p2, "max_code_cv_at_corner_v": max_code_cv, "vfb_max_v": 1.566,
+               "assumptions": "CV low corner: 230k top -0.1%, 10k bottom and 1M trim +0.1%, 55 ohm series FBG, VFB at 1.566 V minus 0.7%; DAC voltage is calibrated at this corner."}
+    corners["status"] = "PASS_MODEL" if (acuv_high <= 4.21 and 4.75 - acuv_high > .54
+        and 37.04 < cv_untrimmed < 37.07 and cv_trimmed > 37.20
+        and cv_trimmed <= 37.80 and dac_for_37p2 <= 1.566) else "FAIL_MODEL"
+
+    switches = {}
+    for label, voltage in (("pd_5v", 5), ("xt60_48v", 48)):
+        switches[label] = simulate(work, f"one_shot_vom_{label}", f"""
+Vsrc src 0 {voltage}
+Rwire src src_w 0.05
+Ivom vs_n gate PWL(0 0 0.49m 0 0.50m 15u 15m 15u)
+Bclamp gate vs_n I=max(0,(V(gate,vs_n)-8.4)*0.01)
+Rgs_lkg gate vs_n 100meg
+Rg1 gate g1 22
+Rg2 gate g2 22
+M1 src_w g1 vs_n vs_n QMOS
+D1 vs_n src_w DMOD
+M2 out g2 vs_n vs_n QMOS
+D2 vs_n out DMOD
+Cbulk out bulk_esr 470u ic=0
+Resr bulk_esr 0 0.04
+Cmlcc out 0 14u ic=0
+Rload out 0 1k
+Bpm pm 0 V=abs(V(src_w,out)*(-I(Vsrc)))
+Bi_probe iprobe 0 V=-I(Vsrc)
+.model QMOS NMOS(LEVEL=1 VTO=2.0 KP=80 RD=0.004 RS=0.003 CGSO=1.8e-9 CGDO=1.2e-10)
+.model DMOD D(IS=1e-9 N=1.1 RS=0.01)
+""", "20u", "15m", {"i_peak_a": "max v(iprobe) from=0.5m to=15m",
+        "p_peak_w": "max v(pm) from=0.5m to=15m",
+        "e_total_j": "integ v(pm) from=0.5m to=15m",
+        "t_90_s": f"when v(out)={voltage * .9} rise=1"})
+    switches["pd_5v"]["status"] = "PASS_MODEL" if switches["pd_5v"]["measurements"]["e_total_j"] < .015 else "FAIL_MODEL"
+    switches["xt60_48v"]["operational_rule"] = "Connect XT60 with source disabled or pre-ramped, or verify 48 V hot-plug SOA on bench."
+    switches["status"] = switches["pd_5v"]["status"]
+    switches["scope"] = "Simplified MOSFET model and lumped energy are not a device SOA or hot-plug qualification."
+
+    rms2 = pv_power_stage_screen()["rms_a"] ** 2
+    sku = {"rms_a_squared": rms2, "hyg080n10ls1c2_w_per_fet": rms2 * .0069,
+           "hyg053n10ns1c2_w_per_fet": rms2 * .0053,
+           "delta_w_per_fet": rms2 * (.0069 - .0053),
+           "ina293a1_common_mode_v": 110, "comparison_common_mode_v": 26,
+           "bat46w_vrrm_v": 100, "comparison_vrrm_v": 70,
+           "scope": "60 W, 12 V to 37.6 V, 100 kHz; full inductor RMS through each FET is a conservative comparison at 10 V gate and typical resistance, not thermal validation."}
+    sku["status"] = "PASS_MODEL" if sku["delta_w_per_fet"] < .06 else "FAIL_MODEL"
+    checks = {"usb_5v_cold_start_assist": cold, "bq_acuv_and_cv_corners": corners,
+              "vom1271_switch_inrush_and_soa": switches, "pv_mosfet_merge_and_sku_summary": sku}
+    return {"status": "PASS_MODEL" if all(x["status"] == "PASS_MODEL" for x in checks.values()) else "FAIL_MODEL", **checks}
+
+
 def main():
     version = subprocess.run([SPICE, "--version"], capture_output=True, check=True, text=True).stdout
     if "ngspice-47" not in version:
@@ -713,7 +829,7 @@ def main():
              "recovery_interface_ld_probe": ld_wake_probe,
              "recovery_interface_charge_window": charge_window_model,
              "regen_cutback": regen_window, "usb_pd_boundaries": pd_modes,
-             "b2_lock_review": b2_lock_review}
+             "b2_lock_review": b2_lock_review, "one_shot_risk_screens": one_shot_risk_screens}
     with TemporaryDirectory(prefix="ev_mppt_spice_") as temp, ThreadPoolExecutor(max_workers=len(tasks)) as pool:
         runs = {key: pool.submit(fn, Path(temp)) for key, fn in tasks.items()}
         scenarios = {key: call.result() for key, call in runs.items()}
@@ -731,6 +847,7 @@ def main():
     print(json.dumps(summary, ensure_ascii=False))
     probe = scenarios["recovery_interface_ld_probe"]["cases_by_assumed_load_ma"]
     return int(summary["b2_design"] != "PASS" or
+               scenarios["one_shot_risk_screens"]["status"] != "PASS_MODEL" or
                scenarios["solar_3_channel"]["status"] != "PASS_MODEL" or
                scenarios["dark_to_sun_bus_zero"]["local_bias"] != "PASS_MODEL" or
                scenarios["dark_to_sun_bus_zero"]["isolation_negative_control"] != "PASS_MODEL" or

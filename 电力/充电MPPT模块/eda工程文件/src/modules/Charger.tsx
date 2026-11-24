@@ -1,6 +1,7 @@
 import { SchematicSection } from "../../../../检查/联合仿真/code_as_eda/renderer"
 
 export const ChargerRefs = [
+  "R_BQ_FB_TRIM_DNP",
   "Q_XT60_CTL",
   "R_XT60_CMD_SER",
   "R_XT60_CMD_PD",

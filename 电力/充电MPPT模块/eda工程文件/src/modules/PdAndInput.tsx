@@ -1,6 +1,7 @@
 import { SchematicSection } from "../../../../检查/联合仿真/code_as_eda/renderer"
 
 export const PdAndInputRefs = [
+  "C_PD_VBUS_LV_DNP",
   "C_PD_CC1", "C_PD_CC2",
   "C_PD_VBUS_LV", "C_PD_VIN3V3", "D_PD_VIN33_PRE", "Q_PD_PPATH_BUF", "Q_PD_PPATH_INV", "R_PD_PPATH_N_PU", "R_PD_PPATH_PU",
   "C_EPR_PROT",

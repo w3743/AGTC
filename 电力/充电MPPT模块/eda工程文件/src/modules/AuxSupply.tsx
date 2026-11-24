@@ -1,6 +1,9 @@
 import { SchematicSection } from "../../../../检查/联合仿真/code_as_eda/renderer"
 
 export const AuxSupplyRefs = [
+  "C_COLD_COMP", "Q_COLD_DRV", "Q_COLD_ERR", "Q_COLD_OV", "Q_COLD_PASS", "Q_COLD_SHUNT",
+  "R_COLD_B", "R_COLD_BE", "R_COLD_ERR_BE", "R_COLD_ERR_C", "R_COLD_FB_BOT1", "R_COLD_FB_BOT2",
+  "R_COLD_FB_TOP", "R_COLD_OV_BOT", "R_COLD_OV_TOP", "R_COLD_START", "U_COLD_REF",
   "J_CORE_P1",
   "J_CORE_P2",
   "J_CAN",
