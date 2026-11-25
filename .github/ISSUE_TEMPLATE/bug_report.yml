@@ -1,0 +1,59 @@
+name: 缺陷报告 (Bug Report)
+description: 反馈代码、固件、硬件资料、仿真工具或仓库配置中的缺陷
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: 感谢反馈问题！若涉及高风险安全漏洞或失控隐患，请勿公开提交，改用 Security 页面私密报告。
+  - type: dropdown
+    id: module
+    attributes:
+      label: 所属模块
+      options:
+        - 算法
+        - 电力
+        - 固件
+        - 机械
+        - 通信
+        - 仓库配置/文档
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 简明扼要地说明遇到了什么异常或错误。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 列出触发该问题所需的输入、命令、操作或工况步骤。
+      placeholder: |
+        1. 检出分支/配置 ...
+        2. 执行命令或进入工况 ...
+        3. 观察到现象 ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_actual
+    attributes:
+      label: 期望行为与实际行为
+      description: 说明正常情况下应有的表现，以及实际观察到的输出、告警或硬件表现。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 环境与版本
+      description: 填写分支名、提交哈希、操作系统、编译器/仿真器或硬件板卡版本。
+      placeholder: "例如：main @ b7042619 / Windows 11 / STM32G431 / ngspice-47"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 日志、波形或截图补充
+      description: 可粘贴报错文本、关键日志片段或附带截图说明（注意移除任何敏感路径或凭据）。
