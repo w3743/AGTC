@@ -45,12 +45,13 @@ export function useShortNetLabels(circuitJson: CircuitJson, displayNames: Readon
     const end = { x: start.x + direction.x * stubLength, y: start.y + direction.y * stubLength }
     const text = displayNames.get(net.name) ?? net.name
     const labelOffset = direction.x ? (text.length * 0.055 + 0.08) : 0.13
+    const sheetProp = sheet ? { schematic_sheet_id: sheet.schematic_sheet_id } : {}
     const label: Label = {
       type: "schematic_net_label",
       schematic_net_label_id: `schematic_net_label_${trace.source_trace_id}`,
       source_net_id: net.source_net_id,
       source_trace_id: trace.source_trace_id,
-      schematic_sheet_id: sheet?.schematic_sheet_id,
+      ...sheetProp,
       anchor_side: direction.anchor,
       anchor_position: end,
       center: { x: end.x + direction.x * labelOffset, y: end.y + direction.y * labelOffset },
@@ -60,7 +61,7 @@ export function useShortNetLabels(circuitJson: CircuitJson, displayNames: Readon
       type: "schematic_trace",
       schematic_trace_id: `schematic_trace_${trace.source_trace_id}`,
       source_trace_id: trace.source_trace_id,
-      schematic_sheet_id: sheet?.schematic_sheet_id,
+      ...sheetProp,
       edges: [{ from: start, to: end }],
       junctions: [],
       subcircuit_connectivity_map_key: trace.subcircuit_connectivity_map_key,
@@ -74,7 +75,10 @@ export function useShortNetLabels(circuitJson: CircuitJson, displayNames: Readon
 export function enlargeSvgAnnotations(svg: string) {
   // Use plain net names with wire stubs. The stock label outlines are
   // sized for the converter's original text and obscure larger lettering.
-  const withoutLabelOutlines = svg.replace(/<path class="net-label sch-net-label"[^>]*\/>/g, "")
+  // Also strip any paper sheet border group so the SVG canvas stays borderless.
+  const withoutLabelOutlines = svg
+    .replace(/<g class="schematic-sheet"[^>]*>[\s\S]*?<\/g>/g, "")
+    .replace(/<path class="net-label sch-net-label"[^>]*\/>/g, "")
   return withoutLabelOutlines.replace(/<text\b[^>]*>/g, (tag) => {
     const cssClass = tag.match(/\bclass="([^"]*)"/)?.[1] ?? ""
     let scale = 1

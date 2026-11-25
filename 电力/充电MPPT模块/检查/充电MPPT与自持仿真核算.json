@@ -1,0 +1,1074 @@
+{
+  "status": "BOUNDARY_SIMULATION_COMPLETE_FINAL_SCHEMATIC_PENDING",
+  "engine": {
+    "version": "ngspice-47",
+    "binary": "电力/FOC驱动模块/仿真/tools/ngspice-47-portable/Spice64/bin/ngspice_con.exe",
+    "sha256": "22d5cae2bd32b2e39157a8d27bf457122f68285b72a9ebefdf41551b628233ab"
+  },
+  "script_sha256": "88fdcfff54df2020def833364509f5c3777d3064cbd620421f238e6fc2c336d3",
+  "conditions": {
+    "solar_3_channel": {
+      "measurements": {
+        "p1_unshaded_w": 19.7243,
+        "p1_shaded_w": 19.6859,
+        "p1_unplug_w": 19.6583,
+        "i1_min_a": 0.0,
+        "p2_unshaded_w": 59.1359,
+        "p2_shaded_w": 16.6331,
+        "p2_unplug_w": 0.0,
+        "i2_min_a": 0.0,
+        "p3_unshaded_w": 39.1818,
+        "p3_shaded_w": 39.3001,
+        "p3_unplug_w": 39.1136,
+        "i3_min_a": 0.0
+      },
+      "deck_sha256": "e903abe8d1df58b5d4699ec10b8a92afe75451f8798a426787a726a3a8403993",
+      "status": "PASS_MODEL",
+      "irradiance_inputs": [
+        {
+          "vmp_v": 12.0,
+          "voc_v": 15.0,
+          "rated_w": 20.0,
+          "after_shade": 1.0
+        },
+        {
+          "vmp_v": 18.0,
+          "voc_v": 22.0,
+          "rated_w": 60.0,
+          "after_shade": 0.28
+        },
+        {
+          "vmp_v": 16.0,
+          "voc_v": 20.0,
+          "rated_w": 40.0,
+          "after_shade": 1.0
+        }
+      ],
+      "power_stage_screen": {
+        "scope": "Single-channel 60 W analytical screen, not a controller, peak-current protection or thermal test. 100 kHz is a comparison point, and 10 V VGS is an assumption, not a demonstrated gate voltage.",
+        "input_v": 12,
+        "bus_proxy_v": 37.6,
+        "average_a": 5,
+        "frequency_hz": 100000,
+        "minimum_l_h": 1.76e-05,
+        "ideal_duty": 0.6808510638297873,
+        "ripple_pp_a": 4.642166344294004,
+        "peak_a": 7.321083172147002,
+        "rms_a": 5.176466848215553,
+        "screen_isat_a": 9.5,
+        "screen_irms_a": 8.0,
+        "mosfet_pair_conduction_at_10v_25c_w": 0.1420177878625757,
+        "mosfet_pair_conduction_at_assumed_1p6_r_multiplier_w": 0.22722846058012114,
+        "inductor_copper_25c_w": 0.476965400746009,
+        "hard_switch_overlap_at_assumed_100ns_w": 0.94,
+        "gate_charge_at_10v_typ_w": 0.146
+      },
+      "scope": "P&O on idealized single-knee I–V curves, averaged power stage, ideal unidirectional output. No measured PV curves, device-specific reverse current or local-shading global maximum proof."
+    },
+    "dark_to_sun_bus_zero": {
+      "measurements": {
+        "local_3v3_v": 3.0,
+        "bus_v": 3.54584e-08,
+        "batt_current_a": -2.25e-08,
+        "wake_crossing_s": 0.0104534
+      },
+      "deck_sha256": "86bf20952058d51c28391fcb56c9a7ae215d50812de4a90c08077030a2ddb878",
+      "local_bias": "PASS_MODEL",
+      "pack_charge": "BLOCKED_BY_FROZEN_INTERFACE",
+      "scope": "Ideal powered bias with example 12 V source after diode OR. Both BMS FETs and charger output isolation off. Nanoamp leakage is model-only. AFE wake and charge are separate.",
+      "boost_body_diode_negative_control": {
+        "measurements": {
+          "bare_bus_v": 10.9388,
+          "protected_bus_v": 2.78372e-07
+        },
+        "deck_sha256": "6868e4f329cc618f4964bc698c9a2927564199d853c109cb298838352ad3c667"
+      },
+      "isolation_negative_control": "PASS_MODEL"
+    },
+    "recovery_interface_ld_probe": {
+      "status": "PROPOSED_INTERFACE_NOT_QUALIFIED",
+      "cases_by_assumed_load_ma": {
+        "10": {
+          "measurements": {
+            "v_ld_end_v": 2.57264,
+            "v_bus_end_v": 2.73665,
+            "i_pack_at_end_a": -1.97634e-08,
+            "energy_injected_j": 0.380515,
+            "source_current_after_off_a": 0.0
+          },
+          "deck_sha256": "6ada38676ed744d32d3899690164bb7cd53f23a96eed8164f2f9c01ae01572a2",
+          "vld_threshold_crossing_supported_in_model": true
+        },
+        "60": {
+          "measurements": {
+            "v_ld_end_v": 0.0391692,
+            "v_bus_end_v": 0.0416663,
+            "i_pack_at_end_a": -2.24583e-08,
+            "energy_injected_j": 0.0113197,
+            "source_current_after_off_a": 0.0
+          },
+          "deck_sha256": "f120e014a7972984a27cc157ab1d043a86b85efbf1f7b796ed33805c5499f671",
+          "vld_threshold_crossing_supported_in_model": false
+        }
+      },
+      "model_limits": {
+        "max_v": 3.3,
+        "max_a": 0.05,
+        "duration_s": 5.5,
+        "energy_upper_j": 0.9075,
+        "bus_cap_f": 0.079784,
+        "ld_resistor_ohm": 5100,
+        "ld_typical_shutdown_pulldown_ohm": 80000,
+        "ld_wake_threshold_max_v": 2.25
+      },
+      "scope": "Ideal only. This probe may raise LD, but cannot imply MCU boot, CCL, CHG conduction or charge permission. Not approved as an external precharge stimulus. Active prebias must end and positively disconnect before any traditional BMS precharge. 60 mA comparison deliberately tests failure to reach threshold."
+    },
+    "recovery_interface_charge_window": {
+      "status": "PASS_MODEL",
+      "scope": "Fault-absent interface logic and ideal switches with a prebiased test bus. Real BMS lease, charge-gate state, diode behaviour, frozen precharge interlock and isolation delay unverified.",
+      "cases": {
+        "verified_charge_path_and_fresh_lease": {
+          "measurements": {
+            "source_before_lease_a": 0.0,
+            "source_during_precharge_a": 0.0,
+            "pack_during_precharge_a": 6.9724e-10,
+            "source_with_lease_a": 0.4,
+            "pack_at_400ms_a": 0.396997,
+            "source_after_revoke_a": 0.0
+          },
+          "deck_sha256": "a00dfc65eda15443a457de1487348346966538e5ef26abba71dd8f832d3fc7d7",
+          "status": "PASS_MODEL"
+        },
+        "no_lease": {
+          "measurements": {
+            "source_before_lease_a": 0.0,
+            "source_during_precharge_a": 0.0,
+            "pack_during_precharge_a": 6.9724e-10,
+            "source_with_lease_a": 0.0,
+            "pack_at_400ms_a": 6.77922e-10,
+            "source_after_revoke_a": 0.0
+          },
+          "deck_sha256": "81e0f13d39002a87ebb91f3bd2a7b2ab09298a5ade1b05a9b21fd0736ccdfb61",
+          "status": "PASS_MODEL"
+        }
+      }
+    },
+    "regen_cutback": {
+      "status": "PASS_MODEL",
+      "cases": {
+        "target_window": {
+          "status": "PASS_MODEL",
+          "measurements": {
+            "t_trip_s": 0.000124,
+            "t_release_s": 0.000715,
+            "trip_v": 37.8,
+            "release_v": 37.2,
+            "t_ce_disable_s": 0.000153007,
+            "t_bkin_assert_s": 0.000153007,
+            "t_ucc_disable_s": 0.000153075,
+            "t_ce_release_s": 0.000733006,
+            "t_below_100ma_s": 0.000242878,
+            "i_hysteresis_hold_a": 4.69896e-08,
+            "trip_to_ce_disable_us": 29.007,
+            "trip_to_bkin_assert_us": 29.007,
+            "trip_to_ucc_disable_us": 29.07499999999999,
+            "trip_to_below_100ma_us": 118.878,
+            "release_to_ce_release_us": 18.00599999999999
+          },
+          "deck_sha256": "aa83f66895add4e5fc8bbd86d9cf295777db102dd36666ca8da387afae7f6010",
+          "assumptions": {
+            "falling_threshold_mv": 393.65079365079373,
+            "tlv_assert_us": 29,
+            "tlv_release_us": 18,
+            "pv_decay_tau_us": 5,
+            "bq_decay_tau_us": 30
+          }
+        },
+        "native_divider_typ": {
+          "status": "PASS_MODEL",
+          "measurements": {
+            "t_trip_s": 0.000124,
+            "t_release_s": 0.000711,
+            "trip_v": 37.8,
+            "release_v": 37.28,
+            "t_ce_disable_s": 0.000153007,
+            "t_bkin_assert_s": 0.000153007,
+            "t_ucc_disable_s": 0.000153075,
+            "t_ce_release_s": 0.000729006,
+            "t_below_100ma_s": 0.000242878,
+            "i_hysteresis_hold_a": 4.69896e-08,
+            "trip_to_ce_disable_us": 29.007,
+            "trip_to_bkin_assert_us": 29.007,
+            "trip_to_ucc_disable_us": 29.07499999999999,
+            "trip_to_below_100ma_us": 118.878,
+            "release_to_ce_release_us": 18.00599999999999
+          },
+          "deck_sha256": "f5874a2799565ef51f76770d5d8a4e66f96cbed723aa45475b0400c08da8500a",
+          "assumptions": {
+            "falling_threshold_mv": 394.5,
+            "tlv_assert_us": 29,
+            "tlv_release_us": 18,
+            "pv_decay_tau_us": 5,
+            "bq_decay_tau_us": 30
+          }
+        },
+        "delayed_response_sensitivity": {
+          "status": "PASS_MODEL",
+          "measurements": {
+            "t_trip_s": 0.000124,
+            "t_release_s": 0.000715,
+            "trip_v": 37.8,
+            "release_v": 37.2,
+            "t_ce_disable_s": 0.000184007,
+            "t_bkin_assert_s": 0.000184007,
+            "t_ucc_disable_s": 0.000184075,
+            "t_ce_release_s": 0.000751006,
+            "t_below_100ma_s": 0.00048358,
+            "i_hysteresis_hold_a": 0.0140267,
+            "trip_to_ce_disable_us": 60.007,
+            "trip_to_bkin_assert_us": 60.007,
+            "trip_to_ucc_disable_us": 60.07499999999998,
+            "trip_to_below_100ma_us": 359.58,
+            "release_to_ce_release_us": 36.00599999999999
+          },
+          "deck_sha256": "7863929e30185b2a2bbd5d46d84c9c8396f4e2010f243010f29ee8e6467ba76b",
+          "assumptions": {
+            "falling_threshold_mv": 393.65079365079373,
+            "tlv_assert_us": 60,
+            "tlv_release_us": 36,
+            "pv_decay_tau_us": 20,
+            "bq_decay_tau_us": 100
+          }
+        }
+      },
+      "tlv6700_source": "TI SNVSAV2B sections 7.5–7.7, Figure 1, INB− to OUTB",
+      "plain_divider_threshold_v_without_resistor_tolerance": {
+        "trip_min": 37.422,
+        "trip_max": 38.178,
+        "release_min": 36.5715,
+        "release_max": 37.8
+      },
+      "scope": "Behavioral TLV6700 hysteresis and asymmetric propagation (29/18 us nominal at 5 V, 10 mV overdrive), CE high, BKIN and UCC EN low. The 37.2 V case assumes added threshold shaping; a plain divider does not produce it. PV/BQ current decay constants and UCC EN load are assumptions, not silicon data or guaranteed cutoff times. The ramp through 37.8 V does not immediately deliver the datasheet's 10 mV overdrive. No CV, bus dynamics, fault reset, body-diode isolation or output disconnect timing is modeled."
+    },
+    "usb_pd_boundaries": {
+      "status": "PASS_MODEL",
+      "cases": [
+        {
+          "input_v": 5,
+          "pdo_current_a": 3,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 13.5,
+          "loss_budget_at_90pct_w": 1.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.098940506,
+            "two_fets_assumed_hot_w": 0.1583048096,
+            "inductor_copper_25c_w": 0.094273501,
+            "inductor_copper_assumed_hot_w": 0.16801217999999998,
+            "input_and_output_shunts_w": 0.01872,
+            "hard_switch_overlap_screen_w": 0.84375,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 3.9722222222222223,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 3.9756,
+            "inductor_min_a": 2.0306,
+            "mean_squared_a2": 9.33401,
+            "inductor_rms_a": 3.0551612068759972,
+            "isat_headroom_a": 17.0244,
+            "irms_headroom_a": 7.944838793124003
+          },
+          "deck_sha256": "d62dbfbe5fd186d30e13831c58dd0c98a7544ecc5e0ffd785cb0bc25702abb68"
+        },
+        {
+          "input_v": 5,
+          "pdo_current_a": 3,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 13.5,
+          "loss_budget_at_90pct_w": 1.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.099854544,
+            "two_fets_assumed_hot_w": 0.15976727040000002,
+            "inductor_copper_25c_w": 0.09514442399999999,
+            "inductor_copper_assumed_hot_w": 0.16956432,
+            "input_and_output_shunts_w": 0.018257823110004526,
+            "hard_switch_overlap_screen_w": 1.4100000000000001,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 4.0837765957446805,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 4.08896,
+            "inductor_min_a": 1.92047,
+            "mean_squared_a2": 9.42024,
+            "inductor_rms_a": 3.0692409485082788,
+            "isat_headroom_a": 16.91104,
+            "irms_headroom_a": 7.930759051491721
+          },
+          "deck_sha256": "310e7418ee72780c69aef651ad24f1a86bfd76e7bb59e81e4d1e6f11b06046e6"
+        },
+        {
+          "input_v": 9,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 40.5,
+          "loss_budget_at_90pct_w": 4.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.27172146,
+            "two_fets_assumed_hot_w": 0.4347543360000001,
+            "inductor_copper_25c_w": 0.25890441,
+            "inductor_copper_assumed_hot_w": 0.4614138,
+            "input_and_output_shunts_w": 0.05648,
+            "hard_switch_overlap_screen_w": 1.4062499999999998,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 6.35,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.35286,
+            "inductor_min_a": 3.65226,
+            "mean_squared_a2": 25.6341,
+            "inductor_rms_a": 5.063012936977349,
+            "isat_headroom_a": 14.64714,
+            "irms_headroom_a": 5.936987063022651
+          },
+          "deck_sha256": "d0d9d3b6ed600af7c1dc495cdaa3f7031929b68fe49ef649e30aa142cd83bcc4"
+        },
+        {
+          "input_v": 9,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 40.5,
+          "loss_budget_at_90pct_w": 4.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.27590952,
+            "two_fets_assumed_hot_w": 0.44145523200000003,
+            "inductor_copper_25c_w": 0.26289492,
+            "inductor_copper_assumed_hot_w": 0.46852559999999993,
+            "input_and_output_shunts_w": 0.05232040799004074,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 6.711436170212766,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.71709,
+            "inductor_min_a": 3.29328,
+            "mean_squared_a2": 26.0292,
+            "inductor_rms_a": 5.101882005691625,
+            "isat_headroom_a": 14.282910000000001,
+            "irms_headroom_a": 5.898117994308375
+          },
+          "deck_sha256": "97a58cfdb45dd6000168b0e0dcd9f3b7c2588c7afbc786fa92c61e845ae334f7"
+        },
+        {
+          "input_v": 12,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 54.0,
+          "loss_budget_at_90pct_w": 6.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.27226842,
+            "two_fets_assumed_hot_w": 0.435629472,
+            "inductor_copper_25c_w": 0.25942557,
+            "inductor_copper_assumed_hot_w": 0.4623426,
+            "input_and_output_shunts_w": 0.06152,
+            "hard_switch_overlap_screen_w": 1.4062499999999998,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 6.4,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.40344,
+            "inductor_min_a": 3.60283,
+            "mean_squared_a2": 25.6857,
+            "inductor_rms_a": 5.0681061551628925,
+            "isat_headroom_a": 14.59656,
+            "irms_headroom_a": 5.9318938448371075
+          },
+          "deck_sha256": "fb14d2c5ffce00899943eda4331d65ab92bd51fe9851fa515ee963f8582b4db1"
+        },
+        {
+          "input_v": 12,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 54.0,
+          "loss_budget_at_90pct_w": 6.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.28030534,
+            "two_fets_assumed_hot_w": 0.44848854400000004,
+            "inductor_copper_25c_w": 0.26708339,
+            "inductor_copper_assumed_hot_w": 0.4759902,
+            "input_and_output_shunts_w": 0.05412516976007243,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 7.042553191489362,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 7.04823,
+            "inductor_min_a": 2.96217,
+            "mean_squared_a2": 26.4439,
+            "inductor_rms_a": 5.1423632699372765,
+            "isat_headroom_a": 13.95177,
+            "irms_headroom_a": 5.8576367300627235
+          },
+          "deck_sha256": "56962126cc41da582bee4f500907c5516515d8b8a26be0ef937c914e9b429e49"
+        },
+        {
+          "input_v": 15,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 67.5,
+          "loss_budget_at_90pct_w": 7.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.27081092,
+            "two_fets_assumed_hot_w": 0.433297472,
+            "inductor_copper_25c_w": 0.25803682,
+            "inductor_copper_assumed_hot_w": 0.4598676,
+            "input_and_output_shunts_w": 0.068,
+            "hard_switch_overlap_screen_w": 1.4062499999999998,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 6.25,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.25294,
+            "inductor_min_a": 3.75229,
+            "mean_squared_a2": 25.5482,
+            "inductor_rms_a": 5.054522727221632,
+            "isat_headroom_a": 14.747060000000001,
+            "irms_headroom_a": 5.945477272778368
+          },
+          "deck_sha256": "5b2b9d920da52ae50bdb22f302ee6503db1f6652825209f6347c978d49c2babe"
+        },
+        {
+          "input_v": 15,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 67.5,
+          "loss_budget_at_90pct_w": 7.5,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.28352032,
+            "two_fets_assumed_hot_w": 0.453632512,
+            "inductor_copper_25c_w": 0.27014672,
+            "inductor_copper_assumed_hot_w": 0.4814496,
+            "input_and_output_shunts_w": 0.05644557775011318,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 7.253989361702128,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 7.25969,
+            "inductor_min_a": 2.75071,
+            "mean_squared_a2": 26.7472,
+            "inductor_rms_a": 5.171769523093619,
+            "isat_headroom_a": 13.740310000000001,
+            "irms_headroom_a": 5.828230476906381
+          },
+          "deck_sha256": "7888f19cc7000d7b1ae9fd7a26bd839016632b923dfd8757dd7ad7b98a1cb256"
+        },
+        {
+          "input_v": 20,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 90.0,
+          "loss_budget_at_90pct_w": 10.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.26644478,
+            "two_fets_assumed_hot_w": 0.426311648,
+            "inductor_copper_25c_w": 0.25387663,
+            "inductor_copper_assumed_hot_w": 0.45245339999999995,
+            "input_and_output_shunts_w": 0.082,
+            "hard_switch_overlap_screen_w": 1.4062499999999998,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 5.555555555555555,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 5.55914,
+            "inductor_min_a": 4.44726,
+            "mean_squared_a2": 25.1363,
+            "inductor_rms_a": 5.013611472780873,
+            "isat_headroom_a": 15.44086,
+            "irms_headroom_a": 5.986388527219127
+          },
+          "deck_sha256": "6d5665fa24c24645d0baea800ab740ece282a2a94ecc0d78ef19ef5a59ad6e81"
+        },
+        {
+          "input_v": 20,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 90.0,
+          "loss_budget_at_90pct_w": 10.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.28493118,
+            "two_fets_assumed_hot_w": 0.455889888,
+            "inductor_copper_25c_w": 0.27149102999999997,
+            "inductor_copper_assumed_hot_w": 0.4838453999999999,
+            "input_and_output_shunts_w": 0.061458804889090085,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 7.340425531914894,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 7.34618,
+            "inductor_min_a": 2.66427,
+            "mean_squared_a2": 26.8803,
+            "inductor_rms_a": 5.184621490523681,
+            "isat_headroom_a": 13.65382,
+            "irms_headroom_a": 5.815378509476319
+          },
+          "deck_sha256": "e8889f10713dd2d920131954affa8cfc244c0e799ca1725c22c31b8d90ef8c1a"
+        },
+        {
+          "input_v": 28,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 126.0,
+          "loss_budget_at_90pct_w": 14.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.33711392,
+            "two_fets_assumed_hot_w": 0.539382272,
+            "inductor_copper_25c_w": 0.32121232,
+            "inductor_copper_assumed_hot_w": 0.5724576,
+            "input_and_output_shunts_w": 0.11272,
+            "hard_switch_overlap_screen_w": 1.96,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "buck",
+          "theoretical_peak_a": 6.704910714285714,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.70844,
+            "inductor_min_a": 4.49792,
+            "mean_squared_a2": 31.8032,
+            "inductor_rms_a": 5.639432595572005,
+            "isat_headroom_a": 14.29156,
+            "irms_headroom_a": 5.360567404427995
+          },
+          "deck_sha256": "d4bdb7c380226ae8021a98627652616abec297731e410246c60fe6d6921f6058"
+        },
+        {
+          "input_v": 28,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 126.0,
+          "loss_budget_at_90pct_w": 14.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.27682324,
+            "two_fets_assumed_hot_w": 0.4429171840000001,
+            "inductor_copper_25c_w": 0.26376554,
+            "inductor_copper_assumed_hot_w": 0.4700772,
+            "input_and_output_shunts_w": 0.07245925758261658,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 6.787234042553192,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 6.79266,
+            "inductor_min_a": 3.21706,
+            "mean_squared_a2": 26.1154,
+            "inductor_rms_a": 5.110322886080683,
+            "isat_headroom_a": 14.20734,
+            "irms_headroom_a": 5.889677113919317
+          },
+          "deck_sha256": "239c2c084f03199c743af86538c2ba35a0d9a75e83a14d3015c8449230b90391"
+        },
+        {
+          "input_v": 36,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 162.0,
+          "loss_budget_at_90pct_w": 18.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.56600608,
+            "two_fets_assumed_hot_w": 0.905609728,
+            "inductor_copper_25c_w": 0.53930768,
+            "inductor_copper_assumed_hot_w": 0.9611424,
+            "input_and_output_shunts_w": 0.15368,
+            "hard_switch_overlap_screen_w": 3.2399999999999998,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "buck",
+          "theoretical_peak_a": 9.309375,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 9.31483,
+            "inductor_min_a": 5.09515,
+            "mean_squared_a2": 53.3968,
+            "inductor_rms_a": 7.307311407077161,
+            "isat_headroom_a": 11.68517,
+            "irms_headroom_a": 3.6926885929228392
+          },
+          "deck_sha256": "fea1a0a2c7a8bfdd2c0dd9879754c635d29f7a7210c65551406f0d80caabdb96"
+        },
+        {
+          "input_v": 36,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 162.0,
+          "loss_budget_at_90pct_w": 18.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.26606424,
+            "two_fets_assumed_hot_w": 0.42570278400000006,
+            "inductor_copper_25c_w": 0.25351404,
+            "inductor_copper_assumed_hot_w": 0.45180719999999996,
+            "input_and_output_shunts_w": 0.08712652784065188,
+            "hard_switch_overlap_screen_w": 2.35,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "boost",
+          "theoretical_peak_a": 5.382978723404256,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 5.38858,
+            "inductor_min_a": 4.62133,
+            "mean_squared_a2": 25.1004,
+            "inductor_rms_a": 5.010029940030299,
+            "isat_headroom_a": 15.611419999999999,
+            "irms_headroom_a": 5.989970059969701
+          },
+          "deck_sha256": "ce774d342636eb1cccd147cf5b173d9cb54499d483495c73a51a071110691562"
+        },
+        {
+          "input_v": 48,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 216.0,
+          "loss_budget_at_90pct_w": 24.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 1.0098566999999998,
+            "two_fets_assumed_hot_w": 1.6157707199999998,
+            "inductor_copper_25c_w": 0.9622219499999999,
+            "inductor_copper_assumed_hot_w": 1.7148509999999997,
+            "input_and_output_shunts_w": 0.23432,
+            "hard_switch_overlap_screen_w": 5.759999999999999,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "buck",
+          "theoretical_peak_a": 12.58828125,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 12.5956,
+            "inductor_min_a": 6.61772,
+            "mean_squared_a2": 95.2695,
+            "inductor_rms_a": 9.760609612109276,
+            "isat_headroom_a": 8.4044,
+            "irms_headroom_a": 1.2393903878907242
+          },
+          "deck_sha256": "d48616ab1fd6118c262155ef5914b03bbc00d2c27d734277fa3045dcf3a993d8"
+        },
+        {
+          "input_v": 48,
+          "pdo_current_a": 5,
+          "bus_v": 37.6,
+          "output_power_w_at_90pct": 216.0,
+          "loss_budget_at_90pct_w": 24.0,
+          "frequency_hz": 250000,
+          "loss_screen": {
+            "two_fets_25c_w": 0.36521876,
+            "two_fets_assumed_hot_w": 0.584350016,
+            "inductor_copper_25c_w": 0.34799146,
+            "inductor_copper_assumed_hot_w": 0.6201827999999999,
+            "input_and_output_shunts_w": 0.1160027161611589,
+            "hard_switch_overlap_screen_w": 3.4468085106382977,
+            "two_switching_gates_at_10v_w": 0.365
+          },
+          "mode": "buck",
+          "theoretical_peak_a": 7.781347517730496,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 7.78798,
+            "inductor_min_a": 3.71345,
+            "mean_squared_a2": 34.4546,
+            "inductor_rms_a": 5.869804085316647,
+            "isat_headroom_a": 13.212019999999999,
+            "irms_headroom_a": 5.130195914683353
+          },
+          "deck_sha256": "75b01793254251a4f91b03834753ef4853f86d82b276104d8b995abe145b645a"
+        },
+        {
+          "input_v": 48,
+          "pdo_current_a": 5,
+          "bus_v": 22.5,
+          "output_power_w_at_90pct": 216.0,
+          "loss_budget_at_90pct_w": 24.0,
+          "frequency_hz": 212000,
+          "loss_screen": {
+            "two_fets_25c_w": 1.02214634,
+            "two_fets_assumed_hot_w": 1.635434144,
+            "inductor_copper_25c_w": 0.9739318899999999,
+            "inductor_copper_assumed_hot_w": 1.7357201999999998,
+            "input_and_output_shunts_w": 0.23432,
+            "hard_switch_overlap_screen_w": 4.884479999999999,
+            "two_switching_gates_at_10v_w": 0.30952
+          },
+          "mode": "buck",
+          "theoretical_peak_a": 13.123916568396226,
+          "status": "PASS_MODEL",
+          "measurements": {
+            "inductor_peak_a": 13.1311,
+            "inductor_min_a": 6.08213,
+            "mean_squared_a2": 96.4289,
+            "inductor_rms_a": 9.819821790643656,
+            "isat_headroom_a": 7.8689,
+            "irms_headroom_a": 1.1801782093563435
+          },
+          "deck_sha256": "6114123071a81e334d3568dcd50ec08684dd441e39c245354121b9b9cc5edc7d"
+        }
+      ],
+      "aux_5v_buck_negative_control": {
+        "usb_nominal_v": 5.0,
+        "assumed_schottky_drop_v": 0.35,
+        "aux_after_diode_v": 4.65,
+        "required_buck_output_v": 5.0,
+        "required_ideal_duty": 1.075268817204301,
+        "status": "CANNOT_REGULATE_5V_FROM_5V_ONLY"
+      },
+      "assumptions": {
+        "inductor": "CODACA CSBX1275-100M",
+        "isat_a": 21,
+        "irms_a": 11,
+        "inductance_worst_h": 8e-06,
+        "efficiency_for_budget": 0.9,
+        "mosfet": "HUAYI HYG053N10NS1C2",
+        "vgs_v": 10,
+        "fet_r_25c_max_ohm": 0.0053,
+        "assumed_hot_r_multiplier": 1.6,
+        "gate_charge_typ_c": 7.3e-08,
+        "rise_plus_fall_typ_s": 1e-07,
+        "inductor_dcr_max_25c_ohm": 0.0101,
+        "assumed_hot_inductor_dcr_ohm": 0.018,
+        "each_shunt_assumed_ohm": 0.002
+      },
+      "scope": "Ideal buck/boost switching-cell stress screen with 90% output power assumption, not BQ control or thermal validation. Input cases are illustrative, not evidence of PDO/cable support or 5 V cold start. Isat is a datasheet L-drop point, Irms a temperature-rise point, neither is a hard board limit. The switching screen omits Coss, reverse recovery, deadtime, overlap-mode operation, core loss, transient loading and junction rise."
+    },
+    "b2_lock_review": {
+      "status": "PASS_MODEL",
+      "design_status": "PASS",
+      "criteria": {
+        "ov_trip_guard_at_least_200mv": true,
+        "epr_tvs_clamp_below_powered_protector_abs_max": true,
+        "epr_voltage_below_unpowered_protector_abs_max": true,
+        "epr_power_loss_below_unpowered_protector_abs_max": true,
+        "b2_pv_only_has_aux_power_path": true,
+        "disabled_boost_output_disconnected": true,
+        "illustrative_low_corner_gate_at_least_10v": true,
+        "bq_default_cv_upper_below_37p45v": true,
+        "bbm_deadtime_at_least_5ms": true
+      },
+      "regen_window": {
+        "bq_divider_only_nominal_v": 36.864000000000004,
+        "bq_nominal_v_with_33ohm_fbg": 36.7478010565135,
+        "bq_upper_v_without_guaranteed_fbg_min": 37.19326981381381,
+        "bq_register_output_step_v_with_33ohm_fbg": 0.04784869929233529,
+        "running_hardware_default_nominal_v": 36.7478010565135,
+        "parked_calibrated_target_range_v": [
+          37.65,
+          37.7
+        ],
+        "parked_hard_ceiling_v": 37.8,
+        "min_trip_margin_above_parked_ceiling_v": 0.3773000000000053,
+        "min_frozen_bov_margin_v": 1.0068999999999946,
+        "ov_divider_power_mw_at_36v": 1.1153184165232357,
+        "ov_corners": {
+          "low": {
+            "measurements": {
+              "trip_v": 38.1773,
+              "release_v": 37.3092
+            },
+            "deck_sha256": "08a7f320be86b0d22a7c0cbfaff83edaf4313983b6e9524663f4a083faa6be1a",
+            "analytic_v": {
+              "trip_v": 38.17728749401198,
+              "release_v": 37.309230607784436
+            }
+          },
+          "nominal": {
+            "measurements": {
+              "trip_v": 38.7333,
+              "release_v": 38.2008
+            },
+            "deck_sha256": "c156af2f2fe32f232c71e7352354154095e257a516cb3d9c032308ad8ca201e8",
+            "analytic_v": {
+              "trip_v": 38.733333333333334,
+              "release_v": 38.20075
+            }
+          },
+          "high": {
+            "measurements": {
+              "trip_v": 39.2931,
+              "release_v": 38.9043
+            },
+            "deck_sha256": "48481587f7cf9fd5faafe8ed66ee0ba70b3fb71fc745455f7a1b0a35195e85a1",
+            "analytic_v": {
+              "trip_v": 39.293128187374755,
+              "release_v": 38.9042584478958
+            }
+          }
+        }
+      },
+      "aux": {
+        "nominal_pre_5v_and_drv_v": [
+          3.6,
+          5.1,
+          11.406
+        ],
+        "ideal_buck_duty_at_4p65v": 0.7741935483870968,
+        "gate_rail_corners_v": [
+          11.15670024,
+          11.65616424
+        ],
+        "illustrative_low_corner_vgs_v": 10.35670024,
+        "boost_disabled_negative_control": {
+          "measurements": {
+            "drv_v": 4.88008
+          },
+          "deck_sha256": "1fe4e8437470b7be9200a885549f9c7cb8f8403c71cd1db2fd6f9edc4b368a0b"
+        },
+        "boost_post_disable_discharge": {
+          "measurements": {
+            "drv_sw_at_5ms_v": 6.30801e-05,
+            "drv_at_5ms_v": 0.000299184,
+            "drv_below_50mv_s": 0.00262532
+          },
+          "deck_sha256": "11b9813d1abc17e80596b9e7f61be599c7d66376a1030975918b7170f8654d17"
+        },
+        "pv_or_front_end_screen": {
+          "pv1": {
+            "measurements": {
+              "aux_input_v": 11.5691,
+              "pre_3v6_v": 3.6,
+              "sys_5v_v": 5.1,
+              "bus_feed_a": 1.00001e-06
+            },
+            "deck_sha256": "fb50d9937410a328b65af5fcfce5fb6fa750df259636eb12d89659da17ee0b7e"
+          },
+          "pv2": {
+            "measurements": {
+              "aux_input_v": 17.5691,
+              "pre_3v6_v": 3.6,
+              "sys_5v_v": 5.1,
+              "bus_feed_a": 1.00002e-06
+            },
+            "deck_sha256": "5c09634e5127fa185ba42aef5901e972aecebe6e72bfe89d9af7d0a56098f1df"
+          },
+          "pv3": {
+            "measurements": {
+              "aux_input_v": 15.5691,
+              "pre_3v6_v": 3.6,
+              "sys_5v_v": 5.1,
+              "bus_feed_a": 1.00002e-06
+            },
+            "deck_sha256": "c48e91886604b0f709ced6294bf2e995954e979b59b6734bf60932fb1a14a4c6"
+          }
+        }
+      },
+      "epr_power_loss_screen": {
+        "measurements": {
+          "powered_v": 47.953,
+          "vpwr_zero_v": 7.04975,
+          "unpowered_peak_v": 7.04975
+        },
+        "deck_sha256": "591b2f44f072ad65a097276c58470dc96fe97b28e29d6a792ad72a4a8a2916f4"
+      },
+      "epr_gate_rc_screen": {
+        "unpowered_hotplug_from_zero": {
+          "measurements": {
+            "pre_step_v": 0.0,
+            "peak_v": 0.0868169
+          },
+          "deck_sha256": "3a261216da5e445e48e212875aeef717cdd6d686b54d37627ca2edbaec433a34"
+        },
+        "unpowered_step_from_spr": {
+          "measurements": {
+            "pre_step_v": 4.9948,
+            "peak_v": 10.7789
+          },
+          "deck_sha256": "6d0c0853b91cd20417a445d5cdd7cb17efb87e2c44490687ed336f2ee0920f29"
+        },
+        "powered_surge_from_epr": {
+          "measurements": {
+            "pre_step_v": 47.9334,
+            "peak_v": 48.5598
+          },
+          "deck_sha256": "1aa22eef6296eecfebeae509eac31188a0eeacd67485e76f177983227e69ed59"
+        }
+      },
+      "bbm_rc_screen": {
+        "nominal_rc": {
+          "measurements": {
+            "old_low_s": 0.0500305,
+            "new_high_s": 0.0649583
+          },
+          "deck_sha256": "5eb68efe7c96b1da7ee87a72004d183e0b740e6d02c48689ca405035be6fe417",
+          "command_to_off_s": 3.0499999999995808e-05,
+          "remaining_deadtime_with_500us_total_off_s": 0.014458299999999993
+        },
+        "low_rc_x7r_screen": {
+          "measurements": {
+            "old_low_s": 0.0500245,
+            "new_high_s": 0.0613288
+          },
+          "deck_sha256": "7c6fa0b072eb03976e481f2b647da7e8d2b85e6ea1520420b70dfc037ced713b",
+          "command_to_off_s": 2.4499999999996747e-05,
+          "remaining_deadtime_with_500us_total_off_s": 0.0108288
+        }
+      },
+      "scope": "B4a circuit-level screens using locked B4 parameters (10 ohm series limiter, active PNP fast turn-off, 10 nF prot cap with self-powered 100 ohm active bleeder, 230k/10k BQ default divider, 220 nF X7R BBM, 4.7 uF + active 100 ohm 10V_DRV bleeder, SS310 PV-to-AUX_HV_IN behavioral startup). Behavioral switches/diodes do not replace physical bench thermal/hot-plug qualification."
+    },
+    "one_shot_risk_screens": {
+      "status": "PASS_MODEL",
+      "usb_5v_cold_start_assist": {
+        "measurements": {
+          "vpre_4v5": 3.46343,
+          "vvpwr_4v5": 3.23663,
+          "vpre_4v75": 3.46915,
+          "vpre_9v": 3.54446,
+          "vtlv_max": 3.032,
+          "vdrvb_48v": 0.0258072,
+          "vdrvb_82v": 0.0268085,
+          "pqpass_4v75": 0.0882305
+        },
+        "deck_sha256": "a6f90b1b40af5a2bdb293d0fdb3c32898ef2c3aaff3db37ccc22995be882c63c",
+        "status": "PASS_MODEL"
+      },
+      "bq_acuv_and_cv_corners": {
+        "acuv_nominal_v": 4.01783042394015,
+        "acuv_upper_v": 4.198509731676813,
+        "usb_4v75_margin_v": 0.551490268323187,
+        "cv_untrimmed_v": 37.05440027123697,
+        "cv_trimmed_v": 37.407434746586134,
+        "dac_vfb_for_37p2_v": 1.546414876932433,
+        "max_code_cv_at_corner_v": 37.67113267531332,
+        "vfb_max_v": 1.566,
+        "assumptions": "CV low corner: 230k top -0.1%, 10k bottom and 1M trim +0.1%, 55 ohm series FBG, VFB at 1.566 V minus 0.7%; DAC voltage is calibrated at this corner.",
+        "status": "PASS_MODEL"
+      },
+      "vom1271_switch_inrush_and_soa": {
+        "pd_5v": {
+          "measurements": {
+            "i_peak_a": 39.3716,
+            "p_peak_w": 27.7599,
+            "e_total_j": 0.000722562,
+            "t_90_s": 0.000585895
+          },
+          "deck_sha256": "1193d3188a21799de0cf21e877a6ead7b727a10f85b08b6c4111dadaee41ea2c",
+          "status": "PASS_MODEL"
+        },
+        "xt60_48v": {
+          "measurements": {
+            "i_peak_a": 391.215,
+            "p_peak_w": 2259.46,
+            "e_total_j": 0.0591596,
+            "t_90_s": 0.000584627
+          },
+          "deck_sha256": "3fa8d37d803f1becdd5742ba7082ba9759b4d513c932b9d6ea508788467f765c",
+          "operational_rule": "Connect XT60 with source disabled or pre-ramped, or verify 48 V hot-plug SOA on bench."
+        },
+        "status": "PASS_MODEL",
+        "scope": "Simplified MOSFET model and lumped energy are not a device SOA or hot-plug qualification."
+      },
+      "pv_mosfet_merge_and_sku_summary": {
+        "rms_a_squared": 26.795809030674665,
+        "hyg080n10ls1c2_w_per_fet": 0.18489108231165519,
+        "hyg053n10ns1c2_w_per_fet": 0.1420177878625757,
+        "delta_w_per_fet": 0.04287329444907946,
+        "ina293a1_common_mode_v": 110,
+        "comparison_common_mode_v": 26,
+        "bat46w_vrrm_v": 100,
+        "comparison_vrrm_v": 70,
+        "scope": "60 W, 12 V to 37.6 V, 100 kHz; full inductor RMS through each FET is a conservative comparison at 10 V gate and typical resistance, not thermal validation.",
+        "status": "PASS_MODEL"
+      }
+    }
+  },
+  "energy": {
+    "status": "CONDITIONAL_BUDGET_ONLY",
+    "nominal_pack_wh": 486.0,
+    "survival_soc_fraction_start_end": [
+      0.25,
+      0.1
+    ],
+    "usable_reserve_wh_nominal": 72.89999999999999,
+    "usable_reserve_wh_with_65pct_capacity_sensitivity": 47.385,
+    "tier0_board6_only": {
+      "target_exclusive_mw": 5,
+      "status": "DESIGN_TARGET_NOT_MEASURED",
+      "scope": "Includes dark-state bias, sensing, watchdog and all board leakage."
+    },
+    "tier0_vehicle_frozen_bms_run": {
+      "estimate_mw": [
+        80,
+        130
+      ],
+      "status": "ESTIMATE_NOT_MEASURED",
+      "bms_can": "CA-IS2062A remains on VOUT_5V",
+      "wh_per_day": [
+        1.92,
+        3.12
+      ],
+      "cold_zero_sun_days": [
+        15.187499999999998,
+        24.6796875
+      ]
+    },
+    "tier0_vehicle_bms_rev2": {
+      "target_exclusive_mw": 50,
+      "status": "PLAN_NOT_IMPLEMENTED",
+      "prerequisite": "Switch off BMS CAN rail; no modification to frozen BMS."
+    },
+    "tier0_consumption_wh_per_day_at_50mw": 1.2,
+    "solar_net_harvest_wh_by_equivalent_sun_hours": {
+      "0.0": 0.0,
+      "0.5": 39.0,
+      "1.0": 78.0,
+      "4.0": 312.0,
+      "5.0": 390.0
+    },
+    "example_heater_w": 40,
+    "example_heater_operating_h": 0.5,
+    "example_heater_wh": 20.0,
+    "daily_tier1_controller_wh_if_4h_irradiated": 3.0,
+    "sunny_day_remaining_wh_at_50mw_planning_after_heater_sleep_and_tier1": [
+      287.8,
+      365.8
+    ],
+    "zero_sun_days_at_50mw_nominal_and_65pct": [
+      60.74999999999999,
+      39.4875
+    ],
+    "zero_sun_days_at_100mw_and_65pct": 19.74375,
+    "break_even_sun_hours_daily_with_heater_and_tier1": 0.31025641025641026,
+    "limitations": "No Tier 2 work, measured leakage, pack self-discharge or measured temperature-capacity curve included. No solar means heater stays off. The 13.9-day lunar-night reference is metaphorical; local inputs govern. Rated heater power requires enough instantaneous solar, compatible voltage and measured thermal coupling."
+  }
+}

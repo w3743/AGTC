@@ -130,7 +130,7 @@ def verify_kicad(directory: Path, parts: dict, check: callable) -> dict:
     if not root_path.is_file():
         return {"sheets": 0, "instances": 0, "pins_checked": 0}
     try:
-        json.loads(projects[0].read_text(encoding="utf-8"))
+        pro_data = json.loads(projects[0].read_text(encoding="utf-8"))
         root = parse_sexpr(root_path)
         project_name = projects[0].stem
         root_uuid = one(root, "uuid")[1]
@@ -157,6 +157,22 @@ def verify_kicad(directory: Path, parts: dict, check: callable) -> dict:
                         parsed[child_path] = parse_sexpr(child_path)
                         instance_paths[child_path] = instance_paths[path] + "/" + one(sheet, "uuid")[1]
                         pending.append(child_path)
+        check(len(parsed) == 1, "kicad_project", "single_flat_schematic", 1, len(parsed))
+        stale_sections = sorted(p.name for p in directory.glob("section_*.kicad_sch"))
+        check(not stale_sections, "kicad_project", "no_section_subsheets", [], stale_sections)
+        paper = one(root, "paper")
+        check(len(paper) >= 4 and paper[1] == "User"
+              and all(re.fullmatch(r"\d+(?:\.\d+)?", str(val)) for val in paper[2:4]),
+              "kicad_paper", "user_custom_size", ["paper", "User", "<width>", "<height>"], paper)
+        wks_path = directory / "borderless.kicad_wks"
+        check(wks_path.is_file(), "kicad_wks", "borderless_file", str(wks_path), wks_path.is_file())
+        if wks_path.is_file():
+            wks_primitives = re.findall(r"\((rect|line|tbtext|polygon|bitmap)\b",
+                                        wks_path.read_text(encoding="utf-8"))
+            check(not wks_primitives, "kicad_wks", "no_border_primitives", [], wks_primitives)
+        layout_file = pro_data.get("schematic", {}).get("page_layout_descr_file")
+        check(layout_file == "${KIPRJMOD}/borderless.kicad_wks",
+              "kicad_pro", "page_layout_descr_file", "${KIPRJMOD}/borderless.kicad_wks", layout_file)
         seen = Counter()
         pin_count = 0
         for path, sheet in parsed.items():
