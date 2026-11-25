@@ -65,12 +65,16 @@ AGTC（Advanced General-purpose Tracked Chassis）面向户外应用，围绕履
 | 文件 | 用途 |
 | --- | --- |
 | `README.md` | 工程入口、目录导航和获取方法。 |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | 社区行为守则（Contributor Covenant v2.1）。 |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | 仓库克隆、分支 PR 流程、自检命令与工程贡献规范。 |
+| [`LICENSE`](LICENSE) | 仓库开源协议文本（GNU GPL v3.0）。 |
+| [`SECURITY.md`](SECURITY.md) | 安全漏洞私密披露流程与实车/高功率硬件安全边界提醒。 |
 | `.gitattributes` | Git LFS、文本和原始证据空白处理规则。 |
 | `.gitignore` | 不纳入版本管理的本地文件规则。 |
 | `.gitleaksignore` | 历史凭据扫描忽略指纹；PR 检查使用独立扫描策略。 |
 | `.gitmodules` | 第三方 Git 子模块的路径和来源。 |
 
-`.github/` 保存 GitHub 工作流配置，说明见[工作流目录](.github/workflows/README.md)。
+`.github/` 保存仓库的 GitHub 自动化与协作配置（含工作流、CODEOWNERS、Issue 与 PR 模板），说明见 [GitHub 配置](.github/README.md)。
 
 ## 获取工程
 
