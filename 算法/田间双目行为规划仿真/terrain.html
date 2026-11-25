@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AGTC · 360° 双目越野</title>
+  <link rel="stylesheet" href="/terrain.css">
+  <script src="/field_view.js" defer></script>
+  <script src="/road_view.js" defer></script>
+  <script src="/view.js" defer></script>
+</head>
+<body>
+  <header>
+    <div><div class="kicker">AGTC NATIVE <span> / </span> 双目越野</div><h1 id="title">实时三维地图</h1></div>
+    <div class="header-end"><span id="phase">连接中</span><a id="other" href="/think" target="_blank">实时决策 ↗</a></div>
+  </header>
+  <main>
+    <p id="alert" class="vehicle-alert" role="alert" hidden></p>
+    <div class="meters">
+      <div><span>场地</span><strong id="fieldSize">—</strong></div>
+      <div><span>地形高差</span><strong>−1 至 +1 m</strong></div>
+      <div><span>车底间隙</span><strong>50 cm</strong></div>
+      <div><span>回合奖励</span><strong id="reward">—</strong></div>
+    </div>
+    <div id="layout">
+      <article class="panel scene">
+        <div class="bar">
+          <div><h2 id="viewTitle">三维仿真与建图参考</h2><p>拖动旋转 · 滚轮缩放 · 右键拖动平移</p></div>
+          <div class="tools"><button id="top">俯视</button><button id="orbit">默认视角</button><button id="follow" aria-pressed="false">跟车</button><button id="cloud" aria-pressed="false">视觉测点</button></div>
+        </div>
+        <div class="viewport"><canvas id="field" aria-hidden="true"></canvas><canvas id="scene" aria-label="可旋转的三维地形与小车"></canvas><div id="target"></div></div>
+        <div class="bottom"><span><i class="mint"></i>已行驶</span><span><i class="blue"></i>当前路线</span><span><i class="amber"></i>实体岩块</span><span><i class="red"></i>视觉风险格</span><span id="distance"></span></div>
+        <div class="actions"><button id="demo">田间巡行演示</button><button id="stop">停车</button><button id="reset">重置</button><span id="notice" role="status"></span></div>
+        <section class="road-panel" aria-labelledby="roadTitle">
+          <div class="bar road-head">
+            <div><h2 id="roadTitle">二维田间通行地图</h2><p id="roadStatus">地图记忆为空</p></div>
+            <div class="tools">
+              <button id="roadFit" type="button">聚焦已记</button>
+              <button id="roadOrigin" type="button" aria-pressed="false">设原点</button>
+              <button id="referenceCloud" type="button" aria-pressed="false">三维参考</button>
+            </div>
+          </div>
+          <div class="road-controls">
+            <button id="startMemory" type="button" disabled>手动建图</button>
+            <button id="autoMemory" type="button" disabled>全自动建图</button>
+            <label>半自动通道<select id="roadChoice"><option value="">当前通道</option></select></label>
+            <button id="semiMemory" type="button" disabled>半自动建图</button>
+            <button id="finishMemory" type="button" disabled>结束建图</button>
+          </div>
+          <div id="manualControls" hidden>
+            <div class="tools" aria-label="按住遥控，松开停车">
+              <button type="button" data-steer="a">左转</button><button type="button" data-steer="w">前进</button>
+              <button type="button" data-steer="s">后退</button><button type="button" data-steer="d">右转</button>
+            </div>
+            <p>方向键 / WASD，或按住按钮遥控。松开停车。</p>
+          </div>
+          <canvas id="roadMap" aria-label="二维田间通行地图，双击设定目标"></canvas>
+          <div class="bottom"><span><i class="mint"></i>已确认可通行</span><span><i style="background:#30484c"></i>待确认</span><span><i class="amber"></i>田垄禁行</span><span><i class="red"></i>障碍或高风险</span><span><i class="blue"></i>当前规划</span></div>
+          <p class="road-instruction" id="roadHint">在二维图双击设目标。黄色田垄禁行，车辆可从地头绕行。</p>
+        </section>
+      </article>
+      <article class="panel sidebar">
+        <h2 id="sideTitle">双目与行驶状态</h2>
+        <div class="pair" id="pair"><figure><img id="left" alt="左目"><figcaption>左目</figcaption></figure><figure><img id="right" alt="右目"><figcaption>右目</figcaption></figure></div>
+        <details id="vehicleSettings" class="settings">
+          <summary>履带式小车参数</summary>
+          <p id="settingsMessage">静止且无任务时可修改</p>
+          <form id="settingsForm">
+            <fieldset id="settingsFields">
+              <label>车高 cm<input id="vehicleHeight" type="number" min="68" max="140" step="1" required></label>
+              <label>相机高 cm<input id="cameraHeight" type="number" min="60" max="140" step="1" required></label>
+              <label>最大爬坡 °<input id="maxSlope" type="number" min="5" max="30" step="1" required></label>
+              <label>静止相机朝向 °<input id="cameraYaw" type="number" min="0" max="359" step="1" required></label>
+              <button type="submit">应用参数</button>
+            </fieldset>
+          </form>
+        </details>
+        <div class="flow">
+          <div class="stage"><span>01 · 360° 双目云台</span><b id="vision">等待相机</b><small id="pose"></small><small id="scan"></small></div>
+          <div class="connector">↓</div>
+          <div class="stage"><span>02 · 任务实时双目</span><b id="map">—</b><small id="riskCells">—</small></div>
+          <div class="connector">↓</div>
+          <div class="stage network"><span>03 · 地形网络</span><b id="network">等待目标</b><small id="networkMeta">—</small><small id="networkMemory">局部神经元与 RNN 记忆等待数据</small></div>
+          <div class="connector">↓</div>
+          <div class="stage"><span>04 · 路线和动作</span><b id="decision">—</b><small id="command">—</small></div>
+        </div>
+        <ul class="outcomes"><li id="crossed">跨坡 未结算</li><li id="detour">绕行 未触发</li><li id="safety">安全判定 —</li></ul>
+      </article>
+    </div>
+  </main>
+</body>
+</html>
